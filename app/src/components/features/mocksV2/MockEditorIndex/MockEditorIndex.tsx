@@ -15,16 +15,11 @@ import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAd
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
 import { FileType, MockType, RQMockCollection } from "../types";
 import { getMock } from "backend/mocks/getMock";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAttributes } from "store/selectors";
+import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { useRBAC } from "features/rbac";
 
@@ -47,10 +42,8 @@ const MockEditorIndex: React.FC<Props> = ({
   isEditorOpenInModal = false,
 }) => {
   const { mockId } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -63,7 +56,6 @@ const MockEditorIndex: React.FC<Props> = ({
   const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
   const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
 
-  const { claimIncentiveRewards } = useIncentiveActions();
   const [searchParams] = useSearchParams();
   const collectionId = searchParams.get("collectionId") || "";
 
@@ -114,27 +106,6 @@ const MockEditorIndex: React.FC<Props> = ({
         if (mockId) {
           toast.success("File created successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
-
-          claimIncentiveRewards({
-            type: IncentivizeEvent.MOCK_CREATED,
-            metadata: { num_mocks: userAttributes?.num_mocks || 1 },
-          })?.then((response) => {
-            if (response.data?.success) {
-              dispatch(
-                incentivizationActions.setUserMilestoneAndRewardDetails({
-                  userMilestoneAndRewardDetails: response.data?.data,
-                })
-              );
-
-              dispatch(
-                incentivizationActions.toggleActiveModal({
-                  modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                  newValue: true,
-                  newProps: { event: IncentivizeEvent.MOCK_CREATED },
-                })
-              );
-            }
-          });
 
           if (selectOnSave) {
             const url = generateFinalUrl({
