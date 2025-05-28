@@ -6,7 +6,7 @@ import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamMemberStatus, BillingTeamRoles, PlanType } from "features/settings/components/BillingTeam/types";
 import { BillingAction } from "./types";
 import { removeMemberFromBillingTeam, revokeBillingTeamInvite, updateBillingTeamMemberRole } from "backend/billing";
 import { ActionLoadingModal } from "componentsV2/modals/ActionLoadingModal";
@@ -43,6 +43,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
+  const subscriptionDetails = billingTeamDetails?.subscriptionDetails || {};
   const isUserAdmin =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
@@ -342,6 +343,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       handleRoleChange,
       checkIsPendingMember,
       getMemberRoleTag,
+      billingTeamDetails.browserstackGroupId,
     ]
   );
 
@@ -364,7 +366,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
               >
                 Manage Licenses
               </RQButton>
-            ) : (
+            ) : ![PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(subscriptionDetails?.rqSubscriptionType) ? (
               <RQButton
                 type="default"
                 icon={<IoMdAdd />}
@@ -374,7 +376,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
               >
                 Assign license
               </RQButton>
-            )}
+            ) : null}
           </Col>
         </Row>
         <Table

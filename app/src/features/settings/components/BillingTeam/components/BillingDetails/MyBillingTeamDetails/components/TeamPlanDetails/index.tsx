@@ -8,7 +8,7 @@ import { TeamPlanStatus } from "../../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamDetails, BillingTeamRoles, PlanType } from "features/settings/components/BillingTeam/types";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { trackBillingTeamActionClicked } from "features/settings/analytics";
@@ -108,7 +108,10 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             <Row align="middle" gutter={8}>
               <Col className="team-plan-details-section-plan-name">
                 {`${billingTeamDetails?.subscriptionDetails?.subscriptionStatus === "trialing" ? "Trial - " : ""}`}
-                {getPrettyPlanName(getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan))} team plan
+                {getPrettyPlanName(getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan))}
+                {billingTeamDetails?.subscriptionDetails?.rqSubscriptionType === PlanType.STUDENT
+                  ? " (Student Program)"
+                  : " team plan"}
               </Col>
               <Col>
                 <Popover
@@ -186,9 +189,11 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               <div>
                 <Col className="text-center caption">Plan renewal date</Col>
                 <Col className="mt-8 text-center text-bold header">
-                  {getLongFormatDateString(
-                    new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
-                  )}
+                  {billingTeamDetails?.subscriptionDetails?.rqSubscriptionType === PlanType.STUDENT
+                    ? "Lifetime access"
+                    : getLongFormatDateString(
+                        new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
+                      )}
                 </Col>
               </div>
             </div>

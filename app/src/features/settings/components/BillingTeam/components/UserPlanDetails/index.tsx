@@ -39,8 +39,9 @@ export const UserPlanDetails = () => {
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
   const { type } = user.details?.planDetails ?? {};
-  const isIndividualPlanType = PlanType.INDIVIDUAL === type;
-  const hasProfessionalStudentPlan = user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT;
+  const isIndividualPlanType = type === PlanType.INDIVIDUAL;
+  const hasProfessionalStudentPlan =
+    type === PlanType.STUDENT || user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT;
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
