@@ -24,7 +24,11 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Header rules are free and unlimited. They don't count toward your rule usage limits",
         },
         {
-          title: "5 Files",
+          title: "5 API Mock Endpoints",
+          enabled: true,
+        },
+        {
+          title: "5 Files (JS / CSS)",
           enabled: true,
         },
       ],
@@ -44,7 +48,11 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
-          title: "5 Files",
+          title: "5 API Mock Endpoints",
+          enabled: true,
+        },
+        {
+          title: "5 Files (JS / CSS)",
           enabled: true,
         },
         {
@@ -68,7 +76,11 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
-          title: "10 Files",
+          title: "10 API Mock Endpoints",
+          enabled: true,
+        },
+        {
+          title: "10 Files (JS / CSS)",
           enabled: true,
         },
         {
@@ -86,11 +98,19 @@ export const PricingFeatures: PlanFeatures = {
       heading: "For collaboration in teams",
       features: [
         {
-          title: "Unlimited rules",
+          title: "Unlimited Rules",
           enabled: true,
         },
         {
-          title: "Unlimited Files",
+          title: "Unlimited Groups",
+          enabled: true,
+        },
+        {
+          title: "Unlimited Mock Endpoints",
+          enabled: true,
+        },
+        {
+          title: "Unlimited Files (JS / CSS)",
           enabled: true,
         },
         {
