@@ -167,7 +167,12 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       <div className="environments-list-item__label">
         <Typography.Text
           ellipsis={{
-            tooltip: environment.name,
+            tooltip: {
+              title: environment.name,
+              placement: "right",
+              color: "#000",
+              mouseEnterDelay: 0.5,
+            },
           }}
         >
           {isGlobalEnvironment(environment.id) && <IoMdGlobe className="global-var-icon" />}
@@ -186,7 +191,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
                   </Link>
                 </span>
               }
-              placement="top"
+              placement="right"
               showArrow={false}
             >
               <span>
@@ -198,7 +203,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         <Tooltip
           overlayClassName="active-environment-tooltip"
           title="Active Environment"
-          placement="top"
+          placement="right"
           showArrow={false}
         >
           <span>
