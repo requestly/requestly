@@ -133,7 +133,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     }}
                   />
                 ) : (
-                  <div className="rq-breadcrumb-record-name">
+                  <div className="rq-breadcrumb-record-name" title={name || placeholder}>
                     <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                       {name || placeholder}
                     </Typography.Text>

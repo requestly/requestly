@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Tabs, TabsProps } from "antd";
+import { Tabs, TabsProps, Typography } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
@@ -89,7 +89,6 @@ export const TabsContainer: React.FC = () => {
         closable: false,
         label: (
           <div
-            title={tabState.title}
             className="tab-title-container"
             onDoubleClick={() => {
               if (tabState.preview) {
@@ -101,7 +100,19 @@ export const TabsContainer: React.FC = () => {
           >
             <div className="tab-title">
               {<div className="icon">{tabState.source.getIcon()}</div>}
-              <div className="title">{tabState.preview ? <i>{tabState.title}</i> : tabState.title}</div>
+              <Typography.Text
+                ellipsis={{
+                  tooltip: {
+                    title: tabState.title,
+                    placement: "bottom",
+                    color: "#000",
+                    mouseEnterDelay: 0.5,
+                  },
+                }}
+                className="title"
+              >
+                {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
+              </Typography.Text>
             </div>
 
             <div className="tab-actions">
