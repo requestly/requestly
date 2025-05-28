@@ -15,13 +15,13 @@ interface WindowsAndLinuxGatedHocProps {
   children: React.ReactNode;
 }
 
-type OsGatedFeatureFlagValue = {
+type FeatureFlagValue = {
   whitelist: string[];
 };
 
 export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = ({ children, featureName }) => {
   const appMode = useSelector(getAppMode);
-  const featureFlagValue = useFeatureValue<OsGatedFeatureFlagValue>("enable_api_client_by_os", {
+  const featureFlagValue = useFeatureValue<FeatureFlagValue>("enable_feature_by_os", {
     whitelist: ["macOS"],
   });
 
