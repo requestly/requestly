@@ -142,23 +142,19 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   }
 
   const sendNotification = useCallback(
-    (value: number) =>
-      debounce((value: number) => {
-        if (user.loggedIn) {
-          const salesInboundNotification = httpsCallable(
-            getFunctions(),
-            "premiumNotifications-salesInboundNotification"
-          );
-          try {
-            salesInboundNotification({
-              notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} triggered with quantity ${value} for plan ${planName} and source ${source}`,
-            });
-          } catch (error) {
-            console.error(error);
-          }
+    debounce((value: number) => {
+      if (user.loggedIn) {
+        const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
+        try {
+          salesInboundNotification({
+            notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} triggered with quantity ${value} for plan ${planName} and source ${source}`,
+          });
+        } catch (error) {
+          console.error(error);
         }
-      }, 4000),
-    [EVENTS.PRICING_QUANTITY_CHANGED, planName, source, user.loggedIn]
+      }
+    }, 4000),
+    [planName, source, user.loggedIn]
   );
 
   const handleQuantityChange = useCallback(
