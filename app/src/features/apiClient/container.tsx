@@ -12,12 +12,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
 
   if (!user.loggedIn) {
-    return (
-      <div className="api-client-container">
-        <APIClientSidebar />
-        <ApiClientLoggedOutView />
-      </div>
-    );
+    return <ApiClientLoggedOutView />;
   }
 
   return (
