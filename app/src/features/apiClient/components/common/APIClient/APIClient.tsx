@@ -19,6 +19,7 @@ import "./apiClient.scss";
 import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
+import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -102,13 +103,15 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        {user.loggedIn ? (
-          <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
-        ) : (
-          <ApiClientLoggedOutView />
-        )}
-      </BottomSheetProvider>
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+          {user.loggedIn ? (
+            <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+          ) : (
+            <ApiClientLoggedOutView />
+          )}
+        </BottomSheetProvider>
+      </WindowsAndLinuxGatedHoc>
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
