@@ -1,7 +1,7 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 export const useIsBrowserStackIntegrationOn = () => {
-  const isBrowserStackIntegrationEnabled = useFeatureIsOn("browserstack_integration");
+  const isBrowserStackIntegrationEnabled = useFeatureValue("browserstack_integration", true);
   // TODO: Add localStorage.get("forceBsIntegration") check when bookmarklet is implemented
   return isBrowserStackIntegrationEnabled;
 };

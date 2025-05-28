@@ -14,7 +14,7 @@ import GiftIcon from "../../../../assets/gift-icon.svg?react";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
 import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 interface PlanColumnProps {
@@ -44,7 +44,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const hasFiddledWithQuantity = useRef(false);
 
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
-  const isBrowserstackCheckoutEnabled = useFeatureIsOn("browserstack_checkout");
+  const isBrowserstackCheckoutEnabled = useFeatureValue("browserstack_checkout", true);
   const isAcceleratorProgramEnabled = useFeatureIsOn("display_accelerator_on_pricing");
 
   const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
