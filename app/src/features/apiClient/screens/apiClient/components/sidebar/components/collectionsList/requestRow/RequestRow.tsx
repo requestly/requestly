@@ -179,7 +179,6 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
       ) : (
         <div className={`request-row`}>
           <div
-            title={record.name || record.data.request?.url}
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
             onClick={() => {
               openTab(
@@ -210,7 +209,19 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
                 ? record.data.request?.method.slice(0, 3)
                 : record.data.request?.method}
             </Typography.Text>
-            <div className="request-url">{record.name || record.data.request?.url}</div>
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name || record.data.request?.url,
+                  placement: "right",
+                  color: "#000",
+                  mouseEnterDelay: 0.5,
+                },
+              }}
+              className="request-url"
+            >
+              {record.name || record.data.request?.url}
+            </Typography.Text>
 
             <Conditional condition={!isReadOnly}>
               <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
