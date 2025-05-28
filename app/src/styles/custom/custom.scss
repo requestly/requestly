@@ -620,3 +620,10 @@ div.react-multi-email .multi-email-tag {
   color: var(--requestly-color-text-default);
   --antd-arrow-background-color: var(--requestly-color-black);
 }
+
+// All tooltips to have sm font size
+.ant-tooltip-inner {
+  // Our -sm token has 13px value while DS has 12px
+  --font-size: 12px;
+  font-size: var(--font-size);
+}
