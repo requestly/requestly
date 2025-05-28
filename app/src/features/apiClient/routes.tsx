@@ -5,14 +5,17 @@ import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/co
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 import { ApiClientErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
+import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 
 export const apiClientRoutes: RouteObject[] = [
   {
     path: PATHS.API_CLIENT.RELATIVE + "/*",
     element: (
-      <ApiClientErrorBoundary>
-        <ApiClientFeatureContainer />
-      </ApiClientErrorBoundary>
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <ApiClientErrorBoundary>
+          <ApiClientFeatureContainer />
+        </ApiClientErrorBoundary>
+      </WindowsAndLinuxGatedHoc>
     ),
     handle: {
       breadcrumb: {
