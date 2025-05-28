@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserOS } from "utils/Misc";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { trackBlockerScreenViewed, trackGithubIssueClicked, trackUseChromeExtensionClicked } from "./analytics";
 import { snakeCase } from "lodash";
 import LINKS from "config/constants/sub/links";
@@ -15,24 +15,37 @@ interface WindowsAndLinuxGatedHocProps {
   children: React.ReactNode;
 }
 
+type OsGatedFeatureFlagValue = {
+  whitelist: string[];
+};
+
 export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = ({ children, featureName }) => {
   const appMode = useSelector(getAppMode);
-  const isFeatureFlagOn = useFeatureIsOn("block_for_windows_and_linux");
-  const os = getUserOS();
+  const featureFlagValue = useFeatureValue<OsGatedFeatureFlagValue>("enable_api_client_by_os", {
+    whitelist: ["macOS"],
+  });
 
+  const os = getUserOS();
   const isDesktopApp = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
-  const isWindowsOrLinux = ["Windows", "Linux"].includes(os);
-  const isGated = isFeatureFlagOn && isDesktopApp && isWindowsOrLinux;
+  const isWhitelisted = featureFlagValue?.whitelist?.includes(os);
 
   useEffect(() => {
-    if (!isGated) {
+    if (!isDesktopApp) {
+      return;
+    }
+
+    if (isWhitelisted) {
       return;
     }
 
     trackBlockerScreenViewed(snakeCase(featureName));
-  }, [isGated, featureName]);
+  }, [isDesktopApp, isWhitelisted, featureName]);
 
-  if (!isGated) {
+  if (!isDesktopApp) {
+    return children;
+  }
+
+  if (isWhitelisted) {
     return children;
   }
 
