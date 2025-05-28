@@ -1,6 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
-import { RQAPI } from "../../types";
+import { AbortReason, RQAPI } from "../../types";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { getHeadersAndQueryParams, getEffectiveAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 import {
@@ -18,6 +18,7 @@ import { trackAPIRequestSent } from "modules/analytics/events/features/apiClient
 import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./apiClientExecutorHelpers";
 import { isEmpty } from "lodash";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -44,7 +45,6 @@ export class ApiClientExecutor {
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
   prepareRequest() {
-    this.entryDetails.response = null;
     this.entryDetails.testResults = [];
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
@@ -139,6 +139,20 @@ export class ApiClientExecutor {
     );
   }
 
+  private buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiClientErrorType): RQAPI.ExecutionError {
+    const errorObject: RQAPI.ExecutionError = {
+      type,
+      source,
+      name: error.name,
+      message: error.message,
+    };
+    if (error instanceof UserAbortError) {
+      errorObject.reason = AbortReason.USER_CANCELLED;
+    }
+
+    return errorObject;
+  }
+
   updateEntryDetails(entryDetails: {
     entry: RQAPI.Entry;
     collectionId: RQAPI.Record["collectionId"];
@@ -181,16 +195,12 @@ export class ApiClientExecutor {
 
     try {
       this.preValidateRequest();
-    } catch (error) {
+    } catch (err) {
+      const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.PRE_VALIDATION);
       return {
         executedEntry: { ...this.entryDetails },
         status: RQAPI.ExecutionStatus.ERROR,
-        error: {
-          type: RQAPI.ApiClientErrorType.PRE_VALIDATION,
-          source: "request",
-          name: error.name,
-          message: error.message,
-        },
+        error,
       };
     }
     let preRequestScriptResult;
@@ -209,18 +219,18 @@ export class ApiClientExecutor {
           preRequestScriptResult.error.type,
           preRequestScriptResult.error.message
         );
+        const error = this.buildExecutionErrorObject(
+          preRequestScriptResult.error,
+          "Pre-request script",
+          RQAPI.ApiClientErrorType.SCRIPT
+        );
 
         return {
           executedEntry: {
             ...this.entryDetails,
           },
           status: RQAPI.ExecutionStatus.ERROR,
-          error: {
-            type: RQAPI.ApiClientErrorType.SCRIPT,
-            source: "Pre-request script",
-            name: preRequestScriptResult.error.name,
-            message: preRequestScriptResult.error.message,
-          },
+          error,
         };
       }
     }
@@ -232,16 +242,12 @@ export class ApiClientExecutor {
         has_scripts: Boolean(this.entryDetails.scripts?.preRequest),
         auth_type: this.entryDetails?.auth?.currentAuthType,
       });
-    } catch (e) {
+    } catch (err) {
+      const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.CORE);
       return {
         status: RQAPI.ExecutionStatus.ERROR,
         executedEntry: { ...this.entryDetails },
-        error: {
-          type: RQAPI.ApiClientErrorType.CORE,
-          source: "request",
-          name: e.name,
-          message: e.message,
-        },
+        error,
       };
     }
 
@@ -262,16 +268,16 @@ export class ApiClientExecutor {
           responseScriptResult.error.type,
           responseScriptResult.error.message
         );
+        const error = this.buildExecutionErrorObject(
+          responseScriptResult.error,
+          "Post-response script",
+          RQAPI.ApiClientErrorType.SCRIPT
+        );
 
         return {
           status: RQAPI.ExecutionStatus.ERROR,
           executedEntry: this.entryDetails,
-          error: {
-            type: RQAPI.ApiClientErrorType.SCRIPT,
-            source: "Post-response script",
-            name: responseScriptResult.error.name,
-            message: responseScriptResult.error.message,
-          },
+          error,
         };
       }
     }
@@ -302,26 +308,28 @@ export class ApiClientExecutor {
   async rerun(): Promise<RQAPI.RerunResult> {
     const preRequestScriptResult = await this.executePreRequestScript(async () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
+      const error = this.buildExecutionErrorObject(
+        preRequestScriptResult.error,
+        "Rerun Pre-request script",
+        RQAPI.ApiClientErrorType.SCRIPT
+      );
       return {
         status: RQAPI.ExecutionStatus.ERROR,
-        error: {
-          ...preRequestScriptResult.error,
-          source: "Rerun Pre-request script",
-          type: RQAPI.ApiClientErrorType.SCRIPT,
-        },
+        error,
       };
     }
 
     const responseScriptResult = await this.executePostResponseScript(async () => {});
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
+      const error = this.buildExecutionErrorObject(
+        responseScriptResult.error,
+        "Rerun Post-response script",
+        RQAPI.ApiClientErrorType.SCRIPT
+      );
       return {
         status: RQAPI.ExecutionStatus.ERROR,
-        error: {
-          ...responseScriptResult.error,
-          source: "Rerun Pre-request script",
-          type: RQAPI.ApiClientErrorType.SCRIPT,
-        },
+        error,
       };
     }
 
@@ -337,6 +345,6 @@ export class ApiClientExecutor {
   }
 
   abort() {
-    this.abortController.abort();
+    this.abortController.abort(AbortReason.USER_CANCELLED);
   }
 }
