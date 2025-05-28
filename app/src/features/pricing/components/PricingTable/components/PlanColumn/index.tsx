@@ -14,7 +14,7 @@ import GiftIcon from "../../../../assets/gift-icon.svg?react";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
 import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 interface PlanColumnProps {
@@ -44,7 +44,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const hasFiddledWithQuantity = useRef(false);
 
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
-  const isBrowserstackCheckoutEnabled = useFeatureIsOn("browserstack_checkout");
+  const isBrowserstackCheckoutEnabled = useFeatureValue("browserstack_checkout", true);
   const isAcceleratorProgramEnabled = useFeatureIsOn("display_accelerator_on_pricing");
 
   const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
@@ -142,19 +142,23 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   }
 
   const sendNotification = useCallback(
-    debounce((value: number) => {
-      if (user.loggedIn) {
-        const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
-        try {
-          salesInboundNotification({
-            notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} triggered with quantity ${value} for plan ${planName} and source ${source}`,
-          });
-        } catch (error) {
-          console.error(error);
+    (value: number) =>
+      debounce((value: number) => {
+        if (user.loggedIn) {
+          const salesInboundNotification = httpsCallable(
+            getFunctions(),
+            "premiumNotifications-salesInboundNotification"
+          );
+          try {
+            salesInboundNotification({
+              notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} triggered with quantity ${value} for plan ${planName} and source ${source}`,
+            });
+          } catch (error) {
+            console.error(error);
+          }
         }
-      }
-    }, 4000),
-    [planName, source, user.loggedIn]
+      }, 4000),
+    [EVENTS.PRICING_QUANTITY_CHANGED, planName, source, user.loggedIn]
   );
 
   const handleQuantityChange = useCallback(
