@@ -3,7 +3,7 @@ import { RQScriptWebWorker } from "../worker/implementation/RQScriptWebWorker";
 import { ScriptWorkload, WorkErrorType, WorkResult, WorkResultType } from "./workLoadTypes";
 import { buildAbortErrorObject, TaskAbortedError } from "modules/errors";
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
-import { AbortType } from "features/apiClient/types";
+import { AbortReason } from "features/apiClient/types";
 
 export class APIClientWorkloadManager {
   private workerPool: WorkerPool<RQScriptWebWorker>;
@@ -18,7 +18,7 @@ export class APIClientWorkloadManager {
   }
 
   private createAbortError(abortSignal: AbortSignal) {
-    if (abortSignal.reason === AbortType.USER_CANCELLED) {
+    if (abortSignal.reason === AbortReason.USER_CANCELLED) {
       return buildAbortErrorObject(new UserAbortError());
     }
     return buildAbortErrorObject(new TaskAbortedError());

@@ -1,5 +1,5 @@
 import React from "react";
-import { RQAPI } from "features/apiClient/types";
+import { AbortReason, RQAPI } from "features/apiClient/types";
 import { ApiClientErrorPlaceholder } from "./ErrorPlaceholder/ErrorPlaceholder";
 import { UserAbortErrorView } from "./UserAbortErrorView";
 
@@ -14,7 +14,7 @@ export const AbortError: React.FC<AbortErrorProps> = ({ error, onRetry, onDismis
     return null;
   }
 
-  if (error?.name === "UserAbortError") {
+  if (error.reason === AbortReason.USER_CANCELLED) {
     return <UserAbortErrorView error={error} handleDismiss={onDismiss} />;
   }
   return (

@@ -1,6 +1,6 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { AbortType, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortReason, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
@@ -12,7 +12,7 @@ import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sy
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 
 const createAbortError = (signal: AbortSignal) => {
-  if (signal.reason === AbortType.USER_CANCELLED) {
+  if (signal.reason === AbortReason.USER_CANCELLED) {
     return new UserAbortError();
   }
   return new Error("Request aborted");
