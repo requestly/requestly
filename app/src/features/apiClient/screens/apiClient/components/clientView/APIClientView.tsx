@@ -322,7 +322,6 @@ const APIClientView: React.FC<Props> = ({
         response: executedEntry.response,
         testResults: executedEntry.testResults,
       };
-      console.log("DBG entryWithResponse", entryWithResponse);
       setEntry(entryWithResponse);
 
       if (apiClientExecutionResult.status === "success") {

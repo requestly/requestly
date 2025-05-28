@@ -65,8 +65,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     );
   }, [testResults]);
 
-  console.log("DBG TABS", isLoading, isFailed, isRequestCancelled);
-
   const bottomSheetTabItems = useMemo(() => {
     const baseTabItems = [
       {
@@ -97,16 +95,16 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       });
     }
 
-    if (!response) {
-      if (isRequestCancelled) {
-        return baseTabItems.map((tabItem) => {
-          return {
-            ...tabItem,
-            children: <AbortError error={error} onRetry={executeRequest} onDismiss={onDismissError} />,
-          };
-        });
-      }
+    if (isRequestCancelled) {
+      return baseTabItems.map((tabItem) => {
+        return {
+          ...tabItem,
+          children: <AbortError error={error} onRetry={executeRequest} onDismiss={onDismissError} />,
+        };
+      });
+    }
 
+    if (!response) {
       if (isFailed) {
         return baseTabItems.map((tabItem) => {
           return {

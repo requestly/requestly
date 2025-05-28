@@ -44,7 +44,6 @@ export class ApiClientExecutor {
   constructor(private appMode: string, private workloadManager: APIClientWorkloadManager) {}
 
   prepareRequest() {
-    this.entryDetails.response = null;
     this.entryDetails.testResults = [];
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
