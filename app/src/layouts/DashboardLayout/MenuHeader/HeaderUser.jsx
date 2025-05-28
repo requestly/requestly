@@ -19,7 +19,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
-import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isSafariBrowser } from "actions/ExtensionActions";
@@ -104,7 +103,6 @@ export default function HeaderUser() {
               );
 
               getTabServiceActions().resetTabs();
-              dispatch(incentivizationActions.resetState());
             })
             .finally(() => setLoading(false));
         },
