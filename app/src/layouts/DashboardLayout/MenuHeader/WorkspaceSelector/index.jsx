@@ -101,7 +101,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
       title={tooltipTitle}
       placement={"bottomRight"}
       showArrow={false}
-      mouseEnterDelay={1}
+      mouseEnterDelay={0.5}
     >
       <Dropdown
         overlay={menu}
