@@ -43,7 +43,7 @@ const LoggedOutView = () => {
         ]}
       >
         <div className="api-client-logged-out-view_content">
-          <Typography.Title level={5}>Please sign in first to use API client</Typography.Title>
+          <Typography.Title level={5}>Please sign in to use API client</Typography.Title>
           <Typography.Text className="api-client-logged-out-view_description">
             Requestly API client requires an account for <span className="success">secure</span> workspace
             collaboration. A <span className="success">local-first</span> version is coming soon, and creating an
