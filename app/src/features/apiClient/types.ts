@@ -148,6 +148,7 @@ export namespace RQAPI {
     type: RQAPI.ApiClientErrorType;
     source: string;
     name: Error["name"];
+    reason?: string;
     message: Error["message"];
   };
 
@@ -236,4 +237,8 @@ export enum PostmanBodyMode {
   FORMDATA = "formdata",
   URL_ENCODED = "urlencoded",
   GRAPHQL = "graphql",
+}
+
+export enum AbortReason {
+  USER_CANCELLED = "user_cancelled",
 }

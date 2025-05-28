@@ -1,4 +1,6 @@
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 import { RQWorker } from "features/apiClient/helpers/modules/scriptsV2/worker/interface/RQWorker";
+import { AbortReason } from "features/apiClient/types";
 import { TaskAbortedError } from "modules/errors";
 
 export class WorkerPool<T extends RQWorker> {
@@ -25,6 +27,9 @@ export class WorkerPool<T extends RQWorker> {
   async acquire(abortSignal: AbortSignal) {
     if (this.busyWorkers.size < this.MAX_WORKERS) {
       if (abortSignal.aborted) {
+        if (abortSignal.reason === AbortReason.USER_CANCELLED) {
+          throw new UserAbortError();
+        }
         throw new TaskAbortedError();
       }
       const worker = this.spawnNewWorker();
