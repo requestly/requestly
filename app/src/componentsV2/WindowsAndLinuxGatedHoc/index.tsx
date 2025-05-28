@@ -5,7 +5,7 @@ import { getAppMode } from "store/selectors";
 import { getUserOS } from "utils/Misc";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { trackWindowsAndLinuxBlockerScreenViewed } from "./analytics";
+import { trackBlockerScreenViewed, trackGithubIssueClicked, trackUseChromeExtensionClicked } from "./analytics";
 import { snakeCase } from "lodash";
 import LINKS from "config/constants/sub/links";
 import "./windowsAndLinuxGatedHoc.scss";
@@ -29,7 +29,7 @@ export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = (
       return;
     }
 
-    trackWindowsAndLinuxBlockerScreenViewed(snakeCase(featureName));
+    trackBlockerScreenViewed(snakeCase(featureName));
   }, [isGated, featureName]);
 
   if (!isGated) {
@@ -61,7 +61,7 @@ export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = (
           <div className="action-btns">
             <RQButton
               onClick={() => {
-                // track event
+                trackGithubIssueClicked(snakeCase(featureName));
                 window.open("https://github.com/requestly/requestly/issues/3062", "_blank");
               }}
               icon={
@@ -79,7 +79,7 @@ export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = (
             <RQButton
               type="primary"
               onClick={() => {
-                // track event
+                trackUseChromeExtensionClicked(snakeCase(featureName));
                 window.open(LINKS.CHROME_EXTENSION, "_blank");
               }}
               icon={<img alt="Chrome logo" className="anticon" src={"/assets/media/common/chrome-white-logo.svg"} />}
