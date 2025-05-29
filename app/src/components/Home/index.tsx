@@ -3,9 +3,10 @@ import { Col, Row } from "antd";
 import { RulesCard } from "./components/RulesCard";
 import ApiClientCard from "./components/ApiClientCard";
 import UserAvatar from "../../assets/images/illustrations/avatar.svg?react";
-import "./home.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
+import { APIMockingCard } from "./components/APIMockingCard";
+import "./home.scss";
 
 export const Home: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -23,6 +24,7 @@ export const Home: React.FC = () => {
         <Row className="homepage-primary-cards-wrapper">
           <RulesCard />
           <ApiClientCard />
+          <APIMockingCard />
         </Row>
       </Col>
     </Col>

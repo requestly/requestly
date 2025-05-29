@@ -11,6 +11,7 @@ import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUplo
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { Conditional } from "components/common/Conditional";
 import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
+import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 
 interface CardProps {
   contentLoading?: boolean;
@@ -26,18 +27,16 @@ interface CardProps {
     primaryAction: React.ReactNode;
   };
   cardType: CardType;
-  title: string;
-  cardIcon: string;
   bodyTitle: string;
   actionButtons: React.ReactNode;
   contentList: Rule[] | AbstractTabSource[];
   listItemClickHandler: (listItem: Rule | AbstractTabSource) => void;
-  viewAllCta: string;
-  viewAllCtaLink: string;
-  viewAllCtaOnClick: () => void;
+  viewAllCta?: string;
+  viewAllCtaLink?: string;
+  viewAllCtaOnClick?: () => void;
   importOptions: {
     label: string;
-    icon: string;
+    icon: string | React.ReactNode;
     menu: DropDownProps["menu"]["items"];
   } | null;
 }
@@ -46,16 +45,14 @@ export const Card: React.FC<CardProps> = ({
   contentLoading,
   wrapperClass = "",
   emptyCardOptions,
-  cardType = "",
-  title = "",
-  cardIcon = "",
+  cardType,
   bodyTitle = "",
   actionButtons,
   contentList,
   listItemClickHandler,
-  viewAllCta,
-  viewAllCtaLink,
-  viewAllCtaOnClick,
+  viewAllCta = "",
+  viewAllCtaLink = "",
+  viewAllCtaOnClick = () => {},
   importOptions,
   showFooter = false,
   defaultImportClickHandler,
@@ -78,8 +75,10 @@ export const Card: React.FC<CardProps> = ({
           <div className={`content-container ${wrapperClass}`}>
             <div className="header-content">
               <div className="details">
-                <img src={cardIcon} alt={title} />
-                <h1>{title}</h1>
+                <div className="icon-container">
+                  <img src={PRODUCT_FEATURES[cardType].icon} alt={PRODUCT_FEATURES[cardType].title} />
+                </div>
+                <h1>{PRODUCT_FEATURES[cardType].title}</h1>
               </div>
 
               <div className="action-buttons">
@@ -117,16 +116,22 @@ export const Card: React.FC<CardProps> = ({
 
             <Conditional condition={showFooter}>
               <div className="footer-section">
-                <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
-                  {viewAllCta}
-                </Link>
+                {viewAllCtaLink ? (
+                  <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
+                    {viewAllCta}
+                  </Link>
+                ) : null}
 
                 {importOptions ? (
                   <div className="import-dropdown">
                     <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
                       <RQButton className="import-dropdown-button" type="transparent">
-                        <img src={importOptions.icon} alt={importOptions.label} />
-                        Import from other apps
+                        {typeof importOptions.icon === "string" ? (
+                          <img src={importOptions.icon} alt={importOptions.label} />
+                        ) : (
+                          importOptions.icon
+                        )}
+                        Import
                         <MdOutlineKeyboardArrowDown />
                       </RQButton>
                     </RQDropdown>

@@ -14,7 +14,7 @@ interface Props {
   playIcon: { src: string; label: string; url: string; onClick: () => void };
   importDropdownOptions: null | {
     label: string;
-    icon: string;
+    icon: string | ReactNode;
     menu: DropDownProps["menu"]["items"];
   };
 }
@@ -22,7 +22,6 @@ interface Props {
 export const HomepageEmptyCard: React.FC<Props> = ({
   icon,
   title,
-  description,
   features,
   primaryAction,
   playIcon,
@@ -42,7 +41,6 @@ export const HomepageEmptyCard: React.FC<Props> = ({
               <h1 className="homepage-emptycard-title">{title}</h1>
               {title === "API client" && <RQBadge badgeText="BETA" />}
             </div>
-            <p className="mt-8 text-center homepage-emptycard-description">{description}</p>
           </div>
         </div>
         <ul className="features">
@@ -62,7 +60,11 @@ export const HomepageEmptyCard: React.FC<Props> = ({
           <span className="import-dropdown-label">Import from</span>
           <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
             <RQButton>
-              <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
+              {typeof importDropdownOptions.icon === "string" ? (
+                <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
+              ) : (
+                importDropdownOptions.icon
+              )}
               {importDropdownOptions.label}
               <MdOutlineKeyboardArrowDown />
             </RQButton>

@@ -33,6 +33,7 @@
     justify-content: center;
     align-items: flex-start;
     margin-top: 40px;
+    padding-bottom: 12px;
 
     & > .ant-col {
       max-width: 49%;
@@ -139,6 +140,7 @@
   align-items: center;
   justify-content: center;
   margin-top: 16px;
+  margin-left: auto;
 
   &-label {
     margin-right: 12px;
@@ -196,6 +198,22 @@
       display: flex;
       align-items: center;
       gap: 12px;
+
+      .icon-container {
+        display: flex;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 32px;
+        background: var(--requestly-color-white-t-20);
+
+        img {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
 
       h1 {
         line-height: 20px;
@@ -292,7 +310,6 @@
     justify-content: space-between;
     align-items: center;
     border-radius: 0px 0px 16px 16px;
-    background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     .import-dropdown {
       display: flex;
@@ -304,9 +321,16 @@
         &:hover {
           background: none;
         }
+
         img {
           width: auto;
           height: auto;
+        }
+
+        svg {
+          --size: 16px;
+          width: var(--size);
+          height: var(--size);
         }
       }
     }

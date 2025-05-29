@@ -102,8 +102,6 @@ const ApiClientCard = () => {
       wrapperClass={`api-client-card`}
       cardType={CardType.API_CLIENT}
       defaultImportClickHandler={() => importTriggerHandler(ApiClientImporterType.REQUESTLY)}
-      title={"API Client"}
-      cardIcon={"/assets/media/apiClient/api-client-icon.svg"}
       importOptions={
         isValidPermission
           ? {

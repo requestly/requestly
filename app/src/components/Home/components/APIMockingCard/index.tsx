@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
@@ -25,15 +25,13 @@ import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
 import { CardType } from "../Card/types";
-import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
-import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
-import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import { ImporterType } from "components/Home/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
-import "./rulesCard.scss";
+import "./apiMockingCard.scss";
+import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 
-export const RulesCard = () => {
+export const APIMockingCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 5;
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -46,50 +44,52 @@ export const RulesCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission("http_rule", "create");
+  const { isValidPermission: isValidPermissionForRules } = validatePermission("http_rule", "create");
+  const { isValidPermission: isValidPermissionForMocks } = validatePermission("mock_api", "create");
+  const isValidPermission = isValidPermissionForRules && isValidPermissionForMocks;
 
   const onRulesDrawerClose = () => {
     setIsRulesDrawerOpen(false);
   };
 
-  const importTriggerHandler = useCallback(
-    (modal: ImporterType) => {
-      if (modal === ImporterType.REQUESTLY && !user?.details?.isLoggedIn) {
-        dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
-      } else {
+  const importTriggerHandler = (modal: ImporterType.REQUESTLY | ImporterType.FILES): void => {
+    if (!user?.details?.isLoggedIn) {
+      dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      return;
+    }
+
+    switch (modal) {
+      case ImporterType.REQUESTLY: {
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
         trackHomeRulesActionClicked(
           `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
         );
+        return;
       }
-    },
-    [dispatch, navigate, user?.details?.isLoggedIn]
-  );
+      case ImporterType.FILES: {
+        navigate(PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE, { state: { modal } });
+        trackHomeRulesActionClicked(
+          `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
+        );
+        return;
+      }
+      default: {
+        return null;
+      }
+    }
+  };
 
   const IMPORT_OPTIONS = [
     {
-      key: "1",
-      label: "Charles Proxy",
-      icon: <Charles />,
-      onClick: () => importTriggerHandler(ImporterType.CHARLES),
-    },
-    {
-      key: "2",
-      label: "Resource Override",
-      icon: <ResourceOverride />,
-      onClick: () => importTriggerHandler(ImporterType.RESOURCE_OVERRIDE),
-    },
-    {
-      key: "3",
-      label: "ModHeader",
-      icon: <ModHeader />,
-      onClick: () => importTriggerHandler(ImporterType.MOD_HEADER),
-    },
-    {
-      key: "4",
-      label: "Requestly",
-      icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
+      key: "0",
+      label: "Import rules",
       onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+    },
+
+    {
+      key: "1",
+      label: "Import mocks",
+      onClick: () => importTriggerHandler(ImporterType.FILES),
     },
   ];
 
@@ -118,7 +118,7 @@ export const RulesCard = () => {
   return (
     <Card
       contentLoading={isLoading || isRulesLoading}
-      cardType={CardType.RULES}
+      cardType={CardType.API_MOCKING}
       defaultImportClickHandler={() => importTriggerHandler(ImporterType.REQUESTLY)}
       showFooter={isValidPermission}
       importOptions={
@@ -126,7 +126,7 @@ export const RulesCard = () => {
           ? {
               menu: IMPORT_OPTIONS,
               label: "Charles, ModHeader, & more",
-              icon: "/assets/media/rules/import-icon.svg",
+              icon: <MdOutlineFileDownload />,
             }
           : null
       }
@@ -135,9 +135,6 @@ export const RulesCard = () => {
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
         redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
       }}
-      viewAllCta={"View all rules"}
-      viewAllCtaLink={PATHS.RULES.MY_RULES.ABSOLUTE}
-      viewAllCtaOnClick={() => trackHomeRulesActionClicked("view_all_rules")}
       actionButtons={
         <RuleSelectionListDrawer
           open={isRulesDrawerOpen}
@@ -166,15 +163,15 @@ export const RulesCard = () => {
           </RBACButton>
         </RuleSelectionListDrawer>
       }
-      bodyTitle="Recent rules"
-      wrapperClass="rules-card"
+      bodyTitle="Recent mocks and rules"
+      wrapperClass="api-mocking-card"
       contentList={rules?.map((rule: Rule) => ({
         icon: ruleIcons[rule.ruleType as RuleType],
         title: rule.name,
         ...rule,
       }))}
       emptyCardOptions={{
-        ...PRODUCT_FEATURES.RULES,
+        ...PRODUCT_FEATURES.API_MOCKING,
         primaryAction: (
           <RoleBasedComponent
             resource="http_rule"
