@@ -29,6 +29,22 @@ import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { Dropdown, MenuProps } from "antd";
 import "./apiMockingCard.scss";
 
+const APIMockingCardDropdownItem: React.FC<{ icon: string; title: string; description: string }> = ({
+  icon,
+  title,
+  description,
+}) => {
+  return (
+    <div className="api-mocking-card-importer-item">
+      <div className="title-container">
+        <img src={icon} alt={title} />
+        <div className="title">{title}</div>
+      </div>
+      <div className="description">{description}</div>
+    </div>
+  );
+};
+
 export const APIMockingCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 5;
   const navigate = useNavigate();
@@ -66,6 +82,8 @@ export const APIMockingCard: React.FC = () => {
       }
       case ImporterType.FILES: {
         navigate(PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE, { state: { modal } });
+
+        // TODO: update the analytics event
         trackHomeRulesActionClicked(
           `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
         );
@@ -80,13 +98,29 @@ export const APIMockingCard: React.FC = () => {
   const items: MenuProps["items"] = [
     {
       key: "0",
-      label: "Modify live API responses",
-      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+      label: (
+        <APIMockingCardDropdownItem
+          icon="/assets/media/home/modify-response.svg"
+          title="Modify live API responses"
+          description="Use “Modify API Response” feature to intercept & override API responses on the fly."
+        />
+      ),
+      onClick: () => {
+        navigate(PATHS.RULE_EDITOR.CREATE_RULE.RESPONSE_RULE.ABSOLUTE, { state: { source: SOURCE.HOME_SCREEN } });
+      },
     },
     {
-      key: "0",
-      label: "Create Mock endpoints in Cloud",
-      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+      key: "1",
+      label: (
+        <APIMockingCardDropdownItem
+          icon="/assets/media/home/create-mock.svg"
+          title="Create Mock endpoints in Cloud"
+          description="Use “File Server” feature to create a new Mock endpoint that serves the desired API responses."
+        />
+      ),
+      onClick: () => {
+        navigate(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE, { state: { source: SOURCE.HOME_SCREEN } });
+      },
     },
   ];
 
@@ -136,7 +170,12 @@ export const APIMockingCard: React.FC = () => {
         showArrow={false}
         title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
       >
-        <Dropdown disabled={!isValidPermission} overlayClassName="more-options" menu={{ items }} trigger={["click"]}>
+        <Dropdown
+          disabled={!isValidPermission}
+          placement="bottomRight"
+          overlayClassName="more-options api-mocking-card-dropdown"
+          menu={{ items }}
+        >
           <RQButton type="primary" size="small">
             New mock
           </RQButton>

@@ -1,0 +1,48 @@
+.api-mocking-card-dropdown.more-options {
+  max-width: 328px;
+
+  ul.ant-dropdown-menu {
+    padding: var(--space-4, 8px);
+
+    li.ant-dropdown-menu-item {
+      width: auto;
+      margin: 0;
+      padding: var(--space-5, 12px);
+    }
+  }
+
+  .api-mocking-card-importer-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-4, 8px);
+
+    .title-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      img {
+        --size: 16px;
+        width: var(--size);
+        height: var(--size);
+      }
+
+      .title {
+        color: var(--requestly-color-text-default, #fff);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px; /* 150% */
+      }
+    }
+
+    .description {
+      color: var(--requestly-color-text-default, #fff);
+      font-size: var(--requestly-font-size-xs, 11px);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 17px; /* 154.545% */
+    }
+  }
+}
