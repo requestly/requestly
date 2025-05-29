@@ -20,8 +20,10 @@ export const MyBillingTeamDetails: React.FC = () => {
 
   const showBillingActions = useMemo(
     () =>
-      ![PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(billingTeamDetails?.subscriptionDetails?.rqSubscriptionType),
-    [billingTeamDetails?.subscriptionDetails?.rqSubscriptionType]
+      ![PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(
+        billingTeamDetails?.subscriptionDetails?.rqSubscriptionType
+      ) || billingTeamDetails?.subscriptionDetails?.plan !== "lite",
+    [billingTeamDetails?.subscriptionDetails?.plan, billingTeamDetails?.subscriptionDetails?.rqSubscriptionType]
   );
 
   if (!billingTeamDetails) return null;
