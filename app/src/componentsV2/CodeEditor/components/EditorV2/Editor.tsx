@@ -29,7 +29,7 @@ import "./components/PopOver/popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 // import {draftPluginForCompletions} from "./draftPlugin"
-// import allDraftExtensions from "./draftPlugin"
+import allDraftExtensions from "./draftPlugin";
 interface EditorProps {
   isScripts?: boolean; // Used to determine if the editor is used for scripts
   value: string;
@@ -274,7 +274,7 @@ const Editor: React.FC<EditorProps> = ({
         customKeyBinding,
         EditorView.lineWrapping,
         // isScripts ? draftPluginForCompletions() : null,
-        // isScripts ? allDraftExtensions : null,
+        ...allDraftExtensions,
         envVariables
           ? highlightVariablesPlugin(
               {
