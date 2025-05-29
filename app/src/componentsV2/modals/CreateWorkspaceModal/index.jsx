@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "@sentry/react";
+
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
@@ -131,6 +133,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         toggleModal();
       } catch (err) {
         toast.error("Unable to Create Team");
+        Sentry.captureException("Create Team Failure");
         trackNewTeamCreateFailure(newTeamName);
       } finally {
         setIsLoading(false);
