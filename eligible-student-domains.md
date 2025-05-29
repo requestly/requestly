@@ -44,5 +44,6 @@ The following domains are eligible for the student programme:
     "edu.co",
     "hunterschools.org",
     "epitech.eu"
+    "strayer.edu"
   ]
 }
