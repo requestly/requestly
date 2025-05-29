@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Outlet, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
@@ -21,16 +21,6 @@ export const BillingTeamContainer: React.FC = () => {
   const billingTeams = useSelector(getAvailableBillingTeams);
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const joinRequestAction = queryParams.get("joinRequestAction");
-
-  const isBillingTeamSidebarVisible = useMemo(() => {
-    if (
-      billingTeams.length > 1 ||
-      (billingTeams.length === 1 && billingTeams.some((team) => !(user?.details?.profile?.uid in team.members)))
-    ) {
-      return true;
-    }
-    return false;
-  }, [billingTeams, user?.details?.profile?.uid]);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -99,11 +89,9 @@ export const BillingTeamContainer: React.FC = () => {
   return (
     <div className="billing-team-container">
       <div>
-        {isBillingTeamSidebarVisible && (
-          <SettingsSecondarySidebar>
-            <BillingTeamsSidebar billingTeams={billingTeams} />
-          </SettingsSecondarySidebar>
-        )}
+        <SettingsSecondarySidebar>
+          <BillingTeamsSidebar billingTeams={billingTeams} />
+        </SettingsSecondarySidebar>
       </div>
       <div className="billing-team-content-wrapper">
         {renderBillingTeamContent()}
