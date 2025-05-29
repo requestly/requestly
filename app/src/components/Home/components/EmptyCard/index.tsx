@@ -1,24 +1,14 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { RQDropdown } from "lib/design-system/components";
-import { DropDownProps } from "antd";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PRODUCT_FEATURES } from "./staticData";
 import { RQButton } from "lib/design-system-v2/components";
+import { EmptyCardOptions, ImportOptions } from "../Card/types";
 import "./EmptyCard.scss";
 
-interface Props {
-  icon: string;
-  title: string;
-  features: string[];
-  description?: string;
-  primaryAction?: ReactNode;
-  playDetails: { icon: ReactNode; label: string; url: string; onClick: () => void };
-  importDropdownOptions: null | {
-    label: string;
-    icon: string | ReactNode;
-    menu: DropDownProps["menu"]["items"];
-  };
+interface Props extends EmptyCardOptions {
+  importDropdownOptions: ImportOptions;
 }
 
 export const HomepageEmptyCard: React.FC<Props> = ({
@@ -47,8 +37,8 @@ export const HomepageEmptyCard: React.FC<Props> = ({
           <div className="action-buttons">{primaryAction}</div>
         </div>
         <ul className="features">
-          {features.map((feature) => (
-            <li>{feature}</li>
+          {features.map((feature, index) => (
+            <li key={index}>{feature}</li>
           ))}
         </ul>
         <a className="play-icon" href={playDetails.url} target="__blank" onClick={playDetails.onClick}>

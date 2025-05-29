@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
@@ -18,7 +17,7 @@ import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/compon
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
-import { CardType } from "../Card/types";
+import { CardListItem, CardType } from "../Card/types";
 import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
 import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
 import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
@@ -36,7 +35,6 @@ export const RulesCard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const isRulesListLoading = useSelector(getIsRulesListLoading);
   const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("http_rule", "create");
@@ -45,7 +43,18 @@ export const RulesCard = () => {
   const rulesToShow = useMemo(() => {
     return rules
       ?.sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
-      ?.slice(0, MAX_RULES_TO_SHOW + 1);
+      ?.slice(0, MAX_RULES_TO_SHOW + 1)
+      .map(
+        (rule: Rule): CardListItem => {
+          return {
+            id: rule.id,
+            title: rule.name,
+            icon: ruleIcons[rule.ruleType as RuleType],
+            type: rule.ruleType,
+            url: "",
+          };
+        }
+      );
   }, [rules]);
 
   const onRulesDrawerClose = () => {
@@ -139,8 +148,8 @@ export const RulesCard = () => {
 
   return (
     <Card
-      contentLoading={isRulesLoading || isRulesListLoading}
       cardType={CardType.RULES}
+      contentLoading={isRulesLoading}
       showFooter={isValidPermission}
       importOptions={
         isValidPermission
@@ -151,9 +160,10 @@ export const RulesCard = () => {
             }
           : null
       }
-      listItemClickHandler={(item: Rule) => {
+      contentList={rulesToShow}
+      listItemClickHandler={(item) => {
         trackHomeRulesActionClicked("rule_clicked");
-        trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
+        trackRuleCreationWorkflowStartedEvent(item.type, SOURCE.HOME_SCREEN);
         redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
       }}
       viewAllCta={"View all rules"}
@@ -161,11 +171,6 @@ export const RulesCard = () => {
       viewAllCtaOnClick={() => trackHomeRulesActionClicked("view_all_rules")}
       bodyTitle="Recent rules"
       wrapperClass="rules-card"
-      contentList={rulesToShow?.map((rule: Rule) => ({
-        icon: ruleIcons[rule.ruleType as RuleType],
-        title: rule.name,
-        ...rule,
-      }))}
       actionButtons={actionButtons}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.RULES,

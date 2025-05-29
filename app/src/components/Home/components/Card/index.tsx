@@ -1,15 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { DropDownProps, Spin } from "antd";
+import { Spin } from "antd";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
-import { CardType } from "./types";
-import { Rule } from "@requestly/shared/types/entities/rules";
+import { CardListItem, CardType, EmptyCardOptions, ImportOptions } from "./types";
 import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { Conditional } from "components/common/Conditional";
-import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { useHomeScreenContext } from "components/Home/contexts";
 
@@ -17,27 +15,16 @@ interface CardProps {
   contentLoading?: boolean;
   showFooter?: boolean;
   wrapperClass?: string;
-  emptyCardOptions: {
-    title: string;
-    description: string;
-    icon: string;
-    features: string[];
-    playDetails: { icon: React.ReactNode; label: string; url: string; onClick: () => void };
-    primaryAction: React.ReactNode;
-  };
+  emptyCardOptions: EmptyCardOptions;
   cardType: CardType;
   bodyTitle: string;
   actionButtons: React.ReactNode;
-  contentList: Rule[] | AbstractTabSource[];
-  listItemClickHandler: (listItem: Rule | AbstractTabSource) => void;
+  contentList: CardListItem[];
+  listItemClickHandler: (listItem: CardListItem) => void;
   viewAllCta?: string;
   viewAllCtaLink?: string;
   viewAllCtaOnClick?: () => void;
-  importOptions: {
-    label: string;
-    icon: string | React.ReactNode;
-    menu: DropDownProps["menu"]["items"];
-  } | null;
+  importOptions: ImportOptions;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -62,7 +49,7 @@ export const Card: React.FC<CardProps> = ({
     return (
       <AnimatePresence>
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
-          <Spin tip={`Getting your ${cardType === CardType.API_CLIENT ? "requests" : "rules"} ready...`} size="large" />
+          <Spin size="small" tip="Getting your records ready..." />
         </m.div>
       </AnimatePresence>
     );
@@ -96,23 +83,12 @@ export const Card: React.FC<CardProps> = ({
       <div className="middle-section">
         <h2>{bodyTitle}</h2>
         <div className="list">
-          {contentList
-            .slice(0, MAX_LIST_ITEMS_TO_SHOW)
-            .map((listItem: Rule & { icon: string; title: string } & AbstractTabSource, index: number) => (
-              <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
-                {listItem?.ruleType ? (
-                  <>
-                    <div className="list-item-icon">{listItem.icon}</div>
-                    <p className="item-title">{listItem.title}</p>
-                  </>
-                ) : (
-                  <>
-                    <div className="list-item-icon">{listItem.icon}</div>
-                    <p className="item-title">{listItem.metadata?.title}</p>
-                  </>
-                )}
-              </div>
-            ))}
+          {contentList.slice(0, MAX_LIST_ITEMS_TO_SHOW).map((listItem, index: number) => (
+            <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
+              <div className="list-item-icon">{listItem.icon}</div>
+              <p className="item-title">{listItem.title}</p>
+            </div>
+          ))}
         </div>
       </div>
     ) : (

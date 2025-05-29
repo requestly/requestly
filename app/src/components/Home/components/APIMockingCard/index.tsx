@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useHasChanged } from "hooks";
-import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { StorageService } from "init";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { redirectToMockEditorEditMock, redirectToRuleEditor } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
-import Logger from "lib/logger";
-import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
@@ -19,13 +12,15 @@ import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
-import { CardType } from "../Card/types";
+import { CardListItem, CardType } from "../Card/types";
 import { ImporterType } from "components/Home/types";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { useRBAC } from "features/rbac";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { Dropdown, MenuProps } from "antd";
+import { useHomeScreenContext } from "components/Home/contexts";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
 import "./apiMockingCard.scss";
 
 const APIMockingCardDropdownItem: React.FC<{ icon: string; title: string; description: string }> = ({
@@ -48,17 +43,47 @@ export const APIMockingCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 5;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const user = useSelector(getUserAuthDetails);
-  const isRulesLoading = useSelector(getIsRulesListLoading);
-  const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
-  const [rules, setRules] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const { validatePermission } = useRBAC();
   const { isValidPermission: isValidPermissionForRules } = validatePermission("http_rule", "create");
   const { isValidPermission: isValidPermissionForMocks } = validatePermission("mock_api", "create");
   const isValidPermission = isValidPermissionForRules && isValidPermissionForMocks;
+
+  const { rules, isRulesLoading, isFetchingMocks, mockRecords } = useHomeScreenContext();
+
+  const responseRules = useMemo(() => {
+    return rules.filter((rule: Rule) => rule.ruleType === RuleType.RESPONSE);
+  }, [rules]);
+
+  const records = useMemo(() => {
+    return ([...responseRules, ...mockRecords] as (Rule | RQMockMetadataSchema)[])
+      .map(
+        (record): CardListItem => {
+          if ("ruleType" in record) {
+            return {
+              id: record.id,
+              title: record.name,
+              icon: ruleIcons[record.ruleType as RuleType],
+              type: record.ruleType,
+              modificationDate: record.modificationDate,
+              url: `${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`,
+            };
+          }
+
+          // mock
+          return {
+            id: record.id,
+            title: record.name,
+            icon: <IoDocumentTextOutline />,
+            type: record.type,
+            modificationDate: Number(record.updatedTs),
+            url: `${PATHS.MOCK_SERVER_V2.EDIT.ABSOLUTE}/${record.id}`, // check navigation
+          };
+        }
+      )
+      ?.sort((a, b) => b.modificationDate - a.modificationDate)
+      ?.slice(0, MAX_RULES_TO_SHOW + 1);
+  }, [responseRules, mockRecords]);
 
   const importTriggerHandler = (modal: ImporterType.REQUESTLY | ImporterType.FILES): void => {
     if (!user?.details?.isLoggedIn) {
@@ -131,28 +156,6 @@ export const APIMockingCard: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    if (isExtensionInstalled() && !isRulesLoading) {
-      StorageService(appMode)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-        .then((res) => {
-          setRules(
-            res
-              .sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
-              .slice(0, MAX_RULES_TO_SHOW + 1)
-          );
-        })
-        .catch((e) => {
-          Logger.log(e);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, [appMode, activeWorkspaceId, hasUserChanged, isRulesLoading]);
-
   const newMockDropdown = (
     <RQTooltip
       showArrow={false}
@@ -173,32 +176,33 @@ export const APIMockingCard: React.FC = () => {
 
   return (
     <Card
-      contentLoading={isLoading || isRulesLoading}
       cardType={CardType.API_MOCKING}
+      contentLoading={isRulesLoading || isFetchingMocks}
       showFooter={isValidPermission}
       importOptions={
         isValidPermission
           ? {
               menu: IMPORT_OPTIONS,
-              label: "Requestly Mocks and Rules",
+              label: "Requestly Rules and Mocks",
               icon: <MdOutlineFileDownload />,
             }
           : null
       }
-      listItemClickHandler={(item: Rule) => {
-        // TODO: update the analytics event
-        trackHomeRulesActionClicked("rule_clicked");
-        trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
-        redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
-      }}
       actionButtons={newMockDropdown}
-      bodyTitle="Recent mocks and rules"
+      bodyTitle="Recent rules and mocks"
       wrapperClass="api-mocking-card"
-      contentList={rules?.map((rule: Rule) => ({
-        icon: ruleIcons[rule.ruleType as RuleType],
-        title: rule.name,
-        ...rule,
-      }))}
+      contentList={records}
+      listItemClickHandler={(item) => {
+        // TODO: update analytics event
+        if (item.type === RuleType.RESPONSE) {
+          trackHomeRulesActionClicked("rule_clicked");
+          trackRuleCreationWorkflowStartedEvent(item.type, SOURCE.HOME_SCREEN);
+          redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
+        } else if (item.type === MockType.API) {
+          // TODO: update analytics event
+          redirectToMockEditorEditMock(navigate, item.id);
+        }
+      }}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_MOCKING,
         primaryAction: newMockDropdown,

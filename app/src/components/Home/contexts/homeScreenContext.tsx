@@ -10,17 +10,27 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Rule } from "@requestly/shared/types/entities/rules";
 import Logger from "lib/logger";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { useFetchMockRecords } from "features/mocks/screens/mocksList/components/MocksList/hooks/useFetchMockRecords";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 
 interface HomeScreenContextInterface {
+  // rules
   rules: Rule[];
   isRulesLoading: boolean;
   isAnyRecordExist: boolean;
+
+  // mocks
+  isFetchingMocks: boolean;
+  mockRecords: RQMockMetadataSchema[];
 }
 
 const HomeScreenContext = createContext<HomeScreenContextInterface>({
   rules: [],
   isRulesLoading: false,
   isAnyRecordExist: false,
+
+  isFetchingMocks: false,
+  mockRecords: [],
 });
 
 interface HomeScreenProviderProps {
@@ -36,7 +46,7 @@ export const HomeScreenProvider: React.FC<HomeScreenProviderProps> = ({ children
   const [rules, setRules] = useState<Rule[]>([]);
   const [isRulesLoading, setIsRulesLoading] = useState(true);
   const [tabs] = useTabServiceWithSelector((state) => [state.tabs]);
-  const isAnyRecordExist = rules.length > 0 || tabs.size > 0;
+  const { isLoading: isFetchingMocks, mockRecords } = useFetchMockRecords(MockType.API, false);
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesListLoading) {
@@ -56,7 +66,14 @@ export const HomeScreenProvider: React.FC<HomeScreenProviderProps> = ({ children
     }
   }, [appMode, activeWorkspaceId, hasUserChanged, isRulesListLoading]);
 
-  const value = { rules, isRulesLoading, isAnyRecordExist };
+  const isAnyRecordExist = rules.length > 0 || tabs.size > 0 || mockRecords.length > 0;
+  const value = {
+    rules,
+    isRulesLoading: isRulesLoading || isRulesListLoading,
+    isAnyRecordExist,
+    isFetchingMocks,
+    mockRecords,
+  };
 
   return <HomeScreenContext.Provider value={value}>{children}</HomeScreenContext.Provider>;
 };
