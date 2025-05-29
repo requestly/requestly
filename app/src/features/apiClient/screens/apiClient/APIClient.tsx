@@ -96,9 +96,9 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
 
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.Entry) => {
-      if (!isHistoryPath) addToHistory(entry);
+      addToHistory(entry);
     },
-    [addToHistory, isHistoryPath]
+    [addToHistory]
   );
 
   if (!entryDetails && !isCreateMode && !isHistoryPath) {
