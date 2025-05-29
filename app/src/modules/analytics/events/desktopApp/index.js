@@ -29,8 +29,8 @@ export const trackProxyReStartedEvent = () => {
 };
 
 export const trackDesktopAppStartedEvent = () => {
-  const os = getUserOS();
-  const params = { os };
+  const detectedOS = getUserOS();
+  const params = { detectedOS };
   trackEvent(DESKTOP_APP_STARTED, params);
 };
 
