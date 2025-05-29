@@ -5,6 +5,8 @@ import ProCard from "@ant-design/pro-card";
 import { Button, Col, Form, Input, Row, Typography } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from "react-router-dom";
+import * as Sentry from "@sentry/react";
+
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
@@ -65,6 +67,11 @@ const CreateWorkspace = () => {
       })
       .catch((err) => {
         toast.error("Unable to Create Team");
+        Sentry.captureException("Create Team Failure", {
+          extra: {
+            message: err.message,
+          },
+        });
         trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
         setIsSubmitProcess(false);
       });
