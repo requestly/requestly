@@ -189,11 +189,9 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               <div>
                 <Col className="text-center caption">Plan renewal date</Col>
                 <Col className="mt-8 text-center text-bold header">
-                  {billingTeamDetails?.subscriptionDetails?.rqSubscriptionType === PlanType.STUDENT
-                    ? "Lifetime access"
-                    : getLongFormatDateString(
-                        new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
-                      )}
+                  {getLongFormatDateString(
+                    new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
+                  )}
                 </Col>
               </div>
             </div>

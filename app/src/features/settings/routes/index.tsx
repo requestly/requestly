@@ -14,6 +14,7 @@ import { OrgMembersView } from "../components/OrgMembers/OrgMembers";
 import Profile from "../components/Profile/ManageAccount";
 import { BillingTeamDetails } from "../components/BillingTeam/components/BillingDetails";
 import { BillingList } from "../components/BillingTeam/components/BillingList";
+import { UserPlanDetails } from "../components/BillingTeam/components/UserPlanDetails";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -58,10 +59,13 @@ export const settingRoutes: RouteObject[] = [
           },
         ],
       },
-
       {
         path: PATHS.SETTINGS.PROFILE.RELATIVE,
         element: <ProtectedRoute component={Profile} />,
+      },
+      {
+        path: PATHS.SETTINGS.MY_PLAN.RELATIVE,
+        element: <ProtectedRoute component={UserPlanDetails} />,
       },
     ],
   },

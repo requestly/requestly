@@ -85,6 +85,12 @@ export const SettingsPrimarySidebar: React.FC = () => {
             path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
           },
           {
+            id: "my-plan",
+            name: "My Plan",
+            path: PATHS.SETTINGS.MY_PLAN.RELATIVE,
+            ishidden: !user.loggedIn,
+          },
+          {
             id: "billing",
             name: "Billing",
             path: PATHS.SETTINGS.BILLING.RELATIVE,

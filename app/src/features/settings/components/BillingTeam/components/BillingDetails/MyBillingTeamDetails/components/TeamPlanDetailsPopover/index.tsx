@@ -5,7 +5,7 @@ import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { PricingFeatures } from "features/pricing";
 import { PRICING } from "features/pricing";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
-import { BillingTeamDetails, PlanType } from "features/settings/components/BillingTeam/types";
+import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 // import { PricingPlans } from "features/pricing";
 
 interface Props {
@@ -50,7 +50,7 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ billingTeamDetails, cl
           ))}
         </Col>
       </Col>
-      {!billingTeamDetails?.browserstackGroupId && planDetails?.rqSubscriptionType !== PlanType.STUDENT ? (
+      {!billingTeamDetails?.browserstackGroupId ? (
         <Col className="team-plan-popover-footer">
           <div className="team-plan-popover-footer-section">
             <Col>Plan start date</Col>
