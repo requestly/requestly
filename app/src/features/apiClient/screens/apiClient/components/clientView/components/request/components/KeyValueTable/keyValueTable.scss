@@ -29,6 +29,12 @@
     }
   }
 
+  .key-value-table-input-container {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+  }
+
   .key-value-table-input {
     border: 1px solid transparent;
     background: transparent;

@@ -8,34 +8,45 @@ import { RQAPI } from "../../../../../../types";
  */
 export class RequestBodyStateManager {
   private text: string;
-  private form: KeyValuePair[];
+  private formUrlEncoded: KeyValuePair[];
+  private multipartForm: KeyValuePair[];
 
   constructor(params: RQAPI.RequestBodyContainer) {
     // defaults are set since some databases like firestore don't handle "undefined"
     this.text = params?.text || "";
-    this.form = params?.form || [];
+    this.formUrlEncoded = params?.formURLEncoded || [];
+    this.multipartForm = params?.multipartForm || [];
   }
 
   setText(text: string) {
     this.text = text;
   }
 
-  setForm(form: KeyValuePair[]) {
-    this.form = form;
+  setFormUrlEncoded(formUrlEncoded: KeyValuePair[]) {
+    this.formUrlEncoded = formUrlEncoded;
+  }
+
+  setMultiPartForm(multipartForm: KeyValuePair[]) {
+    this.multipartForm = multipartForm;
   }
 
   getText() {
     return this.text;
   }
 
-  getForm() {
-    return this.form;
+  getFormUrlEncoded() {
+    return this.formUrlEncoded;
+  }
+
+  getMultiPartForm() {
+    return this.multipartForm;
   }
 
   serialize(): RQAPI.RequestBodyContainer {
     return {
       text: this.text,
-      form: this.form,
+      formURLEncoded: this.formUrlEncoded,
+      multipartForm: this.multipartForm,
     };
   }
 }
@@ -43,13 +54,32 @@ export class RequestBodyStateManager {
 /**
  * This is a utility hook which enables syncing react state and 'RequestBodyStateManager'
  */
-export function useFormBody(requestBodyStateManager: RequestBodyStateManager) {
-  const [formBody, _setFormBody] = useState<RQAPI.RequestFormBody>(requestBodyStateManager.getForm() || []);
+export function useFormUrlEncodedBody(requestBodyStateManager: RequestBodyStateManager) {
+  // can face issue in form parameters
+  const [formUrlEncodedBody, _setFormUrlEncodedBody] = useState<RQAPI.RequestFormBody>(
+    requestBodyStateManager.getFormUrlEncoded() || []
+  );
   return {
-    formBody,
-    setFormBody(form: RQAPI.RequestFormBody) {
-      requestBodyStateManager.setForm(form);
-      _setFormBody(form);
+    formUrlEncodedBody,
+    setFormUrlEncodedBody(form: RQAPI.RequestFormBody) {
+      requestBodyStateManager.setFormUrlEncoded(form);
+      _setFormUrlEncodedBody(form);
+    },
+  };
+}
+
+/**
+ * This is a utility hook which enables syncing react state and 'RequestBodyStateManager'
+ */
+export function useMultiPartFormBody(requestBodyStateManager: RequestBodyStateManager) {
+  const [multipartFormBody, _setMultiPartFormBody] = useState<RQAPI.RequestFormBody>(
+    requestBodyStateManager.getMultiPartForm() || []
+  );
+  return {
+    multipartFormBody,
+    setMultiPartFormBody(form: RQAPI.RequestFormBody) {
+      requestBodyStateManager.setMultiPartForm(form);
+      _setMultiPartFormBody(form);
     },
   };
 }
