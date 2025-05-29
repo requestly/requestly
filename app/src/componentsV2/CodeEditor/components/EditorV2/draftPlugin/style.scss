@@ -1,0 +1,29 @@
+.csome-tooltip {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 12px;
+  max-width: 400px;
+  white-space: pre-wrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.csome-tooltip .tooltip-signature {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #9cdcfe;
+}
+
+.csome-tooltip .tooltip-doc {
+  margin-bottom: 6px;
+  color: #ce9178;
+}
+
+.csome-tooltip .tooltip-tags {
+  font-size: 12px;
+  color: #c586c0;
+  margin: 0;
+}

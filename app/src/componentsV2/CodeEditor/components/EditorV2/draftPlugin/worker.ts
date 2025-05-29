@@ -23,7 +23,6 @@ const worker = createWorker(async function () {
   });
   const system = createSystem(fsMap);
   const compilerOpts = {};
-  console.log("DG: Creating virtual TypeScript environment with files", files);
   return createVirtualTypeScriptEnvironment(
     system,
     ["/rq-namespace.ts", "/global.d.ts", "/index.ts"],
