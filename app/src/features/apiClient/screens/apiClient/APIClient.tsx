@@ -34,7 +34,13 @@ type Props = CreateModeProps | EditModeProps | HistoryModeProps;
 export const APIClient: React.FC<Props> = React.memo((props) => {
   const location = useLocation();
   const { isCreateMode } = props;
-  const { apiClientRecords, history, selectedHistoryIndex, addToHistory } = useApiClientContext();
+  const {
+    apiClientRecords,
+    history,
+    selectedHistoryIndex,
+    addToHistory,
+    setCurrentHistoryIndex,
+  } = useApiClientContext();
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
   const isHistoryPath = location.pathname.includes("history");
 
@@ -96,9 +102,12 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
 
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.Entry) => {
+      if (isHistoryPath) {
+        setCurrentHistoryIndex(history.length);
+      }
       addToHistory(entry);
     },
-    [addToHistory]
+    [addToHistory, isHistoryPath, setCurrentHistoryIndex, history]
   );
 
   if (!entryDetails && !isCreateMode && !isHistoryPath) {
