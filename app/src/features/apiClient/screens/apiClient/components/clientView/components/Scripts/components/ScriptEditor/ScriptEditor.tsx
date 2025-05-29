@@ -51,6 +51,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">
       <Editor
+        isScripts
         value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
         handleChange={(value: string) =>
           setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))

@@ -28,7 +28,10 @@ import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
+// import {draftPluginForCompletions} from "./draftPlugin"
+// import allDraftExtensions from "./draftPlugin"
 interface EditorProps {
+  isScripts?: boolean; // Used to determine if the editor is used for scripts
   value: string;
   language: EditorLanguage | null;
   isReadOnly?: boolean;
@@ -47,6 +50,7 @@ interface EditorProps {
   hideToolbar?: boolean;
 }
 const Editor: React.FC<EditorProps> = ({
+  isScripts = false,
   value,
   language,
   isReadOnly = false,
@@ -269,6 +273,8 @@ const Editor: React.FC<EditorProps> = ({
         editorLanguage,
         customKeyBinding,
         EditorView.lineWrapping,
+        // isScripts ? draftPluginForCompletions() : null,
+        // isScripts ? allDraftExtensions : null,
         envVariables
           ? highlightVariablesPlugin(
               {
