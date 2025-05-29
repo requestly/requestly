@@ -15,6 +15,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const CreateWorkspace = () => {
       teamName: newTeamName,
     })
       .then((response) => {
-        trackNewTeamCreateSuccess(response.data.teamId, newTeamName);
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "teams_screen", WorkspaceType.SHARED);
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
@@ -60,11 +61,11 @@ const CreateWorkspace = () => {
             isNewTeam: true,
           },
         });
-        trackNewTeamCreateSuccess(teamId, newTeamName);
+        trackNewTeamCreateSuccess(teamId, newTeamName, "teams_screen", WorkspaceType.SHARED);
       })
       .catch((err) => {
         toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
+        trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
         setIsSubmitProcess(false);
       });
   };
