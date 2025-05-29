@@ -1,6 +1,6 @@
 # Browser Extension Common Code
 
-This contains code common code shared between MV2 and MV3 extensions.
+This contains code common code shared between MV2 _(now deprecated)_ and MV3 extensions.
 - TS types
 - Constants
 - Storage helpers
