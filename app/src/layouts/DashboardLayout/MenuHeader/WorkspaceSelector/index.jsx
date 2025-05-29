@@ -249,7 +249,7 @@ const WorkspaceSelector = () => {
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
-    if (user.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    if (user.loggedIn) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",

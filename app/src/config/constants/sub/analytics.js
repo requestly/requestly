@@ -150,6 +150,7 @@ export const GA_EVENTS = {
     NUM_SESSIONS_SAVED_ONLINE: "num_sessions_saved_online",
     NUM_SESSIONS_SAVED_OFFLINE: "num_sessions_saved_offline",
     NUM_NETWORK_SESSIONS: "num_network_sessions",
+    NUM_LOCAL_WORKSPACES: "num_local_workspaces",
 
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 

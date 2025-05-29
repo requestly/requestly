@@ -45,6 +45,9 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
           const allLocalWorkspacesResult = await getAllWorkspaces();
           const allLocalWorkspaces =
             allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, allLocalWorkspaces.length);
+
           for (const partialWorkspace of allLocalWorkspaces) {
             const localWorkspace = {
               id: partialWorkspace.id,
