@@ -4,8 +4,8 @@ import { RQDropdown } from "lib/design-system/components";
 import { DropDownProps } from "antd";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PRODUCT_FEATURES } from "./staticData";
-import "./EmptyCard.scss";
 import { RQButton } from "lib/design-system-v2/components";
+import "./EmptyCard.scss";
 
 interface Props {
   icon: string;
@@ -13,7 +13,7 @@ interface Props {
   features: string[];
   description?: string;
   primaryAction?: ReactNode;
-  playIcon: { src: string; label: string; url: string; onClick: () => void };
+  playDetails: { icon: ReactNode; label: string; url: string; onClick: () => void };
   importDropdownOptions: null | {
     label: string;
     icon: string | ReactNode;
@@ -26,7 +26,7 @@ export const HomepageEmptyCard: React.FC<Props> = ({
   title,
   features,
   primaryAction,
-  playIcon,
+  playDetails,
   importDropdownOptions = null,
 }) => {
   return (
@@ -51,9 +51,9 @@ export const HomepageEmptyCard: React.FC<Props> = ({
             <li>{feature}</li>
           ))}
         </ul>
-        <a className="play-icon" href={playIcon.url} target="__blank" onClick={playIcon.onClick}>
-          <img src={playIcon.src} alt="Play" />
-          <p>{playIcon.label}</p>
+        <a className="play-icon" href={playDetails.url} target="__blank" onClick={playDetails.onClick}>
+          {playDetails.icon}
+          <p>{playDetails.label}</p>
         </a>
       </div>
 

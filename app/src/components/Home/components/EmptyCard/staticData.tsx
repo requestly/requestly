@@ -1,7 +1,6 @@
-import PlayIconRules from "../../../../assets/images/gifs/play-rules.gif";
-import PlayIconApi from "../../../../assets/images/gifs/play-api.gif";
 import { trackHomeApisActionClicked, trackHomeRulesActionClicked } from "components/Home/analytics";
 import { CardType } from "../Card/types";
+import { MdOutlineSmartDisplay } from "@react-icons/all-files/md/MdOutlineSmartDisplay";
 
 export const PRODUCT_FEATURES = {
   [CardType.RULES]: {
@@ -15,8 +14,8 @@ export const PRODUCT_FEATURES = {
       "Customize request and response headers",
       "Update hostnames or URL strings",
     ],
-    playIcon: {
-      src: PlayIconRules,
+    playDetails: {
+      icon: <MdOutlineSmartDisplay />,
       label: "See in action ",
       url: "https://rqst.ly/http-rules-yt-tutorials",
       onClick: () => trackHomeRulesActionClicked("see_in_action"),
@@ -33,8 +32,8 @@ export const PRODUCT_FEATURES = {
       "Import API end-points from cURL",
       "Import from Postman and Insomnia",
     ],
-    playIcon: {
-      src: PlayIconApi,
+    playDetails: {
+      icon: <MdOutlineSmartDisplay />,
       label: "See in action ",
       url: "https://rqst.ly/api-client-intro-yt",
       onClick: () => trackHomeApisActionClicked("see_in_action"),
@@ -51,8 +50,8 @@ export const PRODUCT_FEATURES = {
       "Create Mock Endpoints",
       "Supports GraphQL API Overrides",
     ],
-    playIcon: {
-      src: PlayIconApi,
+    playDetails: {
+      icon: <MdOutlineSmartDisplay />,
       label: "See in action ",
       url: "https://www.youtube.com/watch?v=1en9NAeEk8A",
       onClick: () => trackHomeApisActionClicked("see_in_action"),

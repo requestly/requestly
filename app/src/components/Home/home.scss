@@ -100,6 +100,10 @@
         color: var(--requestly-color-text-subtle);
         margin: 0;
       }
+
+      .rq-badge {
+        margin-bottom: 0;
+      }
     }
 
     .action-buttons {
@@ -138,9 +142,14 @@
     align-items: center;
     text-decoration: none;
     color: unset;
-    img {
-      height: 24px;
-      width: auto;
+
+    svg {
+      --size: 20px;
+      width: var(--size);
+      height: var(--size);
+
+      color: var(--requestly-color-text-default);
+      flex-shrink: 0;
       margin-right: 6px;
     }
     p {
@@ -265,6 +274,7 @@
 
     .action-buttons {
       display: flex;
+      align-items: center;
 
       // TODO: Create a separate component for this dropdown button
       .ant-dropdown-button {
@@ -342,10 +352,15 @@
         }
 
         &-icon {
-          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
           svg {
-            width: 20px;
-            height: 20px;
+            --size: 16px;
+            width: var(--size);
+            height: var(--size);
+            color: var(--requestly-color-text-placeholder);
           }
         }
 
