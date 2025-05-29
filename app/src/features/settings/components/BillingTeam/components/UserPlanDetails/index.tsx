@@ -22,7 +22,6 @@ import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDo
 import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
 import { PlanStatus, PlanType } from "../../types";
-import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
@@ -37,9 +36,7 @@ export const UserPlanDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
-  const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
   const { type } = user.details?.planDetails ?? {};
-  const isIndividualPlanType = type === PlanType.INDIVIDUAL;
   const hasProfessionalStudentPlan =
     type === PlanType.STUDENT || user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT;
 
@@ -117,10 +114,6 @@ export const UserPlanDetails = () => {
     }
   }, [user?.details?.planDetails?.subscription?.endDate]);
 
-  const handleCancelPlanClick = () => {
-    setIsCancelPlanModalOpen(true);
-  };
-
   if (isLoading) return null;
 
   const renderPopConfirmation = () => {
@@ -153,26 +146,30 @@ export const UserPlanDetails = () => {
     }
     return (
       <RQButton
-        disabled={isIndividualPlanType ? user?.details?.planDetails?.subscription?.cancelAtPeriodEnd : false}
-        onClick={handleCancelPlanClick}
+        disabled={!user?.details?.planDetails?.subscription?.billingId}
+        onClick={() =>
+          navigate(
+            `${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${user?.details?.planDetails?.subscription?.billingId}`
+          )
+        }
         size="small"
         type="text"
         className="cancel-plan-btn"
       >
-        Cancel Plan
+        Manage Plan
       </RQButton>
     );
   };
 
   return (
     <>
-      <CancelPlanModal
+      {/* <CancelPlanModal
         isOpen={isCancelPlanModalOpen}
         closeModal={() => setIsCancelPlanModalOpen((prev) => !prev)}
         billingTeamQuantity={1}
         currentPlanName={user?.details?.planDetails?.planName}
         currentPlanEndDate={user?.details?.planDetails?.subscription?.endDate}
-      />
+      /> */}
       <div className="display-row-center w-full mt-16">
         <div className="w-full" style={{ maxWidth: "1000px" }}>
           <Col

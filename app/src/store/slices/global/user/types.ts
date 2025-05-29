@@ -30,6 +30,7 @@ export interface UserAuth {
         id: string;
         duration: "annually" | "monthly";
         quantity: number;
+        billingId: string | null;
       };
     };
     organization?: any;
