@@ -315,6 +315,7 @@
 
   .middle-section {
     padding: 0 20px;
+
     h2 {
       line-height: 18px;
       font-size: 12px;
@@ -381,6 +382,37 @@
             text-underline-offset: 4px;
           }
         }
+      }
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-2, 4px);
+      padding: 20px 0;
+
+      img {
+        --size: 48px;
+        width: var(--size);
+        height: var(--size);
+        flex-shrink: 0;
+      }
+
+      .title {
+        color: var(--requestly-color-text-default, #fff);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px; /* 150% */
+      }
+
+      .description {
+        text-align: center;
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-size: var(--requestly-font-size-xs);
+        line-height: 17px; /* 154.545% */
       }
     }
   }

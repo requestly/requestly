@@ -14,6 +14,11 @@ export const PRODUCT_FEATURES = {
       "Customize request and response headers",
       "Update hostnames or URL strings",
     ],
+    emptyStateDetails: {
+      title: "No activity yet",
+      description: "You haven't created any rules. When you do, they'll show up here.",
+      icon: "/assets/media/home/empty-card.svg",
+    },
     playDetails: {
       icon: <MdOutlineSmartDisplay />,
       label: "See in action ",
@@ -32,6 +37,11 @@ export const PRODUCT_FEATURES = {
       "Import API end-points from cURL",
       "Import from Postman and Insomnia",
     ],
+    emptyStateDetails: {
+      title: "No activity yet",
+      description: "You haven't created any request or collection. When you do, they'll show up here.",
+      icon: "/assets/media/home/empty-card.svg",
+    },
     playDetails: {
       icon: <MdOutlineSmartDisplay />,
       label: "See in action ",
@@ -50,6 +60,11 @@ export const PRODUCT_FEATURES = {
       "Create Mock Endpoints",
       "Supports GraphQL API Overrides",
     ],
+    emptyStateDetails: {
+      title: "No activity yet",
+      description: "You haven't created or updated any mock APIs. When you do, they'll show up here.",
+      icon: "/assets/media/home/empty-card.svg",
+    },
     playDetails: {
       icon: <MdOutlineSmartDisplay />,
       label: "See in action ",

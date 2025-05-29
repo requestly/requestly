@@ -11,6 +11,7 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import { Conditional } from "components/common/Conditional";
 import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
+import { useHomeScreenContext } from "components/Home/contexts";
 
 interface CardProps {
   contentLoading?: boolean;
@@ -55,6 +56,7 @@ export const Card: React.FC<CardProps> = ({
   showFooter = false,
 }) => {
   const MAX_LIST_ITEMS_TO_SHOW = showFooter ? 5 : 8;
+  const { isAnyRecordExist } = useHomeScreenContext();
 
   if (contentLoading)
     return (
@@ -65,69 +67,94 @@ export const Card: React.FC<CardProps> = ({
       </AnimatePresence>
     );
 
+  const cardHeader = (
+    <div className="header-content">
+      <div className="details">
+        <div className="icon-container">
+          <img src={PRODUCT_FEATURES[cardType].icon} alt={PRODUCT_FEATURES[cardType].title} />
+        </div>
+        <h1>{PRODUCT_FEATURES[cardType].title}</h1>
+      </div>
+
+      <div className="action-buttons">{actionButtons}</div>
+    </div>
+  );
+
+  const noActivityMessage = (
+    <div className="empty-state">
+      <img
+        src={PRODUCT_FEATURES[cardType].emptyStateDetails.icon}
+        alt={PRODUCT_FEATURES[cardType].emptyStateDetails.title}
+      />
+      <div className="title">{PRODUCT_FEATURES[cardType].emptyStateDetails.title}</div>
+      <div className="description">{PRODUCT_FEATURES[cardType].emptyStateDetails.description}</div>
+    </div>
+  );
+
+  const cardContentList =
+    contentList?.length > 0 ? (
+      <div className="middle-section">
+        <h2>{bodyTitle}</h2>
+        <div className="list">
+          {contentList
+            .slice(0, MAX_LIST_ITEMS_TO_SHOW)
+            .map((listItem: Rule & { icon: string; title: string } & AbstractTabSource, index: number) => (
+              <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
+                {listItem?.ruleType ? (
+                  <>
+                    <div className="list-item-icon">{listItem.icon}</div>
+                    <p className="item-title">{listItem.title}</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="list-item-icon">{listItem.icon}</div>
+                    <p className="item-title">{listItem.metadata?.title}</p>
+                  </>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+    ) : (
+      <div className="middle-section">{noActivityMessage}</div>
+    );
+
+  const cardFooter = (
+    <Conditional condition={showFooter}>
+      <div className="footer-section">
+        {viewAllCtaLink ? (
+          <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
+            {viewAllCta}
+          </Link>
+        ) : null}
+
+        {importOptions ? (
+          <div className="import-dropdown">
+            <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
+              <RQButton className="import-dropdown-button" type="transparent">
+                {typeof importOptions.icon === "string" ? (
+                  <img src={importOptions.icon} alt={importOptions.label} />
+                ) : (
+                  importOptions.icon
+                )}
+                Import
+                <MdOutlineKeyboardArrowDown />
+              </RQButton>
+            </RQDropdown>
+          </div>
+        ) : null}
+      </div>
+    </Conditional>
+  );
+
   return (
     <AnimatePresence>
-      {contentList?.length ? (
+      {isAnyRecordExist ? (
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className={`content-container ${wrapperClass}`}>
-            <div className="header-content">
-              <div className="details">
-                <div className="icon-container">
-                  <img src={PRODUCT_FEATURES[cardType].icon} alt={PRODUCT_FEATURES[cardType].title} />
-                </div>
-                <h1>{PRODUCT_FEATURES[cardType].title}</h1>
-              </div>
-
-              <div className="action-buttons">{actionButtons}</div>
-            </div>
-            <div className="middle-section">
-              <h2>{bodyTitle}</h2>
-              <div className="list">
-                {contentList
-                  .slice(0, MAX_LIST_ITEMS_TO_SHOW)
-                  .map((listItem: Rule & { icon: string; title: string } & AbstractTabSource, index: number) => (
-                    <div key={index} className="list-item" onClick={() => listItemClickHandler(listItem)}>
-                      {listItem?.ruleType ? (
-                        <>
-                          <div className="list-item-icon">{listItem.icon}</div>
-                          <p className="item-title">{listItem.title}</p>
-                        </>
-                      ) : (
-                        <>
-                          <div className="list-item-icon">{listItem.icon}</div>
-                          <p className="item-title">{listItem.metadata?.title}</p>
-                        </>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            <Conditional condition={showFooter}>
-              <div className="footer-section">
-                {viewAllCtaLink ? (
-                  <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
-                    {viewAllCta}
-                  </Link>
-                ) : null}
-
-                {importOptions ? (
-                  <div className="import-dropdown">
-                    <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
-                      <RQButton className="import-dropdown-button" type="transparent">
-                        {typeof importOptions.icon === "string" ? (
-                          <img src={importOptions.icon} alt={importOptions.label} />
-                        ) : (
-                          importOptions.icon
-                        )}
-                        Import
-                        <MdOutlineKeyboardArrowDown />
-                      </RQButton>
-                    </RQDropdown>
-                  </div>
-                ) : null}
-              </div>
-            </Conditional>
+            {cardHeader}
+            {cardContentList}
+            {cardFooter}
           </div>
         </m.div>
       ) : (

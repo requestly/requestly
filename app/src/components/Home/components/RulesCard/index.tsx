@@ -1,15 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getIsRulesListLoading } from "store/selectors";
+import { getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useHasChanged } from "hooks";
 import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
-import { StorageService } from "init";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
-import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
@@ -28,28 +23,30 @@ import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
 import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
 import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
 import { ImporterType } from "components/Home/types";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import DropdownButton from "antd/lib/dropdown/dropdown-button";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { MenuProps } from "antd";
+import { useHomeScreenContext } from "components/Home/contexts";
 import "./rulesCard.scss";
 
 export const RulesCard = () => {
   const MAX_RULES_TO_SHOW = 5;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const user = useSelector(getUserAuthDetails);
-  const isRulesLoading = useSelector(getIsRulesListLoading);
-  const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
-  const [rules, setRules] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const isRulesListLoading = useSelector(getIsRulesListLoading);
   const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("http_rule", "create");
+  const { rules, isRulesLoading } = useHomeScreenContext();
+
+  const rulesToShow = useMemo(() => {
+    return rules
+      ?.sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
+      ?.slice(0, MAX_RULES_TO_SHOW + 1);
+  }, [rules]);
 
   const onRulesDrawerClose = () => {
     setIsRulesDrawerOpen(false);
@@ -104,28 +101,6 @@ export const RulesCard = () => {
     },
   ];
 
-  useEffect(() => {
-    if (isExtensionInstalled() && !isRulesLoading) {
-      StorageService(appMode)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-        .then((res) => {
-          setRules(
-            res
-              .sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
-              .slice(0, MAX_RULES_TO_SHOW + 1)
-          );
-        })
-        .catch((e) => {
-          Logger.log(e);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, [appMode, activeWorkspaceId, hasUserChanged, isRulesLoading]);
-
   const actionButtons = (
     <RuleSelectionListDrawer
       open={isRulesDrawerOpen}
@@ -164,7 +139,7 @@ export const RulesCard = () => {
 
   return (
     <Card
-      contentLoading={isLoading || isRulesLoading}
+      contentLoading={isRulesLoading || isRulesListLoading}
       cardType={CardType.RULES}
       showFooter={isValidPermission}
       importOptions={
@@ -186,7 +161,7 @@ export const RulesCard = () => {
       viewAllCtaOnClick={() => trackHomeRulesActionClicked("view_all_rules")}
       bodyTitle="Recent rules"
       wrapperClass="rules-card"
-      contentList={rules?.map((rule: Rule) => ({
+      contentList={rulesToShow?.map((rule: Rule) => ({
         icon: ruleIcons[rule.ruleType as RuleType],
         title: rule.name,
         ...rule,
