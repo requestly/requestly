@@ -204,7 +204,11 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
     } catch (err) {
       console.error("Team creation failed", err);
       toast.error(err?.message || "Unable to Create Team");
-      Sentry.captureException("Create Team Failure");
+      Sentry.captureException("Create Team Failure", {
+        extra: {
+          message: err.message,
+        },
+      });
       trackNewTeamCreateFailure(workspaceName);
     } finally {
       setIsLoading(false);

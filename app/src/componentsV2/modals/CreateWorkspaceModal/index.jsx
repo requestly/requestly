@@ -133,7 +133,11 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         toggleModal();
       } catch (err) {
         toast.error("Unable to Create Team");
-        Sentry.captureException("Create Team Failure");
+        Sentry.captureException("Create Team Failure", {
+          extra: {
+            message: err.message,
+          },
+        });
         trackNewTeamCreateFailure(newTeamName);
       } finally {
         setIsLoading(false);
