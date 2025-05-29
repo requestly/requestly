@@ -1,5 +1,5 @@
 .bottomsheet-layout-container {
-  height: calc(100% - 70px);
+  height: calc(100% - 56px);
   position: relative;
 
   .ant-tabs {
@@ -30,7 +30,7 @@
     }
     & .ant-tabs-content-holder {
       padding: 8px 8px 28px 8px;
-      overflow: scroll;
+      overflow: hidden;
     }
   }
 
