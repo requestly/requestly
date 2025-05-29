@@ -25,6 +25,7 @@ import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./CreateWorkspaceModal.css";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           teamName: newTeamName,
         });
 
-        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal", WorkspaceType.SHARED);
         toast.info("Workspace Created");
 
         const teamId = response.data.teamId;
@@ -124,14 +125,20 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           }
         }
 
-        trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal", isNotifyAllSelected);
+        trackNewTeamCreateSuccess(
+          teamId,
+          newTeamName,
+          "create_workspace_modal",
+          WorkspaceType.SHARED,
+          isNotifyAllSelected
+        );
         handlePostTeamCreation(teamId, newTeamName, hasMembersInSameDomain);
 
         callback?.();
         toggleModal();
       } catch (err) {
         toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
+        trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
       } finally {
         setIsLoading(false);
       }
