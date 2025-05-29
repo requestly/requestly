@@ -13,10 +13,16 @@ export namespace rq {
 
   export const count: number = 5;
 
-  export function dummyVariables(): any {
+  /**
+   * Some dodumented function.
+   *
+   * @param {string} input - The input string to be processed.
+   * @returns An object with dummy environment variables.
+   */
+  export function dummyVariables(input: string): EnvironmentVariables {
     return {
       somethig: {
-        localValue: "value",
+        localValue: input,
         syncValue: "syncValue",
         type: EnvironmentVariableType.String,
         id: 1,

@@ -6,6 +6,7 @@ import { linter } from "@codemirror/lint";
 import { Diagnostic } from "@codemirror/lint";
 
 import { hoverTooltip, Tooltip } from "@codemirror/view";
+import "./style.scss";
 
 async function intializeWorker() {
   const innerWorker = new Worker(new URL("./worker.ts", import.meta.url), {
@@ -82,18 +83,31 @@ export function draftPluginForHovering() {
       const code = view.state.doc.toString();
       await worker.updateFile({ path: "/index.ts", code });
       const hoverInfo = await worker.getHover({ path: "/index.ts", pos });
-
       if (!hoverInfo?.quickInfo) return null;
 
-      const text = hoverInfo.quickInfo.displayParts?.map((part) => part.text).join("") ?? "No info";
+      const display = hoverInfo.quickInfo.displayParts?.map((p) => p.text).join("") ?? "";
+      const documentation = hoverInfo.quickInfo.documentation?.map((p) => p.text).join("") ?? "";
+      const tags = (hoverInfo.quickInfo.tags ?? [])
+        .map((tag) => {
+          const name = tag.name;
+          const text = tag.text?.map((t) => t.text).join("") ?? "";
+          return `@${name} ${text}`;
+        })
+        .join("\n");
 
+      const dom = document.createElement("div");
+
+      dom.innerHTML = `
+        <div class="tooltip-signature"><code>${display}</code></div>
+        ${documentation ? `<div class="tooltip-doc">${documentation}</div>` : ""}
+        ${tags ? `<pre class="tooltip-tags">${tags}</pre>` : ""}
+      `;
+
+      dom.className = "some-tooltip";
       return {
         pos: hoverInfo.start,
         end: hoverInfo.end,
-        create(view) {
-          const dom = document.createElement("div");
-          dom.textContent = text;
-          dom.className = "cm-tooltip-hover";
+        create() {
           return { dom };
         },
       };
