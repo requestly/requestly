@@ -4,8 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useHasChanged } from "hooks";
-import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
-import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
+import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { StorageService } from "init";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -14,10 +13,7 @@ import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
-import {
-  trackNewRuleButtonClicked,
-  trackRuleCreationWorkflowStartedEvent,
-} from "modules/analytics/events/common/rules";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
@@ -27,9 +23,11 @@ import { Card } from "../Card";
 import { CardType } from "../Card/types";
 import { ImporterType } from "components/Home/types";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
-import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
-import "./apiMockingCard.scss";
+import { useRBAC } from "features/rbac";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
+import { Dropdown, MenuProps } from "antd";
+import "./apiMockingCard.scss";
 
 export const APIMockingCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 5;
@@ -79,13 +77,25 @@ export const APIMockingCard: React.FC = () => {
     }
   };
 
+  const items: MenuProps["items"] = [
+    {
+      key: "0",
+      label: "Modify live API responses",
+      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+    },
+    {
+      key: "0",
+      label: "Create Mock endpoints in Cloud",
+      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+    },
+  ];
+
   const IMPORT_OPTIONS = [
     {
       key: "0",
       label: "Import rules",
       onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
     },
-
     {
       key: "1",
       label: "Import mocks",
@@ -115,17 +125,36 @@ export const APIMockingCard: React.FC = () => {
     }
   }, [appMode, activeWorkspaceId, hasUserChanged, isRulesLoading]);
 
+  const actionButtons = (
+    <RuleSelectionListDrawer
+      open={isRulesDrawerOpen}
+      onClose={onRulesDrawerClose}
+      source={SOURCE.HOME_SCREEN}
+      onRuleItemClick={onRulesDrawerClose}
+    >
+      <RQTooltip
+        showArrow={false}
+        title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
+      >
+        <Dropdown disabled={!isValidPermission} overlayClassName="more-options" menu={{ items }} trigger={["click"]}>
+          <RQButton type="primary" size="small">
+            New mock
+          </RQButton>
+        </Dropdown>
+      </RQTooltip>
+    </RuleSelectionListDrawer>
+  );
+
   return (
     <Card
       contentLoading={isLoading || isRulesLoading}
       cardType={CardType.API_MOCKING}
-      defaultImportClickHandler={() => importTriggerHandler(ImporterType.REQUESTLY)}
       showFooter={isValidPermission}
       importOptions={
         isValidPermission
           ? {
               menu: IMPORT_OPTIONS,
-              label: "Charles, ModHeader, & more",
+              label: "Requestly Mocks and Rules",
               icon: <MdOutlineFileDownload />,
             }
           : null
@@ -135,34 +164,7 @@ export const APIMockingCard: React.FC = () => {
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
         redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
       }}
-      actionButtons={
-        <RuleSelectionListDrawer
-          open={isRulesDrawerOpen}
-          onClose={onRulesDrawerClose}
-          source={SOURCE.HOME_SCREEN}
-          onRuleItemClick={onRulesDrawerClose}
-        >
-          <RBACButton
-            permission="create"
-            resource="http_rule"
-            type="primary"
-            className="new-rule-button"
-            tooltipTitle="Creating a new rule is not allowed in view-only mode."
-            onClick={() => {
-              trackHomeRulesActionClicked("new_rule_button");
-              trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
-
-              if (isExtensionInstalled()) {
-                setIsRulesDrawerOpen(true);
-              } else {
-                dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-              }
-            }}
-          >
-            New Rule
-          </RBACButton>
-        </RuleSelectionListDrawer>
-      }
+      actionButtons={actionButtons}
       bodyTitle="Recent mocks and rules"
       wrapperClass="api-mocking-card"
       contentList={rules?.map((rule: Rule) => ({
@@ -173,46 +175,21 @@ export const APIMockingCard: React.FC = () => {
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_MOCKING,
         primaryAction: (
-          <RoleBasedComponent
-            resource="http_rule"
-            permission="create"
-            fallback={
-              <div
-                className="add-cta"
-                onClick={() => {
-                  redirectToRules(navigate);
-                }}
-              >
-                <span> View and run rules </span>
-              </div>
-            }
+          <RQTooltip
+            showArrow={false}
+            title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
           >
-            <RuleSelectionListDrawer
-              open={isRulesDrawerOpen}
-              onClose={onRulesDrawerClose}
-              source={SOURCE.HOME_SCREEN}
-              onRuleItemClick={() => {
-                onRulesDrawerClose();
-              }}
+            <Dropdown
+              disabled={!isValidPermission}
+              overlayClassName="more-options"
+              menu={{ items }}
+              trigger={["click"]}
             >
-              <div
-                className="add-cta"
-                onClick={() => {
-                  trackHomeRulesActionClicked("create_first_rule");
-                  trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
-
-                  if (isExtensionInstalled()) {
-                    setIsRulesDrawerOpen(true);
-                  } else {
-                    dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                  }
-                }}
-              >
-                <IoMdAdd />
-                <span> Create a new rule </span>
-              </div>
-            </RuleSelectionListDrawer>
-          </RoleBasedComponent>
+              <RQButton type="primary" size="small">
+                New mock
+              </RQButton>
+            </Dropdown>
+          </RQTooltip>
         ),
       }}
     />

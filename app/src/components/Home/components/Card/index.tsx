@@ -7,7 +7,6 @@ import { CardType } from "./types";
 import { Rule } from "@requestly/shared/types/entities/rules";
 import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
-import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { Conditional } from "components/common/Conditional";
 import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
@@ -17,7 +16,6 @@ interface CardProps {
   contentLoading?: boolean;
   showFooter?: boolean;
   wrapperClass?: string;
-  defaultImportClickHandler: () => void;
   emptyCardOptions: {
     title: string;
     description: string;
@@ -55,7 +53,6 @@ export const Card: React.FC<CardProps> = ({
   viewAllCtaOnClick = () => {},
   importOptions,
   showFooter = false,
-  defaultImportClickHandler,
 }) => {
   const MAX_LIST_ITEMS_TO_SHOW = showFooter ? 5 : 8;
 
@@ -81,15 +78,7 @@ export const Card: React.FC<CardProps> = ({
                 <h1>{PRODUCT_FEATURES[cardType].title}</h1>
               </div>
 
-              <div className="action-buttons">
-                <Conditional condition={showFooter}>
-                  <RQButton type="transparent" className="import-dropdown-trigger" onClick={defaultImportClickHandler}>
-                    <MdOutlineFileUpload />
-                    Import
-                  </RQButton>
-                </Conditional>
-                {actionButtons}
-              </div>
+              <div className="action-buttons">{actionButtons}</div>
             </div>
             <div className="middle-section">
               <h2>{bodyTitle}</h2>
@@ -143,7 +132,12 @@ export const Card: React.FC<CardProps> = ({
         </m.div>
       ) : (
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <HomepageEmptyCard {...emptyCardOptions} importDropdownOptions={importOptions} />
+          <HomepageEmptyCard
+            {...emptyCardOptions}
+            icon={PRODUCT_FEATURES[cardType].icon}
+            title={PRODUCT_FEATURES[cardType].title}
+            importDropdownOptions={importOptions}
+          />
         </m.div>
       )}
     </AnimatePresence>

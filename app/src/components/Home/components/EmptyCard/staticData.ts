@@ -9,11 +9,11 @@ export const PRODUCT_FEATURES = {
     description: "Intercept, debug and modify HTTP requests",
     icon: "/assets/media/rules/rules-icon.svg",
     features: [
-      "Map local files or redirect API/JS requests between environments",
-      "Mock XHR & Fetch requests by stubbing API responses",
-      "Modify URLs or swap hosts/domains",
+      "Monitor HTTP requests and responses",
+      "Map local files or redirect URLs",
+      "Modify XHR or Fetch responses",
       "Customize request and response headers",
-      "Inject custom JavaScript or CSS into any website",
+      "Update hostnames or URL strings",
     ],
     playIcon: {
       src: PlayIconRules,
@@ -27,11 +27,11 @@ export const PRODUCT_FEATURES = {
     description: "Design, manage, and test APIs easily",
     icon: "/assets/media/apiClient/api-client-icon.svg",
     features: [
-      "Send API requests and test endpoints effortlessly",
-      "Execute cURL requests directly in the client",
-      "Organize requests into collections",
-      "Use environments and variables for dynamic testing",
-      "Collaborate seamlessly in team workspaces",
+      "Send and test API requests",
+      "Execute cURL requests",
+      "Start with pre-built example collections",
+      "Import API end-points from cURL",
+      "Import from Postman and Insomnia",
     ],
     playIcon: {
       src: PlayIconApi,

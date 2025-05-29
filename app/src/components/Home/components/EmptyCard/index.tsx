@@ -1,12 +1,14 @@
 import React, { ReactNode } from "react";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
-import { RQButton, RQDropdown } from "lib/design-system/components";
+import { RQDropdown } from "lib/design-system/components";
 import { DropDownProps } from "antd";
 import { RQBadge } from "lib/design-system/components/RQBadge";
+import { PRODUCT_FEATURES } from "./staticData";
 import "./EmptyCard.scss";
+import { RQButton } from "lib/design-system-v2/components";
 
 interface Props {
-  icon: string | ReactNode;
+  icon: string;
   title: string;
   features: string[];
   description?: string;
@@ -31,17 +33,18 @@ export const HomepageEmptyCard: React.FC<Props> = ({
     <>
       <div className="homepage-emptycard">
         <div className="header-section">
-          {typeof icon === "string" ? (
-            <img src={icon} alt="icon" className="homepage-emptycard-icon-img" />
-          ) : (
-            <div className="homepage-emptycard-icon">{icon}</div>
-          )}
-          <div className="header-content">
+          <div className="details">
+            <div className="icon-container">
+              <img src={icon} alt={title} />
+            </div>
+
             <div className="title-badge-container">
               <h1 className="homepage-emptycard-title">{title}</h1>
-              {title === "API client" && <RQBadge badgeText="BETA" />}
+              {title === PRODUCT_FEATURES.API_CLIENT.title && <RQBadge badgeText="BETA" />}
             </div>
           </div>
+
+          <div className="action-buttons">{primaryAction}</div>
         </div>
         <ul className="features">
           {features.map((feature) => (
@@ -53,13 +56,11 @@ export const HomepageEmptyCard: React.FC<Props> = ({
           <p>{playIcon.label}</p>
         </a>
       </div>
-      <div className="action-section">{primaryAction}</div>
 
       {importDropdownOptions ? (
         <div className="import-dropdown">
-          <span className="import-dropdown-label">Import from</span>
           <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
-            <RQButton>
+            <RQButton type="transparent">
               {typeof importDropdownOptions.icon === "string" ? (
                 <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
               ) : (
