@@ -4,7 +4,16 @@ import { createDefaultMapFromCDN, createSystem, createVirtualTypeScriptEnvironme
 import ts from "typescript";
 import * as Comlink from "comlink";
 
-const files = [{ "/rq-namespace.ts": RQNameSpaceContents }, { "/index.ts": `import { rq } from './rq-namespace';` }];
+const files = [
+  { "/rq-namespace.ts": RQNameSpaceContents },
+  {
+    "/global.d.ts": /* the import seems unnecessary but is required to make this file be treated as a module*/ `
+    import type { rq as _rq } from "./rq-namespace"; 
+    declare global { const rq: typeof import("./rq-namespace").rq; }
+`,
+  },
+  { "/index.ts": `/* will be replaced by editor contents */` },
+];
 
 const worker = createWorker(async function () {
   const fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, "5.7.3", false, ts);
@@ -15,7 +24,12 @@ const worker = createWorker(async function () {
   const system = createSystem(fsMap);
   const compilerOpts = {};
   console.log("DG: Creating virtual TypeScript environment with files", files);
-  return createVirtualTypeScriptEnvironment(system, ["/rq-namespace.ts"], ts, compilerOpts);
+  return createVirtualTypeScriptEnvironment(
+    system,
+    ["/rq-namespace.ts", "/global.d.ts", "/index.ts"],
+    ts,
+    compilerOpts
+  );
 });
 
 Comlink.expose(worker);

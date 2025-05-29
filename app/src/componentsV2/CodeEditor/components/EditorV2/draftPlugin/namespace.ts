@@ -13,7 +13,7 @@ export namespace rq {
 
   export const count: number = 5;
 
-  export function dummyVariables(): EnvironmentVariables {
+  export function dummyVariables(): any {
     return {
       somethig: {
         localValue: "value",
