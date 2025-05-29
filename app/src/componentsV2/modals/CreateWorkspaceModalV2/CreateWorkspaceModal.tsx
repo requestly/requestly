@@ -176,7 +176,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         }
       })();
 
-      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal");
+      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType);
       toast.info("Workspace Created");
 
       let hasMembersInSameDomain = true;
@@ -196,20 +196,19 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         }
       }
 
-      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", isNotifyAllSelected);
+      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType, isNotifyAllSelected);
       handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
 
       callback?.();
       toggleModal();
     } catch (err) {
-      console.error("Team creation failed", err);
       toast.error(err?.message || "Unable to Create Team");
       Sentry.captureException("Create Team Failure", {
         extra: {
           message: err.message,
         },
       });
-      trackNewTeamCreateFailure(workspaceName);
+      trackNewTeamCreateFailure(workspaceName, workspaceType);
     } finally {
       setIsLoading(false);
     }
