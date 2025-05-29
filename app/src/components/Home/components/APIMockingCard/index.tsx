@@ -16,7 +16,6 @@ import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
-import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
@@ -56,15 +55,10 @@ export const APIMockingCard: React.FC = () => {
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
   const { validatePermission } = useRBAC();
   const { isValidPermission: isValidPermissionForRules } = validatePermission("http_rule", "create");
   const { isValidPermission: isValidPermissionForMocks } = validatePermission("mock_api", "create");
   const isValidPermission = isValidPermissionForRules && isValidPermissionForMocks;
-
-  const onRulesDrawerClose = () => {
-    setIsRulesDrawerOpen(false);
-  };
 
   const importTriggerHandler = (modal: ImporterType.REQUESTLY | ImporterType.FILES): void => {
     if (!user?.details?.isLoggedIn) {
@@ -159,29 +153,22 @@ export const APIMockingCard: React.FC = () => {
     }
   }, [appMode, activeWorkspaceId, hasUserChanged, isRulesLoading]);
 
-  const actionButtons = (
-    <RuleSelectionListDrawer
-      open={isRulesDrawerOpen}
-      onClose={onRulesDrawerClose}
-      source={SOURCE.HOME_SCREEN}
-      onRuleItemClick={onRulesDrawerClose}
+  const newMockDropdown = (
+    <RQTooltip
+      showArrow={false}
+      title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
     >
-      <RQTooltip
-        showArrow={false}
-        title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
+      <Dropdown
+        disabled={!isValidPermission}
+        placement="bottomRight"
+        overlayClassName="more-options api-mocking-card-dropdown"
+        menu={{ items }}
       >
-        <Dropdown
-          disabled={!isValidPermission}
-          placement="bottomRight"
-          overlayClassName="more-options api-mocking-card-dropdown"
-          menu={{ items }}
-        >
-          <RQButton type="primary" size="small">
-            New mock
-          </RQButton>
-        </Dropdown>
-      </RQTooltip>
-    </RuleSelectionListDrawer>
+        <RQButton type="primary" size="small">
+          New mock
+        </RQButton>
+      </Dropdown>
+    </RQTooltip>
   );
 
   return (
@@ -199,11 +186,12 @@ export const APIMockingCard: React.FC = () => {
           : null
       }
       listItemClickHandler={(item: Rule) => {
+        // TODO: update the analytics event
         trackHomeRulesActionClicked("rule_clicked");
         trackRuleCreationWorkflowStartedEvent(item.ruleType, SOURCE.HOME_SCREEN);
         redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
       }}
-      actionButtons={actionButtons}
+      actionButtons={newMockDropdown}
       bodyTitle="Recent mocks and rules"
       wrapperClass="api-mocking-card"
       contentList={rules?.map((rule: Rule) => ({
@@ -213,23 +201,7 @@ export const APIMockingCard: React.FC = () => {
       }))}
       emptyCardOptions={{
         ...PRODUCT_FEATURES.API_MOCKING,
-        primaryAction: (
-          <RQTooltip
-            showArrow={false}
-            title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
-          >
-            <Dropdown
-              disabled={!isValidPermission}
-              overlayClassName="more-options"
-              menu={{ items }}
-              trigger={["click"]}
-            >
-              <RQButton type="primary" size="small">
-                New mock
-              </RQButton>
-            </Dropdown>
-          </RQTooltip>
-        ),
+        primaryAction: newMockDropdown,
       }}
     />
   );
