@@ -15,9 +15,10 @@ interface KeyValueTableProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: EnvironmentVariables;
+  isMultipartForm?: boolean;
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, isMultipartForm }) => {
   const createEmptyPair = useCallback(
     () => ({
       id: Date.now(),
@@ -67,6 +68,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
 
   const handleUpdatePair = useCallback(
     (pair: KeyValuePair) => {
+      console.log("DEBUG", pair);
       handleUpdateRequestPairs(pair, "update");
     },
     [handleUpdateRequestPairs]
@@ -112,6 +114,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           title: "key",
           variables,
           handleUpdatePair,
+          isMultipartForm,
         }),
       },
       {
@@ -125,6 +128,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           title: "value",
           variables,
           handleUpdatePair,
+          isMultipartForm,
         }),
       },
       {
@@ -147,7 +151,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         },
       },
     ];
-  }, [handleUpdatePair, handleDeletePair, data.length, variables]);
+  }, [variables, handleUpdatePair, isMultipartForm, data.length, handleDeletePair]);
 
   return (
     <ContentListTable

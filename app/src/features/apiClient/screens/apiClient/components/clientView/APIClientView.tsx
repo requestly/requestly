@@ -209,13 +209,14 @@ const APIClientView: React.FC<Props> = ({
     setEntry((prev) => updater(prev));
   }, []);
 
+  // need to add steps for setContentType change here to add the header
   const setContentType = useCallback((contentType: RequestContentType) => {
     setEntry((entry) => {
       const newEntry: RQAPI.Entry = {
         ...entry,
         request: {
           ...entry.request,
-          body: contentType === RequestContentType.FORM ? [] : "",
+          body: contentType === RequestContentType.FORM_URL_ENCODED || RequestContentType.MULTIPART_FORM ? [] : "",
           contentType,
         },
       };
@@ -234,7 +235,10 @@ const APIClientView: React.FC<Props> = ({
 
       if (contentType === RequestContentType.JSON) {
         newEntry.request.body = "{}";
-      } else if (contentType === RequestContentType.FORM) {
+      } else if (
+        contentType === RequestContentType.FORM_URL_ENCODED ||
+        contentType === RequestContentType.MULTIPART_FORM
+      ) {
         newEntry.request.body = [];
       } else {
         newEntry.request.body = "";
@@ -435,6 +439,7 @@ const APIClientView: React.FC<Props> = ({
   };
 
   const onSaveButtonClick = useCallback(async () => {
+    console.log("called");
     setIsRequestSaving(true);
 
     const record: Partial<RQAPI.ApiRecord> = {
