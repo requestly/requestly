@@ -28,6 +28,7 @@ import DropdownButton from "antd/lib/dropdown/dropdown-button";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { MenuProps } from "antd";
 import { useHomeScreenContext } from "components/Home/contexts";
+import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import "./rulesCard.scss";
 
 export const RulesCard = () => {
@@ -78,6 +79,7 @@ export const RulesCard = () => {
   const items: MenuProps["items"] = [
     {
       key: "0",
+      icon: <MdOutlineFileUpload />,
       label: "Import rules",
       onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
     },
