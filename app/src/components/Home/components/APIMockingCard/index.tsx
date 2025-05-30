@@ -157,21 +157,21 @@ export const APIMockingCard: React.FC = () => {
   ];
 
   const newMockDropdown = (
-    <RQTooltip
-      showArrow={false}
-      title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
+    <Dropdown
+      disabled={!isValidPermission}
+      placement="bottomRight"
+      overlayClassName="more-options api-mocking-card-dropdown"
+      menu={{ items }}
     >
-      <Dropdown
-        disabled={!isValidPermission}
-        placement="bottomRight"
-        overlayClassName="more-options api-mocking-card-dropdown"
-        menu={{ items }}
+      <RQTooltip
+        showArrow={false}
+        title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
       >
         <RQButton type="primary" size="small">
           New mock
         </RQButton>
-      </Dropdown>
-    </RQTooltip>
+      </RQTooltip>
+    </Dropdown>
   );
 
   return (
