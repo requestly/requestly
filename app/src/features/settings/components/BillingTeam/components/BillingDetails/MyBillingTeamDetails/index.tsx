@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Col } from "antd";
 import { TeamPlanDetails } from "./components/TeamPlanDetails";
 import { BillingTeamMembers } from "./components/BillingTeamMembers";
@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { BillingTeamRoles } from "../../../types";
+import { BillingTeamRoles, PlanType } from "../../../types";
 import { BillingInformation } from "./components/BillingInformation";
 import { AppMembersDrawer } from "./components/AddMembersDrawer/AddMembersDrawer";
 
@@ -18,6 +18,16 @@ export const MyBillingTeamDetails: React.FC = () => {
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
 
+  const showBillingActions = useMemo(
+    () =>
+      !(
+        [PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(
+          billingTeamDetails?.subscriptionDetails?.rqSubscriptionType
+        ) || billingTeamDetails?.subscriptionDetails?.plan === "lite"
+      ),
+    [billingTeamDetails?.subscriptionDetails?.plan, billingTeamDetails?.subscriptionDetails?.rqSubscriptionType]
+  );
+
   if (!billingTeamDetails) return null;
 
   return (
@@ -27,22 +37,26 @@ export const MyBillingTeamDetails: React.FC = () => {
         <Col className="mt-8">
           <TeamPlanDetails billingTeamDetails={billingTeamDetails} />
         </Col>
-        <Col style={{ marginTop: "24px" }}>
-          <BillingTeamMembers openDrawer={() => setIsMembersDrawerOpen(true)} />
-        </Col>
-        {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
-          <Col style={{ marginTop: "24px" }}>
-            <BillingInvoiceCard />
-          </Col>
-        )}
-        {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager &&
-          !billingTeamDetails.browserstackGroupId && (
+        {showBillingActions && (
+          <>
             <Col style={{ marginTop: "24px" }}>
-              <BillingInformation />
+              <BillingTeamMembers openDrawer={() => setIsMembersDrawerOpen(true)} />
             </Col>
-          )}
+            {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
+              <Col style={{ marginTop: "24px" }}>
+                <BillingInvoiceCard />
+              </Col>
+            )}
+            {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager &&
+              !billingTeamDetails.browserstackGroupId && (
+                <Col style={{ marginTop: "24px" }}>
+                  <BillingInformation />
+                </Col>
+              )}
 
-        <AppMembersDrawer isOpen={isMembersDrawerOpen} onClose={() => setIsMembersDrawerOpen(false)} />
+            <AppMembersDrawer isOpen={isMembersDrawerOpen} onClose={() => setIsMembersDrawerOpen(false)} />
+          </>
+        )}
       </div>
     </div>
   );

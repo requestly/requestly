@@ -7,7 +7,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import {
   redirectToAccountDetails,
-  redirectToBillingTeamSettings,
+  redirectToMyPlan,
   redirectToOAuthUrl,
   redirectToProfileSettings,
   redirectToSettings,
@@ -83,7 +83,7 @@ export default function HeaderUser() {
       {
         disabled: appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR,
         label: "Plans and Billing",
-        onClick: () => redirectToBillingTeamSettings(navigate, window.location.pathname, "header"),
+        onClick: () => redirectToMyPlan(navigate, window.location.pathname, "header"),
       },
       {
         label: "Settings",
