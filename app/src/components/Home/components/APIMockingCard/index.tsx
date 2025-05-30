@@ -5,7 +5,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToMockEditorEditMock, redirectToRuleEditor } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import { globalActions } from "store/slices/global/slice";
-import { trackHomeRulesActionClicked } from "components/Home/analytics";
+import { trackHomeMockingActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
@@ -93,19 +93,13 @@ export const APIMockingCard: React.FC = () => {
 
     switch (modal) {
       case ImporterType.REQUESTLY: {
+        trackHomeMockingActionClicked("rules_importer_clicked");
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
-        trackHomeRulesActionClicked(
-          `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
-        );
         return;
       }
       case ImporterType.FILES: {
+        trackHomeMockingActionClicked("mock_importer_clicked");
         navigate(PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE, { state: { modal } });
-
-        // TODO: update the analytics event
-        trackHomeRulesActionClicked(
-          `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
-        );
         return;
       }
       default: {
@@ -125,6 +119,8 @@ export const APIMockingCard: React.FC = () => {
         />
       ),
       onClick: () => {
+        trackHomeMockingActionClicked("new_response_rule_clicked");
+        trackRuleCreationWorkflowStartedEvent(RuleType.RESPONSE, SOURCE.HOME_SCREEN);
         navigate(PATHS.RULE_EDITOR.CREATE_RULE.RESPONSE_RULE.ABSOLUTE, { state: { source: SOURCE.HOME_SCREEN } });
       },
     },
@@ -138,6 +134,7 @@ export const APIMockingCard: React.FC = () => {
         />
       ),
       onClick: () => {
+        trackHomeMockingActionClicked("new_mock_clicked");
         navigate(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE, { state: { source: SOURCE.HOME_SCREEN } });
       },
     },
@@ -197,13 +194,11 @@ export const APIMockingCard: React.FC = () => {
       wrapperClass="api-mocking-card"
       contentList={records}
       listItemClickHandler={(item) => {
-        // TODO: update analytics event
         if (item.type === RuleType.RESPONSE) {
-          trackHomeRulesActionClicked("rule_clicked");
-          trackRuleCreationWorkflowStartedEvent(item.type, SOURCE.HOME_SCREEN);
+          trackHomeMockingActionClicked("rule_clicked");
           redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
         } else if (item.type === MockType.API) {
-          // TODO: update analytics event
+          trackHomeMockingActionClicked("mock_clicked");
           redirectToMockEditorEditMock(navigate, item.id);
         }
       }}
