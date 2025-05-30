@@ -4,8 +4,8 @@
   height: 99%;
 
   .api-client-sheet-panel {
-    overflow-y: auto;
     flex: 1;
+    overflow-y: hidden;
 
     .ant-tabs-extra-content {
       margin-top: -6px;

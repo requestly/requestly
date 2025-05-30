@@ -43,6 +43,8 @@ The following domains are eligible for the student programme:
     "sch.gr",
     "edu.co",
     "hunterschools.org",
-    "epitech.eu"
+    "epitech.eu",
+    "strayer.edu",
+    "purdueglobal.edu"
   ]
 }
