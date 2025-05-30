@@ -17,10 +17,7 @@ import APP_CONSTANTS from "config/constants";
 import firebaseApp from "../../../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import SubscriptionInfo from "features/settings/components/Profile/ActiveLicenseInfo/SubscriptionInfo";
-import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
-import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import "./index.scss";
-import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
 import { PlanStatus, PlanType } from "../../types";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
@@ -209,22 +206,6 @@ export const UserPlanDetails = () => {
                           {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} Plan{" "}
                           {hasProfessionalStudentPlan ? <Tag color="green">Student Program</Tag> : ""}
                         </Col>
-                        {user?.details?.planDetails?.status !== "trialing" && !hasProfessionalStudentPlan && (
-                          <Col>
-                            <RQButton
-                              size="small"
-                              type="text"
-                              icon={<MdOutlineFileDownload />}
-                              className="user-download-invoice-btn"
-                              onClick={() => {
-                                trackPersonalSubscriptionDownloadInvoicesClicked();
-                                redirectToPersonalSubscription(navigate, true, true);
-                              }}
-                            >
-                              Download invoices
-                            </RQButton>
-                          </Col>
-                        )}
                       </Row>
                     </Space>
                   </div>
