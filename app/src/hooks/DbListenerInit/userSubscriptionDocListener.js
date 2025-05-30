@@ -79,6 +79,7 @@ export const newSchemaToOldSchemaAdapter = (firestoreData) => {
       duration: firestoreData?.duration ?? (checkIfAnnualPlan(firestoreData) ? "annually" : "monthly"),
       quantity: firestoreData?.quantity,
       billingId: firestoreData?.billingId,
+      isBrowserstackSubscription: firestoreData?.isBrowserstackSubscription ?? false,
     },
     type: firestoreData?.rqSubscriptionType ?? firestoreData?.type, //TODO: type to be deprecated after migration
   };

@@ -31,6 +31,7 @@ export interface UserAuth {
         duration: "annually" | "monthly";
         quantity: number;
         billingId: string | null;
+        isBrowserstackSubscription: boolean;
       };
     };
     organization?: any;

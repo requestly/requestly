@@ -15,6 +15,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 import "./index.scss";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -22,6 +23,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
+  const billingTeams = useSelector(getAvailableBillingTeams);
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
@@ -94,7 +96,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "billing",
             name: "Billing",
             path: PATHS.SETTINGS.BILLING.RELATIVE,
-            ishidden: !user.loggedIn,
+            ishidden: !user.loggedIn || billingTeams?.length === 0,
           },
         ],
       },
@@ -105,6 +107,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
       user.details?.profile?.isEmailVerified,
       user.loggedIn,
       userAttributes?.browserstack_id,
+      billingTeams?.length,
     ]
   );
 

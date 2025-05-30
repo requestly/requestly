@@ -111,7 +111,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
                 {getPrettyPlanName(getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan))}
                 {billingTeamDetails?.subscriptionDetails?.rqSubscriptionType === PlanType.STUDENT
                   ? " (Student Program)"
-                  : " team plan"}
+                  : " plan"}
               </Col>
               <Col>
                 <Popover
