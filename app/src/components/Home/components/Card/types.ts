@@ -2,8 +2,8 @@ import React from "react";
 import { DropDownProps } from "antd";
 
 export enum CardType {
-  API_CLIENT = "API_CLIENT",
   RULES = "RULES",
+  API_CLIENT = "API_CLIENT",
   API_MOCKING = "API_MOCKING",
 }
 

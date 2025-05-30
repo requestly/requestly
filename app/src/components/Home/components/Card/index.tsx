@@ -10,6 +10,7 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import { Conditional } from "components/common/Conditional";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { useHomeScreenContext } from "components/Home/contexts";
+import { getCardListItemType } from "./utils";
 
 interface CardProps {
   contentLoading?: boolean;
@@ -49,7 +50,7 @@ export const Card: React.FC<CardProps> = ({
     return (
       <AnimatePresence>
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
-          <Spin size="small" tip="Getting your records ready..." />
+          <Spin size="small" tip={`Getting your ${getCardListItemType(cardType)} ready...`} />
         </m.div>
       </AnimatePresence>
     );
