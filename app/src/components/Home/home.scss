@@ -203,7 +203,9 @@
 }
 
 .homepage-card-loader {
-  width: 456px;
+  width: 100%;
+  min-width: 325px;
+  max-width: 325px;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -214,7 +216,7 @@
     color: var(--white);
     margin-top: 8px;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 13px;
   }
 }
 
