@@ -1,3 +1,16 @@
+.api-mocking-card {
+  .api-mocking-import-icon {
+    display: flex;
+    width: 20px;
+    height: 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 3.6px;
+    border-radius: 14.4px;
+    background: var(--requestly-color-primary, #004eeb);
+  }
+}
+
 .api-mocking-card-dropdown.more-options {
   max-width: 328px;
 

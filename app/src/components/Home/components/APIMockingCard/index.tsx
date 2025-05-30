@@ -184,7 +184,11 @@ export const APIMockingCard: React.FC = () => {
           ? {
               menu: IMPORT_OPTIONS,
               label: "Requestly Rules and Mocks",
-              icon: <MdOutlineFileDownload />,
+              icon: (
+                <div className="api-mocking-import-icon">
+                  <MdOutlineFileDownload />
+                </div>
+              ),
             }
           : null
       }
