@@ -212,6 +212,10 @@ export const redirectToBillingTeamSettings = (navigate, redirectUrl, source) => 
   navigate(PATHS.SETTINGS.BILLING.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
+export const redirectToMyPlan = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.MY_PLAN.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
 export const redirectToProfileSettings = (navigate, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.PROFILE.ABSOLUTE, { state: { redirectUrl, source } });
 };

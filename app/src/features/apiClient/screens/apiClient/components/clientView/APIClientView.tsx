@@ -97,7 +97,7 @@ const APIClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const isHistoryPath = location.pathname.includes("history");
 
-  const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
+  const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
   const {
     apiClientRecords,
     onSaveRecord,
@@ -680,8 +680,8 @@ const APIClientView: React.FC<Props> = ({
             executeRequest={onSendButtonClick}
           />
         }
-        minSize={35}
-        initialSizes={[60, 40]}
+        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 35 : 350}
+        initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">
           <RequestTabs
