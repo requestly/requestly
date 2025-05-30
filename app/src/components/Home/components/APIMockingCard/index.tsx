@@ -93,7 +93,7 @@ export const APIMockingCard: React.FC = () => {
 
     switch (modal) {
       case ImporterType.REQUESTLY: {
-        trackHomeMockingActionClicked("rules_importer_clicked");
+        trackHomeMockingActionClicked("rule_importer_clicked");
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
         return;
       }
