@@ -165,8 +165,6 @@ const Editor: React.FC<EditorProps> = ({
         await applyPrettification();
         isDefaultPrettificationDone.current = true;
       })();
-    } else {
-      isUnsaveChange.current = true;
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
 
@@ -261,6 +259,7 @@ const Editor: React.FC<EditorProps> = ({
       width="100%"
       readOnly={isReadOnly}
       value={value ?? ""}
+      onKeyDown={() => (isUnsaveChange.current = true)}
       onChange={debouncedhandleEditorBodyChange}
       theme={vscodeDark}
       extensions={[
