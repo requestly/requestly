@@ -32,6 +32,7 @@ The following domains are eligible for the student programme:
     ".ac.id",
     "bennington.edu",
     "udg.mx",
+    "universitetiaab.com",
     ".ac.kr",
     "lakeheadu.ca",
     "estg.ipp.pt",
