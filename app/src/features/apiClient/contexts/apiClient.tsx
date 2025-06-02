@@ -58,7 +58,7 @@ interface ApiClientContextInterface {
   isImportModalOpen: boolean;
 
   selectedHistoryIndex: number;
-  onSelectionFromHistory: (index: number) => void;
+  setCurrentHistoryIndex: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
@@ -95,7 +95,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   isImportModalOpen: false,
 
   selectedHistoryIndex: 0,
-  onSelectionFromHistory: (index: number) => {},
+  setCurrentHistoryIndex: (index: number) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
@@ -288,7 +288,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     trackHistoryCleared();
   }, []);
 
-  const onSelectionFromHistory = useCallback((index: number) => {
+  const setCurrentHistoryIndex = useCallback((index: number) => {
     setSelectedHistoryIndex(index);
   }, []);
 
@@ -433,7 +433,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     history,
     addToHistory,
     clearHistory,
-    onSelectionFromHistory,
+    setCurrentHistoryIndex,
     selectedHistoryIndex,
 
     isImportModalOpen,
