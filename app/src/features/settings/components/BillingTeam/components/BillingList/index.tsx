@@ -16,6 +16,9 @@ export const BillingList: React.FC = () => {
 
     if (team) {
       navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
+    } else if (billingTeams.length) {
+      // Case when user is not part of any billing team but there are other teams available
+      navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0].id}`);
     } else {
       navigate(APP_CONSTANTS.PATHS.SETTINGS.MY_PLAN.RELATIVE);
     }
