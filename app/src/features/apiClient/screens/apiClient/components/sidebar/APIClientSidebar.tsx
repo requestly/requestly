@@ -40,7 +40,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     clearHistory,
     onNewClick,
     onImportClick,
-    onSelectionFromHistory,
+    setCurrentHistoryIndex,
     recordsToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
@@ -128,7 +128,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         <HistoryList
           history={history}
           selectedHistoryIndex={selectedHistoryIndex}
-          onSelectionFromHistory={onSelectionFromHistory}
+          onSelectionFromHistory={setCurrentHistoryIndex}
         />
       ),
     },
