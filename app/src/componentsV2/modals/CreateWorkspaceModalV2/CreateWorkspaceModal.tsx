@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { Checkbox, Input, Modal, Radio, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "@sentry/react";
+
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
@@ -201,6 +203,11 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
       toggleModal();
     } catch (err) {
       toast.error(err?.message || "Unable to Create Team");
+      Sentry.captureException("Create Team Failure", {
+        extra: {
+          message: err.message,
+        },
+      });
       trackNewTeamCreateFailure(workspaceName, workspaceType);
     } finally {
       setIsLoading(false);

@@ -7,13 +7,18 @@ import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { getUserOS } from "utils/Misc";
 
 interface Props {
   skipWorkspaceCheck: boolean;
 }
 
 export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: false }) => {
-  const isLocalSyncFlagSupported = useFeatureValue("local_sync", false);
+  const os = getUserOS();
+  const localSyncSupportFlag = useFeatureValue("local_sync_support", {
+    whitelist: ["macOS", "Linux"],
+  });
+  const isOsSupported = localSyncSupportFlag?.whitelist?.includes(os);
   const rawIsWorkspaceLocal = useSelector(getActiveWorkspace)?.workspaceType === WorkspaceType.LOCAL;
   const isWorkspaceLocal = options.skipWorkspaceCheck ? true : rawIsWorkspaceLocal;
   const appMode = useSelector(getAppMode);
@@ -22,7 +27,7 @@ export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: 
 
   useEffect(() => {
     if (
-      isLocalSyncFlagSupported === true &&
+      isOsSupported &&
       appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
       isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC) &&
       isWorkspaceLocal
@@ -31,7 +36,7 @@ export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: 
       return;
     }
     setIsLocalSyncSupported(false);
-  }, [appMode, isLocalSyncFlagSupported, isWorkspaceLocal, options.skipWorkspaceCheck]);
+  }, [appMode, isOsSupported, isWorkspaceLocal, options.skipWorkspaceCheck]);
 
   return isLocalSyncSupported;
 };

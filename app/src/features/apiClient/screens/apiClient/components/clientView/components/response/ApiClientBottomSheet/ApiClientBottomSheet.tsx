@@ -69,7 +69,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     const baseTabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.RESPONSE,
-        label: "Response body",
+        label: "Body",
         children: <ResponseBody responseText={response?.body} contentTypeHeader={contentTypeHeader} />,
       },
       {

@@ -25,4 +25,4 @@ The application will start running at http://localhost:3000.
 
 By default, the local application communicates to our dev Firebase server. 
 
-The browser extension to be used should be built using local environment configuration. Follow [guide](/browser-extension/mv2/README.md).
+The browser extension to be used should be built using local environment configuration. Follow [guide](/browser-extension/mv3/README.md).
