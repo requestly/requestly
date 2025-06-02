@@ -12,9 +12,13 @@ function parseSingleModeBody(params: {
 }): RQAPI.RequestBodyContainer {
   const { contentType, body } = params;
   switch (contentType) {
-    case RequestContentType.FORM:
+    case RequestContentType.MULTIPART_FORM:
       return {
-        form: body as RQAPI.RequestFormBody,
+        multipartForm: body as RQAPI.RequestFormBody,
+      };
+    case RequestContentType.FORM_URL_ENCODED:
+      return {
+        formURLEncoded: body as RQAPI.RequestFormBody,
       };
     case RequestContentType.JSON:
       return {
@@ -70,7 +74,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           }
         >
           <Radio value="text">Raw</Radio>
-          <Radio value={RequestContentType.FORM}>Form</Radio>
+          <Radio value={RequestContentType.FORM_URL_ENCODED}>Form URL Encoded</Radio>
+          <Radio value={RequestContentType.MULTIPART_FORM}>Multipart Form</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -106,8 +111,11 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           />
         );
 
-      case RequestContentType.FORM:
-        return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
+      case RequestContentType.FORM_URL_ENCODED:
+      case RequestContentType.MULTIPART_FORM:
+        return (
+          <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} contentType={contentType} />
+        );
 
       default:
         return null;
@@ -120,7 +128,9 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
+      {contentType === RequestContentType.FORM_URL_ENCODED || contentType === RequestContentType.MULTIPART_FORM
+        ? requestBodyOptions
+        : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );
