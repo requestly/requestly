@@ -172,8 +172,7 @@ const ApiClientCard = () => {
               size="small"
               type="primary"
               onClick={() => {
-                navigate(PATHS.API_CLIENT.ABSOLUTE);
-                trackHomeApisActionClicked("create/send_first_api");
+                createNewHandler(CreateType.API);
               }}
             >
               New request
