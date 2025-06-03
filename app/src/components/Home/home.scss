@@ -204,20 +204,24 @@
 }
 
 .homepage-card-loader {
-  width: 100%;
-  min-width: 325px;
-  max-width: 325px;
-  height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
+  flex-direction: column;
+  height: 100%;
 
   & .ant-spin-text {
     color: var(--white);
     margin-top: 8px;
     font-weight: 500;
     font-size: 13px;
+  }
+
+  div.middle-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
   }
 }
 

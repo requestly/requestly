@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Spin } from "antd";
 import { HomepageEmptyCard } from "../EmptyCard";
-import { m, AnimatePresence } from "framer-motion";
+import { m } from "framer-motion";
 import { CardListItem, CardType, EmptyCardOptions, ImportOptions } from "./types";
 import { RQDropdown } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
@@ -47,16 +47,6 @@ export const Card: React.FC<CardProps> = ({
   const MAX_LIST_ITEMS_TO_SHOW = showFooter ? 5 : 8;
   const { isAnyRecordExist } = useHomeScreenContext();
 
-  if (contentLoading)
-    return (
-      <AnimatePresence>
-        {/* @ts-ignore */}
-        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
-          <Spin size="small" tip={`Getting your ${getCardListItemType(cardType)} ready...`} />
-        </m.div>
-      </AnimatePresence>
-    );
-
   const cardHeader = (
     <div className="header-content">
       <div className="details">
@@ -69,6 +59,49 @@ export const Card: React.FC<CardProps> = ({
       <div className="action-buttons">{actionButtons}</div>
     </div>
   );
+
+  const cardFooter = (
+    <Conditional condition={showFooter}>
+      <div className="footer-section">
+        {viewAllCtaLink ? (
+          <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
+            {viewAllCta}
+          </Link>
+        ) : null}
+
+        {importOptions ? (
+          <div className="import-dropdown">
+            <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
+              <RQButton className="import-dropdown-button" type="transparent">
+                <CardIcon icon={importOptions.icon} label={importOptions.label} />
+                Import
+                <MdOutlineKeyboardArrowDown />
+              </RQButton>
+            </RQDropdown>
+          </div>
+        ) : null}
+      </div>
+    </Conditional>
+  );
+
+  if (contentLoading)
+    return (
+      <div className={`content-container ${wrapperClass}`}>
+        <m.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          // @ts-ignore
+          className="homepage-card-loader"
+        >
+          {cardHeader}
+          <div className="middle-section">
+            <Spin size="small" tip={`Getting your ${getCardListItemType(cardType)} ready...`} />
+          </div>
+          {cardFooter}
+        </m.div>
+      </div>
+    );
 
   const noActivityMessage = (
     <div className="empty-state">
@@ -98,40 +131,14 @@ export const Card: React.FC<CardProps> = ({
       <div className="middle-section">{noActivityMessage}</div>
     );
 
-  const cardFooter = (
-    <Conditional condition={showFooter}>
-      <div className="footer-section">
-        {viewAllCtaLink ? (
-          <Link className="view-all-cta" to={viewAllCtaLink} onClick={viewAllCtaOnClick}>
-            {viewAllCta}
-          </Link>
-        ) : null}
-
-        {importOptions ? (
-          <div className="import-dropdown">
-            <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
-              <RQButton className="import-dropdown-button" type="transparent">
-                <CardIcon icon={importOptions.icon} label={importOptions.label} />
-                Import
-                <MdOutlineKeyboardArrowDown />
-              </RQButton>
-            </RQDropdown>
-          </div>
-        ) : null}
-      </div>
-    </Conditional>
-  );
-
   return (
-    <AnimatePresence>
+    <>
       {isAnyRecordExist ? (
-        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <div className={`content-container ${wrapperClass}`}>
-            {cardHeader}
-            {cardContentList}
-            {cardFooter}
-          </div>
-        </m.div>
+        <div className={`content-container ${wrapperClass}`}>
+          {cardHeader}
+          {cardContentList}
+          {cardFooter}
+        </div>
       ) : (
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <HomepageEmptyCard
@@ -142,6 +149,6 @@ export const Card: React.FC<CardProps> = ({
           />
         </m.div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
