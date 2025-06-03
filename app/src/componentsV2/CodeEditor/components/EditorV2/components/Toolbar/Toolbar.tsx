@@ -88,7 +88,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   };
 
   return (
-    <div className="code-editor-toolbar">
+    <div className="code-editor-toolbar no-drag">
       <div className="code-editor-custom-options-row">
         {customOptions ? (
           <>
