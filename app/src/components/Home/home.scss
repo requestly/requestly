@@ -12,7 +12,8 @@
   }
 
   & .welcome-message {
-    margin: 40px auto;
+    margin: 40px 0;
+    margin-left: 90px;
     max-width: 960px;
     align-items: center;
     line-height: 22px;
@@ -29,10 +30,11 @@
   }
 
   & .homepage-primary-cards-wrapper {
-    gap: 48px;
+    gap: 24px;
     justify-content: center;
     align-items: flex-start;
     margin-top: 40px;
+    padding-bottom: 12px;
 
     & > .ant-col {
       max-width: 49%;
@@ -45,27 +47,53 @@
 }
 
 .homepage-emptycard {
-  width: 456px;
-  height: 322px;
+  width: 100%;
+  min-width: 325px;
+  max-width: 325px;
+  padding-top: 20px;
+  height: 304px;
   display: flex;
   flex-direction: column;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
   border-radius: 16px;
   background: var(--requestly-color-neutral-900);
-  padding: 24px;
+  padding: 16px;
 
   .header-section {
     display: flex;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
-    .header-content {
+    .details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .icon-container {
+        display: flex;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 32px;
+        background: var(--requestly-color-white-t-20);
+
+        img {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
+
       h1 {
         line-height: 20px;
         font-size: 14px;
         font-weight: 500;
-        margin: 0 0 4px;
+        margin: 0;
       }
+    }
+
+    .title-badge-container {
       p {
         line-height: 17px;
         font-size: var(--requestly-font-size-xs);
@@ -73,6 +101,14 @@
         color: var(--requestly-color-text-subtle);
         margin: 0;
       }
+
+      .rq-badge {
+        margin-bottom: 0;
+      }
+    }
+
+    .action-buttons {
+      margin-left: auto;
     }
   }
 
@@ -87,7 +123,7 @@
       font-weight: 400;
       display: list-item;
       list-style-type: disc;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
   }
 
@@ -102,13 +138,19 @@
   }
 
   .play-icon {
+    margin-top: auto;
     display: flex;
     align-items: center;
     text-decoration: none;
     color: unset;
-    img {
-      height: 24px;
-      width: auto;
+
+    svg {
+      --size: 20px;
+      width: var(--size);
+      height: var(--size);
+
+      color: var(--requestly-color-text-default);
+      flex-shrink: 0;
       margin-right: 6px;
     }
     p {
@@ -139,6 +181,7 @@
   align-items: center;
   justify-content: center;
   margin-top: 16px;
+  margin-left: auto;
 
   &-label {
     margin-right: 12px;
@@ -152,21 +195,33 @@
     line-height: 18px;
     font-size: 12px;
   }
+
+  svg {
+    --size: 16px;
+    width: var(--size);
+    height: var(--size);
+  }
 }
 
 .homepage-card-loader {
-  width: 456px;
-  height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
+  flex-direction: column;
+  height: 100%;
 
   & .ant-spin-text {
     color: var(--white);
     margin-top: 8px;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 13px;
+  }
+
+  div.middle-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
   }
 }
 
@@ -181,21 +236,40 @@
 .content-container {
   border-radius: 16px;
   background: var(--requestly-color-neutral-900);
-  width: 456px;
-  padding-top: 24px;
-  height: 390px;
+  width: 100%;
+  min-width: 325px;
+  max-width: 325px;
+  padding-top: 20px;
+  height: 346px;
   display: flex;
   flex-direction: column;
 
   .header-content {
-    padding: 0 24px;
+    padding: 0 20px;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
+
     .details {
       display: flex;
       align-items: center;
       gap: 12px;
+
+      .icon-container {
+        display: flex;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 32px;
+        background: var(--requestly-color-white-t-20);
+
+        img {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
 
       h1 {
         line-height: 20px;
@@ -207,6 +281,35 @@
 
     .action-buttons {
       display: flex;
+      align-items: center;
+
+      // TODO: Create a separate component for this dropdown button
+      .ant-dropdown-button {
+        .ant-btn-sm {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+          gap: 6px;
+          text-align: center;
+          color: var(--requestly-color-text-default, #fff);
+          font-style: normal;
+          font-family: var(--requestly-font-family-default, Inter);
+          font-weight: var(--requestly-font-weight-medium);
+          height: 24px;
+          padding: var(--space-0, 0px) var(--space-4, 8px);
+          font-size: var(--requestly-font-size-xs, 11px);
+          line-height: var(--requestly-font-line-height-xs, 15px);
+          background: var(--requestly-color-primary, #004eeb);
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+        }
+
+        .ant-btn-icon-only {
+          svg {
+            flex-shrink: 0;
+          }
+        }
+      }
 
       .import-dropdown-trigger {
         margin-right: 4px;
@@ -218,7 +321,8 @@
   }
 
   .middle-section {
-    padding: 0 24px;
+    padding: 0 20px;
+
     h2 {
       line-height: 18px;
       font-size: 12px;
@@ -256,10 +360,15 @@
         }
 
         &-icon {
-          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
           svg {
-            width: 20px;
-            height: 20px;
+            --size: 16px;
+            width: var(--size);
+            height: var(--size);
+            color: var(--requestly-color-text-placeholder);
           }
         }
 
@@ -282,6 +391,37 @@
         }
       }
     }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-2, 4px);
+      padding: 20px 0;
+
+      img {
+        --size: 48px;
+        width: var(--size);
+        height: var(--size);
+        flex-shrink: 0;
+      }
+
+      .title {
+        color: var(--requestly-color-text-default, #fff);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px; /* 150% */
+      }
+
+      .description {
+        text-align: center;
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-size: var(--requestly-font-size-xs);
+        line-height: 17px; /* 154.545% */
+      }
+    }
   }
 
   .footer-section {
@@ -292,7 +432,6 @@
     justify-content: space-between;
     align-items: center;
     border-radius: 0px 0px 16px 16px;
-    background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
     .import-dropdown {
       display: flex;
@@ -304,9 +443,16 @@
         &:hover {
           background: none;
         }
+
         img {
           width: auto;
           height: auto;
+        }
+
+        svg {
+          --size: 16px;
+          width: var(--size);
+          height: var(--size);
         }
       }
     }
@@ -332,6 +478,10 @@
         line-height: 20px;
         font-size: 14px;
       }
+    }
+
+    li.ant-dropdown-menu-item-divider {
+      margin-left: 8px;
     }
   }
 }
