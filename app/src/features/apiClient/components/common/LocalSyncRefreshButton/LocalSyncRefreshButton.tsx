@@ -17,16 +17,10 @@ export const LocalSyncRefreshButton = () => {
   const { forceRefreshApiClientRecords, apiClientRecordsRepository } = useApiClientContext();
   const { forceRefreshEnvironments } = useEnvironmentManager();
 
-  const handleRefresh = useCallback(() => {
-    reloadFsManager(apiClientRecordsRepository.meta.rootPath).then(() => {
-      Promise.all([forceRefreshApiClientRecords(), forceRefreshEnvironments()])
-        .then(() => {
-          toast.success("Workspace refreshed successfully!");
-        })
-        .catch((error) => {
-          throw error;
-        });
-    });
+  const handleRefresh = useCallback(async () => {
+    await reloadFsManager(apiClientRecordsRepository.meta.rootPath);
+    await Promise.all([forceRefreshApiClientRecords(), forceRefreshEnvironments()]);
+    toast.success("Workspace refreshed successfully!");
   }, [forceRefreshApiClientRecords, forceRefreshEnvironments, apiClientRecordsRepository]);
 
   if (!isLocalWorkspace) return null;
