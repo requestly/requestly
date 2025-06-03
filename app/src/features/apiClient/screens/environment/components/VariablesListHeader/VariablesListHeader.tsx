@@ -9,6 +9,7 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcut
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
 import "./variablesListHeader.scss";
+import { LocalSyncRefreshButton } from "features/apiClient/components/common/LocalSyncRefreshButton/LocalSyncRefreshButton";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -48,21 +49,24 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   return (
     <div className="variables-list-header">
       {!hideBreadcrumb ? (
-        <RQBreadcrumb
-          autoFocus={isNewEnvironment}
-          placeholder="New Environment"
-          recordName={currentEnvironmentName}
-          onBlur={handleNewEnvironmentNameChange}
-          disabled={isGlobalEnvironment(environmentId)}
-          defaultBreadcrumbs={[
-            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-            {
-              isEditable: true,
-              pathname: window.location.pathname,
-              label: currentEnvironmentName,
-            },
-          ]}
-        />
+        <div className="variables-list-header-breadcrumb-container">
+          <RQBreadcrumb
+            autoFocus={isNewEnvironment}
+            placeholder="New Environment"
+            recordName={currentEnvironmentName}
+            onBlur={handleNewEnvironmentNameChange}
+            disabled={isGlobalEnvironment(environmentId)}
+            defaultBreadcrumbs={[
+              { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+              {
+                isEditable: true,
+                pathname: window.location.pathname,
+                label: currentEnvironmentName,
+              },
+            ]}
+          />
+          <LocalSyncRefreshButton />
+        </div>
       ) : (
         <div />
       )}

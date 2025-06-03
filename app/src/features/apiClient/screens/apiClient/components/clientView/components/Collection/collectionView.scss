@@ -2,6 +2,13 @@
   width: 100%;
   height: 100%;
 
+  .collection-view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+  }
+
   .collection-view-breadcrumb-container {
     padding: var(--space-5, 12px) var(--space-6, 16px);
 
