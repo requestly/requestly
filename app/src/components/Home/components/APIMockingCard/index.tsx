@@ -40,7 +40,7 @@ const APIMockingCardDropdownItem: React.FC<{ icon: string; title: string; descri
 };
 
 export const APIMockingCard: React.FC = () => {
-  const MAX_RULES_TO_SHOW = 5;
+  const MAX_ITEMS_TO_SHOW = 5;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -82,7 +82,7 @@ export const APIMockingCard: React.FC = () => {
         }
       )
       ?.sort((a, b) => b.modificationDate - a.modificationDate)
-      ?.slice(0, MAX_RULES_TO_SHOW + 1);
+      ?.slice(0, MAX_ITEMS_TO_SHOW + 1);
   }, [responseRules, mockRecords]);
 
   const importTriggerHandler = (modal: ImporterType.REQUESTLY | ImporterType.FILES): void => {
