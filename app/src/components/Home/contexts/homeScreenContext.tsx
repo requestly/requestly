@@ -9,10 +9,10 @@ import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Rule } from "@requestly/shared/types/entities/rules";
-import Logger from "lib/logger";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { useFetchMockRecords } from "features/mocks/screens/mocksList/components/MocksList/hooks/useFetchMockRecords";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import * as Sentry from "@sentry/react";
 
 interface HomeScreenContextInterface {
   // rules
@@ -57,7 +57,11 @@ export const HomeScreenProvider: React.FC<HomeScreenProviderProps> = ({ children
           setRules(rules);
         })
         .catch((e) => {
-          Logger.log(e);
+          Sentry.captureException(new Error("Failed to fetch rules from storage"), {
+            extra: {
+              storageServiceError: e,
+            },
+          });
         })
         .finally(() => {
           setIsRulesLoading(false);
