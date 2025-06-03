@@ -11,6 +11,7 @@ import { Conditional } from "components/common/Conditional";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { useHomeScreenContext } from "components/Home/contexts";
 import { getCardListItemType } from "./utils";
+import { CardIcon } from "../CardIcon";
 
 interface CardProps {
   contentLoading?: boolean;
@@ -49,6 +50,7 @@ export const Card: React.FC<CardProps> = ({
   if (contentLoading)
     return (
       <AnimatePresence>
+        {/* @ts-ignore */}
         <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
           <Spin size="small" tip={`Getting your ${getCardListItemType(cardType)} ready...`} />
         </m.div>
@@ -109,11 +111,7 @@ export const Card: React.FC<CardProps> = ({
           <div className="import-dropdown">
             <RQDropdown menu={{ items: importOptions.menu.slice(0, 3) }} trigger={["click"]}>
               <RQButton className="import-dropdown-button" type="transparent">
-                {typeof importOptions.icon === "string" ? (
-                  <img src={importOptions.icon} alt={importOptions.label} />
-                ) : (
-                  importOptions.icon
-                )}
+                <CardIcon icon={importOptions.icon} label={importOptions.label} />
                 Import
                 <MdOutlineKeyboardArrowDown />
               </RQButton>

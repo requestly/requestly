@@ -5,6 +5,7 @@ import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PRODUCT_FEATURES } from "./staticData";
 import { RQButton } from "lib/design-system-v2/components";
 import { EmptyCardOptions, ImportOptions } from "../Card/types";
+import { CardIcon } from "../CardIcon";
 import "./EmptyCard.scss";
 
 interface Props extends EmptyCardOptions {
@@ -51,11 +52,7 @@ export const HomepageEmptyCard: React.FC<Props> = ({
         <div className="import-dropdown">
           <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
             <RQButton type="transparent">
-              {typeof importDropdownOptions.icon === "string" ? (
-                <img src={importDropdownOptions.icon} alt={importDropdownOptions.label} />
-              ) : (
-                importDropdownOptions.icon
-              )}
+              <CardIcon icon={importDropdownOptions.icon} label={importDropdownOptions.label} />
               {importDropdownOptions.label}
               <MdOutlineKeyboardArrowDown />
             </RQButton>
