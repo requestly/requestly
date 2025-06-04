@@ -119,7 +119,7 @@ export const APIMockingCard: React.FC = () => {
         />
       ),
       onClick: () => {
-        trackHomeMockingActionClicked("new_response_rule_clicked");
+        trackHomeMockingActionClicked("create_response_rule");
         trackRuleCreationWorkflowStartedEvent(RuleType.RESPONSE, SOURCE.HOME_SCREEN);
         navigate(PATHS.RULE_EDITOR.CREATE_RULE.RESPONSE_RULE.ABSOLUTE, { state: { source: SOURCE.HOME_SCREEN } });
       },
@@ -134,7 +134,7 @@ export const APIMockingCard: React.FC = () => {
         />
       ),
       onClick: () => {
-        trackHomeMockingActionClicked("new_mock_clicked");
+        trackHomeMockingActionClicked("create_mock_endpoint");
         navigate(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE, { state: { source: SOURCE.HOME_SCREEN } });
       },
     },
@@ -198,7 +198,7 @@ export const APIMockingCard: React.FC = () => {
           trackHomeMockingActionClicked("rule_clicked");
           redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
         } else if (item.type === MockType.API) {
-          trackHomeMockingActionClicked("mock_clicked");
+          trackHomeMockingActionClicked("mock_endpoint_clicked");
           redirectToMockEditorEditMock(navigate, item.id);
         }
       }}
