@@ -22,6 +22,7 @@ import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
+import { WorkspaceType } from "types";
 
 interface AppSumoCode {
   error: string;
@@ -131,8 +132,7 @@ const AppSumoModal: React.FC = () => {
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
     try {
       const response: any = await createTeam({ teamName: newTeamName });
-      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
-
+      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo", WorkspaceType.SHARED);
       switchWorkspace(response?.data?.teamId, "appsumo");
 
       setIsLoading(false);

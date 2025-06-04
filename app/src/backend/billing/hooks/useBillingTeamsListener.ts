@@ -55,13 +55,6 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      // Seed the attribute lazily
-      // TODO: Can be removed after a month as this seeding is already present in backend
-      const isAcceleratorBillingTeam = billingTeamDetails.some((team) => team.isAcceleratorTeam === true);
-      if (isAcceleratorBillingTeam) {
-        submitAttrUtil(TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE, "accelerator");
-      }
-
       if (isCompanyEmail(user.details?.emailType)) {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),

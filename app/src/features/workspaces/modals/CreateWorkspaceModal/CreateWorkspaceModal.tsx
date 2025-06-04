@@ -3,6 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "@sentry/react";
+
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -23,13 +25,9 @@ import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/commo
 import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import "./CreateWorkspaceModal.css";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 interface Props {
   isOpen: boolean;
@@ -45,7 +43,6 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
 
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const availableWorkspaces = useSelector(getAllWorkspaces);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -55,9 +52,7 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
-  const { claimIncentiveRewards } = useIncentiveActions();
   const { switchWorkspace } = useWorkspaceHelpers();
-
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
 
@@ -88,27 +83,7 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
           teamName: newTeamName,
         });
 
-        claimIncentiveRewards({
-          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-          metadata: { num_workspaces: availableWorkspaces?.length || 1 },
-        })?.then((response) => {
-          if (response.data?.success) {
-            dispatch(
-              incentivizationActions.setUserMilestoneAndRewardDetails({
-                userMilestoneAndRewardDetails: response.data?.data,
-              })
-            );
-
-            dispatch(
-              incentivizationActions.toggleActiveModal({
-                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                newValue: true,
-                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-              })
-            );
-          }
-        });
-        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal", WorkspaceType.SHARED);
         toast.info("Workspace Created");
 
         const teamId = response.data.teamId;
@@ -144,21 +119,30 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
           }
         }
 
-        trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal", isNotifyAllSelected);
+        trackNewTeamCreateSuccess(
+          teamId,
+          newTeamName,
+          "create_workspace_modal",
+          WorkspaceType.SHARED,
+          isNotifyAllSelected
+        );
         handlePostTeamCreation(teamId, hasMembersInSameDomain);
 
         callback?.();
         toggleModal();
       } catch (err) {
         toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
+        Sentry.captureException("Create Team Failure", {
+          extra: {
+            message: err.message,
+          },
+        });
+        trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
       } finally {
         setIsLoading(false);
       }
     },
     [
-      claimIncentiveRewards,
-      availableWorkspaces?.length,
       isNotifyAllSelected,
       handlePostTeamCreation,
       callback,
@@ -246,12 +230,14 @@ const CreateWorkspaceModal: React.FC<Props> = ({ isOpen, toggleModal, callback, 
           <Col>
             {isVerifiedBusinessUser ? (
               <>
-                <Checkbox checked={isNotifyAllSelected} onChange={(e) => setIsNotifyAllSelected(e.target.checked)} />
-                <span className="ml-2 text-gray text-sm">
-                  Notify all{" "}
-                  <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
-                  users to join this workspace
-                </span>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <Checkbox checked={isNotifyAllSelected} onChange={(e) => setIsNotifyAllSelected(e.target.checked)} />
+                  <span style={{ lineHeight: "1.5em" }} className="ml-2 text-gray text-sm">
+                    Notify all{" "}
+                    <span className="text-white text-bold">{getDomainFromEmail(user?.details?.profile?.email)}</span>{" "}
+                    users to join this workspace
+                  </span>
+                </div>
               </>
             ) : (
               <LearnMoreLink

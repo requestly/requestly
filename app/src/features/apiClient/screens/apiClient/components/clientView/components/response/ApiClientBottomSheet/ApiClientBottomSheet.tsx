@@ -7,14 +7,14 @@ import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
 import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
-import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
+import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
 import { ApiClientLoader } from "../LoadingPlaceholder/ApiClientLoader";
 import { EmptyResponsePlaceholder } from "../EmptyResponsePlaceholder/EmptyResponsePlaceholder";
 import { AbortError } from "../../errors/AbortError";
 import { RequestError } from "../../errors/RequestError";
-import "./apiclientBottomSheet.scss";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
+import "./apiclientBottomSheet.scss";
 
 interface Props {
   response: RQAPI.Response;
@@ -25,6 +25,7 @@ interface Props {
   onCancelRequest: () => void;
   handleTestResultRefresh: () => Promise<void>;
   executeRequest: () => Promise<void>;
+  onDismissError: () => void;
   error?: RQAPI.ExecutionError;
   warning?: RQAPI.ExecutionWarning;
 }
@@ -46,16 +47,29 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   error,
   warning,
   executeRequest,
+  onDismissError,
 }) => {
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
   }, [response?.headers]);
 
+  const testResultsStats = useMemo(() => {
+    if (!testResults?.length) return null;
+
+    const passedTestsCount = testResults.filter((testResult) => testResult.status === TestStatus.PASSED).length;
+
+    return (
+      <Tag className={`count test-results-stats ${passedTestsCount === testResults.length ? "passed" : "failed"}`}>
+        ({passedTestsCount} / {testResults.length})
+      </Tag>
+    );
+  }, [testResults]);
+
   const bottomSheetTabItems = useMemo(() => {
     const baseTabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.RESPONSE,
-        label: "Response body",
+        label: "Body",
         children: <ResponseBody responseText={response?.body} contentTypeHeader={contentTypeHeader} />,
       },
       {
@@ -67,7 +81,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: <>Tests {testResults?.length ? <Tag className="count">{testResults?.length}</Tag> : null}</>,
+        label: <>Tests {testResultsStats}</>,
         children: <TestsView testResults={testResults} handleTestResultRefresh={handleTestResultRefresh} />,
       },
     ];
@@ -81,16 +95,16 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       });
     }
 
-    if (!response) {
-      if (isRequestCancelled) {
-        return baseTabItems.map((tabItem) => {
-          return {
-            ...tabItem,
-            children: <AbortError error={error} onRetry={executeRequest} />,
-          };
-        });
-      }
+    if (isRequestCancelled) {
+      return baseTabItems.map((tabItem) => {
+        return {
+          ...tabItem,
+          children: <AbortError error={error} onRetry={executeRequest} onDismiss={onDismissError} />,
+        };
+      });
+    }
 
+    if (!response) {
       if (isFailed) {
         return baseTabItems.map((tabItem) => {
           return {
@@ -126,6 +140,8 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     onCancelRequest,
     response,
     testResults,
+    testResultsStats,
+    onDismissError,
   ]);
 
   return (

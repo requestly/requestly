@@ -5,15 +5,12 @@ import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
 import { Typography, Row, Col } from "antd";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
-import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
 
 //IMAGES
 // import AppleIconWhite from "../../../assets/img/icons/common/apple-white.svg";
 // import MicrosoftIcon from "../../../assets/img/icons/common/microsoft.svg";
 // import GithubIcon from "../../../assets/img/icons/common/github.svg";
 
-//UTILS
-// import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
 import { getAuthErrorMessage, AuthTypes } from "../utils";
 
@@ -42,6 +39,7 @@ import "./AuthForm.css";
 import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTANTS.AUTH;
 
@@ -63,7 +61,6 @@ const AuthForm = ({
 
   //GLOBAL STATE
   const appMode = useSelector(getAppMode);
-  const path = window.location.pathname;
   const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   const [actionPending, setActionPending] = useState(false);
   const [lastEmailInputHandled, setLastEmailInputHandled] = useState("");
@@ -304,15 +301,6 @@ const AuthForm = ({
     }
   };
 
-  const BackButton = ({ action }) => {
-    return (
-      <button className="back-to-login-btn secondary-text cursor-pointer" style={{ padding: 0 }} onClick={action}>
-        <HiArrowLeft />
-        Back
-      </button>
-    );
-  };
-
   const renderRightFooterLink = () => {
     switch (MODE) {
       case AUTH_ACTION_LABELS.LOG_IN:
@@ -473,11 +461,21 @@ const AuthForm = ({
                 <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
-                  <a className="auth-modal-link" href="https://requestly.com/terms" target="_blank" rel="noreferrer">
+                  <a
+                    className="auth-modal-link"
+                    href={getLinkWithMetadata("https://requestly.com/terms")}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Requestly Terms
                   </a>
                   . Learn about how we use and protect your data in our{" "}
-                  <a className="auth-modal-link" href="https://requestly.com/privacy" target="_blank" rel="noreferrer">
+                  <a
+                    className="auth-modal-link"
+                    href={getLinkWithMetadata("https://requestly.com/privacy")}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Privacy Policy
                   </a>
                   .
@@ -515,16 +513,6 @@ const AuthForm = ({
             <InfoMessage />
           </Row>
           <Row className="auth-wrapper mt-1">
-            {!path.includes(PATHS.AUTH.RESET_PASSWORD.RELATIVE) && (
-              <>
-                <BackButton
-                  action={() => {
-                    SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
-                    setEmail("");
-                  }}
-                />
-              </>
-            )}
             <div className="w-full mt-20">{renderEmailField()}</div>
             {renderPasswordField()} {/* NOT SHOWN WHEN REQUESTING RESET */}
             <FormSubmitButton />

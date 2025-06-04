@@ -27,7 +27,6 @@ import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { RecordStatus, Rule, ResponseRule, RuleType, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
-import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import "./RuleEditorModal.css";
@@ -206,10 +205,6 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     },
     [handleModalClose, showRuleCreatedFromModalToast]
   );
-
-  useEffect(() => {
-    trackRuleEditorViewed(analyticEventEditorViewedSource, ruleType);
-  }, [analyticEventEditorViewedSource, ruleType]);
 
   return (
     <RQModal

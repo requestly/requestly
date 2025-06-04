@@ -43,6 +43,7 @@ import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { isLocalFSWorkspace, isPersonalWorkspace, isSharedWorkspace } from "features/workspaces/utils";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import WorkspaceItem from "./WorkspaceItem";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -73,12 +74,19 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     }
   };
 
+  const tooltipTitle =
+    activeWorkspace?.workspaceType === WorkspaceType.LOCAL
+      ? activeWorkspace.rootPath
+      : prettifyWorkspaceName(activeWorkspaceName);
+
   return (
-    <Dropdown
-      overlay={menu}
-      trigger={["click"]}
-      className="workspace-selector-dropdown no-drag"
-      onOpenChange={handleWorkspaceDropdownClick}
+    <Tooltip
+      overlayClassName="workspace-selector-tooltip"
+      style={{ top: "35px" }}
+      title={tooltipTitle}
+      placement={"bottomRight"}
+      showArrow={false}
+      mouseEnterDelay={0.5}
     >
       <div className="cursor-pointer items-center">
         {activeWorkspace ? (
@@ -119,7 +127,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
           </>
         )}
       </div>
-    </Dropdown>
+    </Tooltip>
   );
 };
 
@@ -132,10 +140,12 @@ const WorkspaceSelector = () => {
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const _availableWorkspaces = availableWorkspaces || [];
-  const sortedAvailableWorkspaces = [
-    ..._availableWorkspaces.filter((team) => !team?.archived),
-    ..._availableWorkspaces.filter((team) => team?.archived),
+  let sortedAvailableWorkspaces = _availableWorkspaces.filter((team) => !team.browserstackDetails); // Filtering our Browserstack Workspaces)
+  sortedAvailableWorkspaces = [
+    ...sortedAvailableWorkspaces.filter((team) => !team?.archived),
+    ...sortedAvailableWorkspaces.filter((team) => team?.archived),
   ];
+
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -231,7 +241,7 @@ const WorkspaceSelector = () => {
   };
 
   const handleCreateNewWorkspaceRedirect = () => {
-    if (user.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    if (user.loggedIn) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",
@@ -318,12 +328,13 @@ const WorkspaceSelector = () => {
         key="2"
         className="workspace-menu-item"
         onClick={() => {
+          trackSignUpButtonClicked(SOURCE.WORKSPACE_SIDEBAR);
           promptUserSignupModal(() => {}, SOURCE.WORKSPACE_SIDEBAR);
-          trackWorkspaceDropdownClicked("sign_in");
+          trackWorkspaceDropdownClicked("sign_up");
         }}
         icon={<UserOutlined className="icon-wrapper" />}
       >
-        Sign in
+        Sign up
       </Menu.Item>
     </Menu>
   );

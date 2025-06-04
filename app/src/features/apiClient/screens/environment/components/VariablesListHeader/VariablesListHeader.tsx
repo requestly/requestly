@@ -3,13 +3,12 @@ import { Input } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
-import { useLocation } from "react-router-dom";
-import "./variablesListHeader.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
+import "./variablesListHeader.scss";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -35,16 +34,14 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   exportActions,
 }) => {
   const { renameEnvironment } = useEnvironmentManager();
-  const { replaceTab } = useTabsLayoutContext();
-  const location = useLocation();
+  const { setTitle, getIsActive, getIsNew } = useGenericState();
+  const enableHotKey = getIsActive();
+  const isNewEnvironment = getIsNew();
 
   const handleNewEnvironmentNameChange = (newName: string) => {
-    renameEnvironment(environmentId, newName).then(() => {
-      replaceTab(environmentId, {
-        id: environmentId,
-        title: newName,
-        url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environmentId)}`,
-      });
+    const updatedName = newName || "New Environment";
+    renameEnvironment(environmentId, updatedName).then(() => {
+      setTitle(updatedName);
     });
   };
 
@@ -52,11 +49,19 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
     <div className="variables-list-header">
       {!hideBreadcrumb ? (
         <RQBreadcrumb
-          autoFocus={location.search.includes("new")}
+          autoFocus={isNewEnvironment}
           placeholder="New Environment"
           recordName={currentEnvironmentName}
           onBlur={handleNewEnvironmentNameChange}
           disabled={isGlobalEnvironment(environmentId)}
+          defaultBreadcrumbs={[
+            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+            {
+              isEditable: true,
+              pathname: window.location.pathname,
+              label: currentEnvironmentName,
+            },
+          ]}
         />
       ) : (
         <div />
@@ -75,6 +80,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           <RQButton
             showHotKeyText
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+            enableHotKey={enableHotKey}
             type="primary"
             onClick={onSave}
             disabled={!hasUnsavedChanges}

@@ -7,8 +7,8 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import {
   trackCheckoutFailedEvent,
-  trackCheckoutButtonClicked,
   trackCheckoutInitiated,
+  trackBStackStripeCheckoutInitiated,
 } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
 import { globalActions } from "store/slices/global/slice";
@@ -18,7 +18,12 @@ import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirma
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
 import APP_CONSTANTS from "config/constants";
-import { redirectToPricingPlans } from "utils/RedirectionUtils";
+import { redirectToPricingPlans, redirectToUrl } from "utils/RedirectionUtils";
+import { createBStackCheckoutUrl } from "features/pricing/utils";
+import { getAppMode } from "store/selectors";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -124,36 +129,36 @@ const pricingButtonsMap: Record<string, any> = {
     },
     [PRICING.PLAN_NAMES.LITE]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
-      [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
+      [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
     },
     [PRICING.PLAN_NAMES.BASIC]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
-      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
     },
     [PRICING.PLAN_NAMES.PROFESSIONAL]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
-      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
     },
     [PRICING.PLAN_NAMES.ENTERPRISE]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.SWITCH_PLAN],
-      [PRICING.PLAN_NAMES.ENTERPRISE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
-      [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
+      [PRICING.PLAN_NAMES.ENTERPRISE]: null,
+      [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: null,
     },
     [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.NOT_VISIBLE],
       [PRICING.PLAN_NAMES.LITE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.ADD_PLAN],
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.UPGRADE],
-      [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: CTA_BUTTONS_CONFIG[CTA_CONFIG_SELECTORS.CURRENT_PLAN],
+      [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: null,
     },
   },
   trial: {
@@ -171,6 +176,7 @@ interface PricingTableButtonsProps {
   source: string;
   quantity: number;
   disabled: boolean;
+  isNewCheckoutFlowEnabled: boolean;
   setIsContactUsModalOpen: (value: boolean) => void;
 }
 
@@ -181,11 +187,13 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   source,
   quantity,
   disabled,
+  isNewCheckoutFlowEnabled,
   setIsContactUsModalOpen,
 }) => {
   const dispatch = useDispatch();
   const firebaseFunction = getFunctions();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const navigate = useNavigate();
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -199,6 +207,11 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     ? user?.details?.planDetails?.type
     : "individual";
 
+  const redirectToCheckoutUrl = (url: string) => {
+    const newTab = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+    redirectToUrl(url, newTab);
+  };
+
   const onButtonClick = (functionName: string) => {
     trackPricingPlanCTAClicked(
       {
@@ -209,15 +222,24 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       },
       source
     );
-    setIsButtonLoading(true);
+
     if (!user?.details?.isLoggedIn) {
+      let redirectURL = window.location.href;
+      if (functionName === CTA_ONCLICK_FUNCTIONS.CHECKOUT) {
+        redirectURL = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
+      }
+
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
+            redirectURL,
             callback: () => redirectToPricingPlans(navigate),
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            authMode:
+              functionName === CTA_ONCLICK_FUNCTIONS.SIGNUP
+                ? APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+                : APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             eventSource: "pricing_table",
           },
         })
@@ -232,6 +254,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.SIGNUP: {
+        trackSignUpButtonClicked(SOURCE.PRICING_TABLE);
         dispatch(
           globalActions.toggleActiveModal({
             modalName: "authModal",
@@ -239,7 +262,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             newProps: {
               authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
               callback: () => redirectToPricingPlans(navigate),
-              eventSource: "pricing_table",
+              eventSource: SOURCE.PRICING_TABLE,
             },
           })
         );
@@ -247,54 +270,66 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
-        trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
-        dispatch(
-          globalActions.toggleActiveModal({
-            modalName: "pricingModal",
-            newValue: true,
-            newProps: {
-              selectedPlan: columnPlanName,
-              planDuration: duration,
-              quantity,
-              source,
-            },
-          })
-        );
-        setIsButtonLoading(false);
+        if (isNewCheckoutFlowEnabled) {
+          setIsButtonLoading(true);
+          const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
+          trackBStackStripeCheckoutInitiated();
+          redirectToCheckoutUrl(checkoutUrl);
+        } else {
+          dispatch(
+            globalActions.toggleActiveModal({
+              modalName: "pricingModal",
+              newValue: true,
+              newProps: {
+                selectedPlan: columnPlanName,
+                planDuration: duration,
+                quantity,
+                source,
+              },
+            })
+          );
+        }
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
-        trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
-        const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
-        manageSubscription({
-          planName: columnPlanName,
-          duration,
-          portalFlowType: "update_subscription",
-        })
-          .then((res: any) => {
-            if (res?.data?.success) {
-              window.location.href = res?.data?.data?.portalUrl;
+        setIsButtonLoading(true);
+        if (isNewCheckoutFlowEnabled) {
+          const checkoutUrl = createBStackCheckoutUrl(columnPlanName, quantity, duration === PRICING.DURATION.ANNUALLY);
+          trackBStackStripeCheckoutInitiated();
+          redirectToCheckoutUrl(checkoutUrl);
+        } else {
+          const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
+          manageSubscription({
+            planName: columnPlanName,
+            duration,
+            portalFlowType: "update_subscription",
+          })
+            .then((res: any) => {
+              if (res?.data?.success) {
+                window.location.href = res?.data?.data?.portalUrl;
 
-              trackCheckoutInitiated({
-                plan_name: columnPlanName,
-                duration,
-                currency: "usd",
-                quantity: quantity,
-                is_user_on_trial: isUserTrialing,
-                source,
-              });
-            }
-          })
-          .catch((err) => {
-            toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-            trackCheckoutFailedEvent(quantity, source);
-          })
-          .finally(() => {
-            setIsButtonLoading(false);
-          });
+                trackCheckoutInitiated({
+                  plan_name: columnPlanName,
+                  duration,
+                  currency: "usd",
+                  quantity: quantity,
+                  is_user_on_trial: isUserTrialing,
+                  source,
+                });
+              }
+            })
+            .catch((err) => {
+              toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+              trackCheckoutFailedEvent(quantity, source, "requestly");
+            })
+            .finally(() => {
+              setIsButtonLoading(false);
+            });
+        }
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN: {
+        setIsButtonLoading(true);
         Modal.confirm({
           title: "Switch Plan",
           content: `You are about to switch from ${getPrettyPlanName(userPlanName)} plan to ${getPrettyPlanName(
@@ -328,6 +363,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.ADD_PLAN: {
+        setIsButtonLoading(true);
         Modal.confirm({
           title: "Confirm Plan Upgrade",
           content: `Would you like to get access to ${getPrettyPlanName(
@@ -383,7 +419,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     }
   }
 
-  if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
+  if (product === PRICING.PRODUCTS.SESSION_REPLAY || quantity === Infinity) {
     if (columnPlanName === PRICING.PLAN_NAMES.FREE) {
       return (
         <Space size={8}>
@@ -443,7 +479,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             {buttonConfig?.text}
           </RQButton>
         )}
-        {buttonConfig.tag && <div className="current-pricing-plan-tag">{buttonConfig.tag}</div>}
+        {buttonConfig?.tag && <div className="current-pricing-plan-tag">{buttonConfig.tag}</div>}
       </Space>
       <ChangePlanRequestConfirmationModal
         isOpen={isConfirmationModalOpen}

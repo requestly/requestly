@@ -3,14 +3,16 @@ import { Row, Col, Typography, Space, Button } from "antd";
 import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import backedBy from "./assets/backed-by.webp";
 import LINKS from "config/constants/sub/links";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import "./PricingPageFooter.scss";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { Title, Link } = Typography;
 
 const PricingPageFooter: React.FC = () => {
   const [isRequestDocsModalOpen, setisRequestDocsModalOpen] = useState(false);
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const handleDocRequiredOnClick = () => {
     trackRequestDocumentClicked();
@@ -27,9 +29,6 @@ const PricingPageFooter: React.FC = () => {
 
   return (
     <div className="pricing-page-footer">
-      <div className="banner">
-        <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
-      </div>
       <div className="footer">
         <img
           className="mascot"
@@ -44,7 +43,7 @@ const PricingPageFooter: React.FC = () => {
               className="rq-logo"
               width={200}
               height={48}
-              src={"/assets/media/common/rq_logo_full.svg"}
+              src={`/assets/media/common/${isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"}`}
               alt="Requestly logo"
             />
             <div className="caption">
@@ -80,19 +79,22 @@ const PricingPageFooter: React.FC = () => {
                 Get
               </Title>
               <Space direction="vertical">
-                <Link target="_blank" href="https://requestly.com/desktop/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/desktop/")}>
                   Desktop app
                 </Link>
-                <Link target="_blank" href="https://requestly.com/downloads/chrome/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/downloads/chrome/")}>
                   Chrome Extension
                 </Link>
-                <Link target="_blank" href="https://requestly.com/downloads/edge/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/downloads/edge/")}>
                   Edge Addon
                 </Link>
-                <Link target="_blank" href="https://requestly.com/integrations/requestly-for-selenium/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/integrations/requestly-for-selenium/")}
+                >
                   Selenium Addon
                 </Link>
-                <Link target="_blank" href="https://requestly.com/downloads/for-safari/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/downloads/for-safari/")}>
                   For Safari
                 </Link>
               </Space>
@@ -102,34 +104,56 @@ const PricingPageFooter: React.FC = () => {
                 Features
               </Title>
               <Space direction="vertical">
-                <Link target="_blank" href="https://requestly.com/products/web-debugger/redirect-rule/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/products/web-debugger/redirect-rule/")}
+                >
                   Redirect URL
                 </Link>
-                <Link target="_blank" href="https://requestly.com/products/web-debugger/replace-rule-switch-hosts/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/products/web-debugger/replace-rule-switch-hosts/")}
+                >
                   Replace Rule
                 </Link>
                 <Link
                   target="_blank"
-                  href="https://requestly.com/products/web-debugger/best-chrome-extension-to-inject-javascript-and-css-on-any-webpage/"
+                  href={getLinkWithMetadata(
+                    "https://requestly.com/products/web-debugger/best-chrome-extension-to-inject-javascript-and-css-on-any-webpage/"
+                  )}
                 >
                   Insert Custom Script
                 </Link>
-                <Link target="_blank" href="https://requestly.com/products/modify-and-mock-graphql-apis/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/products/modify-and-mock-graphql-apis/")}
+                >
                   Override GraphQL APIs
                 </Link>
-                <Link target="_blank" href="https://requestly.com/products/web-debugger/modify-http-headers/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/products/web-debugger/modify-http-headers/")}
+                >
                   Modify HTTP Headers
                 </Link>
                 <Link
                   target="_blank"
-                  href="https://requestly.com/products/web-debugger/intercept-modify-mock-api-responses-test-develop-like-an-expert/"
+                  href={getLinkWithMetadata(
+                    "https://requestly.com/products/web-debugger/intercept-modify-mock-api-responses-test-develop-like-an-expert/"
+                  )}
                 >
                   Modify API Response
                 </Link>
-                <Link target="_blank" href="https://requestly.com/products/web-debugger/delay-http-request/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/products/web-debugger/delay-http-request/")}
+                >
                   Delay request
                 </Link>
-                <Link target="_blank" href="https://requestly.com/products/web-debugger/cross-device-testing/">
+                <Link
+                  target="_blank"
+                  href={getLinkWithMetadata("https://requestly.com/products/web-debugger/cross-device-testing/")}
+                >
                   Cross Device Testing
                 </Link>
               </Space>
@@ -139,15 +163,27 @@ const PricingPageFooter: React.FC = () => {
                 Comparisons
               </Title>
               <Space direction="vertical">
-                <Link href="https://requestly.com/alternatives/a-better-alternate-to-charles-proxy/">
+                <Link
+                  href={getLinkWithMetadata("https://requestly.com/alternatives/a-better-alternate-to-charles-proxy/")}
+                >
                   Charles Proxy VS Requestly
                 </Link>
-                <Link href="https://requestly.com/alternatives/fiddler/">Fiddler VS Requestly</Link>
-                <Link href="https://requestly.com/alternatives/a-better-and-well-documented-alternate-to-modheader/">
-                  MohHeader VS Requestly
+                <Link href={getLinkWithMetadata("https://requestly.com/alternatives/fiddler/")}>
+                  Fiddler VS Requestly
                 </Link>
-                <Link href="https://requestly.com/alternatives/proxyman/">Proxyman VS Requestly</Link>
-                <Link href="https://requestly.com/alternatives/wireshark/">WireShark VS Requestly</Link>
+                <Link
+                  href={getLinkWithMetadata(
+                    "https://requestly.com/alternatives/a-better-and-well-documented-alternate-to-modheader/"
+                  )}
+                >
+                  ModHeader VS Requestly
+                </Link>
+                <Link href={getLinkWithMetadata("https://requestly.com/alternatives/proxyman/")}>
+                  Proxyman VS Requestly
+                </Link>
+                <Link href={getLinkWithMetadata("https://requestly.com/alternatives/wireshark/")}>
+                  WireShark VS Requestly
+                </Link>
               </Space>
             </Col>
             <Col xs={24} md={4}>
@@ -155,13 +191,13 @@ const PricingPageFooter: React.FC = () => {
                 Resources
               </Title>
               <Space direction="vertical">
-                <Link target="_blank" href="https://requestly.com/privacy/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/privacy/")}>
                   Privacy Policy
                 </Link>
-                <Link target="_blank" href="https://requestly.com/terms/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/terms/")}>
                   Terms of Service
                 </Link>
-                <Link target="_blank" href="https://requestly.com/blog/">
+                <Link target="_blank" href={getLinkWithMetadata("https://requestly.com/blog/")}>
                   Blog
                 </Link>
                 <Link target="_blank" href="https://docs.requestly.com/">
@@ -190,7 +226,7 @@ const PricingPageFooter: React.FC = () => {
           </Row>
 
           <div className="socials-continer">
-            <div className="copyright">Copyright © 2024 RQ Labs, Inc. All rights reserved.</div>
+            <div className="copyright">Copyright © 2025 BrowserStack. All rights reserved.</div>
 
             <div className="socials">
               <span className="follow-us">Follow us on</span>

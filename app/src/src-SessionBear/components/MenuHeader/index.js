@@ -9,7 +9,7 @@ import Settings from "assets/icons/settings.svg?react";
 import WorkspaceSelector from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
-import "layouts/DashboardLayout/MenuHeader/MenuHeader.css";
+// import "layouts/DashboardLayout/MenuHeader/MenuHeader.css";
 import "./index.css";
 
 const { Header } = Layout;

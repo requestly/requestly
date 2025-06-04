@@ -35,20 +35,12 @@ const PricingFAQs = () => {
       ),
     },
     {
-      question: <React.Fragment>How is my payment information handled and secured?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Your transaction is processed securely through Stripe. All payments are encrypted, and your credentials and
-          payment method are isolated for security. We do not save any card info.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
+      question: <>Is Requestly free for teams switching from ModHeader?</>,
       answer: (
         <>
-          We provide a custom plan for users seeking unlimited header modifications. Contact us to get this plan
-          activated for you.
+          Yes! ModHeader's primary offering is HTTP header modification, and Requestly's free plan includes unlimited
+          HTTP header modifications. This makes it simple for your team to migrate without any limitations or added
+          costs.
         </>
       ),
     },

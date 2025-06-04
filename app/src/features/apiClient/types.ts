@@ -6,6 +6,7 @@ import {
   BasicAuthAuthorizationConfig,
   BearerTokenAuthorizationConfig,
 } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 
 export enum RequestMethod {
   GET = "GET",
@@ -21,6 +22,9 @@ export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  HTML = "text/html",
+  XML = "application/xml",
+  JAVASCRIPT = "application/javascript",
 }
 
 export interface KeyValuePair {
@@ -53,6 +57,7 @@ export enum BulkActions {
   DELETE = "DELETE",
   MOVE = "MOVE",
   EXPORT = "EXPORT",
+  SELECT_ALL = "SELECT_ALL",
 }
 
 export enum ApiClientImporterType {
@@ -86,6 +91,9 @@ export namespace RQAPI {
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
+  export type RequestHtmlBody = string;
+  export type RequestJavascriptBody = string;
+  export type RequestXmlBody = string;
   export type RequestFormBody = KeyValuePair[];
 
   export type RequestBodyContainer = {
@@ -137,8 +145,10 @@ export namespace RQAPI {
   }
 
   export type ExecutionError = {
+    type: RQAPI.ApiClientErrorType;
     source: string;
     name: Error["name"];
+    reason?: string;
     message: Error["message"];
   };
 
@@ -208,5 +218,27 @@ export namespace RQAPI {
 
   export type RecordPromise = Promise<{ success: boolean; data: Record; message?: string }>;
 
-  export type RecordsPromise = Promise<{ success: boolean; data: Record[]; message?: string }>;
+  export type RecordsPromise = Promise<{
+    success: boolean;
+    data: { records: Record[]; erroredRecords: ErroredRecord[] };
+    message?: string;
+  }>;
+
+  export enum ApiClientErrorType {
+    PRE_VALIDATION = "pre_validation",
+    CORE = "core",
+    ABORT = "abort",
+    SCRIPT = "script",
+  }
+}
+
+export enum PostmanBodyMode {
+  RAW = "raw",
+  FORMDATA = "formdata",
+  URL_ENCODED = "urlencoded",
+  GRAPHQL = "graphql",
+}
+
+export enum AbortReason {
+  USER_CANCELLED = "user_cancelled",
 }

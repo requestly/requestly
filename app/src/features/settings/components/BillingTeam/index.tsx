@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Outlet, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
@@ -11,6 +11,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { toast } from "utils/Toast";
 import { BillingTeamsSidebar } from "./components/BillingTeamsSidebar";
 import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
+import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import "./index.scss";
 
 export const BillingTeamContainer: React.FC = () => {
@@ -21,29 +22,19 @@ export const BillingTeamContainer: React.FC = () => {
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const joinRequestAction = queryParams.get("joinRequestAction");
 
-  const isBillingTeamSidebarVisible = useMemo(() => {
-    if (
-      billingTeams.length > 1 ||
-      (billingTeams.length === 1 && billingTeams.some((team) => !(user?.details?.profile?.uid in team.members)))
-    ) {
-      return true;
-    }
-    return false;
-  }, [billingTeams, user?.details?.profile?.uid]);
-
   useEffect(() => {
     if (!user.loggedIn) {
       toast.warn(
         joinRequestAction
-          ? `You need to login to review this joining request`
-          : `You need to login to view this billing team`
+          ? `You need to sign in to review this joining request`
+          : `You need to sign in to view this billing team`
       );
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             eventSource: SOURCE.BILLING_TEAM,
           },
         })
@@ -59,26 +50,27 @@ export const BillingTeamContainer: React.FC = () => {
           status="error"
           title={
             joinRequestAction
-              ? `You need to login to review this joining request`
-              : "You need to login to view this billing team"
+              ? `You need to sign in to review this joining request`
+              : "You need to sign in to view this billing team"
           }
           extra={
             <RQButton
               type="primary"
               onClick={() => {
+                trackLoginButtonClicked(SOURCE.BILLING_TEAM);
                 dispatch(
                   globalActions.toggleActiveModal({
                     modalName: "authModal",
                     newValue: true,
                     newProps: {
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
                       eventSource: SOURCE.BILLING_TEAM,
                     },
                   })
                 );
               }}
             >
-              Login
+              Sign in
             </RQButton>
           }
         />
@@ -97,11 +89,9 @@ export const BillingTeamContainer: React.FC = () => {
   return (
     <div className="billing-team-container">
       <div>
-        {isBillingTeamSidebarVisible && (
-          <SettingsSecondarySidebar>
-            <BillingTeamsSidebar billingTeams={billingTeams} />
-          </SettingsSecondarySidebar>
-        )}
+        <SettingsSecondarySidebar>
+          <BillingTeamsSidebar billingTeams={billingTeams} />
+        </SettingsSecondarySidebar>
       </div>
       <div className="billing-team-content-wrapper">
         {renderBillingTeamContent()}

@@ -166,7 +166,7 @@ const NetworkTable: React.FC<Props> = ({
         width: "8%",
         render(method: RequestMethod) {
           return (
-            <Typography.Text className="api-method" strong style={{ color: REQUEST_METHOD_COLORS[method] }}>
+            <Typography.Text className="api-method" style={{ color: REQUEST_METHOD_COLORS[method] }}>
               {method}
             </Typography.Text>
           );

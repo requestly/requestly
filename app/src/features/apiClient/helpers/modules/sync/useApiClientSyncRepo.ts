@@ -26,7 +26,7 @@ export const useGetApiClientSyncRepo = () => {
     } else {
       return new ApiClientCloudRepository({ uid: user.details.profile.uid, teamId: activeWorkspace.id });
     }
-  }, [isWorkspaceLocal, user.details.profile.uid, user.loggedIn, activeWorkspace, appMode]);
+  }, [isWorkspaceLocal, user.details?.profile?.uid, user.loggedIn, activeWorkspace, appMode]);
 
   const repository = useMemo(() => getRepository(), [getRepository]);
 

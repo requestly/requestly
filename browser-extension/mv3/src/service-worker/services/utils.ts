@@ -1,7 +1,8 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
-import { stopRecordingOnAllTabs } from "./sessionRecording";
+import { sendMessageToApp } from "./messageHandler/sender";
+import { CLIENT_MESSAGES } from "common/constants";
+import extensionIconManager from "./extensionIconManager";
 import { updateActivationStatus } from "./contextMenu";
 
 /* Do not refer any external variable in below function other than arguments */
@@ -160,30 +161,24 @@ export const isNonBrowserTab = (tabId: number): boolean => {
   return tabId === chrome.tabs.TAB_ID_NONE;
 };
 
-export const toggleExtensionStatus = async (newStatus?: boolean) => {
-  const extensionEnabledStatus = await isExtensionEnabled();
-
-  const updatedStatus = newStatus ?? !extensionEnabledStatus;
-  setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
-  updateActivationStatus(updatedStatus);
-  // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
-  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
-
-  if (!updatedStatus) {
-    stopRecordingOnAllTabs();
+export const updateExtensionStatus = async (newStatus: boolean) => {
+  if (typeof newStatus !== "boolean") {
+    console.log(`[updateExtensionStatus] newStatus is not boolean but ${typeof newStatus}. returning...`);
+    throw new Error(`[updateExtensionStatus] newStatus is not boolean but ${typeof newStatus}`);
   }
 
-  return updatedStatus;
-};
+  console.log(`[updateExtensionStatus] starting...`, {
+    newStatus,
+    extensionIconState: extensionIconManager.getState(),
+  });
 
-export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
-  const webURLs = getAllSupportedWebURLs();
-  let appTabs: chrome.tabs.Tab[] = [];
+  await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, newStatus);
+  updateActivationStatus(newStatus);
+  sendMessageToApp({
+    action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED,
+    isExtensionEnabled: newStatus,
+    extensionIconState: extensionIconManager.getState(),
+  });
 
-  for (const webURL of webURLs) {
-    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
-    appTabs = [...appTabs, ...tabs];
-  }
-
-  return appTabs;
+  return newStatus;
 };

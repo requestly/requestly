@@ -1,11 +1,11 @@
 import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
 import { Radio, RadioChangeEvent, Tooltip } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
-import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
 import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 import "./responseBody.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
+import Editor from "componentsV2/CodeEditor";
 
 interface Props {
   responseText: string;
@@ -28,11 +28,6 @@ const ImageResponsePreview: React.FC<{ responseText: string; mimeType: string }>
 const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
   const [isResponseCopied, setIsResponseCopied] = useState(false);
-
-  const [isResponseBodyFullScreen, setIsResponseBodyFullScreen] = useState(false);
-  const handleFullScreenChange = () => {
-    setIsResponseBodyFullScreen((prev) => !prev);
-  };
 
   const onResponseModeChange = useCallback((e: RadioChangeEvent) => {
     const responseMode: ResponseMode = e.target.value;
@@ -91,12 +86,10 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
             title: "",
             options: [bodyPreviewModeOptions],
           }}
-          isFullScreen={isResponseBodyFullScreen}
-          onFullScreenChange={handleFullScreenChange}
         />
       </div>
     );
-  }, [contentTypeHeader, responseText, bodyPreviewModeOptions, isResponseBodyFullScreen]);
+  }, [contentTypeHeader, responseText, bodyPreviewModeOptions]);
 
   return (
     <div className="api-client-response-body">

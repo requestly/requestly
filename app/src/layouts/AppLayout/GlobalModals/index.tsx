@@ -1,13 +1,16 @@
-import { useDispatch, useSelector } from "react-redux";
-import AuthModal from "components/authentication/AuthModal";
-import { globalActions } from "store/slices/global/slice";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import WorkspaceLoadingModal from "features/workspaces/modals/WorkspaceLoadingModal";
 import SwitchWorkspaceModal from "features/workspaces/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
+import { AuthModal } from "features/onboarding/screens/auth/modals/AuthModal/AuthModal";
+import RQAuthModal from "components/authentication/AuthModal";
+import { useDispatch, useSelector } from "react-redux";
+import { globalActions } from "store/slices/global/slice";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 export const GlobalModals = () => {
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const toggleAuthModal = () => {
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal" }));
@@ -16,11 +19,23 @@ export const GlobalModals = () => {
   return (
     <>
       {activeModals.authModal.isActive ? (
-        <AuthModal
-          isOpen={activeModals.authModal.isActive}
-          toggle={() => toggleAuthModal()}
-          {...activeModals.authModal.props}
-        />
+        <>
+          {isBrowserstackIntegrationOn ? (
+            <AuthModal
+              isOpen={activeModals.authModal.isActive}
+              authMode={activeModals.authModal.props.authMode}
+              eventSource={activeModals.authModal.props.eventSource}
+              closable={activeModals.authModal.props.closable}
+              redirectURL={activeModals.authModal.props.redirectURL}
+            />
+          ) : (
+            <RQAuthModal
+              isOpen={activeModals.authModal.isActive}
+              toggle={() => toggleAuthModal()}
+              {...activeModals.authModal.props}
+            />
+          )}
+        </>
       ) : null}
       {activeModals.workspaceLoadingModal.isActive ? (
         <WorkspaceLoadingModal

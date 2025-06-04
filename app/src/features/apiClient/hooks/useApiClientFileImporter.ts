@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
-import { batchWrite } from "backend/utils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -15,6 +14,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
+import * as Sentry from "@sentry/react";
 
 const BATCH_SIZE = 25;
 
@@ -82,7 +82,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
                 throw new Error(`Unsupported importer: ${importer}`);
               }
 
-              const processedData = processor(content, uid);
+              const processedData = processor(content, uid, apiClientRecordsRepository);
               resolve(processedData);
             } catch (error) {
               Logger.error("Error processing file:", error);
@@ -113,6 +113,10 @@ const useApiClientFileImporter = (importer: ImporterType) => {
             } else {
               trackImportParseFailed(ApiClientImporterType.REQUESTLY, result.reason);
               console.error("Error processing file:", result.reason);
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "api_client_rq_processing");
+                Sentry.captureException("Error processing file:", result.reason);
+              });
             }
           });
 
@@ -122,9 +126,13 @@ const useApiClientFileImporter = (importer: ImporterType) => {
           trackImportParseFailed(ApiClientImporterType.REQUESTLY, error.message);
           setError(error.message);
           setProcessingStatus("idle");
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_client_rq_processing");
+            Sentry.captureException(error);
+          });
         });
     },
-    [processors, importer, uid]
+    [processors, importer, uid, apiClientRecordsRepository]
   );
 
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
@@ -161,8 +169,8 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     // Utility function to handle batch writes for collections
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
-        onSaveRecord(newCollection.data, "none");
+        const newCollection = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
+        onSaveRecord(newCollection.data);
         importedCollectionsCount++;
         return newCollection.data.id;
       } catch (error) {
@@ -172,13 +180,25 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       }
     };
 
-    // Utility function to handle batch writes for collections
+    const collectionWriteResult = await apiClientRecordsRepository.batchWriteApiEntities(
+      BATCH_SIZE,
+      collections,
+      handleCollectionWrites
+    );
+    if (!collectionWriteResult.success) {
+      throw new Error(`Failed to import collections: ${collectionWriteResult.message}`);
+    }
+
     const handleApiWrites = async (api: RQAPI.ApiRecord) => {
       const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
-      const updatedApi = { ...api, collectionId: newCollectionId };
+      const updatedApi = {
+        ...api,
+        collectionId: newCollectionId,
+        id: apiClientRecordsRepository.generateApiRecordId(newCollectionId),
+      };
       try {
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
-        onSaveRecord(newApi.data, "none");
+        onSaveRecord(newApi.data);
         importedApisCount++;
       } catch (error) {
         failedApisCount++;
@@ -186,10 +206,10 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       }
     };
 
-    await Promise.all([
-      batchWrite(BATCH_SIZE, collections, handleCollectionWrites),
-      batchWrite(BATCH_SIZE, apis, handleApiWrites),
-    ]);
+    const apiWriteResult = await apiClientRecordsRepository.batchWriteApiEntities(BATCH_SIZE, apis, handleApiWrites);
+    if (!apiWriteResult.success) {
+      throw new Error(`Failed to import APIs: ${apiWriteResult.message}`);
+    }
 
     if (failedCollectionsCount > 0 || failedApisCount > 0) {
       toast.warn(
@@ -263,6 +283,10 @@ const useApiClientFileImporter = (importer: ImporterType) => {
         Logger.error("Data import failed:", error);
         setError("Something went wrong! Couldn't import data");
         trackImportFailed(ApiClientImporterType.REQUESTLY, JSON.stringify(error));
+        Sentry.withScope((scope) => {
+          scope.setTag("error_type", "api_client_bruno_processing");
+          Sentry.captureException(error);
+        });
       } finally {
         setIsImporting(false);
       }

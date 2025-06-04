@@ -20,8 +20,8 @@ export const trackRequestSaved = (params) => {
   trackEvent(API_CLIENT.REQUEST_SAVED, params);
 };
 
-export const trackRequestFailed = (reason) => {
-  trackEvent(API_CLIENT.REQUEST_FAILED, { reason });
+export const trackRequestFailed = (reason, errorType, url, method, status) => {
+  trackEvent(API_CLIENT.REQUEST_FAILED, { reason, errorType, url, method, status });
 };
 
 export const trackRequestDeleted = () => {
@@ -159,6 +159,10 @@ export const trackHistoryCleared = () => {
 
 export const trackResponseLoaded = (params = {}) => {
   trackEvent(API_CLIENT.RESPONSE_LOADED, params);
+};
+
+export const trackApiRequestDone = (params = {}) => {
+  trackEvent(API_CLIENT.REQUEST_DONE, params);
 };
 
 export const trackRawResponseViewed = () => {

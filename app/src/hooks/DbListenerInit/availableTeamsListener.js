@@ -11,6 +11,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { WorkspaceType } from "types";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
+import * as Sentry from "@sentry/react";
 
 const db = getFirestore(firebaseApp);
 
@@ -33,6 +34,7 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
     }
     return null;
   }
+
   try {
     const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "write", "read"]));
     return onSnapshot(
@@ -43,6 +45,9 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
           const allLocalWorkspacesResult = await getAllWorkspaces();
           const allLocalWorkspaces =
             allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, allLocalWorkspaces.length);
+
           for (const partialWorkspace of allLocalWorkspaces) {
             const localWorkspace = {
               id: partialWorkspace.id,
@@ -63,6 +68,7 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
             localRecords.push(localWorkspace);
           }
         }
+
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
@@ -92,6 +98,13 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
               workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
             };
 
+            if (teamData?.browserstackDetails) {
+              formattedTeamData.browserstackDetails = {
+                groupId: teamData.browserstackDetails?.groupId,
+                subGroupId: teamData.browserstackDetails?.subGroupId,
+              };
+            }
+
             return formattedTeamData;
           })
           .filter(Boolean);
@@ -102,9 +115,26 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
         if (!activeWorkspaceId) return;
 
         const found = records.find((team) => team.id === activeWorkspaceId);
+
+        Logger.log("DBG: availableTeamsListener", {
+          teamFound: found,
+          fetchedRecords: records,
+          activeWorkspaceId,
+          hasUserRemovedHimselfRecently: window.hasUserRemovedHimselfRecently,
+        });
+
         if (!found) {
-          if (!window.hasUserRemovedHimselfRecently)
+          Sentry.captureException(new Error(`No workspace found`), {
+            extra: {
+              activeWorkspaceId,
+              hasUserRemovedHimselfRecently: window.hasUserRemovedHimselfRecently,
+            },
+          });
+
+          if (!window.hasUserRemovedHimselfRecently) {
             alert("You no longer have access to this workspace. Please contact your team admin.");
+          }
+
           clearCurrentlyActiveWorkspace(dispatch, appMode);
           toast.info("Verifying storage checksum");
           setTimeout(() => {

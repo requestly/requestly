@@ -6,7 +6,7 @@
   "update_URL": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
   "content_scripts": [
     {
-      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*"],
+      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*", "*://requestly.com/*"],
       "js": ["app.cs.js"],
       "run_at": "document_start"
     },
@@ -19,6 +19,9 @@
   ],
   "background": {
     "service_worker": "serviceWorker.js"
+  },
+  "externally_connectable": {
+    "matches": ["https://*.bsstag.com/*", "https://*.browserstack.com/*"]
   },
   "web_accessible_resources": [
     {

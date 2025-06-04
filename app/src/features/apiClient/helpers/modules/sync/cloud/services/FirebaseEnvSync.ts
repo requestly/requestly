@@ -10,6 +10,7 @@ import {
   updateEnvironmentInDB,
 } from "backend/environment";
 import { getOwnerId } from "backend/utils";
+import { ErroredRecord } from "../../local/services/types";
 
 export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -22,12 +23,24 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
-  async getAllEnvironments(): Promise<EnvironmentMap> {
-    return fetchAllEnvironmentDetails(this.getPrimaryId());
+  async getAllEnvironments() {
+    const result = await fetchAllEnvironmentDetails(this.getPrimaryId());
+    return {
+      success: true,
+      data: {
+        environments: result,
+        erroredRecords: [] as ErroredRecord[],
+      },
+    };
   }
 
-  async deleteEnvironment(envId: string): Promise<void> {
-    await deleteEnvironmentFromDB(this.getPrimaryId(), envId);
+  async deleteEnvironment(envId: string) {
+    try {
+      await deleteEnvironmentFromDB(this.getPrimaryId(), envId);
+      return { success: true };
+    } catch (e) {
+      return { success: false, message: "Something went wrong while deleting the environment" };
+    }
   }
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
     return createNonGlobalEnvironmentInDB(this.getPrimaryId(), environmentName);

@@ -134,7 +134,13 @@ export const GA_EVENTS = {
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
     NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
-    NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES",
+    NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES", // TODO: should be in smallcase
+
+    NUM_RULES_EXCLUDING_HEADERS: "num_rules_excluding_headers",
+    NUM_ACTIVE_RULES_EXCLUDING_HEADERS: "num_active_rules_excluding_headers",
+    NUM_RULES_EXCLUDING_FREE_RULES: "num_rules_excluding_free_rules",
+    NUM_ACTIVE_RULES_EXCLUDING_FREE_RULES: "num_active_rules_excluding_free_rules",
+
     NUM_GROUPS: "NUM_GROUPS",
     NUM_ACTIVE_GROUPS: "NUM_ACTIVE_GROUPS",
     NUM_SHARED_LISTS: "NUM_SHARED_LISTS",
@@ -144,6 +150,7 @@ export const GA_EVENTS = {
     NUM_SESSIONS_SAVED_ONLINE: "num_sessions_saved_online",
     NUM_SESSIONS_SAVED_OFFLINE: "num_sessions_saved_offline",
     NUM_NETWORK_SESSIONS: "num_network_sessions",
+    NUM_LOCAL_WORKSPACES: "num_local_workspaces",
 
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 
@@ -176,6 +183,7 @@ export const GA_EVENTS = {
     RQ_SUBSCRIPTION_TYPE: "rq_subscription_type",
     SUBSCRIPTION_STATUS: "subscription_status",
     IS_ACCELERATOR_AVAILABLE: "is_accelerator_available",
+    BROWSERSTACK_ID: "browserstack_id",
   },
   VALUES: {
     PAYPAL: "paypal",

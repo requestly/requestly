@@ -42,17 +42,17 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   const theme = useTheme();
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCodeFormatting = () => {
+  const handleCodeFormatting = async () => {
     if (language === EditorLanguage.JSON) {
-      handlePrettifyToggle();
+      await handlePrettifyToggle();
     } else {
-      handlePrettifyCode();
+      await handlePrettifyCode();
     }
   };
 
   // This function is used for all languages except JSON
-  const handlePrettifyCode = () => {
-    const result = prettifyCode(code, language);
+  const handlePrettifyCode = async () => {
+    const result = await prettifyCode(code, language);
 
     if (result.success) {
       onCodeFormat(result.code);
@@ -61,7 +61,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   };
 
   // This function is only used for JSON code
-  const handlePrettifyToggle = () => {
+  const handlePrettifyToggle = async () => {
     if (isCodePrettified) {
       try {
         const minifiedCode = JSON.stringify(JSON.parse(code));
@@ -72,7 +72,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
         // NOOP
       }
     } else {
-      handlePrettifyCode();
+      await handlePrettifyCode();
       setIsCodePrettified(true);
       trackCodeEditorCodePrettified();
     }
@@ -88,7 +88,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   };
 
   return (
-    <div className="code-editor-toolbar">
+    <div className="code-editor-toolbar no-drag">
       <div className="code-editor-custom-options-row">
         {customOptions ? (
           <>

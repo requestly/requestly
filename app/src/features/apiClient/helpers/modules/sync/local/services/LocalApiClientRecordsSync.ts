@@ -1,7 +1,7 @@
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { API, APIEntity, FileSystemResult } from "./types";
+import { API, APIEntity, FileSystemResult, FileType } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -106,19 +106,25 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async getAllRecords(): RQAPI.RecordsPromise {
     const service = await this.getAdapter();
-    const result: FileSystemResult<APIEntity[]> = await service.getAllRecords();
+    const result = await service.getAllRecords();
     if (result.type === "error") {
       return {
         success: false,
-        data: [],
+        data: {
+          records: [],
+          erroredRecords: [],
+        },
         message: `Error: ${result.error.message} in ${result.error.path}`,
       };
     }
-    const parsedRecords = this.parseAPIEntities(result.content);
+    const parsedRecords = this.parseAPIEntities(result.content.records);
     console.log("local fs parsing", parsedRecords);
     return {
       success: true,
-      data: parsedRecords,
+      data: {
+        records: parsedRecords,
+        erroredRecords: result.content.erroredRecords || [],
+      },
     };
   }
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
@@ -266,21 +272,19 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
+  async deleteRecords(recordIds: string[]) {
     const service = await this.getAdapter();
     const result = await service.deleteRecords(recordIds);
 
     if (result.type === "error") {
       return {
         success: false,
-        data: undefined,
         message: result.error.message,
       };
     }
 
     return {
       success: true,
-      data: undefined,
     };
   }
 
@@ -397,5 +401,116 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       success: true,
       data: updatedCollection,
     };
+  }
+
+  async writeToRawFile(
+    id: string,
+    record: any,
+    fileType: FileType
+  ): Promise<{ success: boolean; data: unknown; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.writeRawRecord(id, record, fileType);
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+    return {
+      success: true,
+      data: result.content,
+    };
+  }
+
+  async getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.getRawFileData(id);
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+    return {
+      success: true,
+      data: result.content,
+    };
+  }
+
+  async createCollectionFromImport(
+    collection: RQAPI.CollectionRecord,
+    id: string
+  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+    const service = await this.getAdapter();
+    const result = await service.createCollectionFromCompleteRecord(collection, id);
+    if (result.type === "error") {
+      return {
+        success: false,
+        data: null,
+        message: result.error.message,
+      };
+    }
+    const [parsedRecords] = this.parseAPIEntities([result.content as APIEntity]);
+    return {
+      success: true,
+      data: parsedRecords,
+    };
+  }
+
+  async batchWriteApiEntities(
+    batchSize: number,
+    entities: RQAPI.Record[],
+    writeFunction: (entity: RQAPI.Record) => Promise<any>
+  ) {
+    try {
+      for (const entity of entities) {
+        await writeFunction(entity);
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+    return {
+      success: true,
+    };
+  }
+
+  async duplicateApiEntities(entities: RQAPI.Record[]) {
+    const result: RQAPI.Record[] = [];
+    for (const entity of entities) {
+      const duplicationResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return this.createRecordWithId(entity, entity.id);
+        }
+        return this.createCollectionFromImport(entity, entity.id);
+      })();
+      if (duplicationResult.success) {
+        result.push(duplicationResult.data);
+      }
+    }
+    return result;
+  }
+
+  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+    const service = await this.getAdapter();
+    const result: RQAPI.Record[] = [];
+    for (const entity of entities) {
+      const moveResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return service.moveRecord(entity.id, newParentId);
+        }
+        return service.moveCollection(entity.id, newParentId);
+      })();
+
+      if (moveResult.type === "success") {
+        const parsedCollection = this.parseAPIEntities([moveResult.content as APIEntity]);
+        result.push(parsedCollection[0]);
+      }
+    }
+    return result;
   }
 }

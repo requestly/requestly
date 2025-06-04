@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider, Tooltip } from "antd";
@@ -11,10 +11,7 @@ import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import PersonaRecommendation from "./PersonaRecommendation";
-import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
 import {
   trackGettingStartedVideoPlayed,
   trackNewRuleButtonClicked,
@@ -45,6 +42,7 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
 import { ImporterType } from "components/Home/types";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -53,8 +51,6 @@ export const GettingStarted: React.FC = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const gettingStartedVideo = useRef(null);
@@ -70,11 +66,6 @@ export const GettingStarted: React.FC = () => {
   };
 
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
-
-  const isRecommendationScreenVisible = useMemo(
-    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
-    [appMode, state?.src, userPersona]
-  );
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -129,10 +120,6 @@ export const GettingStarted: React.FC = () => {
     }
   }, []);
 
-  if (isRecommendationScreenVisible) {
-    return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
-  }
-
   const suggestedRules = [
     {
       type: RuleType.REDIRECT,
@@ -170,7 +157,7 @@ export const GettingStarted: React.FC = () => {
               <div className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates{" "}
                 <a
-                  href="https://requestly.com/"
+                  href={getLinkWithMetadata("https://requestly.com/")}
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();

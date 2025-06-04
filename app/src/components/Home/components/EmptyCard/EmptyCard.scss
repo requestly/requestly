@@ -1,0 +1,28 @@
+.title-badge-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  // FIXME: have default styles for RQ Badge component
+  .rq-badge {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+    border: 1px solid #ffffff1f;
+    background: var(--requestly-color-neutral-700);
+    margin-bottom: 4px;
+
+    span {
+      font-size: 9px;
+      font-family: var(--requestly-font-family-default);
+      font-weight: 600;
+      text-align: center;
+      font-style: normal;
+      letter-spacing: 0.5px;
+      line-height: var(--requestly-font-line-height-2xs, 13px);
+      color: var(--requestly-color-neutral-300);
+      background: none;
+      -webkit-text-fill-color: var(--requestly-color-neutral-300);
+    }
+  }
+}

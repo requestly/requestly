@@ -193,11 +193,6 @@ export const trackErrorInSavingDNR = ({
   trackEvent(RULES.ERROR_IN_SAVING_DNR, params);
 };
 
-export const trackRuleEditorViewed = (source, rule_type) => {
-  const params = { source, rule_type };
-  trackEvent(RULES.RULE_EDITOR_VIEWED, params);
-};
-
 export const trackRuleEditorClosed = (reason, rule_type, mode) => {
   const params = { reason, rule_type, mode };
   trackEvent(RULES.RULE_EDITOR_CLOSED, params);
@@ -233,22 +228,12 @@ export const trackRuleSimulatorTried = (rule_type, rule_saved) => {
   trackEvent(RULES.RULE_SIMULATOR_TRIED, params);
 };
 
-export const trackRuleResourceTypeSelected = (rule_type, resource_type) => {
-  const params = { rule_type, resource_type };
-  trackEvent(RULES.RULE_RESOURCE_TYPE_SELECTED, params);
-};
-
 export const trackDesktopRuleViewedOnExtension = (rule_type) => {
   const params = { rule_type };
   trackEvent(RULES.DESKTOP_RULE_VIEWED_ON_EXTENSION, params);
 };
 
 // rule details panel
-export const trackRuleDetailsPanelViewed = (rule_type, source) => {
-  const params = { rule_type, source };
-  trackEvent(RULES.RULE_DETAILS_PANEL_VIEWED, params);
-};
-
 export const trackRuleDetailsPanelClosed = (rule_type, source) => {
   const params = { rule_type, source };
   trackEvent(RULES.RULE_DETAILS_PANEL_CLOSED, params);

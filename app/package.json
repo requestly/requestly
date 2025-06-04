@@ -25,8 +25,9 @@
     "build": "vite build",
     "preview": "npm run build && vite preview",
     "start": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'vite'",
-    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV npm start'",
-    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR npm start'"
+    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV vite'",
+    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR vite --mode dev-emulator'",
+    "emulated-start": "REACT_APP_ENV=EMULATOR vite --mode dev-emulator"
   },
   "browserslist": [
     ">0.2%",
@@ -91,6 +92,7 @@
     "js-file-download": "^0.4.12",
     "jsoneditor": "^9.7.3",
     "jsoneditor-react": "^3.1.2",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "lottie-web": "^5.10.0",
     "md5": "^2.3.0",
@@ -136,7 +138,8 @@
     "ua-parser-js": "^1.0.2",
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

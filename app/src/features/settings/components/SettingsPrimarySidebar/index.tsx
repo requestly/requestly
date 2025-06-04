@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAttributes } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Col, Row } from "antd";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -15,12 +15,15 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 import "./index.scss";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 
 const { PATHS } = APP_CONSTANTS;
 
 export const SettingsPrimarySidebar: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
+  const billingTeams = useSelector(getAvailableBillingTeams);
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
@@ -74,7 +77,9 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "members",
             name: "Members",
             path: PATHS.SETTINGS.MEMBERS.RELATIVE,
-            ishidden: !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user.details?.emailType)),
+            ishidden:
+              !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user.details?.emailType)) ||
+              userAttributes?.browserstack_id,
           },
           {
             id: "workspaces",
@@ -82,15 +87,28 @@ export const SettingsPrimarySidebar: React.FC = () => {
             path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
           },
           {
+            id: "my-plan",
+            name: "My Plan",
+            path: PATHS.SETTINGS.MY_PLAN.RELATIVE,
+            ishidden: !user.loggedIn,
+          },
+          {
             id: "billing",
             name: "Billing",
             path: PATHS.SETTINGS.BILLING.RELATIVE,
-            ishidden: !user.loggedIn,
+            ishidden: !user.loggedIn || billingTeams?.length === 0,
           },
         ],
       },
     ],
-    [appMode, user.details?.emailType, user.details?.profile?.isEmailVerified, user.loggedIn]
+    [
+      appMode,
+      user.details?.emailType,
+      user.details?.profile?.isEmailVerified,
+      user.loggedIn,
+      userAttributes?.browserstack_id,
+      billingTeams?.length,
+    ]
   );
 
   return (

@@ -27,7 +27,7 @@ type RuleDetails = {
 export const RULE_DETAILS: RuleDetails = {
   categories: [
     {
-      title: "URL Rewrites",
+      title: "URL rewrites",
       type: RuleCategories.URL_REWRITES,
       rules: [
         {
@@ -51,7 +51,7 @@ export const RULE_DETAILS: RuleDetails = {
       ],
     },
     {
-      title: "APIs",
+      title: "API mocking",
       type: RuleCategories.APIS,
       rules: [
         {

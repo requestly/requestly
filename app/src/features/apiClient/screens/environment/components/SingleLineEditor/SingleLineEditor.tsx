@@ -3,21 +3,14 @@ import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/vi
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
-import { EditorPopover } from "componentsV2/CodeEditor/components/Editor/components/PopOver";
-import "componentsV2/CodeEditor/components/Editor/components/PopOver/popover.scss";
+import { EditorPopover } from "componentsV2/CodeEditor/components/EditorV2/components/PopOver";
+import "componentsV2/CodeEditor/components/EditorV2/components/PopOver/popover.scss";
 import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
+import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
-interface RQSingleLineEditorProps {
-  defaultValue?: string;
-  className?: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  onPressEnter?: (event: KeyboardEvent, text: string) => void;
-  onBlur?: (text: string) => void;
-  variables?: Record<string, any>;
-}
+import { SingleLineEditorProps } from "./types";
 
-export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
+export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
   defaultValue,
   onChange,
@@ -52,15 +45,23 @@ export const RQSingleLineEditor: React.FC<RQSingleLineEditorProps> = ({
       editorViewRef.current = null;
     }
 
+    if (typeof defaultValue !== "string") {
+      Sentry.captureException(new Error("Editor defaultValue must be a string"), {
+        extra: {
+          defaultValue,
+        },
+      });
+    }
+
     /*
-    CodeMirror uses extensions to configure DOM interactions. 
-    Prec.highest ensures your keybinding takes priority. 
+    CodeMirror uses extensions to configure DOM interactions.
+    Prec.highest ensures your keybinding takes priority.
     Returning true in the run function prevents default browser actions, like the save dialog for Ctrl-S
     */
     editorViewRef.current = new EditorView({
       parent: editorRef.current,
       state: EditorState.create({
-        doc: defaultValue ?? "",
+        doc: typeof defaultValue === "string" ? defaultValue : "", // hack to scope down the crash
         extensions: [
           history(),
           keymap.of(historyKeymap),

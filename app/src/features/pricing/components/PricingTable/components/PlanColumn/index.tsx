@@ -1,7 +1,7 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
-import { Col, InputNumber, Row, Space, Tooltip, Typography } from "antd";
+import { Col, Row, Space, Tooltip, Typography } from "antd";
 import { PricingTableButtons } from "../../PricingTableButtons";
 import { CloseOutlined } from "@ant-design/icons";
 import { capitalize, kebabCase } from "lodash";
@@ -12,6 +12,10 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import GiftIcon from "../../../../assets/gift-icon.svg?react";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
+import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
+import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
 interface PlanColumnProps {
   planName: string;
@@ -38,6 +42,17 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
   const hasFiddledWithQuantity = useRef(false);
+
+  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
+  const isBrowserstackCheckoutEnabled = useFeatureValue("browserstack_checkout", true);
+  const isAcceleratorProgramEnabled = useFeatureIsOn("display_accelerator_on_pricing");
+
+  const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
+
+  const isNewCheckoutFlowEnabled = useMemo(
+    () => shouldShowNewCheckoutFlow(isBrowserstackIntegrationOn, isBrowserstackCheckoutEnabled),
+    [isBrowserstackIntegrationOn, isBrowserstackCheckoutEnabled]
+  );
 
   const getHeaderPlanName = () => {
     const pricingPlansOrder = [
@@ -110,6 +125,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     return null;
   };
 
+  const planCardSubtitle = getPricingPlanAnnualBillingSubtitle(planName);
+
   const EVENTS = {
     PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
   };
@@ -141,12 +158,17 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   );
 
   const handleQuantityChange = useCallback(
-    (value: number) => {
+    (value: number, skipNotification: boolean = false) => {
+      if (value === Infinity) {
+        setQuantity(value);
+        return;
+      }
       if (value < 1 || value > 1000) {
         setDisbaleUpgradeButton(true);
       } else setDisbaleUpgradeButton(false);
       setQuantity(value);
       trackPricingPlansQuantityChanged(value, planName, source);
+
       if (!hasFiddledWithQuantity.current && user.loggedIn) {
         const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
         addToApolloSequence().catch((error) => {
@@ -154,11 +176,14 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         });
         hasFiddledWithQuantity.current = true;
       }
-
-      sendNotification(value);
+      if (!skipNotification) {
+        sendNotification(value);
+      }
     },
     [sendNotification, planName, source, user.loggedIn]
   );
+
+  const cardSubtitle = <>{planCardSubtitle ? <Typography.Text>{planCardSubtitle}</Typography.Text> : null}</>;
 
   return (
     <Col
@@ -167,55 +192,86 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         planName === PRICING.PLAN_NAMES.LITE && duration === PRICING.DURATION.MONTHLY ? "disabled-col" : ""
       }`}
     >
+      {planName === user.details?.planDetails?.planName ? (
+        <div className="plan-card-current-header">
+          {user?.details?.planDetails?.status === "trialing" ? (
+            "TRIAL"
+          ) : (
+            <>
+              CURRENT PLAN{" "}
+              {planName === PRICING.PLAN_NAMES.BASIC || planName === PRICING.PLAN_NAMES.PROFESSIONAL
+                ? `- ${user.details?.planDetails?.subscription?.quantity} SEATS`
+                : ""}
+            </>
+          )}
+        </div>
+      ) : null}
       <div className="plan-card-middle-section">
         <Space size={8}>
-          <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
+          <Typography.Text className="plan-name">
+            {capitalize(planDetails.planTitle)}
+            {planName === PRICING.PLAN_NAMES.LITE
+              ? " - For individuals"
+              : planName === PRICING.PLAN_NAMES.BASIC
+              ? " - Small teams"
+              : ""}
+          </Typography.Text>
           {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALUE</span>}
         </Space>
         {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
           <Row align="middle" className="items-center plan-price-row mt-8">
             <Space size={0}>
-              <span className="text-bold">Starts at</span>
-              <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
-              <div className="caption">
-                <Typography.Text>member / month</Typography.Text>
+              <div className="plan-price enterprise-pricing-container">
+                <span className="text-bold">Starts at</span>
+                <div className="enterprise-pricing-details">
+                  <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
+                  <div className="plan-price caption">
+                    <Typography.Text>member / month</Typography.Text>
+                  </div>
+                </div>
               </div>
             </Space>
           </Row>
         )}
         {planPrice !== undefined && (
           <Row align="middle" className="items-center plan-price-row">
-            <Space size="small">
-              <Typography.Text className="plan-price">
-                ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
-              </Typography.Text>
+            <>
+              {quantity === Infinity ? (
+                <Space direction="vertical">
+                  <Typography.Title level={3} style={{ marginBottom: 0 }}>
+                    Large team?
+                  </Typography.Title>
+                  <Typography.Text>Get in touch with us</Typography.Text>
+                </Space>
+              ) : (
+                <Space size="small">
+                  <Typography.Text className="plan-price">
+                    ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
+                  </Typography.Text>
+                  <div className="caption text-white">/ month</div>
+                </Space>
+              )}
+            </>
+          </Row>
+        )}
+        {planPrice !== undefined && (
+          <Row align="middle" className="quantity-container">
+            <>
               {((product === PRICING.PRODUCTS.HTTP_RULES &&
                 planName !== PRICING.PLAN_NAMES.FREE &&
                 planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
                 planName !== PRICING.PLAN_NAMES.LITE) ||
                 (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
-                <Space>
-                  <InputNumber
-                    style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
-                    size="small"
-                    type="number"
-                    min={1}
-                    max={1000}
-                    maxLength={4}
-                    defaultValue={1}
-                    value={quantity}
-                    onChange={(value: number) => {
-                      handleQuantityChange(value);
-                    }}
-                  />
-                </Space>
+                <PlanQuantitySelector
+                  columnPlanName={planName}
+                  currentPlanName={user.details?.planDetails?.planName}
+                  currentSeats={currentSeats}
+                  isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
+                  quantity={quantity}
+                  handleQuantityChange={handleQuantityChange}
+                />
               )}
-              <div className="caption text-white">
-                {planName !== PRICING.PLAN_NAMES.FREE && (
-                  <div>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</div>
-                )}
-              </div>
-            </Space>
+            </>
           </Row>
         )}
         {planDetails?.planDescription && (
@@ -225,21 +281,25 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             </Typography.Text>
           </Row>
         )}
-        <Row
-          className="annual-bill mt-8"
-          style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}
-        >
-          <Typography.Text type="secondary">
-            {duration === PRICING.DURATION.MONTHLY
-              ? planName === PRICING.PLAN_NAMES.LITE
-                ? getPricingPlanAnnualBillingSubtitle(planName) || ""
-                : "Billed monthly"
-              : getPricingPlanAnnualBillingSubtitle(planName) || ""}
-          </Typography.Text>
+        <Row className="annual-bill mt-8" style={{ display: "flex", minHeight: "17px" }}>
+          {quantity !== Infinity ? (
+            <>
+              {duration === PRICING.DURATION.MONTHLY ? (
+                planName === PRICING.PLAN_NAMES.LITE ? (
+                  cardSubtitle
+                ) : (
+                  <Typography.Text>Billed monthly</Typography.Text>
+                )
+              ) : (
+                cardSubtitle
+              )}
+            </>
+          ) : null}
         </Row>
         <Row
           style={{
-            marginTop: "auto",
+            marginTop: "24px",
+            minHeight: "30px",
           }}
         >
           <PricingTableButtons
@@ -251,6 +311,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             quantity={quantity}
             setIsContactUsModalOpen={setIsContactUsModalOpen}
             disabled={disbaleUpgradeButton}
+            isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
           />
         </Row>
       </div>
@@ -272,7 +333,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         </Space>
       </div>
 
-      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) ? (
+      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) &&
+      isAcceleratorProgramEnabled ? (
         <div className="student-plan-footer">
           <GiftIcon className="gift-plan-icon" width={16} height={16} />
           <a

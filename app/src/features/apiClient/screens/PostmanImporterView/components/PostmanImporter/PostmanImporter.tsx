@@ -9,7 +9,7 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
-import { Row } from "antd";
+import { notification, Row } from "antd";
 import {
   trackImportFailed,
   trackImportParsed,
@@ -18,7 +18,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
-import { batchWrite } from "backend/utils";
+import * as Sentry from "@sentry/react";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
@@ -76,7 +76,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
                 const processedData = processPostmanEnvironmentData(fileContent);
                 resolve({ type: postmanFileType, data: processedData });
               } else {
-                const processedApiRecords = processPostmanCollectionData(fileContent);
+                const processedApiRecords = processPostmanCollectionData(fileContent, apiClientRecordsRepository);
                 resolve({
                   type: postmanFileType,
                   data: {
@@ -88,6 +88,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
             } catch (error) {
               Logger.error("Error processing postman file:", error);
               reject(error);
+              Sentry.withScope((scope) => {
+                scope.setTag("error_type", "api_client_postman_processing");
+                Sentry.captureException(error);
+              });
             }
           };
           reader.readAsText(file);
@@ -122,7 +126,6 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
               }
             } else {
               trackImportParseFailed(ApiClientImporterType.POSTMAN, result.reason);
-              console.error("Error processing postman file:", result.reason);
             }
           });
 
@@ -132,6 +135,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         .catch((error) => {
           trackImportParseFailed(ApiClientImporterType.POSTMAN, error.message);
           setImportError(error.message);
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_client_postman_import");
+            Sentry.captureException(error);
+          });
         })
         .finally(() => {
           if (importError) {
@@ -139,7 +146,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           }
         });
     },
-    [importError]
+    [importError, apiClientRecordsRepository]
   );
 
   const handleImportEnvironments = useCallback(async () => {
@@ -177,8 +184,8 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
 
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
-        const newCollection = await apiClientRecordsRepository.createRecordWithId(collection, collection.id);
-        onSaveRecord(newCollection.data, "none");
+        const newCollection = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
+        onSaveRecord(newCollection.data);
         importedCollectionsCount++;
         return newCollection.data.id;
       } catch (error) {
@@ -187,6 +194,15 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         return null;
       }
     };
+
+    const collectionWriteResult = await apiClientRecordsRepository.batchWriteApiEntities(
+      BATCH_SIZE,
+      collections,
+      handleCollectionWrites
+    );
+    if (!collectionWriteResult.success) {
+      throw new Error(`Failed to import collections: ${collectionWriteResult.message}`);
+    }
 
     const handleApiWrites = async (api: RQAPI.ApiRecord) => {
       const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
@@ -197,18 +213,20 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
-        onSaveRecord(newApi.data, "none");
+        onSaveRecord(newApi.data);
         importedApisCount++;
+        return newApi.data.id;
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
+        return null;
       }
     };
 
-    await Promise.all([
-      batchWrite(BATCH_SIZE, collections, handleCollectionWrites),
-      batchWrite(BATCH_SIZE, apis, handleApiWrites),
-    ]);
+    const apiWriteResult = await apiClientRecordsRepository.batchWriteApiEntities(BATCH_SIZE, apis, handleApiWrites);
+    if (!apiWriteResult.success) {
+      throw new Error(`Failed to import APIs: ${apiWriteResult.message}`);
+    }
 
     if (failedCollectionsCount > 0) {
       const failureMessage =
@@ -238,7 +256,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         const failedCollections = collectionsCount.current - importedCollectionsCount;
 
         if (!importedEnvironments && !importedCollectionsCount) {
-          toast.error("Failed to import Postman data");
+          notification.error({
+            message: "Failed to import Postman data",
+            placement: "bottomRight",
+          });
           return;
         }
 
@@ -277,6 +298,10 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
         Logger.error("Postman data import failed:", error);
         setImportError("Something went wrong!, Couldn't import Postman data");
         trackImportFailed(ApiClientImporterType.POSTMAN, JSON.stringify(error));
+        Sentry.withScope((scope) => {
+          scope.setTag("error_type", "api_client_postman_import");
+          Sentry.captureException(error);
+        });
       })
       .finally(() => {
         setIsImporting(false);

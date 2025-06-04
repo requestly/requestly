@@ -1,4 +1,5 @@
 import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { RQAPI } from "./types";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";
 
@@ -58,4 +59,11 @@ export const POSTMAN_AUTH_TYPES_MAPPING = {
   [PostmanAuth.AuthType.API_KEY]: Authorization.Type.API_KEY,
   [PostmanAuth.AuthType.BEARER_TOKEN]: Authorization.Type.BEARER_TOKEN,
   [PostmanAuth.AuthType.BASIC_AUTH]: Authorization.Type.BASIC_AUTH,
+};
+
+export const DEFAULT_SCRIPT_VALUES = {
+  [RQAPI.ScriptType.PRE_REQUEST]:
+    "// **********************************************\n// 🛠️ Learn more about scripts and snippets: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
+  [RQAPI.ScriptType.POST_RESPONSE]:
+    "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
 };

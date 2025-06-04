@@ -9,6 +9,8 @@ import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/c
 import { getAppMode } from "store/selectors";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 interface Props {
   inviteId: string;
@@ -22,17 +24,16 @@ const BadLoginInvite = ({ inviteId, ownerName, workspace, invitedEmail }: Props)
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
 
-  const openAuthModal = () => {
+  const openAuthModal = (authMode: string) => {
+    trackSignUpButtonClicked("bad_login_invite");
     handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch).then(() => {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
           newProps: {
+            authMode,
             redirectURL: window.location.href,
-            callback: () => {
-              // setVisible(false);
-            },
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: SOURCE.TEAM_WORKSPACE_BAD_INVITE_SCREEN,
           },
         })
       );
@@ -58,15 +59,22 @@ const BadLoginInvite = ({ inviteId, ownerName, workspace, invitedEmail }: Props)
           <p className="text-gray invite-subheader">
             {invitedEmail ? (
               <>
-                To accept the invitation, please login as <b>{invitedEmail}</b>
+                To accept the invitation, please sign in as <b>{invitedEmail}</b>
               </>
             ) : (
-              <>To accept the invitation, please signup.</>
+              <>To accept the invitation, please sign up.</>
             )}
           </p>
         </div>
         <div className="invite-footer">
-          <RQButton className="invite-button" type="primary" size="middle" onClick={() => openAuthModal()}>
+          <RQButton className="invite-button" onClick={() => openAuthModal(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN)}>
+            Sign in
+          </RQButton>
+          <RQButton
+            className="invite-button"
+            type="primary"
+            onClick={() => openAuthModal(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP)}
+          >
             Sign up
           </RQButton>
         </div>

@@ -13,10 +13,26 @@ import { globalActions } from "store/slices/global/slice";
 import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { toast } from "utils/Toast";
 import syncingHelper from "lib/syncing/helpers/syncingHelper";
+import { minifyCode } from "utils/CodeEditorUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export const saveRule = async (appMode, dispatch, ruleObject) => {
   let ruleToSave = cloneDeep(ruleObject);
   delete ruleToSave["schemaVersion"];
+
+  if (ruleToSave.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST) {
+    if (ruleToSave.pairs[0].request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
+      const minifiedValue = minifyCode(ruleToSave.pairs[0].request.value);
+      ruleToSave.pairs[0].request.value = minifiedValue;
+    }
+  }
+
+  if (ruleToSave.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+    if (ruleToSave.pairs[0].response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      const minifiedValue = minifyCode(ruleToSave.pairs[0].response.value);
+      ruleToSave.pairs[0].response.value = minifiedValue;
+    }
+  }
 
   //Pre-validation: regex fix + trim whitespaces
   const fixedRuleData = runMinorFixesOnRule(dispatch, ruleToSave);

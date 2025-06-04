@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext } from "react";
+import React, { createContext, useCallback, useContext, useEffect } from "react";
 import Logger from "../../../../../common/logger";
 import { useMocksModalsContext } from "./modals";
 import {
@@ -18,7 +18,7 @@ import {
   trackMockUploadWorkflowStarted,
   trackNewMockButtonClicked,
 } from "modules/analytics/events/features/mocksV2";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { isMock, isCollection } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
@@ -26,6 +26,8 @@ import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
+import { ImporterType } from "components/Home/types";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -50,6 +52,7 @@ interface RulesProviderProps {
 
 export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ children }) => {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -227,6 +230,13 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     },
     [isValidPermission, showReadOnlyWarning, openMocksImportModalAction]
   );
+
+  // FIXME: this is buggy, to be fixed later
+  useEffect(() => {
+    if (state?.modal === ImporterType.FILES) {
+      importMocksAction(MockType.API, SOURCE.HOME_SCREEN);
+    }
+  }, [state?.modal, importMocksAction]);
 
   const value = {
     createNewCollectionAction,
