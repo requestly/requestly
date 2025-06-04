@@ -114,6 +114,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
             size={28}
             workspace={{
               ...activeWorkspace,
+              name: user.loggedIn ? activeWorkspaceName : null,
               workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
             }}
           />
