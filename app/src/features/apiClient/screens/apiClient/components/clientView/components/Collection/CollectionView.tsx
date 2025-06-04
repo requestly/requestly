@@ -11,7 +11,6 @@ import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
-import { LocalSyncRefreshButton } from "features/apiClient/components/common/LocalSyncRefreshButton/LocalSyncRefreshButton";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -157,24 +156,21 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         />
       ) : (
         <>
-          <div className="collection-view-header">
-            <div className="collection-view-breadcrumb-container">
-              <RQBreadcrumb
-                placeholder="New Collection"
-                recordName={collectionName}
-                onBlur={(newName) => handleCollectionNameChange(newName)}
-                autoFocus={isNewCollection}
-                defaultBreadcrumbs={[
-                  { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-                  {
-                    isEditable: true,
-                    pathname: window.location.pathname,
-                    label: collectionName,
-                  },
-                ]}
-              />
-            </div>
-            <LocalSyncRefreshButton />
+          <div className="collection-view-breadcrumb-container">
+            <RQBreadcrumb
+              placeholder="New Collection"
+              recordName={collectionName}
+              onBlur={(newName) => handleCollectionNameChange(newName)}
+              autoFocus={isNewCollection}
+              defaultBreadcrumbs={[
+                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                {
+                  isEditable: true,
+                  pathname: window.location.pathname,
+                  label: collectionName,
+                },
+              ]}
+            />
           </div>
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />

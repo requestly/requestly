@@ -9,7 +9,6 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcut
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
 import "./variablesListHeader.scss";
-import { LocalSyncRefreshButton } from "features/apiClient/components/common/LocalSyncRefreshButton/LocalSyncRefreshButton";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -65,7 +64,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
               },
             ]}
           />
-          <LocalSyncRefreshButton />
         </div>
       ) : (
         <div />
