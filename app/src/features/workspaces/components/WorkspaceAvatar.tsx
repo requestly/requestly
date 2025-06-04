@@ -24,7 +24,7 @@ const getWorkspaceIcon = (workspace: Workspace) => {
 };
 
 const getUniqueColorForWorkspace = (workspace: Workspace) => {
-  if (!workspace?.name && !workspace?.id && !workspace.workspaceType) return "#ffffff4d";
+  if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "#ffffff4d";
 
   if (isPersonalWorkspace(workspace)) return "#1E69FF";
 
