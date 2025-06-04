@@ -4,6 +4,16 @@
   border-radius: var(--border-radius-sm);
 }
 
+.workspace-selector-dropdown__content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.local-sync-refresh-btn.ant-btn:hover {
+  color: var(--requestly-color-text-default);
+}
+
 .workspace-selector-dropdown:hover {
   background-color: var(--hover-color);
 }
