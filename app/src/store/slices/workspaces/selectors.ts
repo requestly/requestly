@@ -22,7 +22,7 @@ export const getActiveWorkspaceIds = (state: RootState) => {
 
 const dummyPersonalWorkspace = {
   id: null,
-  name: "Private Workspace",
+  name: null,
   membersCount: null,
   workspaceType: "PERSONAL",
 } as Workspace;

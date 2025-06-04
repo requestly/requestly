@@ -110,7 +110,13 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
         onOpenChange={handleWorkspaceDropdownClick}
       >
         <div className="cursor-pointer items-center">
-          <WorkspaceAvatar size={28} workspace={activeWorkspace} />
+          <WorkspaceAvatar
+            size={28}
+            workspace={{
+              ...activeWorkspace,
+              workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+            }}
+          />
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
             {hasNewInvites ? <Badge dot={true} /> : null}

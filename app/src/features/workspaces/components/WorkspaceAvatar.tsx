@@ -14,7 +14,7 @@ interface Props {
 }
 
 const getWorkspaceIcon = (workspace: Workspace) => {
-  if (!workspace?.name && !workspace?.id && !workspace.workspaceType) return "?";
+  if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "W";
 
   if (isPersonalWorkspace(workspace)) return <LockOutlined />;
 
