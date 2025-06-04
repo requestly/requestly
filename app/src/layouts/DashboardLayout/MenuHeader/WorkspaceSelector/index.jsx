@@ -31,7 +31,6 @@ import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
@@ -50,6 +49,7 @@ import {
 } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -110,22 +110,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
         onOpenChange={handleWorkspaceDropdownClick}
       >
         <div className="cursor-pointer items-center">
-          <Avatar
-            size={26}
-            shape="square"
-            icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
-            className="workspace-avatar"
-            style={{
-              backgroundColor: user.loggedIn
-                ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                  ? "#1E69FF"
-                  : isLocalWorkspace
-                  ? "#FFFFFF33"
-                  : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
-                : "#ffffff4d",
-            }}
-          />
-
+          <WorkspaceAvatar size={28} workspace={activeWorkspace} />
           <span className="items-center active-workspace-name">
             <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
             {hasNewInvites ? <Badge dot={true} /> : null}
@@ -472,12 +457,13 @@ const WorkspaceSelector = () => {
         <Menu.Item
           key="1"
           icon={
-            <Avatar
+            <WorkspaceAvatar
               size={28}
-              shape="square"
-              icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)}
-              className="workspace-avatar"
-              style={{ backgroundColor: "#1E69FF" }}
+              workspace={{
+                id: "private",
+                name: "",
+                workspaceType: WorkspaceType.PERSONAL,
+              }}
             />
           }
           className={`workspace-menu-item ${!activeWorkspaceId ? "active-workspace-dropdownItem" : ""}`}
@@ -503,17 +489,7 @@ const WorkspaceSelector = () => {
               <Menu.Item
                 key={team.id}
                 disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
-                icon={
-                  <Avatar
-                    size={28}
-                    shape="square"
-                    icon={team.name?.[0]?.toUpperCase() ?? "P"}
-                    className="workspace-avatar"
-                    style={{
-                      backgroundColor: `${getUniqueColorForWorkspace(team.id, team.name)}`,
-                    }}
-                  />
-                }
+                icon={<WorkspaceAvatar size={28} workspace={team} />}
                 className={`workspace-menu-item ${
                   team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
@@ -561,14 +537,7 @@ const WorkspaceSelector = () => {
               <Menu.Item
                 key={team.id}
                 disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
-                icon={
-                  <Avatar
-                    size={28}
-                    shape="square"
-                    icon={<LuFolderSync />}
-                    className="workspace-avatar local-workspace-avatar"
-                  />
-                }
+                icon={<WorkspaceAvatar size={28} workspace={team} />}
                 className={`workspace-menu-item ${
                   team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
