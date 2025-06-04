@@ -4,8 +4,6 @@ import { IoMdGlobe } from "@react-icons/all-files/io/IoMdGlobe";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import PATHS from "config/constants/sub/paths";
-import { TabsLayoutContextInterface, useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -16,6 +14,8 @@ import {
   trackEnvironmentDuplicated,
   trackEnvironmentRenamed,
 } from "modules/analytics/events/features/apiClient";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
@@ -25,7 +25,6 @@ interface EnvironmentsListItemProps {
     isGlobal?: boolean;
   };
   onExportClick?: (environment: { id: string; name: string }) => void;
-  openTab: TabsLayoutContextInterface["openTab"];
 }
 
 export enum EnvironmentMenuKey {
@@ -38,7 +37,6 @@ export enum EnvironmentMenuKey {
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environment,
-  openTab,
   onExportClick,
 }) => {
   const { envId } = useParams();
@@ -55,9 +53,17 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const { updateTab, activeTab } = useTabsLayoutContext();
+  const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
+    state.openTab,
+    state.closeTabBySource,
+    state.activeTabSource,
+  ]);
 
-  const { closeTab } = useTabsLayoutContext();
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -68,7 +74,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     renameEnvironment(environment.id, newEnvironmentName)
       .then(() => {
         trackEnvironmentRenamed();
-        updateTab(environment.id, { title: newEnvironmentName });
+        openTab(new EnvironmentViewTabSource({ id: environment.id, title: newEnvironmentName }));
         toast.success("Environment renamed successfully");
       })
       .catch(() => {
@@ -78,7 +84,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         setIsRenaming(false);
         setIsRenameInputVisible(false);
       });
-  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, updateTab]);
+  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, openTab]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     toast.loading("Duplicating environment...");
@@ -96,7 +102,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     toast.loading("Deleting environment...");
     deleteEnvironment(environment.id)
       .then(() => {
-        closeTab(environment.id);
+        closeTabBySource(environment.id, "environments");
+
         trackEnvironmentDeleted();
         toast.success("Environment deleted successfully");
         const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
@@ -120,7 +127,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     envId,
     currentEnvironmentId,
     setCurrentEnvironment,
-    closeTab,
+    closeTabBySource,
   ]);
 
   const menuItems = useMemo(() => {
@@ -141,7 +148,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       <Input
         className="environment-input"
         autoFocus
-        value={newEnvironmentName}
+        defaultValue={environment.name}
         onChange={(e) => setNewEnvironmentName(e.target.value)}
         onPressEnter={handleEnvironmentRename}
         onBlur={handleEnvironmentRename}
@@ -152,19 +159,20 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
 
   return (
     <div
-      key={environment.id}
-      className={`environments-list-item ${environment.id === envId && activeTab?.id === envId ? "active" : ""}`}
+      className={`environments-list-item ${environment.id === activeTabSourceId ? "active" : ""}`}
       onClick={() => {
-        openTab(environment.id, {
-          title: environment.name,
-          url: `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(environment.id)}`,
-        });
+        openTab(new EnvironmentViewTabSource({ id: environment.id, title: environment.name }));
       }}
     >
       <div className="environments-list-item__label">
         <Typography.Text
           ellipsis={{
-            tooltip: environment.name,
+            tooltip: {
+              title: environment.name,
+              placement: "right",
+              color: "#000",
+              mouseEnterDelay: 0.5,
+            },
           }}
         >
           {isGlobalEnvironment(environment.id) && <IoMdGlobe className="global-var-icon" />}
@@ -183,7 +191,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
                   </Link>
                 </span>
               }
-              placement="top"
+              placement="right"
               showArrow={false}
             >
               <span>
@@ -195,7 +203,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         <Tooltip
           overlayClassName="active-environment-tooltip"
           title="Active Environment"
-          placement="top"
+          placement="right"
           showArrow={false}
         >
           <span>

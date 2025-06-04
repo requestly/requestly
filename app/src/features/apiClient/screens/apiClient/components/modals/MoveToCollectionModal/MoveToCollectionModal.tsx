@@ -1,4 +1,4 @@
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
@@ -8,9 +8,9 @@ import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
-import { firebaseBatchWrite } from "backend/utils";
 import { head, isEmpty, omit } from "lodash";
 import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -19,7 +19,13 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const { apiClientRecords, onSaveRecord, onSaveBulkRecords, apiClientRecordsRepository } = useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    onSaveBulkRecords,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+  } = useApiClientContext();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,7 +69,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     };
     const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
-      onSaveRecord(newCollection.data);
+      onSaveRecord(newCollection.data, "open");
       return newCollection.data.id;
     } else {
       throw new Error("Failed to create a new collection");
@@ -80,17 +86,18 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
 
       // TODO: use apiClient interface
       try {
-        const result = await firebaseBatchWrite("apis", updatedRequests);
+        const result = await apiClientRecordsRepository.moveAPIEntities(updatedRequests, collectionId);
 
         trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
-        result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
+        result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
+        forceRefreshApiClientRecords();
       } catch (error) {
         console.error("Error moving records: ", error);
         throw new Error("Failed to move some requests to collection");
       }
     },
-    [onSaveRecord, recordsToMove, onSaveBulkRecords]
+    [onSaveRecord, recordsToMove, onSaveBulkRecords, apiClientRecordsRepository, forceRefreshApiClientRecords]
   );
 
   const handleRecordMove = useCallback(async () => {
@@ -103,7 +110,15 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       }
     } catch (error) {
       console.error("Error moving request to collection:", error);
-      toast.error(error.message || "Error moving records to collection");
+      notification.error({
+        message: `Error moving records to collection`,
+        description: error?.message,
+        placement: "bottomRight",
+      });
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "api_client_move_to_collection");
+        Sentry.captureException(error);
+      });
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);

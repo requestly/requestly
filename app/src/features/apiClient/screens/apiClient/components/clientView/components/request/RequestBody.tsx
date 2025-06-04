@@ -24,6 +24,22 @@ function parseSingleModeBody(params: {
       return {
         text: body as RQAPI.RequestRawBody,
       };
+    case RequestContentType.HTML:
+      return {
+        text: body as RQAPI.RequestHtmlBody,
+      };
+    case RequestContentType.JAVASCRIPT:
+      return {
+        text: body as RQAPI.RequestJavascriptBody,
+      };
+    case RequestContentType.XML:
+      return {
+        text: body as RQAPI.RequestXmlBody,
+      };
+    default:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
   }
 }
 
@@ -78,6 +94,9 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
     switch (contentType) {
       case RequestContentType.RAW:
       case RequestContentType.JSON:
+      case RequestContentType.HTML:
+      case RequestContentType.JAVASCRIPT:
+      case RequestContentType.XML:
         return (
           <RawBody
             contentType={contentType}

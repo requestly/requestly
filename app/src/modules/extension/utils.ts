@@ -1,11 +1,6 @@
 import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  trackMv3MigrationCompleted,
-  trackMv3MigrationRulesMigrated,
-  trackMv3MigrationStarted,
-} from "modules/analytics/events/migrations";
 import Logger from "lib/logger";
 import * as semver from "semver";
 import {
@@ -49,7 +44,7 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
     isFirstSyncComplete: window.isFirstSyncComplete,
     currentWorkspaceId,
   });
-  trackMv3MigrationStarted(rules.length);
+
   const rulesMigrationLogs: Record<string, any> = {};
   const migratedRules: Rule[] = [];
 
@@ -105,17 +100,9 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
         },
       });
       Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migrated Successfully", { migratedRules, results });
-      trackMv3MigrationRulesMigrated(
-        rules.length,
-        migratedRules.length,
-        rulesMigrationLogs ? Object.keys(rulesMigrationLogs).length : 0,
-        pathImpactedRulesCount,
-        pageUrlImpactedRulesCount
-      );
     });
   }
 
-  trackMv3MigrationCompleted(rules.length, migratedRules.length);
   Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migration ended", {
     currentWorkspaceMigrationData,
     rulesMigrationLogs,

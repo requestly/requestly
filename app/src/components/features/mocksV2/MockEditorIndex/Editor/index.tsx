@@ -23,7 +23,7 @@ import { APIClient, APIClientRequest } from "features/apiClient/components/commo
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
@@ -31,6 +31,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import Editor from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
@@ -378,12 +379,11 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
-            id={`headers-${id}`} // used to show error toasts created because header invalidation
+          <Editor
+            scriptId={`headers-${id}`} // used to show error toasts created because header invalidation
             isResizable
             height={220}
             value={headersString}
-            defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
             analyticEventProperties={{ source: "mocks", mock_type: type }}
@@ -398,11 +398,10 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
+          <Editor
             isResizable
             height={220}
             value={body}
-            defaultValue={body}
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
@@ -475,7 +474,7 @@ const MockEditor: React.FC<Props> = ({
                   name={name}
                   mode={isNew ? "create" : "edit"}
                   description={desc}
-                  namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+                  namePlaceholder="File name"
                   descriptionPlaceholder="Add your description here."
                   nameChangeCallback={onNameChange}
                   descriptionChangeCallback={onDescriptionChange}
@@ -522,7 +521,7 @@ const MockEditor: React.FC<Props> = ({
               name={name}
               mode={isNew ? "create" : "edit"}
               description={desc}
-              namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+              namePlaceholder="File name"
               descriptionPlaceholder="Add your description here."
               nameChangeCallback={onNameChange}
               descriptionChangeCallback={onDescriptionChange}

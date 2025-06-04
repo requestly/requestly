@@ -85,7 +85,7 @@ const RuleEditor = (props) => {
 
   useEffect(() => {
     if (isNewRuleCreated) {
-      toggleBottomSheet();
+      toggleBottomSheet({ isOpen: false, isTrack: false, action: "new_rule_created" });
       setIsNewRuleCreated(false);
     }
   }, [toggleBottomSheet, isNewRuleCreated]);
@@ -96,7 +96,7 @@ const RuleEditor = (props) => {
       state?.source !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
       !isNewRuleCreated
     ) {
-      if (isBottomSheetOpen) toggleBottomSheet(false);
+      if (isBottomSheetOpen) toggleBottomSheet({ isOpen: false, isTrack: false, action: "new_rule_created" });
     }
   }, [toggleBottomSheet, MODE, state, isNewRuleCreated, isBottomSheetOpen]);
 
@@ -137,6 +137,8 @@ const RuleEditor = (props) => {
           <BottomSheetLayout
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
             hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isSampleRule}
+            minSize={35}
+            initialSizes={[60, 40]}
           >
             <ProCard
               className={`rule-editor-procard ${

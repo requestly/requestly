@@ -3,32 +3,30 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getTabs, tabsLayoutActions } from "store/slices/tabs-layout";
 import { isEmpty } from "lodash";
 import { useCallback, useState } from "react";
 import { getOptions } from "./utils";
-import { FormatType } from "./types";
-import { TabsLayout } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import DropdownButton from "antd/lib/dropdown/dropdown-button";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
-import "./apiClientCard.scss";
 import { Card } from "../Card";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { CardType } from "../Card/types";
+import { CardListItem, CardType } from "../Card/types";
 import { ApiClientImporterType } from "features/apiClient/types";
 import Postman from "../../../../assets/img/brand/postman-icon.svg?react";
 import { CreateType } from "features/apiClient/types";
 import { trackHomeApisActionClicked } from "components/Home/analytics";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
-import { RQTooltip } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { globalActions } from "store/slices/global/slice";
+import "./apiClientCard.scss";
 
 interface CardOptions {
-  contentList: TabsLayout.Tab[];
   bodyTitle: string;
-  type: FormatType;
+  contentList: CardListItem[];
 }
 
 const ApiClientCard = () => {
@@ -36,8 +34,8 @@ const ApiClientCard = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isLoggedIn = user?.details?.isLoggedIn;
-  const tabs = useSelector(getTabs("apiClient"));
-  const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs, FormatType.TABS) : null);
+  const [tabs] = useTabServiceWithSelector((state) => [state.tabs]);
+  const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs) : null);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
@@ -51,10 +49,14 @@ const ApiClientCard = () => {
 
   const importTriggerHandler = useCallback(
     (modal: ApiClientImporterType) => {
-      navigate(PATHS.API_CLIENT.ABSOLUTE, user?.details?.isLoggedIn ? { state: { modal } } : {});
-      trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+      if (!isLoggedIn) {
+        dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      } else {
+        navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { modal } });
+        trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
+      }
     },
-    [navigate, user?.details?.isLoggedIn]
+    [navigate, isLoggedIn, dispatch]
   );
 
   const items: MenuProps["items"] = [
@@ -69,6 +71,15 @@ const ApiClientCard = () => {
       label: "Environment",
       key: "2",
       onClick: () => createNewHandler(CreateType.ENVIRONMENT),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "3",
+      label: "Import a cURL",
+      icon: <MdOutlineSyncAlt />,
+      onClick: () => importTriggerHandler(ApiClientImporterType.CURL),
     },
   ];
 
@@ -99,14 +110,33 @@ const ApiClientCard = () => {
     },
   ];
 
+  const actionButtons = (
+    <RQTooltip
+      showArrow={false}
+      title={isValidPermission ? null : "Creating a new request is not allowed in view-only mode."}
+    >
+      <DropdownButton
+        size="small"
+        type="primary"
+        disabled={!isValidPermission}
+        icon={<MdOutlineKeyboardArrowDown />}
+        overlayClassName="more-options"
+        onClick={() => {
+          createNewHandler(CreateType.API);
+        }}
+        menu={{ items }}
+        trigger={["click"]}
+      >
+        {"New request"}
+      </DropdownButton>
+    </RQTooltip>
+  );
+
   return (
     <Card
-      showFooter={isValidPermission}
-      wrapperClass={`${cardOptions?.type === FormatType.HISTORY ? "history-card" : ""} api-client-card`}
       cardType={CardType.API_CLIENT}
-      defaultImportClickHandler={() => importTriggerHandler(ApiClientImporterType.REQUESTLY)}
-      title={"API Client"}
-      cardIcon={"/assets/media/apiClient/api-client-icon.svg"}
+      showFooter={isValidPermission}
+      wrapperClass={`api-client-card`}
       importOptions={
         isValidPermission
           ? {
@@ -118,31 +148,11 @@ const ApiClientCard = () => {
       }
       bodyTitle={cardOptions?.bodyTitle}
       contentList={isLoggedIn ? cardOptions?.contentList : []}
-      actionButtons={
-        <RQTooltip
-          showArrow={false}
-          title={isValidPermission ? null : "Creating a new request is not allowed in view-only mode."}
-        >
-          <DropdownButton
-            disabled={!isValidPermission}
-            icon={<MdOutlineKeyboardArrowDown />}
-            type="primary"
-            overlayClassName="more-options"
-            onClick={() => {
-              createNewHandler(CreateType.API);
-            }}
-            menu={{ items }}
-            trigger={["click"]}
-          >
-            {"New Request"}
-          </DropdownButton>
-        </RQTooltip>
-      }
-      listItemClickHandler={(item: TabsLayout.Tab) => {
+      listItemClickHandler={(item) => {
         navigate(item.url);
-        dispatch(tabsLayoutActions.setActiveTab({ featureId: "apiClient", tab: { ...item } }));
         trackHomeApisActionClicked("recent_tab_clicked");
       }}
+      actionButtons={actionButtons}
       viewAllCta={"View all APIs"}
       viewAllCtaLink={PATHS.API_CLIENT.ABSOLUTE}
       viewAllCtaOnClick={() => trackHomeApisActionClicked("view_all_apis")}
@@ -153,25 +163,26 @@ const ApiClientCard = () => {
             resource="api_client_request"
             permission="create"
             fallback={
-              <div
-                className="new-request-cta"
+              <RQButton
+                size="small"
+                type="primary"
                 onClick={() => {
                   navigate(PATHS.API_CLIENT.ABSOLUTE);
                 }}
               >
-                View and test APIs
-              </div>
+                View requests
+              </RQButton>
             }
           >
-            <div
-              className="new-request-cta"
+            <RQButton
+              size="small"
+              type="primary"
               onClick={() => {
-                navigate(PATHS.API_CLIENT.ABSOLUTE);
-                trackHomeApisActionClicked("create/send_first_api");
+                createNewHandler(CreateType.API);
               }}
             >
-              <MdOutlineSyncAlt /> Create or test an API
-            </div>
+              New request
+            </RQButton>
           </RoleBasedComponent>
         ),
       }}

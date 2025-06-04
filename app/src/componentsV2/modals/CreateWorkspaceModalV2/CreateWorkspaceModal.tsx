@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { Checkbox, Input, Modal, Radio, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "@sentry/react";
+
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
@@ -8,9 +10,6 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
 import {
   trackAddTeamMemberSuccess,
   trackNewTeamCreateFailure,
@@ -24,10 +23,8 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
@@ -43,7 +40,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const availableWorkspaces = useSelector(getAllWorkspaces);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
@@ -51,9 +47,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
-  const { claimIncentiveRewards } = useIncentiveActions();
   const { switchWorkspace } = useWorkspaceHelpers();
-
   const folderSelectCallback = (path: string) => {
     setFolderPath(path);
   };
@@ -70,32 +64,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
       }
     },
     [switchWorkspace, workspaceType, navigate, isNotifyAllSelected]
-  );
-
-  const handleIncentiveRewards = useCallback(
-    async (availableTeamsLength: number, dispatch: any) => {
-      const response = await claimIncentiveRewards({
-        type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-        metadata: { num_workspaces: availableTeamsLength || 1 },
-      });
-
-      if (response?.data?.success) {
-        dispatch(
-          incentivizationActions.setUserMilestoneAndRewardDetails({
-            userMilestoneAndRewardDetails: response.data?.data,
-          })
-        );
-
-        dispatch(
-          incentivizationActions.toggleActiveModal({
-            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-            newValue: true,
-            newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-          })
-        );
-      }
-    },
-    [claimIncentiveRewards]
   );
 
   const handleDomainInvitesCreation = useCallback(
@@ -182,9 +150,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         }
       })();
 
-      await handleIncentiveRewards(availableWorkspaces?.length, dispatch);
-
-      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal");
+      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType);
       toast.info("Workspace Created");
 
       let hasMembersInSameDomain = true;
@@ -204,20 +170,23 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         }
       }
 
-      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", isNotifyAllSelected);
+      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType, isNotifyAllSelected);
       handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
 
       callback?.();
       toggleModal();
     } catch (err) {
-      console.error("Team creation failed", err);
-      toast.error("Unable to Create Team");
-      trackNewTeamCreateFailure(workspaceName);
+      toast.error(err?.message || "Unable to Create Team");
+      Sentry.captureException("Create Team Failure", {
+        extra: {
+          message: err.message,
+        },
+      });
+      trackNewTeamCreateFailure(workspaceName, workspaceType);
     } finally {
       setIsLoading(false);
     }
   }, [
-    availableWorkspaces?.length,
     billingTeams,
     callback,
     dispatch,
@@ -225,7 +194,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
     toggleModal,
     user?.details?.profile?.email,
     workspaceName,
-    handleIncentiveRewards,
     handlePostTeamCreationStep,
     handleDomainInvitesCreation,
     workspaceType,

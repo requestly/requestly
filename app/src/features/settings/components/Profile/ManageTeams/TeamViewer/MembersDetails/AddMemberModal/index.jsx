@@ -22,14 +22,14 @@ import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { getActiveWorkspaceId, getActiveWorkspacesMembers, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { WorkspaceMemberRole } from "features/workspaces/types";
 import { isAdmin } from "features/settings/utils";
 import { Conditional } from "components/common/Conditional";
+import { TeamRole } from "types";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
   const [userEmail, setUserEmail] = useState([]);
-  const [userInviteRole, setUserInviteRole] = useState(WorkspaceMemberRole.read);
+  const [userInviteRole, setUserInviteRole] = useState(TeamRole.write);
   const [isInviteErrorModalActive, setInviteErrorModalActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [inviteErrors, setInviteErrors] = useState([]);
@@ -48,7 +48,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const loggedInUserId = user?.details?.profile?.uid;
   const workspaceMembers = useSelector(getActiveWorkspacesMembers);
   const loggedInUserTeamRole = workspaceMembers?.[loggedInUserId]?.role;
-  const isLoggedInUserAdmin = loggedInUserTeamRole === WorkspaceMemberRole.admin;
+  const isLoggedInUserAdmin = loggedInUserTeamRole === TeamRole.admin;
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableWorkspaces = useSelector(getAllWorkspaces);
@@ -272,24 +272,17 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                   <div className="email-invites-wrapper">
                     <div className="emails-input-wrapper">
                       <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-                      <Conditional
-                        condition={loggedInUserTeamRole && loggedInUserTeamRole !== WorkspaceMemberRole.read}
-                      >
+                      <Conditional condition={loggedInUserTeamRole && loggedInUserTeamRole !== TeamRole.read}>
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
+                            memberRole={userInviteRole}
                             loggedInUserTeamRole={loggedInUserTeamRole}
                             placement="bottomRight"
                             isAdmin={isAdmin(userInviteRole)}
                             isLoggedInUserAdmin={isLoggedInUserAdmin}
                             loggedInUserId={loggedInUserId}
                             handleMemberRoleChange={(_, updatedRole) => {
-                              let role = updatedRole;
-
-                              if (role === "user") {
-                                role = WorkspaceMemberRole.write;
-                              }
-
-                              setUserInviteRole(role);
+                              setUserInviteRole(updatedRole);
                             }}
                           />
                         </div>

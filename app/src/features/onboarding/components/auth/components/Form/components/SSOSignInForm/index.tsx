@@ -10,11 +10,11 @@ import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackLoginAttemptedEvent, trackLoginFailedEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
-import "./index.scss";
 import { getSSOProviderId } from "backend/auth/sso";
 import { loginWithSSO } from "actions/FirebaseActions";
 import { EmailType } from "@requestly/shared/types/common";
 import { getEmailType } from "utils/mailCheckerUtils";
+import "./index.scss";
 
 interface Props {
   email: string;
@@ -122,6 +122,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
           placeholder="E.g., you@company.com"
           label="Your work email"
           onPressEnter={handleLoginWithSSO}
+          type="email"
         />
       </div>
       <RQButton

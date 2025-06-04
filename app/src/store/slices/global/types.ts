@@ -3,8 +3,6 @@ import { EditorToastState } from "./editorToast/types";
 import { GlobalModals } from "./modals/types";
 import { RulesState } from "./rules/types";
 import { UserAuth } from "./user/types";
-import { SurveyPage } from "components/misc/PersonaSurvey/types";
-import { OnboardingSteps } from "features/rules/screens/rulesList/components/RulesList/components/GettingStarted/WorkspaceOnboarding/types";
 
 export interface GlobalSliceState {
   activeModals: GlobalModals;
@@ -25,17 +23,6 @@ export interface GlobalSliceState {
     isSecondarySidebarCollapsed: boolean;
     isRedirectRuleTutorialModalShown: boolean;
   };
-  userPersona: {
-    page: SurveyPage;
-    persona: string;
-    isSurveyCompleted: boolean;
-    useCases: any;
-  };
-  workspaceOnboarding: {
-    step: OnboardingSteps;
-    isOnboardingCompleted: boolean;
-    workspace: any;
-  };
   appOnboarding: {
     step: ONBOARDING_STEPS;
     persona: string;
@@ -44,6 +31,12 @@ export interface GlobalSliceState {
     disableSkip: boolean;
     createdWorkspace: any;
     isOnboardingCompleted: boolean;
+  };
+  onboarding: {
+    isOnboardingCompleted: boolean;
+    isNewUser: boolean;
+    userPersona: string | null;
+    isAcquisitionAnnouncementModalVisible: boolean;
   };
   misc: {
     persist: {

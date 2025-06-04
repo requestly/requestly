@@ -1,15 +1,22 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortReason, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
-import { generateDocumentId } from "backend/utils";
 import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
+
+const createAbortError = (signal: AbortSignal) => {
+  if (signal.reason === AbortReason.USER_CANCELLED) {
+    return new UserAbortError();
+  }
+  return new Error("Request aborted");
+};
 
 type ResponseOrError = RQAPI.Response | { error: string };
 export const makeRequest = async (
@@ -20,12 +27,11 @@ export const makeRequest = async (
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
-        reject(new Error("Request aborted"));
+        reject(createAbortError(signal));
       }
-
       const abortListener = () => {
         signal.removeEventListener("abort", abortListener);
-        reject(new Error("Request aborted"));
+        reject(createAbortError(signal));
       };
       signal.addEventListener("abort", abortListener);
     }
@@ -170,46 +176,42 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  try {
-    const requestJsonString = curlconverter.toJsonString(curl);
-    const requestJson = JSON.parse(requestJsonString);
+  const requestJsonString = curlconverter.toJsonString(curl);
+  const requestJson = JSON.parse(requestJsonString);
 
-    const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
-    /*
+  const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+  /*
       cURL converter is not able to parse query params from url for some cURL requests
       so parsing it manually from URL and populating queryParams property
     */
-    const requestUrlParams = new URL(requestJson.url).searchParams;
-    const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+  const requestUrlParams = new URL(requestJson.url).searchParams;
+  const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
 
-    const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
-    const contentType = getContentTypeFromRequestHeaders(headers);
-    let body: RQAPI.RequestBody;
+  const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
+  const contentType = getContentTypeFromRequestHeaders(headers);
+  let body: RQAPI.RequestBody;
 
-    if (contentType === RequestContentType.JSON) {
-      body = JSON.stringify(requestJson.data);
-    } else if (contentType === RequestContentType.FORM) {
-      body = generateKeyValuePairsFromJson(requestJson.data);
-    } else {
-      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
-    }
-
-    // remove query params from url
-    const requestUrl = requestJson.url.split("?")[0];
-
-    const request: RQAPI.Request = {
-      url: requestUrl,
-      method: requestJson.method.toUpperCase() as RequestMethod,
-      queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
-      headers,
-      contentType,
-      body: body ?? null,
-    };
-
-    return request;
-  } catch (e) {
-    return null;
+  if (contentType === RequestContentType.JSON) {
+    body = JSON.stringify(requestJson.data);
+  } else if (contentType === RequestContentType.FORM) {
+    body = generateKeyValuePairsFromJson(requestJson.data);
+  } else {
+    body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
   }
+
+  // remove query params from url
+  const requestUrl = requestJson.url.split("?")[0];
+
+  const request: RQAPI.Request = {
+    url: requestUrl,
+    method: requestJson.method.toUpperCase() as RequestMethod,
+    queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
+    headers,
+    contentType,
+    body: body ?? null,
+  };
+
+  return request;
 };
 
 export const isApiRequest = (record: RQAPI.Record) => {
@@ -568,7 +570,10 @@ export const filterOutChildrenRecords = (
     .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
     .map((id) => recordsMap[id]);
 
-export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) => {
+export const processRecordsForDuplication = (
+  recordsToProcess: RQAPI.Record[],
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+) => {
   const recordsToDuplicate: RQAPI.Record[] = [];
   const queue: RQAPI.Record[] = [...recordsToProcess];
 
@@ -576,7 +581,7 @@ export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) =
     const record = queue.shift()!;
 
     if (record.type === RQAPI.RecordType.COLLECTION) {
-      const newId = generateDocumentId("apis");
+      const newId = apiClientRecordsRepository.generateCollectionId(`(Copy) ${record.name}`, record.collectionId);
 
       const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
         id: newId,
@@ -594,7 +599,7 @@ export const processRecordsForDuplication = (recordsToProcess: RQAPI.Record[]) =
       }
     } else {
       const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
-        id: generateDocumentId("apis"),
+        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId),
         name: `(Copy) ${record.name}`,
       });
 

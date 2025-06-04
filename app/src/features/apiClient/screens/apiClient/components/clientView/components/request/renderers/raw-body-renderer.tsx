@@ -1,14 +1,14 @@
-import React, { useCallback, useContext, useState } from "react";
-// import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
-import Editor from "componentsV2/CodeEditor/components/EditorV2/Editor";
+import React, { useCallback, useContext } from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useDebounce } from "hooks/useDebounce";
 import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
+import Editor from "componentsV2/CodeEditor";
+import { RequestContentType } from "features/apiClient/types";
 
 export function RawBody(props: {
-  contentType: "text/plain" | "application/json";
+  contentType: RequestContentType;
   environmentVariables: EnvironmentVariables;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
   editorOptions: React.ReactNode;
@@ -17,11 +17,6 @@ export function RawBody(props: {
 
   const { requestBodyStateManager } = useContext(RequestBodyContext);
   const { text, setText } = useTextBody(requestBodyStateManager);
-  const [isRequestBodyFullScreen, setIsRequestBodyFullScreen] = useState(false);
-
-  const handleFullScreenChange = () => {
-    setIsRequestBodyFullScreen((prev) => !prev);
-  };
 
   const handleTextChange = useDebounce(
     useCallback(
@@ -44,15 +39,13 @@ export function RawBody(props: {
     <div className="api-client-code-editor-container api-request-body-editor-container">
       <Editor
         language={editorLanguage}
-        value={text}
+        value={text ?? ""}
         handleChange={handleTextChange}
         prettifyOnInit={false}
         isResizable={false}
         hideCharacterCount
         envVariables={environmentVariables}
         toolbarOptions={{ title: "", options: [editorOptions] }}
-        isFullScreen={isRequestBodyFullScreen}
-        onFullScreenChange={handleFullScreenChange}
         analyticEventProperties={{ source: "api_client" }}
         showOptions={{
           enablePrettify: contentType === "application/json",

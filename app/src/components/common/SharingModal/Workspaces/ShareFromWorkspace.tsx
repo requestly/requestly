@@ -49,7 +49,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       emails: memberEmails,
       role: TeamRole.write,
       teamName: activeWorkspace.name,
-      numberOfMembers: activeWorkspace?.membersCount,
+      numberOfMembers: activeWorkspace.accessCount,
       source: "sharing_modal_from_workspace",
     }).then((res: any) => {
       const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);

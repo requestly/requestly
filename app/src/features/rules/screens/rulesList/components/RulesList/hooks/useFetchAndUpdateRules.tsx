@@ -9,7 +9,6 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import Logger from "../../../../../../../../../common/logger";
-import { trackRulesListLoaded } from "features/rules/analytics";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -77,7 +76,6 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         groups.filter((group) => group.status === RecordStatus.ACTIVE).length
       );
       sendIndividualRuleTypesCountAttributes(rules);
-      trackRulesListLoaded(rules.length, activeRulesCount, activePremiumRules.length, groups.length);
     },
     [appMode, dispatch, setIsLoading, activeWorkspaceId]
   );

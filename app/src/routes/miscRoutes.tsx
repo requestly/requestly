@@ -11,7 +11,6 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
 import { Home } from "components/Home";
 import { PricingIndexPage } from "features/pricing/components/PricingPage";
-import { IncentiveTasksListScreen } from "features/incentivization";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
 import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
@@ -61,15 +60,15 @@ export const miscRoutes: RouteObject[] = [
   },
   {
     path: PATHS.IMPORT_FROM_CHARLES.RELATIVE,
-    element: <ImportFromCharlesWrapperView />,
+    element: <ProtectedRoute component={ImportFromCharlesWrapperView} />,
   },
   {
     path: PATHS.IMPORT_FROM_MODHEADER.RELATIVE,
-    element: <ImportFromModheaderWrapperView />,
+    element: <ProtectedRoute component={ImportFromModheaderWrapperView} />,
   },
   {
     path: PATHS.IMPORT_FROM_RESOURCE_OVERRIDE.RELATIVE,
-    element: <ImportFromResourceOverrideWrapperView />,
+    element: <ProtectedRoute component={ImportFromResourceOverrideWrapperView} />,
   },
   {
     path: PATHS.HOME.RELATIVE,
@@ -78,10 +77,6 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.APPSUMO.RELATIVE,
     element: <ProtectedRoute component={AppSumoModal} />,
-  },
-  {
-    path: PATHS.CREDITS.RELATIVE,
-    element: <IncentiveTasksListScreen />,
   },
   {
     path: PATHS.SELENIUM_IMPORTER.RELATIVE,

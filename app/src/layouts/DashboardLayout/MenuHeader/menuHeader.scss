@@ -1,0 +1,89 @@
+.app-primary-header {
+  &.ant-layout-header {
+    height: 52px;
+    line-height: unset;
+    padding: var(--space-2, 4px) var(--space-4, 8px);
+    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: var(--requestly-color-surface-0, #212121);
+  }
+
+  .github-star-button {
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 3px;
+    margin-right: 4px;
+  }
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__left {
+    display: flex;
+    align-items: center;
+
+    .app-primary-header-link {
+      height: 30px;
+      flex-shrink: 0;
+      font-size: var(--requestly-font-size-sm);
+      line-height: 22px;
+      padding: 4px 11px;
+      color: var(--requestly-color-text-subtle);
+      border-radius: var(--border-radius-sm);
+
+      &:hover {
+        color: var(--requestly-color-text-default);
+      }
+    }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 4px);
+
+    .header-proxy-server-status-icon {
+      img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .header-search-btn.ant-btn {
+      display: flex;
+      align-items: center;
+      width: 105px;
+      height: 28px;
+      border: none;
+      color: var(--requestly-color-text-subtle);
+      font-weight: 500;
+      padding: 4px 0;
+
+      .header-search-btn-content {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2, 4px);
+      }
+
+      &:hover {
+        border: none;
+      }
+    }
+    .header-gap-wide {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .auth-button-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .ant-btn {
+        font-weight: var(--requestly-font-weight-medium);
+      }
+    }
+  }
+}

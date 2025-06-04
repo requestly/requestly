@@ -1,7 +1,7 @@
 {
   "name": "@requestly/browser-extension-config",
   "version": "1.0.0",
-  "description": "Config for MV2 and MV3 browser extensions",
+  "description": "Config for MV2 (now deprecated) and MV3 browser extensions",
   "homepage": "https://requestly.com",
   "private": true,
   "repository": {

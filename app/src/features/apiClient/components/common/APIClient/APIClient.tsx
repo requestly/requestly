@@ -14,8 +14,12 @@ import {
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import ApiClientLoggedOutView from "../LoggedOutView/LoggedOutView";
 import "./apiClient.scss";
 import { isEmpty } from "lodash";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useSelector } from "react-redux";
+import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -26,6 +30,7 @@ interface Props {
 }
 
 const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
+  const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
       return null;
@@ -98,13 +103,19 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
-      </BottomSheetProvider>
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+          {user.loggedIn ? (
+            <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+          ) : (
+            <ApiClientLoggedOutView />
+          )}
+        </BottomSheetProvider>
+      </WindowsAndLinuxGatedHoc>
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <APIClientView apiEntry={apiEntry} />
+      <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
     </BottomSheetProvider>
   );
 };

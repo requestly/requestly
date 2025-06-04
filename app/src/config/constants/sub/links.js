@@ -1,10 +1,11 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const LINKS = {
   /** DOCS */
 
   // Download
-  REQUESTLY_DOWNLOAD_PAGE: "https://requestly.com/downloads",
+  REQUESTLY_DOWNLOAD_PAGE: getLinkWithMetadata("https://requestly.com/downloads"),
   REQUESTLY_DOCS: "https://docs.requestly.com/",
   //Docs - Using Rules
   REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.com/general/http-rules/overview/",
@@ -52,6 +53,8 @@ const LINKS = {
 
   REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://docs.requestly.com/security-privacy/sessions/",
 
+  REQUESTLY_DOCS_TEST_RULES: "https://docs.requestly.com/general/http-rules/advanced-usage/test-rules",
+
   REQUESTLY_API_DOCS: "https://docs.requestly.com/public-apis/overview/",
 
   REQUESTLY_REDIRECT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/redirect-rule",
@@ -77,21 +80,21 @@ const LINKS = {
   /** LANDING PAGES **/
 
   // Home
-  REQUESTLY_LANDING_HOME: "https://requestly.com/",
+  REQUESTLY_LANDING_HOME: getLinkWithMetadata("https://requestly.com/"),
   //Blog
-  REQUESTLY_BLOG: "https://requestly.com/blog/",
+  REQUESTLY_BLOG: getLinkWithMetadata("https://requestly.com/blog/"),
   //Desktop App
-  REQUESTLY_DESKTOP_APP: "https://requestly.com/desktop",
+  REQUESTLY_DESKTOP_APP: getLinkWithMetadata("https://requestly.com/desktop"),
   //Privacy Policy
-  REQUESTLY_PRIVACY_POLICY: "https://requestly.com/privacy",
+  REQUESTLY_PRIVACY_POLICY: getLinkWithMetadata("https://requestly.com/privacy"),
   // Terms and Conditions
-  REQUESTLY_TERMS_AND_CONDITIONS: "https://requestly.com/terms/",
+  REQUESTLY_TERMS_AND_CONDITIONS: getLinkWithMetadata("https://requestly.com/terms/"),
   //Privacy Statement
-  REQUESTLY_PRIVACY_STATEMENT: "https://requestly.com/privacy/",
+  REQUESTLY_PRIVACY_STATEMENT: getLinkWithMetadata("https://requestly.com/privacy/"),
   //Contact Us
   CONTACT_US: "mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL,
   // Contact Us Page
-  CONTACT_US_PAGE: "https://requestly.com/contact-us/",
+  CONTACT_US_PAGE: getLinkWithMetadata("https://requestly.com/contact-us/"),
   // Book A Demo
   BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
 
@@ -123,14 +126,14 @@ const LINKS = {
   },
 
   /** TUTORIALS */
-  YOUTUBE_TUTORIALS: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+  YOUTUBE_TUTORIALS: "https://rqst.ly/http-rules-yt-tutorials",
 
   TUTORIALS: {
-    REDIRECT_RULE: "https://youtu.be/lOt1kGKTq-w",
+    REDIRECT_RULE: "https://rqst.ly/redirect-rule-yt",
   },
 
   DEMO_VIDEOS: {
-    TEAM_WORKSPACES: "https://www.youtube.com/watch?v=xF5M_z4O5zg",
+    TEAM_WORKSPACES: "https://rqst.ly/team-collaboration-yt-tutorial",
   },
 
   DOWNLOAD_DESKTOP_APP: {
@@ -150,6 +153,10 @@ const LINKS = {
   API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT: "https://github.com/requestly/requestly/issues/2629",
 
   REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
+
+  OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
+
+  ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
 };
 
 export default LINKS;

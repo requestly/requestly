@@ -21,6 +21,11 @@ export interface Workspace {
   workspaceType?: WorkspaceType;
 
   rootPath?: string;
+
+  browserstackDetails?: {
+    groupId: string;
+    subGroupId: string | null;
+  };
 }
 
 export enum WorkspaceType {

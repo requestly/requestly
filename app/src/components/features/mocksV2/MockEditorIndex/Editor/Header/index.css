@@ -12,11 +12,18 @@
 
 .mock-editor-layout-header .header-left-section {
   display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mock-editor-layout-header .header-left-section .rq-breadcrumb {
+  margin-left: 0;
 }
 
 .mock-editor-layout-header .header-right-section {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only svg {

@@ -55,7 +55,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
     onComplete: () => {
       redirectTolatestBillingTeam();
       onCheckoutCompleted?.();
-      trackCheckoutCompleted();
+      trackCheckoutCompleted("requestly");
     },
   };
 

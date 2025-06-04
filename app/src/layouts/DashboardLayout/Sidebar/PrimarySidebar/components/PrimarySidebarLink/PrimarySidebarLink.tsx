@@ -1,8 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { PrimarySidebarItem } from "../../../type";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
-import { snakeCase } from "lodash";
 
 export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
   title,
@@ -12,7 +10,6 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
 }) => (
   <NavLink
     to={path}
-    onClick={() => trackSidebarClicked(snakeCase(title))}
     className={({ isActive }) => `primary-sidebar-link ${isActive ? "primary-sidebar-active-link" : ""}`}
     style={({ isActive }) => {
       return {
@@ -20,7 +17,7 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
       };
     }}
   >
-    <span className="icon__wrapper">{icon}</span>
+    {icon}
     <span className="link-title">{title}</span>
   </NavLink>
 );

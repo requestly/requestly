@@ -40,7 +40,7 @@ export const MockUploaderModal: React.FC<Props> = ({
     toast.loading(`Creating Mock from file ${uploadOptions.file.name}`);
     await createMockFromUploadedFile(uid, uploadOptions.file, activeWorkspaceId)
       .then((mock: RQMockSchema) => {
-        toast.success("Mock Created Successfully");
+        toast.success("File created successfully");
         uploadOptions.onSuccess("OK");
         trackCreateMockEvent(mock.id, mockType, mock.fileType, "uploader");
         trackMockUploaded(mockType);
@@ -69,7 +69,7 @@ export const MockUploaderModal: React.FC<Props> = ({
 
   const uploadProps: UploadProps = {
     name: "file",
-    accept: mockType === MockType.FILE ? ".css, .js, .html" : ".json",
+    accept: mockType === MockType.FILE ? ".css, .js" : ".json",
     multiple: false,
     customRequest: handleFileSelection,
   };
@@ -82,7 +82,7 @@ export const MockUploaderModal: React.FC<Props> = ({
         </p>
         <p className="ant-upload-text">Click or drag file to this area to upload</p>
         <p className="ant-upload-hint">
-          Supports a single file ({mockType === MockType.FILE ? "JS, CSS, HTML" : "JSON"}) upload.
+          Supports a single file ({mockType === MockType.FILE ? "JS, CSS" : "JSON"}) upload.
         </p>
       </Dragger>
     </Modal>

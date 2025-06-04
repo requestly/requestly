@@ -56,6 +56,17 @@ const processManifest = (content) => {
 };
 
 const commonPlugins = [typescript(), json()];
+const commonConfig = {
+  // https://github.com/vitejs/vite-plugin-react/pull/144
+  onwarn(warning, defaultHandler) {
+    // console.log({warning});
+    if (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use client")) {
+      return;
+    } else {
+      defaultHandler(warning);
+    }
+  },
+};
 
 if (isProductionBuildMode) {
   commonPlugins.push(terser());
@@ -63,6 +74,7 @@ if (isProductionBuildMode) {
 
 export default [
   {
+    ...commonConfig,
     input: "src/service-worker/index.ts",
     output: {
       file: `${OUTPUT_DIR}/serviceWorker.js`,
@@ -93,6 +105,7 @@ export default [
     ],
   },
   {
+    ...commonConfig,
     input: "src/content-scripts/app/index.ts",
     output: {
       file: `${OUTPUT_DIR}/app.cs.js`,
@@ -101,6 +114,7 @@ export default [
     plugins: commonPlugins,
   },
   {
+    ...commonConfig,
     input: "src/content-scripts/client/index.ts",
     output: {
       file: `${OUTPUT_DIR}/client.cs.js`,
@@ -109,6 +123,7 @@ export default [
     plugins: commonPlugins,
   },
   {
+    ...commonConfig,
     input: "src/page-scripts/sessionRecorderHelper.js",
     output: {
       file: `${OUTPUT_DIR}/page-scripts/sessionRecorderHelper.ps.js`,
@@ -117,6 +132,7 @@ export default [
     plugins: commonPlugins,
   },
   {
+    ...commonConfig,
     input: "src/page-scripts/ajaxRequestInterceptor/index.js",
     output: {
       file: `${OUTPUT_DIR}/page-scripts/ajaxRequestInterceptor.ps.js`,
@@ -125,6 +141,7 @@ export default [
     plugins: commonPlugins,
   },
   {
+    ...commonConfig,
     input: "src/utility-scripts/cacheJson/cacheJsonOnPage.js",
     output: {
       file: `${OUTPUT_DIR}/libs/cacheJson.js`,

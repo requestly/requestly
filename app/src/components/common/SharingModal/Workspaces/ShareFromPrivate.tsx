@@ -11,7 +11,7 @@ import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
-import { TeamRole } from "types";
+import { TeamRole, WorkspaceType } from "types";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { generateDefaultTeamName } from "utils/teams";
@@ -39,6 +39,9 @@ export const ShareFromPrivate: React.FC<Props> = ({
   const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const _availableWorkspaces = useRef(availableWorkspaces);
+  const filteredAvailableWorkspaces = _availableWorkspaces.current.filter(
+    (workspace) => !workspace.browserstackDetails
+  ); // Filtering our Browserstack Workspaces)
 
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +65,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
-        trackNewTeamCreateSuccess(teamId, teamData.name, "sharing_modal");
+        trackNewTeamCreateSuccess(teamId, teamData.name, "sharing_modal", WorkspaceType.SHARED);
 
         createTeamInvites({
           teamId,
@@ -145,7 +148,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           <div className="text-gray">Not shared with anyone</div>
         </span>
       </Row>
-      {_availableWorkspaces.current.length ? (
+      {filteredAvailableWorkspaces.length ? (
         <>
           <div className="mt-1">Copy rules into a workspace to start collaborating</div>
           <WorkspaceShareMenu isLoading={isLoading} defaultActiveWorkspaces={2} onTransferClick={handleRulesTransfer} />

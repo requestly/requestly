@@ -1,9 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Typography, Dropdown, MenuProps, Checkbox } from "antd";
-import PATHS from "config/constants/sub/paths";
+import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
-import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -16,19 +14,18 @@ import {
   trackMoveRequestToCollectionClicked,
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
-import { TabsLayoutContextInterface } from "layouts/TabsLayout";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import "./RequestRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
-import { MdDriveFileMoveOutline } from "@react-icons/all-files/md/MdDriveFileMoveOutline";
 import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
 
 interface Props {
   record: RQAPI.ApiRecord;
-  openTab: TabsLayoutContextInterface["openTab"];
   isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
@@ -38,7 +35,7 @@ interface Props {
   };
 }
 
-export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
@@ -48,8 +45,15 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
     onSaveRecord,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const isLocalSyncEnabled = useCheckLocalSyncSupport();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -68,13 +72,17 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           if (!result.success) {
             throw new Error("Failed to duplicate request");
           }
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
           toast.success("Request duplicated successfully");
           trackRequestDuplicated();
         })
         .catch((error) => {
           console.error("Error duplicating request:", error);
-          toast.error(error.message || "Unexpected error. Please contact support.");
+          notification.error({
+            message: "Error duplicating request",
+            description: error?.message || "Unexpected error. Please contact support.",
+            placement: "bottomRight",
+          });
           trackDuplicateRequestFailed();
         });
     },
@@ -94,6 +102,7 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsEditMode(true);
+          handleDropdownVisibleChange(false);
         },
       },
       {
@@ -110,23 +119,22 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
           trackDuplicateRequestClicked();
+          handleDropdownVisibleChange(false);
         },
       },
       {
         key: "2",
-        disabled: isLocalSyncEnabled,
         label: (
-          <LocalWorkspaceTooltip featureName="Move to Collection">
-            <div>
-              <MdDriveFileMoveOutline style={{ marginRight: 8 }} />
-              Move to Collection
-            </div>
-          </LocalWorkspaceTooltip>
+          <div>
+            <MdMoveDown style={{ marginRight: 8 }} />
+            Move to Collection
+          </div>
         ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
           trackMoveRequestToCollectionClicked();
+          handleDropdownVisibleChange(false);
         },
       },
       {
@@ -142,10 +150,11 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           itemInfo.domEvent?.stopPropagation?.();
           updateRecordsToBeDeleted([record]);
           setIsDeleteModalOpen(true);
+          handleDropdownVisibleChange(false);
         },
       },
     ];
-  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest, isLocalSyncEnabled]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>
@@ -168,22 +177,26 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
           }}
         />
       ) : (
-        <div className="request-row">
-          {showSelection && (
-            <Checkbox onChange={recordsSelectionHandler.bind(this, record)} checked={selectedRecords.has(record.id)} />
-          )}
-          <NavLink
-            title={record.name || record.data.request?.url}
-            to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`}
-            className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
+        <div className={`request-row`}>
+          <div
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
             onClick={() => {
-              openTab(record.id, {
-                isPreview: true,
-                title: record.name || record.data.request?.url,
-                url: `${PATHS.API_CLIENT.ABSOLUTE}/request/${encodeURIComponent(record.id)}`,
-              });
+              openTab(
+                new RequestViewTabSource({
+                  id: record.id,
+                  apiEntryDetails: record,
+                  title: record.name || record.data.request?.url,
+                }),
+                { preview: true }
+              );
             }}
           >
+            {showSelection && (
+              <Checkbox
+                onChange={recordsSelectionHandler.bind(this, record)}
+                checked={selectedRecords.has(record.id)}
+              />
+            )}
             <Typography.Text
               strong
               className="request-method"
@@ -196,7 +209,19 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
                 ? record.data.request?.method.slice(0, 3)
                 : record.data.request?.method}
             </Typography.Text>
-            <div className="request-url">{record.name || record.data.request?.url}</div>
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name || record.data.request?.url,
+                  placement: "right",
+                  color: "#000",
+                  mouseEnterDelay: 0.5,
+                },
+              }}
+              className="request-url"
+            >
+              {record.name || record.data.request?.url}
+            </Typography.Text>
 
             <Conditional condition={!isReadOnly}>
               <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
@@ -219,15 +244,9 @@ export const RequestRow: React.FC<Props> = ({ record, openTab, isReadOnly, bulkA
                 </Dropdown>
               </div>
             </Conditional>
-          </NavLink>
+          </div>
         </div>
       )}
     </>
   );
 };
-
-/* Remove this notes before prod
-1. request options(children) stay till hover is on its parent class
-2. as cursor moves hover state is lost & visibilty set to hidden
-3. need to make something, that can continue the hover state till the dropdown is closed
-*/

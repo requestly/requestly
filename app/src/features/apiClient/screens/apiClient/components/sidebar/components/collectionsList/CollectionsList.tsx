@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
-import { Typography } from "antd";
+import { notification, Typography } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
@@ -15,8 +15,6 @@ import {
   processRecordsForDuplication,
 } from "../../../../utils";
 import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
@@ -27,8 +25,8 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
-import { firebaseBatchWrite } from "backend/utils";
 import { useRBAC } from "features/rbac";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -36,13 +34,9 @@ interface Props {
 }
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
-  const navigate = useNavigate();
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-
-  const location = useLocation();
-  const { openTab, tabs } = useTabsLayoutContext();
   const {
     isLoadingApiClientRecords,
     apiClientRecords,
@@ -51,6 +45,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     updateRecordsToBeDeleted,
     onSaveRecord,
     onSaveBulkRecords,
+    apiClientRecordsRepository,
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -61,6 +56,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
   );
   const [searchValue, setSearchValue] = useState("");
+  const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
@@ -109,6 +105,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const toggleSelection = useCallback(() => {
     setSelectedRecords(new Set());
     setShowSelection((prev) => !prev);
+    setIsAllRecordsSelected(false);
   }, [setSelectedRecords, setShowSelection]);
 
   const multiSelectOptions = {
@@ -116,9 +113,25 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     toggleMultiSelect: toggleSelection,
   };
 
+  const addNestedCollection = useCallback(
+    (record: RQAPI.CollectionRecord, newSelectedRecords: Set<RQAPI.Record["id"]>) => {
+      newSelectedRecords.add(record.id);
+      if (record.data.children) {
+        record.data.children.forEach((child) => {
+          if (child.type === "collection") {
+            addNestedCollection(child, newSelectedRecords);
+          } else {
+            newSelectedRecords.add(child.id);
+          }
+        });
+      }
+    },
+    []
+  );
+
   const bulkActionHandler = useCallback(
     async (action: BulkActions) => {
-      if (isEmpty(selectedRecords)) {
+      if (isEmpty(selectedRecords) && action !== BulkActions.SELECT_ALL) {
         toast.error("Please Select Records");
         return;
       }
@@ -130,16 +143,24 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       );
       switch (action) {
         case BulkActions.DUPLICATE: {
-          const recordsToDuplicate = processRecordsForDuplication(processedRecords);
+          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
 
           try {
-            const result = await firebaseBatchWrite("apis", recordsToDuplicate);
+            const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
 
             toast.success("Records Duplicated successfully");
-            result.length === 1 ? onSaveRecord(head(result)) : onSaveBulkRecords(result);
+            result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
           } catch (error) {
             console.error("Error Duplicating records: ", error);
-            toast.error("Failed to duplicate some records");
+            notification.error({
+              message: "Failed to duplicate some records",
+              description: error?.message,
+              placement: "bottomRight",
+            });
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_record_duplication");
+              Sentry.captureException(error);
+            });
           }
 
           break;
@@ -160,6 +181,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           setIsMoveCollectionModalOpen(true);
           break;
 
+        case BulkActions.SELECT_ALL:
+          setIsAllRecordsSelected((prev) => !prev);
+          if (isAllRecordsSelected) {
+            setSelectedRecords(new Set());
+          } else {
+            const newSelectedRecords: Set<RQAPI.Record["id"]> = new Set();
+            updatedRecords.collections.forEach((record) => {
+              addNestedCollection(record, newSelectedRecords);
+            });
+            updatedRecords.requests.forEach((record) => {
+              newSelectedRecords.add(record.id);
+            });
+            setSelectedRecords(newSelectedRecords);
+          }
+          break;
+
         default:
           break;
       }
@@ -168,10 +205,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       selectedRecords,
       updatedRecords.childParentMap,
       updatedRecords.recordsMap,
+      updatedRecords.collections,
+      updatedRecords.requests,
       setIsDeleteModalOpen,
       updateRecordsToBeDeleted,
+      isAllRecordsSelected,
+      apiClientRecordsRepository,
       onSaveRecord,
       onSaveBulkRecords,
+      addNestedCollection,
     ]
   );
 
@@ -218,48 +260,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         }
       };
 
+      // Keeping track of selected records to auto check/uncheck select all checkbox in bulk action menu
+      let newSelection = new Set();
+
       setSelectedRecords((prevSelected) => {
         let newSelectedRecords = new Set(prevSelected);
         updateSelection(record, checked, newSelectedRecords);
         record.collectionId && checkParentSelection(record.id, checked, newSelectedRecords);
+        newSelection = newSelectedRecords;
         return newSelectedRecords;
       });
+
+      const totalRecordsCount = updatedRecords.collections.length + updatedRecords.requests.length;
+      setIsAllRecordsSelected(newSelection.size === totalRecordsCount);
     },
     [updatedRecords]
   );
-
-  useEffect(() => {
-    if (isLoadingApiClientRecords) {
-      return;
-    }
-
-    if (tabs.length === 0) {
-      navigate(PATHS.API_CLIENT.ABSOLUTE);
-    }
-  }, [tabs.length, navigate, isLoadingApiClientRecords]);
-
-  const hasOpenedDefaultTab = useRef(false);
-
-  useEffect(() => {
-    if (location.pathname === PATHS.API_CLIENT.ABSOLUTE) {
-      // TODO: Improve logic
-      hasOpenedDefaultTab.current = false;
-    }
-
-    if (isLoadingApiClientRecords) {
-      return;
-    }
-
-    if (hasOpenedDefaultTab.current) {
-      return;
-    }
-
-    hasOpenedDefaultTab.current = true;
-
-    if (tabs.length > 0) {
-      return;
-    }
-  }, [updatedRecords.requests, isLoadingApiClientRecords, openTab, location.pathname, tabs.length]);
 
   useEffect(() => {
     const id = requestId || collectionId;
@@ -271,7 +287,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   return (
     <>
       {apiClientRecords.length > 0 && (
-        <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+        <div className="api-client-sidebar-header-container">
+          <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+          {showSelection && (
+            <ActionMenu
+              isAllRecordsSelected={isAllRecordsSelected}
+              toggleSelection={toggleSelection}
+              bulkActionsHandler={bulkActionHandler}
+            />
+          )}
+        </div>
       )}
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
@@ -285,7 +310,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                 return (
                   <CollectionRow
                     isReadOnly={!isValidPermission}
-                    openTab={openTab}
                     key={record.id}
                     record={record}
                     onNewClick={onNewClick}
@@ -309,7 +333,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   <RequestRow
                     key={record.id}
                     record={record}
-                    openTab={openTab}
                     isReadOnly={!isValidPermission}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
@@ -323,16 +346,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
             </div>
           ) : (
-            <ApiRecordEmptyState
-              disabled={!isValidPermission}
-              newRecordBtnText="New collection"
-              message={searchValue ? "No collection or request found" : "No collections created yet"}
-              onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
-              analyticEventSource="collection_list_empty_state"
-            />
+            <div style={{ paddingTop: 6 }}>
+              <ApiRecordEmptyState
+                disabled={!isValidPermission}
+                newRecordBtnText="New collection"
+                message={searchValue ? "No collection or request found" : "No collections created yet"}
+                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
+                analyticEventSource="collection_list_empty_state"
+              />
+            </div>
           )}
         </div>
       </div>
+
       {isExportModalOpen && (
         <ApiClientExportModal
           exportType="collection"
@@ -357,7 +383,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           }}
         />
       )}
-      {showSelection && <ActionMenu toggleSelection={toggleSelection} bulkActionsHandler={bulkActionHandler} />}
     </>
   );
 };

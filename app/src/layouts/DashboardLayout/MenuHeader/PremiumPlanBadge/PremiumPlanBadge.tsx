@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getPlanNameFromId } from "utils/PremiumUtils";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { Tooltip } from "antd";
-import { getPrettyPlanName } from "utils/FormattingHelper";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -23,7 +21,6 @@ const PremiumPlanBadge = () => {
   const planStatus = userPlanDetails?.status;
   const planEndDateString = userPlanDetails?.subscription?.endDate;
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   let daysLeft = 0;
 
@@ -78,6 +75,13 @@ const PremiumPlanBadge = () => {
     planId &&
     [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus)
   ) {
+    if (daysLeft > 30) {
+      return null;
+    }
+
+    const planName =
+      userPlanDetails?.planName === "professional" ? "Pro" : getPrettyPlanName(userPlanDetails?.planName);
+
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
@@ -86,11 +90,9 @@ const PremiumPlanBadge = () => {
           onKeyDown={handleBadgeClick}
           onClick={handleBadgeClick}
         >
-          <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
+          <div className="premium-plan-name">{`${planName} (Trial)`}</div>
           <div className="premium-plan-days-left">
-            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-              ? `${daysLeft} days left in  ${isIncentivizationEnabled ? "plan" : "trial"}`
-              : "Plan Expired"}
+            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING ? `${daysLeft}d left` : "Expired"}
           </div>
         </div>
       </Tooltip>

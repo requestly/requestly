@@ -7,6 +7,9 @@ export enum PlanStatus {
 export enum PlanType {
   TEAM = "team",
   INDIVIDUAL = "individual",
+  STUDENT = "student",
+  APPSUMO = "appsumo",
+  SIGNUP_TRIAL = "signup_trial",
 }
 
 export interface BillingTeamDetails {
@@ -29,6 +32,7 @@ export interface BillingTeamDetails {
     };
   };
   isAcceleratorTeam?: boolean;
+  browserstackGroupId?: string;
 }
 
 export enum BillingTeamRoles {

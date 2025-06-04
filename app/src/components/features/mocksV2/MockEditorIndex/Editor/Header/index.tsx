@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Row, Layout, Col, Tooltip, Dropdown, Menu, Button } from "antd";
 import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
-import { RQButton, RQBreadcrumb } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { MockType } from "components/features/mocksV2/types";
 import "./index.css";
 import { trackMockEditorClosed, trackMockPasswordGenerateClicked } from "modules/analytics/events/features/mocksV2";
@@ -11,6 +12,7 @@ import { useLocation } from "react-router-dom";
 import PasswordPopup from "./PasswordPopup/PasswordPopup";
 import { Conditional } from "components/common/Conditional";
 import { RBACButton } from "features/rbac";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -36,7 +38,6 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   isEditorReadOnly,
 }) => {
   const location = useLocation();
-
   // Component State
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -90,7 +91,9 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
               }}
             />
           </Tooltip>
-          {!location.pathname.includes("rules") && <RQBreadcrumb />}
+          <Conditional condition={!location.pathname.includes("rules")}>
+            <RQBreadcrumb />
+          </Conditional>
         </Col>
         <Col className="header-right-section">
           <Conditional condition={!isEditorReadOnly}>
@@ -143,8 +146,9 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             permission="create"
             resource="mock_api"
             type="primary"
+            showHotKeyText
+            hotKey={KEYBOARD_SHORTCUTS.FILE_SERVER.SAVE_FILE.hotKey}
             loading={savingInProgress}
-            disabled={savingInProgress}
             onClick={handleSave}
             tooltipTitle="Saving is not allowed in view-only mode. You can test mocks but cannot save them."
           >

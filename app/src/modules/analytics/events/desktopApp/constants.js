@@ -37,3 +37,8 @@ export const TRAFFIC_TABLE = {
   TRAFFIC_TABLE_FILTER_APPLIED: "traffic_table_filter_clicked",
   TRAFFIC_TABLE_SAVING_EXCESS_LOGS_ALERT_SHOWN: "traffic_table_saving_excess_logs_alert_shown",
 };
+
+export const AUTH = {
+  REDIRECTED: "auth_redirected_from_desktop_app",
+  REDIRECT_URL_COPIED: "auth_redirect_url_copied",
+};

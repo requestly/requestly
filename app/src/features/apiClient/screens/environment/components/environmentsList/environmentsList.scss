@@ -1,4 +1,16 @@
+.environments-list-container {
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0px 0px 8px 0;
+}
+
 .environments-list {
+  padding: 0 8px;
+  height: inherit;
+  overflow-y: auto;
+
   &-item {
     color: var(--requestly-color-text-default);
     padding: var(--space-2, 4px) var(--space-4, 8px);
@@ -47,7 +59,7 @@
     }
 
     &.active {
-      background-color: var(--requestly-color-white-t-10);
+      background-color: var(--requestly-color-white-t-20);
     }
 
     &__label {
@@ -56,10 +68,6 @@
       justify-content: space-between;
     }
   }
-
-  height: calc(100% - 50px);
-  overflow-y: auto;
-  padding-right: 2px;
 }
 
 .environment-input.ant-input {
@@ -80,9 +88,14 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
+  transition: none;
 }
 
 .environments-list-item__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   span {
     font-size: 12px;
   }

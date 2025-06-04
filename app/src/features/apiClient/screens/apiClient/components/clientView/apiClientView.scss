@@ -35,22 +35,36 @@
   background-color: var(--requestly-color-background);
 
   .api-client-header-container {
+    position: sticky;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+    &__header {
+      padding: var(--space-5, 12px) var(--space-6, 16px);
+    }
 
     .api-client-breadcrumb-container {
       display: flex;
       align-items: center;
-      padding: 0 16px 0 0;
       justify-content: space-between;
-      border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-      .more-api-request-actions-button {
-        height: auto;
+      padding-bottom: var(--space-5, 12px);
+
+      .rq-breadcrumb {
+        margin: 0;
+      }
+
+      .api-client-view_get-code-btn {
+        color: var(--requestly-color-text-subtle);
+
+        &:hover {
+          color: var(--requestly-color-text-default);
+        }
       }
     }
   }
 
   .api-client-body {
     padding-top: 8px;
+    position: sticky;
     overflow: hidden;
 
     .ant-tabs {
@@ -68,29 +82,29 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 16px 12px;
 
     .api-client-url-container {
       display: flex;
       flex: auto;
       height: 32px;
       width: calc(100% - 205px);
-      gap: 8px;
 
       .api-request-method-selector {
         width: 100px;
       }
 
       .api-request-method-selector .ant-select-selector {
-        border: 1px solid var(--requestly-color-white-t-10);
-        border-top-right-radius: 4px !important;
-        border-bottom-right-radius: 4px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
       }
 
       .api-request-url {
-        border: 1px solid var(--requestly-color-white-t-10);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
         padding: 4px 8px;
         background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-left: none;
 
         &:focus-within {
           border: 1px solid var(--requestly-color-primary);
@@ -114,13 +128,13 @@
   }
 
   .api-request-tabs {
-    height: calc(100% - 35px);
+    height: calc(100% - 20px);
     overflow: hidden;
     margin-top: 8px;
 
     .ant-tabs-content-holder {
       height: inherit;
-      padding: 0 16px 44px;
+      padding: 0 16px 5px;
 
       .ant-tabs-content-top {
         height: 100%;

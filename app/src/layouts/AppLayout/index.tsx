@@ -31,6 +31,7 @@ import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
+import { GrrWarningHoc } from "features/grr";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -97,7 +98,9 @@ const App: React.FC = () => {
                 <CommandBar />
                 <UpdateDialog />
                 <GlobalModals />
-                <Outlet />
+                <GrrWarningHoc>
+                  <Outlet />
+                </GrrWarningHoc>
               </div>
             </LazyMotion>
           </ConfigProvider>

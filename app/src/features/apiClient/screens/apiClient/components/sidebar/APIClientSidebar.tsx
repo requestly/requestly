@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiClientImporterType, RQAPI } from "../../../../types";
 import { useLocation, useParams } from "react-router-dom";
-import { Tabs, TabsProps, Tooltip } from "antd";
+import { notification, Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { CollectionsList } from "./components/collectionsList/CollectionsList";
@@ -10,12 +10,12 @@ import { HistoryList } from "./components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { DeleteApiRecordModal, ImportRequestModal } from "../modals";
+import { DeleteApiRecordModal, ImportFromCurlModal } from "../modals";
 import { getEmptyAPIEntry } from "../../utils";
-import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
+import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
 
 interface Props {}
 
@@ -40,7 +40,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     clearHistory,
     onNewClick,
     onImportClick,
-    onSelectionFromHistory,
+    setCurrentHistoryIndex,
     recordsToBeDeleted,
     isDeleteModalOpen,
     onDeleteModalClose,
@@ -128,7 +128,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         <HistoryList
           history={history}
           selectedHistoryIndex={selectedHistoryIndex}
-          onSelectionFromHistory={onSelectionFromHistory}
+          onSelectionFromHistory={setCurrentHistoryIndex}
         />
       ),
     },
@@ -157,7 +157,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         const result = await apiClientRecordsRepository.createRecord(record);
 
         if (result.success) {
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
 
           setIsImportModalOpen(false);
         } else {
@@ -166,7 +166,11 @@ const APIClientSidebar: React.FC<Props> = () => {
         return result.data;
       } catch (error) {
         console.error("Error importing request", error);
-        toast.error(error.message || "Error importing request");
+        notification.error({
+          message: `Error importing request`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
         throw error;
       } finally {
         setIsLoading(false);
@@ -184,28 +188,31 @@ const APIClientSidebar: React.FC<Props> = () => {
   return (
     <>
       <div className={`api-client-sidebar ${user.loggedIn ? "" : "api-client-sidebar-disabled"}`}>
-        <ApiClientSidebarHeader
-          activeTab={activeKey}
-          history={history}
-          onClearHistory={clearHistory}
-          onImportClick={onImportClick}
-          onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
-        />
+        <div className="api-client-sidebar-content">
+          <ApiClientSidebarHeader
+            activeTab={activeKey}
+            history={history}
+            onClearHistory={clearHistory}
+            onImportClick={onImportClick}
+            onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
+          />
 
-        <Tabs
-          items={items}
-          size="small"
-          tabPosition="left"
-          className="api-client-sidebar-tabs"
-          activeKey={activeKey}
-          defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
-          onChange={handleActiveTabChange}
-        />
+          <Tabs
+            items={items}
+            size="small"
+            tabPosition="left"
+            className="api-client-sidebar-tabs"
+            activeKey={activeKey}
+            defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
+            onChange={handleActiveTabChange}
+          />
+        </div>
+        <ErrorFilesList />
       </div>
 
       <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
 
-      <ImportRequestModal
+      <ImportFromCurlModal
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}

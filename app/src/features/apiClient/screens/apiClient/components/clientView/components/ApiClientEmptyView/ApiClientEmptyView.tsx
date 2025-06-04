@@ -6,12 +6,12 @@ import { RQAPI } from "features/apiClient/types";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
-import { toast } from "utils/Toast";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
 import { RBACButton } from "features/rbac";
 import "./apiClientEmptyView.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { notification } from "antd";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -48,17 +48,24 @@ export const ApiClientEmptyView = () => {
     createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "", apiClientRecordsRepository)
       .then((result) => {
         if (result.success) {
-          onSaveRecord(result.data);
+          onSaveRecord(result.data, "open");
           if (recordType === RQAPI.RecordType.COLLECTION) {
             dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
           }
         } else {
-          toast.error(result.message || "Could not create a collection.");
+          notification.error({
+            message: `Could not create ${recordType === RQAPI.RecordType.API ? "request" : "collection"}.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
         }
       })
       .catch((error) => {
-        console.error("Error creating record", error);
-        toast.error(error.message || "Could not create a collection.");
+        notification.error({
+          message: `Could not create ${recordType === RQAPI.RecordType.API ? "request" : "collection"}.`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
       })
       .finally(() => {
         setIsRecordCreating(null);

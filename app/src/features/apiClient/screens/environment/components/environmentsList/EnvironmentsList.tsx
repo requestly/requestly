@@ -1,10 +1,8 @@
 import { useCallback, useState, useMemo } from "react";
-import { useLocation } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
-import PATHS from "config/constants/sub/paths";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
@@ -12,20 +10,20 @@ import { EmptyState } from "features/apiClient/screens/apiClient/components/side
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
-import "./environmentsList.scss";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabSource";
+import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const {
     getAllEnvironments,
@@ -39,8 +37,7 @@ export const EnvironmentsList = () => {
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
-
-  const { openTab, replaceTab } = useTabsLayoutContext();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
   const filteredEnvironments = useMemo(
@@ -66,19 +63,9 @@ export const EnvironmentsList = () => {
               setCurrentEnvironment(newEnvironment.id);
             }
 
-            const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(newEnvironment.id)}`;
-            const tabConfig = {
-              id: newEnvironment.id,
-              title: newEnvironment.name,
-              url: targetPath,
-            };
+            // const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(newEnvironment.id)}`;
 
-            if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)) {
-              replaceTab("environments/new", tabConfig);
-            } else {
-              openTab(newEnvironment.id, tabConfig);
-            }
-
+            openTab(new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name }));
             trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
           }
         })
@@ -86,15 +73,7 @@ export const EnvironmentsList = () => {
           setIsRecordBeingCreated(null);
         });
     },
-    [
-      addNewEnvironment,
-      environments.length,
-      setCurrentEnvironment,
-      replaceTab,
-      openTab,
-      location.pathname,
-      setIsRecordBeingCreated,
-    ]
+    [addNewEnvironment, environments.length, setCurrentEnvironment, openTab, setIsRecordBeingCreated]
   );
 
   const handleAddEnvironmentClick = useCallback(() => {
@@ -146,30 +125,31 @@ export const EnvironmentsList = () => {
       ) : (
         <>
           <SidebarListHeader onSearch={(value) => setSearchValue(value)} />
-          <div className="environments-list">
-            {searchValue.length > 0 && filteredEnvironments.length === 0 ? (
-              <ListEmptySearchView message="No environments found. Try searching with a different name" />
-            ) : (
-              <>
-                {filteredEnvironments.map((environment) =>
-                  isGlobalEnvironment(environment.id) ? (
-                    <EnvironmentsListItem openTab={openTab} environment={environment} isReadOnly={!isValidPermission} />
-                  ) : (
-                    <EnvironmentsListItem
-                      openTab={openTab}
-                      environment={environment}
-                      isReadOnly={!isValidPermission}
-                      onExportClick={handleExportEnvironments}
-                    />
-                  )
-                )}
-                <div className="mt-8">
-                  {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
-                    <SidebarPlaceholderItem name="New Environment" />
+          <div className="environments-list-container">
+            <div className="environments-list">
+              {searchValue.length > 0 && filteredEnvironments.length === 0 ? (
+                <ListEmptySearchView message="No environments found. Try searching with a different name" />
+              ) : (
+                <>
+                  {filteredEnvironments.map((environment) =>
+                    isGlobalEnvironment(environment.id) ? (
+                      <EnvironmentsListItem environment={environment} isReadOnly={!isValidPermission} />
+                    ) : (
+                      <EnvironmentsListItem
+                        environment={environment}
+                        isReadOnly={!isValidPermission}
+                        onExportClick={handleExportEnvironments}
+                      />
+                    )
                   )}
-                </div>
-              </>
-            )}
+                  <div className="mt-8">
+                    {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
+                      <SidebarPlaceholderItem name="New Environment" />
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           {isExportModalOpen && (
             <ApiClientExportModal

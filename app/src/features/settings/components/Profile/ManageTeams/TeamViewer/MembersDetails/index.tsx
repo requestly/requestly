@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography } from "antd";
@@ -54,8 +54,14 @@ const MembersDetails = ({ teamId, isTeamAdmin }: MembersDetailsProps) => {
     );
   }, [dispatch, doRefreshTeamMembersTable, teamId]);
 
+  const inviteModalShownRef = useRef(false);
   useEffect(() => {
+    if (inviteModalShownRef.current) {
+      return;
+    }
+
     if (isNewTeam) {
+      inviteModalShownRef.current = true;
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "inviteMembersModal",

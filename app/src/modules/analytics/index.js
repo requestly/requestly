@@ -26,7 +26,7 @@ export const trackEvent = (name, params, config) => {
   newParams.rq_app_mode = app_mode;
   newParams.rq_app_version = app_version;
   newParams.automation_enabled = isEnvAutomation();
-  newParams.workspace_role = window.currentlyActiveWorkspaceTeamRole;
+  newParams.workspace_role = window.currentlyActiveWorkspaceTeamRole ?? null;
   // Syncing - Temporary
   newParams.workspace = isPersonalWorkspaceId(window.activeWorkspaceIds?.[0]) ? "personal" : "team";
   newParams.workspaceId = window.activeWorkspaceIds?.[0] ? window.activeWorkspaceIds[0] : null;
@@ -37,7 +37,7 @@ export const trackEvent = (name, params, config) => {
 };
 
 export const trackAttr = (name, value) => {
-  if (!name || value == null) return;
+  if (!name) return;
   if (localStorage.getItem("dataCollectionStatus") && localStorage.getItem("dataCollectionStatus") === "disabled")
     return;
 
