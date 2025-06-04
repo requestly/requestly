@@ -57,11 +57,11 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    globalUnhandledRejectionHandlers.add(this.promiseRejectionHandler);
+    globalUnhandledRejectionHandlers?.add(this.promiseRejectionHandler);
   }
 
   componentWillUnmount(): void {
-    globalUnhandledRejectionHandlers.delete(this.promiseRejectionHandler);
+    globalUnhandledRejectionHandlers?.delete(this.promiseRejectionHandler);
   }
 
   componentDidCatch(error: unknown) {
