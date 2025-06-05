@@ -15,9 +15,10 @@ interface KeyValueTableProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: EnvironmentVariables;
+  checkColon?: boolean;
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange }) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, checkColon = false }) => {
   const createEmptyPair = useCallback(
     () => ({
       id: Date.now(),
@@ -111,6 +112,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
           dataIndex: "key",
           title: "key",
           variables,
+          checkColon,
           handleUpdatePair,
         }),
       },
@@ -147,7 +149,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, o
         },
       },
     ];
-  }, [handleUpdatePair, handleDeletePair, data.length, variables]);
+  }, [variables, handleUpdatePair, checkColon, data.length, handleDeletePair]);
 
   return (
     <ContentListTable

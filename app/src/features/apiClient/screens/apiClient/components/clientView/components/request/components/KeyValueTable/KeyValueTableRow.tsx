@@ -29,6 +29,7 @@ interface EditableCellProps {
   record: KeyValuePair;
   variables: EnvironmentVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
+  checkColon: boolean;
 }
 
 export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -39,6 +40,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   record,
   variables,
   handleUpdatePair,
+  checkColon,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
@@ -71,7 +73,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         ) : (
           <div
             className={`key-value-input-container 
-          ${record.key.includes(":") && dataIndex === "key" ? "error-state" : ""}
+          ${record.key.includes(":") && dataIndex === "key" && checkColon ? "error-state" : ""}
         `}
           >
             <SingleLineEditor
@@ -84,7 +86,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
               }}
               variables={variables}
             />
-            {record.key.includes(":") && dataIndex === "key" && (
+            {record.key.includes(":") && dataIndex === "key" && checkColon && (
               <div className="key-value-table-error-icon">
                 <InfoIcon
                   text="Invalid character used in key"
