@@ -215,6 +215,17 @@ export function buildFsManager(rootPath: string) {
     rootPath
   ) as Promise<void>;
 }
+
+export const reloadFsManager = (rootPath: string) => {
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "reload",
+      timeout: 1000,
+    },
+    rootPath
+  ) as Promise<void>;
+};
 export function createWorkspaceFolder(name: string, path: string) {
   return rpc(
     {

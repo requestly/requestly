@@ -1,4 +1,11 @@
 .variables-list-header {
+  .variables-list-header-breadcrumb-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 16px;
+  }
+
   .env-view-breadcrumb {
     display: flex;
     gap: 4px;
