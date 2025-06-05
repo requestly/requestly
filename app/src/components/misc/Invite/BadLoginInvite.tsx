@@ -1,7 +1,5 @@
 import { Col, Row } from "antd";
-import { RQButton } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { globalActions } from "store/slices/global/slice";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";
@@ -11,6 +9,8 @@ import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { RQButton } from "lib/design-system/components";
 
 interface Props {
   inviteId: string;

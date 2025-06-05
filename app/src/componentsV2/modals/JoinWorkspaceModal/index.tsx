@@ -6,7 +6,6 @@ import { Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
 import { getUniqueTeamsFromInvites } from "utils/teams";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { globalActions } from "store/slices/global/slice";
 import { getPendingInvites, acceptTeamInvite } from "backend/workspace";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
@@ -17,6 +16,7 @@ import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "features/workspaces/types";
 
 interface JoinWorkspaceModalProps {

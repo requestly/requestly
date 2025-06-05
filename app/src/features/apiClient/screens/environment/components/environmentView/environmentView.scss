@@ -11,6 +11,12 @@
     .api-client-read-only-mode-alert {
       margin: 8px 16px;
     }
+
+    .variables-list-view-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 
   .variables-list-action-container {

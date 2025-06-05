@@ -2,7 +2,6 @@ import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { toast } from "utils/Toast";
 import "./index.css";
 import { redirectToTeam } from "utils/RedirectionUtils";
@@ -11,6 +10,7 @@ import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { Workspace } from "features/workspaces/types";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
   inviteId: string;

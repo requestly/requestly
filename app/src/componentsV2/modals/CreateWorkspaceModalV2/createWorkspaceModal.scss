@@ -44,7 +44,6 @@
 
         .ant-radio-group {
           display: flex;
-          gap: 8px;
 
           .ant-radio-wrapper {
             border-radius: 8px;
@@ -52,6 +51,7 @@
             background: var(--requestly-color-surface-0);
             padding: var(--space-6, 16px) var(--space-4, 8px);
             transition: background 0.2s ease-in;
+            width: 50%;
 
             .workspace-type-content {
               &_title {
@@ -109,7 +109,7 @@
                     line-height: 18px; /* 150% */
                     text-overflow: ellipsis;
                     overflow: hidden;
-                    // white-space: nowrap;
+                    word-break: break-all;
                   }
                 }
               }

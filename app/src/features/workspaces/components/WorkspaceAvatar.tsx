@@ -15,25 +15,25 @@ interface Props {
 }
 
 const getWorkspaceIcon = (workspace: Workspace) => {
-  if (!workspace?.name && !workspace?.id) return "?";
+  if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "W";
 
   if (isLocalStorageWorkspace(workspace?.id)) return <IoCloudOfflineOutline />;
 
   if (isPersonalWorkspace(workspace)) return <LockOutlined />;
 
-  if (isLocalFSWorkspace(workspace)) return <LuFolderSync />; // TODO-syncing
+  if (isLocalFSWorkspace(workspace)) return <LuFolderSync />;
 
   return workspace?.name ? workspace?.name[0].toUpperCase() : "?";
 };
 
 const getUniqueColorForWorkspace = (workspace: Workspace) => {
-  if (!workspace?.name && !workspace?.id) return "#ffffff4d";
+  if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "#ffffff4d";
 
   if (isLocalStorageWorkspace(workspace?.id)) return "#ffffff4d";
 
   if (isPersonalWorkspace(workspace)) return "#1E69FF";
 
-  if (isLocalFSWorkspace(workspace)) return "#FFFFFF33"; // TODO-syncing
+  if (isLocalFSWorkspace(workspace)) return "#FFFFFF33";
 
   return getColorFromString(workspace?.id + workspace?.name);
 };

@@ -90,7 +90,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, workspace }) => {
     <Row className="teams-list-item" justify="space-between">
       <Col span={11}>
         <Row align="middle" wrap={false}>
-          <WorkspaceAvatar workspace={workspace} size={24} />
+          <WorkspaceAvatar size={24} workspace={workspace} />
           <Typography.Text className="text-bold text-white teams-list-item-title" ellipsis>
             {workspace?.name}
           </Typography.Text>

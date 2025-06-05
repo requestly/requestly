@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
 import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
 import ApiClientLoggedOutView from "./components/common/LoggedOutView/LoggedOutView";
+import { LocalSyncRefreshHandler } from "./LocalSyncRefreshHandler";
 import "./container.scss";
 
 const ApiClientFeatureContainer: React.FC = () => {
@@ -18,10 +19,13 @@ const ApiClientFeatureContainer: React.FC = () => {
   return (
     <TabServiceProvider>
       <ApiClientProvider>
-        <div className="api-client-container">
-          <APIClientSidebar />
-          {user.loggedIn ? <TabsContainer /> : <ApiClientLoggedOutView />}
-        </div>
+        <>
+          <LocalSyncRefreshHandler />
+          <div className="api-client-container">
+            <APIClientSidebar />
+            {user.loggedIn ? <TabsContainer /> : <ApiClientLoggedOutView />}
+          </div>
+        </>
       </ApiClientProvider>
     </TabServiceProvider>
   );

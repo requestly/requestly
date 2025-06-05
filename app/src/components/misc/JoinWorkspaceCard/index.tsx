@@ -20,8 +20,8 @@ import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/featu
 import PATHS from "config/constants/sub/paths";
 import "./index.css";
 import { getUniqueTeamsFromInvites } from "utils/teams";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "features/workspaces/types";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;

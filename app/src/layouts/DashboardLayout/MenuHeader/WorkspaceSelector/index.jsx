@@ -30,7 +30,6 @@ import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/h
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
 import { toast } from "utils/Toast";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import {
   getActiveWorkspace,
@@ -44,6 +43,10 @@ import { isLocalFSWorkspace, isPersonalWorkspace, isSharedWorkspace } from "feat
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import WorkspaceItem from "./WorkspaceItem";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
+import { RQButton } from "lib/design-system-v2/components";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 export const isWorkspacesFeatureEnabled = (email) => {
   if (!email) return false;
@@ -74,60 +77,65 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     }
   };
 
+  const handleLocalSyncRefresh = (e) => {
+    e.stopPropagation();
+    window.dispatchEvent(new Event("local-sync-refresh"));
+  };
+
   const tooltipTitle =
     activeWorkspace?.workspaceType === WorkspaceType.LOCAL
       ? activeWorkspace.rootPath
       : prettifyWorkspaceName(activeWorkspaceName);
 
   return (
-    <Tooltip
-      overlayClassName="workspace-selector-tooltip"
-      style={{ top: "35px" }}
-      title={tooltipTitle}
-      placement={"bottomRight"}
-      showArrow={false}
-      mouseEnterDelay={0.5}
-    >
-      <div className="cursor-pointer items-center">
-        {activeWorkspace ? (
-          <>
-            {<WorkspaceAvatar workspace={activeWorkspace} />}
-            <Tooltip
-              overlayClassName="workspace-selector-tooltip"
-              style={{ top: "35px" }}
-              title={prettifyWorkspaceName(activeWorkspaceName)}
-              placement={"bottomRight"}
-              showArrow={false}
-              mouseEnterDelay={2}
-            >
+    <>
+      <Dropdown
+        overlay={menu}
+        trigger={["click"]}
+        className="workspace-selector-dropdown no-drag"
+        onOpenChange={handleWorkspaceDropdownClick}
+      >
+        <div className="workspace-selector-dropdown__content">
+          <Tooltip
+            overlayClassName="workspace-selector-tooltip"
+            style={{ top: "35px" }}
+            title={tooltipTitle}
+            placement={"bottomRight"}
+            showArrow={false}
+            mouseEnterDelay={0.5}
+            color="#000"
+          >
+            <div className="cursor-pointer items-center">
+              <WorkspaceAvatar
+                size={28}
+                workspace={{
+                  ...activeWorkspace,
+                  name: user.loggedIn ? activeWorkspaceName : null,
+                  workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+                }}
+              />
               <span className="items-center active-workspace-name">
                 <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
                 {hasNewInvites ? <Badge dot={true} /> : null}
                 <DownOutlined className="active-workspace-name-down-icon" />
               </span>
-            </Tooltip>
-          </>
-        ) : (
-          <>
-            {<WorkspaceAvatar workspace={{ id: "", name: "" }} />}
-            <Tooltip
-              overlayClassName="workspace-selector-tooltip"
-              style={{ top: "35px" }}
-              title={"No Workspace Selected"}
-              placement={"bottomRight"}
-              showArrow={false}
-              mouseEnterDelay={2}
-            >
-              <span className="items-center active-workspace-name">
-                <span className="active-workspace-name">{"No Workspace Selected"}</span>
-                {hasNewInvites ? <Badge dot={true} /> : null}
-                <DownOutlined className="active-workspace-name-down-icon" />
-              </span>
-            </Tooltip>
-          </>
-        )}
-      </div>
-    </Tooltip>
+            </div>
+          </Tooltip>
+        </div>
+      </Dropdown>
+      {activeWorkspace?.workspaceType === WorkspaceType.LOCAL &&
+      isFeatureCompatible(FEATURES.LOCAL_WORKSPACE_REFRESH) ? (
+        <Tooltip title="Load latest changes from your local files" placement="bottom" color="#000">
+          <RQButton
+            onClick={handleLocalSyncRefresh}
+            className="local-sync-refresh-btn no-drag"
+            size="small"
+            iconOnly
+            icon={<MdOutlineRefresh />}
+          />
+        </Tooltip>
+      ) : null}
+    </>
   );
 };
 
