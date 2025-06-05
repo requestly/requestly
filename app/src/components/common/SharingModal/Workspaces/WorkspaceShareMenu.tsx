@@ -29,7 +29,9 @@ interface WorkspaceItemProps {
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const activeWorkspace = useSelector(getActiveWorkspace);
+
   const filteredAvailableWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails); // Filtering our Browserstack Workspaces)
+
   const sortedTeams: Workspace[] = useMemo(
     () =>
       filteredAvailableWorkspaces

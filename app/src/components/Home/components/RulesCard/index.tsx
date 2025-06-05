@@ -14,7 +14,6 @@ import {
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
-import "./rulesCard.scss";
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
 import { Card } from "../Card";
