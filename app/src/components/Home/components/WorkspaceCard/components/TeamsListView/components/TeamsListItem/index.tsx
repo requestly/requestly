@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Col, Row, Skeleton, Spin, Tooltip, Typography } from "antd";
-import { getUniqueColorForUser, getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForUser } from "utils/teams";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { toast } from "utils/Toast";
@@ -17,14 +17,15 @@ import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./teamsListItem.scss";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   inviteId?: string;
-  teamId: string;
-  teamName: string;
+  workspace: Workspace;
 }
 
-export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) => {
+export const TeamsListItem: React.FC<Props> = ({ inviteId, workspace }) => {
   const MAX_MEMBERS_TO_SHOW = 3;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,10 +35,10 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
-    if (teamId) {
+    if (workspace?.id) {
       const getTeamUsers = httpsCallable(getFunctions(), "teams-getTeamUsers");
 
-      getTeamUsers({ teamId: teamId })
+      getTeamUsers({ teamId: workspace?.id })
         .then((res: any) => {
           if (res.data.success) {
             setMembers(res.data.users);
@@ -53,10 +54,10 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           setIsLoading(false);
         });
     }
-  }, [teamId]);
+  }, [workspace?.id]);
 
   const handleJoining = useCallback(() => {
-    trackWorkspaceJoinClicked(teamId, SOURCE.HOME_SCREEN);
+    trackWorkspaceJoinClicked(workspace?.id, SOURCE.HOME_SCREEN);
     trackHomeWorkspaceActionClicked("join_workspace_clicked");
     setIsJoining(true);
     acceptTeamInvite(inviteId)
@@ -65,8 +66,8 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           toast.success("Team joined successfully");
           setHasJoined(true);
           trackWorkspaceInviteAccepted(
-            teamId,
-            teamName,
+            workspace?.id,
+            workspace?.name,
             inviteId,
             SOURCE.HOME_SCREEN,
             res?.data?.invite?.usage,
@@ -83,24 +84,15 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       .finally(() => {
         setIsJoining(false);
       });
-  }, [inviteId, teamId, teamName]);
+  }, [inviteId, workspace?.id, workspace?.name]);
 
   return (
     <Row className="teams-list-item" justify="space-between">
       <Col span={11}>
         <Row align="middle" wrap={false}>
-          <Avatar
-            size={24}
-            shape="square"
-            className="workspace-avatar"
-            icon={teamName ? teamName?.[0]?.toUpperCase() : "W"}
-            style={{
-              backgroundColor: `${getUniqueColorForWorkspace(teamId ?? "", teamName)}`,
-              marginRight: "8px",
-            }}
-          />
+          <WorkspaceAvatar size={24} workspace={workspace} />
           <Typography.Text className="text-bold text-white teams-list-item-title" ellipsis>
-            {teamName}
+            {workspace?.name}
           </Typography.Text>
         </Row>
       </Col>
@@ -152,7 +144,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
               className="teams-list-item-setting-btn"
               onClick={() => {
                 trackHomeWorkspaceActionClicked("manage_workspace_clicked");
-                redirectToManageWorkspace(navigate, teamId);
+                redirectToManageWorkspace(navigate, workspace?.id);
               }}
             />
           </Tooltip>
@@ -184,7 +176,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
                   modalName: "inviteMembersModal",
                   newValue: true,
                   newProps: {
-                    teamId: teamId,
+                    teamId: workspace?.id,
                     source: SOURCE.HOME_SCREEN,
                   },
                 })
