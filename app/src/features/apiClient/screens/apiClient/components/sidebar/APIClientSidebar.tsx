@@ -33,8 +33,6 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
-
   const {
     history,
     clearHistory,
@@ -46,6 +44,10 @@ const APIClientSidebar: React.FC<Props> = () => {
     onDeleteModalClose,
     selectedHistoryIndex,
     apiClientRecordsRepository,
+    isImportModalOpen,
+    onImportRequestModalClose,
+    onSaveRecord,
+    setIsImportModalOpen,
   } = useApiClientContext();
 
   const handleNewRecordClick = useCallback(
