@@ -51,6 +51,8 @@ import { WorkspaceType } from "features/workspaces/types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
 import { RQButton } from "lib/design-system-v2/components";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -144,7 +146,8 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
           </Tooltip>
         </div>
       </Dropdown>
-      {activeWorkspace?.workspaceType === WorkspaceType.LOCAL ? (
+      {activeWorkspace?.workspaceType === WorkspaceType.LOCAL &&
+      isFeatureCompatible(FEATURES.LOCAL_WORKSPACE_REFRESH) ? (
         <Tooltip title="Load latest changes from your local files" placement="bottom" color="#000">
           <RQButton
             onClick={handleLocalSyncRefresh}
