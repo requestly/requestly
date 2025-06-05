@@ -6,11 +6,11 @@ import APP_CONSTANTS from "config/constants";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getAppMode } from "store/selectors";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
-import { Workspace } from "features/workspaces/types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { RQButton } from "lib/design-system-v2/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
-import { RQButton } from "lib/design-system/components";
 
 interface Props {
   inviteId: string;
