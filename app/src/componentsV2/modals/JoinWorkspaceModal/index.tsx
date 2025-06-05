@@ -3,10 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { Avatar, Button, Col, Row } from "antd";
+import { Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
-import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { getUniqueTeamsFromInvites } from "utils/teams";
 import { globalActions } from "store/slices/global/slice";
 import { getPendingInvites, acceptTeamInvite } from "backend/workspace";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
@@ -17,6 +17,8 @@ import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -80,14 +82,9 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
     <li key={team.inviteId}>
       <div className="w-full team-invite-row">
         <Col>
-          <Avatar
+          <WorkspaceAvatar
+            workspace={{ id: team.teamId, name: team.teamName, workspaceType: WorkspaceType.SHARED }}
             size={28}
-            shape="square"
-            className="workspace-avatar"
-            icon={team.teamName?.[0]?.toUpperCase() ?? "W"}
-            style={{
-              backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
-            }}
           />
           <div>{team.teamName}</div>
         </Col>

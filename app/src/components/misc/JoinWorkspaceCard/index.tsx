@@ -19,8 +19,10 @@ import {
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
 import PATHS from "config/constants/sub/paths";
 import "./index.css";
-import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { getUniqueTeamsFromInvites } from "utils/teams";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { WorkspaceType } from "features/workspaces/types";
 
 const MIN_MEMBERS_IN_WORKSPACE = 3;
 
@@ -150,12 +152,8 @@ export const JoinWorkspaceCard = () => {
             <div className="workspace-card-avatar-row-container">
               <Avatar.Group maxCount={3}>
                 {getUniqueTeamsFromInvites(teamInvites).map((team, index) => (
-                  <Avatar
-                    key={index}
-                    icon={<>{team?.teamName?.charAt(0)?.toUpperCase()}</>}
-                    style={{
-                      backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
-                    }}
+                  <WorkspaceAvatar
+                    workspace={{ id: team?.teamId, name: team?.teamName, workspaceType: WorkspaceType.SHARED }}
                   />
                 ))}
               </Avatar.Group>
