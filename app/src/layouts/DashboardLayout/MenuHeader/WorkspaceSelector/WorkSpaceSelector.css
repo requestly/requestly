@@ -10,7 +10,12 @@
   gap: 4px;
 }
 
-.local-sync-refresh-btn.ant-btn:hover {
+.local-sync-refresh-btn.ant-btn {
+  margin: 0 16px 0 4px;
+}
+
+.local-sync-refresh-btn.ant-btn:hover,
+.local-sync-refresh-btn.ant-btn:focus {
   color: var(--requestly-color-text-default);
 }
 
