@@ -110,24 +110,27 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction, exportMocksAction } =
     useMocksActionContext() ?? {};
 
-  const getBulkActionBarInfoText = useCallback((selectedRows: RQMockMetadataSchema[]) => {
-    let mocks = 0;
-    let collections = 0;
+  const getBulkActionBarInfoText = useCallback(
+    (selectedRows: RQMockMetadataSchema[]) => {
+      let mocks = 0;
+      let collections = 0;
 
-    selectedRows.forEach((record) => {
-      isCollection(record) ? collections++ : mocks++;
-    });
+      selectedRows.forEach((record) => {
+        isCollection(record) ? collections++ : mocks++;
+      });
 
-    const formatCount = (count: number, singular: string, plural: string) => {
-      return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
-    };
+      const formatCount = (count: number, singular: string, plural: string) => {
+        return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
+      };
 
-    const recordType = mockType === MockType.API ? "Mock" : "File";
-    const mockString = formatCount(mocks, recordType, recordType + "s");
-    const collectionString = formatCount(collections, "Collection", "Collections");
+      const recordType = mockType === MockType.API ? "Mock" : "File";
+      const mockString = formatCount(mocks, recordType, recordType + "s");
+      const collectionString = formatCount(collections, "Collection", "Collections");
 
-    return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
-  }, []);
+      return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
+    },
+    [mockType]
+  );
 
   // TODO: move into actions
   const updateCollectionOnDrop = useCallback(
