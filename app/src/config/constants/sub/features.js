@@ -67,6 +67,7 @@ FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 // WORKSPACES
 FEATURES.WORKSPACES = "workspaces";
 FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
+FEATURES.LOCAL_WORKSPACE_REFRESH = "local_workspace_refresh";
 
 // PERSONA SURVEY
 FEATURES.PERSONA_SURVEY = "persona-survey";
