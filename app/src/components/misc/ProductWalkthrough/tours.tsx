@@ -3,7 +3,7 @@ import { generateRuleEditorTour, getTourTarget } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
-import { MISC_TOURS } from "./constants";
+import { API_CLIENT_TOURS, MISC_TOURS } from "./constants";
 import LINKS from "config/constants/sub/links";
 import {
   DelayRule,
@@ -399,6 +399,20 @@ export const productTours: Record<string, CustomSteps[]> = {
       hidePointer: true,
       disableOverlay: true,
       offset: 0,
+    },
+  ],
+  [API_CLIENT_TOURS.SAMPLE_COLLECTIONS_IMPORTED]: [
+    {
+      ...tourTooltipPresets,
+      title: "Get started instantly with a ready-to-use collection.",
+      target: getTourTarget(API_CLIENT_TOURS.SAMPLE_COLLECTIONS_IMPORTED),
+      content: null,
+      pointerPlacement: PointerPlacement.LEFT_50,
+      placement: "right",
+      showNext: false,
+      hidePointer: false,
+      disableOverlay: true,
+      offset: 10,
     },
   ],
 };

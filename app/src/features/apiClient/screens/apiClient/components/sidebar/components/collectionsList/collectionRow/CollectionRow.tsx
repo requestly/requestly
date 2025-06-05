@@ -23,6 +23,7 @@ import { CollectionViewTabSource } from "../../../../clientView/components/Colle
 import "./CollectionRow.scss";
 
 interface Props {
+  tourId?: string;
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
   onExportClick: (collection: RQAPI.CollectionRecord) => void;
@@ -38,6 +39,7 @@ interface Props {
 }
 
 export const CollectionRow: React.FC<Props> = ({
+  tourId,
   record,
   onNewClick,
   onExportClick,
@@ -187,6 +189,7 @@ export const CollectionRow: React.FC<Props> = ({
             key={record.id}
             header={
               <div
+                data-tour-id={tourId || ""}
                 className="collection-name-container"
                 onMouseEnter={() => setHoveredId(record.id)}
                 onMouseLeave={() => setHoveredId("")}

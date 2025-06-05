@@ -15,3 +15,7 @@ export const MISC_TOURS = {
     UPGRADE_WORKSPACE_MENU: "upgrade_workspace_menu",
   },
 };
+
+export const API_CLIENT_TOURS = {
+  SAMPLE_COLLECTIONS_IMPORTED: "sample_collections_imported",
+};

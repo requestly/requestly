@@ -27,6 +27,8 @@ import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/Mov
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { API_CLIENT_TOURS } from "components/misc/ProductWalkthrough/constants";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -306,9 +308,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             </div>
           ) : updatedRecords.count > 0 ? (
             <div className="collections-list">
-              {updatedRecords.collections.map((record) => {
+              <ProductWalkthrough
+                startWalkthrough={true}
+                completeTourOnUnmount={false}
+                tourFor={API_CLIENT_TOURS.SAMPLE_COLLECTIONS_IMPORTED}
+                onTourComplete={() => {
+                  // alert("Tour completed!"); // Placeholder for tour completion action
+                }}
+              />
+
+              {updatedRecords.collections.map((record, index) => {
                 return (
                   <CollectionRow
+                    tourId={index === 0 ? API_CLIENT_TOURS.SAMPLE_COLLECTIONS_IMPORTED : ""}
                     isReadOnly={!isValidPermission}
                     key={record.id}
                     record={record}
