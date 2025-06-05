@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider, Tooltip } from "antd";
@@ -11,10 +11,7 @@ import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import PersonaRecommendation from "./PersonaRecommendation";
-import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
 import {
   trackGettingStartedVideoPlayed,
   trackNewRuleButtonClicked,
@@ -27,7 +24,6 @@ import {
   trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
-import emptyInbox from "./empty-inbox.svg";
 import { MdOutlineAddCircleOutline } from "@react-icons/all-files/md/MdOutlineAddCircleOutline";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
@@ -39,12 +35,14 @@ import { trackAskAIClicked } from "features/requestBot";
 import { RQButton } from "lib/design-system/components";
 import BotIcon from "assets/icons/bot.svg?react";
 import { globalActions } from "store/slices/global/slice";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
+import { ImporterType } from "components/Home/types";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -53,10 +51,8 @@ export const GettingStarted: React.FC = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
@@ -70,11 +66,6 @@ export const GettingStarted: React.FC = () => {
   };
 
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
-
-  const isRecommendationScreenVisible = useMemo(
-    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
-    [appMode, state?.src, userPersona]
-  );
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
@@ -101,16 +92,33 @@ export const GettingStarted: React.FC = () => {
   };
 
   useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ImporterType.CHARLES:
+          toggleImportCharlesRulesModal();
+          break;
+        case ImporterType.MOD_HEADER:
+          toggleImportModheaderRulesModal();
+          break;
+        case ImporterType.RESOURCE_OVERRIDE:
+          toggleImportResourceOverrideRulesModal();
+          break;
+        case ImporterType.REQUESTLY:
+          handleUploadRulesClick();
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
+
+  useEffect(() => {
     if (gettingStartedVideo.current) {
       gettingStartedVideo.current.addEventListener("play", () => {
         trackGettingStartedVideoPlayed();
       });
     }
   }, []);
-
-  if (isRecommendationScreenVisible) {
-    return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
-  }
 
   const suggestedRules = [
     {
@@ -140,7 +148,7 @@ export const GettingStarted: React.FC = () => {
     <>
       <div className="v2 getting-started-container">
         <div className="getting-started-content">
-          {isWorkspaceMode ? (
+          {isSharedWorkspaceMode ? (
             <div className="workspace-title-container">
               <div className="workspace-title">
                 <MdInfoOutline />
@@ -149,11 +157,11 @@ export const GettingStarted: React.FC = () => {
               <div className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates{" "}
                 <a
-                  href="https://requestly.com/"
+                  href={getLinkWithMetadata("https://requestly.com/")}
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam(navigate, currentlyActiveWorkspace.id);
+                    redirectToTeam(navigate, activeWorkspaceId);
                   }}
                 >
                   click here
@@ -168,7 +176,13 @@ export const GettingStarted: React.FC = () => {
             <div className="create-new-rule-content">
               <div className="no-rules">
                 <div className="empty-rules-image-container">
-                  <img width={72} height={72} src={emptyInbox} alt="empty-rules" className="empty-rules" />
+                  <img
+                    width={72}
+                    height={72}
+                    src={"/assets/media/rules/empty-inbox.svg"}
+                    alt="empty-rules"
+                    className="empty-rules"
+                  />
                   <div className="caption">No rules created yet</div>
                 </div>
 

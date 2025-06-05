@@ -87,7 +87,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
         </a>
       </div>
       <div className="right-section">
-        <img width={480} height={360} alt="Desktop banner" src="/assets/img/banners/desktop-promo.png" />
+        <img width={480} height={360} alt="Desktop banner" src="/assets/media/Dashboard/desktop-promo.png" />
       </div>
     </RQModal>
   );

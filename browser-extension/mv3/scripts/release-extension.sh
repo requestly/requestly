@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-BROWSER=chrome ENV=prod npm run config
+BROWSER=chrome ENV=local npm run config
 
 echo **Playwright test Started**
 npm run test
@@ -17,6 +17,11 @@ VERSION=`date +'%-y.%-m.%d'`
 npm version $VERSION
 
 # Chrome
+BROWSER=chrome ENV=prod npm run config
+BUILD_MODE='production' npm run build && node scripts/createZip
+
+# Edge
+BROWSER=edge ENV=prod npm run config
 BUILD_MODE='production' npm run build && node scripts/createZip
 
 # Reset config

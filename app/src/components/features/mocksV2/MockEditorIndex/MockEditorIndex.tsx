@@ -15,17 +15,13 @@ import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAd
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
 import { FileType, MockType, RQMockCollection } from "../types";
 import { getMock } from "backend/mocks/getMock";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAttributes } from "store/selectors";
+import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { useIncentiveActions } from "features/incentivization/hooks";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   isNew?: boolean;
@@ -46,14 +42,13 @@ const MockEditorIndex: React.FC<Props> = ({
   isEditorOpenInModal = false,
 }) => {
   const { mockId } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
 
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
@@ -61,7 +56,6 @@ const MockEditorIndex: React.FC<Props> = ({
   const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
   const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
 
-  const { claimIncentiveRewards } = useIncentiveActions();
   const [searchParams] = useSearchParams();
   const collectionId = searchParams.get("collectionId") || "";
 
@@ -71,7 +65,7 @@ const MockEditorIndex: React.FC<Props> = ({
     }
 
     setIsMockLoading(true);
-    getMock(uid, mockId, teamId).then((data: any) => {
+    getMock(uid, mockId, activeWorkspaceId).then((data: any) => {
       if (data) {
         const editorData = mockDataToEditorDataAdapter(data);
         setMockEditorData(editorData);
@@ -83,7 +77,7 @@ const MockEditorIndex: React.FC<Props> = ({
 
       setIsMockLoading(false);
     });
-  }, [mockId, uid, teamId]);
+  }, [mockId, uid, activeWorkspaceId]);
 
   useEffect(() => {
     if (!mockEditorData?.collectionId) {
@@ -91,7 +85,7 @@ const MockEditorIndex: React.FC<Props> = ({
     }
 
     setIsMockCollectionLoading(true);
-    getMock(uid, mockEditorData.collectionId, teamId)
+    getMock(uid, mockEditorData.collectionId, activeWorkspaceId)
       .then((data: any) => {
         if (data) {
           setMockCollectionData(data);
@@ -100,48 +94,25 @@ const MockEditorIndex: React.FC<Props> = ({
       .finally(() => {
         setIsMockCollectionLoading(false);
       });
-  }, [mockEditorData?.collectionId, teamId, uid]);
+  }, [mockEditorData?.collectionId, activeWorkspaceId, uid]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
 
     const finalMockData = editorDataToMockDataConverter(data);
     if (isNew) {
-      return createMock(uid, { ...finalMockData, collectionId }, teamId, collectionId).then((mockId) => {
+      return createMock(uid, { ...finalMockData, collectionId }, activeWorkspaceId, collectionId).then((mockId) => {
         setSavingInProgress(false);
         if (mockId) {
-          toast.success("Mock Created Successfully");
+          toast.success("File created successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
-
-          claimIncentiveRewards({
-            type: IncentivizeEvent.MOCK_CREATED,
-            metadata: { num_mocks: userAttributes?.num_mocks || 1 },
-          })?.then((response) => {
-            // @ts-ignore
-            if (response.data?.success) {
-              dispatch(
-                incentivizationActions.setUserMilestoneAndRewardDetails({
-                  // @ts-ignore
-                  userMilestoneAndRewardDetails: response.data?.data,
-                })
-              );
-
-              dispatch(
-                incentivizationActions.toggleActiveModal({
-                  modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                  newValue: true,
-                  newProps: { event: IncentivizeEvent.MOCK_CREATED },
-                })
-              );
-            }
-          });
 
           if (selectOnSave) {
             const url = generateFinalUrl({
               endpoint: finalMockData.endpoint,
               uid: user?.details?.profile?.uid,
               username: null,
-              teamId: teamId,
+              teamId: activeWorkspaceId,
               password: data?.password,
             });
             selectOnSave(url);
@@ -156,7 +127,7 @@ const MockEditorIndex: React.FC<Props> = ({
       });
     }
 
-    updateMock(uid, mockId, finalMockData, teamId).then((success) => {
+    updateMock(uid, mockId, finalMockData, activeWorkspaceId).then((success) => {
       setSavingInProgress(false);
       if (success) {
         toast.success("Mock Updated Successfully");
@@ -205,6 +176,7 @@ const MockEditorIndex: React.FC<Props> = ({
         mockData={mockData}
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
+        isEditorReadOnly={!isValidPermission}
       />
     );
   } else {
@@ -225,6 +197,7 @@ const MockEditorIndex: React.FC<Props> = ({
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
         isMockCollectionLoading={isMockCollectionLoading}
+        isEditorReadOnly={!isValidPermission}
       />
     );
   }

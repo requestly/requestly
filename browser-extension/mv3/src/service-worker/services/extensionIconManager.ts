@@ -92,6 +92,7 @@ class ExtensionIconManager {
 
   #setExtensionIcon(path: string, tabId?: number) {
     if (tabId === undefined) {
+      // Does not work
       chrome.action.setIcon({ path });
     } else {
       chrome.action.setIcon({ path, tabId });
@@ -136,6 +137,13 @@ class ExtensionIconManager {
     this.#connectedToDesktopApp = false;
     this.#setExtensionIcon(this.#icons.DEFAULT);
     this.#updateIconStateForAllTabs();
+  }
+
+  getState() {
+    return {
+      isExtensionDisabled: this.#isExtensionDisabled,
+      connectedToDesktopApp: this.#connectedToDesktopApp,
+    };
   }
 }
 

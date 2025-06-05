@@ -297,7 +297,7 @@
     "isScanned": false,
     "comingSoon": false,
     "isAvailable": true,
-    "isDocAvailable": "https://docs.requestly.io/desktop-app/how-to.../terminal-setup"
+    "isDocAvailable": "https://docs.requestly.com/general/http-interceptor/terminal"
   },
   "system-wide": {
     "id": "system-wide",

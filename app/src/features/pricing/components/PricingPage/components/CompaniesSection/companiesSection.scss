@@ -1,5 +1,9 @@
 .companies-section-container {
+  margin: auto;
   margin-top: 56px;
+  padding: 24px;
+  max-width: 848px;
+  border-top: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
 }
 
 .companies-section-title {

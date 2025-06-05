@@ -76,7 +76,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
                 width="13.4px"
                 height="10px"
                 alt="down arrow"
-                src="/assets/icons/share.svg"
+                src="/assets/media/views/share.svg"
                 className="rule-header-share-btn-icon"
               />
             }

@@ -2,13 +2,14 @@ import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import {
   getTeamUserRuleAllConfigsPath,
   getTeamUserRuleConfigPath,
   getRecordsSyncPath,
 } from "utils/syncing/syncDataUtils";
+import { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";
 
 // Broadcast channel setup
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
@@ -18,18 +19,19 @@ window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
 });
 
 const ActiveWorkspace = () => {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
+  const { role } = useCurrentWorkspaceUserRole();
 
   const performCleanup = async () => {
     if (window.workspaceCleanupDone) return;
 
     window.workspaceCleanupDone = true;
 
-    if (currentlyActiveWorkspace.id) {
+    if (activeWorkspace?.id) {
       // Fetch fresh rule configs from Firebase
       const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath(
-        currentlyActiveWorkspace.id,
+        activeWorkspace?.id,
         user?.details?.profile?.uid
       );
       if (!teamUserRuleAllConfigsPath) return;
@@ -66,11 +68,12 @@ const ActiveWorkspace = () => {
   }
 
   useEffect(() => {
-    window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
-    window.workspaceMembersCount = currentlyActiveWorkspace?.membersCount ?? null;
+    window.currentlyActiveWorkspaceTeamRole = role;
+    window.currentlyActiveWorkspaceTeamId = activeWorkspace?.id;
+    window.workspaceMembersCount = activeWorkspace?.accessCount ?? null;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE
     window.workspaceCleanupDone = false;
-  }, [currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount]);
+  }, [activeWorkspace?.accessCount, activeWorkspace?.id, role]);
 };
 
 export default ActiveWorkspace;

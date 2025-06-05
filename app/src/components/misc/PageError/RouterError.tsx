@@ -1,8 +1,6 @@
 import { Button, Typography } from "antd";
 import React, { useEffect } from "react";
 import * as Sentry from "@sentry/react";
-
-import img from "../../../assets/images/illustrations/fixing-bugs-dark.svg";
 import "./pageError.scss";
 import LINKS from "config/constants/sub/links";
 import { trackErrorBoundaryShown } from "modules/analytics/events/common/error-boundaries";
@@ -24,7 +22,7 @@ const RouterError: React.FC<Props> = () => {
 
   return (
     <div className="page-error-container">
-      <img src={img} alt="error" />
+      <img src={"/assets/media/components/fixing-bugs-dark.svg"} alt="error" />
       <Typography.Text type="secondary" italic className="message">
         <>
           [router-error] Something went wrong! Please contact the

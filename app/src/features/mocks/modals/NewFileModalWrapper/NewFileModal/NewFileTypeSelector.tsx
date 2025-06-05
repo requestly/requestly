@@ -7,19 +7,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToFileMockEditorCreateMock, redirectToMocksList } from "utils/RedirectionUtils";
 import { IoLogoCss3 } from "@react-icons/all-files/io5/IoLogoCss3";
-import { IoLogoHtml5 } from "@react-icons/all-files/io5/IoLogoHtml5";
 import { IoLogoJavascript } from "@react-icons/all-files/io5/IoLogoJavascript";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { FileType } from "components/features/mocksV2/types";
 
 const FILE_TYPES_CONFIG = {
-  [FileType.HTML]: {
-    TYPE: FileType.HTML,
-    NAME: "Host new HTML file",
-    DESCRIPTION: "Mock an HTML Response",
-    ICON: () => <IoLogoHtml5 />,
-    TOOL_TIP_PLACEMENT: "top",
-  },
   [FileType.CSS]: {
     TYPE: FileType.CSS,
     NAME: "Host new CSS file",
@@ -45,7 +37,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
 
   const fileTypeCard = useMemo(() => {
     return Object.entries(FILE_TYPES_CONFIG).map(([type, data]) => (
-      <Col xs={12} lg={8} key={type} className="file-type-cards-container">
+      <Col push={1} key={type} className="file-type-cards-container">
         <Card
           loading={false}
           size="small"
@@ -88,11 +80,11 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
       </Typography.Title>
       <div className="mb-16">
         <Typography.Text type="secondary" className="new-file-modal-description">
-          You can use File Server to host static files like HTML, CSS, JS & Images only.
+          You can use File Server to host static files like CSS, JS & Images only.
         </Typography.Text>
         <br />
         <Typography.Text type="secondary" className="new-file-modal-description">
-          To host JSON or mock API responses, you can use our Mock Server&nbsp;
+          To host JSON or mock API responses, you can use our File Server&nbsp;
           <Link
             to={"#"}
             onClick={(e) => {
@@ -104,7 +96,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
           </Link>
         </Typography.Text>
       </div>
-      <Row gutter={[16, 16]}>{fileTypeCard}</Row>
+      <Row gutter={[32, 16]}>{fileTypeCard}</Row>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
@@ -6,7 +6,7 @@ import firebaseApp from "firebase.js";
 import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { getAppMode, getUserAttributes, getAppOnboardingDetails } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import moment from "moment";
@@ -20,6 +20,8 @@ import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
+import { EmailType } from "@requestly/shared/types/common";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -33,19 +35,28 @@ const AuthHandler: React.FC<{}> = () => {
   const onboardingDetails = useSelector(getAppOnboardingDetails);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
-  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
+  const getOrganizationUsers = useMemo(
+    () =>
+      httpsCallable<{ domain: string }, { total: number; users: unknown[] }>(
+        getFunctions(),
+        "users-getOrganizationUsers"
+      ),
+    []
+  );
+  const emailTypeRef = useRef<string | null>(null);
 
   const nonBlockingOperations = useCallback(
     async (user: User) => {
       Logger.time("AuthHandler-nonBlockingOperations");
       Logger.timeLog("AuthHandler-nonBlockingOperations", "START");
 
-      submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
-      submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) ?? "Missing_Value");
-
       /* To ensure that this attribute is assigned to only the users signing up for the first time */
       if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
-        if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
+        if (
+          emailTypeRef.current === EmailType.BUSINESS &&
+          user.emailVerified &&
+          !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]
+        ) {
           getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
             const users = res.data.users;
             submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
@@ -62,15 +73,13 @@ const AuthHandler: React.FC<{}> = () => {
         submitAttrUtil(TRACKING.ATTR.DAYS_SINCE_SIGNUP, moment().diff(signupDate, "days"));
       }
 
+      submitAttrUtil(TRACKING.ATTR.BROWSERSTACK_ID, userData?.browserstackId ?? null);
+
       if (userData?.username) {
-        dispatch(
-          // @ts-ignore
-          globalActions.updateUsername({ username: userData.username })
-        );
+        dispatch(globalActions.updateUsername({ username: userData.username }));
       }
 
       dispatch(
-        // @ts-ignore
         globalActions.updateUserInfo({
           loggedIn: true,
           details: {
@@ -101,11 +110,14 @@ const AuthHandler: React.FC<{}> = () => {
 
       try {
         // FIXME: getOrUpdateUserSyncState, checkUserBackupState taking too long for large workspace, can this be improved or moved to non-blocking operations?
-        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
+        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled, mailType] = await Promise.all([
           getUserSubscription(user.uid),
           getOrUpdateUserSyncState(user.uid, appMode),
           checkUserBackupState(user.uid),
+          getEmailType(user.email),
         ]);
+
+        emailTypeRef.current = mailType;
 
         // phase-1 migration: Adaptor to convert firestore schema into old schema
         const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
@@ -115,7 +127,6 @@ const AuthHandler: React.FC<{}> = () => {
         window.keySetDoneisSyncEnabled = true;
 
         dispatch(
-          // @ts-ignore
           globalActions.updateUserInfo({
             loggedIn: true,
             details: {
@@ -128,16 +139,20 @@ const AuthHandler: React.FC<{}> = () => {
               isBackupEnabled,
               isSyncEnabled,
               isPremium: isUserPremium,
+              emailType: mailType,
             },
           })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
           })
         );
+
+        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
+        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, mailType ?? "Missing_Value");
+
         submitAttrUtil(TRACKING.ATTR.IS_PREMIUM, isUserPremium);
         const userName = user.displayName !== "User" ? user.displayName : onboardingDetails.fullName;
         submitAttrUtil(TRACKING.ATTR.DISPLAY_NAME, userName);
@@ -146,12 +161,18 @@ const AuthHandler: React.FC<{}> = () => {
           submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type ?? "Missing Value");
           submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId ?? "Missing Value");
           submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
+          submitAttrUtil(TRACKING.ATTR.SUBSCRIPTION_STATUS, planDetails.status);
+          submitAttrUtil(
+            TRACKING.ATTR.RQ_SUBSCRIPTION_TYPE,
+            firestorePlanDetails?.rqSubscriptionType ?? planDetails.type
+          );
 
           if (planDetails.subscription) {
             submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate ?? "Missing Value");
             submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate ?? "Missing Value");
           }
         }
+
         Logger.timeEnd("AuthHandler-blockingOperations");
         return true;
       } catch (e) {
@@ -160,14 +181,12 @@ const AuthHandler: React.FC<{}> = () => {
         window.uid = null;
 
         dispatch(
-          // @ts-ignore
           globalActions.updateUserInfo({
             loggedIn: false,
             details: null,
           })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,
@@ -249,7 +268,6 @@ const AuthHandler: React.FC<{}> = () => {
           globalActions.updateUserInfo({ loggedIn: false, details: null })
         );
         dispatch(
-          // @ts-ignore
           globalActions.updateInitializations({
             initType: "auth",
             initValue: true,

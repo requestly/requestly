@@ -21,7 +21,7 @@ import { saveDraftSession, generateDraftSessionTitle } from "features/sessionBoo
 import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { DRAFT_SESSION_VIEWED_SOURCE } from "./constants";
 import {
   trackDraftSessionDiscarded,
@@ -38,9 +38,9 @@ import { DebugInfo, SessionRecordingMode } from "./types";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import Logger from "../../../../../../common/logger";
-import { useIncentiveActions } from "features/incentivization/hooks";
+import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
     draftSessionTabId: string;
@@ -69,7 +69,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const isImportedSession = tabId === "imported";
 
   const [isLoading, setIsLoading] = useState(true);
@@ -78,8 +78,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
   const [isSessionSaving, setIsSessionSaving] = useState(false);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
 
   const hasUserCreatedSessions = useMemo(
     () =>
@@ -240,12 +238,11 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       appMode,
       dispatch,
       navigate,
-      workspace?.id,
+      activeWorkspaceId,
       sessionRecordingMetadata,
       sessionEvents,
       [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
-      source,
-      claimIncentiveRewards
+      source
     )
       .catch((err) => {
         setIsSessionSaving(false);
@@ -263,9 +260,8 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     source,
     user,
     userAttributes,
-    workspace?.id,
+    activeWorkspaceId,
     isSessionSaving,
-    claimIncentiveRewards,
   ]);
 
   useEffect(() => {
@@ -295,10 +291,9 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               loading={isSessionSaving}
               onClick={() => {
                 handleSaveDraftSession();
-                // @ts-ignore
                 globalActions.updateProductTourCompleted({
                   tour: TOUR_TYPES.MISCELLANEOUS,
-                  subTour: "firstDraftSession",
+                  subTour: SUB_TOUR_TYPES.FIRST_DRAFT_SESSION,
                 });
               }}
             >
@@ -312,10 +307,9 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               onClick={() => {
                 setIsSavePopupVisible((prev) => !prev);
                 dispatch(
-                  // @ts-ignore
                   globalActions.updateProductTourCompleted({
                     tour: TOUR_TYPES.MISCELLANEOUS,
-                    subTour: "firstDraftSession",
+                    subTour: SUB_TOUR_TYPES.FIRST_DRAFT_SESSION,
                   })
                 );
               }}
@@ -362,7 +356,10 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
           dispatch(
-            globalActions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+            globalActions.updateProductTourCompleted({
+              tour: TOUR_TYPES.MISCELLANEOUS,
+              subTour: SUB_TOUR_TYPES.FIRST_DRAFT_SESSION,
+            })
           )
         }
       />

@@ -8,7 +8,12 @@ import { getAuth } from "firebase/auth";
 import { billingActions } from "store/features/billing/slice";
 import { getBillingTeamMembersProfile } from "..";
 import Logger from "lib/logger";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
+
+const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
@@ -50,7 +55,7 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      if (isCompanyEmail(user?.details?.profile?.email)) {
+      if (isCompanyEmail(user.details?.emailType)) {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),
           where("ownerDomains", "array-contains", domain)
@@ -59,10 +64,14 @@ export const useBillingTeamsListener = () => {
           .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
               if (!userBillingTeamIds.has(doc.id)) {
-                billingTeamDetails.push({
+                const billingTeam = {
                   ...(doc.data() as BillingTeamDetails),
                   id: doc.id,
-                });
+                };
+                if (billingTeam.isAcceleratorTeam === true) {
+                  submitAttrUtil(TRACKING.ATTR.IS_ACCELERATOR_AVAILABLE, true);
+                }
+                billingTeamDetails.push(billingTeam);
               }
             });
           })
@@ -81,11 +90,12 @@ export const useBillingTeamsListener = () => {
       });
     });
   }, [
+    user.loggedIn,
+    user.details?.profile?.email,
+    user.details?.profile?.uid,
+    user.details?.emailType,
     dispatch,
     fetchAndDispatchBillingTeamMembersProfile,
-    user.loggedIn,
-    user?.details?.profile?.email,
-    user?.details?.profile?.uid,
   ]);
 
   const refreshUserToken = async () => {

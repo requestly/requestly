@@ -4,13 +4,23 @@ import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 
 type Variables = Record<string, string | number | boolean>;
+interface RenderResult<T> {
+  renderedTemplate: T;
+  usedVariables: Record<string, unknown>;
+}
 
-export const renderTemplate = (
-  template: string | Record<string, any>,
+export const renderTemplate = <T extends string | Record<string, T>>(
+  template: T,
   variables: Record<string, EnvironmentVariableValue> = {}
-): any => {
+): {
+  renderedVariables?: Record<string, unknown>;
+  renderedTemplate: T;
+} => {
   if (!variables || Object.keys(variables).length === 0) {
-    return template;
+    return {
+      renderedTemplate: template,
+      renderedVariables: {},
+    };
   }
 
   const parsedVariables = Object.entries(variables).reduce((envVars, [key, value]) => {
@@ -23,29 +33,68 @@ export const renderTemplate = (
     return envVars;
   }, {} as Variables);
 
-  return recursiveRender(template, parsedVariables);
+  const { renderedTemplate, usedVariables } = recursiveRender(template, parsedVariables);
+  return {
+    renderedTemplate,
+    renderedVariables: usedVariables,
+  };
 };
 
-const recursiveRender = (input: string | Record<string, any>, variables: Variables): any => {
+const recursiveRender = <T>(input: T, variables: Variables): RenderResult<T> => {
   if (typeof input === "string") {
-    try {
-      const wrappedTemplate = wrapUnexpectedTemplateCaptures(input, variables);
-      const hbsTemplate = compile(wrappedTemplate);
-      return hbsTemplate(variables);
-    } catch (e) {
-      Logger.error("Error while rendering template string:", input);
-      return input; // Return the template unchanged if rendering fails
-    }
+    return processTemplateString(input, variables);
   } else if (typeof input === "object" && input !== null) {
-    return Object.entries(input).reduce(
-      (acc: any, [key, value]) => {
-        acc[key] = recursiveRender(value, variables); // Recursively render the value
-        return acc;
-      },
-      Array.isArray(input) ? [] : {} // Maintain object/array structure
-    );
+    return processObject(input, variables);
   }
-  return input;
+  return {
+    renderedTemplate: input,
+    usedVariables: {},
+  };
+};
+
+const processObject = <T extends Record<string, any>>(input: T, variables: Variables): RenderResult<T> => {
+  const result = Object.entries(input).reduce(
+    (
+      acc: {
+        rendered: Record<string, any>;
+        variables: Record<string, unknown>;
+      },
+      [key, value]
+    ) => {
+      const { renderedTemplate, usedVariables } = recursiveRender(value, variables);
+      acc.rendered[key] = renderedTemplate;
+      acc.variables = { ...acc.variables, ...usedVariables };
+      return acc;
+    },
+    {
+      rendered: Array.isArray(input) ? [] : {},
+      variables: {},
+    }
+  );
+
+  return {
+    renderedTemplate: result.rendered as T, // need assertion since rendered is also being treated as array
+    usedVariables: result.variables,
+  };
+};
+
+const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
+  try {
+    const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
+    const hbsTemplate = compile(wrappedTemplate);
+    const renderedTemplate = hbsTemplate(variables) as T; // since handlebars generic types resolve to any; not string
+
+    return {
+      renderedTemplate,
+      usedVariables,
+    };
+  } catch (e) {
+    Logger.error("Error while rendering template string:", input);
+    return {
+      renderedTemplate: input,
+      usedVariables: {},
+    };
+  }
 };
 
 // it will add `\\` to its prefix, signaling handlebars should ignore it
@@ -53,17 +102,26 @@ const escapeMatchFromHandlebars = (match: string) => {
   return match.replace(/({{)/g, "\\$1");
 };
 
-const wrapUnexpectedTemplateCaptures = (template: string, variables: Record<string, unknown>) => {
-  const helperNames = Object.keys(variables);
-  return template.replace(/{{\s*([\s\S]*?)\s*}}/g, (completeMatch, firstMatchedGroup) => {
-    const isMatchEmpty = firstMatchedGroup.trim() === ""; // {{}}
-    const matchStartsWithKnownHelper = helperNames.includes(firstMatchedGroup);
+const collectAndEscapeVariablesFromTemplate = (
+  template: string,
+  variables: Variables
+): { wrappedTemplate: string; usedVariables: Record<string, unknown> } => {
+  const usedVariables: Record<string, unknown> = {};
+
+  const wrappedTemplate = template.replace(/{{\s*([\s\S]*?)\s*}}/g, (completeMatch, firstMatchedGroup) => {
+    const varName = firstMatchedGroup.trim();
+    const isMatchEmpty = varName === ""; // {{}}
+    const matchStartsWithKnownHelper = varName in variables;
+    usedVariables[varName] = variables[varName];
 
     if (isMatchEmpty || !matchStartsWithKnownHelper) {
       return escapeMatchFromHandlebars(completeMatch);
     }
+
     return completeMatch;
   });
+
+  return { wrappedTemplate, usedVariables };
 };
 
 export const mergeLocalAndSyncVariables = (

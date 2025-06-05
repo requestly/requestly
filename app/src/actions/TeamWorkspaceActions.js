@@ -16,7 +16,9 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { tabsLayoutActions } from "store/slices/tabs-layout";
+import { WorkspaceType } from "types";
+import { workspaceActions } from "store/slices/workspaces/slice";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -32,7 +34,8 @@ export const switchWorkspace = async (
   setLoader,
   source
 ) => {
-  const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
+  const { teamId, teamName, teamMembersCount, workspaceType } = newWorkspaceDetails;
+
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
   if (teamId !== null) {
@@ -85,7 +88,7 @@ export const switchWorkspace = async (
     await StorageService(appMode).clearDB();
   }
 
-  dispatch(tabsLayoutActions.resetState());
+  getTabServiceActions().resetTabs();
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
@@ -95,6 +98,7 @@ export const switchWorkspace = async (
     // We are switching to pvt workspace
     // Clear team members info
     dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
+    dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
   dispatch(
@@ -102,8 +106,10 @@ export const switchWorkspace = async (
       id: teamId,
       name: teamName,
       membersCount: teamMembersCount,
+      workspaceType: workspaceType,
     })
   );
+  dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
 
   //Refresh Rules List
   dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
@@ -114,5 +120,10 @@ export const switchWorkspace = async (
 };
 
 export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
-  await switchWorkspace({ teamId: null, teamName: null, teamMembersCount: null }, dispatch, null, appMode);
+  await switchWorkspace(
+    { teamId: null, teamName: null, teamMembersCount: null, workspaceType: WorkspaceType.PERSONAL },
+    dispatch,
+    null,
+    appMode
+  );
 };

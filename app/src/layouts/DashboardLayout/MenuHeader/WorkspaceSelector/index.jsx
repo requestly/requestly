@@ -23,7 +23,6 @@ import {
   trackWorkspaceDropdownClicked,
   trackCreateNewTeamClicked,
 } from "modules/analytics/events/common/teams";
-import { getCurrentlyActiveWorkspace, getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getLastSeenInviteTs } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
@@ -40,6 +39,20 @@ import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { toast } from "utils/Toast";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
+import {
+  getActiveWorkspace,
+  getActiveWorkspaceId,
+  getAllWorkspaces,
+  isActiveWorkspaceShared,
+} from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
+import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
+import { RQButton } from "lib/design-system-v2/components";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -62,12 +75,14 @@ const getWorkspaceIcon = (workspaceName) => {
 const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const isLocalWorkspace = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
 
   const activeWorkspaceName = user.loggedIn
-    ? isWorkspaceMode
-      ? currentlyActiveWorkspace.name
+    ? isSharedWorkspaceMode
+      ? activeWorkspace?.name
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
 
@@ -77,43 +92,73 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     }
   };
 
+  const handleLocalSyncRefresh = (e) => {
+    e.stopPropagation();
+    window.dispatchEvent(new Event("local-sync-refresh"));
+  };
+
+  const tooltipTitle =
+    activeWorkspace?.workspaceType === WorkspaceType.LOCAL
+      ? activeWorkspace.rootPath
+      : prettifyWorkspaceName(activeWorkspaceName);
+
   return (
-    <Dropdown
-      overlay={menu}
-      trigger={["click"]}
-      className="workspace-selector-dropdown no-drag"
-      onOpenChange={handleWorkspaceDropdownClick}
-    >
-      <div className="cursor-pointer items-center">
-        <Avatar
-          size={26}
-          shape="square"
-          icon={getWorkspaceIcon(activeWorkspaceName)}
-          className="workspace-avatar"
-          style={{
-            backgroundColor: user.loggedIn
-              ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                ? "#1E69FF"
-                : getUniqueColorForWorkspace(currentlyActiveWorkspace?.id, activeWorkspaceName)
-              : "#ffffff4d",
-          }}
-        />
-        <Tooltip
-          overlayClassName="workspace-selector-tooltip"
-          style={{ top: "35px" }}
-          title={prettifyWorkspaceName(activeWorkspaceName)}
-          placement={"bottomRight"}
-          showArrow={false}
-          mouseEnterDelay={2}
-        >
-          <span className="items-center active-workspace-name">
-            <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-            {hasNewInvites ? <Badge dot={true} /> : null}
-            <DownOutlined className="active-workspace-name-down-icon" />
-          </span>
+    <>
+      <Dropdown
+        overlay={menu}
+        trigger={["click"]}
+        className="workspace-selector-dropdown no-drag"
+        onOpenChange={handleWorkspaceDropdownClick}
+      >
+        <div className="workspace-selector-dropdown__content">
+          <Tooltip
+            overlayClassName="workspace-selector-tooltip"
+            style={{ top: "35px" }}
+            title={tooltipTitle}
+            placement={"bottomRight"}
+            showArrow={false}
+            mouseEnterDelay={0.5}
+            color="#000"
+          >
+            <div className="cursor-pointer items-center">
+              <Avatar
+                size={26}
+                shape="square"
+                icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
+                className="workspace-avatar"
+                style={{
+                  backgroundColor: user.loggedIn
+                    ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                      ? "#1E69FF"
+                      : isLocalWorkspace
+                      ? "#FFFFFF33"
+                      : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
+                    : "#ffffff4d",
+                }}
+              />
+
+              <span className="items-center active-workspace-name">
+                <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                {hasNewInvites ? <Badge dot={true} /> : null}
+                <DownOutlined className="active-workspace-name-down-icon" />
+              </span>
+            </div>
+          </Tooltip>
+        </div>
+      </Dropdown>
+      {activeWorkspace?.workspaceType === WorkspaceType.LOCAL &&
+      isFeatureCompatible(FEATURES.LOCAL_WORKSPACE_REFRESH) ? (
+        <Tooltip title="Load latest changes from your local files" placement="bottom" color="#000">
+          <RQButton
+            onClick={handleLocalSyncRefresh}
+            className="local-sync-refresh-btn no-drag"
+            size="small"
+            iconOnly
+            icon={<MdOutlineRefresh />}
+          />
         </Tooltip>
-      </div>
-    </Dropdown>
+      ) : null}
+    </>
   );
 };
 
@@ -121,20 +166,25 @@ const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   const isLimitToPrivateWorkspaceActive = useFeatureIsOn("limit_to_private_workspace");
 
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
-  const _availableTeams = availableTeams || [];
-  const sortedAvailableTeams = [
-    ..._availableTeams.filter((team) => !team?.archived),
-    ..._availableTeams.filter((team) => team?.archived),
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const _availableWorkspaces = availableWorkspaces || [];
+  let sortedAvailableWorkspaces = _availableWorkspaces.filter((team) => !team.browserstackDetails); // Filtering our Browserstack Workspaces)
+  sortedAvailableWorkspaces = [
+    ...sortedAvailableWorkspaces.filter((team) => !team?.archived),
+    ...sortedAvailableWorkspaces.filter((team) => team?.archived),
   ];
+
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const isWorkspaceTypeLocal = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
 
@@ -164,10 +214,10 @@ const WorkspaceSelector = () => {
   }, [user.loggedIn]);
 
   useEffect(() => {
-    if (availableTeams?.length > 0) {
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableTeams.length);
+    if (availableWorkspaces?.length > 0) {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableWorkspaces.length);
     }
-  }, [availableTeams?.length]);
+  }, [availableWorkspaces?.length]);
 
   const renderLoader = () => {
     return (
@@ -255,8 +305,8 @@ const WorkspaceSelector = () => {
         })
       );
       trackInviteTeammatesClicked("workspaces_dropdown");
-      if (isWorkspaceMode) {
-        redirectToTeam(navigate, currentlyActiveWorkspace.id);
+      if (isSharedWorkspaceMode) {
+        redirectToTeam(navigate, activeWorkspaceId);
       } else {
         redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
       }
@@ -336,11 +386,12 @@ const WorkspaceSelector = () => {
         teamId: team.id,
         teamName: team.name,
         teamMembersCount: team.accessCount,
+        workspaceType: team.workspaceType,
       },
       dispatch,
       {
         isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode,
+        isWorkspaceMode: isSharedWorkspaceMode,
       },
       appMode,
       undefined,
@@ -388,17 +439,18 @@ const WorkspaceSelector = () => {
         key="2"
         className="workspace-menu-item"
         onClick={() => {
+          trackSignUpButtonClicked(SOURCE.WORKSPACE_SIDEBAR);
           promptUserSignupModal(() => {}, SOURCE.WORKSPACE_SIDEBAR);
-          trackWorkspaceDropdownClicked("sign_in");
+          trackWorkspaceDropdownClicked("sign_up");
         }}
         icon={<UserOutlined className="icon-wrapper" />}
       >
-        Sign in
+        Sign up
       </Menu.Item>
     </Menu>
   );
 
-  const isTeamCurrentlyActive = (teamId) => currentlyActiveWorkspace.id === teamId;
+  const isTeamCurrentlyActive = (teamId) => activeWorkspaceId === teamId;
   const TeamsInviteCountBadge = (
     <Badge color="#0361FF" count={teamInvites?.length} className="join-workspace-invite-count-badge" />
   );
@@ -433,16 +485,11 @@ const WorkspaceSelector = () => {
 
   useEffect(() => {
     if (isLimitToPrivateWorkspaceActive) {
-      if (currentlyActiveWorkspace?.id) {
+      if (activeWorkspaceId) {
         confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
       }
     }
-  }, [
-    isLimitToPrivateWorkspaceActive,
-    currentlyActiveWorkspace?.id,
-    confirmWorkspaceSwitch,
-    handleSwitchToPrivateWorkspace,
-  ]);
+  }, [isLimitToPrivateWorkspaceActive, activeWorkspaceId, confirmWorkspaceSwitch, handleSwitchToPrivateWorkspace]);
 
   const menu = (
     <Menu className="workspaces-menu" disabled={isLimitToPrivateWorkspaceActive}>
@@ -458,7 +505,7 @@ const WorkspaceSelector = () => {
               style={{ backgroundColor: "#1E69FF" }}
             />
           }
-          className={`workspace-menu-item ${!currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""}`}
+          className={`workspace-menu-item ${!activeWorkspaceId ? "active-workspace-dropdownItem" : ""}`}
           onClick={() => {
             confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
             trackWorkspaceDropdownClicked("switch_workspace");
@@ -468,11 +515,16 @@ const WorkspaceSelector = () => {
             {APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE} (Default)
           </div>
         </Menu.Item>
-        {availableTeams === null ? renderLoader() : null}
+      </Menu.ItemGroup>
 
-        {sortedAvailableTeams &&
-          sortedAvailableTeams.map((team) => {
-            return (
+      {availableWorkspaces === null ? renderLoader() : null}
+
+      {/* Shared Workspaces */}
+      {sortedAvailableWorkspaces.filter((team) => team.workspaceType !== WorkspaceType.LOCAL).length ? (
+        <Menu.ItemGroup key="sharedWorkspaces" title="Shared workspaces">
+          {sortedAvailableWorkspaces
+            .filter((team) => team.workspaceType !== WorkspaceType.LOCAL)
+            .map((team) => (
               <Menu.Item
                 key={team.id}
                 disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
@@ -488,7 +540,7 @@ const WorkspaceSelector = () => {
                   />
                 }
                 className={`workspace-menu-item ${
-                  team.id === currentlyActiveWorkspace.id ? "active-workspace-dropdownItem" : ""
+                  team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
                 onClick={() => {
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
@@ -520,9 +572,61 @@ const WorkspaceSelector = () => {
                   </div>
                 </Tooltip>
               </Menu.Item>
-            );
-          })}
-      </Menu.ItemGroup>
+            ))}
+        </Menu.ItemGroup>
+      ) : null}
+
+      {/* Local Workspaces */}
+      {isLocalSyncEnabled &&
+      sortedAvailableWorkspaces.filter((team) => team.workspaceType === WorkspaceType.LOCAL).length ? (
+        <Menu.ItemGroup key="localWorkspace" title="Local workspaces">
+          {sortedAvailableWorkspaces
+            .filter((team) => team.workspaceType === WorkspaceType.LOCAL)
+            .map((team) => (
+              <Menu.Item
+                key={team.id}
+                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
+                icon={
+                  <Avatar
+                    size={28}
+                    shape="square"
+                    icon={<LuFolderSync />}
+                    className="workspace-avatar local-workspace-avatar"
+                  />
+                }
+                className={`workspace-menu-item ${
+                  team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
+                }`}
+                onClick={() => {
+                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
+                  trackWorkspaceDropdownClicked("switch_workspace");
+                }}
+              >
+                <Tooltip
+                  placement="right"
+                  overlayInnerStyle={{ width: "178px" }}
+                  title={team.archived ? "This workspace has been archived." : ""}
+                >
+                  <div className="workspace-item-wrapper">
+                    <div
+                      className={`workspace-name-container ${
+                        team.archived || isTeamCurrentlyActive(team.id) ? "archived-workspace-item" : ""
+                      }`}
+                    >
+                      <div className="workspace-name">{team.name}</div>
+                      <div className="text-gray workspace-details">{team.rootPath || ""}</div>
+                    </div>
+                    {team.archived ? (
+                      <Tag color="gold">archived</Tag>
+                    ) : isTeamCurrentlyActive(team.id) ? (
+                      <Tag color="green">current</Tag>
+                    ) : null}
+                  </div>
+                </Tooltip>
+              </Menu.Item>
+            ))}
+        </Menu.ItemGroup>
+      ) : null}
 
       <Divider className="ant-divider-margin workspace-divider" />
       <Menu.Item key="3" className="workspace-menu-item">
@@ -546,28 +650,30 @@ const WorkspaceSelector = () => {
         </Dropdown>
       </Menu.Item>
 
-      {isWorkspaceMode ? (
+      {isSharedWorkspaceMode ? (
         <>
           <Divider className="ant-divider-margin workspace-divider" />
-          <Menu.Item
-            key="4"
-            className="workspace-menu-item"
-            onClick={() => {
-              handleInviteTeammatesClick();
-              trackWorkspaceDropdownClicked("invite_teammates");
-            }}
-            icon={<PlusSquareOutlined className="icon-wrapper" />}
-          >
-            Invite teammates
-          </Menu.Item>
+          {!isWorkspaceTypeLocal ? (
+            <Menu.Item
+              key="4"
+              className="workspace-menu-item"
+              onClick={() => {
+                handleInviteTeammatesClick();
+                trackWorkspaceDropdownClicked("invite_teammates");
+              }}
+              icon={<PlusSquareOutlined className="icon-wrapper" />}
+            >
+              Invite teammates
+            </Menu.Item>
+          ) : null}
 
           <Menu.Item
             key="5"
             icon={<SettingOutlined className="icon-wrapper" />}
             className="workspace-menu-item"
             onClick={() => {
-              if (isWorkspaceMode) {
-                redirectToTeam(navigate, currentlyActiveWorkspace.id);
+              if (isSharedWorkspaceMode) {
+                redirectToTeam(navigate, activeWorkspaceId);
               } else {
                 redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
               }

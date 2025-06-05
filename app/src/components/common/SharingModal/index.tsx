@@ -1,6 +1,5 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { RQModal } from "lib/design-system/components";
 import { Tabs, Typography } from "antd";
 import { ShareLinkView } from "./ShareLinkView";
@@ -13,6 +12,7 @@ import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import { trackShareModalViewed, trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
 import "./index.css";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 
 interface ModalProps {
   isOpen: boolean;
@@ -29,7 +29,7 @@ export const SharingModal: React.FC<ModalProps> = ({
   selectedRules = null,
   callback = () => {},
 }) => {
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const [activeTab, setActiveTab] = useState(SharingOptions.SHARE_LINK);
 
   const sharingOptions: TabsProps["items"] = useMemo(
@@ -83,8 +83,8 @@ export const SharingModal: React.FC<ModalProps> = ({
   };
 
   useEffect(() => {
-    trackShareModalViewed(selectedRules?.length, source, availableTeams?.length);
-  }, [availableTeams?.length, selectedRules?.length, source]);
+    trackShareModalViewed(selectedRules?.length, source, availableWorkspaces?.length);
+  }, [availableWorkspaces?.length, selectedRules?.length, source]);
 
   return (
     <RQModal

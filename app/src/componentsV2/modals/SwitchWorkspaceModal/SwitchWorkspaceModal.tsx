@@ -2,18 +2,18 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { Avatar, Button, Col, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
 import { PlusOutlined } from "@ant-design/icons";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { Team } from "types";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import "./switchWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface SwitchWorkspaceModalProps {
   isOpen: boolean;
@@ -23,12 +23,12 @@ interface SwitchWorkspaceModalProps {
 const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, toggleModal }) => {
   const dispatch = useDispatch();
 
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
 
-  const sortedTeams: Team[] = availableTeams
-    ? [...availableTeams].sort((a: Team, b: Team) => b.accessCount - a.accessCount)
+  const sortedTeams: Workspace[] = availableWorkspaces
+    ? [...availableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
     : [];
 
   const handleCreateNewWorkspaceClick = () => {
@@ -43,7 +43,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
     );
   };
 
-  const handleSwitchWorkspaceClick = (team: Team) => {
+  const handleSwitchWorkspaceClick = (team: Workspace) => {
     toggleModal();
     switchWorkspace(
       {
@@ -72,11 +72,11 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
   return (
     <RQModal centered open={isOpen} onCancel={toggleModal}>
       <div className="rq-modal-content switch-workspace-modal-content">
-        {availableTeams?.length > 0 && <div className="header">You have access to these workspaces</div>}
+        {availableWorkspaces?.length > 0 && <div className="header">You have access to these workspaces</div>}
 
-        {availableTeams?.length > 0 ? (
+        {availableWorkspaces?.length > 0 ? (
           <ul className="teams-list">
-            {sortedTeams.map((team: Team) => (
+            {sortedTeams.map((team: Workspace) => (
               <li key={team.inviteId}>
                 <div className="w-full teams-list-row">
                   <Col>
@@ -91,7 +91,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
                     />
                     <div>{team.name}</div>
                   </Col>
-                  <Col>{`${team.accessCount} members`}</Col>
+                  <Col>{`${Object.keys(team.members).length} members`}</Col>
 
                   <Button type="primary" onClick={() => handleSwitchWorkspaceClick(team)}>
                     Switch
@@ -102,7 +102,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
           </ul>
         ) : (
           <div className="title teams-empty-message">
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/assets/media/common/smiles.svg" />
             <div>You don't have any workspaces!</div>
           </div>
         )}

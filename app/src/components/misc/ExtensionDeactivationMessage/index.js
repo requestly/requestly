@@ -1,6 +1,5 @@
 import React from "react";
 import { Row } from "antd";
-import resumeRequestly from "./assets/resume_requestly.gif";
 import { WarningOutlined } from "@ant-design/icons";
 import "./extensionDeactivationMessage.css";
 
@@ -18,7 +17,7 @@ const ExtensionDeactivationMessage = () => {
           <li>Refresh the page to start using Requestly again.</li>
         </ol>
 
-        <img width={628} height={235} src={resumeRequestly} alt="resume requestly" />
+        <img width={628} height={235} src={"/assets/media/common/resume_requestly.gif"} alt="resume requestly" />
       </div>
     </Row>
   );

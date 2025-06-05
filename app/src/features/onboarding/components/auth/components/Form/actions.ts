@@ -11,6 +11,7 @@ import {
   verifyOobCode,
   resetPassword,
   googleSignInDesktopApp,
+  appleSignIn,
 } from "actions/FirebaseActions";
 //CONSTANTS
 // @ts-ignore
@@ -50,6 +51,10 @@ export const handleGoogleSignIn = (appMode: string, MODE: string, source: string
     appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? googleSignInDesktopApp : googleSignIn;
 
   return functionToCall(null, MODE, source);
+};
+
+export const handleAppleSignIn = (source: string) => {
+  return appleSignIn(source, null);
 };
 
 export const handleEmailSignUp = (email: string, password: string, referralCode: string, source: string) => {

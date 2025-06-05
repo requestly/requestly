@@ -9,6 +9,7 @@ export enum FeatureLimitType {
   dynamic_response_body = "dynamic_response_body",
   dynamic_request_body = "dynamic_request_body",
   share_rules = "share_rules",
+  free = "free",
 }
 
 export type FeatureLimits = Partial<Record<FeatureLimitType, number | boolean>>;

@@ -1,48 +1,53 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Dropdown } from "antd";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import type { MenuProps } from "antd";
-import { Team } from "types";
 import { trackShareModalWorkspaceDropdownClicked } from "modules/analytics/events/misc/sharing";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   /**
    * The default number of active workspaces to display before dropdown menu.
    */
   defaultActiveWorkspaces?: number;
-  onTransferClick: (teamData: Team) => void;
+  onTransferClick: (teamData: Workspace) => void;
   isLoading: boolean;
 }
 
 interface WorkspaceItemProps {
-  team: Team;
-  availableTeams?: Team[];
-  onTransferClick?: (teamData: Team) => void;
+  team: Workspace;
+  availableTeams?: Workspace[];
+  onTransferClick?: (teamData: Workspace) => void;
   showArrow?: boolean;
   isLoading?: boolean;
 }
 
 export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading, defaultActiveWorkspaces = 0 }) => {
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspaceId = useSelector(getCurrentlyActiveWorkspace)?.id;
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
-  const activeTeamData: Team = useMemo(
-    () => availableTeams?.find((team: Team) => team?.id === currentlyActiveWorkspaceId),
-    [currentlyActiveWorkspaceId, availableTeams]
+  const filteredAvailableWorkspaces = availableWorkspaces.filter((workspace) => !workspace.browserstackDetails); // Filtering our Browserstack Workspaces)
+
+  const activeTeamData: Workspace = useMemo(
+    () => filteredAvailableWorkspaces?.find((team: Workspace) => team?.id === activeWorkspaceId),
+    [activeWorkspaceId, filteredAvailableWorkspaces]
   );
-  const sortedTeams: Team[] = useMemo(
-    () => (availableTeams ? [...availableTeams].sort((a: Team, b: Team) => b.accessCount - a.accessCount) : []),
-    [availableTeams]
+  const sortedTeams: Workspace[] = useMemo(
+    () =>
+      filteredAvailableWorkspaces
+        ? [...filteredAvailableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
+        : [],
+    [filteredAvailableWorkspaces]
   );
 
   const menuItems: MenuProps["items"] = useMemo(() => {
     return sortedTeams
       .slice(defaultActiveWorkspaces || 0)
-      .map((team: Team, index: number) => {
+      .map((team: Workspace, index: number) => {
         if (!defaultActiveWorkspaces && team?.id === activeTeamData?.id) return null;
         return {
           key: index,
@@ -77,7 +82,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
       {defaultActiveWorkspaces ? (
         <>
           <div className="mt-1">
-            {sortedTeams.slice(0, defaultActiveWorkspaces).map((team: Team, index: number) => (
+            {sortedTeams.slice(0, defaultActiveWorkspaces).map((team: Workspace, index: number) => (
               <WorkspaceItem isLoading={isLoading} team={team} onTransferClick={onTransferClick} key={index} />
             ))}
           </div>
@@ -100,13 +105,13 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={availableTeams?.length > 1 ? ["click"] : [null]}
+          trigger={filteredAvailableWorkspaces?.length > 1 ? ["click"] : [null]}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
         >
           <div>
-            <WorkspaceItem team={activeTeamData} showArrow availableTeams={availableTeams} />
+            <WorkspaceItem team={activeTeamData} showArrow availableTeams={filteredAvailableWorkspaces} />
           </div>
         </Dropdown>
       )}

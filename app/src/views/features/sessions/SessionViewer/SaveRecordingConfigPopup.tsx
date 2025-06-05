@@ -1,6 +1,5 @@
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseOutlined } from "@ant-design/icons";
@@ -19,7 +18,6 @@ import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/fe
 import { toast } from "utils/Toast";
 import { getUserAttributes, getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -27,9 +25,9 @@ import { trackDraftSessionSaved } from "modules/analytics/events/features/sessio
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import Logger from "../../../../../../common/logger";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -53,12 +51,10 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
 
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
@@ -133,12 +129,11 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         appMode,
         dispatch,
         navigate,
-        workspace?.id,
+        activeWorkspaceId,
         sessionRecordingMetadata,
         sessionEvents,
         includedDebugInfo,
-        source,
-        claimIncentiveRewards
+        source
       )
         .then(() => {
           onClose?.();
@@ -156,7 +151,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       sessionRecordingMetadata,
       includedDebugInfo,
       setIsSaveSessionClicked,
-      workspace?.id,
+      activeWorkspaceId,
       sessionEvents,
       dispatch,
       appMode,
@@ -164,7 +159,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       source,
       userAttributes,
       onClose,
-      claimIncentiveRewards,
     ]
   );
 

@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import AuthorizationView from "../../../request/components/AuthorizationView";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
+import { RoleBasedComponent } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
 
 interface Props {
-  authOptions: RQAPI.AuthOptions;
-  updateAuthData: (authOptions: RQAPI.AuthOptions) => any;
-  rootLevelRecord: Boolean;
+  collectionId: string;
+  authOptions?: RQAPI.Auth;
+  updateAuthData: (authOptions: RQAPI.Auth) => any;
+  rootLevelRecord: boolean;
 }
 
 /**
@@ -22,21 +23,28 @@ interface Props {
  * and remain separated from the main Collection View
  *
  */
-const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthData, rootLevelRecord }) => {
-  const { collectionId } = useParams();
-  const [authOptionsState, setAuthOptionsState] = useState(authOptions);
+const CollectionAuthorizationView: React.FC<Props> = ({
+  collectionId,
+  authOptions,
+  updateAuthData,
+  rootLevelRecord,
+}) => {
+  const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
+  const { setPreview, setUnsaved } = useGenericState();
 
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
-  const { updateTab } = useTabsLayoutContext();
-
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);
 
   useEffect(() => {
-    updateTab(collectionId, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, collectionId, hasUnsavedChanges]);
+    setUnsaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setUnsaved, setPreview, hasUnsavedChanges]);
 
   const onSaveAuthData = useCallback(() => {
     setIsSaving(true);
@@ -48,29 +56,31 @@ const CollectionAuthorizationView: React.FC<Props> = ({ authOptions, updateAuthD
       .finally(() => {
         setIsSaving(false);
       });
-  }, [authOptionsState]);
+  }, [authOptionsState, resetChanges, updateAuthData]);
 
   const AuthorizationViewActions = () => (
-    <div className="authorization-save-btn">
-      <RQButton
-        showHotKeyText
-        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
-        type="primary"
-        onClick={onSaveAuthData}
-        disabled={!hasUnsavedChanges}
-        loading={isSaving}
-      >
-        Save
-      </RQButton>
-    </div>
+    <RoleBasedComponent resource="api_client_collection" permission="update">
+      <div className="authorization-save-btn">
+        <RQButton
+          showHotKeyText
+          hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+          type="primary"
+          onClick={onSaveAuthData}
+          disabled={!hasUnsavedChanges}
+          loading={isSaving}
+        >
+          Save
+        </RQButton>
+      </div>
+    </RoleBasedComponent>
   );
 
   return (
     <AuthorizationView
       wrapperClass="collection-auth"
-      defaultValues={authOptionsState}
+      defaults={authOptionsState}
       onAuthUpdate={setAuthOptionsState}
-      rootLevelRecord={rootLevelRecord}
+      isRootLevelRecord={rootLevelRecord}
       variables={variables}
       authorizationViewActions={<AuthorizationViewActions />}
     />

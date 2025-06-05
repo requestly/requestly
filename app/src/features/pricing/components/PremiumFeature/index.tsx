@@ -10,14 +10,10 @@ import { globalActions } from "store/slices/global/slice";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { isCompanyEmail } from "utils/FormattingHelper";
-import { INCENTIVIZATION_SOURCE } from "features/incentivization";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import LINKS from "config/constants/sub/links";
 import "./index.scss";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -52,7 +48,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -61,24 +56,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
   const handlePopoverSecondaryAction = useCallback(() => {
-    if (isIncentivizationEnabled) {
-      onUpgradeForFreeClickCallback();
-      trackUpgradeOptionClicked("upgrade_for_free");
-
-      dispatch(
-        incentivizationActions.toggleActiveModal({
-          modalName: IncentivizationModal.TASKS_LIST_MODAL,
-          newValue: true,
-          newProps: {
-            source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
-          },
-        })
-      );
-    } else {
-      redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
-      trackUpgradeOptionClicked("upgrade_for_6_months");
-    }
-  }, [dispatch, isIncentivizationEnabled, onUpgradeForFreeClickCallback]);
+    redirectToUrl(LINKS.ACCELERATOR_PROGRAM_FORM_LINK, true);
+    trackUpgradeOptionClicked("upgrade_for_6_months");
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -90,7 +70,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
     <>
       {billingTeams.length &&
       user?.details?.profile?.isEmailVerified &&
-      isCompanyEmail(user?.details?.profile?.email) &&
+      isCompanyEmail(user.details?.emailType) &&
       !disabled &&
       features ? (
         <>
@@ -119,22 +99,32 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         <Popconfirm
           zIndex={10010}
           disabled={!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled}
-          overlayClassName={`premium-feature-popover ${!user.loggedIn ? "premium-popover-bottom-padding" : ""}`}
+          overlayClassName={`premium-feature-popover`}
           autoAdjustOverflow
           showArrow={false}
           placement={popoverPlacement}
-          okText="See upgrade plans"
-          cancelText={isIncentivizationEnabled ? "Upgrade for free" : null}
-          cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
+          okText={user.loggedIn ? "See upgrade plans" : "Sign up"}
+          cancelText={null}
+          cancelButtonProps={{ style: { display: "none" } }}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
-            dispatch(
-              globalActions.toggleActiveModal({
-                modalName: "pricingModal",
-                newValue: true,
-                newProps: { source },
-              })
-            );
+            if (user.loggedIn) {
+              dispatch(
+                globalActions.toggleActiveModal({
+                  modalName: "pricingModal",
+                  newValue: true,
+                  newProps: { source },
+                })
+              );
+            } else {
+              dispatch(
+                globalActions.toggleActiveModal({
+                  modalName: "authModal",
+                  newValue: true,
+                  newProps: { source },
+                })
+              );
+            }
           }}
           onCancel={handlePopoverSecondaryAction}
           title={
@@ -142,16 +132,20 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               <Typography.Title level={4}>
                 {isBreachingLimit
                   ? `${capitalize(user?.details?.planDetails?.planName) || "Free"} plan limits reached!`
-                  : "Premium feature"}
+                  : `Premium feature`}
               </Typography.Title>
               <Typography.Text>
                 {isBreachingLimit
-                  ? `You've exceeded the usage limits of the ${
-                      user?.details?.planDetails?.planName || "free"
-                    } plan. Consider upgrading for uninterrupted usage.`
-                  : ` ${
-                      featureName ?? "This feature"
-                    } is a part of our paid offering. Consider upgrading for uninterrupted usage.`}
+                  ? `You've exceeded the usage limits of the ${user?.details?.planDetails?.planName || "free"} plan. ${
+                      user.loggedIn
+                        ? "Consider upgrading for uninterrupted usage."
+                        : "Sign up to get free 30 days trial."
+                    }`
+                  : ` ${featureName ?? "This feature"} is a premium feature. ${
+                      user.loggedIn
+                        ? "Consider upgrading for uninterrupted usage."
+                        : "Sign up to get free 30 days trial."
+                    }`}
               </Typography.Text>
               {/* {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>} */}
             </>
@@ -159,7 +153,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onOpenChange={(open) => {
             if (open) trackUpgradePopoverViewed("default", source);
           }}
-          // cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
         >
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {

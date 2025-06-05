@@ -1,15 +1,13 @@
 import React, { useCallback, useState } from "react";
-import placeholderImage from "../../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
 import { RQAPI } from "features/apiClient/types";
 import { Timeline, Typography } from "antd";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
-import shieldIcon from "./assets/shield-icon.svg";
-import PATHS from "config/constants/sub/paths";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { HistoryViewTabSource } from "../../../clientView/components/request/HistoryView/historyViewTabSource";
 
 interface Props {
   history: RQAPI.Entry[];
@@ -18,14 +16,14 @@ interface Props {
 }
 
 export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
-  const { openTab } = useTabsLayoutContext();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
   const [dismissNote, setDismissNote] = useState(false);
 
   const onHistoryLinkClick = useCallback(
     (index: number) => {
       onSelectionFromHistory(index);
 
-      openTab("history", { title: "History", url: `${PATHS.API_CLIENT.HISTORY.ABSOLUTE}` });
+      openTab(new HistoryViewTabSource());
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
@@ -37,7 +35,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     <>
       {!dismissNote && (
         <div className="storage-communication-note">
-          <img src={shieldIcon} alt="secured" />
+          <img src={"/assets/media/apiClient/shield-icon.svg"} alt="secured" />
           <p> Your history is stored in your device's local storage for better privacy & control.</p>
           <TfiClose onClick={() => setDismissNote(true)} />
         </div>
@@ -79,7 +77,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     </>
   ) : (
     <div className="api-client-sidebar-placeholder">
-      <img src={placeholderImage} alt="empty" />
+      <img src={"/assets/media/apiClient/empty-sheets-dark.svg"} alt="empty" />
       <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
     </div>
   );

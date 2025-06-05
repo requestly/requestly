@@ -1,6 +1,7 @@
 import { Button } from "antd";
 import React from "react";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 const { RULE_TYPES } = GLOBAL_CONSTANTS;
 
 const ExampleContent = (props) => {
@@ -21,7 +22,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/redirect-urls/", "blank");
+                window.open(getLinkWithMetadata("https://requestly.com/products/web-debugger/redirect-urls/"), "blank");
               }}
             >
               View More
@@ -40,7 +41,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/cancel-rule/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/cancel-rule/", "blank");
               }}
             >
               View More
@@ -61,7 +62,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/replace-strings/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/replace-strings", "blank");
               }}
             >
               View More
@@ -83,7 +84,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/modify-headers/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/modify-headers", "blank");
               }}
             >
               View More
@@ -105,7 +106,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/modify-query-params/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/modify-query-params/"),
+                  "blank"
+                );
               }}
             >
               View More
@@ -127,7 +131,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/insert-script-rule/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/insert-script-rule/"),
+                  "blank"
+                );
               }}
             >
               View More
@@ -151,7 +158,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/override-api-response/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/override-api-response/"),
+                  "blank"
+                );
               }}
             >
               View More
@@ -173,7 +183,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://developers.requestly.io/http-rules/modify-user-agents/", "blank");
+                window.open("https://docs.requestly.com/general/http-rules/rule-types/modify-user-agents/", "blank");
               }}
             >
               View More
@@ -192,7 +202,10 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.com/products/web-debugger/delay-http-request/", "blank");
+                window.open(
+                  getLinkWithMetadata("https://requestly.com/products/web-debugger/delay-http-request/"),
+                  "blank"
+                );
               }}
             >
               View More

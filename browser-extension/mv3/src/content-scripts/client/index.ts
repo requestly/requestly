@@ -1,6 +1,6 @@
 import { EXTENSION_MESSAGES } from "common/constants";
 import { initSessionRecording } from "../common/sessionRecorder";
-import { Variable, getVariable } from "../../service-worker/variable";
+import { getVariable, Variable } from "../../service-worker/variable";
 import { initPageScriptMessageListener } from "./pageScriptMessageListener";
 import { initTestRuleHandler } from "./testRuleHandler";
 import { initExtensionMessageListener } from "../common/extensionMessageListener";

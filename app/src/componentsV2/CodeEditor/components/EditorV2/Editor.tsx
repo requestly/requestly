@@ -37,13 +37,14 @@ interface EditorProps {
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
-  handleChange?: (value: string) => void;
-  analyticEventProperties?: AnalyticEventProperties;
+  handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
+  analyticEventProperties?: AnalyticEventProperties;
   showOptions?: {
     enablePrettify?: boolean;
   };
+  hideToolbar?: boolean;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -54,32 +55,38 @@ const Editor: React.FC<EditorProps> = ({
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
-  scriptId = "",
   analyticEventProperties = {},
+  scriptId = "",
   prettifyOnInit = false,
   envVariables,
   showOptions = { enablePrettify: true },
+  hideToolbar = false,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const editorRef = useRef<ReactCodeMirrorRef | null>(null);
   const [editorHeight, setEditorHeight] = useState(height);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [hoveredVariable, setHoveredVariable] = useState(null);
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(false);
   const isDefaultPrettificationDone = useRef(false);
+  const isUnsaveChange = useRef(false);
+  const [isFullScreen, setFullScreen] = useState(false);
+
+  const handleFullScreenChange = () => {
+    setFullScreen((prev) => !prev);
+  };
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
   };
 
   const handleFullScreenToggle = useCallback(() => {
-    setIsFullScreen((prev) => !prev);
+    handleFullScreenChange();
     if (!isFullScreen) {
       trackCodeEditorExpandedClick(analyticEventProperties);
 
@@ -121,33 +128,46 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((code: string) => {
+  /*
+  (fx) sets the implicit change in the editor, prettification change is implicit change
+  Typing edits in editor is controlled by handleChange
+  */
+  const handleEditorSilentUpdate = useCallback((code: string): void => {
+    if (code === null || code === undefined) {
+      return;
+    }
     const view = editorRef.current?.view;
-    if (!view) {
+    const doc = view?.state?.doc;
+
+    if (!view || !doc) {
       return null;
     }
+    // Not mark prettify as unsaved change, that is just a effect
+    isUnsaveChange.current = false;
     const transaction = view.state.update({
-      changes: { from: 0, to: view.state.doc.length, insert: code },
+      changes: { from: 0, to: doc.length, insert: code },
     });
     view.dispatch(transaction);
   }, []);
 
-  const applyPrettification = useCallback(() => {
+  const applyPrettification = useCallback(async () => {
     if (showOptions?.enablePrettify) {
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
-        const prettified = prettifyCode(value, language);
+        const prettified = await prettifyCode(value, language);
         setIsCodePrettified(true);
-        updateContent(prettified.code);
+        handleEditorSilentUpdate(prettified.code);
       }
     }
-  }, [showOptions?.enablePrettify, language, value, updateContent]);
+  }, [showOptions?.enablePrettify, language, value, handleEditorSilentUpdate]);
 
   useEffect(() => {
-    if (isEditorInitialized) {
-      if (!isDefaultPrettificationDone.current && prettifyOnInit) {
-        applyPrettification();
+    if (!isEditorInitialized) return;
+
+    if (!isDefaultPrettificationDone.current && prettifyOnInit) {
+      (async () => {
+        await applyPrettification();
         isDefaultPrettificationDone.current = true;
-      }
+      })();
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
 
@@ -159,13 +179,14 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleEditorClose = useCallback(
     (scriptId: string) => {
-      // @ts-expect-error
       dispatch(globalActions.removeToastForEditor({ scriptId }));
     },
     [dispatch]
   );
 
-  const debouncedhandleEditorBodyChange = useDebounce(handleChange, 200);
+  const debouncedhandleEditorBodyChange = useDebounce((value: string) => {
+    handleChange(value, isUnsaveChange.current);
+  }, 200);
 
   const customKeyBinding = useMemo(
     () =>
@@ -211,7 +232,7 @@ const Editor: React.FC<EditorProps> = ({
         code={value}
         isFullScreen={isFullScreen}
         onCodeFormat={(formattedCode: string) => {
-          updateContent(formattedCode);
+          handleEditorSilentUpdate(formattedCode);
         }}
         isCodePrettified={isCodePrettified}
         setIsCodePrettified={setIsCodePrettified}
@@ -227,7 +248,7 @@ const Editor: React.FC<EditorProps> = ({
       language,
       showOptions.enablePrettify,
       toolbarOptions,
-      updateContent,
+      handleEditorSilentUpdate,
       value,
     ]
   );
@@ -241,6 +262,7 @@ const Editor: React.FC<EditorProps> = ({
       width="100%"
       readOnly={isReadOnly}
       value={value ?? ""}
+      onKeyDown={() => (isUnsaveChange.current = true)}
       onChange={debouncedhandleEditorBodyChange}
       theme={vscodeDark}
       extensions={[
@@ -301,7 +323,7 @@ const Editor: React.FC<EditorProps> = ({
         open={isFullScreen}
         destroyOnClose
         onCancel={() => {
-          setIsFullScreen(false);
+          handleFullScreenToggle();
         }}
         closable={false}
         closeIcon={null}
@@ -310,14 +332,14 @@ const Editor: React.FC<EditorProps> = ({
         maskStyle={{ background: "var(--requestly-color-surface-0, #212121)" }}
         footer={<div className="code-editor-character-count">{getByteSize(value)} characters</div>}
       >
-        {toolbar}
+        {!hideToolbar && toolbar}
         {toastContainer}
         {editor}
       </Modal>
     </>
   ) : (
     <>
-      {toolbar}
+      {!hideToolbar && toolbar}
       <ResizableBox
         height={editorHeight}
         width={Infinity}

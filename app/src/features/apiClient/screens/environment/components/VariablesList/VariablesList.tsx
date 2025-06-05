@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { EnvironmentVariableValue, EnvironmentVariableType, EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -11,21 +11,24 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
 
 interface VariablesListProps {
-  variables: EnvironmentVariables;
+  variables: EnvironmentVariableTableRow[];
   searchValue?: string;
-  onVariablesChange: (variables: EnvironmentVariables) => void;
+  onVariablesChange: (variables: EnvironmentVariableTableRow[]) => void;
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
+export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
 
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_environment", "create");
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
@@ -75,19 +78,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
 
-        const allVariables = variableRows.reduce((acc, variable, index) => {
-          if (variable.key) {
-            acc[variable.key] = {
-              id: variable.id ?? index,
-              type: variable.type,
-              syncValue: variable.syncValue,
-              localValue: variable.localValue,
-            };
-          }
-          return acc;
-        }, {});
-
-        onVariablesChange(allVariables);
+        onVariablesChange(variableRows);
       }
     },
     [dataSource, onVariablesChange, user.loggedIn]
@@ -113,19 +104,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
       setDataSource(newData);
 
-      const remainingVariables = newData.reduce((acc, variable, index) => {
-        if (variable.key) {
-          acc[variable.key] = {
-            id: variable.id ?? index,
-            type: variable.type,
-            syncValue: variable.syncValue,
-            localValue: variable.localValue,
-          };
-        }
-        return acc;
-      }, {});
-
-      onVariablesChange(remainingVariables);
+      onVariablesChange(newData);
 
       if (newData.length === 0) {
         handleAddNewRow([]);
@@ -156,21 +135,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   useEffect(() => {
     if (variables) {
-      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables)
-        .map(([key, value], index) => ({
-          id: value.id ?? index,
-          key,
-          type: value.type,
-          localValue: value.localValue,
-          syncValue: value.syncValue,
-        }))
-        .sort((a, b) => {
-          if (a.id !== undefined && b.id !== undefined) {
-            return a.id - b.id; // Sort by id if both ids are defined
-          }
+      const formattedDataSource = [...variables].sort((a, b) => {
+        return a.id - b.id; // Sort by id if both ids are defined
+      });
 
-          return a.key.localeCompare(b.key); // Otherwise, sort lexicographically by key
-        });
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,
@@ -219,13 +187,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         },
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
-      footer={() => (
-        <div className="variables-list-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
-            Add More
-          </RQButton>
-        </div>
-      )}
+      footer={
+        !isValidPermission
+          ? null
+          : () => (
+              <div className="variables-list-footer">
+                <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
+                  Add More
+                </RQButton>
+              </div>
+            )
+      }
     />
   );
 };

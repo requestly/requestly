@@ -94,7 +94,7 @@ const config = async ({ mode }) => {
       sourcemap: true,
     },
     server: {
-      open: true,
+      open: false,
       port: 3000,
       fs: {
         allow: [".."],

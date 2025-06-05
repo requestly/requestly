@@ -19,24 +19,24 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { CreditsButton } from "./components/CreditsButton/CreditsButton";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
 import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
 import { RQBadge } from "lib/design-system/components/RQBadge";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import "./PrimarySidebar.css";
+import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
+import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
-
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isSlackConnectFeatureEnabled = useFeatureIsOn("slack_connect");
   const isSlackInviteVisible = useFetchSlackInviteVisibility();
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -55,50 +55,51 @@ export const PrimarySidebar: React.FC = () => {
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
-        display: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 1,
-        title: "Network traffic",
+        title: "Network",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
         icon: <NetworkTrafficIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
         id: 2,
-        title: "Network inspector",
+        title: "Network",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
         icon: <NetworkTrafficInspectorIcon />,
-        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       {
         id: 3,
-        title: "HTTP Rules",
+        title: "Rules",
         path: PATHS.RULES.INDEX,
-        icon: <HttpRulesIcon />,
+        icon: (
+          <SafariComingSoonTooltip isVisible={isSafariExtension()}>
+            <HttpRulesIcon />
+          </SafariComingSoonTooltip>
+        ),
         display: true,
-        activeColor: "var(--http-rules)",
       },
       {
         id: 4,
-        title: "API client",
+        title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
         icon: (
           <span className="icon-with-badge">
             <ApiOutlined />
-            <RQBadge badgeText="NEW" />
+            <RQBadge badgeText="BETA" />
           </span>
         ),
         display: true,
-        activeColor: "var(--api-client)",
       },
       {
         id: 5,
-        title: "Mock server",
+        title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
-        activeColor: "var(--mock-server)",
       },
       {
         id: 6,
@@ -110,13 +111,10 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <span className="icon-with-badge">
-              <SessionIcon />
-            </span>
+            <SessionIcon />
           </Tooltip>
         ),
         display: true,
-        activeColor: "var(--session-recording)",
       },
     ];
 
@@ -135,7 +133,6 @@ export const PrimarySidebar: React.FC = () => {
           </Tooltip>
         ),
         display: true,
-        activeColor: "var(--desktop-sessions)",
       };
     }
     return items;
@@ -154,9 +151,8 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
       <div className="primary-sidebar-bottom-btns">
-        {isIncentivizationEnabled ? <CreditsButton /> : null}
         {isSlackConnectFeatureEnabled && isSlackInviteVisible && <JoinSlackButton />}
-        <InviteButton />
+        {!isLocalSyncEnabled && <InviteButton />}
       </div>
     </div>
   );

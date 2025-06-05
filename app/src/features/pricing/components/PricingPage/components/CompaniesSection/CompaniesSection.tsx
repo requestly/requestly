@@ -1,12 +1,13 @@
-import indeedLogo from "assets/img/icons/common/indeed.svg";
-import amazon from "assets/img/icons/common/amazon.svg";
-import atlassian from "assets/img/icons/common/atlassian.svg";
-import intuitLogo from "assets/img/icons/common/intuit.svg";
-import wixLogo from "assets/img/icons/common/wix.svg";
 import "./companiesSection.scss";
 
 export const CompaniesSection = () => {
-  const companyLogos = [indeedLogo, amazon, atlassian, intuitLogo, wixLogo];
+  const companyLogos = [
+    "/assets/media/common/indeed.svg",
+    "/assets/media/pricing/amazon.svg",
+    "/assets/media/pricing/atlassian.svg",
+    "/assets/media/common/intuit.svg",
+    "/assets/media/pricing/wix.svg",
+  ];
 
   return (
     <div className="companies-section-container">

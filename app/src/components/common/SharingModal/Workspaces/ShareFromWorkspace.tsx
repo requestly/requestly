@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import { Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -9,7 +8,7 @@ import CopyButton from "components/misc/CopyButton";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackAddTeamMemberSuccess } from "modules/analytics/events/features/teams";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
-import { Team, TeamRole } from "types";
+import { TeamRole } from "types";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import {
   trackSharingModalRulesDuplicated,
@@ -22,6 +21,8 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
 
 interface Props {
   selectedRules: string[];
@@ -35,7 +36,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   onRulesShared = () => {},
 }) => {
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,23 +45,23 @@ export const ShareFromWorkspace: React.FC<Props> = ({
     setIsLoading(true);
     const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
     createTeamInvites({
-      teamId: currentlyActiveWorkspace.id,
+      teamId: activeWorkspace.id,
       emails: memberEmails,
       role: TeamRole.write,
-      teamName: currentlyActiveWorkspace.name,
-      numberOfMembers: currentlyActiveWorkspace.membersCount,
+      teamName: activeWorkspace.name,
+      numberOfMembers: activeWorkspace.accessCount,
       source: "sharing_modal_from_workspace",
     }).then((res: any) => {
       const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
 
       if (hasSuccessfulInvite) {
         trackAddTeamMemberSuccess({
-          team_id: currentlyActiveWorkspace.id,
+          team_id: activeWorkspace.id,
           email: memberEmails,
           is_admin: false,
           source: "sharing_modal",
           num_users_added: memberEmails.length,
-          workspace_type: isWorkspaceMappedToBillingTeam(currentlyActiveWorkspace.id, billingTeams)
+          workspace_type: isWorkspaceMappedToBillingTeam(activeWorkspace.id, billingTeams)
             ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
             : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
         });
@@ -76,10 +77,10 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       }
       setIsLoading(false);
     });
-  }, [memberEmails, onRulesShared, currentlyActiveWorkspace, setPostShareViewData, billingTeams]);
+  }, [memberEmails, onRulesShared, activeWorkspace, setPostShareViewData, billingTeams]);
 
   const handleTransferToOtherWorkspace = useCallback(
-    (teamData: Team) => {
+    (teamData: Workspace) => {
       setIsLoading(true);
       duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
         setIsLoading(false);
@@ -87,13 +88,13 @@ export const ShareFromWorkspace: React.FC<Props> = ({
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
-          sourceTeamData: currentlyActiveWorkspace,
+          sourceTeamData: activeWorkspace,
         });
 
         onRulesShared();
       });
     },
-    [appMode, onRulesShared, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+    [appMode, onRulesShared, selectedRules, activeWorkspace, setPostShareViewData]
   );
 
   return (
@@ -129,7 +130,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
                 <CopyButton
                   title="Copy link"
                   type="default"
-                  copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?wId=${currentlyActiveWorkspace.id}`}
+                  copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?wId=${activeWorkspace.id}`}
                   showIcon={false}
                   disableTooltip
                   trackCopiedEvent={() => trackSharingUrlInWorkspaceCopied("rule")}

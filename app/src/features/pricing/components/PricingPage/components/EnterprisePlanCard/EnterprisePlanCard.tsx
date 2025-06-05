@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { RQButton } from "lib/design-system/components";
-import securityIllustration from "./assets/security.svg";
-import checkIcon from "assets/img/icons/common/check.svg";
 import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import React from "react";
@@ -43,7 +41,7 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
                 {features.slice(0, 4).map((feature, index) => {
                   return (
                     <div key={index} className="enterprise-plan-feature">
-                      <img src={checkIcon} alt="check icon" /> {feature}
+                      <img src={"/assets/media/common/check.svg"} alt="check icon" /> {feature}
                     </div>
                   );
                 })}
@@ -52,7 +50,7 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
                 {features.slice(4, 8).map((feature, index) => {
                   return (
                     <div key={index} className="enterprise-plan-feature">
-                      <img src={checkIcon} alt="check icon" />
+                      <img src={"/assets/media/common/check.svg"} alt="check icon" />
                       {feature}
                     </div>
                   );
@@ -67,7 +65,7 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
             </RQButton>
           </div>
           <div className="enterprise-plan-img-container">
-            <img src={securityIllustration} alt="security" />
+            <img src={"/assets/media/pricing/security.svg"} alt="security" />
           </div>
         </div>
         {/* <div className="enterprise-plan-card-footer">

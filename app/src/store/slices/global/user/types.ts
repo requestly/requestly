@@ -1,3 +1,4 @@
+import { EmailType } from "@requestly/shared/types/common";
 export interface UserAuth {
   loggedIn: boolean;
   isLimitReached?: boolean;
@@ -12,16 +13,15 @@ export interface UserAuth {
       isSyncEnabled?: boolean;
       isBackupEnabled?: boolean;
     };
-    isLoggedIn: boolean;
-    username: string;
-
+    isLoggedIn?: boolean;
+    username?: string;
     isBackupEnabled?: boolean;
     isSyncEnabled?: boolean;
     isPremium?: boolean;
     planDetails?: {
       planId: string;
       status: string;
-      type: "team" | "individual";
+      type: "team" | "individual" | "student" | "accelerator" | "appsumo" | "signup_trial";
       planName: string;
       subscription: {
         cancelAtPeriodEnd: boolean;
@@ -30,8 +30,11 @@ export interface UserAuth {
         id: string;
         duration: "annually" | "monthly";
         quantity: number;
+        billingId: string | null;
+        isBrowserstackSubscription: boolean;
       };
     };
     organization?: any;
+    emailType?: EmailType;
   };
 }

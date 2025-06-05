@@ -2,11 +2,10 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { AuthScreen } from "features/onboarding";
-import closeIcon from "../../../assets/images/modal/close.svg";
 import APP_CONSTANTS from "../../../config/constants";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import "./AuthModal.css";
+import { AuthScreen } from "features/onboarding";
 
 const AuthModal = ({
   isOpen,
@@ -34,7 +33,13 @@ const AuthModal = ({
   return (
     <>
       {closable && (
-        <img src={closeIcon} width={15} className="modal-close-icon" onClick={() => toggle()} alt="close-icon" />
+        <img
+          src={"/assets/media/components/close.svg"}
+          width={15}
+          className="modal-close-icon"
+          onClick={() => toggle()}
+          alt="close-icon"
+        />
       )}
       <Modal
         size="small"
@@ -47,7 +52,7 @@ const AuthModal = ({
         bodyStyle={{ padding: "0" }}
         wrapClassName="auth-modal-wrapper"
         closable={false}
-        width={920}
+        width={670}
         maskClosable={false}
       >
         <AuthScreen

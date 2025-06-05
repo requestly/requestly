@@ -14,14 +14,14 @@ interface Props<P = {}> {
   hardRedirect?: boolean;
 }
 
-const ProtectedRoute: React.FC<Props> = ({
+function ProtectedRoute<P>({
   component: Component,
   premiumRequired,
   premiumMessage,
   routeSrc,
   hardRedirect = false,
   ...rest
-}) => {
+}: Props<P> & Partial<P>) {
   // Global State
   const user = useSelector(getUserAuthDetails);
 
@@ -40,7 +40,7 @@ const ProtectedRoute: React.FC<Props> = ({
         premiumRequired && !isPremiumUser ? (
           <PremiumRequiredCTA message={premiumMessage} />
         ) : (
-          <Component {...rest} />
+          <Component {...(rest as P)} />
         )
       ) : (
         <>
@@ -49,6 +49,6 @@ const ProtectedRoute: React.FC<Props> = ({
       )}
     </React.Fragment>
   );
-};
+}
 
 export default ProtectedRoute;

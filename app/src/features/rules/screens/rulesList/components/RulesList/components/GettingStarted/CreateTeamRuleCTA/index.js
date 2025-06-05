@@ -7,20 +7,20 @@ import ProCard from "@ant-design/pro-card";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import APP_CONSTANTS from "config/constants";
 import TeamSolvingPuzzleAnimation from "componentsV2/LottieAnimation/TeamSolvingPuzzleAnimation";
 import { globalActions } from "store/slices/global/slice";
 import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
 import "./CreateTeamRuleCTA.css";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 export const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   //Component State
   const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -58,11 +58,11 @@ export const CreateTeamRuleCTA = () => {
               <p className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates click{" "}
                 <a
-                  href="https://requestly.com/"
+                  href={getLinkWithMetadata("https://requestly.com/")}
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam(navigate, currentlyActiveWorkspace.id);
+                    redirectToTeam(navigate, activeWorkspaceId);
                   }}
                 >
                   here

@@ -29,7 +29,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
             iconOnly
             type="default"
             data-dismiss="modal"
-            icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+            icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
             className="header-icon-btn"
           />
         </Col>

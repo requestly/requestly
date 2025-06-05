@@ -3,7 +3,6 @@ import { Col, Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
-import upgradeIcon from "../../../../../../../assets/upgrade.svg";
 import { PRICING } from "features/pricing";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
@@ -105,7 +104,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
             className="team-plan-details-card-actions-cancel"
             icon={<MdOutlineCancel />}
             onClick={() => setIsCancelPlanModalOpen(true)}
-            disabled={subscriptionDetails.cancel_at_period_end}
+            disabled={subscriptionDetails?.cancel_at_period_end}
           >
             Cancel plan
           </RQButton>
@@ -115,7 +114,11 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
           getPlanNameFromId(subscriptionDetails?.plan) === PRICING.PLAN_NAMES.PROFESSIONAL &&
           planStatus === PlanStatus.ACTIVE
         ) && (
-          <RQButton type="primary" onClick={handleUpgradePlan} icon={<img src={upgradeIcon} alt="upgrade" />}>
+          <RQButton
+            type="primary"
+            onClick={handleUpgradePlan}
+            icon={<img src={"/assets/media/settings/upgrade.svg"} alt="upgrade" />}
+          >
             {planStatus === PlanStatus.EXPIRED ? "Renew plan" : "Upgrade plan"}
           </RQButton>
         )}
@@ -128,7 +131,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
       <CancelPlanModal
         isOpen={isCancelPlanModalOpen}
         closeModal={() => setIsCancelPlanModalOpen(false)}
-        billingTeamQuantity={subscriptionDetails.quantity}
+        billingTeamQuantity={subscriptionDetails?.quantity}
         currentPlanName={getPlanNameFromId(subscriptionDetails?.plan)}
         currentPlanEndDate={subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000}
       />

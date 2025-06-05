@@ -10,10 +10,10 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface Props {
   inviteId: string;
@@ -28,42 +28,42 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const [inProgress, setInProgress] = useState(false);
 
   const handleAcceptInvitation = () => {
     setInProgress(true);
     acceptTeamInvite(inviteId)
-      .then((res: any) => {
-        if (res?.data?.success) {
+      .then((res) => {
+        if (res?.success) {
           toast.success("Successfully accepted invite");
           trackWorkspaceInviteAccepted(
-            res?.data?.data?.invite?.metadata?.teamId,
-            res?.data?.data?.invite?.metadata?.teamName,
+            res?.data?.invite?.metadata?.teamId,
+            res?.data?.invite?.metadata?.teamName,
             inviteId,
             "invite_screen",
-            res?.data?.data?.invite?.usage,
-            res?.data?.data?.invite?.metadata?.teamAccessCount
+            res?.data?.invite?.usage,
+            res?.data?.invite?.metadata?.teamAccessCount
           );
 
-          if (res?.data?.data?.invite.type === "teams") {
+          if (res?.data?.invite.type === "teams") {
             switchWorkspace(
               {
-                teamId: res?.data?.data?.invite?.metadata?.teamId,
-                teamName: res?.data?.data?.invite?.metadata?.teamName,
+                teamId: res?.data?.invite?.metadata?.teamId,
+                teamName: res?.data?.invite?.metadata?.teamName,
                 teamMembersCount: 1,
               },
               dispatch,
               {
                 isSyncEnabled: user?.details?.isSyncEnabled,
-                isWorkspaceMode,
+                isWorkspaceMode: isSharedWorkspaceMode,
               },
               appMode,
               null,
               "invite_screen"
             );
-            redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
+            redirectToTeam(navigate, res?.data?.invite?.metadata?.teamId, {
               state: {
                 isNewTeam: false,
               },

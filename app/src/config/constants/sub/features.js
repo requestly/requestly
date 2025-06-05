@@ -41,6 +41,7 @@ FEATURES.ENABLE_TRACKING = "enable_tracking";
 FEATURES.REDIRECT_RULE_DEMO_VIDEO_IN_EDITOR = "redirect-rule-tutorial-video-in-editor-experiment";
 FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
 FEATURES.REGENERATE_SSL_CERTS = "regenerate_ssl_certs";
+FEATURES.LOCAL_LOG_FILE = "local_log_file";
 FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
 FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR = "graphql-payload-filter-operator";
@@ -51,6 +52,7 @@ FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT = "desktop-android-emulator-support";
 FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT = "desktop-ios-simulator-support";
 FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
 FEATURES.FRAMELESS_DESKTOP_APP = "frameless-desktop-app";
+FEATURES.EXTENSION_STATUS_NOTIFICATION = "extension-status-notification";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";
@@ -65,6 +67,7 @@ FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 // WORKSPACES
 FEATURES.WORKSPACES = "workspaces";
 FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
+FEATURES.LOCAL_WORKSPACE_REFRESH = "local_workspace_refresh";
 
 // PERSONA SURVEY
 FEATURES.PERSONA_SURVEY = "persona-survey";
@@ -88,5 +91,6 @@ FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
 
 FEATURES.CONNECT_EXTENSION = "connect_extension";
 FEATURES.EDIT_LOCAL_FILE_PATH = "edit_local_file_path";
+FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
 
 export default FEATURES;

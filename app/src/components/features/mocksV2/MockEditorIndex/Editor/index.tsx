@@ -19,19 +19,19 @@ import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types"
 import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateHeaders, validateStatusCode } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
-// @ts-expect-error growthbook-react does not provide types
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import Editor from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
@@ -62,8 +62,7 @@ const MockEditor: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const username = user?.details?.username;
 
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const areLogsVisible = useFeatureValue("mock_logs", false);
 
@@ -93,8 +92,16 @@ const MockEditor: React.FC<Props> = ({
   const collectionPath = mockCollectionData?.path ?? "";
 
   const finalUrl = useMemo(
-    () => generateFinalUrl({ endpoint, uid: user?.details?.profile?.uid, username, teamId, password, collectionPath }),
-    [endpoint, teamId, user?.details?.profile?.uid, username, password, collectionPath]
+    () =>
+      generateFinalUrl({
+        endpoint,
+        uid: user?.details?.profile?.uid,
+        username,
+        teamId: activeWorkspaceId,
+        password,
+        collectionPath,
+      }),
+    [endpoint, activeWorkspaceId, user?.details?.profile?.uid, username, password, collectionPath]
   );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
@@ -216,7 +223,6 @@ const MockEditor: React.FC<Props> = ({
       onSave(finalMockData);
     } else {
       if (errors.headers) {
-        // @ts-expect-error since the actions file is not typed
         dispatch(
           globalActions.triggerToastForEditor({
             id: `headers-${id}`,
@@ -251,6 +257,7 @@ const MockEditor: React.FC<Props> = ({
           Method
         </label>
         <Select
+          disabled={isEditorReadOnly}
           id="method"
           size="large"
           options={requestMethodDropdownOptions}
@@ -269,6 +276,7 @@ const MockEditor: React.FC<Props> = ({
           Latency
         </label>
         <InputNumber
+          disabled={isEditorReadOnly}
           id="latency"
           size="large"
           type="text"
@@ -278,7 +286,6 @@ const MockEditor: React.FC<Props> = ({
           value={latency}
           name="latency"
           onChange={handleMockLatencyChange}
-          // @ts-ignore: TS2322
           addonAfter="ms"
         />
       </Col>
@@ -292,6 +299,7 @@ const MockEditor: React.FC<Props> = ({
           Status code
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           ref={statusCodeRef}
           id="status-code"
           size="large"
@@ -318,14 +326,12 @@ const MockEditor: React.FC<Props> = ({
           Content type
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           id="content-type"
           size="large"
-          // @ts-ignore
-          type="text"
           placeholder="content"
           value={contentType}
           options={APP_CONSTANTS.CONTENT_TYPE}
-          name="type"
           onChange={(e) => setContentType(e)}
         />
       </Col>
@@ -336,6 +342,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <MockEditorEndpoint
         isNew={isNew}
+        disabled={isEditorReadOnly}
         errors={errors}
         collectionPath={collectionPath}
         endpoint={endpoint}
@@ -372,30 +379,29 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
-            id={`headers-${id}`} // used to show error toasts created because header invalidation
+          <Editor
+            scriptId={`headers-${id}`} // used to show error toasts created because header invalidation
             isResizable
             height={220}
             value={headersString}
-            defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
             analyticEventProperties={{ source: "mocks", mock_type: type }}
+            isReadOnly={isEditorReadOnly}
           />
         </Col>
       </Row>
     );
-  }, [headersString, type, id]);
+  }, [headersString, type, id, isEditorReadOnly]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
+          <Editor
             isResizable
             height={220}
             value={body}
-            defaultValue={body}
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
@@ -455,6 +461,7 @@ const MockEditor: React.FC<Props> = ({
               handleTest={handleTest}
               setPassword={setPassword}
               password={password}
+              isEditorReadOnly={isEditorReadOnly}
             />
             <BottomSheetLayout
               layout={SheetLayout.SPLIT}
@@ -467,7 +474,7 @@ const MockEditor: React.FC<Props> = ({
                   name={name}
                   mode={isNew ? "create" : "edit"}
                   description={desc}
-                  namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+                  namePlaceholder="File name"
                   descriptionPlaceholder="Add your description here."
                   nameChangeCallback={onNameChange}
                   descriptionChangeCallback={onDescriptionChange}
@@ -506,13 +513,15 @@ const MockEditor: React.FC<Props> = ({
             handleTest={handleTest}
             setPassword={setPassword}
             password={password}
+            isEditorReadOnly={isEditorReadOnly}
           />
           <Col className="mock-editor-title-container">
             <RQEditorTitle
+              disabled={isEditorReadOnly}
               name={name}
               mode={isNew ? "create" : "edit"}
               description={desc}
-              namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+              namePlaceholder="File name"
               descriptionPlaceholder="Add your description here."
               nameChangeCallback={onNameChange}
               descriptionChangeCallback={onDescriptionChange}

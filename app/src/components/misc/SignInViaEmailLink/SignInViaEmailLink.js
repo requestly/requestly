@@ -5,7 +5,6 @@ import { Row, Typography } from "antd";
 import SpinnerColumn from "../SpinnerColumn";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { globalActions } from "store/slices/global/slice";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
@@ -24,6 +23,7 @@ import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import Logger from "../../../../../common/logger";
 import { getAppFlavour } from "utils/AppUtils";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -38,20 +38,20 @@ const SignInViaEmailLink = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const wasUserAlreadyLoggedIn = useRef(user.loggedIn);
 
   const logOutUser = useCallback(() => {
-    handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
+    handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch).then(() => {
       dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
     });
-  }, [appMode, dispatch, isWorkspaceMode]);
+  }, [appMode, dispatch, isSharedWorkspaceMode]);
 
   const renderAlreadyLoggedInWarning = useCallback(() => {
     const shouldLogout = window.confirm(
-      `You are already logged in${
+      `You are already signed in${
         user.email ? ` as ${user.email}` : ""
-      }. Do you want to continue login as ${userEmailfromLocalStorage}?`
+      }. Do you want to continue sign in as ${userEmailfromLocalStorage}?`
     );
     if (shouldLogout === true) {
       logOutUser();
@@ -145,7 +145,7 @@ const SignInViaEmailLink = () => {
             }}
             loading={isProcessing}
           >
-            Login
+            Sign in
           </RQButton>
         </Row>
       </div>

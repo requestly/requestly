@@ -1,16 +1,12 @@
 import { Col, Row, Space, Typography } from "antd";
-import atlassianLogo from "../../assets/atlassian.svg";
-import indeedLogo from "../../assets/indeed.svg";
-import verizonLogo from "../../assets/verizon.svg";
-import zalandoLogo from "../../assets/zalando.svg";
 import "./index.scss";
 
 export const CompaniesSection = () => {
   const companies = [
-    { src: atlassianLogo, alt: "atlassian" },
-    { src: indeedLogo, alt: "indeed" },
-    { src: verizonLogo, alt: "verizon" },
-    { src: zalandoLogo, alt: "zalando" },
+    { src: "/assets/media/pricing/atlassian.svg", alt: "atlassian" },
+    { src: "/assets/media/common/indeed.svg", alt: "indeed" },
+    { src: "/assets/media/common/verizon.svg", alt: "verizon" },
+    { src: "/assets/media/pricing/zalando.svg", alt: "zalando" },
   ];
 
   return (
@@ -22,7 +18,7 @@ export const CompaniesSection = () => {
         <Col>
           <Space direction="horizontal" size={24}>
             {companies.map((company) => (
-              <img key={company.alt} src={company.src} alt={company.alt} />
+              <img className="company-logo" key={company.alt} src={company.src} alt={company.alt} />
             ))}
           </Space>
         </Col>

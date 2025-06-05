@@ -19,11 +19,16 @@ export const PricingFeatures: PlanFeatures = {
             "Redirect requests, Replace Strings, Modify headers, Cancel requests, Modify Query Params, Delay Network Requests",
         },
         {
-          title: "5 API Mocks",
+          title: "Unlimited Header Rules",
+          enabled: true,
+          tooltip: "Header rules are free and unlimited. They don't count toward your rule usage limits",
+        },
+        {
+          title: "5 API Mock Endpoints",
           enabled: true,
         },
         {
-          title: "Non-Commercial Use Only",
+          title: "5 Files (JS / CSS)",
           enabled: true,
         },
       ],
@@ -43,12 +48,11 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
-          title: "Unlimited Header Rules",
+          title: "5 API Mock Endpoints",
           enabled: true,
-          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
         },
         {
-          title: "5 API Mocks",
+          title: "5 Files (JS / CSS)",
           enabled: true,
         },
         {
@@ -72,7 +76,11 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
-          title: "10 API Mocks",
+          title: "10 API Mock Endpoints",
+          enabled: true,
+        },
+        {
+          title: "10 Files (JS / CSS)",
           enabled: true,
         },
         {
@@ -90,17 +98,20 @@ export const PricingFeatures: PlanFeatures = {
       heading: "For collaboration in teams",
       features: [
         {
-          title: "Unlimited rules",
+          title: "Unlimited Rules",
           enabled: true,
         },
         {
-          title: "Unlimited mocks",
+          title: "Unlimited Groups",
           enabled: true,
         },
         {
-          title: "Complete access to the API client",
+          title: "Unlimited Mock Endpoints",
           enabled: true,
-          tooltip: "Get complimentary access to API Client Professional Plan.",
+        },
+        {
+          title: "Unlimited Files (JS / CSS)",
+          enabled: true,
         },
         {
           title: "Collaborate with teammates",
@@ -110,10 +121,7 @@ export const PricingFeatures: PlanFeatures = {
           title: "Daily backups (Encrypted)",
           enabled: true,
         },
-        {
-          title: "Email + Chat Priority Support",
-          enabled: true,
-        },
+        { title: "Priority Support (Slack Connect and Email)", enabled: true },
       ],
     },
     enterprise: {
@@ -124,7 +132,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "User Access Management (Map your organization)",
+          title: "Complete access to the API client",
           enabled: true,
         },
         {
@@ -132,60 +140,33 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "SLAs (Support, Service Uptime, Insurance)",
-          enabled: true,
-          visibleInPricingPageOnly: true,
-        },
-        {
-          title: "SSO identity management & SAML",
+          title: "SSO & SAML",
           enabled: true,
         },
         {
-          title: "Pay by invoice",
+          title: "Security & compliance (GDPR, SOC2)",
           enabled: true,
-          visibleInPricingPageOnly: true,
+        },
+        {
+          title: "User Access Management",
+          enabled: true,
         },
         {
           title: "Enterprise grade security & compliance (GDPR, SOC2)",
           enabled: true,
         },
-        {
-          title: "Priority Support - Slack Connect, Email, Chat",
-          enabled: true,
-        },
+        { title: "SLAs (Support, Service Uptime, Insurance)", enabled: true, visibleInPricingPageOnly: true },
+        { title: "Pay by invoice", enabled: true, visibleInPricingPageOnly: true },
       ],
     },
   },
   [PRICING.PRODUCTS.API_CLIENT]: {
     free: {
       planTitle: "Free",
-      heading: "Starter plan",
+      heading: "All you need for individual & small teams",
       features: [
         {
-          title: "Complete access to the API client",
-          enabled: true,
-        },
-        {
-          title: "Upto 10 collaborators. No limits on number of projects.",
-          enabled: true,
-        },
-        {
-          title: "Collection runner limits",
-          enabled: true,
-          tooltip: "100 collection runs per month ",
-        },
-        {
-          title: "Git Integration",
-          enabled: true,
-        },
-      ],
-    },
-    [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
-      planTitle: "Professional",
-      heading: "For collaboration in teams",
-      features: [
-        {
-          title: "Unlimited collaborators",
+          title: "Unlimited collections and environments",
           enabled: true,
         },
         {
@@ -193,13 +174,26 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Integration with Secret Managers",
+          title: "Unlimited collaborators",
+          enabled: true,
+        },
+        {
+          title: "Unlimited local workspaces",
+          enabled: true,
+        },
+        {
+          title: "Unlimited team workspaces",
+          enabled: true,
+        },
+        {
+          title: "Git Integration",
           enabled: true,
         },
       ],
     },
     [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
       planTitle: "Enterprise",
+      heading: "Org-wide secure & controlled API dev",
       features: [
         {
           title: "Role-based access control",

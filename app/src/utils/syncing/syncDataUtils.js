@@ -78,7 +78,7 @@ export const getSyncRuleStatus = () => {
 const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
   const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
-  if (typeof localRecords?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
+  if (typeof latestRules?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
     //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated. // @nsr: not hanlded, but is an enhancement, no breaking logic I guess
     const teamUserRuleConfigPath = getTeamUserRuleConfigPath(objectId);
     if (!teamUserRuleConfigPath) return;

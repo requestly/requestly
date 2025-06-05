@@ -7,15 +7,18 @@ import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../..
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
+import { useRBAC } from "features/rbac";
 import "./RulePairs.css";
 
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule;
+  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule || !isValidPermission;
 
   const getPairMarkup = (pair, pairIndex) => {
     const commonProps = {
@@ -72,7 +75,7 @@ const RulePairs = (props) => {
   return (
     <>
       {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
-        <ResponseRuleResourceTypes ruleDetails={props.currentlySelectedRuleConfig} />
+        <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
       ) : null}
 
       {props.currentlySelectedRuleConfig.TYPE !== "Response" || responseRuleResourceType !== "" ? (

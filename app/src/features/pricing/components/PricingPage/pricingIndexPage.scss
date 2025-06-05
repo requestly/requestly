@@ -22,16 +22,15 @@
   align-items: center;
 
   .pricing-navbar {
-    position: fixed;
+    position: relative;
     top: 0;
-    left: 0;
-    right: 0;
     display: flex;
     align-items: center;
+    width: 100%;
+
     padding: 8px 1rem;
     background: var(--black);
     border-bottom: 1px solid var(--requestly-color-surface-1);
-    z-index: 5;
 
     &-content {
       display: flex;
@@ -43,6 +42,12 @@
     .logo {
       width: 100px;
       cursor: pointer;
+    }
+
+    .auth-button-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   }
 
@@ -140,4 +145,37 @@
   grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
   gap: 16px;
   margin-top: 56px;
+}
+
+.pricing-page-error-message-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #a41f1f;
+  width: 100%;
+  height: 56px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--requestly-color-text-default);
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: var(--requestly-font-size-sm);
+  }
+
+  &-close-icon {
+    cursor: pointer;
+    position: absolute;
+    align-self: center;
+    top: 20px;
+    right: 16px;
+  }
 }

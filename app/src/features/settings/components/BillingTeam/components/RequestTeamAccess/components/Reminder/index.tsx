@@ -143,9 +143,8 @@ export const RequestBillingTeamAccessReminder = () => {
       ) : (
         <>
           <div className="text-white">
-            Requestly's free plan is limited to non-commercial use. To continue using Requestly within your
-            organization, please upgrade to a paid plan. You can purchase licenses directly or set up team billing by
-            contacting us at{" "}
+            Get a license to continue using Requestly To continue using Requestly, you need a license. You can purchase
+            licenses directly or set up team billing by contacting us at{" "}
             <a href={openEmailClientWithDefaultEmailBody("enterprise.support@requestly.io", emailSubject, emailBody)}>
               enterprise.support@requestly.io
             </a>

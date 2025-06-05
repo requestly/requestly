@@ -227,6 +227,15 @@ export const validateRule = (rule, dispatch, appMode) => {
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
     if (rule.version > 1) {
       rule.pairs.every((pair, index) => {
+        if (!pair.modifications) {
+          output = {
+            result: false,
+            message: `Please add atleast one header modification to the rule.`,
+            error: "missing modifications key in pair",
+          };
+          return false;
+        }
+
         if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
           output = {
             result: false,
@@ -451,15 +460,16 @@ export const validateRule = (rule, dispatch, appMode) => {
             ? EditorLanguage.JAVASCRIPT
             : EditorLanguage.JSON;
 
-        const result = prettifyCode(pair.response.value, language);
-
-        if (!result.success) {
-          output = {
-            result: false,
-            message: "Response body contains invalid syntax!",
-            error: "invalid syntax",
-          };
-        }
+        //const result = prettifyCode(pair.response.value, language);
+        prettifyCode(pair.response.value, language).then((result) => {
+          if (!result.success) {
+            output = {
+              result: false,
+              message: "Response body contains invalid syntax!",
+              error: "invalid syntax",
+            };
+          }
+        });
       }
     });
   }
@@ -491,15 +501,16 @@ export const validateRule = (rule, dispatch, appMode) => {
             ? EditorLanguage.JAVASCRIPT
             : EditorLanguage.JSON;
 
-        const result = prettifyCode(pair.request.value, language);
-
-        if (!result.success) {
-          output = {
-            result: false,
-            message: "Request body contains invalid syntax!",
-            error: "invalid syntax",
-          };
-        }
+        //const result = prettifyCode(pair.request.value, language);
+        prettifyCode(pair.request.value, language).then((result) => {
+          if (!result.success) {
+            output = {
+              result: false,
+              message: "Request body contains invalid syntax!",
+              error: "invalid syntax",
+            };
+          }
+        });
       }
     });
   }

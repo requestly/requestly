@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import SessionBearLogo from "src-SessionBear/assets/sessionBearLogoFull.svg";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
@@ -15,8 +13,11 @@ import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/se
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
-import "./draftSessionViewer.scss";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { RQTooltip } from "lib/design-system-v2/components";
+import { useRBAC } from "features/rbac";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
   isDesktopMode: boolean;
@@ -32,6 +33,9 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
   const isOpenedInIframe = location.pathname.includes("iframe");
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "create");
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -75,9 +79,15 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
           {isOpenedInIframe ? (
             <>
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-                <img src={SessionBearLogo} alt="SessionBear Logo" width={150} />
+                <img src={"/assets/media/common/sessionBearLogoFull.svg"} alt="SessionBear Logo" width={150} />
               ) : (
-                <img src={RQLogo} alt="Requestly Logo" width={120} />
+                <img
+                  src={`/assets/media/common/${
+                    isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"
+                  }`}
+                  alt="Requestly Logo"
+                  width={120}
+                />
               )}
             </>
           ) : (
@@ -101,7 +111,12 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               </RQButton>
             )}
 
-            <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
+            <RQTooltip
+              placement="bottomLeft"
+              title={isValidPermission ? null : "As a viewer, you cannot save the session!"}
+            >
+              <SaveSessionButton disabled={!isValidPermission} onSaveClick={handleSaveSessionClicked} />
+            </RQTooltip>
           </div>
         </div>
         <div className="draft-session-viewer-body-wrapper">
@@ -110,7 +125,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
             </Col>
             <Col span={9}>
-              <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
+              <DraftSessionDetailsPanel isReadOnly={!isValidPermission} playerTimeOffset={sessionPlayerOffset} />
             </Col>
           </Row>
         </div>

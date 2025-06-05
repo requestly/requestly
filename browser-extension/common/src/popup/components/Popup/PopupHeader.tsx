@@ -5,7 +5,7 @@ import { EVENT, sendEvent } from "../../events";
 
 interface PopupHeaderProps {
   isExtensionEnabled: boolean;
-  handleToggleExtensionStatus: () => void;
+  handleToggleExtensionStatus: (newStatus: boolean) => void;
 }
 
 const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleToggleExtensionStatus }) => {
@@ -17,7 +17,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
   return (
     <div className="popup-header">
       <div className="popup-header-workspace-section">
-        <img className="product-logo" src="/resources/images/extended_logo.png" />
+        <img className="product-logo" src="/resources/images/48x48.png" />
       </div>
 
       <Row align="middle" gutter={16}>

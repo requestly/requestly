@@ -8,9 +8,9 @@ import {
   ScriptWorkload,
   ScriptExecutionError,
   ScriptPendingWorkFlushingError,
-} from "../../workload-manager/workLoadTypes";
-import { ScriptExecutionWorkerInterface } from "../scriptExecutionWorker/scriptExecutionWorkerInterface";
-import ScriptExecutionWorker from "../scriptExecutionWorker/scriptExecutionWorker?worker";
+} from "../../workloadManager/workLoadTypes";
+import { ScriptExecutionWorkerInterface } from "../script-internals/scriptExecutionWorker/scriptExecutionWorkerInterface";
+import ScriptExecutionWorker from "../script-internals/scriptExecutionWorker/scriptExecutionWorker?worker";
 
 export class RQScriptWebWorker implements RQWorker {
   private internalWorker: Worker;
@@ -30,13 +30,14 @@ export class RQScriptWebWorker implements RQWorker {
 
   async work(workload: ScriptWorkload): Promise<WorkResult> {
     try {
-      await this.scriptWorker.executeScript(
+      const artifacts = await this.scriptWorker.executeScript(
         workload.script,
         workload.initialState,
         proxy(workload.postScriptExecutionCallback)
       );
       return {
         type: WorkResultType.SUCCESS,
+        testExecutionResults: artifacts.testResults,
       };
     } catch (error) {
       if (error.name === ScriptExecutionError.name) {

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import emptyCardImage from "../../../../../../assets/empty-card.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import APP_CONSTANTS from "config/constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +9,7 @@ import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environme
 import "./emptyState.scss";
 
 export interface EmptyStateProps {
+  disabled?: boolean;
   analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
@@ -18,6 +18,7 @@ export interface EmptyStateProps {
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   message,
+  disabled = false,
   newRecordBtnText,
   onNewRecordClick,
   analyticEventSource = "collections_empty_state",
@@ -57,10 +58,16 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <div className="empty-state-container">
-      <img className="empty-card-image" width={40} height={40} src={emptyCardImage} alt="Empty collection list" />
+      <img
+        className="empty-card-image"
+        width={40}
+        height={40}
+        src={"/assets/media/apiClient/empty-card.svg"}
+        alt="Empty collection list"
+      />
       <div className="empty-message">{message}</div>
 
-      <RQButton loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>
+      <RQButton disabled={disabled} loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>
         {newRecordBtnText}
       </RQButton>
     </div>

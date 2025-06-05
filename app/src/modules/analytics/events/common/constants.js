@@ -3,6 +3,9 @@ export const AUTH = {
     ATTEMPTED: "signup_attempted",
     FAILED: "signup_failed",
     SUCCESS: "signup_success",
+
+    // new
+    BUTTON_CLICKED: "signup_button_clicked",
   },
 
   LOGIN: {
@@ -10,6 +13,17 @@ export const AUTH = {
     REQUESTED: "login_requested",
     SUCCESS: "login_success",
     FAILED: "login_failed",
+
+    // new
+    BUTTON_CLICKED: "login_button_clicked",
+    EMAIL_ENTERED: "login_email_entered",
+    BSTACK_LOGIN_INITIATED: "bstack_login_initiated",
+    USER_NOT_FOUND: "login_user_not_found",
+    LOGIN_WITH_SSO_CLICKED: "login_with_sso_clicked",
+    LOGIN_WITH_GOOGLE_CLICKED: "login_with_google_clicked",
+    LOGIN_WITH_MAGIC_LINK_CLICKED: "login_with_magic_link_clicked",
+    LOGIN_WITH_PASSWORD_CLICKED: "login_with_password_clicked",
+    USER_SWITCHED_EMAIL: "login_user_switched_email",
   },
 
   LOGOUT: {
@@ -42,6 +56,9 @@ export const AUTH = {
     SEEN: "email_link_signin_form_seen",
     SUBMITTED: "email_link_signin_form_submitted",
     LINK_RESEND_REQUESTED: "magic_link_resend_requested",
+
+    // New
+    LOGIN_WITH_GOOGLE_INSTEAD: "magic_link_login_with_google_instead",
   },
 
   VERIFY_OOBCODE: {
@@ -114,13 +131,17 @@ export const SOURCE = {
   TEMPLATES_SCREEN: "templates_screen",
   PLAN_EXPIRED_BANNER: "plan_expired_banner",
   MV3_MODAL: "mv3_modal",
-  INCENTIVIZATION_TASK_LIST: "incentivization_task_list",
+  API_CLIENT_EMPTY_STATE: "api_client_empty_state",
+  SHARED_LIST_SCREEN: "shared_list_screen",
+  EXTENSION_ONBOARDING: "extension_onboarding",
+  DESKTOP_ONBOARDING: "desktop_onboarding",
+  PRICING_TABLE: "pricing_table",
+  TEAM_WORKSPACE_BAD_INVITE_SCREEN: "team_workspace_bad_invite_screen",
 };
 
 export const RULES = {
   RULE_CREATED: "rule_created",
   RULE_EDITED: "rule_edited",
-  RULE_SAVE_CLICKED: "rule_save_clicked",
   RULE_DELETED: "rule_deleted",
   RULE_TOGGLED: "rule_toggled",
   RULE_TOGGLE_ATTEMPTED: "rule_toggle_attempted",
@@ -143,7 +164,6 @@ export const RULES = {
   RULE_FEATURE_USAGE: "rule_feature_usage",
   ERROR_IN_RULE_CREATION: "error_in_rule_creation",
   ERROR_IN_SAVING_DNR: "error_in_saving_dnr",
-  RULE_EDITOR_VIEWED: "rule_editor_viewed",
   RULE_EDITOR_CLOSED: "rule_editor_closed",
   RULE_EDITOR_HEADER_CLICKED: "rule_editor_header_clicked",
   NEW_RULE_BUTTON_CLICKED: "new_rule_button_clicked",
@@ -152,12 +172,10 @@ export const RULES = {
   RULES_EMPTY_STATE_CLICKED: "rules_empty_state_clicked",
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
-  RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
   DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
   SAMPLE_REGEX_CLICKED: "sample_regex_clicked",
 
   // rule details panel
-  RULE_DETAILS_PANEL_VIEWED: "rule_details_panel_viewed",
   RULE_DETAILS_PANEL_CLOSED: "rule_details_panel_closed",
   RULE_DETAILS_PANEL_DOCS_CLICKED: "rule_details_panel_docs_clicked",
   RULE_DETAILS_USE_CASE_CLICKED: "rule_details_use_case_clicked",
@@ -181,7 +199,6 @@ export const GROUPS = {
 export const ONBOARDING = {
   INSTALL_EXTENSION_LINK_CLICKED: "install_extension_link_clicked",
   VIEW_ALL_PLATFORMS_CLICKED: "view_all_platforms_clicked",
-  SIDEBAR_CLICKED: "sidebar_clicked",
   HEADER_CLICKED: "header_clicked",
   TOPBAR_CLICKED: "topbar_clicked",
   HELPDESK_CLICKED: "helpdesk_clicked",

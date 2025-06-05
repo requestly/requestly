@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Avatar, Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -17,6 +16,7 @@ import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/tea
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ interface InviteRowProps {
 const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
@@ -43,10 +43,10 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
     setIsJoining(true);
 
     acceptTeamInvite(team?.inviteId)
-      .then((res: any) => {
-        if (res?.data?.success) {
+      .then((res) => {
+        if (res?.success) {
           toast.success("Successfully joined workspace");
-          if (res?.data?.data?.invite.type === "teams") {
+          if (res?.data?.invite.type === "teams") {
             switchWorkspace(
               {
                 teamId: team?.teamId,
@@ -55,7 +55,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
               },
               dispatch,
               {
-                isWorkspaceMode,
+                isWorkspaceMode: isSharedWorkspaceMode,
                 isSyncEnabled: true,
               },
               appMode,
@@ -69,7 +69,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
         setIsJoining(false);
         dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
       })
-      .catch((err) => {
+      .catch(() => {
         toast.error("Error while accepting invitation. Please contact workspace admin");
         setIsJoining(false);
         dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
@@ -108,7 +108,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   useEffect(() => {
     if (user.loggedIn) {
       getPendingInvites({ email: true, domain: true })
-        .then((res: any) => {
+        .then((res) => {
           const pendingInvites = res?.pendingInvites ?? [];
           const sortedInvites = pendingInvites
             ? pendingInvites.sort(
@@ -173,7 +173,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
           </ul>
         ) : (
           <div className="title teams-invite-empty-message">
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/assets/media/common/smiles.svg" />
             <div>You don't have any workspace invites!</div>
           </div>
         )}

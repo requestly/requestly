@@ -64,7 +64,7 @@ const RuleOptions = ({ mode, rule }) => {
             width={10}
             height={6}
             alt="down arrow"
-            src="/assets/icons/downArrow.svg" // TODO: replace icon with react-icon
+            src="/assets/media/common/down-arrow.svg" // TODO: replace icon with react-icon
             className="editor-rule-options-trigger-icon"
           />
         </span>

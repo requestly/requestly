@@ -6,7 +6,6 @@ import { RQButton } from "lib/design-system/components";
 import { globalActions } from "store/slices/global/slice";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
-import groupIcon from "../../../../assets/group.svg";
 import { trackAppOnboardingManageWorkspaceClicked } from "features/onboarding/analytics";
 import "./index.scss";
 
@@ -22,7 +21,7 @@ export const DefaultTeamView = () => {
           <Space direction="vertical" align="center">
             <Row align="middle" justify="center">
               <Row justify="center" align="middle">
-                <img src={groupIcon} alt="group" />
+                <img src={"/assets/media/onboarding/group.svg"} alt="group" />
               </Row>
               <Typography.Title level={5} className="text-center text-white getting-started-default-team-title">
                 Collaborate better with the team using workspaces

@@ -1,27 +1,64 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import { RQDropdown } from "lib/design-system/components";
+import { RQBadge } from "lib/design-system/components/RQBadge";
+import { PRODUCT_FEATURES } from "./staticData";
+import { RQButton } from "lib/design-system-v2/components";
+import { EmptyCardOptions, ImportOptions } from "../Card/types";
+import { CardIcon } from "../CardIcon";
+import "./EmptyCard.scss";
 
-interface Props {
-  icon: string | ReactNode;
-  title: string;
-  description?: string;
-  primaryButton?: ReactNode;
-  secondaryButton?: ReactNode;
+interface Props extends EmptyCardOptions {
+  importDropdownOptions: ImportOptions;
 }
 
-export const HomepageEmptyCard: React.FC<Props> = ({ icon, title, description, primaryButton, secondaryButton }) => {
+export const HomepageEmptyCard: React.FC<Props> = ({
+  icon,
+  title,
+  features,
+  primaryAction,
+  playDetails,
+  importDropdownOptions = null,
+}) => {
   return (
-    <div className="homepage-emptycard">
-      {typeof icon === "string" ? (
-        <img src={icon} alt="icon" className="homepage-emptycard-icon-img" />
-      ) : (
-        <div className="homepage-emptycard-icon">{icon}</div>
-      )}
-      <div className="homepage-emptycard-title">{title}</div>
-      <div className="mt-8 text-center homepage-emptycard-description">{description}</div>
-      <div className="homepage-emptycard-actions">
-        <div>{primaryButton}</div>
-        <div className="mt-8">{secondaryButton}</div>
+    <>
+      <div className="homepage-emptycard">
+        <div className="header-section">
+          <div className="details">
+            <div className="icon-container">
+              <img src={icon} alt={title} />
+            </div>
+
+            <div className="title-badge-container">
+              <h1 className="homepage-emptycard-title">{title}</h1>
+              {title === PRODUCT_FEATURES.API_CLIENT.title && <RQBadge badgeText="BETA" />}
+            </div>
+          </div>
+
+          <div className="action-buttons">{primaryAction}</div>
+        </div>
+        <ul className="features">
+          {features.map((feature, index) => (
+            <li key={index}>{feature}</li>
+          ))}
+        </ul>
+        <a className="play-icon" href={playDetails.url} target="__blank" onClick={playDetails.onClick}>
+          {playDetails.icon}
+          <p>{playDetails.label}</p>
+        </a>
       </div>
-    </div>
+
+      {importDropdownOptions ? (
+        <div className="import-dropdown">
+          <RQDropdown menu={{ items: importDropdownOptions.menu }} trigger={["click"]}>
+            <RQButton type="transparent">
+              <CardIcon icon={importDropdownOptions.icon} label={importDropdownOptions.label} />
+              {importDropdownOptions.label}
+              <MdOutlineKeyboardArrowDown />
+            </RQButton>
+          </RQDropdown>
+        </div>
+      ) : null}
+    </>
   );
 };

@@ -1,11 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { InitialState } from "./types";
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 
 const initialState = {
   currentEnvironment: "",
   environments: {},
   api_collections: {},
+  errorEnvFiles: [] as ErroredRecord[],
 };
 
 const resetState = (): InitialState => initialState;
@@ -34,7 +36,7 @@ const setCurrentEnvironment = (
   state.currentEnvironment = action.payload.environmentId;
 };
 
-const setAllEnvironmentData = (
+const updateAllEnvironmentData = (
   state: InitialState,
   action: PayloadAction<{
     environmentMap: EnvironmentMap;
@@ -84,7 +86,7 @@ const updateEnvironmentName = (
   state.environments[action.payload.ownerId][action.payload.environmentId].name = action.payload.newName;
 };
 
-const setCollectionVariables = (
+const updateCollectionVariables = (
   state: InitialState,
   action: PayloadAction<{ collectionId: string; variables: EnvironmentVariables }>
 ) => {
@@ -94,16 +96,29 @@ const setCollectionVariables = (
   };
 };
 
+const setCollectionVariables = (
+  state: InitialState,
+  action: PayloadAction<Record<string, { variables: EnvironmentVariables }>>
+) => {
+  state.api_collections = action.payload;
+};
+
+const setErrorEnvFiles = (state: InitialState, action: PayloadAction<ErroredRecord[]>) => {
+  state.errorEnvFiles = action.payload;
+};
+
 const environmentVariablesReducerFunctions = {
   addNewEnvironment,
   resetState,
   removeVariableFromEnvironment,
-  setAllEnvironmentData,
+  updateAllEnvironmentData,
   setCurrentEnvironment,
   updateEnvironmentData,
   removeEnvironment,
   updateEnvironmentName,
+  updateCollectionVariables,
   setCollectionVariables,
+  setErrorEnvFiles,
 };
 
 export { initialState };

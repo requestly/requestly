@@ -4,11 +4,10 @@ import ProCard from "@ant-design/pro-card";
 import { Button, Col, Row } from "antd";
 import AuthButtons from "components/authentication/LoginRequiredCTA/AuthButtons";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import img from "assets/images/pages/error/403.svg";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 // DUPLICATED
 // TODO: REMOVE OLD FILE
@@ -16,7 +15,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const dispatch = useDispatch();
 
   // Component State
@@ -35,7 +34,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
           <Button
             type="primary"
             onClick={() => {
-              handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch);
+              handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch);
               setAuthAutoPrompt(true);
             }}
           >
@@ -55,7 +54,7 @@ const PermissionError = ({ isInsideIframe = false }) => {
               <Col>
                 <img
                   className="hp-position-relative hp-d-block hp-m-auto"
-                  src={img}
+                  src={"/assets/media/common/403.svg"}
                   alt="403"
                   style={{ maxHeight: "30vh" }}
                 />

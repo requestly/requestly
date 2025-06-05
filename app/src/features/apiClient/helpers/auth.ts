@@ -1,127 +1,186 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTHORIZATION_TYPES } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
-import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types";
+import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/AuthorizationForm/formStructure/types";
 import { KeyValuePair, RQAPI } from "../types";
+import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
 
-export const processAuthForEntry = (
+/*
+  allRecords is passed to resolve the "INHERIT" auth type, to recursively
+  resolve the parent record's auth type
+*/
+export const getEffectiveAuthForEntry = (
   entry: RQAPI.Entry,
   entryDetails: {
     id: RQAPI.Record["id"];
-    collectionId: RQAPI.Record["collectionId"];
+    parentId: RQAPI.Record["collectionId"];
   },
   allRecords: RQAPI.Record[]
 ) => {
-  const entryCopy = JSON.parse(JSON.stringify(entry)); // Deep Copy
+  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry;
+  const currentAuth = entryCopy.auth;
 
-  let authOptions = entryCopy.auth;
-
-  if (isEmpty(authOptions)) {
-    let currentAuthType = "";
-    if (entryDetails.collectionId) {
-      currentAuthType = AUTHORIZATION_TYPES.INHERIT;
-    } else {
-      currentAuthType = AUTHORIZATION_TYPES.NO_AUTH;
-    }
-    entryCopy.auth = { currentAuthType };
+  let finalAuth: RQAPI.Auth | null = currentAuth;
+  if (isEmpty(currentAuth)) {
+    finalAuth = getDefaultAuth(entryDetails.parentId === null);
+  }
+  if (finalAuth.currentAuthType === Authorization.Type.INHERIT) {
+    finalAuth = inheritAuthFromParent(entryDetails, allRecords);
   }
 
-  if (entryCopy.auth.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
-    authOptions = inheritAuth(entryCopy, entryDetails, allRecords);
-  }
+  finalAuth = pruneConfig(finalAuth);
+  return finalAuth;
+};
 
-  if (!authOptions) {
+export const getHeadersAndQueryParams = (auth: RQAPI.Auth) => {
+  if (!auth) {
     return {
       headers: [],
       queryParams: [],
     };
   }
-
-  return processAuthOptions(authOptions);
+  return extractAuthHeadersAndParams(auth);
 };
 
-function inheritAuth(
-  entry: RQAPI.Record["data"],
-  entryDetails: {
+function inheritAuthFromParent(
+  childDetails: {
     id: RQAPI.Record["id"];
-    collectionId: RQAPI.Record["collectionId"];
+    parentId: RQAPI.Record["collectionId"];
   },
   allRecords: RQAPI.Record[]
 ) {
-  const parentRecord = entryDetails.collectionId
-    ? allRecords.find((record) => record.id === entryDetails.collectionId)
-    : null;
+  const parentRecord = allRecords.find((record) => record.id === childDetails.parentId);
   if (!parentRecord) {
-    return null;
-  }
-  let parentAuthData = parentRecord.data.auth;
-  if (!isEmpty(parentAuthData) && parentAuthData.currentAuthType === AUTHORIZATION_TYPES.INHERIT) {
-    const parentDetails = {
-      id: parentRecord.id,
-      collectionId: parentRecord.collectionId,
+    console.warn(`Parent Record (id: ${childDetails.parentId}) not found for child with id ${childDetails.id}`);
+    console.log("DBG: implying no_auth");
+    return {
+      currentAuthType: Authorization.Type.NO_AUTH,
+      authConfigStore: {},
     };
-    parentAuthData = inheritAuth(parentRecord.data, parentDetails, allRecords);
   }
-  return parentAuthData;
+  let parentAuth = parentRecord.data.auth;
+
+  if (isEmpty(parentAuth)) {
+    return {
+      currentAuthType: Authorization.Type.NO_AUTH,
+      authConfigStore: {},
+    };
+  }
+
+  if (!isEmpty(parentAuth) && parentAuth.currentAuthType === Authorization.Type.INHERIT) {
+    const newChildDetails = {
+      id: parentRecord.id,
+      parentId: parentRecord.collectionId,
+    };
+    parentAuth = inheritAuthFromParent(newChildDetails, allRecords);
+  }
+
+  return parentAuth;
 }
 
-const processAuthOptions = (authOptions: RQAPI.AuthOptions) => {
-  const headers: KeyValuePair[] = [];
-  const queryParams: KeyValuePair[] = [];
+/* This function expects inherit to have been resolved. The argument should be the effective authType */
+function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
+  const resultingHeaders: KeyValuePair[] = [];
+  const resultingQueryParams: KeyValuePair[] = [];
 
-  const { currentAuthType = "" } = authOptions;
-
-  let newKeyValuePair: KeyValuePair;
-
-  const createAuthorizationKeyValuePair = (type: string, key: string, value: string): typeof newKeyValuePair => ({
-    id: Date.now(),
-    key,
-    value,
-    type,
-    isEnabled: true,
-  });
-
-  const updateDataInState = (data: KeyValuePair[], key: string, value: string) => {
-    const existingIndex = data.findIndex((option) => option.type === AUTH_ENTRY_IDENTIFIER);
-    const newOption = createAuthorizationKeyValuePair(AUTH_ENTRY_IDENTIFIER, key, value);
-
-    if (existingIndex !== -1) {
-      data[existingIndex] = { ...data[existingIndex], ...newOption };
-    } else {
-      data.unshift(newOption);
-    }
+  const addEntryToResults = (result: KeyValuePair[], key: string, value: string) => {
+    const newOption = {
+      id: Date.now(),
+      key,
+      value,
+      type: AUTH_ENTRY_IDENTIFIER,
+      isEnabled: true,
+    } as KeyValuePair;
+    result.push(newOption);
   };
 
-  switch (currentAuthType) {
-    case AUTHORIZATION_TYPES.INHERIT:
+  switch (auth.currentAuthType) {
+    case Authorization.Type.INHERIT:
       throw new Error("Inherit auth type should not be processed inside processAuthOptions");
-    case AUTHORIZATION_TYPES.NO_AUTH:
+    case Authorization.Type.NO_AUTH:
       break;
-    case AUTHORIZATION_TYPES.BASIC_AUTH: {
-      const { username, password } = authOptions[currentAuthType];
-      updateDataInState(headers, "Authorization", `Basic ${btoa(`${username || ""}:${password || ""}`)}`);
-      break;
-    }
-    case AUTHORIZATION_TYPES.BEARER_TOKEN: {
-      const { bearer } = authOptions[currentAuthType];
-      updateDataInState(headers, "Authorization", `Bearer ${bearer}`);
+    case Authorization.Type.BASIC_AUTH: {
+      if (!auth.authConfigStore?.[Authorization.Type.BASIC_AUTH]) break; // invalid auth config gets stored as null for now
+      const { username, password } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
+      addEntryToResults(resultingHeaders, "Authorization", `Basic ${btoa(`${username}:${password}`)}`);
       break;
     }
-    case AUTHORIZATION_TYPES.API_KEY: {
-      const { key, value, addTo } = authOptions[currentAuthType];
-
-      updateDataInState(addTo === "QUERY" ? queryParams : headers, key || "", value || "");
-
+    case Authorization.Type.BEARER_TOKEN: {
+      if (!auth.authConfigStore?.[Authorization.Type.BEARER_TOKEN]) break; // invalid auth config gets stored as null for now
+      const { bearer } = auth.authConfigStore[Authorization.Type.BEARER_TOKEN];
+      addEntryToResults(resultingHeaders, "Authorization", `Bearer ${bearer}`);
+      break;
+    }
+    case Authorization.Type.API_KEY: {
+      if (!auth.authConfigStore?.[Authorization.Type.API_KEY]) break; // invalid auth config gets stored as null for now
+      const { key, value, addTo } = auth.authConfigStore[Authorization.Type.API_KEY];
+      addEntryToResults(addTo === "QUERY" ? resultingQueryParams : resultingHeaders, key, value);
       break;
     }
     default:
-      break;
+      throw new Error("Invalid Auth Type");
   }
 
   return {
-    headers,
-    queryParams,
+    headers: resultingHeaders,
+    queryParams: resultingQueryParams,
   };
-};
+}
+
+/* Last line of checks against older records that were created before validations were added to the form */
+function pruneConfig(auth?: RQAPI.Auth): RQAPI.Auth | null {
+  if (!auth) {
+    return null;
+  }
+
+  const { currentAuthType, authConfigStore } = auth;
+  switch (currentAuthType) {
+    case Authorization.Type.NO_AUTH:
+    case Authorization.Type.INHERIT:
+      return {
+        currentAuthType,
+        authConfigStore: {},
+      };
+    case Authorization.Type.BASIC_AUTH:
+      if (
+        isEmpty(authConfigStore[Authorization.Type.BASIC_AUTH]) ||
+        !authConfigStore[Authorization.Type.BASIC_AUTH].username ||
+        !authConfigStore[Authorization.Type.BASIC_AUTH].password
+      ) {
+        return null;
+      }
+      break;
+    case Authorization.Type.BEARER_TOKEN:
+      console.log("DBG: authConfigStore", authConfigStore);
+      if (
+        isEmpty(authConfigStore[Authorization.Type.BEARER_TOKEN]) ||
+        !authConfigStore[Authorization.Type.BEARER_TOKEN].bearer
+      ) {
+        return null;
+      }
+      break;
+    case Authorization.Type.API_KEY:
+      if (
+        isEmpty(authConfigStore[Authorization.Type.API_KEY]) ||
+        !authConfigStore[Authorization.Type.API_KEY].key ||
+        !authConfigStore[Authorization.Type.API_KEY].value ||
+        !["HEADER", "QUERY"].includes(authConfigStore[Authorization.Type.API_KEY].addTo)
+      ) {
+        return null;
+      }
+      break;
+    default:
+      throw new Error("Invalid Auth Type");
+  }
+
+  type validAuthType = keyof typeof authConfigStore;
+  Object.keys(authConfigStore).forEach((availableAuthType: validAuthType) => {
+    if (availableAuthType !== currentAuthType) {
+      delete authConfigStore[availableAuthType];
+    }
+  });
+  auth.authConfigStore = authConfigStore;
+  return auth;
+}
 
 export const updateRequestWithAuthOptions = (data: KeyValuePair[], dataToAdd: KeyValuePair[]) => {
   if (isEmpty(dataToAdd)) {

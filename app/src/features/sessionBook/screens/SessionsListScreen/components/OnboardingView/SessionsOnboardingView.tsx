@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
-import { Button, Col, InputRef, Row, Space, Typography, Input } from "antd";
+import { Col, InputRef, Row, Space, Typography, Input } from "antd";
 import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/apiClient";
 import {
   trackOnboardingPageViewed,
@@ -20,15 +20,16 @@ import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
-import StartSessionRecordingGif from "../../assets/sessions-banner.gif";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { ImportWebSessionModalButton } from "../SessionsList/components/ImportWebSessionModalButton/ImportWebSessionModalButton";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { ImportSessionModal } from "features/sessionBook/modals/ImportSessionModal/ImportSessionModal";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { useRBAC } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
 import "./sessionsOnboardingView.scss";
 
 const { Text, Title } = Typography;
@@ -43,6 +44,8 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
   const navigate = useNavigate();
   const [isImportSessionModalOpen, setIsImportSessionModalOpen] = useState(false);
   const appFlavour = getAppFlavour();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("session_recording", "create");
 
   useEffect(() => {
     trackOnboardingPageViewed();
@@ -55,7 +58,7 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
     return isDesktopSessionsCompatible ? (
       <ImportWebSessionModalButton />
     ) : (
-      <RQButton type="default" onClick={() => setIsImportSessionModalOpen(true)}>
+      <RQButton type="secondary" onClick={() => setIsImportSessionModalOpen(true)}>
         Upload & view downloaded sessions
       </RQButton>
     );
@@ -98,16 +101,18 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
     <>
       <div className="onboarding-content-container">
         {!isModalView && (
-          <Row justify="end" align="middle" className="settings-row">
-            <Space size={20}>
-              {openDownloadedSessionModalBtn}
-              {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY && (
-                <span onClick={handleSettingsNavigation} className="settings-btn">
-                  <MdOutlineSettings /> &nbsp; <Text underline>Settings</Text>
-                </span>
-              )}
-            </Space>
-          </Row>
+          <Conditional condition={isValidPermission}>
+            <Row justify="end" align="middle" className="settings-row">
+              <Space size={20}>
+                {openDownloadedSessionModalBtn}
+                {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY && (
+                  <span onClick={handleSettingsNavigation} className="settings-btn">
+                    <MdOutlineSettings /> &nbsp; <Text underline>Settings</Text>
+                  </span>
+                )}
+              </Space>
+            </Row>
+          </Conditional>
         )}
 
         <Row justify="space-between" className="onboarding-banner">
@@ -155,15 +160,20 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
                 <Col span={15} className="input-container">
                   <Input
                     ref={inputRef}
+                    disabled={!isValidPermission}
                     placeholder="Enter Page URL eg. https://ebay.com"
                     onPressEnter={handleStartRecordingBtnClicked}
                   />
                 </Col>
                 <Col span={3} className="start-btn-container">
-                  <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                    {" "}
+                  <RQButton
+                    size="default"
+                    type="primary"
+                    disabled={!isValidPermission}
+                    onClick={handleStartRecordingBtnClicked}
+                  >
                     Start Recording
-                  </Button>
+                  </RQButton>
                 </Col>
               </Row>
             </Col>
@@ -171,7 +181,11 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
           {!isModalView && (
             <Col span={12} className="banner-demo-video">
               <Row justify="end">
-                <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+                <img
+                  src={"/assets/media/common/sessions-banner.gif"}
+                  alt="How to start session recording"
+                  className="demo-video"
+                />
               </Row>
               <Row onClick={trackOnboardingSampleSessionViewed}>
                 <a

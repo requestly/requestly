@@ -5,8 +5,8 @@ import { PiChatTeardropTextFill } from "@react-icons/all-files/pi/PiChatTeardrop
 import { BsFillChatLeftTextFill } from "@react-icons/all-files/bs/BsFillChatLeftTextFill";
 import BotIcon from "assets/icons/bot.svg?react";
 import { TbMailForward } from "@react-icons/all-files/tb/TbMailForward";
-
 import "./supportPanel.scss";
+//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getIsSupportChatOpened } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -160,10 +160,7 @@ const SupportPanel = () => {
               if (isPanelVisible) window?.$crisp?.push(["do", "chat:close"]);
               if (isRequestBotVisible) setIsRequestBotVisible(false);
               trackSupportOptionOpened();
-              dispatch(
-                // @ts-ignore
-                globalActions.updateIsSupportChatOpened(true)
-              );
+              dispatch(globalActions.updateIsSupportChatOpened(true));
             }}
           />
         </Badge>

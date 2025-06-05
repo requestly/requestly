@@ -86,20 +86,6 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
-    plans: {
-      monthly: {
-        usd: {
-          price: 7,
-        },
-      },
-      annually: {
-        usd: {
-          price: 70,
-        },
-      },
-    },
-  },
   [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
     plans: {
       monthly: {
@@ -114,4 +100,10 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
+};
+
+export const RQBrowserstackPlanIdMap: Record<string, string> = {
+  [PRICING.PLAN_NAMES.LITE]: "lite",
+  [PRICING.PLAN_NAMES.BASIC]: "basic",
+  [PRICING.PLAN_NAMES.PROFESSIONAL]: "professional",
 };

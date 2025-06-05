@@ -30,10 +30,11 @@ import {
 import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rules";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { globalActions } from "store/slices/global/slice";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./rulesTable.css";
 
 import { RecordType, RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   records: StorageRecord[];
@@ -44,6 +45,8 @@ interface Props {
 
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -52,7 +55,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
   const isSampleRulesImported = useSelector(getIsSampleRulesImported);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [groupIdsToExpand, setGroupIdsToExpand] = useState<string[]>([]);
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
@@ -86,7 +89,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       return;
     }
 
-    if (!currentlyActiveWorkspace || currentlyActiveWorkspace?.id) {
+    if (activeWorkspaceId) {
       return;
     }
 
@@ -97,18 +100,16 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
       trackSampleRulesImported();
 
-      // @ts-ignore
       dispatch(globalActions.updateIsSampleRulesImported(true));
 
       dispatch(
-        // @ts-ignore
         globalActions.updateRefreshPendingStatus({
           type: "rules",
           newValue: !isRulesListRefreshPending,
         })
       );
     });
-  }, [user, appMode, isRuleExist, isSampleRulesImported, currentlyActiveWorkspace?.id, isRulesListRefreshPending]);
+  }, [user, appMode, isRuleExist, isSampleRulesImported, activeWorkspaceId, isRulesListRefreshPending, dispatch]);
 
   useEffect(() => {
     const enhancedRecords = enhanceRecords(records, allRecordsMap);
@@ -242,12 +243,12 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   return (
     <>
       {/* Add Modals Required in Rules List here */}
-
       <ContentListTable
-        dragAndDrop
+        dragAndDrop={isValidPermission}
+        isRowSelectable={isValidPermission}
         onRowDropped={onRowDropped}
         id="rules-list-table"
-        className="rules-list-table"
+        className={`rules-list-table ${!isValidPermission ? "read-only" : ""}`}
         defaultExpandedRowKeys={groupIdsToExpand}
         size="middle"
         scroll={{ y: getTableScrollHeight() }}

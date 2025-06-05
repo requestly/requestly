@@ -1,5 +1,5 @@
 import { trackEvent } from "modules/analytics";
-import { PRICING_MODAL, PRICING_WORKSPACE } from "./constants";
+import { PRICING_MODAL, PRICING_STUDENT_PROGRAM, PRICING_WORKSPACE } from "./constants";
 
 export const trackPricingModalPlansViewed = (source: string) => {
   trackEvent(PRICING_MODAL.PRICING_MODAL_PLANS_VIEWED, { source });
@@ -20,4 +20,14 @@ export const trackPricingPlansQuantityChanged = (quantity: number, planName: str
     plan_name: planName,
   };
   trackEvent(PRICING_MODAL.PRICING_PLANS_QUANTITY_CHANGED, params);
+};
+
+export const trackGetFreeTrialClicked = (source: string) => {
+  const params = { source };
+  trackEvent(PRICING_STUDENT_PROGRAM.PRICING_GET_FREE_TRIAL_CLICKED, params);
+};
+
+export const trackStudentProgramClicked = (source: string) => {
+  const params = { source };
+  trackEvent(PRICING_STUDENT_PROGRAM.PRICING_STUDENT_PROGRAM_CLICKED, params);
 };

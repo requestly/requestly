@@ -6,15 +6,14 @@ import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
 import { recordsActions } from "store/features/rules/slice";
-import { Group, RecordStatus, RecordType, Rule } from "@requestly/shared/types/entities/rules";
+import { Group, RecordStatus, RecordType, Rule, RuleType } from "@requestly/shared/types/entities/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import Logger from "../../../../../../../../../common/logger";
-import { trackRulesListLoaded } from "features/rules/analytics";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -26,7 +25,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
-  const activeWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const hasIsRulesListRefreshPendingChanged = useHasChanged(isRulesListRefreshPending);
   const hasIsRulesListHardRefreshPendingChanged = useHasChanged(isRulesListHardRefreshPending);
@@ -50,8 +49,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         let groups = data[0] as Group[];
         let rules = data[1] as Rule[];
 
-        //@ts-ignore
-        rules = migrateAllRulesToMV3(rules, activeWorkspace.id);
+        rules = migrateAllRulesToMV3(rules, activeWorkspaceId);
 
         Logger.log("DBG: fetched data", JSON.stringify({ rules, groups }));
 
@@ -80,8 +78,22 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         const numRuleTypes = parseInt(window.localStorage.getItem("num_rule_types") || "0");
         const activeRulesCount = rules.filter((rule) => rule.status === RecordStatus.ACTIVE).length;
 
+        // Rules without limits
+        const headerRules = rules.filter((rule) => rule.ruleType === RuleType.HEADERS);
+        const activeHeaderRules = headerRules.filter((rule) => rule.status === RecordStatus.ACTIVE);
+
+        // Rules count excluding free rules
+        const rulesCountExcludingFreeRules = rules.length - headerRules.length;
+        const activeRulesCountExcludingFreeRules = activeRulesCount - activeHeaderRules.length;
+
         submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
         submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
+
+        submitAttrUtil(TRACKING.ATTR.NUM_RULES_EXCLUDING_HEADERS, rules.length - headerRules.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_ACTIVE_RULES_EXCLUDING_HEADERS, activeRulesCount - activeHeaderRules.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_RULES_EXCLUDING_FREE_RULES, rulesCountExcludingFreeRules);
+        submitAttrUtil(TRACKING.ATTR.NUM_ACTIVE_RULES_EXCLUDING_FREE_RULES, activeRulesCountExcludingFreeRules);
+
         submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
         submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
         window.localStorage.setItem("num_rule_types", JSON.stringify(ruleTypes.size));
@@ -93,7 +105,6 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
           groups.filter((group) => group.status === RecordStatus.ACTIVE).length
         );
         sendIndividualRuleTypesCountAttributes(rules);
-        trackRulesListLoaded(rules.length, activeRulesCount, activePremiumRules.length, groups.length);
       })
       .catch((err) => {
         Logger.error("DBG: Error in fetching rules and groups", err);
@@ -105,7 +116,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     appMode,
     hasIsRulesListRefreshPendingChanged,
     hasIsRulesListHardRefreshPendingChanged,
-    activeWorkspace.id,
+    activeWorkspaceId,
   ]);
 };
 

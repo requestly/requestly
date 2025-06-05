@@ -142,7 +142,7 @@ export const getBillingTeamRedirectURL = async (ownerId: string): Promise<string
   } else {
     const sortedTeams = billingTeams.sort(
       (a: any, b: any) =>
-        b.data.subscriptionDetails.subscriptionCreated - a.data.subscriptionDetails.subscriptionCreated
+        b.data.subscriptionDetails?.subscriptionCreated - a.data.subscriptionDetails?.subscriptionCreated
     );
     return `${PATHS.SETTINGS.BILLING.RELATIVE}/${sortedTeams[0].id}`;
   }

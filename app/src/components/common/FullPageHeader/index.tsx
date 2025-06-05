@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { Layout, Col, Row } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import "./index.css";
 
 interface HeaderProps {
@@ -13,13 +13,14 @@ interface HeaderProps {
 
 export const FullPageHeader: React.FC<HeaderProps> = ({ showUserHeader = false, doRedirectOnLogoClick = false }) => {
   const navigate = useNavigate();
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
   return (
     <Layout.Header className="full-page-navbar">
       <Row className="w-full" justify="space-between" align="middle">
         <Col>
           <img
             className="logo"
-            src={RQLogo}
+            src={`/assets/media/common/${isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"}`}
             alt="requestly logo"
             onClick={() => (doRedirectOnLogoClick ? redirectToRules(navigate) : {})}
           />

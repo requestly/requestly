@@ -3,7 +3,7 @@ export type VariableValueType = string | number | boolean;
 export interface EnvironmentVariableValue {
   localValue?: VariableValueType;
   syncValue?: VariableValueType;
-  type: VariableValueType;
+  type: EnvironmentVariableType;
   id: number;
 }
 
@@ -27,3 +27,9 @@ export enum EnvironmentVariableType {
 export type VariableExport = EnvironmentVariableValue & {
   key: string;
 };
+
+export enum VariableScope {
+  GLOBAL = "global",
+  ENVIRONMENT = "environment",
+  COLLECTION = "collection",
+}

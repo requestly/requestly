@@ -19,9 +19,10 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 interface AppSumoCode {
   error: string;
@@ -39,7 +40,7 @@ const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
@@ -131,7 +132,7 @@ const AppSumoModal: React.FC = () => {
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
     try {
       const response: any = await createTeam({ teamName: newTeamName });
-      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
+      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo", WorkspaceType.SHARED);
       switchWorkspace(
         {
           teamId: response?.data?.teamId,
@@ -232,11 +233,11 @@ const AppSumoModal: React.FC = () => {
   };
 
   useEffect(() => {
-    const appsumoWorkspace = availableTeams?.find((team: any) => team?.appsumo);
+    const appsumoWorkspace = availableWorkspaces?.find((team: any) => team?.appsumo);
     if (appsumoWorkspace) {
-      setWorkspaceToUpgrade(appsumoWorkspace);
+      setWorkspaceToUpgrade(appsumoWorkspace as any);
     }
-  }, [availableTeams]);
+  }, [availableWorkspaces]);
 
   useEffect(() => {
     dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
@@ -256,7 +257,7 @@ const AppSumoModal: React.FC = () => {
       <>
         <div className="rq-modal-content appsumo-modal">
           <div>
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/assets/media/common/smiles.svg" />
           </div>
           <div className="header mt-16">Please enter your AppSumo code</div>
           <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>

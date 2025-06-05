@@ -1,6 +1,5 @@
 import { Col, Row, Typography } from "antd";
 import { getAppFlavour } from "utils/AppUtils";
-import underlineIcon from "assets/images/illustrations/yellow-highlight.svg";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { CompaniesLogoBanner } from "../CompaniesLogoBanner";
@@ -32,13 +31,13 @@ export const OnboardingAuthBanner = () => {
           <>
             Let’s build a{" "}
             <span className="banner-title-highlight">
-              bug-free <img src={underlineIcon} alt="highlight" />
+              bug-free <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
             </span>{" "}
             product
           </>
         ) : (
           <span className="banner-title-highlight">
-            Why Sign Up ? <img src={underlineIcon} alt="highlight" />
+            Why Sign Up ? <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
           </span>
         )}
       </Typography.Title>
