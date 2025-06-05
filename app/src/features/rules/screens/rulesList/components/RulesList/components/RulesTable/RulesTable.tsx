@@ -186,7 +186,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const toggleRecordsBulkOptionLabel = useMemo(() => {
     const selectedRecords = selectedRows as StorageRecord[];
     const isAllRecordsActive = selectedRecords.every((record) => {
-      return allRecordsMap[record.id].status === RecordStatus.ACTIVE;
+      return allRecordsMap[record.id]?.status === RecordStatus.ACTIVE;
     });
 
     return isAllRecordsActive ? "Deactivate" : "Activate";

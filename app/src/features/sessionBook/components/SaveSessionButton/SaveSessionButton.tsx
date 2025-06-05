@@ -103,15 +103,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ disabled, 
       .finally(() => {
         setIsLoading(false);
       });
-  }, [
-    saveDraftSession,
-    user.loggedIn,
-    dispatch,
-    sessionRecordingMetadata,
-    onSaveClick,
-    isOpenedInIframe,
-    trimmedSessionData,
-  ]);
+  }, [saveDraftSession, user?.loggedIn, dispatch, sessionRecordingMetadata, onSaveClick, isOpenedInIframe]);
 
   return (
     <div className="save-session-btn-container">
