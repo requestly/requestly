@@ -9,9 +9,12 @@ export type QueryParamsStore = {
 };
 
 const getSyncedQueryParams = (entry: RQAPI.Entry) => {
-  const { request } = entry;
+  const { request } = entry || {};
+  if (!request) {
+    return [];
+  }
   const paramsFromUrl = extractQueryParams(request.url);
-  const paramsObject = entry.request.queryParams;
+  const paramsObject = request.queryParams;
 
   const keysFromObject = new Set(paramsObject.map((param) => param.key));
   const finalParams: KeyValuePair[] = [...paramsObject];

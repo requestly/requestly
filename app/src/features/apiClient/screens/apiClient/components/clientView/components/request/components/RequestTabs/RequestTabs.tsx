@@ -12,6 +12,7 @@ import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable
 import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -52,6 +53,8 @@ const RequestTabs: React.FC<Props> = ({
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
+  const queryParams = useQueryParamStore((state) => state.queryParams);
+
   // TODO: remove tabs state
   const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
 
@@ -70,9 +73,7 @@ const RequestTabs: React.FC<Props> = ({
     const items = [
       {
         key: RequestTab.QUERY_PARAMS,
-        label: (
-          <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
-        ),
+        label: <LabelWithCount label="Query Params" count={queryParams.length} />,
         children: <QueryParamsTable variables={variables} />,
       },
       {
@@ -141,7 +142,16 @@ const RequestTabs: React.FC<Props> = ({
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, handleAuthChange, collectionId]);
+  }, [
+    requestEntry,
+    setRequestEntry,
+    setContentType,
+    isApiClientScripts,
+    variables,
+    handleAuthChange,
+    collectionId,
+    queryParams.length,
+  ]);
 
   return (
     <Tabs
