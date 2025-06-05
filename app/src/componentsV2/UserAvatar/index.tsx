@@ -8,13 +8,13 @@ interface UserIconProps {
 }
 
 export const UserAvatar = ({ uid }: UserIconProps) => {
-  const activeWorkspaceMembers = useSelector(getActiveWorkspacesMembers);
+  const activeWorkspacesMembers = useSelector(getActiveWorkspacesMembers);
 
-  if (uid && activeWorkspaceMembers[uid])
+  if (uid && activeWorkspacesMembers[uid])
     return (
       <>
-        <Tooltip title={activeWorkspaceMembers[uid]?.displayName}>
-          <Avatar size={24} src={activeWorkspaceMembers[uid]?.photoUrl} />
+        <Tooltip title={activeWorkspacesMembers[uid]?.displayName}>
+          <Avatar size={24} src={activeWorkspacesMembers[uid]?.photoUrl} />
         </Tooltip>
       </>
     );

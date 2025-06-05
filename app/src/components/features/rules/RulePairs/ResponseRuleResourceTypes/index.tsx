@@ -62,7 +62,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
 
       setCurrentlySelectedRule(dispatch, updatedRule, !isDefaultValue);
     },
-    [dispatch, currentlySelectedRuleData, ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]]
+    [currentlySelectedRuleData, ruleDetails, dispatch]
   );
 
   const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
