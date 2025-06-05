@@ -39,11 +39,11 @@ const ProductSwitcher: React.FC<Props> = ({ activeProduct, setActiveProduct, isO
           <div
             className={`product-details ${isActive ? "active" : ""}`}
             key={product.key}
-            onClick={productChangeHandler.bind(this, product.key)}
+            onClick={() => productChangeHandler(product.key)}
           >
             <div className="product-text">
               <p>{product.title}</p>
-              {!isOpenedFromModal && <span>{product.description}</span>}
+              {!isOpenedFromModal && <span className="description">{product.description}</span>}
             </div>
             <img src={isActive ? product.activeIcon : product.icon} alt={product.title} />
           </div>

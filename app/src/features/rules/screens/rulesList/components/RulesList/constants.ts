@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import LINKS from "config/constants/sub/links";
+import { RuleTemplate } from "features/rules/types/rules";
 import { RuleDetails } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 
 export const sampleRuleDetails: Record<string, { id: string; demoLink: string; details: RuleDetails }> = {
@@ -80,7 +81,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
   },
 };
 
-export const localSampleRules = [
+export const localSampleRules: RuleTemplate[] = [
   {
     data: {
       ruleData: {
@@ -89,7 +90,7 @@ export const localSampleRules = [
         groupId: "Group_rg78s",
         lastModifiedBy: null,
         description: "",
-        creationDate: 1720336454573,
+        creationDate: 1742403283719,
         pairs: [
           {
             response: {
@@ -102,7 +103,7 @@ export const localSampleRules = [
             },
             id: "2xj8r",
             source: {
-              value: "mock.redq.io/api/products",
+              value: "rest.requestly-playground.com/api/products",
               key: "Url",
               operator: "Contains",
             },
@@ -126,7 +127,7 @@ export const localSampleRules = [
     data: {
       ruleData: {
         isSample: false,
-        schemaVersion: "3.0.1",
+        schemaVersion: "3.0.2",
         groupId: "Group_rg78s",
         lastModifiedBy: null,
         extensionRules: [
@@ -134,7 +135,7 @@ export const localSampleRules = [
             condition: {
               isUrlFilterCaseSensitive: true,
               regexFilter:
-                "^(.*https://mock\\.redq\\.io/api/products.*)(#__rq_marker.*)$|(.*https://mock\\.redq\\.io/api/products.*)",
+                "^(.*rest\\.requestly-playground\\.com/api.*)(#__rq_marker.*)$|(.*rest\\.requestly-playground\\.com/api.*)",
               excludedInitiatorDomains: ["requestly.io"],
               excludedRequestDomains: ["requestly.io"],
             },
@@ -149,7 +150,7 @@ export const localSampleRules = [
           {
             condition: {
               isUrlFilterCaseSensitive: true,
-              regexFilter: "^(.*)type\\.slug:bakery(.*)#__rq_marker=(?:.*https://mock\\.redq\\.io/api/products.*)$",
+              regexFilter: "^(.*)type\\.slug:bakery(.*)#__rq_marker=(?:.*rest\\.requestly-playground\\.com/api.*)$",
               excludedInitiatorDomains: ["requestly.io"],
               excludedRequestDomains: ["requestly.io"],
             },
@@ -163,13 +164,13 @@ export const localSampleRules = [
           },
         ],
         description: "",
-        creationDate: 1720340003757,
+        creationDate: 1742403283719,
         pairs: [
           {
             from: "type.slug:bakery",
             id: "qo1c4",
             source: {
-              value: "https://mock.redq.io/api/products",
+              value: "rest.requestly-playground.com/api",
               key: "Url",
               operator: "Contains",
             },
@@ -177,7 +178,7 @@ export const localSampleRules = [
           },
         ],
         objectType: "rule",
-        modificationDate: 1720340105234,
+        modificationDate: 1743579347396,
         createdBy: null,
         currentOwner: null,
         ruleType: "Replace",
@@ -197,7 +198,7 @@ export const localSampleRules = [
         groupId: "Group_rg78s",
         lastModifiedBy: null,
         description: "",
-        creationDate: 1720335748379,
+        creationDate: 1742403283719,
         pairs: [
           {
             response: {
@@ -217,7 +218,7 @@ export const localSampleRules = [
                   },
                 },
               ],
-              value: "https://mock.redq.io/graphql",
+              value: "https://graphql.requestly-playground.com/graphql",
               key: "Url",
               operator: "Contains",
             },
@@ -225,7 +226,7 @@ export const localSampleRules = [
           },
         ],
         objectType: "rule",
-        modificationDate: 1720336361914,
+        modificationDate: 1743578293046,
         createdBy: null,
         currentOwner: null,
         ruleType: "Response",
@@ -241,7 +242,7 @@ export const localSampleRules = [
     data: {
       ruleData: {
         createdBy: null,
-        creationDate: 1723646185896,
+        creationDate: 1742403283719,
         currentOwner: null,
         description: "",
         extensionRules: [
@@ -268,8 +269,8 @@ export const localSampleRules = [
         id: "Script_2c6rd",
         isSample: false,
         lastModifiedBy: null,
-        modificationDate: 1723646226395,
-        name: "Inject CSS/JS on a website",
+        modificationDate: 1743579375423,
+        name: "Inject CSS/JS on a websites",
         objectType: "rule",
         pairs: [
           {
@@ -315,7 +316,7 @@ export const localSampleRules = [
         groupId: "Group_rg78s",
         lastModifiedBy: null,
         description: "",
-        creationDate: 1720333389088,
+        creationDate: 1742403283719,
         pairs: [
           {
             response: {
@@ -327,7 +328,7 @@ export const localSampleRules = [
             },
             id: "obnxx",
             source: {
-              value: "mock.redq.io/api/products",
+              value: "rest.requestly-playground.com/api/products",
               key: "Url",
               operator: "Contains",
             },
@@ -335,7 +336,7 @@ export const localSampleRules = [
           },
         ],
         objectType: "rule",
-        modificationDate: 1720335715632,
+        modificationDate: 1743578326333,
         createdBy: null,
         currentOwner: null,
         ruleType: "Response",
@@ -351,7 +352,7 @@ export const localSampleRules = [
     data: {
       ruleData: {
         createdBy: null,
-        creationDate: 1725001710738,
+        creationDate: 1742403283719,
         currentOwner: null,
         description: "",
         extensionRules: [
@@ -375,7 +376,7 @@ export const localSampleRules = [
         isFavourite: false,
         isSample: false,
         lastModifiedBy: null,
-        modificationDate: 1723631999797,
+        modificationDate: 1743578347950,
         name: "Redirect URL to another URL",
         objectType: "rule",
         pairs: [
@@ -402,7 +403,7 @@ export const localSampleRules = [
   {
     data: {
       ruleData: {
-        modificationDate: 1722422420602,
+        modificationDate: 1743579375725,
         children: [],
         createdBy: null,
         currentOwner: null,
@@ -410,7 +411,7 @@ export const localSampleRules = [
         name: "Sample Rules",
         description: "",
         id: "Group_rg78s",
-        creationDate: 1720183210880,
+        creationDate: 1742403283719,
         objectType: "group",
         status: "Inactive",
       },

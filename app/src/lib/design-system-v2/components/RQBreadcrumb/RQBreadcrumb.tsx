@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, Params, useMatches } from "react-router-dom";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
+import { useRBAC } from "features/rbac";
 import "./RQBreadcrumb.scss";
 
 interface Props {
@@ -13,6 +14,12 @@ interface Props {
   placeholder?: string;
   onRecordNameUpdate?: (updatedRecordName: string) => void;
   autoFocus?: boolean;
+  defaultBreadcrumbs?: {
+    pathname: string;
+    label: string;
+    disabled?: boolean;
+    isEditable?: boolean;
+  }[];
 }
 
 interface MatchedRoute {
@@ -37,26 +44,42 @@ export const RQBreadcrumb: React.FC<Props> = ({
   placeholder,
   onRecordNameUpdate,
   autoFocus = false,
+  defaultBreadcrumbs = [],
 }) => {
   const [name, setName] = useState(recordName || "");
   const [isEditRecord, setIsEditRecord] = useState(false);
   const matchedRoutes = useMatches() as MatchedRoute[];
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("breadcrumbs", "update");
 
   useEffect(() => {
     setName(recordName);
   }, [recordName]);
 
+  const autoFocusRef = useRef(false);
   useEffect(() => {
+    if (autoFocusRef.current) {
+      return;
+    }
+
     if (autoFocus) {
+      autoFocusRef.current = true;
       setIsEditRecord(true);
     }
+
+    return () => setIsEditRecord(false);
   }, [autoFocus]);
 
   const breadcrumbs: ({
-    pathname: MatchedRoute["pathname"];
-  } & MatchedRoute["handle"]["breadcrumb"])[] = matchedRoutes.reduce((result, route) => {
-    return route.handle?.breadcrumb ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }] : result;
-  }, []);
+    pathname: string;
+  } & MatchedRoute["handle"]["breadcrumb"])[] =
+    defaultBreadcrumbs.length > 0
+      ? defaultBreadcrumbs
+      : matchedRoutes.reduce((result, route) => {
+          return route.handle?.breadcrumb
+            ? [...result, { ...route.handle.breadcrumb, pathname: route.pathname }]
+            : result;
+        }, []);
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;
@@ -79,7 +102,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   };
 
   const handleRecordNameEditClick = () => {
-    if (disabled) {
+    if (disabled || !isValidPermission) {
       return;
     }
 
@@ -110,16 +133,18 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     }}
                   />
                 ) : (
-                  <div className="rq-breadcrumb-record-name">
+                  <div className="rq-breadcrumb-record-name" title={name || placeholder}>
                     <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                       {name || placeholder}
                     </Typography.Text>
-                    {disabled ? null : <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />}
+                    {disabled || !isValidPermission ? null : (
+                      <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                    )}
                   </div>
                 )
               ) : (
                 <>
-                  {isPathDisabled ? (
+                  {isPathDisabled || !isValidPermission ? (
                     <li key={index} className="rq-breadcrumb-item">
                       {label}
                     </li>

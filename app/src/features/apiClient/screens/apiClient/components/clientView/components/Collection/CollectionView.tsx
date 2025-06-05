@@ -1,19 +1,16 @@
-import { Result, Skeleton, Tabs } from "antd";
+import { notification, Result, Skeleton, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
-import { useCallback, useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
-import { useSelector } from "react-redux";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
 import PATHS from "config/constants/sub/paths";
-import "./collectionView.scss";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { upsertApiRecord } from "backend/apiClient";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
+import { useGenericState } from "hooks/useGenericState";
+import "./collectionView.scss";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { CollectionViewTabSource } from "./collectionViewTabSource";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -21,20 +18,37 @@ const TAB_KEYS = {
   AUTHORIZATION: "authorization",
 };
 
-export const CollectionView = () => {
-  const { collectionId } = useParams();
-  const { apiClientRecords, onSaveRecord, isLoadingApiClientRecords } = useApiClientContext();
-  const { replaceTab } = useTabsLayoutContext();
-  const user = useSelector(getUserAuthDetails);
-  const teamId = useSelector(getCurrentlyActiveWorkspace);
-  const location = useLocation();
+interface CollectionViewProps {
+  collectionId: string;
+}
+
+export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    isLoadingApiClientRecords,
+    apiClientRecordsRepository,
+    forceRefreshApiClientRecords,
+  } = useApiClientContext();
+
+  const closeTab = useTabServiceWithSelector((state) => state.closeTab);
+
+  const { setTitle, getIsNew } = useGenericState();
+  const isNewCollection = getIsNew();
 
   const collection = useMemo(() => {
     return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
   }, [apiClientRecords, collectionId]);
 
+  useEffect(() => {
+    // To sync title for tabs opened from deeplinks
+    if (collection) {
+      setTitle(collection.name);
+    }
+  }, [collection, setTitle]);
+
   const updateCollectionAuthData = useCallback(
-    async (newAuthOptions: RQAPI.AuthOptions) => {
+    async (newAuthOptions: RQAPI.Auth) => {
       const record = {
         ...collection,
         data: {
@@ -42,14 +56,28 @@ export const CollectionView = () => {
           auth: newAuthOptions,
         },
       };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId)
+      return apiClientRecordsRepository
+        .updateCollectionAuthData(record)
         .then((result) => {
-          // fix-me: to verify new change are broadcasted to child entries that are open in tabs
-          onSaveRecord(result.data);
+          if (result.success) {
+            onSaveRecord(result.data, "open");
+          } else {
+            notification.error({
+              message: `Could not update collection authorization changes!`,
+              description: result?.message,
+              placement: "bottomRight",
+            });
+          }
         })
-        .catch(console.error);
+        .catch((e) => {
+          notification.error({
+            message: `Could not update collection authorization changes!`,
+            description: e?.message,
+            placement: "bottomRight",
+          });
+        });
     },
-    [collection, onSaveRecord, teamId, user.details?.profile?.uid]
+    [collection, onSaveRecord, apiClientRecordsRepository]
   );
 
   const tabItems = useMemo(() => {
@@ -69,6 +97,7 @@ export const CollectionView = () => {
         key: TAB_KEYS.AUTHORIZATION,
         children: (
           <CollectionAuthorizationView
+            collectionId={collectionId}
             authOptions={collection?.data?.auth}
             updateAuthData={updateCollectionAuthData}
             rootLevelRecord={!collection?.collectionId}
@@ -76,21 +105,35 @@ export const CollectionView = () => {
         ),
       },
     ];
-  }, [collection, updateCollectionAuthData]);
+  }, [collection, collectionId, updateCollectionAuthData]);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
       const record = { ...collection, name };
-      return upsertApiRecord(user.details?.profile?.uid, record, teamId).then((result) => {
-        onSaveRecord(result.data);
-        replaceTab(result.data.id, {
-          id: result.data.id,
-          title: result.data.name,
-          url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
-        });
+      return apiClientRecordsRepository.renameCollection(record.id, name).then(async (result) => {
+        if (!result.success) {
+          notification.error({
+            message: `Could not rename collection.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
+          return;
+        }
+
+        onSaveRecord(result.data, "open");
+        const wasForceRefreshed = await forceRefreshApiClientRecords();
+        if (wasForceRefreshed) {
+          closeTab(
+            new CollectionViewTabSource({
+              id: record.id,
+              title: "",
+            })
+          );
+        }
+        setTitle(result.data.name);
       });
     },
-    [collection, teamId, user.details?.profile?.uid, onSaveRecord, replaceTab]
+    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
 
   if (isLoadingApiClientRecords) {
@@ -100,6 +143,8 @@ export const CollectionView = () => {
       </div>
     );
   }
+
+  const collectionName = collection?.name || "New Collection";
 
   return (
     <div className="collection-view-container">
@@ -111,14 +156,24 @@ export const CollectionView = () => {
         />
       ) : (
         <>
-          <RQBreadcrumb
-            placeholder="New Collection"
-            recordName={collection?.name || "New Collection"}
-            onBlur={(newName) => handleCollectionNameChange(newName)}
-            autoFocus={location.search.includes("new")}
-          />
+          <div className="collection-view-breadcrumb-container">
+            <RQBreadcrumb
+              placeholder="New Collection"
+              recordName={collectionName}
+              onBlur={(newName) => handleCollectionNameChange(newName)}
+              autoFocus={isNewCollection}
+              defaultBreadcrumbs={[
+                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                {
+                  isEditable: true,
+                  pathname: window.location.pathname,
+                  label: collectionName,
+                },
+              ]}
+            />
+          </div>
           <div className="collection-view-content">
-            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} />
+            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />
           </div>
         </>
       )}

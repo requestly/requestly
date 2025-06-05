@@ -1,14 +1,24 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortReason, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { upsertApiRecord } from "backend/apiClient";
-import { forEach, isEmpty, split, unionBy } from "lodash";
+import { forEach, isEmpty, omit, split, unionBy } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
+import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 
+const createAbortError = (signal: AbortSignal) => {
+  if (signal.reason === AbortReason.USER_CANCELLED) {
+    return new UserAbortError();
+  }
+  return new Error("Request aborted");
+};
+
+type ResponseOrError = RQAPI.Response | { error: string };
 export const makeRequest = async (
   appMode: string,
   request: RQAPI.Request,
@@ -17,20 +27,37 @@ export const makeRequest = async (
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
-        reject(new Error("Request aborted"));
+        reject(createAbortError(signal));
       }
-
       const abortListener = () => {
         signal.removeEventListener("abort", abortListener);
-        reject(new Error("Request aborted"));
+        reject(createAbortError(signal));
       };
       signal.addEventListener("abort", abortListener);
     }
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then(resolve);
+      getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then(resolve);
+      getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
+        if (!result) {
+          //Backward compatibility check
+          reject(new Error("Failed to make request. Please check if the URL is valid."));
+        } else if ("error" in result) {
+          reject(new Error(result.error));
+        } else {
+          resolve(result);
+        }
+      });
     } else {
       resolve(null);
     }
@@ -57,6 +84,11 @@ export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
       contentType: RequestContentType.RAW,
       ...(request || {}),
     },
+    auth: getDefaultAuth(false),
+    scripts: {
+      preRequest: "",
+      postResponse: "",
+    },
     response: null,
   };
 };
@@ -75,13 +107,15 @@ export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => 
     },
   };
 
-  if (!supportsRequestBody(entry.request.method)) {
-    sanitizedEntry.request.body = null;
-  } else if (entry.request.contentType === RequestContentType.FORM) {
-    sanitizedEntry.request.body = sanitizeKeyValuePairs(
-      sanitizedEntry.request.body as KeyValuePair[],
-      removeDisabledKeys
-    );
+  if (entry.request.body != null) {
+    if (!supportsRequestBody(entry.request.method)) {
+      sanitizedEntry.request.body = null;
+    } else if (entry.request.contentType === RequestContentType.FORM) {
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(
+        entry.request.body as RQAPI.RequestFormBody,
+        removeDisabledKeys
+      );
+    }
   }
 
   return sanitizedEntry;
@@ -142,46 +176,42 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  try {
-    const requestJsonString = curlconverter.toJsonString(curl);
-    const requestJson = JSON.parse(requestJsonString);
+  const requestJsonString = curlconverter.toJsonString(curl);
+  const requestJson = JSON.parse(requestJsonString);
 
-    const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
-    /*
+  const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+  /*
       cURL converter is not able to parse query params from url for some cURL requests
       so parsing it manually from URL and populating queryParams property
     */
-    const requestUrlParams = new URL(requestJson.url).searchParams;
-    const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+  const requestUrlParams = new URL(requestJson.url).searchParams;
+  const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
 
-    const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
-    const contentType = getContentTypeFromRequestHeaders(headers);
-    let body: RQAPI.RequestBody;
+  const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
+  const contentType = getContentTypeFromRequestHeaders(headers);
+  let body: RQAPI.RequestBody;
 
-    if (contentType === RequestContentType.JSON) {
-      body = JSON.stringify(requestJson.data);
-    } else if (contentType === RequestContentType.FORM) {
-      body = generateKeyValuePairsFromJson(requestJson.data);
-    } else {
-      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
-    }
-
-    // remove query params from url
-    const requestUrl = requestJson.url.split("?")[0];
-
-    const request: RQAPI.Request = {
-      url: requestUrl,
-      method: requestJson.method.toUpperCase() as RequestMethod,
-      queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
-      headers,
-      contentType,
-      body: body ?? null,
-    };
-
-    return request;
-  } catch (e) {
-    return null;
+  if (contentType === RequestContentType.JSON) {
+    body = JSON.stringify(requestJson.data);
+  } else if (contentType === RequestContentType.FORM) {
+    body = generateKeyValuePairsFromJson(requestJson.data);
+  } else {
+    body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
   }
+
+  // remove query params from url
+  const requestUrl = requestJson.url.split("?")[0];
+
+  const request: RQAPI.Request = {
+    url: requestUrl,
+    method: requestJson.method.toUpperCase() as RequestMethod,
+    queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
+    headers,
+    contentType,
+    body: body ?? null,
+  };
+
+  return request;
 };
 
 export const isApiRequest = (record: RQAPI.Record) => {
@@ -193,7 +223,14 @@ export const isApiCollection = (record: RQAPI.Record) => {
 };
 
 const sortRecords = (records: RQAPI.Record[]) => {
-  return records.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+  return records.sort((a, b) => {
+    // Sort by type first
+    const typeComparison = a.type.localeCompare(b.type);
+    if (typeComparison !== 0) return typeComparison;
+
+    // If types are the same, sort alphabetically by name
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+  });
 };
 
 const sortNestedRecords = (records: RQAPI.Record[]) => {
@@ -223,18 +260,16 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 
   recordsCopy.forEach((record) => {
     const recordState = recordsMap[record.id];
-    if (record.collectionId) {
-      const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
-      if (parentNode) {
-        parentNode.data.children.push(recordState);
-      }
+    const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
+    if (parentNode) {
+      parentNode.data.children.push(recordState);
     } else {
-      updatedRecords.push(recordState);
+      updatedRecords.push({ ...recordState, collectionId: "" });
     }
   });
 
   sortNestedRecords(updatedRecords);
-  return updatedRecords;
+  return { recordsMap, updatedRecords };
 };
 
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
@@ -243,7 +278,8 @@ export const createBlankApiRecord = (
   uid: string,
   teamId: string,
   recordType: RQAPI.RecordType,
-  collectionId: string
+  collectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<any>
 ) => {
   const newRecord: Partial<RQAPI.Record> = {};
 
@@ -258,12 +294,20 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.COLLECTION) {
     newRecord.name = "New collection";
     newRecord.type = RQAPI.RecordType.COLLECTION;
-    newRecord.data = { variables: {} };
+    newRecord.data = {
+      variables: {},
+      auth: getDefaultAuth(false),
+    };
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }
 
-  return upsertApiRecord(uid, newRecord, teamId);
+  const result =
+    recordType === RQAPI.RecordType.COLLECTION
+      ? apiClientRecordsRepository.createCollection(newRecord as RQAPI.CollectionRecord)
+      : apiClientRecordsRepository.createRecord(newRecord as RQAPI.ApiRecord);
+
+  return result;
 };
 
 export const extractQueryParams = (inputString: string) => {
@@ -288,9 +332,6 @@ export const extractQueryParams = (inputString: string) => {
 };
 
 export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString: string) => {
-  if (isEmpty(queryParams)) {
-    return inputString;
-  }
   const baseUrl = split(inputString, "?")[0];
   const enabledParams = queryParams.filter((param) => param.isEnabled ?? true);
 
@@ -518,4 +559,53 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
   }
 
   return harRequest;
+};
+
+export const filterOutChildrenRecords = (
+  selectedRecords: Set<RQAPI.Record["id"]>,
+  childParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>,
+  recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
+) =>
+  [...selectedRecords]
+    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
+    .map((id) => recordsMap[id]);
+
+export const processRecordsForDuplication = (
+  recordsToProcess: RQAPI.Record[],
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+) => {
+  const recordsToDuplicate: RQAPI.Record[] = [];
+  const queue: RQAPI.Record[] = [...recordsToProcess];
+
+  while (queue.length > 0) {
+    const record = queue.shift()!;
+
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      const newId = apiClientRecordsRepository.generateCollectionId(`(Copy) ${record.name}`, record.collectionId);
+
+      const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
+        id: newId,
+        name: `(Copy) ${record.name}`,
+        data: omit(record.data, "children"),
+      });
+
+      recordsToDuplicate.push(collectionToDuplicate);
+
+      if (record.data.children?.length) {
+        const childrenToDuplicate = record.data.children.map((child) =>
+          Object.assign({}, child, { collectionId: newId })
+        );
+        queue.push(...childrenToDuplicate);
+      }
+    } else {
+      const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
+        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId),
+        name: `(Copy) ${record.name}`,
+      });
+
+      recordsToDuplicate.push(requestToDuplicate);
+    }
+  }
+
+  return recordsToDuplicate;
 };

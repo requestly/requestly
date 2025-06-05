@@ -1,5 +1,5 @@
 .homepage-wrapper {
-  background: var(--surface-0);
+  background-color: var(--requestly-color-background);
   display: flex;
   justify-content: center;
   height: 100%;
@@ -11,155 +11,485 @@
     max-width: 1200px;
   }
 
+  & .welcome-message {
+    margin: 40px 0;
+    margin-left: 90px;
+    max-width: 960px;
+    align-items: center;
+    line-height: 22px;
+    font-size: var(--requestly-font-size-base);
+    font-weight: 500;
+    span {
+      b {
+        color: var(--requestly-color-text-default);
+      }
+    }
+    svg {
+      margin-right: 12px;
+    }
+  }
+
   & .homepage-primary-cards-wrapper {
-    gap: 1rem;
+    gap: 24px;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 40px;
+    padding-bottom: 12px;
 
     & > .ant-col {
       max-width: 49%;
     }
   }
 
-  & .homepage-primary-card {
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--surface-2);
-    background: var(--surface-0_5);
-    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
-    padding: 1rem;
-
-    & .primary-card-header {
-      font-size: var(--requestly-font-size-md, 15px);
-      font-weight: var(--requestly-font-weight-medium);
-      letter-spacing: 0.25px;
-    }
-  }
-
-  & .homepage-bottom-section {
-    padding-bottom: 1rem;
-    gap: 1rem;
-
-    & .homepage-teams-card {
-      max-width: 49%;
-    }
-
-    & .homepage-help-card,
-    & .homepage-changelog-card {
-      max-width: 24%;
-    }
-  }
-
   .ant-skeleton-paragraph li {
     height: 15px;
-  }
-
-  .homepage-view-all-link {
-    margin-top: 8px;
-    padding-left: 4px;
-    font-size: var(--requestly-font-size-sm, 13px);
   }
 }
 
 .homepage-emptycard {
+  width: 100%;
+  min-width: 325px;
+  max-width: 325px;
+  padding-top: 20px;
+  height: 304px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: var(--requestly-color-neutral-900);
+  padding: 16px;
 
-  &-icon-img {
-    width: 24px;
-    height: 24px;
-  }
+  .header-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
 
-  &-icon {
-    height: 24px;
+    .details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
 
-    & .mocks-card-icon {
-      font-size: 24px;
-      margin-top: 0;
+      .icon-container {
+        display: flex;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 32px;
+        background: var(--requestly-color-white-t-20);
+
+        img {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
+
+      h1 {
+        line-height: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+      }
+    }
+
+    .title-badge-container {
+      p {
+        line-height: 17px;
+        font-size: var(--requestly-font-size-xs);
+        font-weight: 400;
+        color: var(--requestly-color-text-subtle);
+        margin: 0;
+      }
+
+      .rq-badge {
+        margin-bottom: 0;
+      }
+    }
+
+    .action-buttons {
+      margin-left: auto;
     }
   }
 
-  &-title {
-    font-weight: 500;
-    margin-top: 8px;
-    color: var(--white);
+  .features {
+    margin: 0;
+    padding-left: 20px;
+
+    li {
+      color: var(--requestly-color-text-subtle);
+      line-height: 17px;
+      font-size: 12px;
+      font-weight: 400;
+      display: list-item;
+      list-style-type: disc;
+      margin-bottom: 16px;
+    }
   }
 
-  &-description {
-    text-align: center;
-    font-size: 12px;
-    color: var(--neutrals-gray-300);
-    max-width: 372px;
+  &-icon-img {
+    width: 40px;
+    height: 40px;
+    margin-right: 16px;
   }
 
-  &-actions {
-    margin-top: 24px;
+  &-icon {
+    height: 40px;
+  }
+
+  .play-icon {
+    margin-top: auto;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    color: var(--white);
+    text-decoration: none;
+    color: unset;
+
+    svg {
+      --size: 20px;
+      width: var(--size);
+      height: var(--size);
+
+      color: var(--requestly-color-text-default);
+      flex-shrink: 0;
+      margin-right: 6px;
+    }
+    p {
+      line-height: 17px;
+      font-size: var(--requestly-font-size-xs);
+      margin: 0;
+    }
+  }
+}
+
+.action-section {
+  border-radius: 8px;
+  border: 1px solid var(--stroke-card, rgba(255, 255, 255, 0.2));
+  background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+  height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.ant-dropdown-menu-item-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.import-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  margin-left: auto;
+
+  &-label {
+    margin-right: 12px;
   }
 
-  &-secondary-btn.ant-btn {
-    color: var(--white);
-    padding: 3px 8px;
+  .ant-dropdown-trigger {
+    display: flex;
+    gap: 8px;
+    height: 40px;
+    border-radius: 8px;
+    line-height: 18px;
+    font-size: 12px;
+  }
+
+  svg {
+    --size: 16px;
+    width: var(--size);
+    height: var(--size);
   }
 }
 
 .homepage-card-loader {
-  width: 100%;
-  height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
+  flex-direction: column;
+  height: 100%;
 
   & .ant-spin-text {
     color: var(--white);
     margin-top: 8px;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 13px;
   }
-}
 
-.homepage-view-all-link {
-  margin-top: 8px;
-  padding-left: 4px;
-  font-size: var(--requestly-font-size-sm, 13px);
+  div.middle-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
+  }
 }
 
 .homepage-teams-card > div {
   height: 100%;
 }
 
-.homepage-incentives-card.ant-col {
-  margin-bottom: 20px;
-  margin-right: 8px;
-  padding-bottom: 0;
-}
-
 .homepage-empty-card-secondary-btn.ant-btn:focus {
   background: none;
+}
+
+.content-container {
+  border-radius: 16px;
+  background: var(--requestly-color-neutral-900);
+  width: 100%;
+  min-width: 325px;
+  max-width: 325px;
+  padding-top: 20px;
+  height: 346px;
+  display: flex;
+  flex-direction: column;
+
+  .header-content {
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    .details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .icon-container {
+        display: flex;
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 32px;
+        background: var(--requestly-color-white-t-20);
+
+        img {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
+
+      h1 {
+        line-height: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      align-items: center;
+
+      // TODO: Create a separate component for this dropdown button
+      .ant-dropdown-button {
+        .ant-btn-sm {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          flex-shrink: 0;
+          gap: 6px;
+          text-align: center;
+          color: var(--requestly-color-text-default, #fff);
+          font-style: normal;
+          font-family: var(--requestly-font-family-default, Inter);
+          font-weight: var(--requestly-font-weight-medium);
+          height: 24px;
+          padding: var(--space-0, 0px) var(--space-4, 8px);
+          font-size: var(--requestly-font-size-xs, 11px);
+          line-height: var(--requestly-font-line-height-xs, 15px);
+          background: var(--requestly-color-primary, #004eeb);
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+        }
+
+        .ant-btn-icon-only {
+          svg {
+            flex-shrink: 0;
+          }
+        }
+      }
+
+      .import-dropdown-trigger {
+        margin-right: 4px;
+        &:hover {
+          background: none;
+        }
+      }
+    }
+  }
+
+  .middle-section {
+    padding: 0 20px;
+
+    h2 {
+      line-height: 18px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--requestly-color-text-subtle);
+      margin: 0 0 16px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .list-item {
+        font-size: 12px;
+        line-height: 18px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        color: var(--requestly-color-text-default);
+        text-decoration-color: #ffffff00;
+        transition: 0.2s all ease-in-out;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+
+        p {
+          margin: 0;
+          text-decoration-color: #ffffff00;
+          transition: 0.2s all ease-in-out;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        &-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            --size: 16px;
+            width: var(--size);
+            height: var(--size);
+            color: var(--requestly-color-text-placeholder);
+          }
+        }
+
+        .request-method {
+          width: 32px;
+          text-align: center;
+          line-height: 14px;
+          font-size: 8px;
+          margin: 0;
+          border-radius: 4px;
+        }
+
+        &:hover {
+          .item-title {
+            text-decoration: underline;
+            text-decoration-color: var(--requestly-color-text-default);
+            text-decoration-thickness: 1px;
+            text-underline-offset: 4px;
+          }
+        }
+      }
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-2, 4px);
+      padding: 20px 0;
+
+      img {
+        --size: 48px;
+        width: var(--size);
+        height: var(--size);
+        flex-shrink: 0;
+      }
+
+      .title {
+        color: var(--requestly-color-text-default, #fff);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 18px; /* 150% */
+      }
+
+      .description {
+        text-align: center;
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-size: var(--requestly-font-size-xs);
+        line-height: 17px; /* 154.545% */
+      }
+    }
+  }
+
+  .footer-section {
+    margin-top: auto;
+    height: 56px;
+    display: flex;
+    padding: 4px 4px 4px 24px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0px 0px 16px 16px;
+
+    .import-dropdown {
+      display: flex;
+      margin-top: 0;
+
+      .import-dropdown-button {
+        box-shadow: none;
+        font-weight: 400;
+        &:hover {
+          background: none;
+        }
+
+        img {
+          width: auto;
+          height: auto;
+        }
+
+        svg {
+          --size: 16px;
+          width: var(--size);
+          height: var(--size);
+        }
+      }
+    }
+
+    .view-all-cta {
+      display: block;
+      line-height: 18px;
+      font-size: 12px;
+      color: var(--requestly-color-primary-text);
+    }
+  }
+}
+
+.more-options {
+  ul {
+    li {
+      width: 160px;
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+      span {
+        line-height: 20px;
+        font-size: 14px;
+      }
+    }
+
+    li.ant-dropdown-menu-item-divider {
+      margin-left: 8px;
+    }
+  }
 }
 
 @media (max-width: 1000px) {
   .homepage-wrapper {
     & .homepage-primary-cards-wrapper .homepage-primary-card.ant-col {
       max-width: 100%;
-    }
-
-    & .homepage-bottom-section {
-      &.ant-row-no-wrap {
-        flex-wrap: wrap;
-      }
-
-      & .homepage-help-card,
-      & .homepage-changelog-card {
-        max-width: 100%;
-      }
-
-      & .homepage-teams-card {
-        max-width: 100%;
-      }
     }
   }
 }

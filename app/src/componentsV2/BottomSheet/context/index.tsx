@@ -6,10 +6,15 @@ import {
   trackViewBottomSheetOnRightClicked,
 } from "../analytics";
 
+interface toggleParams {
+  isOpen: boolean;
+  isTrack: boolean;
+  action: string;
+}
 interface BottomSheetContextProps {
   isBottomSheetOpen: boolean;
   sheetPlacement: BottomSheetPlacement;
-  toggleBottomSheet: (isOpen?: boolean) => void;
+  toggleBottomSheet: (params?: toggleParams) => void;
   toggleSheetPlacement: (placement?: BottomSheetPlacement) => void;
 }
 
@@ -23,13 +28,17 @@ export const BottomSheetProvider: React.FC<{
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
 
-  const toggleBottomSheet = (isOpen?: boolean) => {
+  const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
     if (isOpen) {
       setIsBottomSheetOpen(isOpen);
-      trackBottomSheetToggled(isOpen);
+      if (isTrack) {
+        trackBottomSheetToggled(isOpen, action);
+      }
     } else {
       setIsBottomSheetOpen((prev) => !prev);
-      trackBottomSheetToggled(!isBottomSheetOpen);
+      if (isTrack) {
+        trackBottomSheetToggled(!isBottomSheetOpen, action);
+      }
     }
   };
 

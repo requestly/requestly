@@ -23,7 +23,7 @@ const DeleteWorkspaceModal: React.FC<DeleteWorkspaceModalProps> = ({
     <RQModal centered open={isOpen} onCancel={handleModalClose}>
       <div className="rq-modal-content">
         <div>
-          <img alt="smile" width="37px" height="37px" src="/assets/img/workspaces/oops.svg" />
+          <img alt="smile" width="37px" height="37px" src="/assets/media/settings/oops.svg" />
         </div>
         <div className="header delete-team-modal-header">Are you sure you want to delete this workspace?</div>
         <p className="text-gray">

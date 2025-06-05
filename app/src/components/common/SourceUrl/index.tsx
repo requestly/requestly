@@ -8,6 +8,7 @@ import { RulePairSource, RuleSourceKey, RuleSourceOperator } from "@requestly/sh
 type Source = RulePairSource | SessionRecordingPageSource;
 
 interface SourceProps {
+  disabled?: boolean;
   source: Source;
   autoFocus?: boolean;
   additionalActions?: React.ReactNode;
@@ -17,6 +18,7 @@ interface SourceProps {
 export const SourceConditionInput: React.FC<SourceProps> = ({
   source,
   autoFocus = false,
+  disabled = false,
   additionalActions = <></>,
   onSourceChange,
 }) => {
@@ -24,6 +26,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
     <div className="source-condition-input-wrapper mt-8">
       <Col className="shrink-0 source-condition-input-select">
         <Select
+          disabled={disabled}
           value={source.key}
           className="source-condition-selector cursor-pointer uppercase"
           onChange={(value) => {
@@ -32,8 +35,8 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
         >
           {Object.entries(RuleSourceKey).map(([key, value]) =>
             value === RuleSourceKey.PATH ? null : (
-              <Select.Option key={value} value={value}>
-                {capitalize(value)}
+              <Select.Option key={String(value)} value={value}>
+                {capitalize(String(value))}
               </Select.Option>
             )
           )}
@@ -41,6 +44,7 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
       </Col>
       <Col className="shrink-0 source-condition-input-select">
         <Select
+          disabled={disabled}
           value={source.operator}
           className="source-condition-selector cursor-pointer"
           onChange={(value) => {
@@ -53,12 +57,13 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
                 ? "Wildcard"
                 : value === RuleSourceOperator.MATCHES
                 ? "RegEx"
-                : value}
+                : String(value)}
             </Select.Option>
           ))}
         </Select>
       </Col>
       <Input
+        disabled={disabled}
         autoFocus={autoFocus}
         className="source-url-input"
         placeholder="Enter source URL"

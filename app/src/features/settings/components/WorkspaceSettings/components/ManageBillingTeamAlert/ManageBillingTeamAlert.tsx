@@ -29,7 +29,6 @@ export const ManageBillingTeamAlert: React.FC = () => {
             className="manage-btn"
             icon={<CgOptions />}
             onClick={() => {
-              //@ts-ignore
               dispatch(globalActions.updateIsManageBillingTeamAlertVisible(false));
               navigate(PATHS.SETTINGS.BILLING.ABSOLUTE);
             }}
@@ -39,7 +38,6 @@ export const ManageBillingTeamAlert: React.FC = () => {
         </div>
       }
       onClose={() => {
-        //@ts-ignore
         dispatch(globalActions.updateIsManageBillingTeamAlertVisible(false));
       }}
     />

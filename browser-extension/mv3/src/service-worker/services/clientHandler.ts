@@ -1,6 +1,6 @@
 import { generateUrlPattern, getBlockedDomains, isExtensionEnabled, onBlockListChange } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
-import { Variable, onVariableChange } from "../variable";
+import { onVariableChange, Variable } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
 import { globalStateManager } from "./globalStateManager";

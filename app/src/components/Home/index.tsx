@@ -1,48 +1,35 @@
 import React from "react";
 import { Col, Row } from "antd";
-import { ChangeLogCard } from "./components/ChangelogCard";
-import { HelpCard } from "./components/HelpCard";
-import { TeamsCard } from "./components/WorkspaceCard";
-import { Templates } from "./components/Templates";
 import { RulesCard } from "./components/RulesCard";
-import { MocksCard } from "./components/MocksCard";
-import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import ApiClientCard from "./components/ApiClientCard";
+import UserAvatar from "../../assets/images/illustrations/avatar.svg?react";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useSelector } from "react-redux";
+import { APIMockingCard } from "./components/APIMockingCard";
+import { HomeScreenProvider } from "./contexts";
 import "./home.scss";
 
 export const Home: React.FC = () => {
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
+  const user = useSelector(getUserAuthDetails);
+  const displayName = user?.details?.profile?.displayName?.split(" ")[0] ?? "Guest";
 
   return (
-    <Col className="homepage-wrapper">
-      <Col className="homepage-content">
-        {isIncentivizationEnabled && (
-          <Col className="homepage-primary-card homepage-incentives-card">
-            <IncentivesCard />
-          </Col>
-        )}
-
-        <Row className="homepage-primary-cards-wrapper">
-          <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
+    <HomeScreenProvider>
+      <Col className="homepage-wrapper">
+        <Col className="homepage-content">
+          <Row className="welcome-message">
+            <UserAvatar />
+            <span>
+              <b>Welcome {displayName}!</b> Glad to have you on Requestly. 🚀<i> Let’s go!</i>
+            </span>
+          </Row>
+          <Row className="homepage-primary-cards-wrapper">
             <RulesCard />
-          </Col>
-          <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
-            <MocksCard />
-          </Col>
-        </Row>
-        <Templates />
-        <Row className="homepage-bottom-section" wrap={false}>
-          <Col xs={24} md={24} lg={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
-            <TeamsCard />
-          </Col>
-          <Col xs={24} md={24} lg={6} className="homepage-help-card homepage-primary-card">
-            <HelpCard />
-          </Col>
-          <Col xs={24} md={24} lg={6} className="homepage-changelog-card homepage-primary-card">
-            <ChangeLogCard />
-          </Col>
-        </Row>
+            <ApiClientCard />
+            <APIMockingCard />
+          </Row>
+        </Col>
       </Col>
-    </Col>
+    </HomeScreenProvider>
   );
 };

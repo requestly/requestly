@@ -1,5 +1,5 @@
-import { Team } from "types";
 import { Group as NewGroup, Rule as NewRule } from "@requestly/shared/types/entities/rules";
+import { Workspace } from "features/workspaces/types";
 
 export enum SharingOptions {
   WORKSPACE = "workspace",
@@ -34,5 +34,5 @@ export type PostShareViewData = {
     teamName: string;
     accessCount: number;
   };
-  sourceTeamData?: Team | null;
+  sourceTeamData?: Workspace | null;
 };

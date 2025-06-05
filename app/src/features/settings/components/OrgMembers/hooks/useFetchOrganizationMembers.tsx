@@ -3,9 +3,10 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import { OrgMember } from "../types";
 import Logger from "../../../../../../../common/logger";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 export const useFetchOrgMembers = () => {
   const user = useSelector(getUserAuthDetails);
@@ -13,14 +14,14 @@ export const useFetchOrgMembers = () => {
   const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: OrgMember[] }>(null);
 
   useEffect(() => {
-    if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
+    if (user.loggedIn && !isCompanyEmail(user.details?.emailType)) {
       trackBillingTeamNoMemberFound("personal_email", "");
       setOrganizationMembers({ total: 0, users: [] });
       setIsLoading(false);
       return;
     }
 
-    if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
+    if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user.details?.emailType)) {
       const getOrganizationUsers = httpsCallable(getFunctions(), "users-getOrganizationUsers");
       getOrganizationUsers({
         domain: getDomainFromEmail(user?.details?.profile?.email),
@@ -38,7 +39,7 @@ export const useFetchOrgMembers = () => {
           setIsLoading(false);
         });
     }
-  }, [user.loggedIn, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
+  }, [user.loggedIn, user.details?.profile?.email, user.details?.profile?.isEmailVerified, user.details?.emailType]);
 
   return { isLoading, organizationMembers: organizationMembers?.users };
 };

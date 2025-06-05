@@ -1,4 +1,11 @@
 .variables-list-header {
+  .variables-list-header-breadcrumb-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 16px;
+  }
+
   .env-view-breadcrumb {
     display: flex;
     gap: 4px;
@@ -24,6 +31,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .variables-list-btn-actions-container {
+      display: flex;
+      gap: 8px;
+    }
   }
 
   .variables-list-search-input {

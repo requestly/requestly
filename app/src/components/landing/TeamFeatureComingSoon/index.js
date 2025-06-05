@@ -25,7 +25,7 @@ const TeamFeatureComingSoon = ({ title = "" }) => {
         </p>
 
         <div className="team-feature-banner">
-          <img alt="file" className="file-icon" src="/assets/img/workspaces/file.svg" />
+          <img alt="file" className="file-icon" src="/assets/media/common/file.svg" />
           <div className="header">Coming soon!</div>
           <p className="text-dark-gray">
             Meanwhile you can{" "}

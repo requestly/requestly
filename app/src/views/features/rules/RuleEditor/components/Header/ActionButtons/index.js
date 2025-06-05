@@ -7,7 +7,6 @@ const ActionButtons = ({ mode }) => {
   return (
     <div className="rule-editor-header-action-btns">
       {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? <ShareRuleButton /> : null}
-
       <CreateRuleButton />
     </div>
   );

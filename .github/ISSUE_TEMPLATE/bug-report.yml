@@ -62,7 +62,7 @@ body:
     attributes:
       label: Requestly Version
       description: |
-        Requestly version where you found this bug. https://docs.requestly.io/other/requestly-faqs#find-requestly-version
+        Requestly version where you found this bug. https://docs.requestly.com/guides/troubleshooting/frequently-asked-questions
       placeholder: |
         e.g. v1.4.8
     validations:

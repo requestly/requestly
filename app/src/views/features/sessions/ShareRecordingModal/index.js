@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Button, Col, Row, Radio, Tag, Typography, Modal } from "antd";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
@@ -21,6 +20,7 @@ import { useSelector } from "react-redux";
 import { StartFromOffsetInput } from "./components/StartFromOffsetInput/StartFromOffsetInput";
 import { getSecondsFromStringifiedMinSec } from "utils/DateTimeUtils";
 import "./shareRecordingModal.scss";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const _ = require("lodash");
 
@@ -66,7 +66,7 @@ const ShareRecordingModal = ({
   currentOffset = "0:00",
 }) => {
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const publicURL = getSessionRecordingSharedLink(recordingId);
   // Component State
@@ -123,13 +123,13 @@ const ShareRecordingModal = ({
   const getPrettyDescription = (visibility) => {
     switch (visibility) {
       case Visibility.ONLY_ME:
-        return isWorkspaceMode
+        return isSharedWorkspaceMode
           ? "No one outside this workspace can access this recording"
           : "No one except me can access this recording";
       case Visibility.PUBLIC:
         return "Anyone on the Internet with the link can view";
       case Visibility.CUSTOM:
-        return isWorkspaceMode
+        return isSharedWorkspaceMode
           ? "People in this Workspace & listed below can open with the link"
           : "Only people listed below can open with the link";
       case Visibility.ORGANIZATION:
@@ -143,7 +143,7 @@ const ShareRecordingModal = ({
   const allOptions = [
     {
       key: Visibility.ONLY_ME,
-      label: isWorkspaceMode ? "Private to workspace" : "Private to me",
+      label: isSharedWorkspaceMode ? "Private to workspace" : "Private to me",
     },
     {
       key: Visibility.PUBLIC,
@@ -157,7 +157,7 @@ const ShareRecordingModal = ({
     // },
     {
       key: Visibility.CUSTOM,
-      label: isWorkspaceMode ? "Only with specific people outside this workspace" : "Only with specific people",
+      label: isSharedWorkspaceMode ? "Only with specific people outside this workspace" : "Only with specific people",
     },
   ];
 

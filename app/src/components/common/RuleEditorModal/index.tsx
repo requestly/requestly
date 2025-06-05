@@ -28,8 +28,8 @@ import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { RecordStatus, Rule, ResponseRule, RuleType, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
-import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
+import { RoleBasedComponent, useRBAC } from "features/rbac";
 import "./RuleEditorModal.css";
 
 enum EditorMode {
@@ -52,6 +52,8 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isLoading, setIsLoading] = useState(false);
   const [isRuleNotFound, setIsRuleNotFound] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
   const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
 
   const ruleMenuOptions = useMemo(
@@ -204,10 +206,6 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     [handleModalClose, showRuleCreatedFromModalToast]
   );
 
-  useEffect(() => {
-    trackRuleEditorViewed(analyticEventEditorViewedSource, ruleType);
-  }, [analyticEventEditorViewedSource, ruleType]);
-
   return (
     <RQModal
       centered
@@ -232,38 +230,42 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               <RQEditorTitle
                 mode={mode}
                 name={currentlySelectedRuleData?.name ?? ""}
+                disabled={!isValidPermission}
                 nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
                 namePlaceholder="Enter rule name"
                 description={currentlySelectedRuleData?.description ?? ""}
                 descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
                 descriptionPlaceholder="Add description (optional)"
               />
-              <Col span={7}>
-                <Row align="middle" justify="end" wrap={false} className="rule-editor-modal-actions">
-                  <RuleStatusButton isRuleEditorModal={true} mode={mode} />
-                  {mode === EditorMode.EDIT && (
-                    <>
-                      <DeleteButton
-                        rule={currentlySelectedRuleData}
-                        isDisabled={mode === EditorMode.CREATE}
-                        isRuleEditorModal={true}
-                        ruleDeletedCallback={() => handleModalClose()}
-                      />
 
-                      <Dropdown overlay={ruleMenuOptions} trigger={["click"]} placement="bottomRight">
-                        <RQButton iconOnly type="default" icon={<MoreOutlined />} />
-                      </Dropdown>
-                    </>
-                  )}
+              <RoleBasedComponent resource="http_rule" permission="create">
+                <Col span={7}>
+                  <Row align="middle" justify="end" wrap={false} className="rule-editor-modal-actions">
+                    <RuleStatusButton isRuleEditorModal={true} mode={mode} />
+                    {mode === EditorMode.EDIT && (
+                      <>
+                        <DeleteButton
+                          rule={currentlySelectedRuleData}
+                          isDisabled={mode === EditorMode.CREATE}
+                          isRuleEditorModal={true}
+                          ruleDeletedCallback={() => handleModalClose()}
+                        />
 
-                  <CreateRuleButton
-                    isRuleEditorModal={true}
-                    ruleEditorModalMode={mode}
-                    analyticEventRuleCreatedSource={"rule_editor_modal_header"}
-                    ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
-                  />
-                </Row>
-              </Col>
+                        <Dropdown overlay={ruleMenuOptions} trigger={["click"]} placement="bottomRight">
+                          <RQButton iconOnly type="default" icon={<MoreOutlined />} />
+                        </Dropdown>
+                      </>
+                    )}
+
+                    <CreateRuleButton
+                      isRuleEditorModal={true}
+                      ruleEditorModalMode={mode}
+                      analyticEventRuleCreatedSource={"rule_editor_modal_header"}
+                      ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
+                    />
+                  </Row>
+                </Col>
+              </RoleBasedComponent>
             </Row>
 
             <div className="rule-editor-modal-container">
@@ -272,7 +274,10 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               {currentlySelectedRuleConfig?.ALLOW_ADD_PAIR ? (
                 <Row justify="end">
                   <Col span={24}>
-                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                    <AddPairButton
+                      disabled={!isValidPermission}
+                      currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+                    />
                   </Col>
                 </Row>
               ) : null}

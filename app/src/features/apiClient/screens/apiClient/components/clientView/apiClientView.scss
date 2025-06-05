@@ -35,26 +35,46 @@
   background-color: var(--requestly-color-background);
 
   .api-client-header-container {
-    padding: 8px 16px 8px 6px;
+    position: sticky;
     border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-  }
 
-  .api-client-body {
-    padding: 0 16px;
-    padding-top: 8px;
-    overflow: hidden;
+    &__header {
+      padding: var(--space-5, 12px) var(--space-6, 16px);
+    }
 
-    .ant-tabs {
-      .ant-tabs-nav-wrap {
-        .ant-tabs-tab {
-          padding: 6px 4px;
+    .api-client-breadcrumb-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--space-5, 12px);
+
+      .rq-breadcrumb {
+        margin: 0;
+      }
+
+      .api-client-view_get-code-btn {
+        color: var(--requestly-color-text-subtle);
+
+        &:hover {
+          color: var(--requestly-color-text-default);
         }
       }
     }
   }
 
-  .rq-breadcrumb {
-    margin: 0 10px;
+  .api-client-body {
+    padding-top: 8px;
+    position: sticky;
+    overflow: hidden;
+
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        padding: 0 16px;
+        .ant-tabs-tab {
+          padding: 6px 4px;
+        }
+      }
+    }
   }
 
   .api-client-header {
@@ -70,14 +90,25 @@
       width: calc(100% - 205px);
 
       .api-request-method-selector {
-        width: 120px;
+        width: 100px;
+      }
+
+      .api-request-method-selector .ant-select-selector {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
       }
 
       .api-request-url {
-        padding: 4px 8px;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+        padding: 4px 8px;
         background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-left: none;
+
+        &:focus-within {
+          border: 1px solid var(--requestly-color-primary);
+        }
       }
 
       .ant-select-selector {
@@ -97,17 +128,16 @@
   }
 
   .api-request-tabs {
-    height: calc(100% - 35px);
+    height: calc(100% - 20px);
     overflow: hidden;
     margin-top: 8px;
 
     .ant-tabs-content-holder {
       height: inherit;
-      padding-bottom: 44px;
+      padding: 0 16px 5px;
 
       .ant-tabs-content-top {
         height: 100%;
-        overflow: auto;
       }
     }
   }

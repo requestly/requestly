@@ -2,13 +2,27 @@
   width: 100%;
   height: 100%;
 
+  .collection-view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+  }
+
+  .collection-view-breadcrumb-container {
+    padding: var(--space-5, 12px) var(--space-6, 16px);
+
+    .rq-breadcrumb {
+      margin: 0;
+      height: 36px;
+    }
+  }
+
   .collection-view-content {
     width: 100%;
     height: calc(100% - 35px);
     overflow-y: hidden;
     border-top: 1px solid var(--requestly-color-white-t-10);
-    margin-top: 12px;
-    padding-top: 4px;
 
     .ant-tabs {
       height: inherit;
@@ -46,6 +60,16 @@
 
     .rq-content-list-table-container {
       padding-top: 0;
+    }
+
+    .ant-tabs-tabpane {
+      .api-client-read-only-mode-alert {
+        margin: 7px 16px 8px 16px;
+      }
+
+      .authorization-view {
+        margin: 0 16px;
+      }
     }
   }
 }

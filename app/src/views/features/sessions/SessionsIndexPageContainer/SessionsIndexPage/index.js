@@ -24,7 +24,6 @@ import RecordingsList from "./RecordingsList";
 import OnboardingView, { SessionOnboardingView } from "./OnboardingView";
 import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
 import PageLoader from "components/misc/PageLoader";
 import { useHasChanged } from "hooks";
@@ -44,6 +43,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -53,8 +53,8 @@ const SessionsIndexPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
 
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
@@ -75,7 +75,7 @@ const SessionsIndexPage = () => {
     const records = [];
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
-    const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
+    const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
     let query = null;
 
@@ -126,7 +126,7 @@ const SessionsIndexPage = () => {
     });
   };
 
-  const stableFetchRecordings = useCallback(fetchRecordings, [user?.details?.profile?.uid, workspace]);
+  const stableFetchRecordings = useCallback(fetchRecordings, [user?.details?.profile?.uid, activeWorkspaceId]);
   const redirectToSettingsPage = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
@@ -167,15 +167,15 @@ const SessionsIndexPage = () => {
         stableFetchRecordings();
       }
     }
-  }, [hasUserChanged, workspace, stableFetchRecordings, user?.details?.profile?.uid]);
+  }, [hasUserChanged, activeWorkspaceId, stableFetchRecordings, user?.details?.profile?.uid]);
 
   const filteredRecordings = filterUniqueObjects(sessionRecordings);
 
   useEffect(() => {
-    if (filteredRecordings?.length >= 0 && !isWorkspaceMode) {
+    if (filteredRecordings?.length >= 0 && !isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS, filteredRecordings?.length);
     }
-  }, [filteredRecordings?.length, isWorkspaceMode]);
+  }, [filteredRecordings?.length, isSharedWorkspaceMode]);
 
   const toggleImportSessionModal = useCallback(() => {
     if (!user?.loggedIn) {

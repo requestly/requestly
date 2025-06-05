@@ -4,7 +4,6 @@ import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 import { Popover, Typography } from "antd";
 
@@ -14,8 +13,7 @@ import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/utils";
 import { isEmpty } from "lodash";
-import pathContainsImg from "./path-contains.png";
-import pageUrlSourceFilterImg from "./source-filter-page-url.png";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -32,9 +30,12 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
       <ul>
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PATH_MIGRATED) && (
           <li className="migrated-rule-description">
-            <Popover content={<img src={pathContainsImg} width={200} alt="path-migration" />} trigger="hover">
+            <Popover
+              content={<img src={"/assets/media/rules/path-contains.png"} width={200} alt="path-migration" />}
+              trigger="hover"
+            >
               <a
-                href="https://developers.requestly.com/http-rules/map-local-url-redirect/#72394d506ece433288b806a0f2d80589"
+                href="https://docs.requestly.com/general/http-rules/rule-types/map-local"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -47,10 +48,20 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PAGEURL_MIGRATED) && (
           <li className="migrated-rule-description">
             <Popover
-              content={<img src={pageUrlSourceFilterImg} width={200} alt="page-url-source-filter-migration" />}
+              content={
+                <img
+                  src={"/assets/media/rules/source-filter-page-url.png"}
+                  width={200}
+                  alt="page-url-source-filter-migration"
+                />
+              }
               trigger="hover"
             >
-              <a href="https://developers.requestly.com/http-rules/advance-targeting/" target="_blank" rel="noreferrer">
+              <a
+                href="https://docs.requestly.com/general/http-rules/advanced-usage/advance-filters/"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Typography.Text code>Page URL</Typography.Text>{" "}
               </a>
             </Popover>
@@ -63,7 +74,7 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
 };
 
 const MigratedRules = () => {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const [rulesData, setRulesData] = useState({});
@@ -71,12 +82,12 @@ const MigratedRules = () => {
   const migratedRulesLogs = useMemo(() => {
     const migrationData = getMV3MigrationData();
 
-    const migratedRulesLogs = migrationData?.[currentlyActiveWorkspace?.id ?? "private"]?.rulesMigrationLogs;
+    const migratedRulesLogs = migrationData?.[activeWorkspaceId ?? "private"]?.rulesMigrationLogs;
 
     if (isEmpty(migratedRulesLogs)) return {};
 
     return migratedRulesLogs;
-  }, [currentlyActiveWorkspace]);
+  }, [activeWorkspaceId]);
 
   useEffect(() => {
     if (Object.keys(migratedRulesLogs).length) {

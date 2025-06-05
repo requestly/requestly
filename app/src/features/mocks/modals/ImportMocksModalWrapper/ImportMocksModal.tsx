@@ -11,7 +11,6 @@ import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { processMocksToImport } from "./utils";
 import { toast } from "utils/Toast";
 import { createMock } from "backend/mocks/createMock";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { createCollection } from "backend/mocks/createCollection";
 import PATHS from "config/constants/sub/paths";
 import {
@@ -20,6 +19,7 @@ import {
   trackMocksJsonParsed,
 } from "modules/analytics/events/features/mocksV2";
 import "./ImportMocksModal.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface ImportMocksModalProps {
   isOpen: boolean;
@@ -39,8 +39,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [dataToImport, setDataToImport] = useState({
     records: [],
@@ -113,7 +112,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       const collectionsPromises: Promise<{ oldId: string; newId: string; path: string }>[] = [];
 
       dataToImport.collections.forEach((collection) => {
-        const promise = createCollection(uid, collection, teamId)
+        const promise = createCollection(uid, collection, activeWorkspaceId)
           .then((newCollection) => {
             return { oldId: collection.id, newId: newCollection.id, path: newCollection.path };
           })
@@ -140,7 +139,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
         const newCollectionId = oldToNewCollectionDetails[mock.collectionId].newId;
         const updatedMock = { ...mock, collectionId: newCollectionId ?? "" };
 
-        mocksPromises.push(createMock(uid, updatedMock, teamId, newCollectionId));
+        mocksPromises.push(createMock(uid, updatedMock, activeWorkspaceId, newCollectionId));
       });
 
       await Promise.all(mocksPromises);

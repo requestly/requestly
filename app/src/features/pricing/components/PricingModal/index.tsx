@@ -16,6 +16,8 @@ import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analyt
 import { PricingModalFooterBanner } from "./components/FooterBanner";
 import "./index.scss";
 import ProductSwitcher from "../ProductSwitcher";
+import { StudentProgram } from "../PricingPage/components/StudentProgram";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -46,7 +48,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
   const [isTableScrollable, setIsTableScrollable] = useState(false);
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
-  const [activeProduct, setActiveProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
+  const [activeProduct, setActiveProduct] = useState(
+    isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
+  );
 
   const tableRef = useRef(null);
 
@@ -84,7 +88,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         .catch((err) => {
           setStripeError(err);
           setIsLoading(false);
-          trackCheckoutFailedEvent("individual", source);
+          trackCheckoutFailedEvent(quantity, source, "requestly");
         });
     },
     [duration, toggleModal, source, quantity]
@@ -96,7 +100,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       setIsTableScrollable(isScrollable);
       tableRef.current.scrollLeft ? setIsTableScrolledToRight(true) : setIsTableScrolledToRight(false);
     }
-  }, [tableRef.current]);
+  }, []);
 
   useEffect(() => {
     if (selectedPlan && quantity && !isCheckoutCompleted && !isCheckoutScreenVisible) {
@@ -166,10 +170,14 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         ) : (
           <>
             <Row className="display-row-center" style={{ paddingTop: "1rem" }}>
-              <Typography.Title level={4}>{title}</Typography.Title>
+              <Typography.Title level={4} className="title">
+                {title}
+              </Typography.Title>
             </Row>
-            <ProductSwitcher isOpenedFromModal activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
-            <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
+            {!isSafariBrowser() && (
+              <ProductSwitcher isOpenedFromModal activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
+            )}
+            <Row justify="center" className="display-row-center w-full" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
                   size="small"
@@ -211,6 +219,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               source={source}
               product={activeProduct}
             />
+            <StudentProgram source={source} />
             <CompaniesSection />
             <PricingModalFooterBanner />
           </>

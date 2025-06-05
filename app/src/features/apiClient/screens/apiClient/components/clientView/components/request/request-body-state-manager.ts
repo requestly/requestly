@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { KeyValuePair } from "features/apiClient/types";
 import { RQAPI } from "../../../../../../types";
@@ -59,6 +59,11 @@ export function useFormBody(requestBodyStateManager: RequestBodyStateManager) {
  */
 export function useTextBody(requestBodyStateManager: RequestBodyStateManager) {
   const [text, _setText] = useState<string>(requestBodyStateManager.getText());
+
+  useEffect(() => {
+    _setText(requestBodyStateManager.getText());
+  }, [requestBodyStateManager]);
+
   return {
     text,
     setText(text: string) {

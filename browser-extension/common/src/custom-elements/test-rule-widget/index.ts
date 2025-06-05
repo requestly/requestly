@@ -21,6 +21,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
     this.setAttribute("draggable", "true");
     super.connectedCallback();
     this.addListeners();
+    this.showInfoContainer();
   }
 
   addListeners() {
@@ -71,6 +72,17 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
     }
   }
 
+  showInfoContainer() {
+    const infoTextContent = this.attributes.getNamedItem("rq-test-rule-text")?.value;
+    if (infoTextContent) {
+      const infoContainer = this.shadowRoot.getElementById("info-container");
+      const infoContainerText = this.shadowRoot.getElementById("info-text");
+      setInnerHTML(infoContainerText, infoTextContent);
+      infoContainer.classList.remove("hidden");
+      infoContainer.classList.add("visible");
+    }
+  }
+
   _getDefaultMarkup() {
     return `
     <style>${styles}</style>
@@ -92,8 +104,8 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
         </div>
         <div id="test-rule-container"></div>
          <div id="info-container" class="hidden">
-          <div id="info-icon" class="secondary-text">${InfoIcon}</div>
-          <div id="info-text" class="secondary-text"></div>
+          <div id="info-icon">${InfoIcon}</div>
+          <div id="info-text"></div>
         </div>
     </div>
     `;

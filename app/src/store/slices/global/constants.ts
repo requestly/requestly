@@ -1,8 +1,9 @@
 import APP_CONSTANTS from "config/constants";
+//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { GlobalSliceState } from "./types";
-
 import appListJson from "../../initial-state/sub/appsList.json";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
 
 const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   /* User */
@@ -12,12 +13,6 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   },
 
   syncingV2: false,
-
-  userPersona: {
-    page: "getting_started",
-    persona: "",
-    isSurveyCompleted: false,
-  },
 
   isExtensionEnabled: true,
 
@@ -45,7 +40,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     groupwiseRulesToPopulate: {},
     selectedRules: {},
     selectedGroups: {},
-    lastBackupTimeStamp: "",
+    lastBackupTimeStamp: 0,
     isRulesListLoading: false,
     isSampleRulesImported: false,
   },
@@ -173,14 +168,8 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     deviceId: null,
   },
 
-  workspaceOnboarding: {
-    step: "auth",
-    isOnboardingCompleted: false,
-    workspace: {},
-  },
-
   appOnboarding: {
-    step: "auth",
+    step: ONBOARDING_STEPS.AUTH,
     persona: null,
     fullName: null,
     industry: null,
@@ -189,10 +178,18 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
     isOnboardingCompleted: false,
   },
 
+  onboarding: {
+    isOnboardingCompleted: false,
+    isNewUser: false,
+    userPersona: null,
+    isAcquisitionAnnouncementModalVisible: true,
+  },
+
   editorToast: {},
 
   misc: {
     persist: {
+      isOrgBannerDismissed: false,
       isPlanExpiredBannerClosed: false,
       appNotificationBannerDismissTs: 0,
       isProductHuntLaunchedBannerClosed: false,
@@ -216,6 +213,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       isJoinWorkspaceCardVisible: true,
       isManageBillingTeamAlertVisible: true,
       isSupportChatOpened: false,
+      lastUsedFeaturePath: "/",
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried

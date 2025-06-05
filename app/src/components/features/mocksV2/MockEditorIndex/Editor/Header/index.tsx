@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Row, Layout, Col, Tooltip, Dropdown, Menu, Button } from "antd";
 import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
-import { RQButton, RQBreadcrumb } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
+import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { MockType } from "components/features/mocksV2/types";
 import "./index.css";
 import { trackMockEditorClosed, trackMockPasswordGenerateClicked } from "modules/analytics/events/features/mocksV2";
@@ -9,6 +10,9 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useLocation } from "react-router-dom";
 import PasswordPopup from "./PasswordPopup/PasswordPopup";
+import { Conditional } from "components/common/Conditional";
+import { RBACButton } from "features/rbac";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -19,6 +23,7 @@ interface HeaderProps {
   handleTest: () => void;
   setPassword: (password: string) => void;
   password: string;
+  isEditorReadOnly: boolean;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -30,9 +35,9 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   handleTest,
   setPassword,
   password,
+  isEditorReadOnly,
 }) => {
   const location = useLocation();
-
   // Component State
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -79,42 +84,51 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             <RQButton
               iconOnly
               type="text"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
               onClick={() => {
                 trackMockEditorClosed(mockType, "back_button");
                 handleClose();
               }}
             />
           </Tooltip>
-          {!location.pathname.includes("rules") && <RQBreadcrumb />}
+          <Conditional condition={!location.pathname.includes("rules")}>
+            <RQBreadcrumb />
+          </Conditional>
         </Col>
         <Col className="header-right-section">
-          <div className="mock-edtior-options-container">
-            <Dropdown
-              destroyPopupOnHide
-              trigger={["click"]}
-              open={showDropdown}
-              placement="bottomRight"
-              overlay={dropdownOverlay}
-              onOpenChange={handleDropdownVisibleChange}
-              className={`mock-editor-options-dropdown-trigger ${
-                showDropdown ? "mock-editor-options-dropdown-active" : ""
-              }`}
-            >
-              <span className="text-gray">
-                More
-                <img
-                  width={10}
-                  height={6}
-                  alt="down arrow"
-                  src="/assets/icons/downArrow.svg"
-                  className="mock-editor-options-trigger-icon"
-                />
-              </span>
-            </Dropdown>
-          </div>
+          <Conditional condition={!isEditorReadOnly}>
+            <div className="mock-edtior-options-container">
+              <Dropdown
+                destroyPopupOnHide
+                trigger={["click"]}
+                open={showDropdown}
+                placement="bottomRight"
+                overlay={dropdownOverlay}
+                onOpenChange={handleDropdownVisibleChange}
+                className={`mock-editor-options-dropdown-trigger ${
+                  showDropdown ? "mock-editor-options-dropdown-active" : ""
+                }`}
+              >
+                <span className="text-gray">
+                  More
+                  <img
+                    width={10}
+                    height={6}
+                    alt="down arrow"
+                    src="/assets/media/common/down-arrow.svg"
+                    className="mock-editor-options-trigger-icon"
+                  />
+                </span>
+              </Dropdown>
+            </div>
+          </Conditional>
+
           {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
-            <RQButton type="default" icon={<ExperimentOutlined />} onClick={handleTest}>
+            <RQButton
+              icon={<ExperimentOutlined />}
+              onClick={handleTest}
+              type={isEditorReadOnly ? "primary" : "default"}
+            >
               Test
             </RQButton>
           )}
@@ -127,9 +141,19 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           >
             Cancel
           </RQButton>
-          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={handleSave}>
+
+          <RBACButton
+            permission="create"
+            resource="mock_api"
+            type="primary"
+            showHotKeyText
+            hotKey={KEYBOARD_SHORTCUTS.FILE_SERVER.SAVE_FILE.hotKey}
+            loading={savingInProgress}
+            onClick={handleSave}
+            tooltipTitle="Saving is not allowed in view-only mode. You can test mocks but cannot save them."
+          >
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
-          </RQButton>
+          </RBACButton>
         </Col>
       </Row>
     </Layout.Header>

@@ -1,22 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Col, Row, Spin } from "antd";
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { useHasChanged } from "hooks";
-import { HomepageEmptyCard } from "../EmptyCard";
-import { m, AnimatePresence } from "framer-motion";
-import { RQButton } from "lib/design-system/components";
-import { redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
-import rulesIcon from "../../assets/rules.svg";
-import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
-import { StorageService } from "init";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { redirectToRuleEditor, redirectToRules } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
-import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
@@ -27,169 +14,212 @@ import {
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
-import "./rulesCard.scss";
 import { Rule, RuleType } from "@requestly/shared/types/entities/rules";
+import { PRODUCT_FEATURES } from "../EmptyCard/staticData";
+import { Card } from "../Card";
+import { CardListItem, CardType } from "../Card/types";
+import ModHeader from "../../../../assets/img/brand/mod-header-icon.svg?react";
+import ResourceOverride from "../../../../assets/img/brand/resource-override-icon.svg?react";
+import Charles from "../../../../assets/img/brand/charles-icon.svg?react";
+import { ImporterType } from "components/Home/types";
+import { RoleBasedComponent, useRBAC } from "features/rbac";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
+import DropdownButton from "antd/lib/dropdown/dropdown-button";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import { MenuProps } from "antd";
+import { useHomeScreenContext } from "components/Home/contexts";
+import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
+import "./rulesCard.scss";
 
-export const RulesCard: React.FC = () => {
-  const MAX_RULES_TO_SHOW = 3;
+export const RulesCard = () => {
+  const MAX_RULES_TO_SHOW = 5;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
-  const isRulesLoading = useSelector(getIsRulesListLoading);
-  const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
-  const [rules, setRules] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
+  const { rules, isRulesLoading } = useHomeScreenContext();
+
+  const rulesToShow = useMemo(() => {
+    return rules
+      ?.sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
+      ?.slice(0, MAX_RULES_TO_SHOW + 1)
+      .map(
+        (rule: Rule): CardListItem => {
+          return {
+            id: rule.id,
+            title: rule.name,
+            icon: ruleIcons[rule.ruleType as RuleType],
+            type: rule.ruleType,
+            url: "",
+          };
+        }
+      );
+  }, [rules]);
 
   const onRulesDrawerClose = () => {
     setIsRulesDrawerOpen(false);
   };
 
-  useEffect(() => {
-    if (isExtensionInstalled() && !isRulesLoading) {
-      StorageService(appMode)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-        .then((res) => {
-          setRules(
-            res
-              .sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
-              .slice(0, MAX_RULES_TO_SHOW + 1)
-          );
-        })
-        .catch((e) => {
-          Logger.log(e);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
+  const importTriggerHandler = useCallback(
+    (modal: ImporterType) => {
+      if (modal === ImporterType.REQUESTLY && !user?.details?.isLoggedIn) {
+        dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      } else {
+        navigate(PATHS.RULES.MY_RULES.ABSOLUTE, { state: { modal } });
+        trackHomeRulesActionClicked(
+          `${modal.toLowerCase()}${modal.toLowerCase() === ImporterType.REQUESTLY ? "_rules" : ""}_importer_clicked`
+        );
+      }
+    },
+    [dispatch, navigate, user?.details?.isLoggedIn]
+  );
 
-  if (isLoading || isRulesLoading)
-    return (
-      <AnimatePresence>
-        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
-          <Spin tip="Getting your rules ready..." size="large" />
-        </m.div>
-      </AnimatePresence>
-    );
+  const items: MenuProps["items"] = [
+    {
+      key: "0",
+      icon: <MdOutlineFileUpload />,
+      label: "Import rules",
+      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+    },
+  ];
+
+  const IMPORT_OPTIONS = [
+    {
+      key: "1",
+      label: "Charles Proxy",
+      icon: <Charles />,
+      onClick: () => importTriggerHandler(ImporterType.CHARLES),
+    },
+    {
+      key: "2",
+      label: "Resource Override",
+      icon: <ResourceOverride />,
+      onClick: () => importTriggerHandler(ImporterType.RESOURCE_OVERRIDE),
+    },
+    {
+      key: "3",
+      label: "ModHeader",
+      icon: <ModHeader />,
+      onClick: () => importTriggerHandler(ImporterType.MOD_HEADER),
+    },
+    {
+      key: "4",
+      label: "Requestly",
+      icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
+      onClick: () => importTriggerHandler(ImporterType.REQUESTLY),
+    },
+  ];
+
+  const actionButtons = (
+    <RuleSelectionListDrawer
+      open={isRulesDrawerOpen}
+      onClose={onRulesDrawerClose}
+      source={SOURCE.HOME_SCREEN}
+      onRuleItemClick={onRulesDrawerClose}
+    >
+      <RQTooltip
+        showArrow={false}
+        title={isValidPermission ? null : "Creating a new mock or a rule is not allowed in view-only mode."}
+      >
+        <DropdownButton
+          size="small"
+          type="primary"
+          disabled={!isValidPermission}
+          icon={<MdOutlineKeyboardArrowDown />}
+          overlayClassName="more-options"
+          onClick={() => {
+            trackHomeRulesActionClicked("new_rule_button");
+            trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
+
+            if (isExtensionInstalled()) {
+              setIsRulesDrawerOpen(true);
+            } else {
+              dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+            }
+          }}
+          menu={{ items }}
+          trigger={["click"]}
+        >
+          <>{"New rule"}</>
+        </DropdownButton>
+      </RQTooltip>
+    </RuleSelectionListDrawer>
+  );
 
   return (
-    <AnimatePresence>
-      {rules?.length ? (
-        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <Row justify="space-between" align="middle">
-            <Col span={16}>
-              <Row gutter={8} align="middle">
-                <Col>
-                  <img width={16} height={16} src={rulesIcon} alt="rules" />
-                </Col>
-                <Col className="text-white primary-card-header">HTTP Rules</Col>
-              </Row>
-            </Col>
-            <Col span={8} className="homepage-rules-card-header-action">
-              <RuleSelectionListDrawer
-                open={isRulesDrawerOpen}
-                onClose={onRulesDrawerClose}
-                source={SOURCE.HOME_SCREEN}
-                onRuleItemClick={() => {
-                  onRulesDrawerClose();
-                }}
-              >
-                <Button
-                  type="default"
-                  className="rules-card-create-btn"
-                  onClick={() => {
-                    trackHomeRulesActionClicked("new_rule_drawer");
-                    trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
-                    setIsRulesDrawerOpen(true);
-                  }}
-                >
-                  <IoMdAdd /> New rule
-                </Button>
-              </RuleSelectionListDrawer>
-            </Col>
-          </Row>
-          <div className="homepage-rules-list">
-            {rules.map((rule: Rule, index: number) => {
-              if (index >= MAX_RULES_TO_SHOW) return null;
-              return (
-                <div
-                  key={index}
-                  className="homepage-rules-list-item"
-                  onClick={() => {
-                    trackHomeRulesActionClicked("rule_name");
-                    trackRuleCreationWorkflowStartedEvent(rule.ruleType, SOURCE.HOME_SCREEN);
-                    redirectToRuleEditor(navigate, rule.id, SOURCE.HOME_SCREEN);
-                  }}
-                >
-                  <span className="homepage-rules-list-item-icon">{ruleIcons[rule.ruleType as RuleType]}</span>
-                  <div> {rule.name}</div>
-                </div>
-              );
-            })}
-          </div>
-          {rules.length > MAX_RULES_TO_SHOW && (
-            <Link
-              className="homepage-view-all-link"
-              to={PATHS.RULES.MY_RULES.ABSOLUTE}
-              onClick={() => trackHomeRulesActionClicked("view_all_rules")}
-            >
-              View all rules
-            </Link>
-          )}
-        </m.div>
-      ) : (
-        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <HomepageEmptyCard
-            icon={rulesIcon}
-            title="HTTP Rules"
-            description="Create rules to modify HTTP requests and responses."
-            primaryButton={
-              <RuleSelectionListDrawer
-                open={isRulesDrawerOpen}
-                onClose={onRulesDrawerClose}
-                source={SOURCE.HOME_SCREEN}
-                onRuleItemClick={() => {
-                  onRulesDrawerClose();
-                }}
-              >
-                <RQButton
-                  type="primary"
-                  onClick={() => {
-                    trackHomeRulesActionClicked("create_new_rule");
-                    trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
-
-                    if (isExtensionInstalled()) {
-                      setIsRulesDrawerOpen(true);
-                    } else {
-                      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                    }
-                  }}
-                >
-                  Create new Rule
-                </RQButton>
-              </RuleSelectionListDrawer>
+    <Card
+      cardType={CardType.RULES}
+      contentLoading={isRulesLoading}
+      showFooter={isValidPermission}
+      importOptions={
+        isValidPermission
+          ? {
+              menu: IMPORT_OPTIONS,
+              label: "Charles, ModHeader, & more",
+              icon: "/assets/media/rules/import-icon.svg",
             }
-            secondaryButton={
+          : null
+      }
+      contentList={rulesToShow}
+      listItemClickHandler={(item) => {
+        trackHomeRulesActionClicked("rule_clicked");
+        trackRuleCreationWorkflowStartedEvent(item.type, SOURCE.HOME_SCREEN);
+        redirectToRuleEditor(navigate, item.id, SOURCE.HOME_SCREEN);
+      }}
+      viewAllCta={"View all rules"}
+      viewAllCtaLink={PATHS.RULES.MY_RULES.ABSOLUTE}
+      viewAllCtaOnClick={() => trackHomeRulesActionClicked("view_all_rules")}
+      bodyTitle="Recent rules"
+      wrapperClass="rules-card"
+      actionButtons={actionButtons}
+      emptyCardOptions={{
+        ...PRODUCT_FEATURES.RULES,
+        primaryAction: (
+          <RoleBasedComponent
+            resource="http_rule"
+            permission="create"
+            fallback={
               <RQButton
-                className="homepage-empty-card-secondary-btn"
-                type="text"
+                size="small"
+                type="primary"
                 onClick={() => {
-                  trackHomeRulesActionClicked("start_with_template");
-                  redirectToTemplates(navigate);
+                  redirectToRules(navigate);
                 }}
               >
-                Start with a template
+                View rules
               </RQButton>
             }
-          />
-        </m.div>
-      )}
-    </AnimatePresence>
+          >
+            <RuleSelectionListDrawer
+              open={isRulesDrawerOpen}
+              onClose={onRulesDrawerClose}
+              source={SOURCE.HOME_SCREEN}
+              onRuleItemClick={() => {
+                onRulesDrawerClose();
+              }}
+            >
+              <RQButton
+                size="small"
+                type="primary"
+                onClick={() => {
+                  trackHomeRulesActionClicked("create_first_rule");
+                  trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
+
+                  if (isExtensionInstalled()) {
+                    setIsRulesDrawerOpen(true);
+                  } else {
+                    dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                  }
+                }}
+              >
+                New rule
+              </RQButton>
+            </RuleSelectionListDrawer>
+          </RoleBasedComponent>
+        ),
+      }}
+    />
   );
 };

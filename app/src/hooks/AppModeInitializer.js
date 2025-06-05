@@ -32,7 +32,6 @@ import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
@@ -44,9 +43,9 @@ import { PreviewType, networkSessionActions } from "store/features/network-sessi
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 let hasAppModeBeenSet = false;
 
@@ -55,12 +54,11 @@ const AppModeInitializer = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isDesktopSessionsCompatible =
-    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const appsListRef = useRef(null);
   const hasMessageHandlersBeenSet = useRef(false);
@@ -250,7 +248,7 @@ const AppModeInitializer = () => {
             dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
             dispatch(networkSessionActions.setSessionName(fileObj.name));
             trackHarFileOpened();
-            redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
+            redirectToNetworkSession(navigate, undefined, false);
           }
         } else {
           console.log("unknown file type detected");
@@ -271,11 +269,11 @@ const AppModeInitializer = () => {
       isProxyServerRunning &&
       appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
       !hasConnectedAppBefore &&
-      userPersona.isSurveyCompleted
+      userPersona?.isSurveyCompleted
     ) {
       dispatch(globalActions.toggleActiveModal({ modalName: "connectedAppsModal" }));
     }
-  }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning, userPersona.isSurveyCompleted]);
+  }, [appMode, dispatch, hasConnectedAppBefore, isProxyServerRunning, userPersona?.isSurveyCompleted]);
 
   // Set app mode to "DESKTOP" if required. Default is "EXTENSION"
   useEffect(() => {
@@ -341,7 +339,7 @@ const AppModeInitializer = () => {
         invokeSyncingIfRequired({
           dispatch,
           uid: user?.details?.profile?.uid,
-          team_id: currentlyActiveWorkspace?.id,
+          team_id: activeWorkspaceId,
           appMode,
           isSyncEnabled: user?.details?.isSyncEnabled,
         });
@@ -351,7 +349,7 @@ const AppModeInitializer = () => {
         };
       });
     }
-  }, [appMode, currentlyActiveWorkspace?.id, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
+  }, [appMode, activeWorkspaceId, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
 
   return null;
 };

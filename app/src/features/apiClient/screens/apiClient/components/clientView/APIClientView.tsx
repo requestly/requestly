@@ -1,5 +1,5 @@
-import { Dropdown, Row, Select, Skeleton, Space } from "antd";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { notification, Select, Space } from "antd";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
@@ -20,6 +20,7 @@ import {
   trackInstallExtensionDialogShown,
   trackRequestSaved,
   trackRequestRenamed,
+  trackApiRequestDone,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -33,50 +34,76 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { upsertApiRecord } from "backend/apiClient";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import { RequestExecutor } from "features/apiClient/helpers/requestExecutor/requestExecutor";
-import { isEmpty } from "lodash";
-import CopyAsModal from "../modals/CopyAsModal/CopyAsModal";
-import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-
-interface Props {
-  openInModal?: boolean;
-  apiEntry?: RQAPI.Entry;
-  notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
-  apiEntryDetails?: RQAPI.ApiRecord;
-}
+import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
+import { ApiClientSnippetModal } from "../modals/ApiClientSnippetModal/ApiClientSnippetModal";
+import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
+import { Conditional } from "components/common/Conditional";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import { useGenericState } from "hooks/useGenericState";
+import PATHS from "config/constants/sub/paths";
+import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
   label: method,
 }));
 
-const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRequestFinished, openInModal }) => {
+type BaseProps = {
+  openInModal?: boolean;
+  onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
+};
+
+type CreateModeProps = BaseProps & {
+  isCreateMode: true;
+  apiEntryDetails:
+    | null
+    | ({
+        data: RQAPI.Entry; // If you want to prefill the details then only data can be passed in create mode
+      } & Partial<RQAPI.ApiRecord>);
+};
+
+type EditModeProps = BaseProps & {
+  isCreateMode: false;
+  apiEntryDetails: RQAPI.ApiRecord;
+};
+
+type HistoryModeProps = BaseProps & {
+  isCreateMode: false;
+  apiEntryDetails: RQAPI.ApiRecord;
+};
+
+type Props = CreateModeProps | EditModeProps | HistoryModeProps;
+
+const APIClientView: React.FC<Props> = ({
+  isCreateMode,
+  openInModal = false,
+  onSaveCallback,
+  notifyApiRequestFinished,
+  apiEntryDetails,
+}) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-  const [searchParams] = useSearchParams();
-  const isCreateMode = searchParams.has("create");
-  const { requestId } = useParams();
+  const isHistoryPath = location.pathname.includes("history");
 
-  const { toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
+  const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    apiClientWorkloadManager,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -87,6 +114,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getCollectionVariables,
     getCurrentEnvironmentVariables,
     renderVariables,
+    environmentSyncRepository,
   } = environmentManager;
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
@@ -94,30 +122,35 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
   ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>({ ...(apiEntry ?? getEmptyAPIEntry()) });
+  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
-  const [error, setError] = useState<RQAPI.RequestErrorEntry["error"]>(null);
+  const [error, setError] = useState<RQAPI.ExecutionError>(null);
+  const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
-  const [requestExecutor, setRequestExecutor] = useState<RequestExecutor | null>(null);
+  const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
 
-  // const abortControllerRef = useRef<AbortController>(null);
-  const [isAnimating, setIsAnimating] = useState(true);
-  const animationTimerRef = useRef<NodeJS.Timeout>();
-  const { response, ...entryWithoutResponse } = entry;
+  const { setPreview, setUnsaved, setTitle, getIsActive } = useGenericState();
+
+  const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse), isAnimating);
-  const { updateTab, activeTab } = useTabsLayoutContext();
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
 
-  const [copyAsModalOpen, setCopyAsModalOpen] = useState(false);
+  const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
 
   useEffect(() => {
+    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  }, [apiEntryDetails?.data]);
+
+  useLayoutEffect(() => {
     const handleResize = () => {
       const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
       toggleSheetPlacement(bottomSheetPlacement);
     };
+
+    handleResize();
 
     window.addEventListener("resize", handleResize);
 
@@ -126,42 +159,21 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     };
   }, [toggleSheetPlacement]);
 
-  useEffect(() => {
-    const tabId = isCreateMode ? requestId : apiEntryDetails?.id;
-
-    updateTab(tabId, { hasUnsavedChanges: hasUnsavedChanges });
-  }, [updateTab, isCreateMode, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+  useLayoutEffect(() => {
+    setUnsaved(hasUnsavedChanges);
+  }, [setUnsaved, hasUnsavedChanges]);
 
   useEffect(() => {
-    const tabId = apiEntryDetails?.id;
-
-    if (activeTab?.id === tabId && hasUnsavedChanges) {
-      updateTab(tabId, { isPreview: false });
+    if (hasUnsavedChanges) {
+      setPreview(false);
     }
-  }, [updateTab, activeTab?.id, requestId, apiEntryDetails?.id, hasUnsavedChanges]);
+  }, [setPreview, hasUnsavedChanges]);
 
   useEffect(() => {
-    if (apiEntry) {
-      setEntry({
-        ...apiEntry,
-        request: {
-          ...apiEntry.request,
-          ...syncQueryParams(
-            apiEntry.request.queryParams,
-            apiEntry.request.url,
-            isEmpty(apiEntry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
-          ),
-        },
-      });
+    if (entry) {
       setRequestName("");
     }
-
-    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 800);
-
-    return () => {
-      clearTimeout(animationTimerRef.current);
-    };
-  }, [apiEntry]);
+  }, [entry]);
 
   const setUrl = useCallback((url: string) => {
     setEntry((entry) => ({
@@ -245,18 +257,25 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
           }
         }
         if (key === "global") {
-          await setVariables("global", state[key]);
+          const globalEnvId = environmentSyncRepository.getGlobalEnvironmentId();
+          await setVariables(globalEnvId, state[key]);
         }
         if (key === "collectionVariables") {
           await setCollectionVariables(state[key], apiEntryDetails?.collectionId);
         }
       }
     },
-    [getCurrentEnvironment, setVariables, setCollectionVariables, apiEntryDetails?.collectionId]
+    [
+      getCurrentEnvironment,
+      setVariables,
+      setCollectionVariables,
+      apiEntryDetails?.collectionId,
+      environmentSyncRepository,
+    ]
   );
 
   const onSendButtonClick = useCallback(async () => {
-    updateTab(apiEntryDetails?.id, { isPreview: false });
+    // updateTab(apiEntryDetails?.id, { isPreview: false });
 
     if (!entry.request.url) {
       return;
@@ -274,85 +293,111 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       return;
     }
 
-    toggleBottomSheet(true);
+    toggleBottomSheet({ isOpen: true, isTrack: false, action: "on_send_request_bottom_sheet" });
 
     setIsFailed(false);
     setError(null);
+    setWarning(null);
     setIsLoadingResponse(true);
     setIsRequestCancelled(false);
     //Need to change the response and error to null
     setEntry((entry) => ({
       ...entry,
-      response: null,
       error: null,
     }));
 
-    requestExecutor.updateApiRecords(apiClientRecords);
-    requestExecutor.updateEntryDetails({
+    apiClientExecutor.updateApiRecords(apiClientRecords);
+    apiClientExecutor.updateEntryDetails({
       entry: sanitizeEntry(entry),
       recordId: apiEntryDetails?.id,
       collectionId: apiEntryDetails?.collectionId,
     });
 
-    requestExecutor
-      .execute()
-      .then((executedEntry) => {
-        const response = executedEntry.response;
-        // TODO: Add an entry in history
-        const entryWithResponse = { ...entry, response };
-        const renderedEntryWithResponse = { ...executedEntry, response };
+    try {
+      const apiClientExecutionResult = await apiClientExecutor.execute();
 
-        if (response) {
-          setEntry(entryWithResponse);
-          trackResponseLoaded({
-            type: getContentTypeFromResponseHeaders(response.headers),
-            time: Math.round(response.time / 1000),
-          });
-          trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
-          trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
-        } else {
-          const erroredEntry = executedEntry as RQAPI.RequestErrorEntry;
+      const { executedEntry } = apiClientExecutionResult;
+      const entryWithResponse: RQAPI.Entry = {
+        ...entry,
+        response: executedEntry.response,
+        testResults: executedEntry.testResults,
+      };
+      setEntry(entryWithResponse);
 
-          setIsFailed(true);
-          setError(erroredEntry?.error ?? null);
-          if (erroredEntry?.error) {
-            Sentry.withScope((scope) => {
-              scope.setTag("error_type", "api_request_failure");
-              scope.setContext("request_details", {
-                url: entryWithResponse.request.url,
-                method: entryWithResponse.request.method,
-                headers: entryWithResponse.request.headers,
-                queryParams: entryWithResponse.request.queryParams,
-              });
-              scope.setFingerprint(["api_request_error", entryWithResponse.request.method, erroredEntry.error.source]);
-              Sentry.captureException(
-                new Error(`API Request Failed: ${erroredEntry.error.message || "Unknown error"}`)
-              );
-            });
-          }
-          trackRequestFailed();
-          trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
-          trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
+      if (apiClientExecutionResult.status === "success") {
+        if (apiClientExecutionResult.warning) {
+          setWarning(apiClientExecutionResult.warning);
         }
-        notifyApiRequestFinished?.(renderedEntryWithResponse);
-      })
-      .finally(() => {
-        setIsLoadingResponse(false);
-      });
+        trackResponseLoaded({
+          type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
+          time: Math.round(executedEntry.response.time / 1000),
+        });
+        trackApiRequestDone({
+          url: executedEntry.request.url,
+          method: executedEntry.request.method,
+          status: executedEntry.response.status,
+        });
+        trackRQLastActivity(API_CLIENT.RESPONSE_LOADED);
+        trackRQDesktopLastActivity(API_CLIENT.RESPONSE_LOADED);
+      } else if (apiClientExecutionResult.status === "error") {
+        const { error } = apiClientExecutionResult;
+        setIsFailed(true);
+        setError(error ?? null);
+        if (error) {
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "api_request_failure");
+            scope.setContext("request_details", {
+              url: entryWithResponse.request.url,
+              method: entryWithResponse.request.method,
+              headers: entryWithResponse.request.headers,
+              queryParams: entryWithResponse.request.queryParams,
+            });
+            scope.setFingerprint(["api_request_error", entryWithResponse.request.method, error.source]);
+            Sentry.captureException(new Error(`API Request Failed: ${error.message || "Unknown error"}`));
+          });
+        }
+        trackRequestFailed(
+          error.message,
+          error.type,
+          entryWithResponse.request.url,
+          entryWithResponse.request.method,
+          entryWithResponse.response?.status
+        );
+        trackRQLastActivity(API_CLIENT.REQUEST_FAILED);
+        trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
+      }
 
+      notifyApiRequestFinished?.(executedEntry);
+    } catch (e) {
+      setIsFailed(true);
+      setError({
+        type: e.type,
+        source: "request",
+        name: e.name,
+        message: e.message,
+      });
+    } finally {
+      setIsLoadingResponse(false);
+    }
     trackRQLastActivity(API_CLIENT.REQUEST_SENT);
     trackRQDesktopLastActivity(API_CLIENT.REQUEST_SENT);
   }, [
-    updateTab,
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
     entry,
     toggleBottomSheet,
-    requestExecutor,
+    apiClientExecutor,
     apiClientRecords,
     dispatch,
     notifyApiRequestFinished,
   ]);
+
+  const handleDismissError = () => {
+    setError(null);
+    setIsFailed(false);
+    setIsLoadingResponse(false);
+    setIsRequestCancelled(false);
+  };
 
   const handleRecordNameUpdate = async () => {
     if (!requestName || requestName === apiEntryDetails?.name) {
@@ -369,26 +414,29 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       record.name = requestName;
     }
 
-    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
-
     if (isCreateMode) {
-      args.push(requestId);
       record.name = requestName;
     }
 
-    const result = await upsertApiRecord(...args);
+    const result = isCreateMode
+      ? await apiClientRecordsRepository.createRecord(record)
+      : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord(
-        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open"
-      );
+      setTitle(requestName);
+      const savedRecord = { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } };
+      onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
       setRequestName("");
+      onSaveCallback(savedRecord);
 
       toast.success("Request name updated!");
     } else {
-      toast.error("Something went wrong!");
+      notification.error({
+        message: `Could not rename Request.`,
+        description: result?.message,
+        placement: "bottomRight",
+      });
     }
   };
 
@@ -400,44 +448,55 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
       data: { ...sanitizeEntry(entry, false) },
     };
 
+    if (isCreateMode) {
+      const requestId = apiClientRecordsRepository.generateApiRecordId();
+      record.id = requestId;
+    }
+
+    //  Is this check necessary?
     if (apiEntryDetails?.id) {
       record.id = apiEntryDetails?.id;
     }
 
-    const args: Parameters<typeof upsertApiRecord> = [uid, record, teamId];
-
-    if (isCreateMode) {
-      args.push(requestId);
-    }
-
-    const result = await upsertApiRecord(...args);
+    const result = isCreateMode
+      ? await apiClientRecordsRepository.createRecordWithId(record, record.id)
+      : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      onSaveRecord(
-        { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } },
-        isCreateMode ? "replace" : "open"
-      );
-      setEntry({ ...result.data.data, response: entry.response });
+      onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
+
+      setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
       resetChanges();
-      trackRequestSaved("api_client_view");
+      trackRequestSaved({
+        src: "api_client_view",
+        has_scripts: Boolean(entry.scripts?.preRequest),
+        auth_type: entry?.auth?.currentAuthType,
+      });
+      if (isCreateMode) {
+        onSaveCallback(result.data);
+      }
       toast.success("Request saved!");
     } else {
-      toast.error("Something went wrong!");
+      notification.error({
+        message: `Could not save request.`,
+        description: result?.message,
+        placement: "bottomRight",
+      });
     }
 
     setIsRequestSaving(false);
-  }, [entry, apiEntryDetails, onSaveRecord, setEntry, teamId, uid, resetChanges, isCreateMode, requestId]);
+  }, [apiClientRecordsRepository, apiEntryDetails, entry, isCreateMode, onSaveCallback, onSaveRecord, resetChanges]);
 
-  const cancelRequest = useCallback(() => {
-    // abortControllerRef.current?.abort();
-    requestExecutor.abort();
+  const handleCancelRequest = useCallback(() => {
+    apiClientExecutor.abort();
     trackAPIRequestCancelled();
-  }, [requestExecutor]);
+    setIsRequestCancelled(true);
+  }, [apiClientExecutor]);
 
-  const handleAuthChange = useCallback((authOptions: RQAPI.AuthOptions) => {
+  const handleAuthChange = useCallback((newAuth: RQAPI.Auth) => {
     setEntry((prevEntry) => {
       const updatedEntry = { ...prevEntry };
-      updatedEntry.auth = authOptions;
+      updatedEntry.auth = newAuth;
       return updatedEntry;
     });
   }, []);
@@ -446,15 +505,37 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  useEffect(() => {
-    if (!requestExecutor) {
-      setRequestExecutor(new RequestExecutor(appMode, apiClientWorkloadManager));
+  const handleTestResultRefresh = useCallback(async () => {
+    try {
+      apiClientExecutor.updateEntryDetails({
+        entry: sanitizeEntry(entry),
+        recordId: apiEntryDetails?.id,
+        collectionId: apiEntryDetails?.collectionId,
+      });
+
+      const result = await apiClientExecutor.rerun();
+      if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
+        setEntry((entry) => ({
+          ...entry,
+          testResults: result.artifacts.testResults,
+        }));
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      toast.error("Something went wrong while refreshing test results");
     }
-  }, [apiClientRecords, apiClientWorkloadManager, appMode, requestExecutor]);
+  }, [apiClientExecutor, apiEntryDetails?.id, apiEntryDetails?.collectionId, entry]);
 
   useEffect(() => {
-    if (requestExecutor) {
-      requestExecutor.updateInternalFunctions({
+    if (!apiClientExecutor) {
+      setApiClientExecutor(new ApiClientExecutor(appMode, apiClientWorkloadManager));
+    }
+  }, [apiClientRecords, apiClientWorkloadManager, appMode, apiClientExecutor]);
+
+  useEffect(() => {
+    if (apiClientExecutor) {
+      apiClientExecutor.updateInternalFunctions({
         getCollectionVariables,
         getEnvironmentVariables: getCurrentEnvironmentVariables,
         getGlobalVariables,
@@ -468,141 +549,157 @@ const APIClientView: React.FC<Props> = ({ apiEntry, apiEntryDetails, notifyApiRe
     getGlobalVariables,
     handleUpdatesFromExecutionWorker,
     renderVariables,
-    requestExecutor,
+    apiClientExecutor,
   ]);
+
+  const handleRevertChanges = () => {
+    setEntry(apiEntryDetails?.data);
+  };
+
+  const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
     <div className="api-client-view">
       <div className="api-client-header-container">
-        {user.loggedIn && !openInModal ? (
-          <RQBreadcrumb
-            loading={isAnimating}
-            placeholder="New Request"
-            recordName={apiEntryDetails?.name}
-            onRecordNameUpdate={setRequestName}
-            onBlur={handleRecordNameUpdate}
-            // Auto focus breadcrumb input when a new record is created
-            autoFocus={location.search.includes("new")}
-          />
-        ) : null}
+        <RoleBasedComponent
+          permission="create"
+          resource="api_client_request"
+          fallback={
+            <Conditional condition={user.loggedIn && !openInModal && hasUnsavedChanges}>
+              <RevertViewModeChangesAlert
+                title="As a viewer, You can modify and test APIs, but cannot save updates."
+                callback={handleRevertChanges}
+              />
+            </Conditional>
+          }
+        />
+        <div className="api-client-header-container__header">
+          <div className="api-client-breadcrumb-container">
+            <Conditional condition={user.loggedIn && !openInModal}>
+              <RQBreadcrumb
+                placeholder="Untitled request"
+                recordName={apiEntryDetails?.name}
+                onRecordNameUpdate={setRequestName}
+                onBlur={handleRecordNameUpdate}
+                autoFocus={location.pathname.includes("new")}
+                defaultBreadcrumbs={[
+                  { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                  {
+                    isEditable: !isHistoryPath,
+                    pathname: window.location.pathname,
+                    label: isHistoryPath ? "History" : apiEntryDetails?.name || "Untitled request",
+                  },
+                ]}
+              />
+            </Conditional>
+
+            <RQButton
+              type="transparent"
+              icon={<IoMdCode />}
+              size="small"
+              className="api-client-view_get-code-btn"
+              onClick={() => {
+                apiClientExecutor.updateApiRecords(apiClientRecords);
+                apiClientExecutor.updateEntryDetails({
+                  entry: sanitizeEntry(entry),
+                  recordId: apiEntryDetails?.id,
+                  collectionId: apiEntryDetails?.collectionId,
+                });
+                setIsSnippetModalVisible(true);
+              }}
+            >
+              Get client code
+            </RQButton>
+          </div>
+
+          <div className="api-client-header">
+            <Space.Compact className="api-client-url-container">
+              <Select
+                popupClassName="api-request-method-selector"
+                className="api-request-method-selector"
+                options={requestMethodOptions}
+                value={entry.request.method}
+                onChange={setMethod}
+              />
+              <SingleLineEditor
+                className="api-request-url"
+                placeholder="https://example.com"
+                //value={entry.request.url}
+                defaultValue={entry.request.url}
+                onChange={(text) => {
+                  setUrl(text);
+                }}
+                onPressEnter={onUrlInputEnterPressed}
+                variables={currentEnvironmentVariables}
+                // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+              />
+            </Space.Compact>
+            <RQButton
+              showHotKeyText
+              onClick={onSendButtonClick}
+              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+              type="primary"
+              className="text-bold"
+              disabled={!entry.request.url}
+            >
+              Send
+            </RQButton>
+
+            <Conditional condition={user.loggedIn && !openInModal}>
+              <RBACButton
+                permission="create"
+                resource="api_client_request"
+                showHotKeyText
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
+                onClick={onSaveButtonClick}
+                loading={isRequestSaving}
+                tooltipTitle="Saving is not allowed in view-only mode. You can update and view changes but cannot save them."
+                enableHotKey={enableHotkey}
+              >
+                Save
+              </RBACButton>
+            </Conditional>
+          </div>
+        </div>
       </div>
       <BottomSheetLayout
         layout={SheetLayout.SPLIT}
         bottomSheet={
           <ApiClientBottomSheet
-            key={requestId}
+            key={apiEntryDetails?.id}
             response={entry.response}
+            testResults={testResults}
             isLoading={isLoadingResponse}
             isFailed={isFailed}
             isRequestCancelled={isRequestCancelled}
-            onCancelRequest={cancelRequest}
+            onCancelRequest={handleCancelRequest}
+            handleTestResultRefresh={handleTestResultRefresh}
             error={error}
+            onDismissError={handleDismissError}
+            warning={warning}
+            executeRequest={onSendButtonClick}
           />
         }
-        minSize={35}
-        initialSizes={[60, 40]}
+        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 35 : 350}
+        initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">
-          <Skeleton loading={isAnimating} active>
-            <div className="api-client-header">
-              <Space.Compact className="api-client-url-container">
-                <Select
-                  popupClassName="api-request-method-selector"
-                  className="api-request-method-selector"
-                  options={requestMethodOptions}
-                  value={entry.request.method}
-                  onChange={setMethod}
-                />
-                {/* <Input
-              className="api-request-url"
-              placeholder="https://example.com"
-              value={entry.request.url}
-              onChange={(evt) => setUrl(evt.target.value)}
-              onPressEnter={onUrlInputEnterPressed}
-              onBlur={onUrlInputBlur}
-              prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-            /> */}
-                <RQSingleLineEditor
-                  className="api-request-url"
-                  placeholder="https://example.com"
-                  //value={entry.request.url}
-                  defaultValue={entry.request.url}
-                  onChange={(text) => {
-                    setUrl(text);
-                  }}
-                  onPressEnter={onUrlInputEnterPressed}
-                  variables={currentEnvironmentVariables}
-                  // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
-                />
-              </Space.Compact>
-              <RQButton
-                showHotKeyText
-                onClick={onSendButtonClick}
-                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-                type="primary"
-                className="text-bold"
-                disabled={!entry.request.url}
-              >
-                Send
-              </RQButton>
-              {user.loggedIn && !openInModal ? (
-                <RQButton
-                  showHotKeyText
-                  hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_REQUEST.hotKey}
-                  onClick={onSaveButtonClick}
-                  loading={isRequestSaving}
-                >
-                  Save
-                </RQButton>
-              ) : null}
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: 0,
-                      onClick: () => {
-                        requestExecutor.updateApiRecords(apiClientRecords);
-                        requestExecutor.updateEntryDetails({
-                          entry: sanitizeEntry(entry),
-                          recordId: apiEntryDetails?.id,
-                          collectionId: apiEntryDetails?.collectionId,
-                        });
-                        setCopyAsModalOpen(true);
-                      },
-                      label: <Row>Copy As</Row>,
-                    },
-                  ],
-                }}
-                trigger={["click"]}
-                overlayClassName="rule-more-actions-dropdown"
-              >
-                <RQButton
-                  type="transparent"
-                  className="more-api-request-actions-button"
-                  icon={<MdOutlineMoreHoriz />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                />
-              </Dropdown>
-            </div>
-            <RequestTabs
-              key={requestId}
-              requestId={apiEntryDetails?.id}
-              collectionId={apiEntryDetails?.collectionId}
-              requestEntry={entry}
-              setRequestEntry={setRequestEntry}
-              setContentType={setContentType}
-              handleAuthChange={handleAuthChange}
-            />
-          </Skeleton>
+          <RequestTabs
+            key={apiEntryDetails?.id}
+            requestId={apiEntryDetails?.id}
+            collectionId={apiEntryDetails?.collectionId}
+            requestEntry={entry}
+            setRequestEntry={setRequestEntry}
+            setContentType={setContentType}
+            handleAuthChange={handleAuthChange}
+          />
         </div>
       </BottomSheetLayout>
-      {copyAsModalOpen ? (
-        <CopyAsModal
-          apiRequest={requestExecutor.prepareRequest()}
-          open={copyAsModalOpen}
-          onClose={() => setCopyAsModalOpen(false)}
+      {isSnippetModalVisible ? (
+        <ApiClientSnippetModal
+          apiRequest={apiClientExecutor.prepareRequest()}
+          open={isSnippetModalVisible}
+          onClose={() => setIsSnippetModalVisible(false)}
         />
       ) : null}
     </div>

@@ -9,7 +9,6 @@ import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { StorageService } from "../../../../init";
 import {
   cleanup,
@@ -23,19 +22,13 @@ import {
   getAllRules,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
-  getIsRuleEditorTourCompleted,
   getIsCurrentlySelectedRuleDetailsPanelShown,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
-import {
-  trackRuleEditorViewed,
-  trackDesktopRuleViewedOnExtension,
-  trackDocsSidebarViewed,
-} from "modules/analytics/events/common/rules";
+import { trackDesktopRuleViewedOnExtension, trackDocsSidebarViewed } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
@@ -51,7 +44,6 @@ const RuleBuilder = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { state } = location;
   const ruleGroupId = searchParams.get("groupId") ?? undefined;
   const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(location, props.isSharedListViewRule);
 
@@ -65,19 +57,17 @@ const RuleBuilder = (props) => {
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
+  const isReadOnly = currentlySelectedRuleData?.isReadOnly;
 
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
   }, [props.isSharedListViewRule]);
-
-  const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);
 
   //References
   const isCleaningUpRef = useRef(false);
   //Component State
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
@@ -181,21 +171,6 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted && !allRules.length) {
-      setStartWalkthrough(true);
-    }
-  }, [MODE, allRules.length, isRuleEditorTourCompleted]);
-
-  useEffect(() => {
-    const source = state?.source ?? null;
-    const ruleType = currentlySelectedRuleConfig.TYPE;
-
-    if (ruleType && source) {
-      trackRuleEditorViewed(source, ruleType);
-    }
-  }, [currentlySelectedRuleConfig.TYPE, state?.source]);
-
-  useEffect(() => {
     if (
       MODE === RULE_EDITOR_CONFIG.MODES.EDIT &&
       isDesktopOnlyRule(currentlySelectedRuleData) &&
@@ -247,13 +222,6 @@ const RuleBuilder = (props) => {
 
   return (
     <m.div layout transition={{ type: "linear", duration: 0.2 }} style={{ height: "inherit" }}>
-      {/* <ProductWalkthrough
-        tourFor={RULE_TYPE_TO_CREATE}
-        startWalkthrough={startWalkthrough}
-        context={currentlySelectedRuleData}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
-      /> */}
-
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
@@ -264,7 +232,7 @@ const RuleBuilder = (props) => {
               source="new_rule_editor"
               handleSeeLiveRuleDemoClick={props.handleSeeLiveRuleDemoClick}
               ruleDetails={
-                isSampleRule
+                isSampleRule && isReadOnly
                   ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details
                   : RULE_DETAILS[currentlySelectedRuleData?.ruleType]
               }

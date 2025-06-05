@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Col, Layout, Row, Switch } from "antd";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PricingTable } from "../PricingTable";
 import { PRICING } from "features/pricing/constants/pricing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { redirectToRules } from "utils/RedirectionUtils";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { EnterprisePlanCard } from "./components/EnterprisePlanCard/EnterprisePlanCard";
 import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
 import { StatsCard } from "./components/StatsCard/StatsCard";
@@ -17,21 +16,56 @@ import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
 import ProductSwitcher from "../ProductSwitcher";
-import "./pricingIndexPage.scss";
 import { kebabCase } from "lodash";
+import { StudentProgram } from "./components/StudentProgram";
+import { isSafariBrowser } from "actions/ExtensionActions";
+import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
+import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
+import "./pricingIndexPage.scss";
 
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
+  const checkoutErrorMessage = searchParams.get("errorMsg");
+  const [isErrorBannerClosed, setIsErrorBannerClosed] = useState(false);
 
-  const [activeProduct, setActiveProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
+  const [activeProduct, setActiveProduct] = useState(
+    isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
+  );
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
+
+  const isCheckoutFailedEventSent = useRef(false);
+
+  useEffect(() => {
+    if (isBrowserStackIntegrationOn && checkoutErrorMessage && !isCheckoutFailedEventSent.current) {
+      trackCheckoutFailedEvent(1, "browserstack_checkout_page", "browserstack");
+      isCheckoutFailedEventSent.current = true;
+    }
+  }, [isBrowserStackIntegrationOn, checkoutErrorMessage]);
 
   return (
     <div className="pricing-page-wrapper">
       <div className="pricing-page-container">
+        {checkoutErrorMessage && !isErrorBannerClosed && (
+          <div className="pricing-page-error-message-banner">
+            <MdOutlineInfo />
+            <span>{checkoutErrorMessage}</span>
+            <span className="pricing-page-error-message-banner-close-icon">
+              <MdOutlineClose onClick={() => setIsErrorBannerClosed(true)} />
+            </span>
+          </div>
+        )}
         <Layout.Header className="pricing-navbar">
           <div className="pricing-navbar-content">
-            <img className="logo" src={RQLogo} alt="requestly logo" onClick={() => redirectToRules(navigate)} />
+            <img
+              className="logo"
+              src={`/assets/media/common/${isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"}`}
+              alt="requestly logo"
+              onClick={() => redirectToRules(navigate)}
+            />
             <HeaderUser />
           </div>
         </Layout.Header>
@@ -43,7 +77,9 @@ export const PricingIndexPage = () => {
             <div className="pricing-page-description">
               More than half of Fortune 500 companies already use Requestly
             </div>
-            <ProductSwitcher activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
+            {!isSafariBrowser() && (
+              <ProductSwitcher activeProduct={activeProduct} setActiveProduct={setActiveProduct} />
+            )}
             <Row justify="center" className="display-row-center w-full mt-24" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
@@ -62,6 +98,7 @@ export const PricingIndexPage = () => {
               <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} product={activeProduct} />
             </div>
             <EnterprisePlanCard product={activeProduct} />
+            <StudentProgram source={SOURCE.PRICING_PAGE} />
             <CompaniesSection />
             <StatsCard />
             <OtherWaysToMakePurchase />

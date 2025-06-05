@@ -32,6 +32,8 @@
   flex-direction: row-reverse;
   padding: 16px 0;
 }
+
+/* TODO: fix inconsistency in class names rule-list-table and rules-list-table */
 .rule-list-table .ant-table-body .ant-table-tbody .rq-content-list-table-row td.ant-table-cell:nth-child(2) {
   padding: 12px 0;
 }
@@ -209,4 +211,12 @@
 
 tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {
   display: flex;
+}
+
+.rules-list-table.read-only .rq-content-list-table-row-group > td:first-child {
+  display: flex;
+  gap: 2px;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
 }

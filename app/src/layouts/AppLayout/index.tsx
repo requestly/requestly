@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import isEmpty from "is-empty";
+import { isEmpty } from "lodash";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
@@ -29,8 +29,9 @@ import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
+import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
+import { GrrWarningHoc } from "features/grr";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -41,10 +42,10 @@ const App: React.FC = () => {
   }, []);
 
   usePreLoadRemover();
+  useClientStorageService();
   useGeoLocation();
   useIsExtensionEnabled();
   useBillingTeamsListener();
-  useEnvironmentManager({ manageGlobalEnv: true });
   useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 
@@ -74,17 +75,17 @@ const App: React.FC = () => {
     <>
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
-      <AuthHandler />
       <AppModeInitializer />
-      <DBListeners />
-      {/* <RuleExecutionsSyncer /> */}
-      {/* @ts-ignore */}
-      <ActiveWorkspace />
-      {/* @ts-ignore */}
-      <ThirdPartyIntegrationsHandler />
-      <ThemeProvider>
-        <ConfigProvider locale={enUS}>
-          <GrowthBookProvider growthbook={growthbook}>
+      <AuthHandler />
+      <GrowthBookProvider growthbook={growthbook}>
+        <DBListeners />
+        {/* <RuleExecutionsSyncer /> */}
+        {/* @ts-ignore */}
+        <ActiveWorkspace />
+        {/* @ts-ignore */}
+        <ThirdPartyIntegrationsHandler />
+        <ThemeProvider>
+          <ConfigProvider locale={enUS}>
             {/* @ts-ignore */}
             <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
@@ -95,12 +96,14 @@ const App: React.FC = () => {
                 <CommandBar />
                 <UpdateDialog />
                 <GlobalModals />
-                <Outlet />
+                <GrrWarningHoc>
+                  <Outlet />
+                </GrrWarningHoc>
               </div>
             </LazyMotion>
-          </GrowthBookProvider>
-        </ConfigProvider>
-      </ThemeProvider>
+          </ConfigProvider>
+        </ThemeProvider>
+      </GrowthBookProvider>
     </>
   );
 };

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Col, Row, Button, Typography } from "antd";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import TeamMembersTable from "./TeamMembersTable";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { PlusOutlined } from "@ant-design/icons";
@@ -11,6 +10,8 @@ import "./MembersDetails.css";
 import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const dispatch = useDispatch();
@@ -23,8 +24,8 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
   const [refreshTeamMembersTable, setRefreshTeamMembersTable] = useState(false);
 
   // Global state
-  const availableTeams = useSelector(getAvailableTeams);
-  const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const teamDetails = availableWorkspaces?.find((team) => team.id === teamId) ?? {};
   const accessCount = teamDetails?.accessCount;
 
   // To handle refresh in TeamMembersTable
@@ -47,8 +48,14 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
     );
   }, [dispatch, doRefreshTeamMembersTable, teamId]);
 
+  const inviteModalShownRef = useRef(false);
   useEffect(() => {
+    if (inviteModalShownRef.current) {
+      return;
+    }
+
     if (isNewTeam) {
+      inviteModalShownRef.current = true;
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "inviteMembersModal",
@@ -96,11 +103,14 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
             {accessCount > 1 ? `${accessCount} Members` : "Workspace Members"}
           </div>
         </Col>
-        <Col>
-          <Button type="primary" onClick={handleAddMemberClick}>
-            <PlusOutlined /> <span className="text-bold caption">Invite People</span>
-          </Button>
-        </Col>
+
+        <RoleBasedComponent resource="workspace" permission="update">
+          <Col>
+            <Button type="primary" onClick={handleAddMemberClick}>
+              <PlusOutlined /> <span className="text-bold caption">Invite People</span>
+            </Button>
+          </Col>
+        </RoleBasedComponent>
       </Row>
 
       <div className="members-table-container">

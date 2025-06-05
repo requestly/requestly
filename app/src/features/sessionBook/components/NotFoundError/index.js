@@ -2,7 +2,6 @@ import React from "react";
 import ProCard from "@ant-design/pro-card";
 import { Button, Col, Row } from "antd";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import img from "assets/images/pages/error/403.svg";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 
@@ -20,7 +19,7 @@ const NotFoundError = () => {
               <Col>
                 <img
                   className="hp-position-relative hp-d-block hp-m-auto"
-                  src={img}
+                  src={"/assets/media/common/403.svg"}
                   alt="403"
                   style={{ maxHeight: "30vh" }}
                 />

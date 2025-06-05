@@ -1,5 +1,5 @@
 .premium-plan-days-left {
-  font-size: 10px;
+  font-size: 12px;
   padding-left: 8px;
   padding-right: 8px;
   color: var(--danger);
@@ -10,7 +10,7 @@
   border: 1px solid rgba(205, 217, 229, 0.1);
   background-image: linear-gradient(180deg, #373e47, #30363d 90%);
   color: #adbac7;
-  border-radius: 5px;
+  border-radius: 5px 0px 0px 5px;
   font-size: 12px;
   font-weight: 500;
   width: 100%;
@@ -24,5 +24,8 @@
   border: 1px solid rgba(205, 217, 229, 0.1);
   border-radius: 5px;
   text-align: center;
-  line-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }

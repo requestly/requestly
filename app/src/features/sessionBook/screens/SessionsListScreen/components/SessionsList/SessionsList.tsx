@@ -8,11 +8,12 @@ import { SessionsListContentHeader } from "./components/SessionsListContentHeade
 import { SessionsTable } from "./components/SessionsTable/SessionsTable";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
 
 export const SessionsList = () => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const user = useSelector(getUserAuthDetails);
   const [searchValue, setSearchValue] = useState("");
   const [forceRender, setForceRender] = useState(false);
@@ -44,10 +45,10 @@ export const SessionsList = () => {
   );
 
   useEffect(() => {
-    if (sessions?.length >= 0 && !isWorkspaceMode) {
+    if (sessions?.length >= 0 && !isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS, sessions?.length);
     }
-  }, [sessions?.length, isWorkspaceMode]);
+  }, [sessions?.length, isSharedWorkspaceMode]);
 
   if (isSessionsListLoading) {
     return <PageLoader message="Loading sessions..." />;
@@ -76,5 +77,19 @@ export const SessionsList = () => {
         ) : null}
       </>
     );
-  } else return <SessionsOnboardingView />;
+  } else
+    return (
+      <RoleBasedComponent
+        resource="session_recording"
+        permission="create"
+        fallback={
+          <RBACEmptyState
+            title="No sessions created yet."
+            description="As a viewer, you will be able to view sessions once someone from your team creates them. You can contact your workspace admin to update your role."
+          />
+        }
+      >
+        <SessionsOnboardingView />
+      </RoleBasedComponent>
+    );
 };

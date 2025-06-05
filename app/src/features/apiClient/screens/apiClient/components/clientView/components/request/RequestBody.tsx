@@ -1,13 +1,11 @@
 import { Radio, Select } from "antd";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { RQAPI, RequestContentType } from "../../../../../../types";
 import { FormBody } from "./renderers/form-body-renderer";
-import { JsonBody } from "./renderers/json-body-renderer";
 import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
 import { RequestBodyProps } from "./request-body-types";
 import "./requestBody.scss";
-
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -26,12 +24,29 @@ function parseSingleModeBody(params: {
       return {
         text: body as RQAPI.RequestRawBody,
       };
+    case RequestContentType.HTML:
+      return {
+        text: body as RQAPI.RequestHtmlBody,
+      };
+    case RequestContentType.JAVASCRIPT:
+      return {
+        text: body as RQAPI.RequestJavascriptBody,
+      };
+    case RequestContentType.XML:
+      return {
+        text: body as RQAPI.RequestXmlBody,
+      };
+    default:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
   }
 }
 
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
-  const [requestBodyStateManager] = useState(
+
+  const requestBodyStateManager = useMemo(
     () =>
       new RequestBodyStateManager(
         props.mode === "multiple"
@@ -40,7 +55,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
               contentType,
               body: props.body,
             })
-      )
+      ),
+    [contentType, props]
   );
 
   const requestBodyOptions = useMemo(() => {
@@ -76,9 +92,14 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
+      case RequestContentType.RAW:
       case RequestContentType.JSON:
+      case RequestContentType.HTML:
+      case RequestContentType.JAVASCRIPT:
+      case RequestContentType.XML:
         return (
-          <JsonBody
+          <RawBody
+            contentType={contentType}
             environmentVariables={variables}
             setRequestEntry={setRequestEntry}
             editorOptions={requestBodyOptions}
@@ -89,13 +110,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       default:
-        return (
-          <RawBody
-            environmentVariables={variables}
-            setRequestEntry={setRequestEntry}
-            editorOptions={requestBodyOptions}
-          />
-        );
+        return null;
     }
   }, [contentType, variables, setRequestEntry, requestBodyOptions]);
 

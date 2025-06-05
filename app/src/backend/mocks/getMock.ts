@@ -10,7 +10,7 @@ export const getMock = async (uid: string, mockId: string, teamId?: string): Pro
     return null;
   }
 
-  const mock = await getMockFromFirebase(mockId).catch(() => null);
+  const mock = await getMockFromFirebase(mockId).catch((): null => null);
 
   // TODO: We can lazy load this in another call and show a loader
   if (BODY_IN_BUCKET_ENABLED && mock && mock?.recordType !== MockRecordType.COLLECTION) {
@@ -24,10 +24,11 @@ const getMockFromFirebase = async (mockId: string): Promise<RQMockSchema> => {
   const docRef = doc(db, "mocks", mockId);
 
   const snapshot = await getDoc(docRef);
+  console.log("snapshot", snapshot.data());
 
   if (snapshot.exists()) {
     const data = snapshot.data() as RQMockSchema;
-    return data;
+    return { ...data, id: snapshot.id };
   } else {
     return null;
   }

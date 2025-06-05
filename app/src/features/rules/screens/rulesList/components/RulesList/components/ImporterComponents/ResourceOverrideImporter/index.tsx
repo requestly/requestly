@@ -20,7 +20,7 @@ import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExtern
 import { copyToClipBoard } from "utils/Misc";
 import "../importer-components.css";
 import { parseRulesFromResourceOverride } from "modules/rule-adapters/resource-override-rule-adapters/parseRulesFromResourceOverride";
-import { Rule } from "types";
+import { Rule } from "@requestly/shared/types/entities/rules";
 import { generateObjectId } from "utils/FormattingHelper";
 import {
   trackResourceOverrideSettingsImportComplete,
@@ -29,6 +29,7 @@ import {
   trackResourceOverrideSettingsImportViewed,
   trackResourceOverrideSettingsParsed,
 } from "modules/analytics/events/features/rules";
+import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
 
 const validExportSteps = [
   {
@@ -103,10 +104,22 @@ export const ImportFromResourceOverrideWrapperView: React.FC = () => {
   useEffect(() => {
     trackResourceOverrideSettingsImportViewed("TOP_LEVEL_ROUTE");
   }, []);
+
   return (
-    <div className="importer-wrapper">
-      <ImportFromResourceOverride />
-    </div>
+    <RoleBasedComponent
+      resource="http_rule"
+      permission="create"
+      fallback={
+        <RBACEmptyState
+          title="You cannot import as a viewer"
+          description="As a viewer, you will be able to view and test rules once someone from your team import them. You can contact your workspace admin to update your role."
+        />
+      }
+    >
+      <div className="importer-wrapper">
+        <ImportFromResourceOverride />
+      </div>
+    </RoleBasedComponent>
   );
 };
 
@@ -298,16 +311,16 @@ export const ImportFromResourceOverride: React.FC<ImportFromResourceOverrideProp
                   Follow below steps to export settings from Resource Override:
                 </Row>
                 <ol>
-                  {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
+                  {validExportSteps.map(({ step }, index) => (
                     <>
                       <li key={index}>{step}</li>
-                      {additionalSteps.length > 0 && (
+                      {/* {additionalSteps.length > 0 && (
                         <ol className="additional-import-steps-list">
                           {additionalSteps.map(({ step }, index) => (
                             <li key={index}>{step}</li>
                           ))}
                         </ol>
-                      )}
+                      )} */}
                     </>
                   ))}
                 </ol>

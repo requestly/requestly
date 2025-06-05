@@ -1,5 +1,5 @@
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import STORAGE from "config/constants/sub/storage";
 
 export enum AuthTypes {
   FORGOT_PASSWORD = "forgot-password",
@@ -75,5 +75,21 @@ export const getAuthErrorMessage = (authType: string, errorCode: string) => {
 
     default:
       return "An unexpected has occurred. Please write us to " + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL;
+  }
+};
+
+export const getDesktopAppAuthParams = (): URLSearchParams | null => {
+  try {
+    const EXPIRY_DURATION = 3 * 60 * 1000; // 3mins -> milliseconds
+    const value = window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
+    const paramsObj = JSON.parse(value) as { params: string; createdAt: number };
+
+    if (Date.now() - paramsObj.createdAt > EXPIRY_DURATION) {
+      return null;
+    }
+
+    return new URLSearchParams(paramsObj.params);
+  } catch (error) {
+    return null;
   }
 };

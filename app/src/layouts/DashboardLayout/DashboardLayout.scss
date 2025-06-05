@@ -18,6 +18,16 @@
     "footer footer";
 }
 
+.app-layout.app-dashboard-layout {
+  &.read-role {
+    --view-only-banner-height: 32px;
+
+    .app-header {
+      max-height: calc(var(--app-header-height) + var(--view-only-banner-height));
+    }
+  }
+}
+
 .app-header {
   grid-area: header;
   height: 100%;
@@ -71,6 +81,10 @@
 .app-main-content,
 #dashboardMainContent {
   height: 100%;
+}
+
+#dashboardMainContent {
+  overflow: hidden;
 }
 
 .app-layout .ant-layout-footer {

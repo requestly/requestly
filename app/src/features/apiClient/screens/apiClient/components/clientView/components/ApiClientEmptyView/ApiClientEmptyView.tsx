@@ -1,31 +1,35 @@
-import emptyViewIcon from "../../../../../../assets/emptyView.svg";
-import defaultViewIcon from "../../../../../../assets/defaultView.svg";
-import { RQButton } from "lib/design-system-v2/components";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQAPI } from "features/apiClient/types";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
-import { toast } from "utils/Toast";
+import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
+import { variablesActions } from "store/features/variables/slice";
+import { RBACButton } from "features/rbac";
 import "./apiClientEmptyView.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { notification } from "antd";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
 
   const isEmpty = apiClientRecords.length === 0;
 
   const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
+    recordType === RQAPI.RecordType.API
+      ? trackNewRequestClicked("api_client_home")
+      : trackNewCollectionClicked("api_client_home");
+
     if (!user.loggedIn) {
       dispatch(
         globalActions.toggleActiveModal({
@@ -41,13 +45,27 @@ export const ApiClientEmptyView = () => {
       return;
     }
     setIsRecordCreating(recordType);
-    createBlankApiRecord(user?.details?.profile?.uid, team?.id, recordType, "")
+    createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "", apiClientRecordsRepository)
       .then((result) => {
-        onSaveRecord(result.data);
+        if (result.success) {
+          onSaveRecord(result.data, "open");
+          if (recordType === RQAPI.RecordType.COLLECTION) {
+            dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
+          }
+        } else {
+          notification.error({
+            message: `Could not create ${recordType === RQAPI.RecordType.API ? "request" : "collection"}.`,
+            description: result?.message,
+            placement: "bottomRight",
+          });
+        }
       })
       .catch((error) => {
-        console.error("Error creating record", error);
-        toast.error("Something went wrong, please try again or contact support!");
+        notification.error({
+          message: `Could not create ${recordType === RQAPI.RecordType.API ? "request" : "collection"}.`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
       })
       .finally(() => {
         setIsRecordCreating(null);
@@ -56,7 +74,6 @@ export const ApiClientEmptyView = () => {
 
   return (
     <div className="api-client-empty-view-container">
-      <img src={isEmpty ? emptyViewIcon : defaultViewIcon} alt="empty-view" />
       <div>
         <div className="api-client-empty-view-header">
           {isEmpty ? "No API requests created yet." : "Pick up where you left off or start fresh."}
@@ -67,19 +84,25 @@ export const ApiClientEmptyView = () => {
             : "View saved collections and requests, continue from where you left off, or start something new."}
         </div>
         <div className="api-client-empty-view-actions">
-          <RQButton
+          <RBACButton
+            permission="create"
+            resource="api_client_request"
+            tooltipTitle="Creating a new request is not allowed in view-only mode."
             loading={isRecordCreating === RQAPI.RecordType.API}
             onClick={() => handleNewRecordClick(RQAPI.RecordType.API)}
           >
             Create a new API request
-          </RQButton>
-          <RQButton
+          </RBACButton>
+          <RBACButton
+            permission="create"
+            resource="api_client_collection"
+            tooltipTitle="Creating a new collection is not allowed in view-only mode."
             loading={isRecordCreating === RQAPI.RecordType.COLLECTION}
             onClick={() => handleNewRecordClick(RQAPI.RecordType.COLLECTION)}
             type="primary"
           >
             Create a new collection
-          </RQButton>
+          </RBACButton>
         </div>
       </div>
     </div>

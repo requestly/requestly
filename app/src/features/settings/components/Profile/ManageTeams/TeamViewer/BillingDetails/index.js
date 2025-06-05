@@ -57,7 +57,7 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
             type="default"
             onClick={() => {
               trackWorkspaceSettingsLearnMoreClicked(teamDetails.id);
-              redirectToUrl("https://developers.requestly.io/faq/billing-team/", true);
+              redirectToUrl("https://docs.requestly.com/general/others/billing-subscriptions", true);
             }}
           >
             Learn more

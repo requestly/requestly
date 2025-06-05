@@ -17,6 +17,7 @@ import { Button, Col, Modal, Row } from "antd";
 import RuleBuilder from "components/features/rules/RuleBuilder";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { TemplateData } from "../../components/TemplatesTable/types";
+import { RoleBasedComponent } from "features/rbac";
 import "./templatePreviewModal.css";
 
 interface TemplatePreviewModalProps {
@@ -82,9 +83,11 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({ rule
         <Row justify="space-between" align="middle">
           <Col flex="auto">{rule.ruleDefinition.name} (Preview Mode)</Col>
           <Col flex="none" style={{ marginRight: "2rem" }}>
-            <Button type="primary" onClick={() => saveRuleTemplate(rule)}>
-              Use this template
-            </Button>
+            <RoleBasedComponent resource="http_rule" permission="create">
+              <Button type="primary" onClick={() => saveRuleTemplate(rule)}>
+                Use this template
+              </Button>
+            </RoleBasedComponent>
           </Col>
         </Row>
       }

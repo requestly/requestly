@@ -1,13 +1,17 @@
 .pricing-modal-wrapper {
-  height: calc(100% - 62px);
+  height: 100%;
   overflow: auto;
+
+  .ant-typography.title {
+    margin: 0;
+  }
 }
 
 .pricing-modal-right-inset-shadow,
 .pricing-modal-left-inset-shadow {
   position: absolute;
   width: 70px;
-  height: 90%;
+  height: 92%;
   right: 8px;
   top: 20px;
   bottom: 0;
@@ -36,9 +40,34 @@
   max-height: 780px;
   overflow: hidden;
 
+  .plan-card {
+    padding-top: 24px;
+
+    .plan-card-middle-section {
+      .plan-name {
+        font-size: var(--requestly-font-size-base, 16px);
+      }
+    }
+
+    .plan-card-details {
+      padding-bottom: 13px;
+    }
+
+    .plan-features-list {
+      margin-top: 18px;
+    }
+
+    .pro-basic-feature-title {
+      font-size: 12px;
+
+      img {
+        width: 58px;
+      }
+    }
+  }
+
   .pricing-table {
-    margin: 0 24px;
-    margin-top: 24px;
+    margin: 16px 24px 0 24px;
   }
 
   .ant-modal-body {
@@ -58,6 +87,26 @@
 
   .pricing-modal-close-icon {
     color: var(--white);
+  }
+
+  .student-program-nudge {
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .companies-wrapper {
+    &.ant-space.ant-space-vertical {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .ant-typography.companies-section-header {
+      font-size: 12px;
+    }
+
+    .company-logo {
+      height: 16px;
+    }
   }
 
   .checkout-embed-wrapper {

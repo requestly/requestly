@@ -2,8 +2,6 @@ import { Typography, Row, Col } from "antd";
 import { HiArrowRight } from "@react-icons/all-files/hi/HiArrowRight";
 import { CompanyMarquee } from "components/misc/Marquee";
 import { OnboardingAuthBanner } from "features/onboarding";
-import quoteIcon from "../../../assets/img/icons/common/quote.svg";
-import underlineIcon from "../../../assets/img/icons/common/underline.svg";
 
 export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) => {
   const workEmailsBenefits = [
@@ -41,7 +39,7 @@ export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) 
 
     return (
       <Col className="signup-modal-testimonial-wrapper">
-        <img src={quoteIcon} alt="quote" />
+        <img src={"/assets/media/components/quote.svg"} alt="quote" />
         <Row>
           <Typography.Text type="primary">{testimonials[currentTestimonialIndex].body}</Typography.Text>
         </Row>
@@ -72,7 +70,7 @@ export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) 
         <Typography.Text type="primary" className="text-bold header">
           Use{" "}
           <span className="work-email-highlight-wrapper">
-            work email <img src={underlineIcon} alt="work email" />
+            work email <img src={"/assets/media/common/underline.svg"} alt="work email" />
           </span>{" "}
           to get access to
         </Typography.Text>

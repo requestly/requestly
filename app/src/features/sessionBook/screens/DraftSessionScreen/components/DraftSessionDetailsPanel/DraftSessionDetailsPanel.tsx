@@ -13,10 +13,11 @@ import { SheetLayout } from "componentsV2/BottomSheet/types";
 import "./draftSessionDetailsPanel.scss";
 
 interface DraftSessionDetailsPanelProps {
+  isReadOnly?: boolean;
   playerTimeOffset: number;
 }
 
-const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ playerTimeOffset }) => {
+const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ isReadOnly, playerTimeOffset }) => {
   const dispatch = useDispatch();
   const metadata = useSelector(getSessionRecordingMetaData);
 
@@ -55,6 +56,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
             <div>
               <label className="session-details-label">Name</label>
               <RQInput
+                disabled={isReadOnly}
                 className="session-details-input"
                 value={metadata?.name || ""}
                 placeholder="Enter session name"
@@ -64,6 +66,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
             <div className="mt-16">
               <label className="session-details-label">Description</label>
               <Input.TextArea
+                disabled={isReadOnly}
                 className="session-details-textarea"
                 rows={4}
                 value={metadata?.description || ""}

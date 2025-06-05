@@ -17,6 +17,26 @@ export function displayFileSelector(callback) {
   }
 }
 
+export const displayFolderSelector = (callback, onCancelCallback) => {
+  const handleDialogPromise = (result) => {
+    const { canceled, filePaths } = result;
+    if (!canceled) {
+      if (callback) {
+        return callback(filePaths[0]);
+      }
+    } else {
+      if (onCancelCallback) {
+        return onCancelCallback();
+      }
+    }
+  };
+  if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-folder-dialog", {}).then((result) => {
+      handleDialogPromise(result);
+    });
+  }
+};
+
 export const handleOpenLocalFileInBrowser = (link) => {
   window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
     link,

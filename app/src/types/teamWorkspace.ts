@@ -7,6 +7,12 @@ export interface TeamWorkspace {
   inviteId: string;
 }
 
+export enum WorkspaceType {
+  PERSONAL = "PERSONAL",
+  SHARED = "SHARED",
+  LOCAL = "LOCAL",
+}
+
 export interface Team {
   id?: string;
   name: string;
@@ -14,6 +20,8 @@ export interface Team {
   access: string[];
   admins: string[];
   adminCount: number;
+  appsumo?: boolean;
+  workspaceType?: WorkspaceType;
   members: {
     [ownerId: string]: {
       role: TeamRole;
@@ -21,11 +29,13 @@ export interface Team {
   };
   owner: string;
   inviteId?: string;
+  rootPath?: string;
 }
 
 export enum TeamRole {
   admin = "admin",
   write = "write",
+  read = "read",
 }
 
 // teams invite
@@ -43,3 +53,22 @@ export interface TeamInviteMetadata extends Record<string, unknown> {
 export interface TeamInvite extends Invite {
   metadata: TeamInviteMetadata;
 }
+
+interface BaseCreateTeamParams {
+  teamId?: string;
+  teamName: string;
+}
+
+export interface LocalWorkspaceConfig {
+  type: WorkspaceType.LOCAL;
+  rootPath: string;
+}
+
+export interface SharedOrPrivateWorkspaceConfig {
+  type: WorkspaceType.SHARED | WorkspaceType.PERSONAL;
+  generatePublicLink?: boolean;
+}
+
+export type CreateTeamParams = BaseCreateTeamParams & {
+  config: LocalWorkspaceConfig | SharedOrPrivateWorkspaceConfig;
+};

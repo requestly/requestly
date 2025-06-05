@@ -180,11 +180,9 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           }}
           disabled={isInputDisabled}
         >
-          {pair.destination ? "Change file" : " Select mock/file"}
+          {pair.destination ? "Change file" : " Select file"}
         </RQButton>
-        <span className="destination-file-path">
-          {pair.destination.length ? pair.destination : " No mock or file chosen"}
-        </span>
+        <span className="destination-file-path">{pair.destination.length ? pair.destination : " No file chosen"}</span>
         {pair.destination && (
           <a href={pair.destination} target="_blank" rel="noreferrer">
             <HiOutlineExternalLink className="external-link-icon" />
@@ -250,7 +248,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                             (using $1, $2, etc).
                             <br />
                             <a
-                              href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                              href="https://docs.requestly.com/general/http-rules/advanced-usage/source-conditions#testing-url-with-wildcard-condition"
                               target="_blank"
                               rel="noreferrer"
                             >
@@ -428,7 +426,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                       Local file
                     </Radio>
                   </MoreInfo>
-                  <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
+                  <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from File server</Radio>
                 </Radio.Group>
               )}
             </Col>

@@ -1,10 +1,8 @@
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFile";
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getAppMode, getUserAttributes } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
@@ -19,20 +17,16 @@ import { compressEvents, getSessionEventsToSave } from "features/sessionBook/uti
 import { trackDraftSessionSaved, trackDraftSessionSaveFailed } from "features/sessionBook/analytics";
 import { toast } from "utils/Toast";
 import { DebugInfo, SessionSaveMode } from "features/sessionBook/types";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
 import PATHS from "config/constants/sub/paths";
 import { getAppFlavour } from "utils/AppUtils";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const useSaveDraftSession = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const { claimIncentiveRewards } = useIncentiveActions();
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
   const sessionEvents = useSelector(getSessionRecordingEvents);
@@ -41,9 +35,6 @@ export const useSaveDraftSession = () => {
 
   const saveDraftSessionHandler = useCallback(
     async (recordingOptions: DebugInfo[], isOpenedInIframe: boolean, source: string) => {
-      const isDraftSession =
-        window.location.pathname.includes("draft") || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
-
       const sessionEventsToSave = trimmedSessionData?.events ?? sessionEvents;
       const attributes = {
         ...sessionAttributes,
@@ -73,7 +64,7 @@ export const useSaveDraftSession = () => {
         );
       }
 
-      const workspaceId = isOpenedInIframe ? searchParams.get("workspaceId") : currentlyActiveWorkspace?.id;
+      const workspaceId = isOpenedInIframe ? searchParams.get("workspaceId") : activeWorkspaceId;
 
       return saveRecording(
         user?.details?.profile?.uid,
@@ -93,29 +84,6 @@ export const useSaveDraftSession = () => {
             source,
             recording_mode: sessionRecordingMetadata?.recordingMode,
           });
-
-          if (isDraftSession) {
-            claimIncentiveRewards({
-              type: IncentivizeEvent.SESSION_RECORDED,
-              metadata: { num_sessions: userAttributes?.num_sessions || 1 },
-            })?.then((response: any) => {
-              if (response.data?.success) {
-                dispatch(
-                  incentivizationActions.setUserMilestoneAndRewardDetails({
-                    userMilestoneAndRewardDetails: response.data?.data,
-                  })
-                );
-
-                dispatch(
-                  incentivizationActions.toggleActiveModal({
-                    modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                    newValue: true,
-                    newProps: { event: IncentivizeEvent.SESSION_RECORDED },
-                  })
-                );
-              }
-            });
-          }
 
           if (isOpenedInIframe) {
             window.parent.postMessage(
@@ -143,12 +111,10 @@ export const useSaveDraftSession = () => {
     },
     [
       appMode,
-      claimIncentiveRewards,
-      currentlyActiveWorkspace,
+      activeWorkspaceId,
       dispatch,
       navigate,
       user,
-      userAttributes,
       sessionEvents,
       sessionRecordingMetadata,
       searchParams,

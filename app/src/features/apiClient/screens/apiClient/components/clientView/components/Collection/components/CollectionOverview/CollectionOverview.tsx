@@ -1,19 +1,15 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
-import { Input, Tabs } from "antd";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { Input, notification, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
-import { useTabsLayoutContext } from "layouts/TabsLayout";
-import PATHS from "config/constants/sub/paths";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { useOutsideClick } from "hooks";
+import { useRBAC } from "features/rbac";
+import { useGenericState } from "hooks/useGenericState";
 import "./collectionOverview.scss";
 
 interface CollectionOverviewProps {
@@ -23,10 +19,10 @@ interface CollectionOverviewProps {
 const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
-  const { onSaveRecord } = useApiClientContext();
-  const { replaceTab } = useTabsLayoutContext();
+  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_collection", "create");
+  const { setTitle, close } = useGenericState();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -34,40 +30,57 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
   const { ref: collectionDescriptionRef } = useOutsideClick<HTMLDivElement>(() => setShowEditor(false));
 
+  useEffect(() => {
+    setCollectionName(collection?.name);
+  }, [collection?.name]);
+
   const handleDescriptionChange = useCallback(
     async (value: string) => {
       const newDescription = value;
-      const updatedCollection = {
-        ...collection,
-        description: newDescription,
-      };
-      return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
-        onSaveRecord(result.data);
-      });
+
+      return apiClientRecordsRepository
+        .updateCollectionDescription(collection.id, newDescription)
+        .then((result) => {
+          const updatedCollection = {
+            ...collection,
+            description: result.data,
+          };
+          onSaveRecord(updatedCollection, "open");
+        })
+        .catch((error) => {
+          notification.error({
+            message: `Could not update collection description.`,
+            description: error?.message,
+            placement: "bottomRight",
+          });
+        });
     },
-    [collection, onSaveRecord, user.details?.profile?.uid, team?.id]
+    [collection, onSaveRecord, apiClientRecordsRepository]
   );
 
   const debouncedDescriptionChange = useDebounce(handleDescriptionChange, 1500);
 
   const handleCollectionNameChange = async () => {
+    const updatedCollectionName = collectionName || "Untitled Collection";
     const updatedCollection = {
       ...collection,
-      name: collectionName || "Untitled Collection",
+      name: updatedCollectionName,
     };
 
     if (collectionName === "") {
-      setCollectionName("Untitled Collection");
+      setCollectionName(updatedCollectionName);
     }
 
-    return upsertApiRecord(user.details?.profile?.uid, updatedCollection, team?.id).then((result) => {
-      onSaveRecord(result.data);
-      replaceTab(result.data.id, {
-        id: result.data.id,
-        title: result.data.name,
-        url: `${PATHS.API_CLIENT.ABSOLUTE}/collection/${result.data.id}`,
-      });
-    });
+    const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
+    if (result.success) {
+      onSaveRecord(result.data, "open");
+      setTitle(updatedCollectionName);
+    }
+
+    const wasForceRefreshed = await forceRefreshApiClientRecords();
+    if (wasForceRefreshed) {
+      close();
+    }
   };
 
   const markdown = useMemo(() => {
@@ -97,6 +110,7 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
     <div className="collection-overview-wrapper">
       <div className="collection-overview-container">
         <InlineInput
+          disabled={!isValidPermission}
           value={collectionName}
           onChange={(value) => {
             setCollectionName(value);
@@ -104,7 +118,6 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
           onBlur={handleCollectionNameChange}
           placeholder="Collection name"
         />
-
         <div ref={collectionDescriptionRef} className="collection-overview-description">
           {showEditor ? (
             <>
@@ -138,7 +151,16 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
               />
             </>
           ) : (
-            <div className="collection-overview-description-markdown" onClick={() => setShowEditor(true)}>
+            <div
+              className="collection-overview-description-markdown"
+              onClick={() => {
+                if (!isValidPermission) {
+                  return;
+                }
+
+                setShowEditor(true);
+              }}
+            >
               {markdown}
             </div>
           )}

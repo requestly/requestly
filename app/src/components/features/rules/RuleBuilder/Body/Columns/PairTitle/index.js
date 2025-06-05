@@ -15,7 +15,7 @@ const PairTitle = (props) => {
           icon={<QuestionCircleOutlined />}
           type="link"
           size="small"
-          href="https://docs.requestly.io/using-rules/modify-ajax-response-rule"
+          href="https://docs.requestly.com/general/http-rules/rule-types/modify-response-body"
           target="_blank"
         />
       ) : null}

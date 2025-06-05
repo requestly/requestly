@@ -7,8 +7,9 @@ import { dateObjToDateString, getOldestDate } from "./DateTimeUtils";
 import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installation";
 import { getValueAsPromise } from "actions/FirebaseActions";
 import { isEmailVerified } from "./AuthUtils";
-import { isCompanyEmail } from "./FormattingHelper";
 import moment from "moment";
+import { EmailType } from "@requestly/shared/types/common";
+import { getEmailType } from "./mailCheckerUtils";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -176,11 +177,11 @@ export const getConnectedAppsCount = (appsListArray) => {
 export const isVerifiedBusinessDomainUser = async (email, uid) => {
   if (!email || !uid) return false;
 
-  return isEmailVerified(uid).then((result) => {
-    if (result && isCompanyEmail(email)) {
-      return true;
-    } else return false;
-  });
+  const result = await isEmailVerified(uid);
+  const email_type = await getEmailType(email);
+  const isCompanyEmail = email_type === EmailType.BUSINESS;
+
+  return result && isCompanyEmail;
 };
 
 export const openEmailClientWithDefaultEmailBody = (email, subject, body) => {

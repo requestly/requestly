@@ -4,15 +4,14 @@ import { RQMockCollection } from "components/features/mocksV2/types";
 import { Button } from "antd";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
-import deleteIcon from "../../assets/delete.svg";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";
 import { trackMockCollectionDeleted } from "modules/analytics/events/features/mocksV2";
 import { toast } from "utils/Toast";
 import "./deleteCollectionModal.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface DeleteCollectionModalProps {
   visible: boolean;
@@ -29,8 +28,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isDeletingOnlyCollection, setIsDeletingOnlyCollection] = useState(false);
   const [isDeletingCollectionAndMocks, setIsDeletingCollectionAndMocks] = useState(false);
@@ -42,7 +40,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
 
       // FIXME: This might break when multiple people working in workspace
       //        since we are using UI as a source for mockIds
-      await updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId);
+      await updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, activeWorkspaceId);
       await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
       trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_only_collection");
@@ -63,7 +61,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
       setIsDeletingCollectionAndMocks(true);
       const mockIds = collection.children?.map((mock) => mock.id);
 
-      await deleteMocks(uid, mockIds, teamId);
+      await deleteMocks(uid, mockIds, activeWorkspaceId);
       await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
       trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_mocks_and_collection");
@@ -90,7 +88,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
       onCancel={handleCancel}
       className="delete-collection-modal"
     >
-      <img width={32} height={32} src={deleteIcon} alt="Delete collection" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete collection" className="icon" />
       <div className="header">Delete this collection?</div>
       <div className="description">
         This will permanently delete this collection. <br />

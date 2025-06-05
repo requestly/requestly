@@ -1,0 +1,27 @@
+.api-client-sheet-panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 99%;
+
+  .api-client-sheet-panel {
+    flex: 1;
+    overflow-y: hidden;
+
+    .ant-tabs-extra-content {
+      margin-top: -6px;
+      margin-right: 4px;
+    }
+  }
+
+  .test-results-stats {
+    letter-spacing: -0.4px;
+
+    &.passed {
+      color: var(--requestly-color-success-300);
+    }
+
+    &.failed {
+      color: var(--requestly-color-error-300);
+    }
+  }
+}

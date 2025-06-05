@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import InstallExtensionCTA from "../../../../components/misc/InstallExtensionCTA";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariExtension } from "actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
@@ -12,6 +12,7 @@ import RulesSyncing from "./components/RulesSyncing";
 import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
 import "./index.scss";
 import { BlockList } from "./components/BlockListSettings/BlockListSettings";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
@@ -22,8 +23,13 @@ export const GlobalSettings = () => {
     []
   );
 
-  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
-    return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
+  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    if (!isExtensionInstalled()) {
+      return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
+    }
+    if (isSafariExtension()) {
+      return <SafariLimitedSupportView />;
+    }
   }
 
   return (

@@ -8,7 +8,6 @@ import { getColumnKey } from "../utils";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
-import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
@@ -17,6 +16,7 @@ import { trackMockResponsesRequestsSelected } from "modules/analytics/events/fea
 import { REQUEST_METHOD_COLORS, RequestMethod } from "../../../../../../../../constants/requestMethodColors";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./index.scss";
+import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 
 export const ITEM_SIZE = 30;
 
@@ -166,7 +166,7 @@ const NetworkTable: React.FC<Props> = ({
         width: "8%",
         render(method: RequestMethod) {
           return (
-            <Typography.Text className="api-method" strong style={{ color: REQUEST_METHOD_COLORS[method] }}>
+            <Typography.Text className="api-method" style={{ color: REQUEST_METHOD_COLORS[method] }}>
               {method}
             </Typography.Text>
           );

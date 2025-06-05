@@ -6,8 +6,7 @@ import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "util
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
-import MenuHeader from "./MenuHeader";
-import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
+// import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe, isDesktopMode } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
@@ -22,20 +21,29 @@ import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesk
 import { getUserOS } from "utils/Misc";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import useRootPathRedirector from "hooks/useRootPathRedirector";
+import { ViewOnlyModeBanner } from "components/common/ViewOnlyModeBanner/ViewOnlyModeBanner";
+import { useCurrentWorkspaceUserRole } from "hooks";
+import { TeamRole } from "types";
+import { Conditional } from "components/common/Conditional";
+import { MenuHeader } from "./MenuHeader/MenuHeader";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
-  const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
+  // const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
+  const { role } = useCurrentWorkspaceUserRole();
+  const isReadRole = role === TeamRole.read;
 
-  initializeOneTap();
+  useRootPathRedirector();
+  // initializeOneTap();
 
-  if (shouldShowOneTapPrompt()) {
-    promptOneTap();
-  }
+  // if (shouldShowOneTapPrompt()) {
+  //   promptOneTap();
+  // }
 
   const isSidebarVisible = useMemo(
     () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),
@@ -70,7 +78,8 @@ const DashboardLayout = () => {
     <>
       <AppNotificationBanner />
       <PlanExpiredBanner />
-      <div className="app-layout app-dashboard-layout">
+
+      <div className={`app-layout app-dashboard-layout  ${isReadRole ? "read-role" : ""}`}>
         <div
           className={`app-header ${
             isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
@@ -78,15 +87,16 @@ const DashboardLayout = () => {
               : ""
           }`}
         >
-          {" "}
-          <MenuHeader />
+          {isPricingPage(pathname) ? null : <MenuHeader />}
+          <Conditional condition={isReadRole}>
+            <ViewOnlyModeBanner />
+          </Conditional>
         </div>
 
         {isDesktopAppConnected ? (
           <ConnectedToDesktopView />
         ) : (
           <>
-            {" "}
             <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
             <div className="app-main-content">
               <DashboardContent />

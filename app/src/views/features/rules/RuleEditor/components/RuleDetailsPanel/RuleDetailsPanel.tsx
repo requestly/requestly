@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
 import { MdOutlineFactCheck } from "@react-icons/all-files/md/MdOutlineFactCheck";
@@ -13,7 +13,6 @@ import {
   trackRuleDetailsPanelClosed,
   trackRuleDetailsPanelDocsClicked,
   trackRuleDetailsPanelUseCaseClicked,
-  trackRuleDetailsPanelViewed,
 } from "modules/analytics/events/common/rules";
 import { trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
 import { useNavigate } from "react-router-dom";
@@ -65,12 +64,6 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({
     trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "use_template");
     navigate(`${PATHS.RULES.TEMPLATES.ABSOLUTE}?id=${templateId}`);
   };
-
-  useEffect(() => {
-    if (ruleType && source) {
-      trackRuleDetailsPanelViewed(ruleType, source);
-    }
-  }, [ruleType, source]);
 
   const getActionButton = (useCase: string, example: UseCaseExample) => {
     switch (example?.type) {

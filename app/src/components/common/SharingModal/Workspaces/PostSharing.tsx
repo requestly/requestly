@@ -2,18 +2,17 @@ import React, { useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Avatar } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { LockOutlined } from "@ant-design/icons";
-import mailSuccessImg from "assets/images/illustrations/mail-success.svg";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 import { toast } from "utils/Toast";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 interface PostSharingProps {
   postShareViewData: PostShareViewData;
@@ -29,7 +28,7 @@ interface WorkspaceInfoProps {
 export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, setPostShareViewData, toggleModal }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   const handleSwitchWorkspace = useCallback(() => {
     switchWorkspace(
@@ -40,7 +39,7 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
       },
       dispatch,
       {
-        isWorkspaceMode,
+        isWorkspaceMode: isSharedWorkspaceMode,
         isSyncEnabled: true,
       },
       appMode,
@@ -57,18 +56,18 @@ export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, set
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
         );
       });
-  }, [appMode, dispatch, isWorkspaceMode, toggleModal, postShareViewData]);
+  }, [appMode, dispatch, isSharedWorkspaceMode, toggleModal, postShareViewData]);
 
   const postSharingViews = useMemo(() => {
     return {
       [WorkspaceSharingTypes.NEW_WORKSPACE_CREATED]: {
-        header: <img src={mailSuccessImg} alt="mail sent" width={60} />,
+        header: <img src={"/assets/media/components/mail-success.svg"} alt="mail sent" width={60} />,
         message: "New Workspace created and Teammates invited!",
         ctaText: "Switch to the new workspace",
         action: handleSwitchWorkspace,
       },
       [WorkspaceSharingTypes.USERS_INVITED]: {
-        header: <img src={mailSuccessImg} alt="mail sent" width={60} />,
+        header: <img src={"/assets/media/components/mail-success.svg"} alt="mail sent" width={60} />,
         message: "Email invites sent!",
         ctaText: "Invite more users",
         action: () => {
