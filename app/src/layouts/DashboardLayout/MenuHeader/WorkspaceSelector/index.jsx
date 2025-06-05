@@ -101,59 +101,61 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
       : prettifyWorkspaceName(activeWorkspaceName);
 
   return (
-    <Dropdown
-      overlay={menu}
-      trigger={["click"]}
-      className="workspace-selector-dropdown no-drag"
-      onOpenChange={handleWorkspaceDropdownClick}
-    >
-      <div className="workspace-selector-dropdown__content">
-        <Tooltip
-          overlayClassName="workspace-selector-tooltip"
-          style={{ top: "35px" }}
-          title={tooltipTitle}
-          placement={"bottomRight"}
-          showArrow={false}
-          mouseEnterDelay={0.5}
-          color="#000"
-        >
-          <div className="cursor-pointer items-center">
-            <Avatar
-              size={26}
-              shape="square"
-              icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
-              className="workspace-avatar"
-              style={{
-                backgroundColor: user.loggedIn
-                  ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                    ? "#1E69FF"
-                    : isLocalWorkspace
-                    ? "#FFFFFF33"
-                    : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
-                  : "#ffffff4d",
-              }}
-            />
+    <>
+      <Dropdown
+        overlay={menu}
+        trigger={["click"]}
+        className="workspace-selector-dropdown no-drag"
+        onOpenChange={handleWorkspaceDropdownClick}
+      >
+        <div className="workspace-selector-dropdown__content">
+          <Tooltip
+            overlayClassName="workspace-selector-tooltip"
+            style={{ top: "35px" }}
+            title={tooltipTitle}
+            placement={"bottomRight"}
+            showArrow={false}
+            mouseEnterDelay={0.5}
+            color="#000"
+          >
+            <div className="cursor-pointer items-center">
+              <Avatar
+                size={26}
+                shape="square"
+                icon={isLocalWorkspace ? <LuFolderSync /> : getWorkspaceIcon(activeWorkspaceName)}
+                className="workspace-avatar"
+                style={{
+                  backgroundColor: user.loggedIn
+                    ? activeWorkspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                      ? "#1E69FF"
+                      : isLocalWorkspace
+                      ? "#FFFFFF33"
+                      : getUniqueColorForWorkspace(activeWorkspaceId, activeWorkspaceName)
+                    : "#ffffff4d",
+                }}
+              />
 
-            <span className="items-center active-workspace-name">
-              <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-              {hasNewInvites ? <Badge dot={true} /> : null}
-              <DownOutlined className="active-workspace-name-down-icon" />
-            </span>
-          </div>
-        </Tooltip>
-        {activeWorkspace?.workspaceType === WorkspaceType.LOCAL ? (
-          <Tooltip title="Refresh workspace" placement="bottom" color="#000">
-            <RQButton
-              onClick={handleLocalSyncRefresh}
-              className="local-sync-refresh-btn"
-              size="small"
-              iconOnly
-              icon={<MdOutlineRefresh />}
-            />
+              <span className="items-center active-workspace-name">
+                <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                {hasNewInvites ? <Badge dot={true} /> : null}
+                <DownOutlined className="active-workspace-name-down-icon" />
+              </span>
+            </div>
           </Tooltip>
-        ) : null}
-      </div>
-    </Dropdown>
+        </div>
+      </Dropdown>
+      {activeWorkspace?.workspaceType === WorkspaceType.LOCAL ? (
+        <Tooltip title="Load latest changes from your local files" placement="bottom" color="#000">
+          <RQButton
+            onClick={handleLocalSyncRefresh}
+            className="local-sync-refresh-btn no-drag"
+            size="small"
+            iconOnly
+            icon={<MdOutlineRefresh />}
+          />
+        </Tooltip>
+      ) : null}
+    </>
   );
 };
 
