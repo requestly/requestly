@@ -20,6 +20,7 @@ import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
+import { getOwnerId } from "backend/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
@@ -51,11 +52,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
-
-  const ownerId = useMemo(() => (activeWorkspaceId ? `team-${activeWorkspaceId}` : user?.details?.profile?.uid), [
-    activeWorkspaceId,
-    user?.details?.profile?.uid,
-  ]);
+  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const syncRepository = useGetApiClientSyncRepo();
 
