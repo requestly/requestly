@@ -94,7 +94,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           trackSharingModalRulesDuplicated("personal", selectedRules.length);
           setPostShareViewData({
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
-            targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
+            targetTeamData: { ...teamData, id: teamId } as Workspace,
           });
 
           onRulesShared();
@@ -123,7 +123,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
         trackSharingModalRulesDuplicated("personal", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          targetTeamData: teamData,
           sourceTeamData: activeWorkspace,
         });
 
