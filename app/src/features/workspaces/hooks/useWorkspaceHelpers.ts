@@ -4,9 +4,9 @@ import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import { variablesActions } from "store/features/variables/slice";
 import { getPersonalWorkspaceId } from "../utils";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { tabsLayoutActions } from "store/slices/tabs-layout";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 
 export const useWorkspaceHelpers = () => {
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ export const useWorkspaceHelpers = () => {
     trackWorkspaceSwitched(source);
     console.log("[useWorkspaceHelpers.switchWorkspace]", { workspaceId });
     dispatch(variablesActions.resetState());
-    dispatch(tabsLayoutActions.resetState());
+    getTabServiceActions().resetTabs();
     return workspaceManager.initActiveWorkspaces([workspaceId]);
   };
 
