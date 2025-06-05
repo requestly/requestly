@@ -69,3 +69,28 @@
 .tour-tooltip-pointer-top-100 {
   left: 85%;
 }
+
+.tour-tooltip-pointer-left {
+  left: -5px;
+  transform: rotate(270deg) translateY(-50%);
+}
+
+.tour-tooltip-pointer-left-0 {
+  top: calc(10% - 10px);
+}
+
+.tour-tooltip-pointer-left-25 {
+  top: calc(30% - 10px);
+}
+
+.tour-tooltip-pointer-left-50 {
+  top: calc(50% - 10px);
+}
+
+.tour-tooltip-pointer-left-75 {
+  top: calc(67% - 10px);
+}
+
+.tour-tooltip-pointer-left-100 {
+  top: calc(85% - 10px);
+}
