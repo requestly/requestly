@@ -1,4 +1,11 @@
-import { autocompletion, Completion, CompletionResult, CompletionSource } from "@codemirror/autocomplete";
+import {
+  autocompletion,
+  Completion,
+  CompletionResult,
+  CompletionSource,
+  insertCompletionText,
+} from "@codemirror/autocomplete";
+import { EditorView } from "@codemirror/view";
 import { EnvironmentVariables } from "backend/environment/types";
 
 /**
@@ -38,7 +45,16 @@ function varCompletionSource(envVariables: EnvironmentVariables): CompletionSour
           ? "•".repeat(String(envVariables[key].localValue ?? envVariables[key].syncValue).length)
           : ((envVariables[key].localValue ?? envVariables[key].syncValue) as string),
       type: envVariables[key].localValue ? "local variable" : "sync variable",
-    } as Completion;
+      apply: (view: EditorView, completion: Completion, from: number, to: number): void => {
+        // Look ahead up to 10 characters, skip spaces, then check for and add closing braces
+        const LOOK_AHEAD_BUFFER = 10;
+        const lookahead = view.state.doc.sliceString(to, to + LOOK_AHEAD_BUFFER);
+        const nextChars = lookahead.trimStart().slice(0, 2);
+        const closingChars = nextChars.startsWith("}}") ? "" : nextChars.startsWith("}") ? "}" : "}}";
+        const finalCompletion = completion.label + closingChars;
+        view.dispatch(insertCompletionText(view.state, finalCompletion, from, to));
+      },
+    };
   });
   return generateCompletionSource(/\{\{.*?/g, varCompletions, 2);
 }
