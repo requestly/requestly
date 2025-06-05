@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from "react";
 import { RQButton } from "lib/design-system/components";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { toast } from "utils/Toast";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface PostSharingProps {
   postShareViewData: PostShareViewData;

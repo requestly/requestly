@@ -9,7 +9,7 @@ import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import "./index.scss";
 import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
-import { isPersonalWorkspaceId } from "features/workspaces/utils";
+import { isPersonalWorkspace } from "features/workspaces/utils";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -106,7 +106,7 @@ const WorkspaceDropdown: React.FC<{
               <WorkspaceAvatar
                 workspace={{
                   ...workspaceToUpgrade,
-                  workspaceType: isPersonalWorkspaceId(workspaceToUpgrade.id)
+                  workspaceType: isPersonalWorkspace(workspaceToUpgrade)
                     ? WorkspaceType.PERSONAL
                     : WorkspaceType.SHARED,
                 }}

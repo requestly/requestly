@@ -6,7 +6,6 @@ import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
@@ -16,6 +15,8 @@ import { getWorkspaceById } from "store/slices/workspaces/selectors";
 import { isPersonalWorkspaceId } from "features/workspaces/utils";
 import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
 import { WorkspaceType } from "features/workspaces/types";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
@@ -99,7 +100,7 @@ const TeamViewer = () => {
         <Row align="middle" justify="space-between" className="manage-workspace-header-container">
           <Col>
             <Row wrap={false} align="middle" className="manage-workspace-header">
-              <WorkspaceAvatar workspace={teamDetails} size={28} />
+              <WorkspaceAvatar workspace={teamDetails} size={28} />{" "}
               <span className="header">Manage {name ?? "private"} workspace</span>
             </Row>
           </Col>
