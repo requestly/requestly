@@ -1,14 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import { QueryParamSyncType, RQAPI } from "features/apiClient/types";
+import { RQAPI } from "features/apiClient/types";
 import { useLocation } from "react-router-dom";
 import { Skeleton } from "antd";
-import { syncQueryParams } from "./utils";
 import "./apiClient.scss";
-import { isEmpty } from "lodash";
-import { useGenericState } from "hooks/useGenericState";
+import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -34,17 +32,9 @@ type Props = CreateModeProps | EditModeProps | HistoryModeProps;
 export const APIClient: React.FC<Props> = React.memo((props) => {
   const location = useLocation();
   const { isCreateMode } = props;
-  const {
-    apiClientRecords,
-    history,
-    selectedHistoryIndex,
-    addToHistory,
-    setCurrentHistoryIndex,
-  } = useApiClientContext();
-  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
+  const { history, selectedHistoryIndex, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
+  const [selectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
   const isHistoryPath = location.pathname.includes("history");
-
-  const { setTitle } = useGenericState();
 
   const requestId = isCreateMode === false ? props.requestId : null;
   const onSaveCallback = props.onSaveCallback ?? (() => {});
@@ -65,35 +55,6 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
 
     return entryDetails;
   }, [isHistoryPath, history, selectedHistoryIndex]);
-
-  useEffect(() => {
-    if (isCreateMode) {
-      return;
-    }
-
-    const record = apiClientRecords.find((record) => record.id === requestId) as RQAPI.ApiRecord;
-
-    if (record) {
-      const entry = record.data;
-      if (entry) {
-        entry.request = {
-          ...entry.request,
-          ...syncQueryParams(
-            entry.request.queryParams,
-            entry.request.url,
-            isEmpty(entry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
-          ),
-        };
-      }
-      record.data = entry;
-      setSelectedEntryDetails(record);
-
-      // To sync title for tabs opened from deeplinks
-      if (!props.apiEntryDetails?.name) {
-        setTitle(record.name);
-      }
-    }
-  }, [apiClientRecords, isCreateMode, props.apiEntryDetails?.name, requestId, setTitle]);
 
   const entryDetails = useMemo(
     () => (isHistoryPath && !requestId ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord,
@@ -122,12 +83,14 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
-        <APIClientView
-          apiEntryDetails={entryDetails}
-          notifyApiRequestFinished={handleAppRequestFinished}
-          onSaveCallback={onSaveCallback}
-          isCreateMode={isCreateMode}
-        />
+        <QueryParamsProvider entry={entryDetails?.data}>
+          <APIClientView
+            apiEntryDetails={entryDetails}
+            notifyApiRequestFinished={handleAppRequestFinished}
+            onSaveCallback={onSaveCallback}
+            isCreateMode={isCreateMode}
+          />
+        </QueryParamsProvider>
       </div>
     </BottomSheetProvider>
   );

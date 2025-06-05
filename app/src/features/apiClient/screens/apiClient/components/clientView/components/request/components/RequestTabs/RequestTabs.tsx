@@ -73,9 +73,7 @@ const RequestTabs: React.FC<Props> = ({
         label: (
           <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
         ),
-        children: (
-          <QueryParamsTable requestEntry={requestEntry} setRequestEntry={setRequestEntry} variables={variables} />
-        ),
+        children: <QueryParamsTable variables={variables} />,
       },
       {
         key: RequestTab.BODY,
