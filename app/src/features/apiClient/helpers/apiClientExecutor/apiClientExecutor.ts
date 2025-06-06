@@ -196,7 +196,6 @@ export class ApiClientExecutor {
   async execute(): Promise<RQAPI.ExecutionResult> {
     this.prepareRequest();
     this.entryDetails.request.url = addUrlSchemeIfMissing(this.entryDetails.request.url);
-    console.log("DBG entryDetails", this.entryDetails.request.url);
 
     try {
       this.preValidateRequest();

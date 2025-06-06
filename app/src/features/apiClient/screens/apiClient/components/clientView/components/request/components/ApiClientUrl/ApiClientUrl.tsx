@@ -27,6 +27,10 @@ export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, o
         }
       });
 
+      /*  Opted for manual counters because:
+        - Url params does not have context of the disabled params, when params in url are changed, disabled params positioning should also be maintained.
+        - This is possible to handle using Array.prototye.findIndex, but it is not performant as it traverses the queryParams for each disabled param.
+      */
       let urlParamIndex = 0;
       for (let i = 0; i < Math.max(queryParams.length, paramsFromUrl.length + disabledPositions.size); i++) {
         if (disabledPositions.has(i)) {
