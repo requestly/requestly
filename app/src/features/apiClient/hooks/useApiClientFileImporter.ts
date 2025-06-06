@@ -288,8 +288,8 @@ const useApiClientFileImporter = (importer: ImporterType) => {
 
         toast.success(
           `Successfully imported ${[
-            importedCollectionsAndApisCount > 0
-              ? `${importedCollectionsAndApisCount} collection${importedCollectionsAndApisCount !== 1 ? "s" : ""}`
+            importedCollectionsCount > 0
+              ? `${importedCollectionsCount} collection${importedCollectionsCount !== 1 ? "s" : ""}`
               : "",
             importedEnvironments > 0
               ? `${importedEnvironments} environment${importedEnvironments !== 1 ? "s" : ""}`
