@@ -30,7 +30,7 @@ interface EditableCellProps {
   record: KeyValuePair;
   variables: EnvironmentVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
-  checkColon: boolean;
+  checkInvalidCharacter: boolean;
 }
 
 export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -41,7 +41,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   record,
   variables,
   handleUpdatePair,
-  checkColon,
+  checkInvalidCharacter,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
@@ -74,7 +74,11 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         ) : (
           <div
             className={`key-value-input-container 
-          ${/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkColon ? "error-state" : ""}
+          ${
+            /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
+              ? "error-state"
+              : ""
+          }
         `}
           >
             <SingleLineEditor
@@ -88,14 +92,15 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
               variables={variables}
             />
             <Conditional
-              condition={/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkColon}
+              condition={
+                /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
+              }
             >
               <div className="key-value-table-error-icon">
                 <InfoIcon
                   text="Invalid character used in key"
                   tooltipPlacement="right"
                   showArrow={false}
-                  danger={true}
                   style={{
                     color: "var(--requestly-color-error)",
                     marginTop: "2px",

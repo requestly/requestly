@@ -71,7 +71,6 @@ function generateFields(
                 text="Invalid character used in key"
                 tooltipPlacement="right"
                 showArrow={false}
-                danger={true}
                 style={{
                   color: "var(--requestly-color-error)",
                   fontFamily: "Material Symbols Outlined",

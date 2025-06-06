@@ -12,17 +12,11 @@ interface Props {
   danger?: boolean;
 }
 
-const InfoIcon: React.FC<Props> = ({
-  text,
-  tooltipPlacement = "bottomRight",
-  style = {},
-  showArrow = true,
-  danger,
-}) => {
+const InfoIcon: React.FC<Props> = ({ text, tooltipPlacement = "bottomRight", style = {}, showArrow = true }) => {
   return (
     <Tooltip
       title={text}
-      overlayClassName={`info-icon-tooltip ${danger ? "info-icon-tooltip-danger" : ""}`}
+      overlayClassName="info-icon-tooltip"
       placement={tooltipPlacement}
       arrowPointAtCenter
       showArrow={showArrow}
