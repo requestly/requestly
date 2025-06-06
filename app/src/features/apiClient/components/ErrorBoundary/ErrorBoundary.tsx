@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { RenderableError } from "../../../../errors/RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
 import * as Sentry from "@sentry/react";
 import "./errorboundary.scss";
 import { NativeError } from "errors/NativeError";
+import { useSelector } from "react-redux";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 
 interface Props {
   children: React.ReactNode;
@@ -25,11 +27,11 @@ function sendErrorToSentry(error: Error) {
 }
 
 function decorateErrorForSentry(error: Error & { tags?: Record<string, string> }) {
-  error.tags = { ...error.tags, "caught_by": "api_client_error_boundary" };
+  error.tags = { ...error.tags, caught_by: "api_client_error_boundary" };
 }
 
 function createError(message?: string) {
-  return new Error("An unexpected error occurred");
+  return new Error(message || "An unexpected error occurred");
 }
 
 function sanitizeError(rawError: any) {
@@ -50,7 +52,20 @@ function sanitizeError(rawError: any) {
   return error;
 }
 
-export class ApiClientErrorBoundary extends React.Component<Props, State> {
+const ErrorBoundaryWrapper = (props: Props) => {
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const errorBoundaryRef = useRef<ApiClientErrorBoundary>(null);
+
+  useEffect(() => {
+    if (errorBoundaryRef.current) {
+      errorBoundaryRef.current.setState({ hasError: false, error: null });
+    }
+  }, [activeWorkspace?.id]);
+
+  return <ApiClientErrorBoundary ref={errorBoundaryRef} {...props} />;
+};
+
+class ApiClientErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -69,9 +84,10 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
-    const error = sanitizeError(event.reason);
-    decorateErrorForSentry(error);
-    this.setState({ hasError: true, error });
+    const error = { message: event.reason };
+    const sanitizedError = sanitizeError(error);
+    decorateErrorForSentry(sanitizedError);
+    this.setState({ hasError: true, error: sanitizedError });
   };
 
   static getDerivedStateFromError(error: Error): State {
@@ -129,3 +145,5 @@ export class ApiClientErrorBoundary extends React.Component<Props, State> {
     return this.props.children;
   }
 }
+
+export default ErrorBoundaryWrapper;
