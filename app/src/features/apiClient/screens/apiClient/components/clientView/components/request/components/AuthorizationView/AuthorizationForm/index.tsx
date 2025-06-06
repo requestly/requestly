@@ -7,6 +7,7 @@ import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
+import { Conditional } from "components/common/Conditional";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
@@ -64,7 +65,7 @@ function generateFields(
             onChange={(value) => onChangeHandler(value, field.id)}
             variables={currentEnvironmentVariables}
           />
-          {hasColon && formType === Authorization.Type.API_KEY && field.id === "key" && (
+          <Conditional condition={hasColon && formType === Authorization.Type.API_KEY && field.id === "key"}>
             <div className="error-icon">
               <InfoIcon
                 text="Invalid character used in key"
@@ -78,7 +79,7 @@ function generateFields(
                 }}
               />
             </div>
-          )}
+          </Conditional>
         </div>
       );
     case AuthForm.FIELD_TYPE.SELECT:
