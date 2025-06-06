@@ -73,14 +73,12 @@ const useApiClientFileImporter = (importer: ImporterType) => {
               throw new Error("Invalid file format. Please select a valid JSON export file.");
             }
 
-            console.log("Processing file:", file);
             const reader = new FileReader();
 
             reader.onerror = () => setError("Failed to import the selected file.");
             reader.onabort = () => setError("Processing aborted");
 
             reader.onload = () => {
-              console.log("read.onload", file.name);
               try {
                 const content = JSON.parse(reader.result as string);
                 const processor = processors[importer];
@@ -91,7 +89,6 @@ const useApiClientFileImporter = (importer: ImporterType) => {
 
                 const processedData = processor(content, uid, apiClientRecordsRepository, skipRename);
 
-                console.log("Processed data:", processedData);
                 resolve(processedData);
               } catch (error) {
                 Logger.error("Error processing file:", error);
