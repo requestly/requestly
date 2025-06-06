@@ -255,6 +255,33 @@ export const initXhrInterceptor = (debug) => {
     XMLHttpRequest[key] = val;
   });
 
+  const originalWithCredentialsDescriptor = Object.getOwnPropertyDescriptor(
+    OriginalXMLHttpRequest.prototype,
+    "withCredentials"
+  );
+  Object.defineProperty(XMLHttpRequest.prototype, "withCredentials", {
+    get: function () {
+      // Return the value from the proxy XHR if it exists, otherwise use original as fallback
+      if (this.rqProxyXhr) {
+        return this.rqProxyXhr.withCredentials;
+      }
+      return originalWithCredentialsDescriptor.get.call(this);
+    },
+    set: function (value) {
+      try {
+        // Set on both the original XHR and proxy XHR
+        originalWithCredentialsDescriptor.set.call(this, value);
+        if (this.rqProxyXhr) {
+          this.rqProxyXhr.withCredentials = value;
+        }
+      } catch (err) {
+        console.log("[rqProxyXhr.withCredentials] error", err);
+      }
+    },
+    enumerable: true,
+    configurable: true,
+  });
+
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url, async = true) {
     open.apply(this, arguments);
