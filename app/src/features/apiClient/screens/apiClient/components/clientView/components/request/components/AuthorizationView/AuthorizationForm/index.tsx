@@ -48,13 +48,13 @@ function generateFields(
   onChangeHandler: (value: string, id: string) => void,
   value: string
 ) {
-  const hasColon = value?.includes(":");
+  const hasInvalidCharacter = /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(value);
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
         <div
           className={`input-container ${
-            hasColon && formType === Authorization.Type.API_KEY && field.id === "key" ? "error-state" : ""
+            hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" ? "error-state" : ""
           }`}
         >
           <SingleLineEditor
@@ -65,7 +65,7 @@ function generateFields(
             onChange={(value) => onChangeHandler(value, field.id)}
             variables={currentEnvironmentVariables}
           />
-          <Conditional condition={hasColon && formType === Authorization.Type.API_KEY && field.id === "key"}>
+          <Conditional condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key"}>
             <div className="error-icon">
               <InfoIcon
                 text="Invalid character used in key"

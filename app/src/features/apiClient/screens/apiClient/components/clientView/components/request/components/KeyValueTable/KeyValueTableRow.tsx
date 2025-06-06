@@ -74,7 +74,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         ) : (
           <div
             className={`key-value-input-container 
-          ${record.key.includes(":") && dataIndex === "key" && checkColon ? "error-state" : ""}
+          ${/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkColon ? "error-state" : ""}
         `}
           >
             <SingleLineEditor
@@ -87,7 +87,9 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
               }}
               variables={variables}
             />
-            <Conditional condition={record?.key.includes(":") && dataIndex === "key" && checkColon}>
+            <Conditional
+              condition={/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkColon}
+            >
               <div className="key-value-table-error-icon">
                 <InfoIcon
                   text="Invalid character used in key"
@@ -99,7 +101,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
                     height: "14px",
                     fontFamily: "Material Symbols Outlined",
                   }}
-                ></InfoIcon>
+                />
               </div>
             </Conditional>
           </div>
