@@ -98,8 +98,9 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
                   danger={true}
                   style={{
                     color: "var(--requestly-color-error)",
-                    width: "12.25px",
-                    height: "17px",
+                    marginTop: "2px",
+                    width: "16px",
+                    height: "16px",
                     fontFamily: "Material Symbols Outlined",
                   }}
                 />

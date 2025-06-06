@@ -1,6 +1,6 @@
 import React, { CSSProperties } from "react";
 import { Tooltip } from "antd";
-import { InfoCircleFilled } from "@ant-design/icons";
+import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { TooltipPlacement } from "antd/lib/tooltip";
 import "./infoIcon.scss";
 
@@ -27,7 +27,7 @@ const InfoIcon: React.FC<Props> = ({
       arrowPointAtCenter
       showArrow={showArrow}
     >
-      <InfoCircleFilled style={style} />
+      <MdOutlineInfo style={style} />
     </Tooltip>
   );
 };

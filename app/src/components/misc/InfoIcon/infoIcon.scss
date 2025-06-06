@@ -2,16 +2,6 @@ body.dark {
   .info-icon-tooltip {
     .ant-tooltip-inner,
     .ant-tooltip-arrow-content {
-      background-color: #434343 !important;
-      --antd-arrow-background-color: #434343 !important;
-    }
-  }
-}
-
-body.dark {
-  .info-icon-tooltip-danger {
-    .ant-tooltip-inner,
-    .ant-tooltip-arrow-content {
       display: flex;
       padding: 8px 12px;
       align-items: flex-start;

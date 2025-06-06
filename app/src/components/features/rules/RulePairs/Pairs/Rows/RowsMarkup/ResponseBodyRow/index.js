@@ -354,6 +354,10 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             <InfoIcon
               tooltipPlacement="right"
               text="When enabled, response is served directly from Requestly and hence Developer Tools won't show this request in network table."
+              style={{
+                position: "relative",
+                top: "3px",
+              }}
             />
           </Col>
         </Row>
