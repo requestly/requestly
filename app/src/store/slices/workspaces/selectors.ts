@@ -1,7 +1,7 @@
 import { RootState } from "store/types";
 import { workspacesEntityAdapter } from "./slice";
 import { ReducerKeys } from "store/constants";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 const sliceRootState = (state: RootState) => state[ReducerKeys.WORKSPACE];
 
@@ -36,6 +36,11 @@ export const getActiveWorkspace = (state: RootState) => {
   }
 
   return getWorkspaceById(activeWorkspaceId)(state);
+};
+
+export const isPersonalWorkspacePersonal = (state: RootState) => {
+  const activeWorkspace = getActiveWorkspace(state);
+  return activeWorkspace?.workspaceType === WorkspaceType.PERSONAL;
 };
 
 export const isActiveWorkspaceShared = (state: RootState) => {

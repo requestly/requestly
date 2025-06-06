@@ -13,7 +13,7 @@ export const UserAvatar = ({ uid }: UserIconProps) => {
   if (uid && activeWorkspacesMembers[uid])
     return (
       <>
-        <Tooltip title={activeWorkspacesMembers[uid]?.displayName}>
+        <Tooltip title={`${activeWorkspacesMembers[uid]?.displayName} (${activeWorkspacesMembers[uid]?.email})`}>
           <Avatar size={24} src={activeWorkspacesMembers[uid]?.photoUrl} />
         </Tooltip>
       </>

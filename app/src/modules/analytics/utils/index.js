@@ -1,3 +1,4 @@
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { EmailType } from "@requestly/shared/types/common";
 
 export function buildBasicUserProperties(user) {
@@ -19,7 +20,9 @@ export function buildBasicUserProperties(user) {
       uid: user.uid,
       isBusinessAccount,
       company,
-      workspaceId: window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null,
+      workspaceId: getActiveWorkspaceId(window.activeWorkspaceIds)
+        ? getActiveWorkspaceId(window.activeWorkspaceIds)
+        : null,
       browserstackId: user.browserstackId,
     };
   }

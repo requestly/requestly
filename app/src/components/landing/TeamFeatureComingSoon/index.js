@@ -1,13 +1,10 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Row, Col } from "antd";
-import { getAppMode } from "store/selectors";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import "./TeamFeatureComingSoon.css";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 const TeamFeatureComingSoon = ({ title = "" }) => {
-  const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
+  const { switchToPersonalWorkspace } = useWorkspaceHelpers();
 
   return (
     <Row className="team-feature-coming-soon-container">
@@ -32,7 +29,7 @@ const TeamFeatureComingSoon = ({ title = "" }) => {
             <span
               title="Switch to personal workspace"
               className="text-underline cursor-pointer"
-              onClick={() => clearCurrentlyActiveWorkspace(dispatch, appMode)}
+              onClick={() => switchToPersonalWorkspace()}
             >
               switch to personal workspace
             </span>{" "}
