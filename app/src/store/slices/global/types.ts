@@ -49,6 +49,7 @@ export interface GlobalSliceState {
       isConnectedAppsTourCompleted: boolean;
       isNetworkSessionTooltipShown: boolean;
       isRuleEditorTourCompleted: boolean;
+      isApiClientSampleCollectionsTourCompleted: boolean;
       isCodeEditorFullScreenModeOnboardingCompleted: boolean;
       extensionInstallSource: string;
       isMiscTourCompleted: {
