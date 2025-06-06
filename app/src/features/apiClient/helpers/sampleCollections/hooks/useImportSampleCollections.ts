@@ -9,7 +9,7 @@ import * as Sentry from "@sentry/react";
 
 export const useImportSampleCollections = () => {
   const user = useSelector(getUserAuthDetails);
-  const { apiClientRecords } = useApiClientContext();
+  const { isApiClientRecordsLoaded, apiClientRecords } = useApiClientContext();
   const { processFiles, handleImportData, resetImportData, processingStatus = "idle" } = useApiClientFileImporter(
     ImporterType.RQ
   );
@@ -17,12 +17,36 @@ export const useImportSampleCollections = () => {
   const isRecordsEmpty = apiClientRecords.length === 0;
 
   const detailsFetchingRef = useRef(false);
-  const importCollections = useCallback(() => {
-    if (!uid) {
+  const importCollections = useCallback(
+    (uid: string) => {
+      detailsFetchingRef.current = true;
+      sampleCollections
+        .getImportDetails(uid)
+        .then((details) => {
+          if (details.imported) {
+            return;
+          }
+
+          processFiles([sampleCollections.getSampleCollectionsFile()], true).then(() => {
+            handleImportData(() => {
+              resetImportData();
+              sampleCollections.updateImportDetails(uid, { imported: true, version: SAMPLE_COLLECTIONS_VERSION });
+            });
+          });
+        })
+        .catch((error) => {
+          Sentry.captureException(error);
+        });
+    },
+    [processFiles, resetImportData, handleImportData]
+  );
+
+  useEffect(() => {
+    if (!uid || !isRecordsEmpty) {
       return;
     }
 
-    if (!isRecordsEmpty) {
+    if (!isApiClientRecordsLoaded) {
       return;
     }
 
@@ -34,28 +58,6 @@ export const useImportSampleCollections = () => {
       return;
     }
 
-    detailsFetchingRef.current = true;
-
-    sampleCollections
-      .getImportDetails(uid)
-      .then((details) => {
-        if (details.imported) {
-          return;
-        }
-
-        processFiles([sampleCollections.getSampleCollectionsFile()], true).then(() => {
-          handleImportData(() => {
-            sampleCollections.updateImportDetails(uid, { imported: true, version: SAMPLE_COLLECTIONS_VERSION });
-            resetImportData();
-          });
-        });
-      })
-      .catch((error) => {
-        Sentry.captureException(error);
-      });
-  }, [uid, isRecordsEmpty, processingStatus, processFiles, resetImportData, handleImportData]);
-
-  useEffect(() => {
-    importCollections();
-  }, [importCollections]);
+    importCollections(uid);
+  }, [uid, isRecordsEmpty, isApiClientRecordsLoaded, processingStatus, importCollections]);
 };
