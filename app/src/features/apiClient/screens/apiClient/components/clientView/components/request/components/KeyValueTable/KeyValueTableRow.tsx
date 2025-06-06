@@ -95,10 +95,11 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
                   text="Invalid character used in key"
                   tooltipPlacement="right"
                   showArrow={false}
+                  danger={true}
                   style={{
                     color: "var(--requestly-color-error)",
                     width: "12.25px",
-                    height: "14px",
+                    height: "17px",
                     fontFamily: "Material Symbols Outlined",
                   }}
                 />
