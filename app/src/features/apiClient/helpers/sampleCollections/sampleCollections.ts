@@ -24,10 +24,12 @@ class SampleCollections {
    */
   private convertSampleCollectionsIntoFile() {
     const FILE_NAME = "sampleCollections.json";
+    const FILE_TYPE = "application/json";
+
     const jsonString = JSON.stringify(SAMPLE_COLLECTIONS.collections, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
+    const blob = new Blob([jsonString], { type: FILE_TYPE });
     const file = new File([blob], FILE_NAME, {
-      type: "application/json",
+      type: FILE_TYPE,
       lastModified: Date.now(),
     });
 
