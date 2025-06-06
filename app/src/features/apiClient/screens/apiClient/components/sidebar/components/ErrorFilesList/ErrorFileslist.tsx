@@ -72,8 +72,8 @@ export const ErrorFilesList = () => {
           ERROR FILES
         </div>
         <div className="error-files-list-body">
-          {files.map((file) => (
-            <div key={file.name} className="error-file-item" onClick={() => handleOpenErrorFile(file)}>
+          {files.map((file, index) => (
+            <div key={index} className="error-file-item" onClick={() => handleOpenErrorFile(file)}>
               {renderFileIcon(file)}
               <span>{file.name}</span>
               <div className="error-file-item-actions">

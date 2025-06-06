@@ -306,8 +306,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         return;
       }
 
-      console.log({ recordType });
-
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);

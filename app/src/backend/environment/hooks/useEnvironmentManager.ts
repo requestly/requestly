@@ -187,7 +187,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       } else {
         dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: result.data.environments, ownerId }));
       }
-      console.log("result.data.errorFiles", result.data.erroredRecords);
       dispatch(variablesActions.setErrorEnvFiles(result.data.erroredRecords));
 
       if (newCurrentEnvironmentId) {
@@ -198,7 +197,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       // Attach global and collection listeners
       unsubscribeGlobalVariablesListener = attachGlobalVariablesListener();
     } catch (err) {
-      console.log("env fetch error", err);
       Logger.log("fetch all env details error", err);
       if (err instanceof MutexTimeoutError) {
         return;
