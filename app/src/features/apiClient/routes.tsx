@@ -4,7 +4,7 @@ import ApiClientFeatureContainer from "./container";
 import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
-import ApiClientErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
+import { ApiClientErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 
 export const apiClientRoutes: RouteObject[] = [
