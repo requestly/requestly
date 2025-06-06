@@ -6,6 +6,8 @@ import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import InfoIcon from "components/misc/InfoIcon";
+import { Conditional } from "components/common/Conditional";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
@@ -46,17 +48,37 @@ function generateFields(
   onChangeHandler: (value: string, id: string) => void,
   value: string
 ) {
+  const hasInvalidCharacter = /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(value);
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
-        <SingleLineEditor
-          key={`${formType}-${index}`}
-          className={field.className ?? ""}
-          placeholder={field.placeholder}
-          defaultValue={value}
-          onChange={(value) => onChangeHandler(value, field.id)}
-          variables={currentEnvironmentVariables}
-        />
+        <div
+          className={`input-container ${
+            hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" ? "error-state" : ""
+          }`}
+        >
+          <SingleLineEditor
+            key={`${formType}-${index}`}
+            className={field.className ?? ""}
+            placeholder={field.placeholder}
+            defaultValue={value}
+            onChange={(value) => onChangeHandler(value, field.id)}
+            variables={currentEnvironmentVariables}
+          />
+          <Conditional condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key"}>
+            <div className="error-icon">
+              <InfoIcon
+                text="Invalid character used in key"
+                tooltipPlacement="right"
+                showArrow={false}
+                style={{
+                  color: "var(--requestly-color-error)",
+                  fontFamily: "Material Symbols Outlined",
+                }}
+              />
+            </div>
+          </Conditional>
+        </div>
       );
     case AuthForm.FIELD_TYPE.SELECT:
       return (

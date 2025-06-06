@@ -23,5 +23,7 @@ export const HeadersTable: React.FC<HeadersTableProps> = ({ headers, variables, 
     [setRequestEntry]
   );
 
-  return <KeyValueTable data={headers} variables={variables} onChange={handleHeadersChange} />;
+  return (
+    <KeyValueTable data={headers} variables={variables} onChange={handleHeadersChange} checkInvalidCharacter={true} />
+  );
 };
