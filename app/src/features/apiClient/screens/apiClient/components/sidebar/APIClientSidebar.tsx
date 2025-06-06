@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
+import { useImportSampleCollections } from "features/apiClient/helpers/sampleCollections/hooks/useImportSampleCollections";
 
 interface Props {}
 
@@ -33,8 +34,6 @@ const APIClientSidebar: React.FC<Props> = () => {
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
-
   const {
     history,
     clearHistory,
@@ -46,7 +45,13 @@ const APIClientSidebar: React.FC<Props> = () => {
     onDeleteModalClose,
     selectedHistoryIndex,
     apiClientRecordsRepository,
+    isImportModalOpen,
+    onImportRequestModalClose,
+    onSaveRecord,
+    setIsImportModalOpen,
   } = useApiClientContext();
+
+  useImportSampleCollections();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {

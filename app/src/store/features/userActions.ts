@@ -262,6 +262,13 @@ export const updateIsSupportChatOpened = (prevState: GlobalSliceState, action: P
   prevState.misc.persist.isSupportChatOpened = action.payload;
 };
 
+export const updateIsApiClientSampleCollectionsTourCompleted = (
+  prevState: GlobalSliceState,
+  action: PayloadAction<boolean>
+) => {
+  prevState.misc.persist.isApiClientSampleCollectionsTourCompleted = action.payload;
+};
+
 export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (
   prevState: GlobalSliceState,
   action: PayloadAction<boolean>

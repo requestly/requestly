@@ -18,7 +18,6 @@ import { ApiRecordEmptyState } from "./apiRecordEmptyState/ApiRecordEmptyState";
 import { SidebarPlaceholderItem } from "../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { sessionStorage } from "utils/sessionStorage";
 import { SidebarListHeader } from "../sidebarListHeader/SidebarListHeader";
-import "./collectionsList.scss";
 import { head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
@@ -27,6 +26,12 @@ import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/Mov
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { API_CLIENT_TOURS } from "components/misc/ProductWalkthrough/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { getIsApiClientSampleCollectionsTourCompleted } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import "./collectionsList.scss";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -34,9 +39,11 @@ interface Props {
 }
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
+  const dispatch = useDispatch();
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
+  const isCollectionsTourCompleted = useSelector(getIsApiClientSampleCollectionsTourCompleted);
   const {
     isLoadingApiClientRecords,
     apiClientRecords,
@@ -92,6 +99,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   }, []);
 
   const updatedRecords = useMemo(() => {
+    // console.log("Updated records called");
     const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
     const recordsToRender = prepareRecordsToRender(filteredRecords);
     return recordsToRender;
@@ -306,9 +314,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             </div>
           ) : updatedRecords.count > 0 ? (
             <div className="collections-list">
-              {updatedRecords.collections.map((record) => {
+              <ProductWalkthrough
+                startWalkthrough={!isCollectionsTourCompleted}
+                completeTourOnUnmount={false}
+                tourFor={API_CLIENT_TOURS.SAMPLE_COLLECTIONS_IMPORTED}
+                onTourComplete={() => {
+                  dispatch(globalActions.updateIsApiClientSampleCollectionsTourCompleted(true));
+                }}
+              />
+
+              {updatedRecords.collections.map((record, index) => {
                 return (
                   <CollectionRow
+                    tourId={index === 0 ? API_CLIENT_TOURS.SAMPLE_COLLECTIONS_IMPORTED : ""}
                     isReadOnly={!isValidPermission}
                     key={record.id}
                     record={record}

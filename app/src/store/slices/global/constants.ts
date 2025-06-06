@@ -198,6 +198,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      isApiClientSampleCollectionsTourCompleted: false,
       isCodeEditorFullScreenModeOnboardingCompleted: false,
       extensionInstallSource: null,
       isMiscTourCompleted: {

@@ -242,6 +242,10 @@ export const getIsRuleEditorTourCompleted = (state) => {
   );
 };
 
+export const getIsApiClientSampleCollectionsTourCompleted = (state) => {
+  return getGlobalState(state).misc.persist?.isApiClientSampleCollectionsTourCompleted;
+};
+
 export const getIsCodeEditorFullScreenModeOnboardingCompleted = (state) => {
   return getGlobalState(state).misc.persist?.isCodeEditorFullScreenModeOnboardingCompleted;
 };

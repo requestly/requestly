@@ -12,6 +12,13 @@ export enum PointerPlacement {
   BOTTOM_50 = "bottom-50",
   BOTTOM_75 = "bottom-75",
   BOTTOM_100 = "bottom-100",
+
+  // TODO: autogenerate for all positions
+  LEFT_0 = "left-0",
+  LEFT_25 = "left-25",
+  LEFT_50 = "left-50",
+  LEFT_75 = "left-75",
+  LEFT_100 = "left-100",
 }
 
 export interface CustomSteps extends Step {

@@ -16,7 +16,8 @@ interface UpdatedApiRecordsToImport {
 export const processRqImportData = (
   fileContent: ImportData,
   uid: string | null,
-  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>,
+  skipRename = false
 ): {
   apis: RQAPI.ApiRecord[];
   collections: RQAPI.CollectionRecord[];
@@ -56,7 +57,7 @@ export const processRqImportData = (
   });
 
   collections.forEach((collection: RQAPI.CollectionRecord) => {
-    const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
+    const collectionToImport = { ...collection, name: `${skipRename ? "" : "(Imported) "}` + collection.name };
     if (collectionToImport.collectionId) {
       const oldCollectionId = collectionToImport.collectionId;
       delete collectionToImport.collectionId;
