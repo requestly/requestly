@@ -31,6 +31,14 @@ export enum ImporterType {
   RQ = "RQ",
 }
 
+const DEFAULT_PROCESSED_DATA: ProcessedData = {
+  apis: [],
+  environments: [],
+  collections: [],
+  recordsCount: 0,
+};
+
+// FIXME: Update logic, avoid tight coupling
 const useApiClientFileImporter = (importer: ImporterType) => {
   const processors = useMemo(
     () => ({
@@ -40,12 +48,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     []
   );
 
-  const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
-    apis: [],
-    environments: [],
-    collections: [],
-    recordsCount: 0,
-  });
+  const [processedFileData, setProcessedFileData] = useState<ProcessedData>({ ...DEFAULT_PROCESSED_DATA });
 
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,78 +62,99 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const { environments = [], collections = [], apis = [] } = processedFileData;
 
   const processFiles = useCallback(
-    (files: File[]) => {
-      setProcessingStatus("processing");
-      setError(null);
+    (files: File[], skipRename = false) => {
+      return new Promise<string>((resolve, reject) => {
+        setProcessingStatus("processing");
+        setError(null);
 
-      const processFiles = files.map((file) => {
-        return new Promise((resolve, reject) => {
-          if (!file.type.includes("json")) {
-            throw new Error("Invalid file format. Please select a valid JSON export file.");
-          }
-          const reader = new FileReader();
+        const processFiles = files.map((file) => {
+          return new Promise((resolve, reject) => {
+            if (!file.type.includes("json")) {
+              throw new Error("Invalid file format. Please select a valid JSON export file.");
+            }
 
-          reader.onerror = () => setError("Failed to import the selected file.");
-          reader.onabort = () => setError("Processing aborted");
+            console.log("Processing file:", file);
+            const reader = new FileReader();
 
-          reader.onload = () => {
-            try {
-              const content = JSON.parse(reader.result as string);
-              const processor = processors[importer];
+            reader.onerror = () => setError("Failed to import the selected file.");
+            reader.onabort = () => setError("Processing aborted");
 
-              if (!processor) {
-                throw new Error(`Unsupported importer: ${importer}`);
+            reader.onload = () => {
+              console.log("read.onload", file.name);
+              try {
+                const content = JSON.parse(reader.result as string);
+                const processor = processors[importer];
+
+                if (!processor) {
+                  throw new Error(`Unsupported importer: ${importer}`);
+                }
+
+                const processedData = processor(content, uid, apiClientRecordsRepository, skipRename);
+
+                console.log("Processed data:", processedData);
+                resolve(processedData);
+              } catch (error) {
+                Logger.error("Error processing file:", error);
+                reject(error);
               }
-
-              const processedData = processor(content, uid, apiClientRecordsRepository);
-              resolve(processedData);
-            } catch (error) {
-              Logger.error("Error processing file:", error);
-              reject(error);
-            }
-          };
-          reader.readAsText(file);
+            };
+            reader.readAsText(file);
+          });
         });
+
+        Promise.allSettled(processFiles)
+          .then((results) => {
+            const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
+            if (hasProcessingAllFilesFailed) {
+              const error = new Error(
+                "Could not process the selected files!, Please check if the files are valid export files."
+              );
+
+              reject(error.message);
+              throw error;
+            }
+
+            results.forEach((result: any) => {
+              if (result.status === "fulfilled") {
+                const proccessedData: ProcessedData = { ...DEFAULT_PROCESSED_DATA };
+
+                proccessedData.collections.push(...result.value.collections);
+                proccessedData.apis.push(...result.value.apis);
+                proccessedData.environments.push(...result.value.environments);
+
+                proccessedData.recordsCount = proccessedData.recordsCount + result.value.count;
+
+                setProcessedFileData(proccessedData);
+                trackImportParsed(
+                  ApiClientImporterType.REQUESTLY,
+                  proccessedData.collections.length,
+                  proccessedData.apis.length
+                );
+              } else {
+                trackImportParseFailed(ApiClientImporterType.REQUESTLY, result.reason);
+                console.error("Error processing file:", result.reason);
+                Sentry.withScope((scope) => {
+                  scope.setTag("error_type", "api_client_rq_processing");
+                  Sentry.captureException("Error processing file:", result.reason);
+                });
+              }
+            });
+
+            setProcessingStatus("processed");
+            resolve("processed");
+          })
+          .catch((error) => {
+            trackImportParseFailed(ApiClientImporterType.REQUESTLY, error.message);
+            setError(error.message);
+            setProcessingStatus("idle");
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_rq_processing");
+              Sentry.captureException(error);
+            });
+
+            reject(error.message);
+          });
       });
-
-      Promise.allSettled(processFiles)
-        .then((results) => {
-          const hasProcessingAllFilesFailed = !results.some((result) => result.status === "fulfilled");
-          if (hasProcessingAllFilesFailed) {
-            throw new Error("Could not process the selected files!, Please check if the files are valid export files.");
-          }
-
-          results.forEach((result: any) => {
-            if (result.status === "fulfilled") {
-              setProcessedFileData((prev) => {
-                prev.collections.push(...result.value.collections);
-                prev.apis.push(...result.value.apis);
-                prev.environments.push(...result.value.environments);
-                prev.recordsCount = prev.recordsCount + result.value.count;
-                trackImportParsed(ApiClientImporterType.REQUESTLY, prev.collections.length, prev.apis.length);
-                return prev;
-              });
-            } else {
-              trackImportParseFailed(ApiClientImporterType.REQUESTLY, result.reason);
-              console.error("Error processing file:", result.reason);
-              Sentry.withScope((scope) => {
-                scope.setTag("error_type", "api_client_rq_processing");
-                Sentry.captureException("Error processing file:", result.reason);
-              });
-            }
-          });
-
-          setProcessingStatus("processed");
-        })
-        .catch((error) => {
-          trackImportParseFailed(ApiClientImporterType.REQUESTLY, error.message);
-          setError(error.message);
-          setProcessingStatus("idle");
-          Sentry.withScope((scope) => {
-            scope.setTag("error_type", "api_client_rq_processing");
-            Sentry.captureException(error);
-          });
-        });
     },
     [processors, importer, uid, apiClientRecordsRepository]
   );
