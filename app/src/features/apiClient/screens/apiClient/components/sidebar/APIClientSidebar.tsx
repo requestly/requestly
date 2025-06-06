@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
+import { useImportSampleCollections } from "features/apiClient/helpers/sampleCollections/hooks/useImportSampleCollections";
 
 interface Props {}
 
@@ -49,6 +50,8 @@ const APIClientSidebar: React.FC<Props> = () => {
     onSaveRecord,
     setIsImportModalOpen,
   } = useApiClientContext();
+
+  useImportSampleCollections();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
