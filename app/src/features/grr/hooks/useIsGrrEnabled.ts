@@ -1,3 +1,4 @@
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import firebaseApp from "firebase";
 import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ export const useIsGrrEnabled = () => {
   const isLoggedIn = user?.loggedIn;
   const uid = user?.details?.profile?.uid;
   const [isGrrEnabled, setIsGrrEnabled] = useState(false);
+  const isUserGrrBlocked = useFeatureIsOn("user-grr-blocked");
 
   useEffect(() => {
     if (!isLoggedIn || !uid) {
@@ -16,19 +18,23 @@ export const useIsGrrEnabled = () => {
       return;
     }
 
-    const db = getFirestore(firebaseApp);
-    const unsubscribeListener = onSnapshot(doc(db, "users", uid), (doc) => {
-      if (doc.exists()) {
-        const userDetails = doc.data();
-        const isGrrBlocked = !!userDetails?.["block-config"]?.grr?.isBlocked;
-        setIsGrrEnabled(isGrrBlocked);
-      }
-    });
+    if (isUserGrrBlocked) {
+      setIsGrrEnabled(true);
+    } else {
+      const db = getFirestore(firebaseApp);
+      const unsubscribeListener = onSnapshot(doc(db, "users", uid), (doc) => {
+        if (doc.exists()) {
+          const userDetails = doc.data();
+          const isGrrBlocked = !!userDetails?.["block-config"]?.grr?.isBlocked;
+          setIsGrrEnabled(isGrrBlocked);
+        }
+      });
 
-    return () => {
-      unsubscribeListener?.();
-    };
-  }, [isLoggedIn, uid]);
+      return () => {
+        unsubscribeListener?.();
+      };
+    }
+  }, [isLoggedIn, uid, isUserGrrBlocked]);
 
   return { isGrrEnabled };
 };
