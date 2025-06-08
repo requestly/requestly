@@ -26,7 +26,7 @@ import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
-import { useDebounce } from "hooks/useDebounce";
+// import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
@@ -37,7 +37,7 @@ interface EditorProps {
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
-  handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
+  handleChange?: (value: string) => void;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
   analyticEventProperties?: AnalyticEventProperties;
@@ -120,14 +120,6 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
-  // To initialize the editor
-  const editorRefCallback = (editor: ReactCodeMirrorRef) => {
-    if (editor?.editor && editor?.state && editor?.view) {
-      editorRef.current = editor;
-      setIsEditorInitialized(true);
-    }
-  };
-
   /*
   (fx) sets the implicit change in the editor, prettification change is implicit change
   Typing edits in editor is controlled by handleChange
@@ -174,7 +166,9 @@ const Editor: React.FC<EditorProps> = ({
   // Reinitializing the fullscreen editor
   useEffect(() => {
     isDefaultPrettificationDone.current = false;
-    setIsEditorInitialized(false);
+    return () => {
+      setIsEditorInitialized(false);
+    };
   }, [isFullScreen]);
 
   const handleEditorClose = useCallback(
@@ -184,9 +178,9 @@ const Editor: React.FC<EditorProps> = ({
     [dispatch]
   );
 
-  const debouncedhandleEditorBodyChange = useDebounce((value: string) => {
-    handleChange(value, isUnsaveChange.current);
-  }, 200);
+  // const debouncedhandleEditorBodyChange = useDebounce((value: string) => {
+  //   handleChange(value, isUnsaveChange.current);
+  // }, 200);
 
   const customKeyBinding = useMemo(
     () =>
@@ -255,7 +249,7 @@ const Editor: React.FC<EditorProps> = ({
 
   const editor = (
     <CodeMirror
-      ref={editorRefCallback}
+      ref={editorRef}
       className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
         !isEditorInitialized ? "not-visible" : ""
       }`}
@@ -263,7 +257,8 @@ const Editor: React.FC<EditorProps> = ({
       readOnly={isReadOnly}
       value={value ?? ""}
       onKeyDown={() => (isUnsaveChange.current = true)}
-      onChange={debouncedhandleEditorBodyChange}
+      onCreateEditor={() => setIsEditorInitialized(true)}
+      onChange={handleChange}
       theme={vscodeDark}
       extensions={[
         editorLanguage,
