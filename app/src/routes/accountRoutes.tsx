@@ -4,7 +4,6 @@ import MyTeams from "features/settings/components/WorkspaceSettings/components/M
 import CreateWorkspace from "components/user/Teams/CreateWorkspace";
 import PersonalSubscription from "features/settings/components/Profile/PersonalSubscription";
 import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
-import RefreshSubscription from "components/payments/RefreshSubscription";
 import UpdatePaymentMethod from "components/payments/UpdatePaymentMethod";
 import ManageAccount from "features/settings/components/Profile";
 import TeamViewer from "features/settings/components/Profile/ManageTeams/TeamViewer";
@@ -43,10 +42,6 @@ export const accountRoutes: RouteObject[] = [
   {
     path: PATHS.ACCOUNT.UPDATE_PAYMENT_METHOD.RELATIVE,
     element: <ProtectedRoute component={UpdatePaymentMethod} />,
-  },
-  {
-    path: PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.RELATIVE,
-    element: <ProtectedRoute component={RefreshSubscription} />,
   },
   {
     path: PATHS.ACCOUNT.CHECKOUT.RELATIVE,
