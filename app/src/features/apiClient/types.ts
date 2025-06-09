@@ -8,6 +8,10 @@ import {
 } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 
+export enum FormDropDownOptions {
+  "FILE" = "file",
+  "TEXT" = "text",
+}
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -21,7 +25,8 @@ export enum RequestMethod {
 export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
-  FORM = "application/x-www-form-urlencoded",
+  FORM_URL_ENCODED = "application/x-www-form-urlencoded",
+  MULTIPART_FORM = "multipart/form-data",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
@@ -98,7 +103,8 @@ export namespace RQAPI {
 
   export type RequestBodyContainer = {
     text?: string;
-    form?: KeyValuePair[];
+    formURLEncoded?: KeyValuePair[];
+    multipartForm?: KeyValuePair[];
   };
 
   export type Auth = {
