@@ -56,13 +56,12 @@ export const processRqImportData = (
   });
 
   collections.forEach((collection: RQAPI.CollectionRecord) => {
-    const collectionToImport = { ...collection, name: `${collection.name}` };
-    if (collectionToImport.collectionId) {
-      const oldCollectionId = collectionToImport.collectionId;
-      delete collectionToImport.collectionId;
-      collectionToImport.collectionId = oldToNewIdMap[oldCollectionId] ?? "";
+    if (collection.collectionId) {
+      const oldCollectionId = collection.collectionId;
+      delete collection.collectionId;
+      collection.collectionId = oldToNewIdMap[oldCollectionId] ?? "";
     }
-    updatedApiRecordsToImport.collections.push(collectionToImport);
+    updatedApiRecordsToImport.collections.push(collection);
   });
 
   apis.forEach((api: RQAPI.ApiRecord) => {
