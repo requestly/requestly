@@ -420,7 +420,6 @@ const APIClientView: React.FC<Props> = ({
         description: "key contains invalid characters.",
         placement: "bottomRight",
       });
-      setIsRequestSaving(false);
       return;
     }
 
