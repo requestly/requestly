@@ -1,0 +1,162 @@
+diff --git a/node_modules/@uiw/react-codemirror/cjs/useCodeMirror.js b/node_modules/@uiw/react-codemirror/cjs/useCodeMirror.js
+index b63f975..8fb284f 100644
+--- a/node_modules/@uiw/react-codemirror/cjs/useCodeMirror.js
++++ b/node_modules/@uiw/react-codemirror/cjs/useCodeMirror.js
+@@ -157,6 +157,7 @@ function useCodeMirror(props) {
+     }
+     var currentValue = view ? view.state.doc.toString() : '';
+     if (view && value !== currentValue) {
++      console.log("cjs/ value chnged from ".concat(currentValue, " to ").concat(value));
+       view.dispatch({
+         changes: {
+           from: 0,
+diff --git a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
+index eab503a..4fe0770 100644
+--- a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
++++ b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
+@@ -53,6 +53,7 @@ export function useCodeMirror(props) {
+     !vu.transactions.some(tr => tr.annotation(External))) {
+       var doc = vu.state.doc;
+       var _value = doc.toString();
++      console.log(`DG-3: ${Date.now()}: _value in useCodeMirror onChange`, JSON.stringify({_value }));
+       onChange(_value, vu);
+     }
+     onStatistics && onStatistics(getStatistics(vu));
+@@ -108,28 +109,130 @@ export function useCodeMirror(props) {
+       view.focus();
+     }
+   }, [autoFocus, view]);
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: theme changed`, theme)
++  }, [theme])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: height changed`, height)
++  }, [height])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: minHeight changed`, minHeight)
++  }, [minHeight])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: maxHeight changed`, maxHeight)
++  }, [maxHeight])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: width changed`, width)
++  }, [width])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: minWidth changed`, minWidth)
++  }, [minWidth])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: maxWidth changed`, maxWidth)
++  }, [maxWidth])
++
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: placeholderStr changed`, placeholderStr)
++  }, [placeholderStr])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: editable changed`, editable)
++  }, [editable])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: readOnly changed`, readOnly)
++  }, [readOnly])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: defaultIndentWithTab changed`, defaultIndentWithTab)
++  }, [defaultIndentWithTab])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: defaultBasicSetup changed`, defaultBasicSetup)
++  }, [defaultBasicSetup])
++
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: onChange changed`)
++  }, [onChange])
++
++  useEffect(() => {
++    console.log(`DG-5: ${Date.now()}: onUpdate changed`)
++  }, [onUpdate])
++
++
++
+   useEffect(() => {
+     if (view) {
++      console.log(`DG-4: ${Date.now()}: view.dispatching reconfiguration`)
+       view.dispatch({
+         effects: StateEffect.reconfigure.of(getExtensions)
+       });
+     }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, [theme, extensions, height, minHeight, maxHeight, width, minWidth, maxWidth, placeholderStr, editable, readOnly, defaultIndentWithTab, defaultBasicSetup, onChange, onUpdate]);
++  }, [theme, extensions, height, editable, maxHeight, width, minWidth, maxWidth, placeholderStr, editable, readOnly, defaultIndentWithTab, defaultBasicSetup, onChange, onUpdate]);
++
+   useEffect(() => {
+     if (value === undefined) {
+       return;
+     }
+     var currentValue = view ? view.state.doc.toString() : '';
+     if (view && value !== currentValue) {
++      console.log(`DG-1: ${Date.now()}: value changed`, JSON.stringify({value, currentValue}, null, 2));
++      // Find the start of the difference
++      let start = 0;
++      console.log(`DG-11: ${Date.now()}: start calculating valueStart`);
++      while (
++        start < value.length &&
++        start < currentValue.length &&
++        value[start] === currentValue[start]
++      ) {
++        start++;
++      }
++
++      console.log(`DG-12: ${Date.now()}: valueStart`, start);
++      // Find the end of the difference
++      let endCurrent = currentValue.length;
++      let endValue = value.length;
++
++      console.log(`DG-13: ${Date.now()}: start calculating endCurrent and endValue`);
++      while (
++        endCurrent > start &&
++        endValue > start &&
++        value[endValue - 1] === currentValue[endCurrent - 1]
++      ) {
++        endCurrent--;
++        endValue--;
++      } 
++      console.log(`DG-14: ${Date.now()}: endCurrent`, endCurrent, 'endValue', endValue);
++      const changesToDispatch = {
++        from: start,
++        to: endCurrent,
++        insert: value.slice(start, endValue),
++      }
++
++      console.log(`DG-15: ${Date.now()}: dispatching sliced changes`, JSON.stringify({changesToDispatch}, null, 2));
++
+       view.dispatch({
+-        changes: {
+-          from: 0,
+-          to: currentValue.length,
+-          insert: value || ''
+-        },
+-        annotations: [External.of(true)]
++        changes: changesToDispatch,
++        annotations: [External.of(true)],
+       });
++      // view.dispatch({
++      //   changes: {
++      //     from: 0,
++      //     to: currentValue.length,
++      //     insert: value || ''
++      //   },
++      //   annotations: [External.of(true)]
++      // });
+     }
+   }, [value, view]);
+   return {
