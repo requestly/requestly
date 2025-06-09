@@ -147,7 +147,7 @@ export const AppNotificationBanner = () => {
               }
             })
             .catch(() => {
-              toast.error("Error in converting to annual plan. Please contact support contact@requestly.io");
+              toast.error("Error in converting to annual plan. Please contact support support@requestly.io");
               trackCheckoutFailedEvent(
                 user?.details?.planDetails?.subscription?.quantity,
                 "monthly_to_annual_conversion",

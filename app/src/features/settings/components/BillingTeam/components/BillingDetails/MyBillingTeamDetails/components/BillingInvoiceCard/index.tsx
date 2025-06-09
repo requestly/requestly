@@ -88,7 +88,7 @@ export const BillingInvoiceCard: React.FC = () => {
       </div>
 
       <div className="billing-team-invoice-card-footer">
-        Need any help? Get in touch with us at <a href="mailto:contact@requestly.io">contact@requestly.io</a>
+        Need any help? Get in touch with us at <a href="mailto:support@requestly.io">support@requestly.io</a>
       </div>
     </Col>
   );

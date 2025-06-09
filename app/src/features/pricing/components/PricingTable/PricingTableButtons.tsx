@@ -319,7 +319,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
               }
             })
             .catch((err) => {
-              toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+              toast.error("Error in managing subscription. Please contact support support@requestly.io");
               trackCheckoutFailedEvent(quantity, source, "requestly");
             })
             .finally(() => {

@@ -7,7 +7,7 @@ This documentation will guide you through the process of development and contrib
 
 ## Code of conduct
 
-We adhere to the [Requestly code of conduct](./CODE_OF_CONDUCT.md) and by participating, you are expected to uphold this code. Please report unacceptable behavior to contact@requestly.io.
+We adhere to the [Requestly code of conduct](./CODE_OF_CONDUCT.md) and by participating, you are expected to uphold this code. Please report unacceptable behavior to support@requestly.io.
 
 ## Reporting issues
 
@@ -26,7 +26,7 @@ Please note that we have multiple Git repositories. The [Development](#developme
 3. Reference the Github issue in the PR description.
 4. Follow and update all items in the PR checklist.
 
-All submissions require code review from team. So, please be patient. In case your PR is in opened state for more than 2 weeks without any response from us, feel free to escalate at contact@requestly.io. 
+All submissions require code review from team. So, please be patient. In case your PR is in opened state for more than 2 weeks without any response from us, feel free to escalate at support@requestly.io. 
 
 ## Development
 
