@@ -50,6 +50,7 @@ import SingleLineEditor from "features/apiClient/screens/environment/components/
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
+import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -458,11 +459,20 @@ const APIClientView: React.FC<Props> = ({
       record.id = apiEntryDetails?.id;
     }
 
+    const isValidHeader = record.data?.request?.headers?.every((header) => {
+      return !header.isEnabled || !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
+    });
+
+    const isValidAuthKey =
+      record.data?.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+      !record.data?.auth?.authConfigStore?.API_KEY?.key ||
+      !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record.data?.auth?.authConfigStore?.API_KEY?.key);
+
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, record.id)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
-    if (result.success && result.data.type === RQAPI.RecordType.API) {
+    if (result.success && result.data.type === RQAPI.RecordType.API && isValidHeader && isValidAuthKey) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
 
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
