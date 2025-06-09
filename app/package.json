@@ -18,6 +18,7 @@
     "url": "https://requestly.com/"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "test": "vitest --passWithNoTests",
     "lint": "eslint --fix --ext .js,.jsx .",
