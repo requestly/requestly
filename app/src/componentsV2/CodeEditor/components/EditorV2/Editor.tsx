@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { Prec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
@@ -46,6 +46,13 @@ interface EditorProps {
   };
   hideToolbar?: boolean;
 }
+
+const basicSetup = {
+  highlightActiveLine: false,
+  bracketMatching: true,
+  closeBrackets: true,
+  allowMultipleSelections: true,
+};
 const Editor: React.FC<EditorProps> = ({
   value,
   language,
@@ -253,19 +260,9 @@ const Editor: React.FC<EditorProps> = ({
     ]
   );
 
-  const editor = (
-    <CodeMirror
-      ref={editorRefCallback}
-      className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
-        !isEditorInitialized ? "not-visible" : ""
-      }`}
-      width="100%"
-      readOnly={isReadOnly}
-      value={value ?? ""}
-      onKeyDown={() => (isUnsaveChange.current = true)}
-      onChange={debouncedhandleEditorBodyChange}
-      theme={vscodeDark}
-      extensions={[
+  const extensions = useMemo(
+    () =>
+      [
         editorLanguage,
         customKeyBinding,
         EditorView.lineWrapping,
@@ -279,13 +276,24 @@ const Editor: React.FC<EditorProps> = ({
             )
           : null,
         generateCompletionsForVariables(envVariables),
-      ].filter(Boolean)}
-      basicSetup={{
-        highlightActiveLine: false,
-        bracketMatching: true,
-        closeBrackets: true,
-        allowMultipleSelections: true,
-      }}
+      ].filter(Boolean),
+    [customKeyBinding, editorLanguage, envVariables]
+  );
+
+  const CMEditor = memo(() => (
+    <CodeMirror
+      ref={editorRefCallback}
+      className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
+        !isEditorInitialized ? "not-visible" : ""
+      }`}
+      width="100%"
+      readOnly={isReadOnly}
+      value={value ?? ""}
+      onKeyDown={() => (isUnsaveChange.current = true)}
+      onChange={debouncedhandleEditorBodyChange}
+      theme={vscodeDark}
+      extensions={extensions}
+      basicSetup={basicSetup}
       data-enable-grammarly="false"
       data-gramm_editor="false"
       data-gramm="false"
@@ -305,7 +313,7 @@ const Editor: React.FC<EditorProps> = ({
         </div>
       )}
     </CodeMirror>
-  );
+  ));
 
   const toastContainer = toastOverlay && (
     <EditorToastContainer
@@ -334,7 +342,7 @@ const Editor: React.FC<EditorProps> = ({
       >
         {!hideToolbar && toolbar}
         {toastContainer}
-        {editor}
+        <CMEditor />
       </Modal>
     </>
   ) : (
@@ -360,7 +368,7 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {editor}
+        <CMEditor />
       </ResizableBox>
     </>
   );
