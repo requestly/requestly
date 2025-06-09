@@ -1,8 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import { CustomTooltipProps } from "../types";
+import { CustomTooltipProps, PointerPlacement } from "../types";
 import "./index.css";
+
+const getPointerPlacement = (placement: PointerPlacement) => {
+  if (placement.includes("top")) {
+    return "top";
+  } else if (placement.includes("bottom")) {
+    return "bottom";
+  } else if (placement.includes("left")) {
+    return "left";
+  } else {
+    return "right";
+  }
+};
 
 export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   index,
@@ -24,9 +36,9 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
     <div {...tooltipProps} className="tour-tooltip-container">
       {!step?.hidePointer && (
         <img
-          className={`tour-tooltip-pointer tour-tooltip-pointer-${
-            step.pointerPlacement.includes("bottom") ? "bottom" : "top"
-          } tour-tooltip-pointer-${step.pointerPlacement}`}
+          className={`tour-tooltip-pointer tour-tooltip-pointer-${getPointerPlacement(
+            step.pointerPlacement
+          )} tour-tooltip-pointer-${step.pointerPlacement}`}
           src={"/assets/media/components/tooltip-pointer.svg"}
           alt="tooltip pointer"
         />
@@ -37,26 +49,28 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
       {size > 1 && <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>}
       <div className="title white">{step.title}</div>
       <div className="text-gray tour-tooltip-content">{step.content}</div>
-      <div className="tour-tooltip-buttons-container">
-        <Button
-          type="default"
-          ref={nextButtonRef}
-          className="tour-tooltip-next-btn"
-          style={{ visibility: step.showNext ? "visible" : "hidden" }}
-          // used closeProps because primary props takes away the focus from input boxes when tooltip appears
-          {...closeProps}
-          disabled={step.disableNext?.(context)}
-        >
-          {step?.customNextButtonText ??
-            (isLastStep ? (
-              "Finish"
-            ) : (
-              <>
-                Next <img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />
-              </>
-            ))}
-        </Button>
-      </div>
+      {step.showNext ? (
+        <div className="tour-tooltip-buttons-container">
+          <Button
+            type="default"
+            ref={nextButtonRef}
+            className="tour-tooltip-next-btn"
+            style={{ visibility: step.showNext ? "visible" : "hidden" }}
+            // used closeProps because primary props takes away the focus from input boxes when tooltip appears
+            {...closeProps}
+            disabled={step.disableNext?.(context)}
+          >
+            {step?.customNextButtonText ??
+              (isLastStep ? (
+                "Finish"
+              ) : (
+                <>
+                  Next <img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />
+                </>
+              ))}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 };

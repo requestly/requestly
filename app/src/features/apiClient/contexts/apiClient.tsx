@@ -36,6 +36,7 @@ interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
   errorFiles: ErroredRecord[];
   isLoadingApiClientRecords: boolean;
+  isApiClientRecordsLoaded: boolean;
   onNewRecord: (apiClientRecord: RQAPI.Record) => void;
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => void;
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => void;
@@ -74,6 +75,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   apiClientRecords: [],
   errorFiles: [],
   isLoadingApiClientRecords: false,
+  isApiClientRecordsLoaded: false,
   onNewRecord: (apiClientRecord: RQAPI.Record) => {},
   onRemoveRecord: (apiClientRecord: RQAPI.Record) => {},
   onUpdateRecord: (apiClientRecord: RQAPI.Record) => {},
@@ -130,6 +132,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const location = useLocation();
   const [locationState, setLocationState] = useState(location?.state);
   const [isLoadingApiClientRecords, setIsLoadingApiClientRecords] = useState(!!locationState?.action);
+  const [isApiClientRecordsLoaded, setIsApiClientRecordsLoaded] = useState(false);
   const [apiClientRecords, setApiClientRecords] = useState<RQAPI.Record[]>([]);
   const [errorFiles, setErrorFiles] = useState([]);
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
@@ -193,6 +196,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         updateCollectionVariablesOnInit(result.data.records);
       }
       setIsLoadingApiClientRecords(false);
+      setIsApiClientRecordsLoaded(true);
     });
   }, [apiClientRecordsRepository, uid, dispatch]);
 
@@ -417,6 +421,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientRecords,
     errorFiles,
     isLoadingApiClientRecords,
+    isApiClientRecordsLoaded,
     onNewRecord,
     onRemoveRecord,
     onUpdateRecord,
