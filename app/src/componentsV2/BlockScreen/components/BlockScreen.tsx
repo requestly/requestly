@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect } from "react";
 import "./blockscreen.scss";
 import MinimalLayout from "layouts/MinimalLayout";
 import { BlockConfig, BlockType } from "../hooks/useIsUserBlocked";
-import { trackGrrBlockedScreenViewed } from "features/grr/analytics";
+import { trackBlockScreenViewed } from "../analytics";
 
 interface Props {
   blockConfig: BlockConfig;
@@ -33,8 +33,8 @@ export const BlockScreen: React.FC<Props> = ({ blockConfig }) => {
   const config = blockConfig[blockType as BlockType];
 
   useEffect(() => {
-    trackGrrBlockedScreenViewed();
-  }, []);
+    trackBlockScreenViewed(blockType);
+  }, [blockType]);
 
   let blockElement = (
     <BlockComponent
