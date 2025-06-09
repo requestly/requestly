@@ -83,7 +83,7 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
-    const error = { message: event.reason };
+    const error = typeof event.reason === "string" ? { message: event.reason } : event.reason;
     const sanitizedError = sanitizeError(error);
     decorateErrorForSentry(sanitizedError);
     this.setState({ hasError: true, error: sanitizedError });
