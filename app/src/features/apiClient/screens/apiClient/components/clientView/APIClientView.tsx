@@ -405,6 +405,25 @@ const APIClientView: React.FC<Props> = ({
       return;
     }
 
+    const isValidHeader = entry.request?.headers?.every((header) => {
+      return !header.isEnabled || !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
+    });
+
+    const isValidAuthKey =
+      entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+      !entry.auth?.authConfigStore?.API_KEY?.key ||
+      !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(entry.auth?.authConfigStore?.API_KEY?.key);
+
+    if (!isValidHeader || !isValidAuthKey) {
+      notification.error({
+        message: `Could not save request.`,
+        description: "key contains invalid characters.",
+        placement: "bottomRight",
+      });
+      setIsRequestSaving(false);
+      return;
+    }
+
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...entry },
@@ -444,6 +463,25 @@ const APIClientView: React.FC<Props> = ({
   const onSaveButtonClick = useCallback(async () => {
     setIsRequestSaving(true);
 
+    const isValidHeader = entry.request?.headers?.every((header) => {
+      return !header.isEnabled || !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
+    });
+
+    const isValidAuthKey =
+      entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+      !entry.auth?.authConfigStore?.API_KEY?.key ||
+      !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(entry.auth?.authConfigStore?.API_KEY?.key);
+
+    if (!isValidHeader || !isValidAuthKey) {
+      notification.error({
+        message: `Could not save request.`,
+        description: "key contains invalid characters.",
+        placement: "bottomRight",
+      });
+      setIsRequestSaving(false);
+      return;
+    }
+
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...sanitizeEntry(entry, false) },
@@ -459,20 +497,11 @@ const APIClientView: React.FC<Props> = ({
       record.id = apiEntryDetails?.id;
     }
 
-    const isValidHeader = record.data?.request?.headers?.every((header) => {
-      return !header.isEnabled || !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
-    });
-
-    const isValidAuthKey =
-      record.data?.auth?.currentAuthType !== Authorization.Type.API_KEY ||
-      !record.data?.auth?.authConfigStore?.API_KEY?.key ||
-      !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record.data?.auth?.authConfigStore?.API_KEY?.key);
-
     const result = isCreateMode
       ? await apiClientRecordsRepository.createRecordWithId(record, record.id)
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
-    if (result.success && result.data.type === RQAPI.RecordType.API && isValidHeader && isValidAuthKey) {
+    if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
 
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });

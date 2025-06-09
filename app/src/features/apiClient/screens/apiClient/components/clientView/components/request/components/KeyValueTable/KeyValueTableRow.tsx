@@ -45,6 +45,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   ...restProps
 }) => {
   const form = useContext(EditableContext);
+  const INVALID_KEY_CHARACTERS = /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
 
   const save = async () => {
     try {
@@ -75,7 +76,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
           <div
             className={`key-value-input-container 
           ${
-            /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
+            INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
               ? "error-state"
               : ""
           }
@@ -92,9 +93,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
               variables={variables}
             />
             <Conditional
-              condition={
-                /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
-              }
+              condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
             >
               <div className="key-value-table-error-icon">
                 <InfoIcon
