@@ -56,7 +56,7 @@ export const processRqImportData = (
   });
 
   collections.forEach((collection: RQAPI.CollectionRecord) => {
-    const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
+    const collectionToImport = { ...collection, name: `${collection.name}` };
     if (collectionToImport.collectionId) {
       const oldCollectionId = collectionToImport.collectionId;
       delete collectionToImport.collectionId;
