@@ -1,5 +1,4 @@
 //EXTERNALS
-import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { trackErrorInRuleCreation } from "modules/analytics/events/common/rules";
 import { cloneDeep } from "lodash";
@@ -13,6 +12,7 @@ import { HTML_ERRORS } from "../CreateRuleButton/actions/insertScriptValidators"
 import { globalActions } from "store/slices/global/slice";
 import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { toast } from "utils/Toast";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 import { minifyCode } from "utils/CodeEditorUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -42,42 +42,43 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
   // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
 
   //Set the modification date of rule
-  ruleToSave.modificationDate = generateObjectCreationDate();
+  // ruleToSave.modificationDate = generateObjectCreationDate();
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
-  const ruleSavePromises = [
-    detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
-    detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),
-  ];
+  await syncingHelper.saveRuleOrGroup(ruleToSave);
+  // const ruleSavePromises = [
+  //   detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
+  //   detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),
+  // ];
 
-  return Promise.all(ruleSavePromises)
-    .then(([_, result_1]) => {
-      //Set the modification date of group
-      if (result_1 && result_1.objectType === "group") {
-        const groupToSave = {
-          ...result_1,
-          modificationDate: generateObjectCreationDate(),
-        };
-        //Save the group
-        Logger.log("Writing to storage in saveRule");
-        return StorageService(appMode)
-          .saveRuleOrGroup(groupToSave)
-          .catch(() => {
-            throw new Error("Error in saving rule");
-          });
-      }
-    })
-    .catch((error) => {
-      Logger.log("Error in saving rule:", error);
-      trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
-      Sentry.captureException(error, {
-        tags: {
-          error_source: "save_rule",
-        },
-      });
-      throw new Error("Error in saving rule");
-    });
+  // return Promise.all(ruleSavePromises)
+  //   .then(([_, result_1]) => {
+  //     //Set the modification date of group
+  //     if (result_1 && result_1.objectType === "group") {
+  //       const groupToSave = {
+  //         ...result_1,
+  //         modificationDate: generateObjectCreationDate(),
+  //       };
+  //       //Save the group
+  //       Logger.log("Writing to storage in saveRule");
+  //       return StorageService(appMode)
+  //         .saveRuleOrGroup(groupToSave)
+  //         .catch(() => {
+  //           throw new Error("Error in saving rule");
+  //         });
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     Logger.log("Error in saving rule:", error);
+  //     trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
+  //     Sentry.captureException(error, {
+  //       tags: {
+  //         error_source: "save_rule",
+  //       },
+  //     });
+  //     throw new Error("Error in saving rule");
+  //   });
 };
 
 export const validateSyntaxInRule = async (dispatch, ruleToSave) => {

@@ -1,4 +1,3 @@
-import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { setIdsOfSingleRulePairs } from "utils/rules/set-ids-of-rules-pairs";
 import { generateObjectId } from "utils/FormattingHelper";
@@ -7,12 +6,13 @@ import { runRuleMigrations } from "utils/rules/ruleMigrations";
 import APP_CONSTANTS from "config/constants";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { migrateRuleToMV3 } from "modules/extension/utils";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
 export const addRulesAndGroupsToStorage = (appMode, array) => {
   Logger.log("Writing to storage in addRulesAndGroupsToStorage");
-  return StorageService(appMode).saveMultipleRulesOrGroups(array);
+  return syncingHelper.saveMultipleRulesOrGroups(array);
 };
 
 const setNewIdOfRulePairs = (incomingArray) => {

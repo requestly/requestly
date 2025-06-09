@@ -4,6 +4,7 @@ import Logger from "lib/logger";
 import posthogIntegration from "./integrations/posthog";
 import localIntegration from "./integrations/local";
 import { isEnvAutomation } from "utils/EnvUtils";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [
@@ -26,8 +27,9 @@ export const trackEvent = (name, params, config) => {
   newParams.rq_app_version = app_version;
   newParams.automation_enabled = isEnvAutomation();
   newParams.workspace_role = window.currentlyActiveWorkspaceTeamRole ?? null;
-  newParams.workspace = window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
-  newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
+  // Syncing - Temporary
+  newParams.workspace = isPersonalWorkspaceId(window.activeWorkspaceIds?.[0]) ? "personal" : "team";
+  newParams.workspaceId = window.activeWorkspaceIds?.[0] ? window.activeWorkspaceIds[0] : null;
   newParams.workspaceMembersCount = window.workspaceMembersCount ?? null;
 
   Logger.log(`[analytics.trackEvent] name=${name}`, { params, config });

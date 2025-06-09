@@ -131,6 +131,8 @@
     "remark-gfm": "^4.0.0",
     "rrweb": "2.0.0-alpha.14",
     "rrweb-player": "2.0.0-alpha.14",
+    "rxdb": "^16.4.0",
+    "rxjs": "^7.8.1",
     "semver": "^7.5.4",
     "styled-components": "^6.1.8",
     "ua-parser-js": "^1.0.2",
