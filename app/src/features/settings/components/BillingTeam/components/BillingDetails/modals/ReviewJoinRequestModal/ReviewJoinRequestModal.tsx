@@ -103,7 +103,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
       case ReviewResultMessage.NO_USER_FOUND:
         return (
           <>
-            User not found. Please reach out to us at <a href="mailto:contact@requestly.io">contact@requestly.io</a> for
+            User not found. Please reach out to us at <a href="mailto:support@requestly.io">support@requestly.io</a> for
             assistance.
           </>
         );
@@ -111,7 +111,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
         return (
           <>
             The billing team was not found. Please reach out to us at{" "}
-            <a href="mailto:contact@requestly.io">contact@requestly.io</a> for assistance.
+            <a href="mailto:support@requestly.io">support@requestly.io</a> for assistance.
           </>
         );
     }

@@ -51,7 +51,7 @@ export const UpgradeToAnnual: React.FC = () => {
         }
       })
       .catch(() => {
-        toast.error("Error in converting to annual plan. Please contact support contact@requestly.io");
+        toast.error("Error in converting to annual plan. Please contact support support@requestly.io");
         trackCheckoutFailedEvent(
           user?.details?.planDetails?.subscription?.quantity,
           "monthly_to_annual_conversion",
@@ -75,7 +75,7 @@ export const UpgradeToAnnual: React.FC = () => {
         })
       );
     } else if (!user?.details?.isPremium || user?.details?.planDetails?.status !== PlanStatus.ACTIVE) {
-      setPageMessage("You do not have a premium plan to upgrade. Please contact support at contact@requestly.io");
+      setPageMessage("You do not have a premium plan to upgrade. Please contact support at support@requestly.io");
       setShowLoader(false);
     } else if (user?.details?.planDetails?.subscription?.duration === PRICING.DURATION.ANNUALLY) {
       setPageMessage("You are already on an annual plan.");
@@ -96,7 +96,7 @@ export const UpgradeToAnnual: React.FC = () => {
         setShowLoader(true);
       } else {
         setPageMessage(
-          "You are not the manager of billing team. Please contact your billing team manager or our support at contact@requestly.io"
+          "You are not the manager of billing team. Please contact your billing team manager or our support at support@requestly.io"
         );
         setShowLoader(false);
       }

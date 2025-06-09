@@ -25,7 +25,7 @@ const BadSessionError: React.FC = () => {
           <Col span={24}>
             <h1 className="display-3">There is some error in this SessionBook</h1>
             <p className="lead">
-              Please contact support at <a href="mailto:contact@requestly.io">contact@requestly.io</a>
+              Please contact support at <a href="mailto:support@requestly.io">support@requestly.io</a>
             </p>
           </Col>
         </Row>
