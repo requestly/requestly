@@ -11,7 +11,7 @@ index b63f975..8fb284f 100644
          changes: {
            from: 0,
 diff --git a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
-index eab503a..4fe0770 100644
+index eab503a..2171701 100644
 --- a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
 +++ b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
 @@ -53,6 +53,7 @@ export function useCodeMirror(props) {
@@ -22,76 +22,15 @@ index eab503a..4fe0770 100644
        onChange(_value, vu);
      }
      onStatistics && onStatistics(getStatistics(vu));
-@@ -108,28 +109,130 @@ export function useCodeMirror(props) {
+@@ -108,6 +109,7 @@ export function useCodeMirror(props) {
        view.focus();
      }
    }, [autoFocus, view]);
 +
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: theme changed`, theme)
-+  }, [theme])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: height changed`, height)
-+  }, [height])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: minHeight changed`, minHeight)
-+  }, [minHeight])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: maxHeight changed`, maxHeight)
-+  }, [maxHeight])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: width changed`, width)
-+  }, [width])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: minWidth changed`, minWidth)
-+  }, [minWidth])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: maxWidth changed`, maxWidth)
-+  }, [maxWidth])
-+
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: placeholderStr changed`, placeholderStr)
-+  }, [placeholderStr])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: editable changed`, editable)
-+  }, [editable])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: readOnly changed`, readOnly)
-+  }, [readOnly])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: defaultIndentWithTab changed`, defaultIndentWithTab)
-+  }, [defaultIndentWithTab])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: defaultBasicSetup changed`, defaultBasicSetup)
-+  }, [defaultBasicSetup])
-+
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: onChange changed`)
-+  }, [onChange])
-+
-+  useEffect(() => {
-+    console.log(`DG-5: ${Date.now()}: onUpdate changed`)
-+  }, [onUpdate])
-+
-+
-+
    useEffect(() => {
      if (view) {
-+      console.log(`DG-4: ${Date.now()}: view.dispatching reconfiguration`)
        view.dispatch({
-         effects: StateEffect.reconfigure.of(getExtensions)
+@@ -115,21 +117,54 @@ export function useCodeMirror(props) {
        });
      }
      // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,26 +41,22 @@ index eab503a..4fe0770 100644
      if (value === undefined) {
        return;
      }
++
      var currentValue = view ? view.state.doc.toString() : '';
      if (view && value !== currentValue) {
-+      console.log(`DG-1: ${Date.now()}: value changed`, JSON.stringify({value, currentValue}, null, 2));
-+      // Find the start of the difference
 +      let start = 0;
-+      console.log(`DG-11: ${Date.now()}: start calculating valueStart`);
-+      while (
-+        start < value.length &&
-+        start < currentValue.length &&
-+        value[start] === currentValue[start]
-+      ) {
++      const minLength = Math.min(value.length, currentValue.length);
++
++      while (start < minLength && value[start] === currentValue[start]) {
 +        start++;
 +      }
 +
-+      console.log(`DG-12: ${Date.now()}: valueStart`, start);
-+      // Find the end of the difference
++      if (start === value.length && start === currentValue.length) {
++        return null;
++      }
++
 +      let endCurrent = currentValue.length;
 +      let endValue = value.length;
-+
-+      console.log(`DG-13: ${Date.now()}: start calculating endCurrent and endValue`);
 +      while (
 +        endCurrent > start &&
 +        endValue > start &&
@@ -130,14 +65,11 @@ index eab503a..4fe0770 100644
 +        endCurrent--;
 +        endValue--;
 +      } 
-+      console.log(`DG-14: ${Date.now()}: endCurrent`, endCurrent, 'endValue', endValue);
 +      const changesToDispatch = {
 +        from: start,
 +        to: endCurrent,
 +        insert: value.slice(start, endValue),
 +      }
-+
-+      console.log(`DG-15: ${Date.now()}: dispatching sliced changes`, JSON.stringify({changesToDispatch}, null, 2));
 +
        view.dispatch({
 -        changes: {
