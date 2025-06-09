@@ -31,7 +31,6 @@ import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
-import { GrrWarningHoc } from "features/grr";
 import { BlockScreenHoc } from "componentsV2/BlockScreen/BlockScreenHoc";
 
 const { PATHS } = APP_CONSTANTS;
