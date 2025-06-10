@@ -12,6 +12,7 @@ import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable
 import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { Conditional } from "components/common/Conditional";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -157,7 +158,7 @@ const RequestTabs: React.FC<Props> = ({
       size="small"
       moreIcon={null}
       tabBarExtraContent={
-        showCredentialsCheckbox ? (
+        <Conditional condition={showCredentialsCheckbox}>
           <Checkbox
             onChange={(e) => {
               setRequestEntry((prev) => ({
@@ -172,7 +173,7 @@ const RequestTabs: React.FC<Props> = ({
           >
             <span className="credentials-checkbox-label">Include credentials</span>
           </Checkbox>
-        ) : null
+        </Conditional>
       }
     />
   );
