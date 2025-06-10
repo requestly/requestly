@@ -19,6 +19,7 @@ import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./a
 import { isEmpty } from "lodash";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -196,7 +197,7 @@ export class ApiClientExecutor {
     try {
       this.preValidateRequest();
       const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
-        return /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
+        return INVALID_KEY_CHARACTERS.test(header.key);
       });
 
       if (invalidHeader) {

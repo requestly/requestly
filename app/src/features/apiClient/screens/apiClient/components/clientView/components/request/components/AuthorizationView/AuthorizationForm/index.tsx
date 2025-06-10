@@ -8,6 +8,7 @@ import { RQAPI } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
@@ -48,7 +49,7 @@ function generateFields(
   onChangeHandler: (value: string, id: string) => void,
   value: string
 ) {
-  const hasInvalidCharacter = /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(value);
+  const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(value);
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (

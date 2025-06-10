@@ -5,6 +5,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -45,7 +46,6 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   ...restProps
 }) => {
   const form = useContext(EditableContext);
-  const INVALID_KEY_CHARACTERS = /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
 
   const save = async () => {
     try {

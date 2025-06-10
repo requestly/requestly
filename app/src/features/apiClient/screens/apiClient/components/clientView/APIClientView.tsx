@@ -51,6 +51,7 @@ import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
+import { INVALID_KEY_CHARACTERS } from "../../../../constants";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -406,13 +407,13 @@ const APIClientView: React.FC<Props> = ({
     }
 
     const isValidHeader = entry.request?.headers?.every((header) => {
-      return !header.isEnabled || !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
+      return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
     });
 
     const isValidAuthKey =
       entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
       !entry.auth?.authConfigStore?.API_KEY?.key ||
-      !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(entry.auth?.authConfigStore?.API_KEY?.key);
+      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key);
 
     if (!isValidHeader || !isValidAuthKey) {
       notification.error({
@@ -463,13 +464,13 @@ const APIClientView: React.FC<Props> = ({
     setIsRequestSaving(true);
 
     const isValidHeader = entry.request?.headers?.every((header) => {
-      return !header.isEnabled || !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(header.key);
+      return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
     });
 
     const isValidAuthKey =
       entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
       !entry.auth?.authConfigStore?.API_KEY?.key ||
-      !/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/.test(entry.auth?.authConfigStore?.API_KEY?.key);
+      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key);
 
     if (!isValidHeader || !isValidAuthKey) {
       notification.error({
