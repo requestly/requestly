@@ -21,5 +21,5 @@ export const HistoryView: React.FC = () => {
     [openTab]
   );
 
-  return <APIClient isCreateMode onSaveCallback={handleSaveCallback} />;
+  return <APIClient isCreateMode isHistoryMode onSaveCallback={handleSaveCallback} />;
 };
