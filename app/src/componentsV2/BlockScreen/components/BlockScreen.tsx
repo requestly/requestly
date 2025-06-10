@@ -70,22 +70,13 @@ export const BlockScreen: React.FC<Props> = ({ blockConfig }) => {
     blockElement = (
       <BlockComponent
         logo={<img width={56} height={56} src={"/assets/media/grr/globe-warning.svg"} alt={blockType} />}
-        title={"Requestly is currently unavailable for your organization"}
+        title={"Requestly is currently not enabled for your Organization"}
         subtitle={
           <>
-            We're working with your organization to bring Requestly to you as soon as possible. If you are someone who
-            would like to have Requestly access, please reach out to us at
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="mailto:contact@requestly.com"
-              className="block-screen-message-contact-mail"
-            >
-              contact@requestly.com
-            </a>
+            {"To enable Requestly access, please "}
             {config?.metadata?.contactEmail ? (
               <>
-                OR get in touch with{" "}
+                reach out to{" "}
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -94,8 +85,18 @@ export const BlockScreen: React.FC<Props> = ({ blockConfig }) => {
                 >
                   {config?.metadata?.contactEmail}
                 </a>
+                {" or "}
               </>
             ) : null}
+            drop us an email at
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="mailto:support@requestly.com"
+              className="block-screen-message-contact-mail"
+            >
+              support@requestly.com
+            </a>
             .
           </>
         }
