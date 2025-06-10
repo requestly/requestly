@@ -246,7 +246,7 @@ export class ApiClientExecutor {
       const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.CORE);
       return {
         status: RQAPI.ExecutionStatus.ERROR,
-        executedEntry: { ...this.entryDetails },
+        executedEntry: { ...this.entryDetails, response: null },
         error,
       };
     }
