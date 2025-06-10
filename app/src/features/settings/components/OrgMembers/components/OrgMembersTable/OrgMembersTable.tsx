@@ -101,7 +101,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                   !members?.length ? (
                     <>
                       Couldn't find member?{" "}
-                      <a className="external-link" href="mailto:contact@requestly.io">
+                      <a className="external-link" href="mailto:support@requestly.io">
                         Contact us
                       </a>{" "}
                       and we'll assist you in adding your team members.

@@ -325,7 +325,7 @@ const AppSumoModal: React.FC = () => {
           {showMaxCodesExeceededError && (
             <div className="danger caption">
               {
-                "Maximum 10 AppSumo codes can be applied. Please connect with support for further help at contact@requestly.io"
+                "Maximum 10 AppSumo codes can be applied. Please connect with support for further help at support@requestly.io"
               }
             </div>
           )}

@@ -128,7 +128,7 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
             </div>
             {this.getCustomError(error)}
             <div className="error-boundary__contact">
-              If the issue persists, contact <a href="mailto:contact@requestly.io">support</a>
+              If the issue persists, contact <a href="mailto:support@requestly.io">support</a>
             </div>
             <div className="error-boundary__actions">
               <RQButton onClick={() => window.location.reload()}>Reload</RQButton>

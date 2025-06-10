@@ -21,7 +21,7 @@ CONSTANTS.APP_FLAVOURS = {
 };
 
 CONSTANTS.COMPANY_INFO = {
-  SUPPORT_EMAIL: "contact@requestly.io",
+  SUPPORT_EMAIL: "support@requestly.io",
 };
 
 CONSTANTS.VERSION = 3;

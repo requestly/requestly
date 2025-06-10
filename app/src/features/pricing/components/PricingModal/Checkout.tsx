@@ -102,7 +102,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
                     </RQButton>
                     <Divider plain>OR</Divider>
                     <Typography.Text>
-                      Contact support <span className="text-bold text-underline">contact@requestly.io</span> to manage
+                      Contact support <span className="text-bold text-underline">support@requestly.io</span> to manage
                       it
                     </Typography.Text>
                   </Space>
