@@ -251,7 +251,6 @@ export const initXhrInterceptor = (debug) => {
           return credentialsDescriptor.get.call(this);
         },
         set: function (value) {
-          console.log("In Extension XHR");
           xhr.withCredentials = value;
           credentialsDescriptor.set.call(this, value);
         },
