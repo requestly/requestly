@@ -97,7 +97,7 @@ const APIClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const isHistoryPath = location.pathname.includes("history");
 
-  const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
+  const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
   const {
     apiClientRecords,
     onSaveRecord,
@@ -143,21 +143,6 @@ const APIClientView: React.FC<Props> = ({
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
   }, [apiEntryDetails?.data]);
-
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-      toggleSheetPlacement(bottomSheetPlacement);
-    };
-
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [toggleSheetPlacement]);
 
   useLayoutEffect(() => {
     setUnsaved(hasUnsavedChanges);
@@ -680,7 +665,7 @@ const APIClientView: React.FC<Props> = ({
             executeRequest={onSendButtonClick}
           />
         }
-        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 35 : 350}
+        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">
