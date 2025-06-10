@@ -1,10 +1,10 @@
-import { Tabs, TabsProps, Tag } from "antd";
+import { Checkbox, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo } from "react";
 import { RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
@@ -51,6 +51,7 @@ const RequestTabs: React.FC<Props> = ({
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
+  const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
   // TODO: remove tabs state
   const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
@@ -155,6 +156,24 @@ const RequestTabs: React.FC<Props> = ({
       items={tabItems}
       size="small"
       moreIcon={null}
+      tabBarExtraContent={
+        showCredentialsCheckbox ? (
+          <Checkbox
+            onChange={(e) => {
+              setRequestEntry((prev) => ({
+                ...prev,
+                request: {
+                  ...prev.request,
+                  includeCredentials: e.target.checked,
+                },
+              }));
+            }}
+            checked={requestEntry.request.includeCredentials}
+          >
+            <span className="credentials-checkbox-label">Include credentials</span>
+          </Checkbox>
+        ) : null
+      }
     />
   );
 };

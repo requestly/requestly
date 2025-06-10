@@ -36,6 +36,8 @@ export const makeRequest = async (
       signal.addEventListener("abort", abortListener);
     }
 
+    request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
+
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
       getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
         if (!result) {
