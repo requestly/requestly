@@ -61,7 +61,8 @@
       cursor: row-resize;
     }
 
-    &:hover {
+    &:hover,
+    &:active {
       background: var(--requestly-color-surface-0, #212121);
       border: 2px solid var(--requestly-color-primary, #004eeb);
     }
