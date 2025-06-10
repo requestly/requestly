@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { EnvironmentVariables } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { Timestamp } from "firebase/firestore";
@@ -25,3 +26,11 @@ export const updateRecordMetaData = (record: RQAPI.Record) => {
 
   return recordState;
 };
+
+export function captureException(e: any) {
+  Sentry.captureException(e, {
+    tags: {
+      alert: true,
+    }
+  })
+}
