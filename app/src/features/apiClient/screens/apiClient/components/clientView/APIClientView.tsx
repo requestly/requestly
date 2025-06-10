@@ -470,7 +470,8 @@ const APIClientView: React.FC<Props> = ({
     const isValidAuthKey =
       entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
       !entry.auth?.authConfigStore?.API_KEY?.key ||
-      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key);
+      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key) ||
+      entry.auth?.authConfigStore?.API_KEY.addTo === "QUERY";
 
     if (!isValidHeader || !isValidAuthKey) {
       notification.error({

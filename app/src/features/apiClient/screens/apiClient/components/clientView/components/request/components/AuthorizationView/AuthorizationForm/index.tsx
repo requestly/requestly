@@ -18,6 +18,11 @@ interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig>
   variables: EnvironmentVariables;
 }
 
+const addToOptions = {
+  HEADER: "HEADER",
+  QUERY: "QUERY",
+};
+
 const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
   defaultAuthValues,
   formData,
@@ -33,7 +38,7 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
         <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
-            {generateFields(formField, index, variables, formType, handleFormChange, formState[formField.id])}
+            {generateFields(formField, index, variables, formType, handleFormChange, formState)}
           </div>
         </div>
       ))}
@@ -47,26 +52,35 @@ function generateFields(
   currentEnvironmentVariables: EnvironmentVariables,
   formType: Authorization.Type,
   onChangeHandler: (value: string, id: string) => void,
-  value: string
+  formState: Record<string, string>
 ) {
-  const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(value);
+  const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(formState[field.id]);
+  //this is used as on mount the formState is undefinded so added a fallback
+  const isHeader = (formState.addTo || addToOptions.HEADER) === addToOptions.HEADER;
+  /*
+  TODO: Make a component for singleLineEditor error-state to avoid repetition
+  */
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
         <div
           className={`input-container ${
-            hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" ? "error-state" : ""
+            hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader
+              ? "error-state"
+              : ""
           }`}
         >
           <SingleLineEditor
             key={`${formType}-${index}`}
             className={field.className ?? ""}
             placeholder={field.placeholder}
-            defaultValue={value}
+            defaultValue={formState[field.id]}
             onChange={(value) => onChangeHandler(value, field.id)}
             variables={currentEnvironmentVariables}
           />
-          <Conditional condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key"}>
+          <Conditional
+            condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}
+          >
             <div className="error-icon">
               <InfoIcon
                 text="Invalid character used in key"
@@ -85,7 +99,7 @@ function generateFields(
       return (
         <Select
           key={`${formType}-${index}`}
-          value={value}
+          value={formState[field.id]}
           options={field.options}
           defaultValue={field.defaultValue}
           className={field.className ?? ""}
