@@ -241,6 +241,23 @@ export const initXhrInterceptor = (debug) => {
       });
     }
 
+    const credentialsDescriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "withCredentials");
+
+    // FIXME: This is breaking for some websites.
+    // https://linear.app/requestly/issue/ENGG-1823
+    if (credentialsDescriptor) {
+      Object.defineProperty(actualXhr, "withCredentials", {
+        get: function () {
+          return credentialsDescriptor.get.call(this);
+        },
+        set: function (value) {
+          console.log("In Extension XHR");
+          xhr.withCredentials = value;
+          credentialsDescriptor.set.call(this, value);
+        },
+      });
+    }
+
     this.rqProxyXhr = xhr;
   };
 
@@ -253,33 +270,6 @@ export const initXhrInterceptor = (debug) => {
   XMLHttpRequest.prototype = OriginalXMLHttpRequest.prototype;
   Object.entries(OriginalXMLHttpRequest).map(([key, val]) => {
     XMLHttpRequest[key] = val;
-  });
-
-  const originalWithCredentialsDescriptor = Object.getOwnPropertyDescriptor(
-    OriginalXMLHttpRequest.prototype,
-    "withCredentials"
-  );
-  Object.defineProperty(XMLHttpRequest.prototype, "withCredentials", {
-    get: function () {
-      // Return the value from the proxy XHR if it exists, otherwise use original as fallback
-      if (this.rqProxyXhr) {
-        return this.rqProxyXhr.withCredentials;
-      }
-      return originalWithCredentialsDescriptor.get.call(this);
-    },
-    set: function (value) {
-      try {
-        // Set on both the original XHR and proxy XHR
-        originalWithCredentialsDescriptor.set.call(this, value);
-        if (this.rqProxyXhr) {
-          this.rqProxyXhr.withCredentials = value;
-        }
-      } catch (err) {
-        console.log("[rqProxyXhr.withCredentials] error", err);
-      }
-    },
-    enumerable: true,
-    configurable: true,
   });
 
   const open = XMLHttpRequest.prototype.open;
