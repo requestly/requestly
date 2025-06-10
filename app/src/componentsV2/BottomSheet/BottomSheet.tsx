@@ -1,12 +1,10 @@
 import React, { ReactNode } from "react";
 import { Tabs, TabsProps } from "antd";
-import { RQButton } from "lib/design-system/components";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
 import { BiDockBottom } from "@react-icons/all-files/bi/BiDockBottom";
-import { MdExpandLess } from "@react-icons/all-files/md/MdExpandLess";
-import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
 import { BottomSheetPlacement } from "./types";
+import { RQButton } from "lib/design-system-v2/components";
 import "./BottomSheet.scss";
 
 interface BottomSheetProps extends TabsProps {
@@ -19,49 +17,44 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   items,
   defaultActiveKey,
   tourId = "",
-  disableDocking,
+  disableDocking = false,
   utilities,
+  tabBarExtraContent = null,
   ...props
 }) => {
-  const { isBottomSheetOpen, sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
+  const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
-  return (
-    <>
+  const tabExtraContent = (
+    <div className="bottom-sheet-tab-extra-content">
+      {tabBarExtraContent as ReactNode}
+
       <div className="bottom-sheet-utilites">
         {utilities}
-        {isSheetPlacedAtBottom && (
+
+        {disableDocking ? null : (
           <RQButton
             size="small"
-            iconOnly
-            type="default"
-            icon={isBottomSheetOpen ? <MdExpandMore /> : <MdExpandLess />}
-            onClick={() => {
-              if (isSheetPlacedAtBottom) {
-                toggleBottomSheet({ isOpen: false, isTrack: true, action: "bottom_sheet_utility_toggle" });
-              }
-            }}
-          />
-        )}
-        {!disableDocking && (
-          <RQButton
-            size="small"
-            iconOnly
-            type="default"
+            type="transparent"
+            title="Toggle"
             onClick={() => toggleSheetPlacement()}
+            className="bottom-sheet-toggle-btn"
             icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
           />
         )}
       </div>
+    </div>
+  );
 
-      <Tabs
-        moreIcon={null}
-        data-tour-id={tourId}
-        defaultActiveKey={defaultActiveKey}
-        items={items}
-        onTabClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
-        {...props}
-      />
-    </>
+  return (
+    <Tabs
+      items={items}
+      moreIcon={null}
+      data-tour-id={tourId}
+      defaultActiveKey={defaultActiveKey}
+      onTabClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
+      tabBarExtraContent={tabExtraContent}
+      {...props}
+    />
   );
 };

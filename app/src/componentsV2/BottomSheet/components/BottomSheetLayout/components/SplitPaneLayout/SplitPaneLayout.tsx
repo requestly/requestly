@@ -30,6 +30,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   return (
     <Split
+      key={splitDirection}
       ref={splitPane}
       direction={splitDirection}
       sizes={isSheetPlacedAtBottom ? [100, 0] : initialSizes}
@@ -37,10 +38,17 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
       }`}
+      gutter={(index, direction) => {
+        const gutterContainer = document.createElement("div");
+        gutterContainer.style.position = "relative";
+        gutterContainer.className = `gutter-container gutter-container-${direction}`;
+        gutterContainer.innerHTML = `<div class="gutter gutter-${direction}" />`;
+        return gutterContainer;
+      }}
       gutterStyle={() => {
         return {
-          height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : "8px",
-          width: splitDirection === SplitDirection.HORIZONTAL ? "8px" : "100%",
+          height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : "0px",
+          width: splitDirection === SplitDirection.HORIZONTAL ? "0px" : "100%",
         };
       }}
       gutterAlign="center"

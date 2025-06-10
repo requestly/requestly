@@ -16,18 +16,12 @@
 
   &.horizontal-split {
     display: flex;
-
-    .gutter {
-      border-left: 1px solid var(--requestly-color-surface-1);
-      cursor: ew-resize;
-    }
   }
 
   &.vertical-split {
-    .gutter {
-      border-top: 1px solid var(--requestly-color-surface-1);
-      cursor: ns-resize;
-    }
+    display: flex;
+    flex-direction: column;
+
     & .ant-tabs-content-holder {
       padding: 8px;
       overflow: hidden;
@@ -51,12 +45,26 @@
   }
 
   .gutter {
-    box-shadow: 0 0 1px 0 var(--requestly-color-surface-1);
-    background-color: var(--requestly-color-surface-1);
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
+    z-index: 1;
+    position: absolute;
+    transition: 0.3s all;
+    background: transparent;
+    border: 2px solid transparent;
+    width: inherit !important;
+    height: inherit !important;
 
-    &:hover {
-      background-color: var(--requestly-color-surface-2);
+    &.gutter-horizontal {
+      cursor: col-resize;
+    }
+
+    &.gutter-vertical {
+      cursor: row-resize;
+    }
+
+    &:hover,
+    &:active {
+      background: var(--requestly-color-surface-0, #212121);
+      border: 2px solid var(--requestly-color-primary, #004eeb);
     }
   }
 
