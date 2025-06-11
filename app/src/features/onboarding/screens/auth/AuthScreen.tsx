@@ -33,6 +33,7 @@ import {
   trackLoginUserSwitchedEmail,
 } from "modules/analytics/events/common/auth/login";
 import { setRedirectMetadata } from "features/onboarding/utils";
+import * as Sentry from "@sentry/react";
 import "./authScreen.scss";
 
 export const AuthScreen = () => {
@@ -127,6 +128,13 @@ export const AuthScreen = () => {
         } else {
           setShowRQAuthForm(true);
         }
+      }
+      if (metadata.isExistingUser && !metadata.providers.length) {
+        Sentry.captureException("Existing user login attempt with empty providers", {
+          extra: {
+            email,
+          },
+        });
       }
     },
     [navigate, setAuthMode, setAuthProviders, handleSendEmailLink, isDesktopSignIn, email, redirectURL, eventSource]

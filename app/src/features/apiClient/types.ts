@@ -117,6 +117,7 @@ export namespace RQAPI {
     body?: RequestBody;
     bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
+    includeCredentials?: boolean;
   }
 
   export interface Response {
