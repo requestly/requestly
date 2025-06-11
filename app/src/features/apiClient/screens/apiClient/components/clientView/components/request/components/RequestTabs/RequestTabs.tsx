@@ -55,7 +55,7 @@ const RequestTabs: React.FC<Props> = ({
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
-  const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
+  const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false) || true;
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
