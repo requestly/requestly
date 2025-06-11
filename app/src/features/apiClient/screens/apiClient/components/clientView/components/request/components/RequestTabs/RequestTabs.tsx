@@ -1,10 +1,10 @@
-import { Tabs, TabsProps, Tag } from "antd";
+import { Checkbox, Tabs, TabsProps, Tag } from "antd";
 import React, { memo, useEffect, useMemo } from "react";
 import { RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
@@ -12,6 +12,9 @@ import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable
 import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { Conditional } from "components/common/Conditional";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 
 export enum RequestTab {
@@ -52,6 +55,7 @@ const RequestTabs: React.FC<Props> = ({
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
+  const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
@@ -163,6 +167,26 @@ const RequestTabs: React.FC<Props> = ({
       items={tabItems}
       size="small"
       moreIcon={null}
+      tabBarExtraContent={
+        <Conditional
+          condition={showCredentialsCheckbox && isFeatureCompatible(FEATURES.API_CLIENT_INCLUDE_CREDENTIALS)}
+        >
+          <Checkbox
+            onChange={(e) => {
+              setRequestEntry((prev) => ({
+                ...prev,
+                request: {
+                  ...prev.request,
+                  includeCredentials: e.target.checked,
+                },
+              }));
+            }}
+            checked={requestEntry.request.includeCredentials}
+          >
+            <span className="credentials-checkbox-label">Include credentials</span>
+          </Checkbox>
+        </Conditional>
+      }
     />
   );
 };

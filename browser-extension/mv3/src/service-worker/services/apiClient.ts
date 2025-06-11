@@ -30,6 +30,7 @@ interface Request {
   headers: KeyValuePair[];
   body?: RequestBody;
   contentType?: RequestContentType;
+  includeCredentials?: boolean;
 }
 
 interface Response {
@@ -92,7 +93,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
       method,
       headers,
       body: finalRequestBody,
-      credentials: "omit" as RequestCredentials,
+      credentials: apiRequest.includeCredentials ? "include" : "omit",
     });
     const responseTime = performance.now() - requestStartTime;
 
