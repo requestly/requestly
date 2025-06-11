@@ -241,10 +241,8 @@ export const initXhrInterceptor = (debug) => {
       });
     }
 
+    // https://github.com/requestly/requestly/issues/2936
     const credentialsDescriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "withCredentials");
-
-    // FIXME: This is breaking for some websites.
-    // https://linear.app/requestly/issue/ENGG-1823
     if (credentialsDescriptor) {
       Object.defineProperty(actualXhr, "withCredentials", {
         get: function () {
