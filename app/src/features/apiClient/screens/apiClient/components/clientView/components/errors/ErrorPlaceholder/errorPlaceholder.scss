@@ -26,16 +26,16 @@
       font-size: 11px;
       line-height: 18px;
       letter-spacing: 0.25px;
+      max-width: 400px;
+      text-align: center;
 
       .error-name {
         color: var(--requestly-color-error-text);
-        align-self: flex-start;
       }
 
       .error-message {
         color: var(--requestly-color-subtle);
-        display: flex;
-        align-items: center;
+        display: inline;
         gap: 4px;
 
         svg {
