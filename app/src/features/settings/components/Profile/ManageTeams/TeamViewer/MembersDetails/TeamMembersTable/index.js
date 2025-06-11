@@ -165,6 +165,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
         return (
           <MemberRoleDropdown
             key={member.id}
+            source="membersTable"
             showLoader
             isHoverEffect={isLoggedInUserAdmin && member?.id !== loggedInUserId}
             placement="bottomLeft"

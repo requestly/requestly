@@ -275,6 +275,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                       <Conditional condition={loggedInUserTeamRole && loggedInUserTeamRole !== TeamRole.read}>
                         <div className="access-dropdown-container">
                           <MemberRoleDropdown
+                            source="inviteModal"
                             memberRole={userInviteRole}
                             loggedInUserTeamRole={loggedInUserTeamRole}
                             placement="bottomRight"
