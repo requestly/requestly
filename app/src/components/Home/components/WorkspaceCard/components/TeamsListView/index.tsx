@@ -11,7 +11,7 @@ import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./teamsListView.scss";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   pendingInvites?: Invite[];
@@ -49,15 +49,20 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
                     <TeamsListItem
                       key={index}
                       inviteId={invite.id}
-                      teamId={invite.metadata.teamId as string}
-                      teamName={invite.metadata.teamName as string}
+                      workspace={
+                        {
+                          id: invite.metadata.teamId,
+                          name: invite.metadata.teamName,
+                          workspaceType: WorkspaceType.SHARED,
+                        } as Workspace
+                      }
                     />
                   ))}
                 </>
               ) : (
                 <>
-                  {sortedAvailableTeams.map((team: Workspace, index: number) => (
-                    <TeamsListItem key={index} teamId={team.id} teamName={team.name} />
+                  {sortedAvailableTeams.map((workspace: Workspace, index: number) => (
+                    <TeamsListItem key={index} workspace={workspace} />
                   ))}
                 </>
               )}

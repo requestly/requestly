@@ -118,7 +118,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       };
     }
     const parsedRecords = this.parseAPIEntities(result.content.records);
-    console.log("local fs parsing", parsedRecords);
     return {
       success: true,
       data: {
