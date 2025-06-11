@@ -1,10 +1,10 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { AbortReason, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortReason, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { forEach, isEmpty, omit, split, unionBy } from "lodash";
+import { forEach, omit, split } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
@@ -35,6 +35,9 @@ export const makeRequest = async (
       };
       signal.addEventListener("abort", abortListener);
     }
+
+    //TODO: make the default value false if and when the feature flag is turned on
+    request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
       getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
@@ -348,65 +351,6 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
     .join("&");
 
   return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
-};
-
-export const syncQueryParams = (
-  queryParams: KeyValuePair[],
-  url: string,
-  type: QueryParamSyncType = QueryParamSyncType.SYNC
-) => {
-  const updatedQueryParams = extractQueryParams(url);
-
-  switch (type) {
-    case QueryParamSyncType.SYNC: {
-      const updatedUrl = queryParamsToURLString(queryParams, url);
-
-      // Dont sync if URL is same
-      if (updatedUrl !== url) {
-        const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
-        const deduplicatedParams: KeyValuePair[] = [];
-        const seenPairs = new Set();
-
-        combinedParams.forEach((param) => {
-          const pair = `${param.key}=${param.value}`;
-          if (!seenPairs.has(pair)) {
-            seenPairs.add(pair);
-            deduplicatedParams.push(param);
-          }
-        });
-
-        return { queryParams: deduplicatedParams, url: queryParamsToURLString(deduplicatedParams, url) };
-      }
-
-      return { queryParams, url };
-    }
-    case QueryParamSyncType.TABLE: {
-      const updatedQueryParamsCopy = [...updatedQueryParams];
-
-      // Adding disabled key value pairs
-      queryParams.forEach((queryParam, index) => {
-        if (!(queryParam.isEnabled ?? true)) {
-          updatedQueryParamsCopy.splice(index, 0, queryParam);
-        }
-      });
-
-      return {
-        queryParams: isEmpty(updatedQueryParamsCopy) ? [getEmptyPair()] : updatedQueryParamsCopy,
-      };
-    }
-
-    case QueryParamSyncType.URL: {
-      const updatedUrl = queryParamsToURLString(queryParams, url);
-
-      return { url: updatedUrl };
-    }
-
-    default:
-      return {
-        queryParams,
-        url,
-      };
-  }
 };
 
 export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
