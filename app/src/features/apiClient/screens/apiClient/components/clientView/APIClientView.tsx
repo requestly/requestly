@@ -50,6 +50,8 @@ import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiClientUrl";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
+import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
+import { INVALID_KEY_CHARACTERS } from "../../../../constants";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -97,13 +99,9 @@ const APIClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const isHistoryPath = location.pathname.includes("history");
 
-  const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    apiClientWorkloadManager,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } =
+    useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -116,10 +114,10 @@ const APIClientView: React.FC<Props> = ({
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
+    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
+  );
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
@@ -145,21 +143,6 @@ const APIClientView: React.FC<Props> = ({
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
   }, [apiEntryDetails?.data]);
-
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-      toggleSheetPlacement(bottomSheetPlacement);
-    };
-
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [toggleSheetPlacement]);
 
   useLayoutEffect(() => {
     setUnsaved(hasUnsavedChanges);
@@ -404,6 +387,24 @@ const APIClientView: React.FC<Props> = ({
       return;
     }
 
+    const isValidHeader = entry.request?.headers?.every((header) => {
+      return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
+    });
+
+    const isValidAuthKey =
+      entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+      !entry.auth?.authConfigStore?.API_KEY?.key ||
+      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key);
+
+    if (!isValidHeader || !isValidAuthKey) {
+      notification.error({
+        message: `Could not save request.`,
+        description: "key contains invalid characters.",
+        placement: "bottomRight",
+      });
+      return;
+    }
+
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...entry },
@@ -450,6 +451,25 @@ const APIClientView: React.FC<Props> = ({
         queryParams: queryParams,
       },
     };
+    const isValidHeader = entry.request?.headers?.every((header) => {
+      return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
+    });
+
+    const isValidAuthKey =
+      entry.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+      !entry.auth?.authConfigStore?.API_KEY?.key ||
+      !INVALID_KEY_CHARACTERS.test(entry.auth?.authConfigStore?.API_KEY?.key) ||
+      entry.auth?.authConfigStore?.API_KEY.addTo === "QUERY";
+
+    if (!isValidHeader || !isValidAuthKey) {
+      notification.error({
+        message: `Could not save request.`,
+        description: "key contains invalid characters.",
+        placement: "bottomRight",
+      });
+      setIsRequestSaving(false);
+      return;
+    }
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
@@ -700,7 +720,7 @@ const APIClientView: React.FC<Props> = ({
             executeRequest={onSendButtonClick}
           />
         }
-        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 35 : 350}
+        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">

@@ -3,7 +3,6 @@ import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
-import { useLocation } from "react-router-dom";
 import { Skeleton } from "antd";
 import "./apiClient.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
@@ -11,6 +10,7 @@ import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContext
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
   apiEntryDetails?: RQAPI.ApiRecord;
+  isHistoryMode?: boolean;
 };
 
 type CreateModeProps = BaseProps & {
@@ -22,25 +22,18 @@ type EditModeProps = BaseProps & {
   requestId: string;
 };
 
-type HistoryModeProps = BaseProps & {
-  isCreateMode: false;
-  requestId?: string;
-};
-
-type Props = CreateModeProps | EditModeProps | HistoryModeProps;
+type Props = CreateModeProps | EditModeProps;
 
 export const APIClient: React.FC<Props> = React.memo((props) => {
-  const location = useLocation();
-  const { isCreateMode } = props;
+  const { isCreateMode, isHistoryMode } = props;
   const { history, selectedHistoryIndex, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
   const [selectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
-  const isHistoryPath = location.pathname.includes("history");
 
   const requestId = isCreateMode === false ? props.requestId : null;
   const onSaveCallback = props.onSaveCallback ?? (() => {});
 
   const requestHistoryEntry = useMemo(() => {
-    if (!isHistoryPath) {
+    if (!isHistoryMode) {
       return;
     }
 
@@ -54,24 +47,24 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     };
 
     return entryDetails;
-  }, [isHistoryPath, history, selectedHistoryIndex]);
+  }, [isHistoryMode, history, selectedHistoryIndex]);
 
   const entryDetails = useMemo(
-    () => (isHistoryPath && !requestId ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord,
-    [isHistoryPath, requestHistoryEntry, selectedEntryDetails, requestId]
+    () => (isHistoryMode && !requestId ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord,
+    [isHistoryMode, requestHistoryEntry, selectedEntryDetails, requestId]
   );
 
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.Entry) => {
-      if (isHistoryPath) {
+      if (isHistoryMode) {
         setCurrentHistoryIndex(history.length);
       }
       addToHistory(entry);
     },
-    [addToHistory, isHistoryPath, setCurrentHistoryIndex, history]
+    [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
   );
 
-  if (!entryDetails && !isCreateMode && !isHistoryPath) {
+  if (!entryDetails && !isCreateMode && !isHistoryMode) {
     return (
       <>
         <Skeleton className="api-client-header-skeleton" paragraph={{ rows: 1, width: "100%" }} />
