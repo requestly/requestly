@@ -241,6 +241,20 @@ export const initXhrInterceptor = (debug) => {
       });
     }
 
+    // https://github.com/requestly/requestly/issues/2936
+    const credentialsDescriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "withCredentials");
+    if (credentialsDescriptor) {
+      Object.defineProperty(actualXhr, "withCredentials", {
+        get: function () {
+          return credentialsDescriptor.get.call(this);
+        },
+        set: function (value) {
+          xhr.withCredentials = value;
+          credentialsDescriptor.set.call(this, value);
+        },
+      });
+    }
+
     this.rqProxyXhr = xhr;
   };
 
