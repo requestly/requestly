@@ -49,6 +49,36 @@
 
           .field {
             width: 448px;
+
+            .input-container.error-state {
+              position: relative;
+              display: flex;
+              align-items: center;
+              height: 32px;
+              padding: 8px 8px;
+              gap: 6px;
+              border: 1px solid var(--requestly-color-error);
+              border-radius: 4px;
+
+              .error-icon {
+                position: inherit;
+                margin-bottom: 12px;
+                padding: 2px;
+                align-items: center;
+                margin-left: auto;
+                svg {
+                  width: 17px;
+                  height: 17px;
+                }
+              }
+            }
+            .input-container.error-state > .editor-popup-container {
+              width: 100%;
+              height: 100%;
+              border: none;
+              padding: 0;
+              margin-bottom: 8px;
+            }
           }
 
           .ant-select-selector {

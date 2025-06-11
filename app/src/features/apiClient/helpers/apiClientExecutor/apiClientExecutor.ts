@@ -20,6 +20,7 @@ import { isEmpty } from "lodash";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -231,6 +232,13 @@ export class ApiClientExecutor {
 
     try {
       this.preValidateRequest();
+      const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
+        return INVALID_KEY_CHARACTERS.test(header.key);
+      });
+
+      if (invalidHeader) {
+        throw new Error(`Invalid header key: "${invalidHeader.key}". Header keys must not contain special characters.`);
+      }
     } catch (err) {
       const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.PRE_VALIDATION);
       return {
