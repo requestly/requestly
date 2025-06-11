@@ -1,5 +1,5 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
+import { addUrlSchemeIfMissing, makeRequest, queryParamsToURLString } from "../../screens/apiClient/utils";
 import { AbortReason, RQAPI } from "../../types";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { getHeadersAndQueryParams, getEffectiveAuthForEntry, updateRequestWithAuthOptions } from "../auth";
@@ -47,6 +47,10 @@ export class ApiClientExecutor {
 
   prepareRequest() {
     this.entryDetails.testResults = [];
+    this.entryDetails.request.url = queryParamsToURLString(
+      this.entryDetails.request.queryParams,
+      this.entryDetails.request.url
+    );
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
     this.renderedVariables = {};
