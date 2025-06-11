@@ -3,6 +3,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "./sub/features";
 
 // set null if the version is never compatiable on appMode
+// for desktop app, by default assumes that the feature is compatible on all platforms if not specified
 export const FEATURE_COMPATIBLE_VERSION = {
   [FEATURES.RESPONSE_MAP_LOCAL]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "0.0.29-beta",
@@ -109,28 +110,46 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "24.9.17",
   },
   [FEATURES.EDIT_LOCAL_FILE_PATH]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "1.7.6",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "1.7.6",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
 
   [FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "1.7.7",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "1.7.7",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.FRAMELESS_DESKTOP_APP]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "1.8.0",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "1.8.0",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.LOCAL_FILE_SYNC]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "2.0.0",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "2.0.0",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.LOCAL_LOG_FILE]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.5.23",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "25.5.23",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_FOR_LOCAL_FILE]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.5.19",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "25.5.19",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.EXTENSION_STATUS_NOTIFICATION]: {
@@ -138,7 +157,10 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "25.5.18",
   },
   [FEATURES.LOCAL_WORKSPACE_REFRESH]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.6.5",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      version: "25.6.5",
+      platforms: ["macOS"],
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
 };

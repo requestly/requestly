@@ -8,16 +8,27 @@ import { getAppDetails } from "./AppUtils";
  * @returns {boolean} Whether the feature is compatible or not
  */
 export function isFeatureCompatible(featureName) {
-  const { app_mode, app_version } = getAppDetails();
+  const { app_mode, app_version, os } = getAppDetails();
   const compatibilityVersionMap = FEATURE_COMPATIBLE_VERSION[featureName] || {};
-  return checkVersionCompatibility(app_version, compatibilityVersionMap[app_mode]);
+  return checkVersionCompatibility(app_version, os, compatibilityVersionMap[app_mode]);
 }
 
-const checkVersionCompatibility = (currentVersion, compatibleVersion) => {
-  if (!compatibleVersion || !currentVersion) {
+const checkVersionCompatibility = (currentVersion, os, compatibilityCriteria) => {
+  if (!compatibilityCriteria || !currentVersion) {
     return false;
   }
+  let compatibleVersion;
 
+  if (typeof compatibilityCriteria !== "string") {
+    // depend on the user os to determine the compatibility criteria
+    const compatiblePlatforms = compatibilityCriteria.platforms || null;
+    if (compatiblePlatforms && !compatiblePlatforms.includes(os)) {
+      return false;
+    }
+    compatibleVersion = compatibilityCriteria.version;
+  } else {
+    compatibleVersion = compatibilityCriteria;
+  }
   try {
     return semver.gte(currentVersion, compatibleVersion);
   } catch (err) {
