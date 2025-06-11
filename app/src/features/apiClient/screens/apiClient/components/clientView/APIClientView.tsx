@@ -100,8 +100,12 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
-  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } =
-    useApiClientContext();
+  const {
+    apiClientRecords,
+    onSaveRecord,
+    apiClientWorkloadManager,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -114,10 +118,10 @@ const APIClientView: React.FC<Props> = ({
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
-    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
+    apiEntryDetails?.collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
