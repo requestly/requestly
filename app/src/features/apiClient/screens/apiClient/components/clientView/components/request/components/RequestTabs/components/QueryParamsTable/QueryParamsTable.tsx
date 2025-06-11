@@ -1,25 +1,29 @@
 import React, { useCallback } from "react";
 import { EnvironmentVariables } from "backend/environment/types";
-import { KeyValuePair } from "features/apiClient/types";
+import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { KeyValueTable } from "../../../KeyValueTable/KeyValueTable";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
-import { useGenericState } from "hooks/useGenericState";
 
 interface QueryParamsTableProps {
   variables: EnvironmentVariables;
+  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
 }
 
-export const QueryParamsTable: React.FC<QueryParamsTableProps> = ({ variables }) => {
-  const { setUnsaved } = useGenericState();
-
+export const QueryParamsTable: React.FC<QueryParamsTableProps> = ({ variables, setRequestEntry }) => {
   const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
 
   const handleUpdateQueryParams = useCallback(
     (updatedPairs: KeyValuePair[]) => {
       setQueryParams(updatedPairs);
-      setUnsaved(true);
+      setRequestEntry((prev) => ({
+        ...prev,
+        request: {
+          ...prev.request,
+          queryParams: updatedPairs,
+        },
+      }));
     },
-    [setQueryParams, setUnsaved]
+    [setQueryParams, setRequestEntry]
   );
 
   return <KeyValueTable data={queryParams} variables={variables} onChange={handleUpdateQueryParams} />;
