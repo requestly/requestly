@@ -2,7 +2,7 @@ import { notification, Select, Space } from "antd";
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
+import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
@@ -10,7 +10,6 @@ import {
   getEmptyPair,
   sanitizeEntry,
   supportsRequestBody,
-  syncQueryParams,
 } from "../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
@@ -46,10 +45,11 @@ import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/
 import { ApiClientSnippetModal } from "../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
-import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
+import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiClientUrl";
+import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
 
@@ -100,12 +100,8 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    apiClientWorkloadManager,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { apiClientRecords, onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } =
+    useApiClientContext();
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -118,10 +114,10 @@ const APIClientView: React.FC<Props> = ({
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
+    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
+  );
 
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
@@ -132,6 +128,8 @@ const APIClientView: React.FC<Props> = ({
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [apiClientExecutor, setApiClientExecutor] = useState<ApiClientExecutor | null>(null);
+
+  const queryParams = useQueryParamStore((state) => state.queryParams);
 
   const { setPreview, setUnsaved, setTitle, getIsActive } = useGenericState();
 
@@ -161,17 +159,6 @@ const APIClientView: React.FC<Props> = ({
       setRequestName("");
     }
   }, [entry]);
-
-  const setUrl = useCallback((url: string) => {
-    setEntry((entry) => ({
-      ...entry,
-      request: {
-        ...entry.request,
-        url,
-        ...syncQueryParams(entry.request.queryParams, url, QueryParamSyncType.TABLE),
-      },
-    }));
-  }, []);
 
   const setMethod = useCallback((method: RequestMethod) => {
     setEntry((entry) => {
@@ -293,9 +280,17 @@ const APIClientView: React.FC<Props> = ({
       error: null,
     }));
 
+    const requestToSend = {
+      ...entry,
+      request: {
+        ...entry.request,
+        queryParams: queryParams,
+      },
+    };
+
     apiClientExecutor.updateApiRecords(apiClientRecords);
     apiClientExecutor.updateEntryDetails({
-      entry: sanitizeEntry(entry),
+      entry: sanitizeEntry(requestToSend),
       recordId: apiEntryDetails?.id,
       collectionId: apiEntryDetails?.collectionId,
     });
@@ -377,6 +372,7 @@ const APIClientView: React.FC<Props> = ({
     apiClientRecords,
     dispatch,
     notifyApiRequestFinished,
+    queryParams,
   ]);
 
   const handleDismissError = () => {
@@ -448,6 +444,13 @@ const APIClientView: React.FC<Props> = ({
   const onSaveButtonClick = useCallback(async () => {
     setIsRequestSaving(true);
 
+    const entryToSave = {
+      ...entry,
+      request: {
+        ...entry.request,
+        queryParams: queryParams,
+      },
+    };
     const isValidHeader = entry.request?.headers?.every((header) => {
       return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
     });
@@ -470,7 +473,7 @@ const APIClientView: React.FC<Props> = ({
 
     const record: Partial<RQAPI.ApiRecord> = {
       type: RQAPI.RecordType.API,
-      data: { ...sanitizeEntry(entry, false) },
+      data: { ...sanitizeEntry(entryToSave, false) },
     };
 
     if (isCreateMode) {
@@ -510,7 +513,16 @@ const APIClientView: React.FC<Props> = ({
     }
 
     setIsRequestSaving(false);
-  }, [apiClientRecordsRepository, apiEntryDetails, entry, isCreateMode, onSaveCallback, onSaveRecord, resetChanges]);
+  }, [
+    apiClientRecordsRepository,
+    apiEntryDetails,
+    entry,
+    isCreateMode,
+    onSaveCallback,
+    onSaveRecord,
+    resetChanges,
+    queryParams,
+  ]);
 
   const handleCancelRequest = useCallback(() => {
     apiClientExecutor.abort();
@@ -581,6 +593,15 @@ const APIClientView: React.FC<Props> = ({
     setEntry(apiEntryDetails?.data);
   };
 
+  const handleOnUrlChange = (value: string) => {
+    const baseUrl = value.split("?")[0];
+    setEntry((prevEntry) => ({
+      ...prevEntry,
+      request: { ...prevEntry.request, url: baseUrl },
+    }));
+    setUnsaved(true);
+  };
+
   const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
@@ -646,17 +667,11 @@ const APIClientView: React.FC<Props> = ({
                 value={entry.request.method}
                 onChange={setMethod}
               />
-              <SingleLineEditor
-                className="api-request-url"
-                placeholder="https://example.com"
-                //value={entry.request.url}
-                defaultValue={entry.request.url}
-                onChange={(text) => {
-                  setUrl(text);
-                }}
-                onPressEnter={onUrlInputEnterPressed}
-                variables={currentEnvironmentVariables}
-                // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
+              <ApiClientUrl
+                url={entry.request.url}
+                onUrlChange={handleOnUrlChange}
+                onEnterPress={onUrlInputEnterPressed}
+                currentEnvironmentVariables={currentEnvironmentVariables}
               />
             </Space.Compact>
             <RQButton

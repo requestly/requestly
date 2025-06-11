@@ -2,24 +2,23 @@ import { Modal } from "antd";
 import React, { useMemo } from "react";
 import { APIClientRequest } from "./types";
 import BetaBadge from "components/misc/BetaBadge";
-import { QueryParamSyncType, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
   generateKeyValuePairsFromJson,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
-  syncQueryParams,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import ApiClientLoggedOutView from "../LoggedOutView/LoggedOutView";
 import "./apiClient.scss";
-import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
+import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -78,11 +77,6 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
 
     entry.request = {
       ...entry.request,
-      ...syncQueryParams(
-        entry.request.queryParams,
-        entry.request.url,
-        isEmpty(entry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
-      ),
     };
 
     return entry;
@@ -106,7 +100,9 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
           {user.loggedIn ? (
-            <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+            <QueryParamsProvider entry={apiEntry}>
+              <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+            </QueryParamsProvider>
           ) : (
             <ApiClientLoggedOutView />
           )}
@@ -115,7 +111,9 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
+      <QueryParamsProvider entry={apiEntry}>
+        <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
+      </QueryParamsProvider>
     </BottomSheetProvider>
   );
 };
