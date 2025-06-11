@@ -13,6 +13,8 @@ import { HeadersTable } from "./components/HeadersTable/HeadersTable";
 import { useDeepLinkState } from "hooks";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { Conditional } from "components/common/Conditional";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -158,7 +160,9 @@ const RequestTabs: React.FC<Props> = ({
       size="small"
       moreIcon={null}
       tabBarExtraContent={
-        <Conditional condition={showCredentialsCheckbox}>
+        <Conditional
+          condition={showCredentialsCheckbox && isFeatureCompatible(FEATURES.API_CLIENT_INCLUDE_CREDENTIALS)}
+        >
           <Checkbox
             onChange={(e) => {
               setRequestEntry((prev) => ({

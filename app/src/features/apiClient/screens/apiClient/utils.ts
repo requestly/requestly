@@ -36,6 +36,7 @@ export const makeRequest = async (
       signal.addEventListener("abort", abortListener);
     }
 
+    //TODO: make the default value false if and when the feature flag is turned on
     request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
