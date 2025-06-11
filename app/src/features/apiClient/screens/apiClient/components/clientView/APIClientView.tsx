@@ -579,6 +579,7 @@ const APIClientView: React.FC<Props> = ({
       ...prevEntry,
       request: { ...prevEntry.request, url: baseUrl },
     }));
+    setUnsaved(true);
   };
 
   const enableHotkey = getIsActive();
