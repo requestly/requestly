@@ -97,7 +97,6 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
     const error = typeof event.reason === "string" ? { message: event.reason } : event.reason;
     const sanitizedError = sanitizeError(error);
     decorateErrorForSentry(sanitizedError);
-    console.log("sanitizedError", sanitizedError.tags);
     this.setState({ hasError: true, error: sanitizedError });
   };
 
