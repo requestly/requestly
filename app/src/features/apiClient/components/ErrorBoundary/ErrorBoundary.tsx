@@ -10,7 +10,7 @@ import { WorkspaceType } from "types";
 
 interface Props {
   children: React.ReactNode;
-  isLocalWorkspace: boolean;
+  defaultTags?: Record<string, string>,
 }
 
 interface State {
@@ -18,11 +18,13 @@ interface State {
   error: Error | null;
 }
 
-function sendErrorToSentry(error: Error, isLocalWorkspace: boolean) {
+function sendErrorToSentry(error: Error, defaultTags?: Record<string, string>) {
   Sentry.withScope((scope) => {
     scope.setTag("caught_by", "api_client_error_boundary");
-    if (isLocalWorkspace) {
-      scope.setTag("source", "local_fs");
+    if (defaultTags) {
+      for (const key in defaultTags) {
+        scope.setTag(key, defaultTags[key]);
+      }
     }
     if (error instanceof NativeError) {
       scope.setExtra("details", error.details);
@@ -66,11 +68,19 @@ const ErrorBoundaryWrapper = (props: Props) => {
     }
   }, [activeWorkspace?.id]);
 
+  let defaultTags: Record<string, string> = {};
+  if (activeWorkspace?.workspaceType === WorkspaceType.LOCAL) {
+    defaultTags = {
+      ...defaultTags,
+      source: "local_fs",
+    }
+  }
+
   return (
     <ApiClientErrorBoundary
       ref={errorBoundaryRef}
       {...props}
-      isLocalWorkspace={activeWorkspace?.workspaceType === WorkspaceType.LOCAL}
+      defaultTags={defaultTags}
     />
   );
 };
@@ -90,7 +100,7 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: unknown) {
-    sendErrorToSentry(sanitizeError(error), this.props.isLocalWorkspace);
+    sendErrorToSentry(sanitizeError(error), this.props.defaultTags);
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {
