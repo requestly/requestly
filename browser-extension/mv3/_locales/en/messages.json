@@ -1,14 +1,14 @@
 {
   "extName": {
-    "message": "Requestly: OpenSource Web Development Toolkit",
+    "message": "Requestly: Supercharge your Development & QA",
     "description": "Requestly browser extension name which is visible in Web Stores"
   },
   "extDesc": {
-    "message": "Powerful webdev toolkit: HTTP Interceptor,API Mocking & API Client. Features: Redirects,Headers,API Collections,Environments & Mocks",
+    "message": "Features: Intercept & Modify HTTPs Requests, API Mocking, GraphQL Mocking, Rest API Client, API Testing, Modify HTTP Headers, etc",
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {
-    "message": "Requestly: OpenSource Web Development Toolkit",
+    "message": "Requestly: Supercharge your Development & QA",
     "description": "Tooltip text shown on hovering Requestly browser extension icon"
   }
 }
