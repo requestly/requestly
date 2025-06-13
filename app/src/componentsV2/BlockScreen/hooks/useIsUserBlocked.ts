@@ -29,12 +29,12 @@ export const useIsUserBlocked = () => {
   const [finalBlockConfig, setFinalBlockConfig] = useState<BlockConfig>({});
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !uid) {
       return;
     }
 
     const db = getFirestore(firebaseApp);
-    const unsubscribeListener = onSnapshot(doc(db, "users", uid), (doc) => {
+    const unsubscribeListener = onSnapshot(doc(db, "users", undefined), (doc) => {
       if (doc.exists()) {
         const userDetails = doc.data();
         setUserBlockConfig(userDetails?.["block-config"] || {});
@@ -47,7 +47,7 @@ export const useIsUserBlocked = () => {
   }, [isLoggedIn, uid]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !email) {
       return;
     }
 
