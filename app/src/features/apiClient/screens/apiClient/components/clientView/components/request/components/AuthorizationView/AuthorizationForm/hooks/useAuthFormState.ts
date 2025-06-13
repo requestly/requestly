@@ -82,7 +82,12 @@ export const useAuthFormState = (
 
   useEffect(() => {
     const newDefaults = getDefaultFormState(formType, defaultAuth);
-    setFormState(newDefaults);
+    setFormState((prev) => {
+      return {
+        ...newDefaults,
+        ...prev, // Preserve any existing values in the form state
+      };
+    });
   }, [formType, defaultAuth]);
 
   const handleFormChange = useCallback(
