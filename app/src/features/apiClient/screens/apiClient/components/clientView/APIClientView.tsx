@@ -148,10 +148,7 @@ const APIClientView: React.FC<Props> = ({
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
 
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
-  const [purgeAndAddHeaders, purgeAndAddQueryParams] = useAutogenerateStore((state) => [
-    state.purgeAndAddHeaders,
-    state.purgeAndAddQueryParams,
-  ]);
+  const [purgeAndAdd] = useAutogenerateStore((state) => [state.purgeAndAdd]);
 
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
@@ -553,20 +550,11 @@ const APIClientView: React.FC<Props> = ({
         }
         return acc;
       }, {} as Record<string, string>);
-
-      if (
-        newAuth.currentAuthType === Authorization.Type.API_KEY &&
-        newAuth.authConfigStore?.API_KEY?.addTo === "QUERY"
-      ) {
-        ///changing it to my KeyValuePair to my keyvalue pair
-        const queryParamsContent: KeyValuePair[] = [];
-        queryParams.forEach(({ key, value }) => {
-          queryParamsContent.push({ key, value });
-        });
-
-        purgeAndAddQueryParams("auth", queryParamsContent);
-      }
-      purgeAndAddHeaders("auth", headersContent);
+      const queryParamsContent: KeyValuePair[] = [];
+      queryParams.forEach(({ key, value }) => {
+        queryParamsContent.push({ key, value });
+      });
+      purgeAndAdd("auth", headersContent, queryParamsContent);
 
       setEntry((prevEntry) => {
         const updatedEntry = { ...prevEntry };
@@ -574,7 +562,7 @@ const APIClientView: React.FC<Props> = ({
         return updatedEntry;
       });
     },
-    [purgeAndAddHeaders, purgeAndAddQueryParams]
+    [purgeAndAdd]
   );
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
