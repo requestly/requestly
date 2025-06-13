@@ -1,23 +1,22 @@
 .auto-gen-table-container {
   margin-bottom: 16px;
 
+  & > .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    padding: 8px 12px !important;
+  }
+
   .heading-text {
     overflow: hidden;
-    color: var(--alias-tokens-color-text-default, #fff);
     text-overflow: ellipsis;
-
-    font-family: var(--font-family-default, Inter);
-    font-size: var(--font-size-2xs, 9px);
+    font-size: 10px;
     font-style: normal;
     font-weight: 500;
-    line-height: 13px; /* 144.444% */
+    line-height: 13px;
     letter-spacing: 1px;
     text-transform: uppercase;
   }
 
   .collapse-button {
-    font-size: 14px;
-    color: #1890ff;
     cursor: pointer;
   }
 

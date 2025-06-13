@@ -8,9 +8,10 @@ type ColumnTypes = Exclude<TableProps<{ key: string; value: string }>["columns"]
 
 interface KeyValueTableProps {
   data: { key: string; value: string }[];
+  type: "queryParams" | "headers";
 }
 
-export const AutoGenTable: React.FC<KeyValueTableProps> = ({ data }) => {
+export const AutoGenTable: React.FC<KeyValueTableProps> = ({ data, type }) => {
   const memoizedData = useMemo(() => data, [data]);
 
   const columns = useMemo(() => {
@@ -26,10 +27,6 @@ export const AutoGenTable: React.FC<KeyValueTableProps> = ({ data }) => {
         dataIndex: "value",
         editable: false,
       },
-      {
-        title: "",
-        width: "50px",
-      },
     ];
   }, []);
 
@@ -37,7 +34,11 @@ export const AutoGenTable: React.FC<KeyValueTableProps> = ({ data }) => {
     <div className="auto-gen-table-container">
       <Collapse defaultActiveKey={["1"]} className="collapse-container">
         <Collapse.Panel
-          header={<span className="heading-text">Auto-Generated Headers</span>}
+          header={
+            <span className="heading-text">
+              {type === "headers" ? "Auto-Generated Headers" : "Auto-Generated Query Parameters"}
+            </span>
+          }
           key="1"
           className="custom-collapse-panel"
         >
