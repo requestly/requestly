@@ -80,6 +80,8 @@ export const useAuthFormState = (
     onChangeHandlerRef.current(newConfig?.validate() ? newConfig : null);
   }, [formState, formType]);
 
+  // fix-me: Ideally the formType callback and the formstate update should be in the same place,
+  // using something like zustand or contexts. Side Effect changes like these have been known to be hard to debug.
   useEffect(() => {
     const newDefaults = getDefaultFormState(formType, defaultAuth);
     setFormState((prev) => {
