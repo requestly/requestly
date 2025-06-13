@@ -9,10 +9,6 @@ export const trackAppSettingsSidebarClicked = (action: string) => {
   trackEvent(SETTINGS.APP_SETTINGS_SIDEBAR_CLICKED, { action });
 };
 
-export const trackBillingTeamViewed = (email_status: string, count_my_teams: number, role: string) => {
-  trackEvent(SETTINGS.BILLING.BILLING_TEAM_VIEWED, { email_status, count_my_teams, role });
-};
-
 export const trackBillingTeamNavigated = (navigated_to: string) => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_NAVIGATED, { navigated_to });
 };
@@ -103,4 +99,34 @@ export const trackBillingTeamManageLicenseClicked = () => {
 
 export const trackBillingTeamInvoiceDashboardClicked = () => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVOICE_DASHBOARD_CLICKED);
+};
+
+/* LOCAL_LOG_FILE */
+
+export const trackLocalLogFileConfigToggled = (isEnabled: boolean) => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.TOGGLED, { isEnabled });
+};
+
+export const trackLocalLogFileFilterAdded = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.FILTER.ADD);
+};
+
+export const trackLocalLogFileFilterRemoved = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.FILTER.REMOVE);
+};
+
+export const trackLocalLogFileStorePathSelectionStarted = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.FILE_SELECTION.STARTED);
+};
+
+export const trackLocalLogFileStorePathSelectionCompleted = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.FILE_SELECTION.COMPLETED);
+};
+
+export const trackLocalLogFileStorePathSelectionFailed = (failReason: "IPC" | "CANCELLED") => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.FILE_SELECTION.FAILED, { failReason });
+};
+
+export const trackLocalLogFileStorePathCleared = () => {
+  trackEvent(SETTINGS.DESKTOP.LOCAL_LOG_FILE.STORE_PATH.CLEARED);
 };

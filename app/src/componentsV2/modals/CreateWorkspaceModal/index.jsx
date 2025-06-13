@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import * as Sentry from "@sentry/react";
+
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
@@ -23,12 +25,9 @@ import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/commo
 import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import "./CreateWorkspaceModal.css";
-import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -39,7 +38,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const appMode = useSelector(getAppMode);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const availableWorkspaces = useSelector(getAllWorkspaces);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -48,8 +46,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     description: "",
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
@@ -95,27 +91,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           teamName: newTeamName,
         });
 
-        claimIncentiveRewards({
-          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-          metadata: { num_workspaces: availableWorkspaces?.length || 1 },
-        })?.then((response) => {
-          if (response.data?.success) {
-            dispatch(
-              incentivizationActions.setUserMilestoneAndRewardDetails({
-                userMilestoneAndRewardDetails: response.data?.data,
-              })
-            );
-
-            dispatch(
-              incentivizationActions.toggleActiveModal({
-                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                newValue: true,
-                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-              })
-            );
-          }
-        });
-        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal", WorkspaceType.SHARED);
         toast.info("Workspace Created");
 
         const teamId = response.data.teamId;
@@ -151,20 +127,30 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           }
         }
 
-        trackNewTeamCreateSuccess(teamId, newTeamName, "create_workspace_modal", isNotifyAllSelected);
+        trackNewTeamCreateSuccess(
+          teamId,
+          newTeamName,
+          "create_workspace_modal",
+          WorkspaceType.SHARED,
+          isNotifyAllSelected
+        );
         handlePostTeamCreation(teamId, newTeamName, hasMembersInSameDomain);
 
         callback?.();
         toggleModal();
       } catch (err) {
         toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
+        Sentry.captureException("Create Team Failure", {
+          extra: {
+            message: err.message,
+          },
+        });
+        trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
       } finally {
         setIsLoading(false);
       }
     },
     [
-      dispatch,
       isNotifyAllSelected,
       createOrgTeamInvite,
       callback,
@@ -173,8 +159,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       user?.details?.profile?.email,
       handlePostTeamCreation,
       billingTeams,
-      availableWorkspaces?.length,
-      claimIncentiveRewards,
     ]
   );
 

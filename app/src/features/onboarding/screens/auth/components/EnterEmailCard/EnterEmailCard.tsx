@@ -64,6 +64,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
           value={email}
           onValueChange={onEmailChange}
           onPressEnter={handleOnContinue}
+          type="email"
         />
       </div>
       <RQButton

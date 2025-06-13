@@ -2,20 +2,23 @@ import { Modal } from "antd";
 import React, { useMemo } from "react";
 import { APIClientRequest } from "./types";
 import BetaBadge from "components/misc/BetaBadge";
-import { QueryParamSyncType, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
-  generateKeyValuePairsFromJson,
+  generateKeyValuePairs,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
-  syncQueryParams,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import ApiClientLoggedOutView from "../LoggedOutView/LoggedOutView";
 import "./apiClient.scss";
-import { isEmpty } from "lodash";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useSelector } from "react-redux";
+import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
+import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -26,6 +29,7 @@ interface Props {
 }
 
 const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
+  const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
       return null;
@@ -41,8 +45,8 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     urlObj.search = "";
 
     entry.request.url = urlObj.toString();
-    entry.request.queryParams = generateKeyValuePairsFromJson(searchParams);
-    entry.request.headers = filterHeadersToImport(generateKeyValuePairsFromJson(request.headers));
+    entry.request.queryParams = generateKeyValuePairs(searchParams);
+    entry.request.headers = filterHeadersToImport(generateKeyValuePairs(request.headers));
     entry.request.method = (request.method as RequestMethod) || RequestMethod.GET;
     entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
 
@@ -51,7 +55,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
 
       if (entry.request.contentType === RequestContentType.FORM) {
         const searchParams = new URLSearchParams(request.body);
-        entry.request.body = generateKeyValuePairsFromJson(Object.fromEntries(searchParams));
+        entry.request.body = generateKeyValuePairs(Object.fromEntries(searchParams));
       }
     } else if (request.body instanceof FormData) {
       if (entry.request.contentType !== RequestContentType.FORM) {
@@ -67,17 +71,12 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
         request.body.forEach((value, key) => {
           formDataObj[key] = value as string;
         });
-        entry.request.body = generateKeyValuePairsFromJson(formDataObj);
+        entry.request.body = generateKeyValuePairs(formDataObj);
       }
     }
 
     entry.request = {
       ...entry.request,
-      ...syncQueryParams(
-        entry.request.queryParams,
-        entry.request.url,
-        isEmpty(entry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
-      ),
     };
 
     return entry;
@@ -98,13 +97,23 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
-      </BottomSheetProvider>
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+          {user.loggedIn ? (
+            <QueryParamsProvider entry={apiEntry}>
+              <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+            </QueryParamsProvider>
+          ) : (
+            <ApiClientLoggedOutView />
+          )}
+        </BottomSheetProvider>
+      </WindowsAndLinuxGatedHoc>
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
+      <QueryParamsProvider entry={apiEntry}>
+        <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
+      </QueryParamsProvider>
     </BottomSheetProvider>
   );
 };

@@ -1,0 +1,47 @@
+.implicit-rule-switch-confirmation {
+  max-width: 360px;
+
+  .ant-popover-inner {
+    border-radius: 5px;
+  }
+
+  .ant-popover-inner-content,
+  .ant-popover-message {
+    padding: 0;
+  }
+
+  .title-container {
+    display: flex;
+    padding: var(--space-5, 12px) var(--space-6, 16px) 0 var(--space-6, 16px);
+    align-items: center;
+    gap: var(--space-4, 8px);
+
+    .icon {
+      flex-shrink: 0;
+      color: var(--requestly-color-text-default, #fff);
+      text-align: center;
+      --size: 16px;
+      width: var(--size);
+      height: var(--size);
+    }
+
+    .title {
+      color: var(--requestly-color-text-default, #fff);
+      font-size: var(--font-size-sm, 12px);
+      font-style: normal;
+      font-weight: var(--requestly-font-weight-medium);
+      line-height: 18px;
+    }
+  }
+
+  .description {
+    color: var(--requestly-color-text-default, #fff);
+    font-size: var(--font-size-sm, 12px);
+    line-height: 18px;
+    padding: var(--space-2, 4px) var(--space-6, 16px) 0 var(--space-6, 16px);
+  }
+
+  .ant-popover-buttons {
+    padding: 16px;
+  }
+}

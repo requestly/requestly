@@ -41,6 +41,10 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
   const [isActionCompleted, setIsActionCompleted] = useState(false);
 
   useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
     if (!isActionCompleted) {
       trackBillingTeamAccessRequestResponded(requestAction, "loading");
       reviewBillingTeamJoiningRequest(billingId, requestAction, userId)
@@ -58,7 +62,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
           setIsActionCompleted(true);
         });
     }
-  }, [billingId, requestAction, userId, isActionCompleted]);
+  }, [isOpen, billingId, requestAction, userId, isActionCompleted]);
 
   const getReviewResultIcon = useCallback((status: string) => {
     switch (status) {

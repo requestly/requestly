@@ -1,3 +1,3 @@
 import { withTimeout, Mutex } from "async-mutex";
-
-export const fetchLock = withTimeout(new Mutex(), 0);
+export class MutexTimeoutError extends Error {}
+export const fetchLock = withTimeout(new Mutex(), 0, new MutexTimeoutError());

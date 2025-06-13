@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Collapse, Dropdown, MenuProps, Tooltip } from "antd";
+import { Checkbox, Collapse, Dropdown, MenuProps, Tooltip, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
@@ -196,9 +196,19 @@ export const CollectionRow: React.FC<Props> = ({
                   });
                 }}
               >
-                <div className="collection-name" title={record.name}>
+                <Typography.Text
+                  ellipsis={{
+                    tooltip: {
+                      title: record.name,
+                      placement: "right",
+                      color: "#000",
+                      mouseEnterDelay: 0.5,
+                    },
+                  }}
+                  className="collection-name"
+                >
                   {record.name}
-                </div>
+                </Typography.Text>
 
                 <Conditional condition={!isReadOnly}>
                   <div

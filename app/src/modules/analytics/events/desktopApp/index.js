@@ -11,6 +11,7 @@ import {
   TRAFFIC_TABLE,
   AUTH,
 } from "./constants";
+import { getUserOS } from "utils/Misc";
 
 export const trackProxyServerStartedEvent = () => {
   const params = {};
@@ -28,7 +29,8 @@ export const trackProxyReStartedEvent = () => {
 };
 
 export const trackDesktopAppStartedEvent = () => {
-  const params = {};
+  const detectedOS = getUserOS();
+  const params = { detectedOS };
   trackEvent(DESKTOP_APP_STARTED, params);
 };
 

@@ -16,9 +16,8 @@ export class RequestViewTabSource extends BaseTabSource {
       <RequestView key={metadata.id} requestId={metadata.id} apiEntryDetails={metadata.apiEntryDetails} />
     );
     this.metadata = {
-      id: metadata.id,
+      ...metadata,
       name: "request",
-      title: metadata.title,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
     this.icon = <MdOutlineSyncAlt />;

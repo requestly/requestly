@@ -42,12 +42,15 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     local_file: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? pair.response.value : "",
   });
 
-  const isServeWithoutRequestSupported = useMemo(
-    () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
-    []
-  );
-
-  const codeFormattedFlag = useRef(null);
+  const isServeWithoutRequestSupported = useMemo(() => {
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST);
+    } else if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
+      return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_LOCAL_FILE);
+    } else {
+      return false;
+    }
+  }, [pair.response.type]);
 
   const onChangeResponseType = useCallback(
     (responseBodyType) => {
@@ -192,7 +195,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   };
 
-  const responseBodyChangeHandler = (value) => {
+  const responseBodyChangeHandler = (value, triggerUnsavedChanges) => {
     responseBodyValues.current[pair.response.type] = value;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
@@ -201,13 +204,16 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           "response.type": pair.response.type,
           "response.value": responseBodyValues.current[pair.response.type],
         },
-        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: triggerUnsavedChanges,
       })
     );
   };
 
   const handleServeWithoutRequestFlagChange = (event) => {
-    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+    if (
+      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ||
+      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE
+    ) {
       const flag = event.target.checked;
 
       if (flag) {
@@ -227,11 +233,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const getEditorDefaultValue = useCallback(() => {
     // handle unsaved changes trigger
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      codeFormattedFlag.current = false;
-    }, 2000);
-
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       return "{}";
     }
@@ -342,21 +343,26 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               />
             </Col>
           </Row>
-          {isServeWithoutRequestSupported && pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
-            <Row className="serve-without-request-setting">
-              <Col xl="12" span={24}>
-                <Checkbox onChange={handleServeWithoutRequestFlagChange} checked={pair.response.serveWithoutRequest}>
-                  Serve this response body without making a call to the server.
-                </Checkbox>
-                <InfoIcon
-                  tooltipPlacement="right"
-                  text="When enabled, response is served directly from Requestly and hence Developer Tools won't show this request in network table."
-                />
-              </Col>
-            </Row>
-          ) : null}
         </>
       )}
+      {isServeWithoutRequestSupported ? (
+        <Row className="serve-without-request-setting">
+          <Col xl="12" span={24}>
+            <Checkbox onChange={handleServeWithoutRequestFlagChange} checked={pair.response.serveWithoutRequest}>
+              Serve this response body without making a call to the server.
+            </Checkbox>
+            <InfoIcon
+              tooltipPlacement="right"
+              showArrow={false}
+              text="When enabled, response is served directly from Requestly and hence Developer Tools won't show this request in network table."
+              style={{
+                position: "relative",
+                top: "3px",
+              }}
+            />
+          </Col>
+        </Row>
+      ) : null}
     </Col>
   );
 };

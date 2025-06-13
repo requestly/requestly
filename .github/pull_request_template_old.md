@@ -13,7 +13,6 @@ Closes issue: <!-- Link to Github issue -->
 - [ ] Verified UI in browser.
 - [ ] For UI changes, added/updated analytics events (if applicable).
 - [ ] For changes in extension's code, manually tested in Chrome and Firefox.
-- [ ] For changes in extension's code, both MV2 and MV3 are covered.
 - [ ] Added/updated unit tests for this change.
 - [ ] Raised pull request to update corresponding documentation (if already exists).
 

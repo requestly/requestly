@@ -53,11 +53,17 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
-  const [openTab, activeTabId, closeTabBySource] = useTabServiceWithSelector((state) => [
+  const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
     state.openTab,
-    state.activeTabId,
     state.closeTabBySource,
+    state.activeTabSource,
   ]);
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
 
   const handleEnvironmentRename = useCallback(async () => {
     if (newEnvironmentName === environment.name) {
@@ -142,7 +148,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       <Input
         className="environment-input"
         autoFocus
-        value={newEnvironmentName}
+        defaultValue={environment.name}
         onChange={(e) => setNewEnvironmentName(e.target.value)}
         onPressEnter={handleEnvironmentRename}
         onBlur={handleEnvironmentRename}
@@ -153,7 +159,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
 
   return (
     <div
-      className={`environments-list-item ${environment.id === envId && `${activeTabId}` === envId ? "active" : ""}`}
+      className={`environments-list-item ${environment.id === activeTabSourceId ? "active" : ""}`}
       onClick={() => {
         openTab(new EnvironmentViewTabSource({ id: environment.id, title: environment.name }));
       }}
@@ -161,7 +167,12 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       <div className="environments-list-item__label">
         <Typography.Text
           ellipsis={{
-            tooltip: environment.name,
+            tooltip: {
+              title: environment.name,
+              placement: "right",
+              color: "#000",
+              mouseEnterDelay: 0.5,
+            },
           }}
         >
           {isGlobalEnvironment(environment.id) && <IoMdGlobe className="global-var-icon" />}
@@ -180,7 +191,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
                   </Link>
                 </span>
               }
-              placement="top"
+              placement="right"
               showArrow={false}
             >
               <span>
@@ -192,7 +203,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         <Tooltip
           overlayClassName="active-environment-tooltip"
           title="Active Environment"
-          placement="top"
+          placement="right"
           showArrow={false}
         >
           <span>

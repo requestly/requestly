@@ -1,9 +1,11 @@
+import * as Sentry from "@sentry/react";
 import firebaseApp from "../../firebase";
 import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
+import { captureException } from "./utils";
 
 export function sanitizeRecord(record: Partial<RQAPI.Record>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -72,7 +74,8 @@ const createApiRecord = async (
       await setDoc(docRef, { ...newRecord, id: docId });
       Logger.log(`Api document created with ID ${docId}`);
       return { success: true, data: { ...newRecord, id: docId } };
-    } catch {
+    } catch (e) {
+      captureException(e);
       Logger.error(`Error creating Api document with ID ${docId}`);
       return { success: false, data: null };
     }
@@ -87,6 +90,7 @@ const createApiRecord = async (
 
       return { success: true, data: { ...newRecord, id: resultDocRef.id } };
     } catch (err) {
+      captureException(err);
       Logger.error("Error while creating api record", err);
       return { success: false, data: null };
     }
@@ -112,6 +116,7 @@ export const updateApiRecord = async (
     Logger.log(`Api document updated`);
     return { success: true, data: updatedRecord };
   } catch (err) {
+    captureException(err);
     Logger.error("Error while updating api record", err);
     return { success: false, data: null };
   }

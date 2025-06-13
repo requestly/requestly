@@ -27,11 +27,7 @@ import {
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
-import {
-  trackRuleEditorViewed,
-  trackDesktopRuleViewedOnExtension,
-  trackDocsSidebarViewed,
-} from "modules/analytics/events/common/rules";
+import { trackDesktopRuleViewedOnExtension, trackDocsSidebarViewed } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
@@ -48,7 +44,6 @@ const RuleBuilder = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { state } = location;
   const ruleGroupId = searchParams.get("groupId") ?? undefined;
   const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(location, props.isSharedListViewRule);
 
@@ -62,6 +57,7 @@ const RuleBuilder = (props) => {
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
+  const isReadOnly = currentlySelectedRuleData?.isReadOnly;
 
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
@@ -175,15 +171,6 @@ const RuleBuilder = (props) => {
   }
 
   useEffect(() => {
-    const source = state?.source ?? null;
-    const ruleType = currentlySelectedRuleConfig.TYPE;
-
-    if (ruleType && source) {
-      trackRuleEditorViewed(source, ruleType);
-    }
-  }, [currentlySelectedRuleConfig.TYPE, state?.source]);
-
-  useEffect(() => {
     if (
       MODE === RULE_EDITOR_CONFIG.MODES.EDIT &&
       isDesktopOnlyRule(currentlySelectedRuleData) &&
@@ -245,7 +232,7 @@ const RuleBuilder = (props) => {
               source="new_rule_editor"
               handleSeeLiveRuleDemoClick={props.handleSeeLiveRuleDemoClick}
               ruleDetails={
-                isSampleRule
+                isSampleRule && isReadOnly
                   ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details
                   : RULE_DETAILS[currentlySelectedRuleData?.ruleType]
               }

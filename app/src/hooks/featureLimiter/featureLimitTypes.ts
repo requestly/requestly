@@ -13,6 +13,7 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.dynamic_response_body]: false,
     [FeatureLimitType.dynamic_request_body]: false,
     [FeatureLimitType.share_rules]: false,
+    [FeatureLimitType.free]: true,
   },
   [PRICING.PLAN_NAMES.LITE]: {
     [FeatureLimitType.num_rules]: 5,
@@ -25,6 +26,7 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.dynamic_response_body]: true,
     [FeatureLimitType.dynamic_request_body]: true,
     [FeatureLimitType.share_rules]: true,
+    [FeatureLimitType.free]: true,
   },
   [PRICING.PLAN_NAMES.BASIC]: {
     [FeatureLimitType.num_rules]: 25,
@@ -37,6 +39,7 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.dynamic_response_body]: true,
     [FeatureLimitType.dynamic_request_body]: true,
     [FeatureLimitType.share_rules]: true,
+    [FeatureLimitType.free]: true,
   },
   [PRICING.PLAN_NAMES.BASIC_V2]: {
     [FeatureLimitType.num_rules]: 10,
@@ -49,5 +52,6 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.dynamic_response_body]: true,
     [FeatureLimitType.dynamic_request_body]: true,
     [FeatureLimitType.share_rules]: true,
+    [FeatureLimitType.free]: true,
   },
 };

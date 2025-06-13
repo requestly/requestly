@@ -20,12 +20,14 @@ import { isEmpty } from "lodash";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
+import { getOwnerId } from "backend/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
+import { MutexTimeoutError } from "../fetch-lock";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -50,11 +52,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const allEnvironmentData = useSelector(getAllEnvironmentData);
   const collectionVariables = useSelector(getCollectionVariables);
-
-  const ownerId = useMemo(() => (activeWorkspaceId ? `team-${activeWorkspaceId}` : user?.details?.profile?.uid), [
-    activeWorkspaceId,
-    user?.details?.profile?.uid,
-  ]);
+  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const syncRepository = useGetApiClientSyncRepo();
 
@@ -189,7 +187,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       } else {
         dispatch(variablesActions.updateAllEnvironmentData({ environmentMap: result.data.environments, ownerId }));
       }
-      console.log("result.data.errorFiles", result.data.erroredRecords);
       dispatch(variablesActions.setErrorEnvFiles(result.data.erroredRecords));
 
       if (newCurrentEnvironmentId) {
@@ -200,8 +197,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       // Attach global and collection listeners
       unsubscribeGlobalVariablesListener = attachGlobalVariablesListener();
     } catch (err) {
-      console.log("env fetch error", err);
       Logger.log("fetch all env details error", err);
+      if (err instanceof MutexTimeoutError) {
+        return;
+      }
+      throw err;
     } finally {
       setIsLoading(false);
     }
