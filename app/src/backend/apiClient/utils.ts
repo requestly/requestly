@@ -31,6 +31,6 @@ export function captureException(e: any) {
   Sentry.captureException(e, {
     tags: {
       alert: true,
-    }
-  })
+    },
+  });
 }
