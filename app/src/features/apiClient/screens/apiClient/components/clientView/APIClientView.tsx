@@ -54,7 +54,7 @@ import { Authorization } from "./components/request/components/AuthorizationView
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
 import { extractAuthHeadersAndParams } from "features/apiClient/helpers/auth";
-import { KeyValuePair } from "features/apiClient/store/autogenerateStore";
+import { SimpleKeyValuePair } from "features/apiClient/store/autogenerateStore";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -550,7 +550,7 @@ const APIClientView: React.FC<Props> = ({
         }
         return acc;
       }, {} as Record<string, string>);
-      const queryParamsContent: KeyValuePair[] = [];
+      const queryParamsContent: SimpleKeyValuePair[] = [];
       queryParams.forEach(({ key, value }) => {
         queryParamsContent.push({ key, value });
       });

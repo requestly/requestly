@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/react";
 import firebaseApp from "../../firebase";
 import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { getOwnerId } from "backend/utils";
