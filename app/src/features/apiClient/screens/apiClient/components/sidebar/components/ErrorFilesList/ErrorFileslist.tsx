@@ -42,6 +42,7 @@ const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
         setIsConfirmationPopupOpen(false);
       }}
     >
+      {/* TODO: Use RQ icononly button */}
       <RiDeleteBin6Line className="error-file-item-action-icon" onClick={() => setIsConfirmationPopupOpen(true)} />
     </Popconfirm>
   );
