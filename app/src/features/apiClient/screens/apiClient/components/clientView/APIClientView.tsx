@@ -54,6 +54,7 @@ import { Authorization } from "./components/request/components/AuthorizationView
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
 import { extractAuthHeadersAndParams } from "features/apiClient/helpers/auth";
+import { KeyValuePair } from "features/apiClient/store/autogenerateStore";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -145,7 +146,10 @@ const APIClientView: React.FC<Props> = ({
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
 
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
-  const [purgeAndAddHeaders] = useAutogenerateStore((state) => [state.purgeAndAddHeaders]);
+  const [purgeAndAddHeaders, purgeAndAddQueryParams] = useAutogenerateStore((state) => [
+    state.purgeAndAddHeaders,
+    state.purgeAndAddQueryParams,
+  ]);
 
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
@@ -540,7 +544,7 @@ const APIClientView: React.FC<Props> = ({
   const handleAuthChange = useCallback(
     (newAuth: RQAPI.Auth) => {
       console.log("DBG: handleAuthChange", newAuth);
-      const { headers } = extractAuthHeadersAndParams(newAuth);
+      const { headers, queryParams } = extractAuthHeadersAndParams(newAuth);
       const headersContent: Record<string, string> = headers.reduce((acc, { key, value }) => {
         if (key) {
           acc[key] = value;
@@ -548,6 +552,18 @@ const APIClientView: React.FC<Props> = ({
         return acc;
       }, {} as Record<string, string>);
 
+      if (
+        newAuth.currentAuthType === Authorization.Type.API_KEY &&
+        newAuth.authConfigStore?.API_KEY?.addTo === "QUERY"
+      ) {
+        ///changing it to my KeyValuePair to my keyvalue pair
+        const queryParamsContent: KeyValuePair[] = [];
+        queryParams.forEach(({ key, value }) => {
+          queryParamsContent.push({ key, value });
+        });
+
+        purgeAndAddQueryParams("auth", queryParamsContent);
+      }
       purgeAndAddHeaders("auth", headersContent);
 
       setEntry((prevEntry) => {
@@ -556,7 +572,7 @@ const APIClientView: React.FC<Props> = ({
         return updatedEntry;
       });
     },
-    [purgeAndAddHeaders]
+    [purgeAndAddHeaders, purgeAndAddQueryParams]
   );
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
