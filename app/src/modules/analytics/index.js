@@ -44,7 +44,6 @@ export const trackEvent = (name, params, config) => {
   newParams.automation_enabled = isEnvAutomation();
   newParams.workspace_role = window.currentlyActiveWorkspaceTeamRole ?? null;
   newParams.workspace = getWorkspaceType();
-  console.log("newParams", newParams);
   newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
   newParams.workspaceMembersCount = window.workspaceMembersCount ?? null;
 
