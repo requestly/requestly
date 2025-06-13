@@ -36,6 +36,10 @@ const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
       }}
       okButtonProps={{
         danger: true,
+        className: "file-delete-confirmation-btn",
+      }}
+      cancelButtonProps={{
+        className: "file-delete-confirmation-btn",
       }}
       okText="Delete"
       onCancel={() => {

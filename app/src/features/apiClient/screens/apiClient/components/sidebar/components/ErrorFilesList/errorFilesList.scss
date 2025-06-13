@@ -107,3 +107,8 @@
     width: 248px;
   }
 }
+
+.file-delete-confirmation-btn.ant-btn {
+  font-size: var(--requestly-font-size-xs);
+  font-weight: var(--requestly-font-weight-medium);
+}
