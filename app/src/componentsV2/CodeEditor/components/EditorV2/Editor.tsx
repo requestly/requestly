@@ -26,7 +26,6 @@ import { EditorPopover } from "./components/PopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/PopOver/popover.scss";
-import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
@@ -184,9 +183,12 @@ const Editor: React.FC<EditorProps> = ({
     [dispatch]
   );
 
-  const debouncedhandleEditorBodyChange = useDebounce((value: string) => {
-    handleChange(value, isUnsaveChange.current);
-  }, 200);
+  const handleEditorBodyChange = useCallback(
+    (newVal: string) => {
+      handleChange(newVal, isUnsaveChange.current);
+    },
+    [handleChange]
+  );
 
   const customKeyBinding = useMemo(
     () =>
@@ -263,7 +265,7 @@ const Editor: React.FC<EditorProps> = ({
       readOnly={isReadOnly}
       value={value ?? ""}
       onKeyDown={() => (isUnsaveChange.current = true)}
-      onChange={debouncedhandleEditorBodyChange}
+      onChange={handleEditorBodyChange}
       theme={vscodeDark}
       extensions={[
         editorLanguage,
