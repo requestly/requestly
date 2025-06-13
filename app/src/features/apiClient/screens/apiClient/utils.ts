@@ -137,15 +137,25 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
   return ![RequestMethod.GET, RequestMethod.HEAD].includes(method);
 };
 
-export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
-  return Object.entries(json || {}).map(([key, value, isEnabled = true]) => {
-    return {
-      key: key || "",
-      value,
-      id: Math.random(),
-      isEnabled,
-    };
-  });
+export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
+  const result: KeyValuePair[] = [];
+  if (typeof data === 'string') {
+    data = {
+      [data]: '',
+    }
+  }
+  for (const [key, rawValue] of Object.entries(data)) {
+    const valueArray = Array.isArray(rawValue) ? rawValue : [rawValue];
+    for (const value of valueArray) {
+      result.push({
+        key: key || "",
+        value,
+        id: Math.random(),
+        isEnabled: true,
+      })
+    }
+  }
+  return result;
 };
 
 export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
@@ -181,23 +191,22 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const requestJsonString = curlconverter.toJsonString(curl);
   const requestJson = JSON.parse(requestJsonString);
-
-  const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+  const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests
       so parsing it manually from URL and populating queryParams property
     */
   const requestUrlParams = new URL(requestJson.url).searchParams;
-  const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+  const paramsFromUrl = generateKeyValuePairs(Object.fromEntries(requestUrlParams.entries()));
 
-  const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
+  const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers));
   const contentType = getContentTypeFromRequestHeaders(headers);
   let body: RQAPI.RequestBody;
 
   if (contentType === RequestContentType.JSON) {
     body = JSON.stringify(requestJson.data);
   } else if (contentType === RequestContentType.FORM) {
-    body = generateKeyValuePairsFromJson(requestJson.data);
+    body = generateKeyValuePairs(requestJson.data);
   } else {
     body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
   }
