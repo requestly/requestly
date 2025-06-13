@@ -21,7 +21,7 @@ const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
       title={
         <div className="file-delete-confirmation-container">
           <div className="file-delete-confirmation-title">
-            <RiDeleteBinLine /> Delete file
+            <RiDeleteBinLine /> Delete file!
           </div>
           <div className="file-delete-confirmation-description">
             The file will be deleted from your system. Are you sure you want to delete?
