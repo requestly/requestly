@@ -34,7 +34,7 @@ export const useIsUserBlocked = () => {
     }
 
     const db = getFirestore(firebaseApp);
-    const unsubscribeListener = onSnapshot(doc(db, "users", undefined), (doc) => {
+    const unsubscribeListener = onSnapshot(doc(db, "users", uid), (doc) => {
       if (doc.exists()) {
         const userDetails = doc.data();
         setUserBlockConfig(userDetails?.["block-config"] || {});
