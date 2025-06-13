@@ -342,6 +342,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       handleRoleChange,
       checkIsPendingMember,
       getMemberRoleTag,
+      billingTeamDetails.browserstackGroupId,
     ]
   );
 

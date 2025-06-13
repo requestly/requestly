@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
@@ -13,20 +13,13 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { useIncentiveActions } from "features/incentivization/hooks";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
-import { useIsNewUserForIncentivization } from "features/incentivization/hooks";
-import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import { useRBAC } from "features/rbac";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
@@ -38,9 +31,6 @@ export const TestRuleHeader = () => {
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(user.loggedIn);
   const { sheetPlacement } = useBottomSheetContext();
-
-  const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUserForIncentivization = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -80,34 +70,6 @@ export const TestRuleHeader = () => {
 
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
-
-    const incentiveEvent = isNewUserForIncentivization
-      ? IncentivizeEvent.RULE_CREATED_AND_TESTED
-      : IncentivizeEvent.RULE_TESTED;
-
-    claimIncentiveRewards({
-      type: incentiveEvent,
-      metadata: { rule_type: currentlySelectedRuleData.ruleType },
-    })?.then((response) => {
-      if (response.data?.success) {
-        dispatch(
-          incentivizationActions.setUserMilestoneAndRewardDetails({
-            userMilestoneAndRewardDetails: response.data?.data,
-          })
-        );
-
-        dispatch(
-          incentivizationActions.toggleActiveModal({
-            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-            newValue: true,
-            newProps: {
-              event: incentiveEvent,
-              metadata: { rule_type: currentlySelectedRuleData.ruleType },
-            },
-          })
-        );
-      }
-    });
   }, [
     pageUrl,
     error,
@@ -116,9 +78,6 @@ export const TestRuleHeader = () => {
     currentlySelectedRuleData.ruleType,
     currentlySelectedRuleData.status,
     isCurrentlySelectedRuleHasUnsavedChanges,
-    dispatch,
-    claimIncentiveRewards,
-    isNewUserForIncentivization,
     allRecordsMap,
     currentlySelectedRuleData.groupId,
   ]);

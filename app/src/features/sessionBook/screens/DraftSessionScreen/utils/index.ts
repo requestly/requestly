@@ -4,10 +4,7 @@ import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFil
 import { toast } from "utils/Toast";
 import { trackDraftSessionSaveFailed, trackDraftSessionSaved } from "features/sessionBook/analytics";
 import { SessionRecordingMetadata, SessionSaveMode } from "../../../types";
-import { IncentivizeEvent, UserIncentiveEvent } from "features/incentivization/types";
 import { Dispatch } from "@reduxjs/toolkit";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
 import PATHS from "config/constants/sub/paths";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { NavigateFunction } from "react-router-dom";
@@ -32,11 +29,8 @@ export const saveDraftSession = async (
   sessionEvents: any,
   recordingOptions: CheckboxValueType[],
   source: string,
-  claimIncentiveRewards: (event: UserIncentiveEvent) => Promise<unknown>,
   isOpenedInIframe?: boolean
 ) => {
-  const isDraftSession = window.location.pathname.includes("draft") || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
-
   const recordingOptionsToSave = getRecordingOptionsToSave(recordingOptions);
 
   if (isOpenedInIframe) {
@@ -61,29 +55,6 @@ export const saveDraftSession = async (
         source,
         recording_mode: sessionRecordingMetadata?.recordingMode,
       });
-
-      if (isDraftSession) {
-        claimIncentiveRewards({
-          type: IncentivizeEvent.SESSION_RECORDED,
-          metadata: { num_sessions: userAttributes?.num_sessions || 1 },
-        })?.then((response: any) => {
-          if (response.data?.success) {
-            dispatch(
-              incentivizationActions.setUserMilestoneAndRewardDetails({
-                userMilestoneAndRewardDetails: response.data?.data,
-              })
-            );
-
-            dispatch(
-              incentivizationActions.toggleActiveModal({
-                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                newValue: true,
-                newProps: { event: IncentivizeEvent.SESSION_RECORDED },
-              })
-            );
-          }
-        });
-      }
 
       if (isOpenedInIframe) {
         window.parent.postMessage(

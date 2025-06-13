@@ -22,11 +22,11 @@ import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
 import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
-import { EditorPopover } from "./components/PopOver";
+import { VariablePopover } from "./components/VariablePopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
-import "./components/PopOver/popover.scss";
-import { useDebounce } from "hooks/useDebounce";
+import "./components/VariablePopOver/variable-popover.scss";
+
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
@@ -37,7 +37,7 @@ interface EditorProps {
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
-  handleChange?: (value: string) => void;
+  handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
   envVariables?: EnvironmentVariables;
   analyticEventProperties?: AnalyticEventProperties;
@@ -74,6 +74,7 @@ const Editor: React.FC<EditorProps> = ({
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
   const [isCodePrettified, setIsCodePrettified] = useState(false);
   const isDefaultPrettificationDone = useRef(false);
+  const isUnsaveChange = useRef(false);
   const [isFullScreen, setFullScreen] = useState(false);
 
   const handleFullScreenChange = () => {
@@ -127,13 +128,22 @@ const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const updateContent = useCallback((code: string): void => {
+  /*
+  (fx) sets the implicit change in the editor, prettification change is implicit change
+  Typing edits in editor is controlled by handleChange
+  */
+  const handleEditorSilentUpdate = useCallback((code: string): void => {
+    if (code === null || code === undefined) {
+      return;
+    }
     const view = editorRef.current?.view;
     const doc = view?.state?.doc;
 
     if (!view || !doc) {
       return null;
     }
+    // Not mark prettify as unsaved change, that is just a effect
+    isUnsaveChange.current = false;
     const transaction = view.state.update({
       changes: { from: 0, to: doc.length, insert: code },
     });
@@ -145,18 +155,18 @@ const Editor: React.FC<EditorProps> = ({
       if (language === EditorLanguage.JSON || language === EditorLanguage.JAVASCRIPT) {
         const prettified = await prettifyCode(value, language);
         setIsCodePrettified(true);
-        updateContent(prettified.code);
+        handleEditorSilentUpdate(prettified.code);
       }
     }
-  }, [showOptions?.enablePrettify, language, value, updateContent]);
+  }, [showOptions?.enablePrettify, language, value, handleEditorSilentUpdate]);
 
   useEffect(() => {
-    if (isEditorInitialized) {
+    if (!isEditorInitialized) return;
+
+    if (!isDefaultPrettificationDone.current && prettifyOnInit) {
       (async () => {
-        if (!isDefaultPrettificationDone.current && prettifyOnInit) {
-          await applyPrettification();
-          isDefaultPrettificationDone.current = true;
-        }
+        await applyPrettification();
+        isDefaultPrettificationDone.current = true;
       })();
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
@@ -174,7 +184,12 @@ const Editor: React.FC<EditorProps> = ({
     [dispatch]
   );
 
-  const debouncedhandleEditorBodyChange = useDebounce(handleChange, 200);
+  const handleEditorBodyChange = useCallback(
+    (newVal: string) => {
+      handleChange(newVal, isUnsaveChange.current);
+    },
+    [handleChange]
+  );
 
   const customKeyBinding = useMemo(
     () =>
@@ -220,7 +235,7 @@ const Editor: React.FC<EditorProps> = ({
         code={value}
         isFullScreen={isFullScreen}
         onCodeFormat={(formattedCode: string) => {
-          updateContent(formattedCode);
+          handleEditorSilentUpdate(formattedCode);
         }}
         isCodePrettified={isCodePrettified}
         setIsCodePrettified={setIsCodePrettified}
@@ -236,7 +251,7 @@ const Editor: React.FC<EditorProps> = ({
       language,
       showOptions.enablePrettify,
       toolbarOptions,
-      updateContent,
+      handleEditorSilentUpdate,
       value,
     ]
   );
@@ -250,7 +265,8 @@ const Editor: React.FC<EditorProps> = ({
       width="100%"
       readOnly={isReadOnly}
       value={value ?? ""}
-      onChange={debouncedhandleEditorBodyChange}
+      onKeyDown={() => (isUnsaveChange.current = true)}
+      onChange={handleEditorBodyChange}
       theme={vscodeDark}
       extensions={[
         editorLanguage,
@@ -280,7 +296,7 @@ const Editor: React.FC<EditorProps> = ({
       {envVariables && (
         <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
           {hoveredVariable && (
-            <EditorPopover
+            <VariablePopover
               editorRef={{
                 current: editorRef.current?.editor ?? null,
               }}

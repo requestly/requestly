@@ -1,7 +1,7 @@
 {
   "name": "@requestly/browser-extension-common",
   "version": "1.0.0",
-  "description": "Common code between MV2 and MV3 browser extensions",
+  "description": "Common code between MV2 (now deprecated) and MV3 browser extensions",
   "homepage": "https://requestly.com",
   "private": true,
   "repository": {

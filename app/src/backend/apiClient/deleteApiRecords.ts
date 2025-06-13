@@ -2,6 +2,7 @@ import firebaseApp from "../../firebase";
 import { doc, getFirestore, Timestamp, writeBatch } from "firebase/firestore";
 import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
+import { captureException } from "./utils";
 
 export const deleteApiRecords = async (
   uid: string,
@@ -44,6 +45,7 @@ const deleteApiRecordsFromFirebase = async (
 
     return { success: true, data: null };
   } catch (error) {
+    captureException(error);
     Logger.error("Error while deleting api records!", error);
     return { success: false, data: null };
   }

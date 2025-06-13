@@ -27,8 +27,12 @@ The following domains are eligible for the student programme:
     ".edu.cn",
     ".edu.al",
     ".edu.es",
+    ".edu.tr",
+    ".edu.vn",
     ".ac.id",
     "bennington.edu",
+    "udg.mx",
+    "universitetiaab.com",
     ".ac.kr",
     "lakeheadu.ca",
     "estg.ipp.pt",
@@ -40,6 +44,9 @@ The following domains are eligible for the student programme:
     "sch.gr",
     "edu.co",
     "hunterschools.org",
-    "epitech.eu"
+    "epitech.eu",
+    "student.su.se",
+    "strayer.edu",
+    "purdueglobal.edu"
   ]
 }

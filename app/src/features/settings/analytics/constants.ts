@@ -4,7 +4,6 @@ export const SETTINGS = {
 
   // TODO: Move these constants inside billin folder
   BILLING: {
-    BILLING_TEAM_VIEWED: "billing_team_viewed",
     BILLING_TEAM_NAVIGATED: "billing_team_navigated",
     BILLING_TEAM_ACTION_CLICKED: "billing_team_action_clicked",
     BILLING_TEAM_NO_MEMBER_FOUND: "billing_team_no_member_found_to_be_added",
@@ -31,5 +30,23 @@ export const SETTINGS = {
     WORKSPACE_SETTINGS_GO_TO_BILLING_TEAM_CLICKED: "workspace_settings_go_to_billing_team_clicked",
     WORKSPACE_SETTINGS_LEARN_MORE_CLICKED: "workspace_settings_learn_about_billing_team_clicked",
     WORKSPACE_SETTINGS_AUTOMATIC_MAPPING_TOGGLE_CLICKED: "workspace_settings_automatic_mapping_to_billing_team_toggled",
+  },
+
+  DESKTOP: {
+    LOCAL_LOG_FILE: {
+      TOGGLED: "local_log_file_config_toggled",
+      FILTER: {
+        ADD: "local_log_file_filter_added",
+        REMOVE: "local_log_file_filter_removed",
+      },
+      STORE_PATH: {
+        FILE_SELECTION: {
+          STARTED: "local_log_file_store_path_file_selection_started",
+          COMPLETED: "local_log_file_store_path_file_selection_completed",
+          FAILED: "local_log_file_store_path_file_selection_failed",
+        },
+        CLEARED: "local_log_file_store_path_cleared",
+      },
+    },
   },
 };

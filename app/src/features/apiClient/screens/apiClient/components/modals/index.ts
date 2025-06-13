@@ -1,2 +1,2 @@
-export { ImportRequestModal } from "./ImportRequestModal";
+export { ImportFromCurlModal } from "./ImportFromCurlModal/ImportRequestModal";
 export { DeleteApiRecordModal } from "./deleteApiRecordModal/DeleteApiRecordModal";

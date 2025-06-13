@@ -5,9 +5,10 @@ import { useDebounce } from "hooks/useDebounce";
 import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
 import Editor from "componentsV2/CodeEditor";
+import { RequestContentType } from "features/apiClient/types";
 
 export function RawBody(props: {
-  contentType: "text/plain" | "application/json";
+  contentType: RequestContentType;
   environmentVariables: EnvironmentVariables;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
   editorOptions: React.ReactNode;
@@ -38,7 +39,7 @@ export function RawBody(props: {
     <div className="api-client-code-editor-container api-request-body-editor-container">
       <Editor
         language={editorLanguage}
-        value={text}
+        value={text ?? ""}
         handleChange={handleTextChange}
         prettifyOnInit={false}
         isResizable={false}

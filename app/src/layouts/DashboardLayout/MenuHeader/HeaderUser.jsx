@@ -7,7 +7,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import {
   redirectToAccountDetails,
-  redirectToBillingTeamSettings,
+  redirectToMyPlan,
   redirectToOAuthUrl,
   redirectToProfileSettings,
   redirectToSettings,
@@ -19,7 +19,6 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
-import { incentivizationActions } from "store/features/incentivization/slice";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isSafariBrowser } from "actions/ExtensionActions";
@@ -29,7 +28,7 @@ import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
-import { setRedirectURI } from "features/onboarding/utils";
+import { setRedirectMetadata } from "features/onboarding/utils";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -84,7 +83,7 @@ export default function HeaderUser() {
       {
         disabled: appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR,
         label: "Plans and Billing",
-        onClick: () => redirectToBillingTeamSettings(navigate, window.location.pathname, "header"),
+        onClick: () => redirectToMyPlan(navigate, window.location.pathname, "header"),
       },
       {
         label: "Settings",
@@ -104,7 +103,6 @@ export default function HeaderUser() {
               );
 
               getTabServiceActions().resetTabs();
-              dispatch(incentivizationActions.resetState());
             })
             .finally(() => setLoading(false));
         },
@@ -150,7 +148,7 @@ export default function HeaderUser() {
 
     if (isBrowserstackIntegrationOn) {
       setIsSignupButtonLoading(true);
-      setRedirectURI(window.location.href);
+      setRedirectMetadata({ source: SOURCE.NAVBAR, redirectURL: window.location.href });
       redirectToOAuthUrl(navigate);
       return;
     } else {

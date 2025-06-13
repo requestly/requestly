@@ -5,9 +5,11 @@ import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
-import { getUniqueColorForWorkspace } from "utils/teams";
 import "./index.scss";
 import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { isPersonalWorkspace } from "features/workspaces/utils";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -52,29 +54,13 @@ const WorkspaceDropdown: React.FC<{
         key: "private_workspace",
         label: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
         icon: (
-          <Avatar
-            size={18}
-            shape="square"
-            icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)}
-            className="workspace-avatar"
-            style={{ backgroundColor: "#1E69FF" }}
-          />
+          <WorkspaceAvatar workspace={{ id: "private", name: "", workspaceType: WorkspaceType.PERSONAL }} size={18} />
         ),
       },
       ...filteredAvailableTeams.map((team: any) => ({
         label: team.name,
         key: team.id,
-        icon: (
-          <Avatar
-            size={18}
-            shape="square"
-            icon={getWorkspaceIcon(team.name)}
-            className="workspace-avatar"
-            style={{
-              backgroundColor: getUniqueColorForWorkspace(team?.id, team.name),
-            }}
-          />
-        ),
+        icon: <WorkspaceAvatar workspace={team} size={18} />,
       })),
     ].filter((items) => (isAppSumo ? items.key !== "private_workspace" : true)),
     onClick: ({ key: teamId }: { key: string }) => {
@@ -123,22 +109,14 @@ const WorkspaceDropdown: React.FC<{
         >
           <RQButton className="workspace-selector-dropdown-btn">
             <div className="cursor-pointer items-center">
-              <Avatar
-                size={18}
-                shape="square"
-                icon={getWorkspaceIcon(
-                  workspaceToUpgrade?.name ?? APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                )}
-                className="workspace-avatar"
-                style={{
-                  backgroundColor:
-                    !workspaceToUpgrade ||
-                    workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                      ? "#1E69FF"
-                      : workspaceToUpgrade?.id === APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.id
-                      ? APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.color
-                      : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
+              <WorkspaceAvatar
+                workspace={{
+                  ...workspaceToUpgrade,
+                  workspaceType: isPersonalWorkspace(workspaceToUpgrade)
+                    ? WorkspaceType.PERSONAL
+                    : WorkspaceType.SHARED,
                 }}
+                size={18}
               />
               <span>{workspaceToUpgrade?.name}</span>
               <DownOutlined className="workspace-selector-dropdown-icon" />

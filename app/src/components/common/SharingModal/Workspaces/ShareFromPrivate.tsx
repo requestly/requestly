@@ -11,7 +11,7 @@ import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
-import { TeamRole } from "types";
+import { TeamRole, WorkspaceType } from "types";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { generateDefaultTeamName } from "utils/teams";
@@ -65,7 +65,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
-        trackNewTeamCreateSuccess(teamId, teamData.name, "sharing_modal");
+        trackNewTeamCreateSuccess(teamId, teamData.name, "sharing_modal", WorkspaceType.SHARED);
 
         createTeamInvites({
           teamId,
@@ -94,7 +94,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
           trackSharingModalRulesDuplicated("personal", selectedRules.length);
           setPostShareViewData({
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
-            targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
+            targetTeamData: { ...teamData, id: teamId } as Workspace,
           });
 
           onRulesShared();
@@ -123,7 +123,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
         trackSharingModalRulesDuplicated("personal", selectedRules.length);
         setPostShareViewData({
           type: WorkspaceSharingTypes.EXISTING_WORKSPACE,
-          targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
+          targetTeamData: teamData,
           sourceTeamData: activeWorkspace,
         });
 

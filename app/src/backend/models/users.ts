@@ -1,3 +1,5 @@
+import { BlockConfig } from "componentsV2/BlockScreen/hooks/useIsUserBlocked";
+
 // FIXME: This needs to be fetched from backend
 export interface User {
   domain: string;
@@ -7,10 +9,5 @@ export interface User {
   signupTs: number;
   username: string;
   browserstackId?: string;
-  "block-config"?: {
-    grr: {
-      isBlocked: boolean;
-      reason: string;
-    };
-  };
+  "block-config"?: BlockConfig;
 }

@@ -9,6 +9,23 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.6.11",
+    logs: [
+      "[ENGG-3742] fix: [extension] include credentials in API requests",
+      "[ENGG-3668] fix: withCredentials property is not respected in modify response rule with XHR",
+    ],
+  },
+  {
+    version: "25.5.27",
+    logs: [
+      "[ENGG-3627] fix: inconsistent extension enabled state",
+      "[ENGG-3627] fix: ambiguous extension state when updating extension status and added debug logs",
+      "[ENGG-3177]: fix rule applied widgets",
+      "updated extension name and description",
+      "added getExtensionMetadata listener",
+    ],
+  },
+  {
     version: "25.5.3",
     logs: ["chore: add requestly.com in app domains (#2949)"],
   },

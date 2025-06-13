@@ -2,7 +2,7 @@ import config from "common/config";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/constants";
 import rulesStorageService from "../../rulesStorageService";
 import { getRecord } from "common/storage";
-import { Rule } from "common/types";
+import { Rule, RuleType } from "common/types";
 import RuleExecutionHandler from "./ruleExecutionHandler";
 import { cloneDetails } from "../utils";
 
@@ -75,21 +75,22 @@ const showExplicitTestRuleWidget = async (ruleId: string) => {
 
 const setWidgetInfoText = (testRuleWidget: HTMLElement, ruleDetails: Rule) => {
   const { ruleType } = ruleDetails;
+  const INFO_TEXT_ATTRIBUTE = "rq-test-rule-text";
 
   switch (ruleType) {
-    case "Response":
+    case RuleType.RESPONSE:
       testRuleWidget.setAttribute(
-        "rq-test-rule-text",
-        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://docs.requestly.com/general/http-rules/rule-types/modify-response-body/">details</a>.`
+        INFO_TEXT_ATTRIBUTE,
+        `The responses are modified, but won't show in DevTools due to technical constraints. See <a class="link" target="_blank" href="https://docs.requestly.com/general/http-rules/advanced-usage/test-rules">docs</a> for details.`
       );
       break;
-    case "Headers":
+    case RuleType.HEADERS:
       const responseHeaderExists = ruleDetails.pairs.some((pair) => {
         return pair?.modifications?.Response?.length > 0;
       });
       responseHeaderExists &&
         testRuleWidget.setAttribute(
-          "rq-test-rule-text",
+          INFO_TEXT_ATTRIBUTE,
           `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://docs.requestly.com/general/http-rules/rule-types/modify-headers">details</a>.`
         );
       break;
@@ -175,6 +176,8 @@ const notifyRuleAppliedToImplicitWidget = async (rule: Rule) => {
   const implicitTestRuleWidget = document.querySelector("rq-implicit-test-rule-widget") as HTMLElement;
 
   if (implicitTestRuleWidget) {
+    setWidgetInfoText(implicitTestRuleWidget, rule);
+
     implicitTestRuleWidget.dispatchEvent(
       new CustomEvent(
         "new-rule-applied",

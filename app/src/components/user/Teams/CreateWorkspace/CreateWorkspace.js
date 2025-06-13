@@ -5,6 +5,8 @@ import ProCard from "@ant-design/pro-card";
 import { Button, Col, Form, Input, Row, Typography } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from "react-router-dom";
+import * as Sentry from "@sentry/react";
+
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
@@ -15,6 +17,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
@@ -38,7 +41,7 @@ const CreateWorkspace = () => {
       teamName: newTeamName,
     })
       .then((response) => {
-        trackNewTeamCreateSuccess(response.data.teamId, newTeamName);
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "teams_screen", WorkspaceType.SHARED);
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
@@ -60,11 +63,16 @@ const CreateWorkspace = () => {
             isNewTeam: true,
           },
         });
-        trackNewTeamCreateSuccess(teamId, newTeamName);
+        trackNewTeamCreateSuccess(teamId, newTeamName, "teams_screen", WorkspaceType.SHARED);
       })
       .catch((err) => {
         toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
+        Sentry.captureException("Create Team Failure", {
+          extra: {
+            message: err.message,
+          },
+        });
+        trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
         setIsSubmitProcess(false);
       });
   };

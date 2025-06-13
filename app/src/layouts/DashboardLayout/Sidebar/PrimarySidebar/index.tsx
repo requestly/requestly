@@ -19,8 +19,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { CreditsButton } from "./components/CreditsButton/CreditsButton";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
 import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
@@ -36,8 +34,6 @@ export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
-
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isSlackConnectFeatureEnabled = useFeatureIsOn("slack_connect");
   const isSlackInviteVisible = useFetchSlackInviteVisibility();
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
@@ -155,7 +151,6 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
       <div className="primary-sidebar-bottom-btns">
-        {isIncentivizationEnabled ? <CreditsButton /> : null}
         {isSlackConnectFeatureEnabled && isSlackInviteVisible && <JoinSlackButton />}
         {!isLocalSyncEnabled && <InviteButton />}
       </div>

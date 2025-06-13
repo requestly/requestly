@@ -17,8 +17,7 @@
 
 .environment-switcher-dropdown {
   .ant-dropdown-menu {
-    width: 160px;
-    height: 112px;
+    width: 200px;
     background: var(--requestly-color-surface-1);
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
@@ -27,6 +26,7 @@
 
     li.ant-dropdown-menu-item {
       padding: 0;
+      margin-right: 0;
 
       .ant-dropdown-menu-title-content {
         width: 100%;

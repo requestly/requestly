@@ -48,21 +48,23 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   return (
     <div className="variables-list-header">
       {!hideBreadcrumb ? (
-        <RQBreadcrumb
-          autoFocus={isNewEnvironment}
-          placeholder="New Environment"
-          recordName={currentEnvironmentName}
-          onBlur={handleNewEnvironmentNameChange}
-          disabled={isGlobalEnvironment(environmentId)}
-          defaultBreadcrumbs={[
-            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-            {
-              isEditable: true,
-              pathname: window.location.pathname,
-              label: currentEnvironmentName,
-            },
-          ]}
-        />
+        <div className="variables-list-header-breadcrumb-container">
+          <RQBreadcrumb
+            autoFocus={isNewEnvironment}
+            placeholder="New Environment"
+            recordName={currentEnvironmentName}
+            onBlur={handleNewEnvironmentNameChange}
+            disabled={isGlobalEnvironment(environmentId)}
+            defaultBreadcrumbs={[
+              { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+              {
+                isEditable: true,
+                pathname: window.location.pathname,
+                label: currentEnvironmentName,
+              },
+            ]}
+          />
+        </div>
       ) : (
         <div />
       )}

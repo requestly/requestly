@@ -27,6 +27,9 @@
     "scripts": ["serviceWorker.js"],
     "type": "module"
   },
+  "externally_connectable": {
+    "matches": ["https://*.bsstag.com/*", "https://*.browserstack.com/*"]
+  },
   "web_accessible_resources": [
     {
       "resources": ["libs/cacheJson.js", "resources/images/128x128.png"],

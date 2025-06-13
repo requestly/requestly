@@ -156,7 +156,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       menuItems.splice(2, 0, {
         key: "replay_request",
         label: "Edit and Replay",
-        disabled: isContextMenuOptionDisabled,
         onClick: () => {
           trackTrafficTableDropdownClicked("replay_request");
           trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_REQUEST_DROPDOWN_CLICKED);

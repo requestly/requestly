@@ -1,1 +1,0 @@
-<script src="bootstrap.js"></script>

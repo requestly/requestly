@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 0px 0px 8px 0;
 }
 
 .environments-list {
@@ -58,7 +59,7 @@
     }
 
     &.active {
-      background-color: var(--requestly-color-white-t-10);
+      background-color: var(--requestly-color-white-t-20);
     }
 
     &__label {
@@ -87,9 +88,14 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
+  transition: none;
 }
 
 .environments-list-item__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   span {
     font-size: 12px;
   }

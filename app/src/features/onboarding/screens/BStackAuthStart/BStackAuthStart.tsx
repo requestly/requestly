@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { redirectToHome, redirectToOAuthUrl } from "utils/RedirectionUtils";
-import { setRedirectURI } from "features/onboarding/utils";
+import { setRedirectMetadata } from "features/onboarding/utils";
 import "./bstackAuthStart.scss";
 
 export const BStackAuthStart = () => {
@@ -20,7 +20,7 @@ export const BStackAuthStart = () => {
   useEffect(() => {
     const redirectURI = params.current.get("redirectURI");
     if (redirectURI) {
-      setRedirectURI(redirectURI);
+      setRedirectMetadata({ source: "browserstack_auth_start", redirectURL: redirectURI });
     }
     if (user.loggedIn) {
       redirectToHome(appMode, navigate);

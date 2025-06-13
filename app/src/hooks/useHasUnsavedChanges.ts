@@ -22,10 +22,13 @@ export const useHasUnsavedChanges = <T>(currentValue: T, reset = false) => {
     setHasUnsavedChanges(!isEqual(originalValue.current, currentValue));
   }, [currentValue]);
 
-  const resetChanges = useCallback(() => {
-    originalValue.current = currentValue;
-    setHasUnsavedChanges(false);
-  }, [currentValue]);
+  const resetChanges = useCallback(
+    (resetValue?: T) => {
+      originalValue.current = resetValue ?? currentValue;
+      setHasUnsavedChanges(false);
+    },
+    [currentValue]
+  );
 
   useEffect(() => {
     if (!reset) {

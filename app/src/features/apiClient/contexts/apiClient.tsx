@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQAPI } from "../types";
-import Logger from "lib/logger";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
   trackNewEnvironmentClicked,
@@ -59,7 +58,7 @@ interface ApiClientContextInterface {
   isImportModalOpen: boolean;
 
   selectedHistoryIndex: number;
-  onSelectionFromHistory: (index: number) => void;
+  setCurrentHistoryIndex: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
@@ -96,7 +95,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   isImportModalOpen: false,
 
   selectedHistoryIndex: 0,
-  onSelectionFromHistory: (index: number) => {},
+  setCurrentHistoryIndex: (index: number) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
   onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
@@ -179,35 +178,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     };
 
     setIsLoadingApiClientRecords(true);
-    apiClientRecordsRepository
-      .getAllRecords()
-      .then((result) => {
-        if (!result.success) {
-          notification.error({
-            message: "Could not fetch records!",
-            description: result?.message,
-            placement: "bottomRight",
-          });
-          setApiClientRecords([]);
-          return;
-        } else {
-          setApiClientRecords(result.data.records);
-          setErrorFiles(result.data.erroredRecords);
-          updateCollectionVariablesOnInit(result.data.records);
-        }
-      })
-      .catch((error) => {
+    apiClientRecordsRepository.getAllRecords().then((result) => {
+      if (!result.success) {
         notification.error({
           message: "Could not fetch records!",
-          description: typeof error ==="string" ? error : error.message,
+          description: result?.message,
           placement: "bottomRight",
         });
         setApiClientRecords([]);
-        Logger.error("Error loading api records!", error);
-      })
-      .finally(() => {
-        setIsLoadingApiClientRecords(false);
-      });
+        return;
+      } else {
+        setApiClientRecords(result.data.records);
+        setErrorFiles(result.data.erroredRecords);
+        updateCollectionVariablesOnInit(result.data.records);
+      }
+      setIsLoadingApiClientRecords(false);
+    });
   }, [apiClientRecordsRepository, uid, dispatch]);
 
   useEffect(() => {
@@ -302,7 +288,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     trackHistoryCleared();
   }, []);
 
-  const onSelectionFromHistory = useCallback((index: number) => {
+  const setCurrentHistoryIndex = useCallback((index: number) => {
     setSelectedHistoryIndex(index);
   }, []);
 
@@ -319,8 +305,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
         return;
       }
-
-      console.log({ recordType });
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
@@ -447,7 +431,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     history,
     addToHistory,
     clearHistory,
-    onSelectionFromHistory,
+    setCurrentHistoryIndex,
     selectedHistoryIndex,
 
     isImportModalOpen,

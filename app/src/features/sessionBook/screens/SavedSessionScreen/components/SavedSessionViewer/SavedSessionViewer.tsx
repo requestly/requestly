@@ -130,6 +130,8 @@ export const SavedSessionViewer = () => {
           </Conditional>
         </div>
         <BottomSheetLayout
+          minSize={350}
+          initialSizes={[58, 42]}
           hideBottomSheet={bottomSheetLayoutBreakpoint}
           bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}
         >

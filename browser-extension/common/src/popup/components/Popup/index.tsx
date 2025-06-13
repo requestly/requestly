@@ -10,6 +10,7 @@ import { BlockedExtensionView } from "../BlockedExtensionView/BlockedExtensionVi
 import DesktopAppProxy from "../DesktopAppProxy/DesktopAppProxy";
 import { ConnectedToDesktopView } from "../DesktopAppProxy/components/ConnectedToDesktopView/ConnectedToDesktopView";
 import "./popup.css";
+import { message } from "antd";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -44,13 +45,27 @@ const Popup: React.FC = () => {
       ?.then(setIsBlockedOnTab);
   }, [currentTab]);
 
-  const handleToggleExtensionStatus = useCallback((newStatus?: boolean) => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus }, (updatedStatus) => {
-      setIsExtensionEnabled(updatedStatus);
-      sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
-        isEnabled: updatedStatus,
-      });
+  const handleToggleExtensionStatus = useCallback((newStatus: boolean) => {
+    console.log("[Popup] handleToggleExtensionStatus", {
+      newStatus,
     });
+    chrome.runtime.sendMessage(
+      { action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS, newStatus },
+      ({ success, updatedStatus }) => {
+        console.log("[Popup] handleToggleExtensionStatus callback", {
+          success,
+          updatedStatus,
+        });
+        if (!success) {
+          message.error("Cannot update extension status. Please contact support.", 0.75);
+          return;
+        }
+        setIsExtensionEnabled(updatedStatus);
+        sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
+          isEnabled: updatedStatus,
+        });
+      }
+    );
   }, []);
 
   return (
