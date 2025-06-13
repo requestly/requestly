@@ -19,7 +19,7 @@ const getWorkspaceType = () => {
     switch (window.currentlyActiveWorkspaceType) {
       case WorkspaceType.LOCAL:
         return "local";
-      case WorkspaceType.TEAM:
+      case WorkspaceType.SHARED:
         return "team";
       case WorkspaceType.PERSONAL:
         return "personal";
