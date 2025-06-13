@@ -29,7 +29,7 @@ export const useIsUserBlocked = () => {
   const [finalBlockConfig, setFinalBlockConfig] = useState<BlockConfig>({});
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !uid) {
       return;
     }
 
@@ -47,7 +47,7 @@ export const useIsUserBlocked = () => {
   }, [isLoggedIn, uid]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !email) {
       return;
     }
 
