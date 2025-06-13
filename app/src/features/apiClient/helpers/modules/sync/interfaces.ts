@@ -84,6 +84,10 @@ export type ApiClientLocalMeta = {
   rootPath: string;
 };
 
+export type ApiClientInMemoryMeta = {
+  environments: EnvironmentMap,
+};
+
 export type EnvironmentListenerParams =
   | { scope: VariableScope.COLLECTION; callback: (data: CollectionVariableMap) => void }
   | { scope: Exclude<VariableScope, VariableScope.COLLECTION>; id: string; callback: (data: EnvironmentData) => void };
