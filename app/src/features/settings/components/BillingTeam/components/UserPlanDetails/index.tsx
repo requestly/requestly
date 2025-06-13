@@ -14,8 +14,6 @@ import { globalActions } from "store/slices/global/slice";
 import { PRICING } from "features/pricing";
 import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
-import firebaseApp from "../../../../../../firebase";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 import SubscriptionInfo from "features/settings/components/Profile/ActiveLicenseInfo/SubscriptionInfo";
 import "./index.scss";
 import { PlanStatus, PlanType } from "../../types";
@@ -30,7 +28,6 @@ export const UserPlanDetails = () => {
   const billingTeams = useSelector(getAvailableBillingTeams);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [daysLeft, setDaysLeft] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
   const { type } = user.details?.planDetails ?? {};
@@ -55,31 +52,6 @@ export const UserPlanDetails = () => {
         type: "appsumo",
         plan: user?.details?.planDetails?.planId,
       });
-    }
-
-    if (activeWorkspaceId) {
-      const db = getFirestore(firebaseApp);
-      const teamsRef = doc(db, "teams", activeWorkspaceId);
-      getDoc(teamsRef)
-        .then((docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data?.appsumo) {
-              setHasAppSumoSubscription(true);
-              setLifeTimeSubscriptionDetails({
-                ...data.appsumo,
-                startDate: data.appsumo.date,
-                endDate: getSubscriptionEndDateForAppsumo(new Date(data.appsumo.date)),
-                type: "appsumo",
-                plan: data?.plan,
-              });
-            }
-          }
-        })
-        .catch(() => {
-          Logger.log("Error while fetching appsumo details for team");
-        })
-        .finally(() => setIsLoading(false));
     }
   }, [
     getSubscriptionEndDateForAppsumo,
@@ -110,8 +82,6 @@ export const UserPlanDetails = () => {
       Logger.log(err);
     }
   }, [user?.details?.planDetails?.subscription?.endDate]);
-
-  if (isLoading) return null;
 
   const renderPopConfirmation = () => {
     const showFreeTrailCancelMessage = () => {
