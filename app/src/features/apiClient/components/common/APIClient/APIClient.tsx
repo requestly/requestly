@@ -19,6 +19,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -100,9 +101,11 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
           {user.loggedIn ? (
-            <QueryParamsProvider entry={apiEntry}>
-              <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
-            </QueryParamsProvider>
+            <AutogenerateProvider entry={apiEntry}>
+              <QueryParamsProvider entry={apiEntry}>
+                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+              </QueryParamsProvider>
+            </AutogenerateProvider>
           ) : (
             <ApiClientLoggedOutView />
           )}
@@ -111,9 +114,11 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <QueryParamsProvider entry={apiEntry}>
-        <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
-      </QueryParamsProvider>
+      <AutogenerateProvider entry={apiEntry}>
+        <QueryParamsProvider entry={apiEntry}>
+          <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
+        </QueryParamsProvider>
+      </AutogenerateProvider>
     </BottomSheetProvider>
   );
 };

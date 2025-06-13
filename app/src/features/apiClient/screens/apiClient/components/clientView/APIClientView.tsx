@@ -52,6 +52,8 @@ import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiCl
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
+import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
+import { extractAuthHeadersAndParams } from "features/apiClient/helpers/auth";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -143,6 +145,7 @@ const APIClientView: React.FC<Props> = ({
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
 
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
+  const [purgeAndAddHeaders] = useAutogenerateStore((state) => [state.purgeAndAddHeaders]);
 
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
@@ -534,13 +537,27 @@ const APIClientView: React.FC<Props> = ({
     setIsRequestCancelled(true);
   }, [apiClientExecutor]);
 
-  const handleAuthChange = useCallback((newAuth: RQAPI.Auth) => {
-    setEntry((prevEntry) => {
-      const updatedEntry = { ...prevEntry };
-      updatedEntry.auth = newAuth;
-      return updatedEntry;
-    });
-  }, []);
+  const handleAuthChange = useCallback(
+    (newAuth: RQAPI.Auth) => {
+      console.log("DBG: handleAuthChange", newAuth);
+      const { headers } = extractAuthHeadersAndParams(newAuth);
+      const headersContent: Record<string, string> = headers.reduce((acc, { key, value }) => {
+        if (key) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, string>);
+
+      purgeAndAddHeaders("auth", headersContent);
+
+      setEntry((prevEntry) => {
+        const updatedEntry = { ...prevEntry };
+        updatedEntry.auth = newAuth;
+        return updatedEntry;
+      });
+    },
+    [purgeAndAddHeaders]
+  );
 
   const onUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
