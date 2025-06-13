@@ -124,7 +124,8 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
   }
 
   validate(): boolean {
-    return this.username !== "" && this.password !== "";
+    console.log("DBG-3");
+    return !!(this.username && this.password);
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {
