@@ -88,10 +88,6 @@ const SubscriptionInfo = ({
     return <></>;
   }
 
-  const getAppSumoCodesRedeemedLabel = (codeCount) => {
-    return codeCount === 1 ? `${codeCount} code redeemed` : `${codeCount} codes redeemed`;
-  };
-
   return (
     <Row className="my-4">
       <Col>
@@ -117,11 +113,7 @@ const SubscriptionInfo = ({
                     ) : null}
                   </AntRow>
                 </Descriptions.Item>
-                <Descriptions.Item label="Type">
-                  {type === "appsumo"
-                    ? `${beautifySubscriptionType(type)} (${getAppSumoCodesRedeemedLabel(appSumoCodeCount)})`
-                    : beautifySubscriptionType(type)}
-                </Descriptions.Item>
+                <Descriptions.Item label="Type">{beautifySubscriptionType(type)}</Descriptions.Item>
                 {isUserPremium && (
                   <Descriptions.Item label="Valid From">{new Date(validFrom).toDateString()}</Descriptions.Item>
                 )}
