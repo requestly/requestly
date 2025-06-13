@@ -1,4 +1,10 @@
-.grr-warning-message-container {
+.block-screen-screen {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-15, 80px) 10px;
+}
+
+.block-screen-message-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,20 +13,20 @@
   width: 100%;
   max-width: 600px;
 
-  .grr-warning-message-icon img {
+  .block-screen-message-icon img {
     width: 56px;
     height: 56px;
     aspect-ratio: 1/1;
   }
 
-  .grr-warning-content {
+  .block-screen-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: var(--space-4, 8px);
 
-    .grr-warning-message-title {
+    .block-screen-message-title {
       display: -webkit-box;
       -webkit-box-orient: vertical;
       line-clamp: 1;
@@ -37,14 +43,14 @@
       line-height: 20px; /* 142.857% */
     }
 
-    .grr-warning-message-description {
+    .block-screen-message-description {
       color: var(--requestly-color-text-subtle, #bbb);
       text-align: center;
       font-size: var(--font-size-sm, 12px);
       line-height: 18px; /* 150% */
     }
 
-    .grr-warning-message-contact-mail {
+    .block-screen-message-contact-mail {
       display: inline-block;
       color: var(--requestly-color-primary-text);
       padding: 0 3px;
