@@ -22,10 +22,11 @@ import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
 import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
-import { EditorPopover } from "./components/PopOver";
+import { VariablePopover } from "./components/VariablePopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
-import "./components/PopOver/popover.scss";
+import "./components/VariablePopOver/variable-popover.scss";
+
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 interface EditorProps {
   value: string;
@@ -295,7 +296,7 @@ const Editor: React.FC<EditorProps> = ({
       {envVariables && (
         <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
           {hoveredVariable && (
-            <EditorPopover
+            <VariablePopover
               editorRef={{
                 current: editorRef.current?.editor ?? null,
               }}
