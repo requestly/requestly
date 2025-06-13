@@ -18,6 +18,7 @@
     "url": "https://requestly.com/"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "test": "vitest --passWithNoTests",
     "lint": "eslint --fix --ext .js,.jsx .",
@@ -164,6 +165,7 @@
     "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",
     "less": "^4.2.0",
+    "patch-package": "^8.0.0",
     "sass": "^1.58.3",
     "source-map-loader": "^3.0.1",
     "typescript": "^5.7.3",

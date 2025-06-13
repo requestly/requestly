@@ -68,8 +68,6 @@ const CurrentTrafficTable = ({
   disableFilters = false,
   persistLogsFilters = false,
 }) => {
-  const GUTTER_SIZE = 20;
-  const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
@@ -792,11 +790,11 @@ const CurrentTrafficTable = ({
           </div>
 
           <div className={!isPreviewOpen ? "hide-traffic-table-split-gutter" : ""}>
+            {/* TODO: use <SplitPaneLayout/> component */}
             <Split
               sizes={rulePaneSizes}
               minSize={[75, 0]}
-              gutterSize={gutterSize}
-              dragInterval={20}
+              gutterSize={4}
               direction="vertical"
               cursor="row-resize"
               className="traffic-table-split-container"

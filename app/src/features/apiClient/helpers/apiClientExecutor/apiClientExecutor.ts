@@ -1,6 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
-import { AbortReason, RQAPI } from "../../types";
+import { AbortReason, KeyValuePair, RQAPI } from "../../types";
+import { addUrlSchemeIfMissing, makeRequest, queryParamsToURLString } from "../../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { getHeadersAndQueryParams, getEffectiveAuthForEntry, updateRequestWithAuthOptions } from "../auth";
 import {
@@ -19,6 +19,8 @@ import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./a
 import { isEmpty } from "lodash";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -34,6 +36,14 @@ type InternalFunctions = {
   };
 };
 
+enum RQErrorHeaderValue {
+  DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
+}
+
+enum RequestErrorMessage {
+  DNS_RESOLUTION_ERROR = "Could not connect. Please check if the server is up and the address can be resolved.",
+}
+
 export class ApiClientExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.Entry;
@@ -46,6 +56,10 @@ export class ApiClientExecutor {
 
   prepareRequest() {
     this.entryDetails.testResults = [];
+    this.entryDetails.request.url = queryParamsToURLString(
+      this.entryDetails.request.queryParams,
+      this.entryDetails.request.url
+    );
     this.abortController = new AbortController();
     this.entryDetails.request.queryParams = [];
     this.renderedVariables = {};
@@ -143,7 +157,7 @@ export class ApiClientExecutor {
     const errorObject: RQAPI.ExecutionError = {
       type,
       source,
-      name: error.name,
+      name: error.name || "Error",
       message: error.message,
     };
     if (error instanceof UserAbortError) {
@@ -151,6 +165,33 @@ export class ApiClientExecutor {
     }
 
     return errorObject;
+  }
+
+  private buildErrorObjectFromHeader(header: KeyValuePair): RQAPI.ExecutionError {
+    switch (header.value) {
+      case RQErrorHeaderValue.DNS_RESOLUTION_ERROR:
+        return this.buildExecutionErrorObject(
+          {
+            name: "Error",
+            message: RequestErrorMessage.DNS_RESOLUTION_ERROR,
+            type: RQAPI.ApiClientErrorType.CORE,
+            source: "request",
+          },
+          "request",
+          RQAPI.ApiClientErrorType.CORE
+        );
+      default:
+        return this.buildExecutionErrorObject(
+          {
+            name: "Error",
+            message: "Failed to fetch",
+            type: RQAPI.ApiClientErrorType.CORE,
+            source: "request",
+          },
+          "request",
+          RQAPI.ApiClientErrorType.CORE
+        );
+    }
   }
 
   updateEntryDetails(entryDetails: {
@@ -195,6 +236,13 @@ export class ApiClientExecutor {
 
     try {
       this.preValidateRequest();
+      const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
+        return INVALID_KEY_CHARACTERS.test(header.key);
+      });
+
+      if (invalidHeader) {
+        throw new Error(`Invalid header key: "${invalidHeader.key}". Header keys must not contain special characters.`);
+      }
     } catch (err) {
       const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.PRE_VALIDATION);
       return {
@@ -238,16 +286,34 @@ export class ApiClientExecutor {
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
       this.entryDetails.response = response;
+      const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
+
+      if (rqErrorHeader) {
+        return {
+          status: RQAPI.ExecutionStatus.ERROR,
+          executedEntry: { ...this.entryDetails, response: null },
+          error: this.buildErrorObjectFromHeader(rqErrorHeader),
+        };
+      }
       trackAPIRequestSent({
         has_scripts: Boolean(this.entryDetails.scripts?.preRequest),
         auth_type: this.entryDetails?.auth?.currentAuthType,
       });
     } catch (err) {
-      const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.CORE);
       return {
         status: RQAPI.ExecutionStatus.ERROR,
-        executedEntry: { ...this.entryDetails },
-        error,
+        executedEntry: { ...this.entryDetails, response: null },
+        error: this.buildExecutionErrorObject(
+          {
+            ...err,
+            message:
+              this.appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+                ? err.message
+                : RequestErrorMessage.DNS_RESOLUTION_ERROR,
+          },
+          "request",
+          RQAPI.ApiClientErrorType.CORE
+        ),
       };
     }
 
