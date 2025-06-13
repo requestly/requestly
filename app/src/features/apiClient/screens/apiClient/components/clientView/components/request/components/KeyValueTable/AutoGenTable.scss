@@ -1,0 +1,90 @@
+.auto-gen-table-container {
+  margin-bottom: 16px;
+
+  .heading-text {
+    overflow: hidden;
+    color: var(--alias-tokens-color-text-default, #fff);
+    text-overflow: ellipsis;
+
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--font-size-2xs, 9px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 13px; /* 144.444% */
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .collapse-button {
+    font-size: 14px;
+    color: #1890ff;
+    cursor: pointer;
+  }
+
+  .api-key-value-table {
+    &.rq-content-list-table {
+      border: none !important;
+    }
+    tr {
+      td.ant-table-cell:nth-last-child(2) {
+        border-right: none !important;
+      }
+
+      &:hover {
+        td.ant-table-cell {
+          .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+            opacity: 1;
+          }
+        }
+
+        td.ant-table-cell:nth-last-child(2) {
+          border-right: 1px solid #303030 !important;
+        }
+      }
+    }
+
+    td.ant-table-cell {
+      padding: 4px 12px !important;
+
+      .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+        width: 30px;
+        opacity: 0;
+      }
+    }
+    .key-value-input-container.error-state {
+      display: flex;
+      align-items: center;
+      height: 24px;
+      padding: 6px 12px;
+      gap: 6px;
+      flex: 1 0 0;
+      line-height: 17px;
+      border: 1px solid var(--requestly-color-error);
+      border-radius: 4px;
+    }
+    .key-value-table-input {
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 4px 6px !important;
+      height: 24px;
+      font-size: var(--requestly-font-size-sm);
+      width: 100%;
+
+      &:hover {
+        border: 1px solid transparent;
+      }
+
+      &-disabled {
+        opacity: 0.5;
+      }
+
+      .cm-editor {
+        margin-top: -7px;
+      }
+    }
+
+    .ant-table-footer {
+      background: var(--requestly-color-background);
+    }
+  }
+}

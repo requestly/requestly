@@ -6,6 +6,7 @@ import { RQAPI } from "features/apiClient/types";
 import { Skeleton } from "antd";
 import "./apiClient.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -76,14 +77,16 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
-        <QueryParamsProvider entry={entryDetails?.data}>
-          <APIClientView
-            apiEntryDetails={entryDetails}
-            notifyApiRequestFinished={handleAppRequestFinished}
-            onSaveCallback={onSaveCallback}
-            isCreateMode={isCreateMode}
-          />
-        </QueryParamsProvider>
+        <AutogenerateProvider entry={entryDetails?.data}>
+          <QueryParamsProvider entry={entryDetails?.data}>
+            <APIClientView
+              apiEntryDetails={entryDetails}
+              notifyApiRequestFinished={handleAppRequestFinished}
+              onSaveCallback={onSaveCallback}
+              isCreateMode={isCreateMode}
+            />
+          </QueryParamsProvider>
+        </AutogenerateProvider>
       </div>
     </BottomSheetProvider>
   );

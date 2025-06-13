@@ -78,7 +78,7 @@ function inheritAuthFromParent(
 }
 
 /* This function expects inherit to have been resolved. The argument should be the effective authType */
-function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
+export function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
   const resultingHeaders: KeyValuePair[] = [];
   const resultingQueryParams: KeyValuePair[] = [];
 
@@ -95,7 +95,7 @@ function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
 
   switch (auth.currentAuthType) {
     case Authorization.Type.INHERIT:
-      throw new Error("Inherit auth type should not be processed inside processAuthOptions");
+      break;
     case Authorization.Type.NO_AUTH:
       break;
     case Authorization.Type.BASIC_AUTH: {
