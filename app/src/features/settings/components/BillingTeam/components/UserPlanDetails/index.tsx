@@ -19,14 +19,12 @@ import "./index.scss";
 import { PlanStatus, PlanType } from "../../types";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [daysLeft, setDaysLeft] = useState(0);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
@@ -55,7 +53,6 @@ export const UserPlanDetails = () => {
     }
   }, [
     getSubscriptionEndDateForAppsumo,
-    activeWorkspaceId,
     type,
     user?.details?.planDetails?.subscription?.startDate,
     user?.details?.planDetails?.subscription?.endDate,
