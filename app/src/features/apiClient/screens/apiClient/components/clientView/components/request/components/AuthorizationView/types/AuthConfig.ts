@@ -124,7 +124,6 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
   }
 
   validate(): boolean {
-    console.log("DBG-3");
     return !!(this.username && this.password);
   }
 
