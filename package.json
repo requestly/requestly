@@ -16,6 +16,9 @@
     "prepare": "husky install",
     "build": "rollup -c"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/requestly/requestly.git"
