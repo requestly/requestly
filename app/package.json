@@ -60,7 +60,7 @@
     "@reduxjs/toolkit": "^1.9.0",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
-    "@requestly/shared": "file:../shared",
+    "@requestly/shared": "file:../packages/shared",
     "@sentry/react": "^7.54.0",
     "@sentry/tracing": "^7.54.0",
     "@stripe/react-stripe-js": "^2.3.0",
