@@ -24,9 +24,9 @@
     "type-check": "tsc --noEmit",
     "build": "vite build",
     "preview": "npm run build && vite preview",
-    "start": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'vite'",
-    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV vite'",
-    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR vite --mode dev-emulator'",
+    "start": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../packages/shared && npm run watch' 'vite'",
+    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../packages/shared && npm run watch' 'REACT_APP_ENV=DEV vite'",
+    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' '../packages/shared && npm run watch' 'REACT_APP_ENV=EMULATOR vite --mode dev-emulator'",
     "emulated-start": "REACT_APP_ENV=EMULATOR vite --mode dev-emulator"
   },
   "browserslist": [
