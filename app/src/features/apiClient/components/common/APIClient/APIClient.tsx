@@ -5,7 +5,7 @@ import BetaBadge from "components/misc/BetaBadge";
 import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
-  generateKeyValuePairsFromJson,
+  generateKeyValuePairs,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
@@ -46,8 +46,8 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     urlObj.search = "";
 
     entry.request.url = urlObj.toString();
-    entry.request.queryParams = generateKeyValuePairsFromJson(searchParams);
-    entry.request.headers = filterHeadersToImport(generateKeyValuePairsFromJson(request.headers));
+    entry.request.queryParams = generateKeyValuePairs(searchParams);
+    entry.request.headers = filterHeadersToImport(generateKeyValuePairs(request.headers));
     entry.request.method = (request.method as RequestMethod) || RequestMethod.GET;
     entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
 
@@ -56,7 +56,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
 
       if (entry.request.contentType === RequestContentType.FORM) {
         const searchParams = new URLSearchParams(request.body);
-        entry.request.body = generateKeyValuePairsFromJson(Object.fromEntries(searchParams));
+        entry.request.body = generateKeyValuePairs(Object.fromEntries(searchParams));
       }
     } else if (request.body instanceof FormData) {
       if (entry.request.contentType !== RequestContentType.FORM) {
@@ -72,7 +72,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
         request.body.forEach((value, key) => {
           formDataObj[key] = value as string;
         });
-        entry.request.body = generateKeyValuePairsFromJson(formDataObj);
+        entry.request.body = generateKeyValuePairs(formDataObj);
       }
     }
 

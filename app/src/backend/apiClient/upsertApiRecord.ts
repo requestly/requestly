@@ -73,7 +73,7 @@ const createApiRecord = async (
       await setDoc(docRef, { ...newRecord, id: docId });
       Logger.log(`Api document created with ID ${docId}`);
       return { success: true, data: { ...newRecord, id: docId } };
-    } catch(e) {
+    } catch (e) {
       captureException(e);
       Logger.error(`Error creating Api document with ID ${docId}`);
       return { success: false, data: null };

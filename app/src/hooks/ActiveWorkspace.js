@@ -70,10 +70,11 @@ const ActiveWorkspace = () => {
   useEffect(() => {
     window.currentlyActiveWorkspaceTeamRole = role;
     window.currentlyActiveWorkspaceTeamId = activeWorkspace?.id;
+    window.currentlyActiveWorkspaceType = activeWorkspace?.workspaceType;
     window.workspaceMembersCount = activeWorkspace?.accessCount ?? null;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE
     window.workspaceCleanupDone = false;
-  }, [activeWorkspace?.accessCount, activeWorkspace?.id, role]);
+  }, [activeWorkspace?.accessCount, activeWorkspace?.id, role, activeWorkspace?.workspaceType]);
 };
 
 export default ActiveWorkspace;

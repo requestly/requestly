@@ -13,10 +13,8 @@ export class CollectionViewTabSource extends BaseTabSource {
     super();
     this.component = <CollectionView key={metadata.id} collectionId={metadata.id} />;
     this.metadata = {
-      id: metadata.id,
+      ...metadata,
       name: "collection",
-      title: metadata.title,
-      isNewTab: metadata.focusBreadcrumb,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
     this.icon = <MdOutlineFolder />;

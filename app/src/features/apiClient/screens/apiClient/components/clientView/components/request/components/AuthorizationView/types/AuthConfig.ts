@@ -72,7 +72,7 @@ export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.
   }
 
   validate(): boolean {
-    return this.key !== "" && this.value !== "";
+    return Boolean(this.key && this.value);
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.API_KEY] | null {
@@ -98,7 +98,7 @@ export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.
   }
 
   validate(): boolean {
-    return this.bearer !== "";
+    return Boolean(this.bearer);
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BEARER_TOKEN] | null {
