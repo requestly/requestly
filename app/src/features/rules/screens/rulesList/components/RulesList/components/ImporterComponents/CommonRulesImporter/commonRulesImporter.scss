@@ -1,0 +1,102 @@
+.ant-modal-body {
+  .common-importer-container {
+    .common-importer-header {
+      margin-right: 16px;
+    }
+  }
+}
+
+.common-importer-container {
+  margin: auto;
+  margin-top: -14px;
+
+  .common-importer-header {
+    padding-bottom: 8px;
+
+    .importer-header-heading {
+      font-size: var(--requestly-font-size-base);
+      font-weight: var(--requestly-font-weight-medium);
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .common-importer-body {
+    .common-importer-warning-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      // background-color: var(--requestly-color-surface-2);
+      border: 1px var(--requestly-color-warning-500) solid;
+      border-radius: 4px;
+      padding: 8px 16px;
+      margin-bottom: 8px;
+      color: var(--requestly-color-warning-500);
+    }
+
+    .common-importer-warning-banner-text {
+      font-size: var(--requestly-font-size-sm);
+      gap: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .common-importer-warning-icon {
+      margin-top: -2px;
+    }
+
+    .common-importer-warning-docs-link a {
+      font-size: var(--requestly-font-size-sm);
+
+      color: var(--requestly-color-white);
+      text-decoration: underline;
+    }
+
+    .import-error {
+      font-size: var(--requestly-font-size-sm);
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      padding: 8px;
+      margin-bottom: 8px;
+      background: var(--requestly-color-surface-2);
+      border-radius: 8px;
+      border: 1px solid var(--requestly-color-error-300);
+
+      .import-error-heading {
+        color: var(--requestly-color-error-300);
+      }
+    }
+
+    .imported-rules-container {
+      padding: 8px;
+      background: var(--requestly-color-surface-2);
+      border-radius: 8px;
+      margin-bottom: 8px;
+
+      .success-heading {
+        color: var(--requestly-color-success-300);
+        gap: 8px;
+        display: flex;
+        align-items: center;
+        padding-left: 16px;
+        padding-bottom: 8px;
+      }
+    }
+  }
+
+  &.importer-success {
+    .common-importer-footer {
+      border-top: 1px solid var(--requestly-color-white-t-20);
+    }
+  }
+
+  .common-importer-footer {
+    padding: 8px 0px 0px 0px;
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-xs);
+    text-align: center;
+    margin: 8px 0px 0px 0px;
+  }
+}

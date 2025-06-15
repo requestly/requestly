@@ -35,6 +35,7 @@ import { ImportFromModheader } from "features/rules/screens/rulesList/components
 import { ImportFromResourceOverride } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ResourceOverrideImporter";
 import { useLocation } from "react-router-dom";
 import { ImporterType } from "components/Home/types";
+import { HeaderEditorImporter } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/HeaderEditorImporter/HeaderEditorImporterComponent";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -56,6 +57,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
   const [isImportFromModheaderModalOpen, setIsImportFromModheaderModalOpen] = useState(false);
   const [isImportFromResourceOverrideModalOpen, setIsImportFromResourceOverrideModalOpen] = useState(false);
+  const [isImportFromHeaderEditorModalOpen, setIsImportFromHeaderEditorModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
@@ -311,6 +313,9 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         case ImporterType.RESOURCE_OVERRIDE:
           setIsImportFromResourceOverrideModalOpen(true);
           break;
+        case ImporterType.HEADER_EDITOR:
+          setIsImportFromHeaderEditorModalOpen(true);
+          break;
         default:
           break;
       }
@@ -338,6 +343,8 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
             onBackButtonClick={() => setIsImportFromResourceOverrideModalOpen(false)}
             callback={toggleModal}
           />
+        ) : isImportFromHeaderEditorModalOpen ? (
+          <HeaderEditorImporter />
         ) : (
           <>
             <div className="rule-importer-content">
