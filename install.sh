@@ -8,10 +8,10 @@ rm -rf node_modules
 npm install
 
 echo -e "\n***** Installing and Building @requestly/shared module *****"
-cd ./shared
+cd ./packages/shared
 rm -rf node_modules
 sh ./install.sh
-cd ..
+cd ../..
 
 echo -e "\n***** Installing React app dependencies *****"
 # Install dependencies for react app
