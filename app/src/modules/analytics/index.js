@@ -4,6 +4,7 @@ import Logger from "lib/logger";
 import posthogIntegration from "./integrations/posthog";
 import localIntegration from "./integrations/local";
 import { isEnvAutomation } from "utils/EnvUtils";
+import { WorkspaceType } from "types";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [
@@ -12,6 +13,22 @@ const BLACKLISTED_EVENTS = [
   SYNCING.SYNC.FAILED,
   SYNCING.BACKUP.CREATED,
 ];
+
+const getWorkspaceType = () => {
+  if (window.currentlyActiveWorkspaceType) {
+    switch (window.currentlyActiveWorkspaceType) {
+      case WorkspaceType.LOCAL:
+        return "local";
+      case WorkspaceType.SHARED:
+        return "team";
+      case WorkspaceType.PERSONAL:
+        return "personal";
+      default:
+        return "personal";
+    }
+  }
+  return window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
+};
 
 export const trackEvent = (name, params, config) => {
   if (BLACKLISTED_EVENTS.includes(name)) return;
@@ -26,7 +43,7 @@ export const trackEvent = (name, params, config) => {
   newParams.rq_app_version = app_version;
   newParams.automation_enabled = isEnvAutomation();
   newParams.workspace_role = window.currentlyActiveWorkspaceTeamRole ?? null;
-  newParams.workspace = window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
+  newParams.workspace = getWorkspaceType();
   newParams.workspaceId = window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null;
   newParams.workspaceMembersCount = window.workspaceMembersCount ?? null;
 

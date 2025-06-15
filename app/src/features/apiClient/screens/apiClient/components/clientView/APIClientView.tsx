@@ -467,6 +467,7 @@ const APIClientView: React.FC<Props> = ({
       ...entry,
       request: {
         ...entry.request,
+        url: entry.request.url.split("?")[0],
         queryParams: queryParams,
       },
     };
@@ -513,7 +514,8 @@ const APIClientView: React.FC<Props> = ({
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
 
       setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
-      resetChanges();
+      const { response, testResults, ...resultWithoutResponse } = result.data.data;
+      resetChanges(resultWithoutResponse);
       trackRequestSaved({
         src: "api_client_view",
         has_scripts: Boolean(entry.scripts?.preRequest),
@@ -630,10 +632,9 @@ const APIClientView: React.FC<Props> = ({
   };
 
   const handleOnUrlChange = (value: string) => {
-    const baseUrl = value.split("?")[0];
     setEntry((prevEntry) => ({
       ...prevEntry,
-      request: { ...prevEntry.request, url: baseUrl },
+      request: { ...prevEntry.request, url: value },
     }));
     setUnsaved(true);
   };
