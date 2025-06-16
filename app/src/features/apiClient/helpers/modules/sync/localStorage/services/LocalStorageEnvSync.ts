@@ -10,12 +10,12 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
     this.meta = metadata;
   }
 
-  private getStorageKey() {
-    return this.meta.storageKey;
-  }
-
   private getVersion() {
     return this.meta.version;
+  }
+
+  private getStorageKey() {
+    return `${this.meta.storageKey}:v${this.getVersion()}`;
   }
 
   private getNewId() {
@@ -23,17 +23,12 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
   }
 
   private getLocalStorageRecords(): LocalStorageSyncRecords {
-    return (
-      JSON.parse(localStorage.getItem(this.getStorageKey())) || {
-        version: this.getVersion(),
-        data: { apis: [], environments: {} },
-      }
-    );
+    return JSON.parse(localStorage.getItem(this.getStorageKey())) || { apis: [], environments: {} };
   }
 
   async getAllEnvironments() {
     const records = this.getLocalStorageRecords();
-    const environments = records.data.environments;
+    const environments = records.environments;
 
     if (Object.keys(environments).length > 0) {
       return {
@@ -63,7 +58,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
       variables: {},
     };
 
-    records.data.environments[newEnvironment.id] = newEnvironment;
+    records.environments[newEnvironment.id] = newEnvironment;
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return newEnvironment;
   }
@@ -77,15 +72,15 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
       variables: {},
     };
 
-    records.data.environments[newEnvironment.id] = newEnvironment;
+    records.environments[newEnvironment.id] = newEnvironment;
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return newEnvironment;
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
     const records = this.getLocalStorageRecords();
-    if (records.data.environments[envId]) {
-      delete records.data.environments[envId];
+    if (records.environments[envId]) {
+      delete records.environments[envId];
       localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
       return { success: true };
     } else {
@@ -98,7 +93,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
     const records = this.getLocalStorageRecords();
-    const environment = records.data.environments[environmentId];
+    const environment = records.environments[environmentId];
 
     if (environment) {
       if (updates.name) {
@@ -109,7 +104,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
         environment.variables = { ...environment.variables, ...updates.variables };
       }
 
-      records.data.environments[environmentId] = environment;
+      records.environments[environmentId] = environment;
       localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     } else {
       throw new Error("Environment not found");
