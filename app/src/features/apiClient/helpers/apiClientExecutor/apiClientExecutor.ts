@@ -285,6 +285,8 @@ export class ApiClientExecutor {
 
     try {
       const response = await makeRequest(this.appMode, this.entryDetails.request, this.abortController.signal);
+      //@ts-ignore
+      console.log('id is...', response.requestId);
       this.entryDetails.response = response;
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 

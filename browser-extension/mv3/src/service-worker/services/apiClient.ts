@@ -1,3 +1,5 @@
+import { box } from "./box";
+
 /* TYPES */
 enum RequestMethod {
   GET = "GET",
@@ -89,6 +91,13 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
 
   try {
     const requestStartTime = performance.now();
+    let requestId = '';
+    box.addHandler(
+      (id: string) => {
+        console.log('heeey');
+        requestId = id;
+      }
+    )
     const response = await fetch(url, {
       method,
       headers,
@@ -119,7 +128,10 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     } else {
       responseBody = await responseBlob.text();
     }
+    console.log('woohoo', requestId);
     return {
+      //@ts-ignore
+      requestId,
       body: responseBody,
       time: responseTime,
       headers: responseHeaders,
