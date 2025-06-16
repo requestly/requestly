@@ -15,12 +15,12 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     this.meta = metadata;
   }
 
-  private getStorageKey() {
-    return this.meta.storageKey;
-  }
-
   private getVersion() {
     return this.meta.version;
+  }
+
+  private getStorageKey() {
+    return `${this.meta.storageKey}:v${this.getVersion()}`;
   }
 
   private getNewId() {
@@ -28,20 +28,16 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
   }
 
   private getLocalStorageRecords(): LocalStorageSyncRecords {
-    return (
-      JSON.parse(localStorage.getItem(this.getStorageKey())) || {
-        version: this.getVersion(),
-        data: { apis: [], environments: {} },
-      }
-    );
+    return JSON.parse(localStorage.getItem(this.getStorageKey())) || { apis: [], environments: {} };
   }
 
   async getAllRecords() {
     const records = this.getLocalStorageRecords();
+
     return {
       success: true,
       data: {
-        records: records.data.apis,
+        records: records.apis,
         erroredRecords: [] as ErroredRecord[],
       },
     };
@@ -49,7 +45,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
 
   async getApiRecord(recordId: string): RQAPI.RecordPromise {
     const records = this.getLocalStorageRecords();
-    const record = records.data.apis.find((record) => record.id === recordId);
+    const record = records.apis.find((record) => record.id === recordId);
     if (record) {
       return {
         success: true,
@@ -84,7 +80,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     } as RQAPI.Record;
 
     const records = this.getLocalStorageRecords();
-    records.data.apis.push(newRecord);
+    records.apis.push(newRecord);
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return { success: true, data: newRecord };
   }
@@ -114,7 +110,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     } as RQAPI.Record;
 
     const records = this.getLocalStorageRecords();
-    records.data.apis.push(newRecord);
+    records.apis.push(newRecord);
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return { success: true, data: newRecord };
   }
@@ -124,7 +120,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     sanitizedRecord.id = id;
 
     const records = this.getLocalStorageRecords();
-    const index = records.data.apis.findIndex((record) => record.id === id);
+    const index = records.apis.findIndex((record) => record.id === id);
 
     if (index === -1) {
       return { success: false, data: null, message: "Record not found!" };
@@ -136,14 +132,14 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    records.data.apis[index] = updatedRecord;
+    records.apis[index] = updatedRecord;
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return { success: true, data: updatedRecord };
   }
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
     const records = this.getLocalStorageRecords();
-    const updatedRecords = records.data.apis.map((record) => {
+    const updatedRecords = records.apis.map((record) => {
       if (recordIds.includes(record.id)) {
         return {
           ...record,
@@ -293,14 +289,14 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     );
 
     const records = this.getLocalStorageRecords();
-    const updatedRecords = records.data.apis.map((record) => {
+    const updatedRecords = records.apis.map((record) => {
       if (updatedRequestsMap[record.id]) {
         return updatedRequestsMap[record.id];
       }
       return record;
     });
 
-    records.data.apis = updatedRecords;
+    records.apis = updatedRecords;
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return updatedRequests;
   }
