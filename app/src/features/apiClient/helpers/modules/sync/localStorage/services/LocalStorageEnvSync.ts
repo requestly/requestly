@@ -1,0 +1,137 @@
+import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
+import { ApiClientLocalStorageMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
+import { ErroredRecord } from "../../local/services/types";
+import { LocalStorageSyncRecords } from "./types";
+
+export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalStorageMeta> {
+  meta: ApiClientLocalStorageMeta;
+
+  constructor(metadata: ApiClientLocalStorageMeta) {
+    this.meta = metadata;
+  }
+
+  private getStorageKey() {
+    return this.meta.storageKey;
+  }
+
+  private getVersion() {
+    return this.meta.version;
+  }
+
+  private getNewId() {
+    return `${Date.now()}`;
+  }
+
+  private getRecords(): LocalStorageSyncRecords {
+    return (
+      JSON.parse(localStorage.getItem(this.getStorageKey())) || {
+        version: this.getVersion(),
+        data: { apis: [], environments: {} },
+      }
+    );
+  }
+
+  async getAllEnvironments() {
+    const records = this.getRecords();
+    const environments = records.data.environments;
+
+    if (Object.keys(environments).length > 0) {
+      return {
+        success: true,
+        data: {
+          environments,
+          erroredRecords: [] as ErroredRecord[],
+        },
+      };
+    } else {
+      return {
+        success: true,
+        data: {
+          environments: {},
+          erroredRecords: [],
+        },
+      };
+    }
+  }
+
+  async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
+    const records = this.getRecords();
+
+    const newEnvironment: EnvironmentData = {
+      id: this.getNewId(),
+      name: environmentName,
+      variables: {},
+    };
+
+    records.data.environments[newEnvironment.id] = newEnvironment;
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    return newEnvironment;
+  }
+
+  async createGlobalEnvironment(): Promise<EnvironmentData> {
+    const records = this.getRecords();
+
+    const newEnvironment: EnvironmentData = {
+      id: this.getGlobalEnvironmentId(),
+      name: "Global Environment",
+      variables: {},
+    };
+
+    records.data.environments[newEnvironment.id] = newEnvironment;
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    return newEnvironment;
+  }
+
+  async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
+    const records = this.getRecords();
+    if (records.data.environments[envId]) {
+      delete records.data.environments[envId];
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+      return { success: true };
+    } else {
+      return { success: false, message: "Something went wrong while deleting the environment" };
+    }
+  }
+
+  async updateEnvironment(
+    environmentId: string,
+    updates: Partial<Pick<EnvironmentData, "name" | "variables">>
+  ): Promise<void> {
+    const records = this.getRecords();
+    const environment = records.data.environments[environmentId];
+
+    if (environment) {
+      if (updates.name) {
+        environment.name = updates.name;
+      }
+
+      if (updates.variables) {
+        environment.variables = { ...environment.variables, ...updates.variables };
+      }
+
+      records.data.environments[environmentId] = environment;
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    } else {
+      throw new Error("Environment not found");
+    }
+  }
+
+  async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
+    const environment = allEnvironments[environmentId];
+
+    if (environment) {
+      const newEnvironment = await this.createNonGlobalEnvironment(`${environment.name} (Copy)`);
+      return newEnvironment;
+    } else {
+      throw new Error("Environment not found for duplication");
+    }
+  }
+
+  getGlobalEnvironmentId(): string {
+    return "global";
+  }
+
+  attachListener(params: EnvironmentListenerParams): () => any {
+    return () => {};
+  }
+}
