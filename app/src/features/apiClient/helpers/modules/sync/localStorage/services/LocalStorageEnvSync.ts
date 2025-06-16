@@ -22,7 +22,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
     return `${Date.now()}`;
   }
 
-  private getRecords(): LocalStorageSyncRecords {
+  private getLocalStorageRecords(): LocalStorageSyncRecords {
     return (
       JSON.parse(localStorage.getItem(this.getStorageKey())) || {
         version: this.getVersion(),
@@ -32,7 +32,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
   }
 
   async getAllEnvironments() {
-    const records = this.getRecords();
+    const records = this.getLocalStorageRecords();
     const environments = records.data.environments;
 
     if (Object.keys(environments).length > 0) {
@@ -55,7 +55,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
   }
 
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
-    const records = this.getRecords();
+    const records = this.getLocalStorageRecords();
 
     const newEnvironment: EnvironmentData = {
       id: this.getNewId(),
@@ -69,7 +69,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
   }
 
   async createGlobalEnvironment(): Promise<EnvironmentData> {
-    const records = this.getRecords();
+    const records = this.getLocalStorageRecords();
 
     const newEnvironment: EnvironmentData = {
       id: this.getGlobalEnvironmentId(),
@@ -83,7 +83,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
-    const records = this.getRecords();
+    const records = this.getLocalStorageRecords();
     if (records.data.environments[envId]) {
       delete records.data.environments[envId];
       localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
@@ -97,7 +97,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
-    const records = this.getRecords();
+    const records = this.getLocalStorageRecords();
     const environment = records.data.environments[environmentId];
 
     if (environment) {
