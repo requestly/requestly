@@ -37,7 +37,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     return {
       success: true,
       data: {
-        records: records.apis,
+        records: records.apis.filter((record) => !record.deleted),
         erroredRecords: [] as ErroredRecord[],
       },
     };
@@ -127,7 +127,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     }
 
     const updatedRecord = {
-      ...record,
+      ...records.apis[index],
       ...sanitizedRecord,
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
@@ -139,7 +139,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
     const records = this.getLocalStorageRecords();
-    const updatedRecords = records.apis.map((record) => {
+    const updatedApis = records.apis.map((record) => {
       if (recordIds.includes(record.id)) {
         return {
           ...record,
@@ -150,7 +150,8 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
       return record;
     });
 
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(updatedRecords));
+    records.apis = updatedApis;
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
     return { success: true, data: null };
   }
 
