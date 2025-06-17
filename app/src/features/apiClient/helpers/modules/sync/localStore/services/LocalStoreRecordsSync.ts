@@ -1,17 +1,17 @@
 import { RQAPI } from "features/apiClient/types";
-import { ApiClientLocalStorageMeta, ApiClientRecordsInterface } from "../../interfaces";
+import { ApiClientRecordsInterface } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { LocalStorageSyncRecords } from "./types";
+import { ApiClientLocalStoreMeta, LocalStoreSyncRecords } from "./types";
 import { sanitizeRecord } from "backend/apiClient/upsertApiRecord";
 import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
 
-export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStorageMeta> {
-  meta: ApiClientLocalStorageMeta;
+export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
+  meta: ApiClientLocalStoreMeta;
 
-  constructor(readonly metadata: ApiClientLocalStorageMeta) {
+  constructor(readonly metadata: ApiClientLocalStoreMeta) {
     this.meta = metadata;
   }
 
@@ -27,7 +27,7 @@ export class LocalStorageRecordsSync implements ApiClientRecordsInterface<ApiCli
     return `${Date.now()}`; // TODO: has to be uuid
   }
 
-  private getLocalStorageRecords(): LocalStorageSyncRecords {
+  private getLocalStorageRecords(): LocalStoreSyncRecords {
     return JSON.parse(localStorage.getItem(this.getStorageKey())) || { apis: [], environments: {} };
   }
 
