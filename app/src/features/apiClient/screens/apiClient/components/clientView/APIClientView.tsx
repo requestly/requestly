@@ -1,5 +1,5 @@
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState, useRef } from "react";
 import { notification, Select, Space } from "antd";
-import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
@@ -106,7 +106,7 @@ const APIClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const isHistoryPath = location.pathname.includes("history");
 
-  const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
+  const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
   const {
     apiClientRecords,
     onSaveRecord,
@@ -155,6 +155,17 @@ const APIClientView: React.FC<Props> = ({
     state.purgeAndAdd,
     state.purgeAndAddHeaders,
   ]);
+
+  const isDefaultPlacementRef = useRef(false);
+  useLayoutEffect(() => {
+    if (isDefaultPlacementRef.current) {
+      return;
+    }
+
+    isDefaultPlacementRef.current = true;
+    const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+    toggleSheetPlacement(bottomSheetPlacement);
+  }, [toggleSheetPlacement]);
 
   useEffect(() => {
     setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
