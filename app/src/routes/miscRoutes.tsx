@@ -15,6 +15,7 @@ import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/c
 import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
 import { ImportFromResourceOverrideWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ResourceOverrideImporter";
+import { HeaderEditorImportScreen } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/HeaderEditorImporter/HeaderEditorImporterScreen";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -65,6 +66,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.IMPORT_FROM_MODHEADER.RELATIVE,
     element: <ProtectedRoute component={ImportFromModheaderWrapperView} />,
+  },
+  {
+    path: PATHS.IMPORT_FROM_HEADER_EDITOR.RELATIVE,
+    element: <ProtectedRoute component={HeaderEditorImportScreen} />,
   },
   {
     path: PATHS.IMPORT_FROM_RESOURCE_OVERRIDE.RELATIVE,
