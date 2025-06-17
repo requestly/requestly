@@ -1,12 +1,12 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
-import { ApiClientLocalStorageMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
+import { EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { LocalStorageSyncRecords } from "./types";
+import { ApiClientLocalStoreMeta, LocalStoreSyncRecords } from "./types";
 
-export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalStorageMeta> {
-  meta: ApiClientLocalStorageMeta;
+export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
+  meta: ApiClientLocalStoreMeta;
 
-  constructor(metadata: ApiClientLocalStorageMeta) {
+  constructor(metadata: ApiClientLocalStoreMeta) {
     this.meta = metadata;
   }
 
@@ -22,7 +22,7 @@ export class LocalStorageEnvSync implements EnvironmentInterface<ApiClientLocalS
     return `${Date.now()}`;
   }
 
-  private getLocalStorageRecords(): LocalStorageSyncRecords {
+  private getLocalStorageRecords(): LocalStoreSyncRecords {
     return JSON.parse(localStorage.getItem(this.getStorageKey())) || { apis: [], environments: {} };
   }
 
