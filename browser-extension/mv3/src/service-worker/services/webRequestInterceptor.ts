@@ -5,8 +5,10 @@ import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
 import { onVariableChange, Variable } from "../variable";
 import { saveRecord } from "common/storage";
+import { box } from "./box";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
+  box.registerHandler(details.requestId);
   // Firefox and Safari do not have documentLifecycle
   // @ts-ignore
   if (details?.documentLifecyle) {
@@ -93,6 +95,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 };
 
 const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
+  box.invokeHandler(details.requestId);
   let isMainOrPrerenderedFrame =
     //@ts-ignore
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
