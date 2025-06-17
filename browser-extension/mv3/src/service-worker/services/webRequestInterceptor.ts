@@ -5,6 +5,7 @@ import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
 import { onVariableChange, Variable } from "../variable";
 import { apiRequestCorrelationManager } from "./apiClient/ApiRequestCorrelationManager";
+import { REQUESTLY_ID_HEADER } from "./apiClient";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // Firefox and Safari do not have documentLifecycle
@@ -61,10 +62,9 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
     return;
   }
 
-  const rqidHeader = details.requestHeaders.find((h) => h.name.toLowerCase() === "x-requestly-id");
-  if (rqidHeader) {
-    // Map rqidHeader.value <-> details.requestId in extension memory
-    apiRequestCorrelationManager.bindHandlerToRequestId(details.requestId, rqidHeader.value);
+  const rqId = details.requestHeaders.find((h) => h.name.toLowerCase() === REQUESTLY_ID_HEADER)?.value;
+  if (rqId) {
+    apiRequestCorrelationManager.bindHandlerToRequestId(details.requestId, rqId);
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {

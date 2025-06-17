@@ -1,6 +1,6 @@
 class ApiRequestCorrelationManager {
-  private registeredHandlers: Map<string, Function> = new Map();
   private handlers: Map<string, Function> = new Map();
+  private registeredHandlers: Map<string, Function> = new Map();
 
   addHandler(rqId: string, fn: Function) {
     if (!rqId || !fn) {
@@ -31,6 +31,16 @@ class ApiRequestCorrelationManager {
       this.registeredHandlers.delete(networkId);
     }
   }
+
+  removeHandler(rqId: string) {
+    if (!rqId) {
+      return;
+    }
+
+    this.handlers.delete(rqId);
+  }
 }
 
 export const apiRequestCorrelationManager = new ApiRequestCorrelationManager();
+
+self.apiRequestCorrelationManager = apiRequestCorrelationManager;

@@ -44,6 +44,8 @@ interface Response {
   redirectedUrl: string;
 }
 
+export const REQUESTLY_ID_HEADER = "x-requestly__id__";
+
 /* UTIL */
 
 const isFormRequest = (
@@ -76,8 +78,8 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     headers.append(key, value);
   });
 
-  const requestId = crypto.randomUUID();
-  headers.append("X-requestly-Id", requestId);
+  const requestlyId = crypto.randomUUID();
+  headers.append(REQUESTLY_ID_HEADER, requestlyId);
 
   //log all request headers
   console.log("!!!debug", "request headers", Array.from(headers.entries()));
@@ -99,9 +101,9 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     const requestStartTime = performance.now();
     let responseHeaders: KeyValuePair[] = [];
     apiRequestCorrelationManager.addHandler(
-      requestId,
+      requestlyId,
       (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
-        console.log("!!!debug", "requestly handler invoked for requestId", requestId);
+        console.log("!!!debug", "requestly handler invoked for requestId", requestlyId);
         responseHeaders = requestDetails.responseHeaders.map((header) => ({
           key: header.name,
           value: header.value,
@@ -115,11 +117,6 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
       credentials: apiRequest.includeCredentials ? "include" : "omit",
     });
     const responseTime = performance.now() - requestStartTime;
-
-    // await new Promise((resolve) => {
-    //   setTimeout(resolve, 1000); // Wait for a short time to ensure response headers are stored
-    // });
-    console.log("!!!debug", "response headers", responseHeaders);
 
     const responseBlob = await response.blob();
     const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
@@ -138,10 +135,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     } else {
       responseBody = await responseBlob.text();
     }
-    console.log("woohoo", requestId);
     return {
-      //@ts-ignore
-      requestId,
       body: responseBody,
       time: responseTime,
       headers: responseHeaders,
@@ -150,6 +144,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
       redirectedUrl: response.url !== url ? response.url : "",
     };
   } catch (e) {
+    apiRequestCorrelationManager.removeHandler(requestlyId);
     return {
       error: e.message,
     };
