@@ -4,7 +4,7 @@ import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
 import { onVariableChange, Variable } from "../variable";
-import { box } from "./box";
+import { apiRequestCorrelationManager } from "./apiClient/ApiRequestCorrelationManager";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // Firefox and Safari do not have documentLifecycle
@@ -50,6 +50,10 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 };
 
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
+  if (details.url.includes("3652")) {
+    console.log("!!!debug", "", details);
+  }
+
   let isMainOrPrerenderedFrame =
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
@@ -60,7 +64,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
   const rqidHeader = details.requestHeaders.find((h) => h.name.toLowerCase() === "x-requestly-id");
   if (rqidHeader) {
     // Map rqidHeader.value <-> details.requestId in extension memory
-    box.registerHandler(details.requestId, rqidHeader.value);
+    apiRequestCorrelationManager.bindHandlerToRequestId(details.requestId, rqidHeader.value);
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
@@ -88,7 +92,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 };
 
 const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  box.invokeHandler(details);
+  apiRequestCorrelationManager.invokeHandler(details);
   let isMainOrPrerenderedFrame =
     //@ts-ignore
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;

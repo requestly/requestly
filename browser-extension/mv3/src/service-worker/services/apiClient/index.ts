@@ -1,4 +1,4 @@
-import { box } from "./box";
+import { apiRequestCorrelationManager } from "./ApiRequestCorrelationManager";
 
 /* TYPES */
 enum RequestMethod {
@@ -98,13 +98,16 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   try {
     const requestStartTime = performance.now();
     let responseHeaders: KeyValuePair[] = [];
-    box.addHandler(requestId, (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
-      console.log("!!!debug", "requestly handler invoked for requestId", requestId);
-      responseHeaders = requestDetails.responseHeaders.map((header) => ({
-        key: header.name,
-        value: header.value,
-      }));
-    });
+    apiRequestCorrelationManager.addHandler(
+      requestId,
+      (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
+        console.log("!!!debug", "requestly handler invoked for requestId", requestId);
+        responseHeaders = requestDetails.responseHeaders.map((header) => ({
+          key: header.name,
+          value: header.value,
+        }));
+      }
+    );
     const response = await fetch(url, {
       method,
       headers,
