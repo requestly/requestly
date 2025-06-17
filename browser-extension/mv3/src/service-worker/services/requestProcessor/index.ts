@@ -4,30 +4,9 @@ import { handleInitiatorDomainFunction } from "./handleInitiatorDomainFunction";
 import rulesStorageService from "../../../rulesStorageService";
 import { RuleType } from "common/types";
 import { handleCSPError } from "./handleCSPError";
-import { updateRequestSpecificRules } from "../rulesManager";
 
 class RequestProcessor {
-  constructor() {
-    updateRequestSpecificRules(
-      -1, // -1 means this rule is not associated with any tab
-      "",
-      {
-        action: {
-          type: "modifyHeaders" as chrome.declarativeNetRequest.RuleActionType,
-          requestHeaders: [
-            {
-              header: "x-requestly-id",
-              operation: "remove" as chrome.declarativeNetRequest.HeaderOperation,
-            },
-          ],
-        },
-        condition: {
-          resourceTypes: ["xmlhttprequest" as chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
-        },
-      },
-      "removeRequestlyIdHeader"
-    );
-  }
+  constructor() {}
 
   onBeforeAJAXRequest = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
     const enabledRules = await rulesStorageService.getEnabledRules();
