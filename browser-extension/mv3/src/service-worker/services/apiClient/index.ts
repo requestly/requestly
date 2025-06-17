@@ -81,9 +81,6 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   const requestlyId = crypto.randomUUID();
   headers.append(REQUESTLY_ID_HEADER, requestlyId);
 
-  //log all request headers
-  console.log("!!!debug", "request headers", Array.from(headers.entries()));
-
   if (isFormRequest(apiRequest.method, apiRequest.contentType, body)) {
     const formData = new FormData();
     body?.forEach(({ key, value }) => {
@@ -103,7 +100,6 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     apiRequestCorrelationManager.addHandler(
       requestlyId,
       (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
-        console.log("!!!debug", "requestly handler invoked for requestId", requestlyId);
         responseHeaders = requestDetails.responseHeaders.map((header) => ({
           key: header.name,
           value: header.value,

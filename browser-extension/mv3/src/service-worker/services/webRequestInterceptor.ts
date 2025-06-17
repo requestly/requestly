@@ -51,10 +51,6 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 };
 
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  if (details.url.includes("3652")) {
-    console.log("!!!debug", "", details);
-  }
-
   let isMainOrPrerenderedFrame =
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 

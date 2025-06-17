@@ -32,15 +32,13 @@ class ApiRequestCorrelationManager {
     }
   }
 
-  removeHandler(rqId: string) {
-    if (!rqId) {
+  removeHandler(requestId: string) {
+    if (!requestId) {
       return;
     }
 
-    this.handlers.delete(rqId);
+    this.registeredHandlers.delete(requestId);
   }
 }
 
 export const apiRequestCorrelationManager = new ApiRequestCorrelationManager();
-
-self.apiRequestCorrelationManager = apiRequestCorrelationManager;
