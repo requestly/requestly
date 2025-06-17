@@ -29,6 +29,7 @@ The following domains are eligible for the student programme:
     ".edu.es",
     ".edu.tr",
     ".edu.vn",
+    ".edu.pe",
     ".ac.id",
     "bennington.edu",
     "udg.mx",
