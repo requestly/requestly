@@ -9,6 +9,7 @@ import { useAuthScreenContext } from "features/onboarding/screens/auth/context";
 import { trackLoginWithGoogleClicked } from "modules/analytics/events/common/auth/signup";
 import "./googleAuthButton.scss";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import Logger from "../../../../../../../../../../common/logger";
 
 interface GoogleAuthButtonProps {
   onGoogleAuthClick?: () => void;
@@ -32,6 +33,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
 
   const onFail = useCallback(
     (code: AuthErrorCode) => {
+      Logger.log("[Auth-GoogleAuthButton-onFail] Error logging in with Google", { code });
       failedLoginCallback(code, AUTH_PROVIDERS.GMAIL);
     },
     [failedLoginCallback]
@@ -43,6 +45,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       setIsLoading(true);
       onGoogleAuthClick();
       if (!credentialResponse) {
+        Logger.log("[Auth-GoogleAuthButton-handleGoogleAuth] No credential response");
         toast.error("Something went wrong. Please try again.");
         setIsLoading(false);
         return;

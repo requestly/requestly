@@ -12,6 +12,7 @@ import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./emailAuthForm.scss";
 import { trackLoginWithPasswordClicked } from "modules/analytics/events/common/auth/signup";
+import Logger from "../../../../../../../../../../common/logger";
 
 interface EmailAuthFormProps {
   isLoading: boolean;
@@ -38,6 +39,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
         toggleAuthModal(false);
       }
     } catch (error) {
+      Logger.log("[Auth-EmailAuthForm-handleSignInWithEmailAndPassword] catch", { error });
       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, error.errorCode));
     } finally {
       setIsSignInInProgress(false);

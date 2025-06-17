@@ -13,6 +13,7 @@ import "./rqAuthCard.scss";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
 import { getSSOProviderId } from "backend/auth/sso";
+import Logger from "../../../../../../../../common/logger";
 
 interface RQAuthCardProps {
   onBackClick: () => void;
@@ -49,6 +50,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
       setIsSSOLoginInProgress(false);
       successfulLoginCallback(AUTH_PROVIDERS.SSO);
     } catch (err) {
+      Logger.log("[Auth-handleSSOLogin] Error logging in with SSO", { err });
       failedLoginCallback(AuthErrorCode.UNKNOWN, AUTH_PROVIDERS.SSO);
       toast.error("Something went wrong, Could not sign in with SSO");
       setIsSSOLoginInProgress(false);

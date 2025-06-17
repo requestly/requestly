@@ -9,6 +9,7 @@ import { useAuthScreenContext } from "../../context";
 import LINKS from "config/constants/sub/links";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import { trackLoginEmailEntered } from "modules/analytics/events/common/auth/signup";
+import Logger from "../../../../../../../../common/logger";
 
 interface EnterEmailCardProps {
   onEmailChange: (email: string) => void;
@@ -31,6 +32,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
     const processedEmail = email.trim();
 
     if (!isEmailValid(processedEmail)) {
+      Logger.log("[Auth-handleOnContinue] Invalid email");
       toast.error("Please enter a valid email address");
       setIsLoading(false);
       return;
@@ -44,10 +46,12 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
           onAuthSyncVerification(metadata);
           return;
         }
+        Logger.log("[Auth-handleOnContinue] Error getting user auth sync details", { data });
         toast.error("Something went wrong! Please try again or contact support.");
         setIsLoading(false);
       });
     } catch (error) {
+      Logger.log("[Auth-handleOnContinue] catch", { error });
       toast.error("Something went wrong! Please try again or contact support.");
       setIsLoading(false);
     }
