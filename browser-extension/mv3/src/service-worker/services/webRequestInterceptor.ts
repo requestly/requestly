@@ -4,11 +4,9 @@ import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
 import { onVariableChange, Variable } from "../variable";
-import { saveRecord } from "common/storage";
 import { box } from "./box";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
-  box.registerHandler(details.requestId);
   // Firefox and Safari do not have documentLifecycle
   // @ts-ignore
   if (details?.documentLifecyle) {
@@ -51,12 +49,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
   });
 };
 
-const rqIdHeaderMap = new Map<string, string>();
-
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  if (details.url.includes("localhost")) {
-    console.log("!!!debug", "request headers", details);
-  }
   let isMainOrPrerenderedFrame =
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
@@ -67,7 +60,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
   const rqidHeader = details.requestHeaders.find((h) => h.name.toLowerCase() === "x-requestly-id");
   if (rqidHeader) {
     // Map rqidHeader.value <-> details.requestId in extension memory
-    rqIdHeaderMap.set(details.requestId, rqidHeader.value);
+    box.registerHandler(details.requestId, rqidHeader.value);
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
@@ -95,26 +88,13 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 };
 
 const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  box.invokeHandler(details.requestId);
+  box.invokeHandler(details);
   let isMainOrPrerenderedFrame =
     //@ts-ignore
     details.type === "main_frame" || details.documentLifecycle === "prerender" ? true : false;
 
   if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
-  }
-
-  const rqidHeader = rqIdHeaderMap.get(details.requestId);
-  if (rqidHeader) {
-    const responseHeaders = details.responseHeaders || [];
-    saveRecord(`requestly-${rqidHeader}`, {
-      requestId: details.requestId,
-      responseHeaders: responseHeaders.map((header) => ({
-        key: header.name,
-        value: header.value,
-      })),
-    });
-    rqIdHeaderMap.delete(details.requestId);
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {

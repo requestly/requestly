@@ -1,4 +1,3 @@
-import { getRecord, removeRecord } from "common/storage";
 import { box } from "./box";
 
 /* TYPES */
@@ -63,8 +62,6 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   let url = apiRequest.url;
   let finalRequestBody: any = body;
 
-  const requestId = crypto.randomUUID();
-
   if (apiRequest?.queryParams.length) {
     const urlObj = new URL(apiRequest.url);
     const searchParams = new URLSearchParams(urlObj.search);
@@ -78,6 +75,8 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   apiRequest?.headers.forEach(({ key, value }) => {
     headers.append(key, value);
   });
+
+  const requestId = crypto.randomUUID();
   headers.append("X-requestly-Id", requestId);
 
   //log all request headers
@@ -98,10 +97,13 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
 
   try {
     const requestStartTime = performance.now();
-    let requestId = "";
-    box.addHandler((id: string) => {
-      console.log("heeey");
-      requestId = id;
+    let responseHeaders: KeyValuePair[] = [];
+    box.addHandler(requestId, (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
+      console.log("!!!debug", "requestly handler invoked for requestId", requestId);
+      responseHeaders = requestDetails.responseHeaders.map((header) => ({
+        key: header.name,
+        value: header.value,
+      }));
     });
     const response = await fetch(url, {
       method,
@@ -114,14 +116,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     // await new Promise((resolve) => {
     //   setTimeout(resolve, 1000); // Wait for a short time to ensure response headers are stored
     // });
-    const responseHeaders: KeyValuePair[] = (await getRecord(`requestly-${requestId}`)).responseHeaders || [];
     console.log("!!!debug", "response headers", responseHeaders);
-
-    removeRecord(`requestly-${requestId}`); // Clean up the stored request ID after fetching the response
-    // chrome.storage.local.remove(`requestly-${requestId}`);
-    // for (const [key, value] of response.headers.entries()) {
-    //   responseHeaders.push({ key, value });
-    // }
 
     const responseBlob = await response.blob();
     const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
