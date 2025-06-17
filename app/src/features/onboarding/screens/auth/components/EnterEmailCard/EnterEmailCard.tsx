@@ -44,6 +44,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
         if (data.success) {
           const metadata = data.syncData;
           onAuthSyncVerification(metadata);
+          Logger.log("[Auth-handleOnContinue] metadata", { metadata });
           return;
         }
         Logger.log("[Auth-handleOnContinue] Error getting user auth sync details", { data });

@@ -49,6 +49,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
       await loginWithSSO(ssoProviderId, email);
       setIsSSOLoginInProgress(false);
       successfulLoginCallback(AUTH_PROVIDERS.SSO);
+      Logger.log("[Auth-handleSSOLogin] Successfully logged in with SSO");
     } catch (err) {
       Logger.log("[Auth-handleSSOLogin] Error logging in with SSO", { err });
       failedLoginCallback(AuthErrorCode.UNKNOWN, AUTH_PROVIDERS.SSO);

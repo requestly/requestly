@@ -61,6 +61,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
     onResendEmailClick()
       .then(() => {
         setCountdown(20);
+        Logger.log("[Auth-EmailVerificationCard-handleResendEmailClick] Successfully re-sent email link");
       })
       .catch((error) => {
         Logger.log("[Auth-EmailVerificationCard-handleResendEmailClick] catch", { error });

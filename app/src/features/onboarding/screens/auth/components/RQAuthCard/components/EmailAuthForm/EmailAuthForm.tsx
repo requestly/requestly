@@ -37,6 +37,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
         const greatingName = result.user.displayName?.split(" ")?.[0];
         toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome back!");
         toggleAuthModal(false);
+        Logger.log("[Auth-EmailAuthForm-handleSignInWithEmailAndPassword] Successfully logged in");
       }
     } catch (error) {
       Logger.log("[Auth-EmailAuthForm-handleSignInWithEmailAndPassword] catch", { error });

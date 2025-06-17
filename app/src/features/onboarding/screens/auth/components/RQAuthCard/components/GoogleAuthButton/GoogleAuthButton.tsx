@@ -29,6 +29,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
 
   const onSuccess = useCallback(() => {
     successfulLoginCallback(AUTH_PROVIDERS.GMAIL);
+    Logger.log("[Auth-GoogleAuthButton-onSuccess] Successfully logged in with Google");
   }, [successfulLoginCallback]);
 
   const onFail = useCallback(
@@ -54,6 +55,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       // @ts-ignore
       if (decodedCredential.email !== email) {
         onFail(AuthErrorCode.DIFFERENT_USER);
+        Logger.log("[Auth-GoogleAuthButton-handleGoogleAuth] Different user");
         setIsLoading(false);
         return;
       }
