@@ -635,6 +635,7 @@ const APIClientView: React.FC<Props> = ({
         getEnvironmentVariables: getCurrentEnvironmentVariables,
         getGlobalVariables,
         postScriptExecutionCallback: handleUpdatesFromExecutionWorker,
+        renderVariables,
       });
     }
   }, [
@@ -643,6 +644,7 @@ const APIClientView: React.FC<Props> = ({
     getGlobalVariables,
     handleUpdatesFromExecutionWorker,
     apiClientExecutor,
+    renderVariables,
   ]);
 
   const handleRevertChanges = () => {
