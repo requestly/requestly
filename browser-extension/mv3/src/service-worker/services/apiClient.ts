@@ -1,3 +1,5 @@
+import { getRecord, removeRecord } from "common/storage";
+
 /* TYPES */
 enum RequestMethod {
   GET = "GET",
@@ -60,6 +62,8 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   let url = apiRequest.url;
   let finalRequestBody: any = body;
 
+  const requestId = crypto.randomUUID();
+
   if (apiRequest?.queryParams.length) {
     const urlObj = new URL(apiRequest.url);
     const searchParams = new URLSearchParams(urlObj.search);
@@ -73,6 +77,10 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   apiRequest?.headers.forEach(({ key, value }) => {
     headers.append(key, value);
   });
+  headers.append("X-requestly-Id", requestId);
+
+  //log all request headers
+  console.log("!!!debug", "request headers", Array.from(headers.entries()));
 
   if (isFormRequest(apiRequest.method, apiRequest.contentType, body)) {
     const formData = new FormData();
@@ -97,10 +105,17 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     });
     const responseTime = performance.now() - requestStartTime;
 
-    const responseHeaders: KeyValuePair[] = [];
-    for (const [key, value] of response.headers.entries()) {
-      responseHeaders.push({ key, value });
-    }
+    // await new Promise((resolve) => {
+    //   setTimeout(resolve, 1000); // Wait for a short time to ensure response headers are stored
+    // });
+    const responseHeaders: KeyValuePair[] = (await getRecord(`requestly-${requestId}`)).responseHeaders || [];
+    console.log("!!!debug", "response headers", responseHeaders);
+
+    removeRecord(`requestly-${requestId}`); // Clean up the stored request ID after fetching the response
+    // chrome.storage.local.remove(`requestly-${requestId}`);
+    // for (const [key, value] of response.headers.entries()) {
+    //   responseHeaders.push({ key, value });
+    // }
 
     const responseBlob = await response.blob();
     const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
