@@ -91,6 +91,7 @@ const PageScriptMessageHandler = {
   },
 
   isListenerAdder: false,
+  // TODO: init to be never called more than once
   init: function () {
     // Handle Backward compatibility
     // We have updated domain to .io in newer version of extensions but older extension versions
