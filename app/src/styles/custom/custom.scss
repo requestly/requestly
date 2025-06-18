@@ -608,5 +608,5 @@ div.react-multi-email .multi-email-tag {
 // All tooltips to have sm font size
 .ant-tooltip-inner {
   // Our new -sm token has 13px value while DS has 12px
-  font-size: var(--font-size-sm, 12px);
+  font-size: var(--requestly-font-size-sm, 12px);
 }

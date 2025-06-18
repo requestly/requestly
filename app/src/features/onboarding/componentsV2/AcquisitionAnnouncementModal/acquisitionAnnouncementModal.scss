@@ -71,7 +71,7 @@
 
   &__description {
     color: var(--requestly-color-text-subtle);
-    font-size: var(--font-size-sm, 12px);
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px; /* 150% */
   }
 
@@ -82,7 +82,7 @@
     color: var(--requestly-color-primary-text, #639ff9);
     text-align: center;
 
-    font-size: var(--font-size-sm, 12px);
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px; /* 150% */
     align-self: flex-end;
 
