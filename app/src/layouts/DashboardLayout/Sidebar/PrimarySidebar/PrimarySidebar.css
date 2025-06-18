@@ -76,7 +76,7 @@
 }
 
 .primary-sidebar-link .link-title {
-  font-size: var(--requestly-font-size-2xs);
+  font-size: var(--requestly-font-size-xs);
   line-height: 15.92px;
   text-align: center;
 }
