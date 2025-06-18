@@ -188,18 +188,30 @@ export const CollectionRow: React.FC<Props> = ({
     [record.id, apiClientRecordsRepository, onSaveRecord]
   );
 
-  const checkCanDropItem = (item: DraggableItem) => {
-    if (item.id === record.id || item.collectionId === record.id) return false;
-    if (item.type === RQAPI.RecordType.COLLECTION) {
-      const isItemParentCollection = checkIsParentCollection(item.id, record.id, recordsChildParentMap);
-      if (isItemParentCollection) {
-        toast.error("Item cannot be moved to its own child collection");
+  const checkCanDropItem = useCallback(
+    (item: DraggableItem): boolean => {
+      if (item.id === record.id) {
         return false;
       }
+
+      if (item.collectionId === record.id) {
+        return false;
+      }
+
+      // For collections, check for circular reference (parent-child relationship)
+      if (item.type === RQAPI.RecordType.COLLECTION) {
+        const wouldCreateCircularReference = checkIsParentCollection(item.id, record.id, recordsChildParentMap);
+
+        if (wouldCreateCircularReference) {
+          toast.error("Cannot move a collection into its own child collection");
+          return false;
+        }
+      }
+
       return true;
-    }
-    return true;
-  };
+    },
+    [record.id, recordsChildParentMap]
+  );
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
