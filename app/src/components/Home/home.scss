@@ -87,7 +87,7 @@
 
       h1 {
         line-height: 20px;
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         font-weight: 500;
         margin: 0;
       }
@@ -273,7 +273,7 @@
 
       h1 {
         line-height: 20px;
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         font-weight: 500;
         margin: 0;
       }
@@ -476,7 +476,7 @@
       }
       span {
         line-height: 20px;
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
       }
     }
 

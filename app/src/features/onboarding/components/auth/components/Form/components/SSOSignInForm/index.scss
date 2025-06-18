@@ -8,7 +8,7 @@
   font-weight: 500;
 
   & span {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 }
 

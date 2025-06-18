@@ -121,7 +121,7 @@
     line-height: 14px;
 
     & svg {
-      font-size: 14px;
+      font-size: var(--requestly-font-size-md, 14px);
     }
   }
 

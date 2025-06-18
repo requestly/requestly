@@ -19,7 +19,7 @@
 }
 
 .session-settings-container .header .anticon {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
 }
 
 .automatic-recording-container {
@@ -27,7 +27,7 @@
 }
 
 .automatic-recording-details .heading {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   margin-bottom: 5px;
   color: var(--white);

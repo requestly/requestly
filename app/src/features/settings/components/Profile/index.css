@@ -66,7 +66,7 @@
   box-shadow: rgba(50, 50, 93, 0.15) 0px 1px 3px, rgba(0, 0, 0, 0.02) 0px 1px 0px;
   color: #8898aa;
   display: block;
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 400;
   height: calc(1.5em + 1.25rem + 5px);
   line-height: 21px;
@@ -160,7 +160,7 @@
   color: #8898aa;
   display: block;
   flex: 1 1 0%;
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 400;
   height: calc(1.5em + 1.25rem + 5px);
   left: 0px;

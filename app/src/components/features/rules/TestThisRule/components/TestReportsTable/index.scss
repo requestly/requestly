@@ -31,7 +31,7 @@
     font-weight: 500;
 
     & svg {
-      font-size: 14px;
+      font-size: var(--requestly-font-size-md, 14px);
       position: relative;
       top: -1px;
     }
@@ -71,7 +71,7 @@
     color: var(--text-default);
 
     & svg {
-      font-size: 14px;
+      font-size: var(--requestly-font-size-md, 14px);
     }
   }
 
@@ -86,7 +86,7 @@
   color: var(--text-subtle);
 
   & .saving-test-session-spinner {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
     color: var(--text-default);
   }
 }

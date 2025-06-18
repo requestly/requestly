@@ -11,7 +11,7 @@
     font-weight: 500;
     color: var(--white);
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 
   & .create-workspace-view-description {
