@@ -103,18 +103,20 @@
   --requestly-font-weight-bold: 700;
   --requestly-font-weight-extrabold: 800;
   --requestly-font-weight-black: 900;
-  --requestly-font-size-2xs: 0.625rem; /* 10px */
+  --requestly-font-size-2xs: 0.563rem; /* 9px */
   --requestly-font-size-xs: 0.688rem; /* 11px */
-  --requestly-font-size-sm: 0.813rem; /* 13px */
-  --requestly-font-size-md: 0.938rem; /* 15px */
+  --requestly-font-size-sm: 0.75rem; /* 12px */
+  --requestly-font-size-md: 0.875rem; /* 14px */
   --requestly-font-size-base: 1rem; /* 16px */
-  --requestly-font-size-lg: 1.25rem; /* 20px */
-  --requestly-font-size-xl: 1.5rem; /* 24px */
+  --requestly-font-size-lg: 1rem; /* 16px */
+  --requestly-font-size-xl: 1.125rem; /* 18px */
+
   --requestly-font-size-2xl: 1.875rem; /* 30px */
   --requestly-font-size-3xl: 2.25rem; /* 36px */
   --requestly-font-size-4xl: 3rem; /* 48px */
   --requestly-font-size-5xl: 3.75rem; /* 60px */
-  --requestly-font-line-height-2xs: 0.75rem;
+
+  --requestly-font-line-height-2xs: 0.813rem;
   --requestly-font-line-height-xs: 0.938rem;
   --requestly-font-line-height-sm: 1.25rem;
   --requestly-font-line-height-md: 1.438rem;
@@ -125,6 +127,7 @@
   --requestly-font-line-height-3xl: 3.375rem;
   --requestly-font-line-height-4xl: 4.5rem;
   --requestly-font-line-height-5xl: 5.625rem;
+
   --requestly-font-family-code: Roboto Mono;
   --requestly-font-family-default: Inter;
 }
