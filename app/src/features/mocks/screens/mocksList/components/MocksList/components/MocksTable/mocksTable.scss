@@ -168,7 +168,7 @@
 
           .mock-type {
             margin-top: 2px;
-            font-size: 9px;
+            font-size: var(--requestly-font-size-2xs, 9px);
             font-weight: 600;
             letter-spacing: 1px;
             text-transform: uppercase;

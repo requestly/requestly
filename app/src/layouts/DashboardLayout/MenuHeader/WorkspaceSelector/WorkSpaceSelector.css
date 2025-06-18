@@ -52,7 +52,7 @@
 }
 
 .active-workspace-name-down-icon.anticon {
-  font-size: 9px;
+  font-size: var(--requestly-font-size-2xs, 9px);
   margin-top: 1px;
   margin-left: 10px;
 }
