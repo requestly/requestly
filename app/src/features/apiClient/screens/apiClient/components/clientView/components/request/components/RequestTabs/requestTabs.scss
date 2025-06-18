@@ -20,9 +20,9 @@
   }
 
   .ant-tabs-content,
-  .ant-tabs-tabpane,
   .ant-tabs-tabpane {
     height: 100%;
+    overflow: auto;
   }
 
   .rq-content-list-table-container {
