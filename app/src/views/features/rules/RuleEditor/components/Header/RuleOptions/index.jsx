@@ -6,6 +6,7 @@ import DuplicateButton from "../ActionButtons/DuplicateButton";
 import DeleteButton from "../ActionButtons/DeleteButton";
 import APP_CONSTANTS from "config/constants";
 import "./RuleOptions.css";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 
 const RuleOptions = ({ mode, rule }) => {
   const navigate = useNavigate();
@@ -59,14 +60,7 @@ const RuleOptions = ({ mode, rule }) => {
       <RQButton>
         <span>
           More
-          <img
-            style={{ width: "10px", height: "6px" }}
-            width={10}
-            height={6}
-            alt="down arrow"
-            src="/assets/media/common/down-arrow.svg" // TODO: replace icon with react-icon
-            className="editor-rule-options-trigger-icon"
-          />
+          <MdOutlineKeyboardArrowDown />
         </span>
       </RQButton>
     </Dropdown>
