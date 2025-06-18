@@ -77,7 +77,7 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
-        <AutogenerateProvider entry={entryDetails?.data}>
+        <AutogenerateProvider>
           <QueryParamsProvider entry={entryDetails?.data}>
             <APIClientView
               apiEntryDetails={entryDetails}
