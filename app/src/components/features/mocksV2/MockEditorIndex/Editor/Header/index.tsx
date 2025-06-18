@@ -109,10 +109,8 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
                 }`}
               >
                 <RQButton>
-                  <span>
-                    More
-                    <MdOutlineKeyboardArrowDown />
-                  </span>
+                  More
+                  <MdOutlineKeyboardArrowDown />
                 </RQButton>
               </Dropdown>
             </div>

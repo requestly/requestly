@@ -203,12 +203,10 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         className={`editor-group-dropdown-trigger ${showDropdown ? "editor-group-dropdown-active" : ""}`}
       >
         <RQButton>
-          <span>
-            {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
-              ? "Add to group"
-              : "Edit group"}
-            <MdOutlineKeyboardArrowDown />
-          </span>
+          {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+            ? "Add to group"
+            : "Edit group"}
+          <MdOutlineKeyboardArrowDown />
         </RQButton>
       </Dropdown>
     </div>

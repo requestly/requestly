@@ -58,10 +58,8 @@ const RuleOptions = ({ mode, rule }) => {
       className={`editor-rule-options-trigger ${isOptionsVisible ? "editor-rule-options-active" : ""}`}
     >
       <RQButton>
-        <span>
-          More
-          <MdOutlineKeyboardArrowDown />
-        </span>
+        More
+        <MdOutlineKeyboardArrowDown />
       </RQButton>
     </Dropdown>
   );
