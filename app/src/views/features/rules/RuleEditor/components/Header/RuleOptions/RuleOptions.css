@@ -16,10 +16,6 @@
   border-color: var(--dropdown-active-border-color);
 }
 
-.editor-rule-options-trigger-icon {
-  margin-left: 5px;
-}
-
 .editor-rule-options-menu.ant-dropdown-menu {
   width: 7.35rem;
 }
