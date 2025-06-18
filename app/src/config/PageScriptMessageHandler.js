@@ -90,6 +90,7 @@ const PageScriptMessageHandler = {
     }
   },
 
+  isListenerAdder: false,
   init: function () {
     // Handle Backward compatibility
     // We have updated domain to .io in newer version of extensions but older extension versions
@@ -104,7 +105,10 @@ const PageScriptMessageHandler = {
       this.constants.DOMAIN = this.constants.DOMAIN.replace(".io", ".in");
     }
 
-    window.addEventListener("message", this.handleMessageReceived.bind(this));
+    if (!this.isListenerAdded) {
+      window.addEventListener("message", this.handleMessageReceived.bind(this));
+      this.isListenerAdded = true;
+    }
   },
 };
 
