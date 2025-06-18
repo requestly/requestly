@@ -139,10 +139,10 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
 
 export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
   const result: KeyValuePair[] = [];
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     data = {
-      [data]: '',
-    }
+      [data]: "",
+    };
   }
   for (const [key, rawValue] of Object.entries(data)) {
     const valueArray = Array.isArray(rawValue) ? rawValue : [rawValue];
@@ -152,7 +152,7 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
         value,
         id: Math.random(),
         isEnabled: true,
-      })
+      });
     }
   }
   return result;
@@ -561,4 +561,14 @@ export const processRecordsForDuplication = (
   }
 
   return recordsToDuplicate;
+};
+
+export const checkIsParentCollection = (
+  id: string,
+  recordId: string,
+  recordsChildParentMap: Record<string, string>
+): boolean => {
+  if (id === recordId) return true;
+  if (!recordId || !recordsChildParentMap[recordId]) return false;
+  return checkIsParentCollection(recordsChildParentMap[recordId], recordId, recordsChildParentMap);
 };

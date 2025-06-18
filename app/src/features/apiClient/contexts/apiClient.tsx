@@ -66,6 +66,7 @@ interface ApiClientContextInterface {
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
+  recordsChildParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>;
 
   forceRefreshApiClientRecords: () => Promise<boolean>;
 }
@@ -104,6 +105,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
 
   apiClientWorkloadManager: new APIClientWorkloadManager(),
   apiClientRecordsRepository: null,
+  recordsChildParentMap: {},
 
   forceRefreshApiClientRecords: async () => false,
 });
@@ -413,6 +415,16 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
+  const recordsChildParentMap = useMemo(() => {
+    return apiClientRecords.reduce(
+      (collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item: RQAPI.Record) => {
+        collectionIdMap[item.id] = item.collectionId || "";
+        return collectionIdMap;
+      },
+      {}
+    );
+  }, [apiClientRecords]);
+
   const value = {
     apiClientRecords,
     errorFiles,
@@ -446,6 +458,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     apiClientWorkloadManager: workloadManager,
     apiClientRecordsRepository,
     forceRefreshApiClientRecords,
+    recordsChildParentMap,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
