@@ -74,7 +74,6 @@
   }
 
   .api-client-body {
-    padding-top: 8px;
     position: sticky;
     overflow: hidden;
 
@@ -153,7 +152,7 @@
   .api-request-tabs {
     height: calc(100% - 20px);
     overflow: hidden;
-    margin-top: 8px;
+    margin-top: 2px;
 
     .ant-tabs-content-holder {
       height: inherit;
