@@ -58,7 +58,7 @@
     }
 
     .pro-basic-feature-title {
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
 
       img {
         width: 58px;
@@ -101,7 +101,7 @@
     }
 
     .ant-typography.companies-section-header {
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
     }
 
     .company-logo {

@@ -270,7 +270,7 @@
     .session-panel-content {
       height: 300px;
       overflow: auto;
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
 
       .placeholder {
         height: 100%;

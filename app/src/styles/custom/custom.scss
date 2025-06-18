@@ -526,7 +526,7 @@ div.react-multi-email.focused {
 }
 
 div.react-multi-email .multi-email-tag {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 400;
   padding: 4px 8px;
   color: var(--white);

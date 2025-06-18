@@ -1,5 +1,5 @@
 .premium-plan-days-left {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   padding-left: 8px;
   padding-right: 8px;
   color: var(--danger);
@@ -11,7 +11,7 @@
   background-image: linear-gradient(180deg, #373e47, #30363d 90%);
   color: #adbac7;
   border-radius: 5px 0px 0px 5px;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 500;
   width: 100%;
   padding: 0 4px;

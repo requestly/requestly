@@ -116,7 +116,7 @@
     gap: 8px;
     color: var(--neutrals-gray-300);
     margin-top: 10px;
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     align-items: center;
     line-height: 14px;
 

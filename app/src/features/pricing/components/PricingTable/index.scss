@@ -56,13 +56,13 @@
 
 .plan-price-row {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   min-height: 60px;
 
   .caption {
     &.text-white {
       color: var(--requestly-color-text-subtle);
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
       font-weight: 400;
       line-height: 18px;
       font-style: normal;
@@ -203,7 +203,7 @@
 
   &.api-client {
     line-height: 18px;
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     font-weight: 500;
     color: var(--requestly-color-warning-400);
   }
@@ -219,7 +219,7 @@
   color: var(--neutrals-gray-300);
 
   span {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px;
   }
 

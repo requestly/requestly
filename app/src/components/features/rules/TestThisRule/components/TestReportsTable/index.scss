@@ -20,7 +20,7 @@
   }
 
   td {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     color: var(--text-subtle);
   }
 

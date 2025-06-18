@@ -15,7 +15,7 @@
   }
 
   & .create-workspace-view-description {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     color: var(--neutrals-gray-300);
     text-align: center;
     max-width: 300px;

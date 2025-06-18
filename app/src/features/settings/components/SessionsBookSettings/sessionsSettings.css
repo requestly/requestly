@@ -83,7 +83,7 @@
 .specific-page-mode-container .add-new-source-btn.ant-btn {
   margin-top: 6px;
   padding: 11px;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   height: auto;
   color: var(--white);
   border: 1px dashed var(--primary);
