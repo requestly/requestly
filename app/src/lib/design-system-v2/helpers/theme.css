@@ -110,12 +110,6 @@
   --requestly-font-size-base: 1rem; /* 16px */
   --requestly-font-size-lg: 1rem; /* 16px */
   --requestly-font-size-xl: 1.125rem; /* 18px */
-
-  --requestly-font-size-2xl: 1.875rem; /* 30px */
-  --requestly-font-size-3xl: 2.25rem; /* 36px */
-  --requestly-font-size-4xl: 3rem; /* 48px */
-  --requestly-font-size-5xl: 3.75rem; /* 60px */
-
   --requestly-font-line-height-2xs: 0.813rem;
   --requestly-font-line-height-xs: 0.938rem;
   --requestly-font-line-height-sm: 1.25rem;
@@ -127,7 +121,6 @@
   --requestly-font-line-height-3xl: 3.375rem;
   --requestly-font-line-height-4xl: 4.5rem;
   --requestly-font-line-height-5xl: 5.625rem;
-
   --requestly-font-family-code: Roboto Mono;
   --requestly-font-family-default: Inter;
 }
