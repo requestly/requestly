@@ -28,9 +28,9 @@ echo -e "\n***** Generating requestly-core Dist Files *****"
 npm run build
 
 echo -e "\n***** Building @requestly/shared *****"
-cd shared
+cd ./packages/shared
 npm run build
-cd ..
+cd ../..
 
 echo -e "\n***** Building New React App *****"
 cd app
