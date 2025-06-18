@@ -192,7 +192,7 @@
     .mock-description-icon {
       display: flex;
       align-items: center;
-      font-size: 16px;
+      font-size: var(--requestly-font-size-lg, 16px);
       color: var(--requestly-color-text-placeholder);
       flex-shrink: 0;
     }

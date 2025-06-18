@@ -90,7 +90,7 @@
   margin: 2.8rem 0;
   padding: 1.8rem;
   border-radius: 0.4rem;
-  font-size: 16px;
+  font-size: var(--requestly-font-size-lg, 16px);
 }
 
 .profile-team-body {
@@ -137,7 +137,7 @@
 }
 
 .profile-card-body {
-  font-size: 16px;
+  font-size: var(--requestly-font-size-lg, 16px);
 }
 
 .input-group {
