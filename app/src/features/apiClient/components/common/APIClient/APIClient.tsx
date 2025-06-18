@@ -20,7 +20,6 @@ import { useSelector } from "react-redux";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
-
 interface Props {
   request: string | APIClientRequest; // string for cURL request
   openInModal?: boolean;
@@ -101,7 +100,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
           {user.loggedIn ? (
-            <AutogenerateProvider entry={apiEntry}>
+            <AutogenerateProvider>
               <QueryParamsProvider entry={apiEntry}>
                 <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
               </QueryParamsProvider>
@@ -114,7 +113,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     </Modal>
   ) : (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <AutogenerateProvider entry={apiEntry}>
+      <AutogenerateProvider>
         <QueryParamsProvider entry={apiEntry}>
           <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
         </QueryParamsProvider>
