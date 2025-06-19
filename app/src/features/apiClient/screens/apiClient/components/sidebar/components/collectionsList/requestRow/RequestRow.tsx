@@ -58,7 +58,11 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: RQAPI.RecordType.API,
-    item: { id: record.id, type: record.type, collectionId: record.collectionId },
+    item: {
+      id: record.id,
+      type: record.type,
+      collectionId: record.collectionId,
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

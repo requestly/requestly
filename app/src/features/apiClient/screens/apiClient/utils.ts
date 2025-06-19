@@ -564,11 +564,12 @@ export const processRecordsForDuplication = (
 };
 
 export const checkIsParentCollection = (
-  id: string,
-  recordId: string,
+  potentialParentId: string,
+  targetRecordId: string,
   recordsChildParentMap: Record<string, string>
 ): boolean => {
-  if (id === recordId) return true;
-  if (!recordId || !recordsChildParentMap[recordId]) return false;
-  return checkIsParentCollection(recordsChildParentMap[recordId], recordId, recordsChildParentMap);
+  if (potentialParentId === targetRecordId) return true;
+  if (!targetRecordId || !recordsChildParentMap[targetRecordId]) return false;
+
+  return checkIsParentCollection(potentialParentId, recordsChildParentMap[targetRecordId], recordsChildParentMap);
 };

@@ -40,12 +40,6 @@ interface Props {
   };
 }
 
-type DraggableItem = {
-  id: string;
-  type: RQAPI.RecordType;
-  collectionId: string;
-};
-
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
@@ -67,6 +61,7 @@ export const CollectionRow: React.FC<Props> = ({
     onSaveRecord,
     apiClientRecordsRepository,
     recordsChildParentMap,
+    forceRefreshApiClientRecords,
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -162,19 +157,12 @@ export const CollectionRow: React.FC<Props> = ({
   const isRootCollection = !record.collectionId;
 
   const handleRecordDrop = useCallback(
-    async (item: { id: string; type: string }) => {
+    async (item: Partial<RQAPI.Record>) => {
       try {
-        const result = await apiClientRecordsRepository.updateRecord(
-          { collectionId: record.id } as Partial<RQAPI.Record>,
-          item.id
-        );
-        if (result.success) {
-          onSaveRecord(result.data);
-          setLoadingCollectionId(null);
-
-          return;
-        }
-        throw new Error(result.message || "Failed to move item. Please try again.");
+        const result = await apiClientRecordsRepository.moveAPIEntities([item], record.id);
+        onSaveRecord(result[0]);
+        forceRefreshApiClientRecords();
+        setLoadingCollectionId(null);
       } catch (error) {
         notification.error({
           message: "Error moving item",
@@ -185,11 +173,11 @@ export const CollectionRow: React.FC<Props> = ({
         setLoadingCollectionId(null);
       }
     },
-    [record.id, apiClientRecordsRepository, onSaveRecord]
+    [record.id, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords]
   );
 
   const checkCanDropItem = useCallback(
-    (item: DraggableItem): boolean => {
+    (item: Partial<RQAPI.Record>): boolean => {
       if (item.id === record.id) {
         return false;
       }
@@ -227,7 +215,7 @@ export const CollectionRow: React.FC<Props> = ({
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-    drop: (item: DraggableItem, monitor) => {
+    drop: (item: Partial<RQAPI.Record>, monitor) => {
       const isOverCurrent = monitor.isOver({ shallow: true });
       if (!isOverCurrent) return;
 
