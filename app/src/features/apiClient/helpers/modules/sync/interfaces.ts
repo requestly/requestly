@@ -84,6 +84,11 @@ export type ApiClientLocalMeta = {
   rootPath: string;
 };
 
+export type ApiClientLocalStoreMeta = {
+  version: number;
+  storageKey: string;
+};
+
 export type EnvironmentListenerParams =
   | { scope: VariableScope.COLLECTION; callback: (data: CollectionVariableMap) => void }
   | { scope: Exclude<VariableScope, VariableScope.COLLECTION>; id: string; callback: (data: EnvironmentData) => void };
