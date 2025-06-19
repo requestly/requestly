@@ -3,17 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { Collapse, Popconfirm, Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
-import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
+import {
+  getCurrentlySelectedRuleData,
+  getRequestRuleResourceType,
+  getResponseRuleResourceType,
+} from "../../../../store/selectors";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
-import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
+import ResponseRuleResourceTypes from "./RequestResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
 import { useRBAC } from "features/rbac";
 import "./RulePairs.css";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
+  const ruleResourceType = useSelector(
+    currentlySelectedRuleData.ruleType === "Response" ? getResponseRuleResourceType : getRequestRuleResourceType
+  );
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("http_rule", "create");
 
@@ -72,33 +79,35 @@ const RulePairs = (props) => {
   const activePanelKey = getFirstFiveRuleIds(currentlySelectedRuleData?.pairs);
   const rulePairHeading = currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
 
+  if ([RuleType.REQUEST, RuleType.RESPONSE].includes(props.currentlySelectedRuleConfig.TYPE) && !ruleResourceType) {
+    return (
+      <div className="rule-pairs-container">
+        <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
+      </div>
+    );
+  }
+
   return (
     <>
-      {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
-        <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
-      ) : null}
-
-      {props.currentlySelectedRuleConfig.TYPE !== "Response" || responseRuleResourceType !== "" ? (
-        <Collapse
-          className="rule-pairs-collapse"
-          defaultActiveKey={activePanelKey}
-          key={activePanelKey[activePanelKey.length - 1]}
-          expandIconPosition="end"
-        >
-          {currentlySelectedRuleData?.pairs?.length > 0
-            ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
-                <Collapse.Panel
-                  key={pair.id || pairIndex}
-                  className="rule-pairs-panel"
-                  extra={deleteButton(pairIndex)}
-                  header={<span className="panel-header">{rulePairHeading}</span>}
-                >
-                  {getPairMarkup(pair, pairIndex)}
-                </Collapse.Panel>
-              ))
-            : null}
-        </Collapse>
-      ) : null}
+      <Collapse
+        className="rule-pairs-collapse"
+        defaultActiveKey={activePanelKey}
+        key={activePanelKey[activePanelKey.length - 1]}
+        expandIconPosition="end"
+      >
+        {currentlySelectedRuleData?.pairs?.length > 0
+          ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
+              <Collapse.Panel
+                key={pair.id || pairIndex}
+                className="rule-pairs-panel"
+                extra={deleteButton(pairIndex)}
+                header={<span className="panel-header">{rulePairHeading}</span>}
+              >
+                {getPairMarkup(pair, pairIndex)}
+              </Collapse.Panel>
+            ))
+          : null}
+      </Collapse>
     </>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Radio, Row, Tooltip } from "antd";
-import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "store/selectors";
+import { getCurrentlySelectedRuleData, getRequestRuleResourceType, getResponseRuleResourceType } from "store/selectors";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
@@ -12,8 +12,8 @@ import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
-import "./ResponseRuleResourceTypes.css";
-import { ResponseRule } from "@requestly/shared/types/entities/rules";
+import { ResponseRule, RuleType } from "@requestly/shared/types/entities/rules";
+import "./RequestResponseRuleResourceTypes.css";
 
 const DownloadDesktopAppLink: React.FC = () => (
   <a
@@ -33,7 +33,9 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
+  const ruleResourceType = useSelector(
+    currentlySelectedRuleData?.ruleType === RuleType.RESPONSE ? getResponseRuleResourceType : getRequestRuleResourceType
+  );
   const { getFeatureLimitValue } = useFeatureLimiter();
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
@@ -66,13 +68,14 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
   );
 
   const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
+  const isNewRequestRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.request ?? {});
 
   useEffect(() => {
-    if (isNewResponseRule) return;
+    if (isNewResponseRule || isNewRequestRule) return;
 
     // legacy rules will have "unknown" resource type
     updateResourceType(ResponseRule.ResourceType.UNKNOWN);
-  }, [isNewResponseRule, requestPayloadFilter, updateResourceType]);
+  }, [isNewRequestRule, isNewResponseRule, requestPayloadFilter, updateResourceType]);
 
   const handleResourceTypeChange = (type: ResponseRule.ResourceType) => {
     const clearGraphqlRequestPayload = type !== ResponseRule.ResourceType.GRAPHQL_API;
@@ -82,13 +85,13 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
 
   const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.graphql_resource_type);
 
-  return isNewResponseRule && responseRuleResourceType !== ResponseRule.ResourceType.UNKNOWN ? (
+  return (isNewResponseRule || isNewRequestRule) && ruleResourceType !== ResponseRule.ResourceType.UNKNOWN ? (
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group
           disabled={isSampleRule || disabled}
-          value={responseRuleResourceType}
+          value={ruleResourceType}
           onChange={(e) => {
             if (e.target.value !== ResponseRule.ResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
           }}
