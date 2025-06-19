@@ -23,7 +23,7 @@
       border-radius: 8px;
       background: var(--requestly-color-background);
       border: 1px solid var(--requestly-color-white-t-10);
-      font-size: 11px;
+      font-size: var(--requestly-font-size-xs, 11px);
       line-height: 18px;
       letter-spacing: 0.25px;
       max-width: 400px;

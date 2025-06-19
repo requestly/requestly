@@ -42,7 +42,7 @@
   > .ant-menu-item:first-child
   .clear-all-filter-option
   .anticon {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item.ant-menu-item-selected {
@@ -111,7 +111,7 @@
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .traffic-table-content {

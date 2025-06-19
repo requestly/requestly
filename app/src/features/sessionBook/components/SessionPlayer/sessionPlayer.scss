@@ -254,7 +254,7 @@
 
       .session-player-controller__speed-selector.ant-select {
         width: 50px;
-        font-size: 12px;
+        font-size: var(--requestly-font-size-sm, 12px);
       }
     }
   }

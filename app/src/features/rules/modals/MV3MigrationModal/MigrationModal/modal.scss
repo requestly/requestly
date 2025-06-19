@@ -93,14 +93,14 @@
     margin-bottom: 5px;
   }
   .header .text {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
     color: #ccc;
   }
 
   .header .external-link {
     color: #4d9fec;
     text-decoration: none;
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 
   /* Section and Description Styles */
@@ -118,7 +118,7 @@
   }
 
   .description .text {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
     color: #ccc;
   }
 
@@ -148,7 +148,7 @@
         .icon {
           text-align: center;
           font-family: "Material Symbols Outlined";
-          font-size: 16px;
+          font-size: var(--requestly-font-size-lg, 16px);
           font-style: normal;
           font-weight: 400;
           line-height: 16px; /* 100% */
@@ -199,7 +199,7 @@
   }
 
   .migrated-rule-name {
-    font-size: 16px;
+    font-size: var(--requestly-font-size-lg, 16px);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -207,7 +207,7 @@
   }
 
   .migrated-rule-description {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
     color: #ccc;
   }
 
@@ -288,7 +288,7 @@
     .ant-collapse-content-box {
       padding: 15px 20px;
       color: #ccc; /* Lighter text color for content */
-      font-size: 14px;
+      font-size: var(--requestly-font-size-md, 14px);
     }
 
     .changeLog-panel-header {
@@ -311,7 +311,7 @@
       color: var(--requestly-color-text-default);
       text-align: center;
       font-family: "Material Symbols Outlined";
-      font-size: 14px;
+      font-size: var(--requestly-font-size-md, 14px);
       font-style: normal;
       font-weight: 400;
       line-height: 16px; /* 114.286% */

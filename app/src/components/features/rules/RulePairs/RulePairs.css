@@ -80,7 +80,7 @@
 }
 
 .ant-select.ant-select-lg {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
 }
 
 .rule-pairs-panel .modification-type-dropdown {

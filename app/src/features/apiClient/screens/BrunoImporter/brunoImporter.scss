@@ -2,7 +2,7 @@
   padding: 16px;
 
   &__header {
-    font-size: 16px;
+    font-size: var(--requestly-font-size-lg, 16px);
     font-weight: 500;
     margin-bottom: 16px;
   }
