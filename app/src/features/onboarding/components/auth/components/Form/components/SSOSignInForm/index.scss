@@ -8,7 +8,7 @@
   font-weight: 500;
 
   & span {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 }
 
@@ -32,7 +32,7 @@
   }
 
   & .sso-not-found-card-text {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     color: var(--neutrals-yellow-300);
 
     & a {
@@ -45,6 +45,6 @@
 .sso-form-footer {
   font-weight: 500;
   color: var(--text-subtle);
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   margin-top: 1rem;
 }

@@ -76,7 +76,7 @@
 }
 
 .primary-sidebar-link .link-title {
-  font-size: var(--requestly-font-size-2xs);
+  font-size: var(--requestly-font-size-xs);
   line-height: 15.92px;
   text-align: center;
 }
@@ -89,7 +89,7 @@
   position: absolute;
   top: -7px;
   right: -30px;
-  font-size: 9px;
+  font-size: var(--requestly-font-size-2xs, 9px);
   padding: 1px 2px;
   z-index: 1;
   background: var(--requestly-color-neutral-700);

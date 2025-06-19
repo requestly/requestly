@@ -27,7 +27,7 @@
       .info-text {
         color: #8f8f8f;
         line-height: 15px;
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         display: flex;
         align-items: center;
         margin-bottom: 16px;
@@ -131,7 +131,7 @@
         }
 
         h2 {
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
           line-height: 17px;
           color: var(--requestly-color-text-subtle);
         }
@@ -175,14 +175,14 @@
 
         span {
           color: #bbb;
-          font-size: 12px;
+          font-size: var(--requestly-font-size-sm, 12px);
           line-height: 15px;
           margin-left: 7px;
         }
       }
 
       label {
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         line-height: 15px;
         color: #bbbbbb;
         margin-right: 12px;
