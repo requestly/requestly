@@ -60,7 +60,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 
   const rqId = details.requestHeaders.find((h) => h.name.toLowerCase() === REQUESTLY_ID_HEADER)?.value;
   if (rqId) {
-    apiRequestCorrelationManager.bindHandlerToRequestId(details.requestId, rqId);
+    apiRequestCorrelationManager.linkWebRequestToRqId(details.requestId, rqId);
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {

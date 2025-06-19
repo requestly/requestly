@@ -8,7 +8,7 @@
       "type": "modifyHeaders",
       "requestHeaders": [
         {
-          "header": "x-requestly__id__",
+          "header": "x-requestly-id",
           "operation": "remove"
         }
       ]

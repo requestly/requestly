@@ -44,7 +44,7 @@ interface Response {
   redirectedUrl: string;
 }
 
-export const REQUESTLY_ID_HEADER = "x-requestly__id__";
+export const REQUESTLY_ID_HEADER = "x-requestly-id";
 
 /* UTIL */
 
@@ -148,9 +148,10 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
       redirectedUrl: response.url !== url ? response.url : "",
     };
   } catch (e) {
-    apiRequestCorrelationManager.removeHandler(requestlyId);
     return {
       error: e.message,
     };
+  } finally {
+    apiRequestCorrelationManager.removeHandler(requestlyId);
   }
 }
