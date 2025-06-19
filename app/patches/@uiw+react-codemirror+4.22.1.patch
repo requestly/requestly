@@ -1,8 +1,8 @@
 diff --git a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
-index eab503a..ee6fa2a 100644
+index eab503a..22723d2 100644
 --- a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
 +++ b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
-@@ -5,6 +5,52 @@ import { getDefaultExtensions } from './getDefaultExtensions';
+@@ -5,6 +5,124 @@ import { getDefaultExtensions } from './getDefaultExtensions';
  import { getStatistics } from './utils';
  var External = Annotation.define();
  var emptyExtensions = [];
@@ -10,13 +10,82 @@ index eab503a..ee6fa2a 100644
 +var editorInstances = {};
 +var instanceCounter = 0;
 +
++// Timeout Latch Implementation (Alternative approach)
++var TimeoutLatch = function(timeoutMS, callback) {
++  this.timeLeftMS = timeoutMS;
++  this.timeoutMS = timeoutMS;
++  this.isCancelled = false;
++  this.isTimeExhausted = false;
++  this.callback = callback;
++};
++
++TimeoutLatch.prototype.reduceTimeLeft = function(timeMS) {
++  if (this.isCancelled || this.isTimeExhausted) return;
++  this.timeLeftMS -= timeMS;
++  if (this.timeLeftMS <= 0) {
++    this.isTimeExhausted = true;
++    if (this.callback) this.callback();
++  }
++};
++
++TimeoutLatch.prototype.cancel = function() {
++  this.isCancelled = true;
++};
++
++TimeoutLatch.prototype.isDone = function() {
++  return this.isCancelled || this.isTimeExhausted;
++};
++
++var scheduler = {
++  latches: [],
++  timer: null,
++  isRunning: false,
++  
++  tick: function() {
++    for (var i = this.latches.length - 1; i >= 0; i--) {
++      var latch = this.latches[i];
++      if (!latch.isDone()) {
++        latch.reduceTimeLeft(1);
++      } else {
++        this.latches.splice(i, 1);
++      }
++    }
++    
++    if (this.latches.length === 0) {
++      this.stop();
++    }
++  },
++  
++  start: function() {
++    if (this.isRunning) return;
++    this.timer = setInterval(this.tick.bind(this), 1);
++    this.isRunning = true;
++  },
++  
++  stop: function() {
++    if (!this.isRunning) return;
++    clearInterval(this.timer);
++    this.isRunning = false;
++  },
++  
++  scheduleTimeoutLatch: function(timeoutMS, callback) {
++    var latch = new TimeoutLatch(timeoutMS, callback);
++    this.latches.push(latch);
++    if (!this.isRunning) {
++      this.start();
++    }
++    return latch;
++  }
++};
++
 +function getInstanceState(instanceId) {
 +  if (!editorInstances[instanceId]) {
 +    editorInstances[instanceId] = {
 +      userIsTyping: false,
 +      typingTimer: null,
 +      pendingValueUpdate: null,
-+      lastTypingTime: 0
++      lastTypingTime: 0,
++      timeoutLatch: null
 +    };
 +  }
 +  return editorInstances[instanceId];
@@ -27,6 +96,9 @@ index eab503a..ee6fa2a 100644
 +  if (state) {
 +    if (state.typingTimer) {
 +      clearTimeout(state.typingTimer);
++    }
++    if (state.timeoutLatch) {
++      state.timeoutLatch.cancel();
 +    }
 +    delete editorInstances[instanceId];
 +  }
@@ -55,7 +127,7 @@ index eab503a..ee6fa2a 100644
  export function useCodeMirror(props) {
    var {
      value,
-@@ -33,6 +79,8 @@ export function useCodeMirror(props) {
+@@ -33,6 +151,8 @@ export function useCodeMirror(props) {
    var [container, setContainer] = useState();
    var [view, setView] = useState();
    var [state, setState] = useState();
@@ -64,13 +136,16 @@ index eab503a..ee6fa2a 100644
    var defaultThemeOption = EditorView.theme({
      '&': {
        height,
-@@ -48,11 +96,27 @@ export function useCodeMirror(props) {
+@@ -48,12 +168,44 @@ export function useCodeMirror(props) {
    });
    var updateListener = EditorView.updateListener.of(vu => {
      if (vu.docChanged && typeof onChange === 'function' &&
 -    // Fix echoing of the remote changes:
 -    // If transaction is market as remote we don't have to call `onChange` handler again
      !vu.transactions.some(tr => tr.annotation(External))) {
++      console.time('DG-2: updateListener-setTimeout-' + instanceId);
++      // console.time('updateListener-timeoutLatch-' + instanceId);
++      
        var doc = vu.state.doc;
        var _value = doc.toString();
 +      
@@ -83,18 +158,32 @@ index eab503a..ee6fa2a 100644
 +        instanceState.pendingValueUpdate = null;
 +      }
 +      
-+      if (instanceState.typingTimer) {
-+        clearTimeout(instanceState.typingTimer);
++      // APPROACH 1: setTimeout approach (current patch) - COMMENT OUT TO USE TIMEOUT LATCH
++      // if (instanceState.typingTimer) {
++      //   clearTimeout(instanceState.typingTimer);
++      // }
++      
++      // instanceState.typingTimer = setTimeout(() => {
++      //   handleTypingSessionEnd(instanceState);
++      // }, TYPING_TIMEOUT);
++      
++      // APPROACH 2: Timeout Latch approach - UNCOMMENT TO USE
++      if (instanceState.timeoutLatch) {
++        instanceState.timeoutLatch.cancel();
 +      }
 +      
-+      instanceState.typingTimer = setTimeout(() => {
++      instanceState.timeoutLatch = scheduler.scheduleTimeoutLatch(TYPING_TIMEOUT, function() {
 +        handleTypingSessionEnd(instanceState);
-+      }, TYPING_TIMEOUT);
++      });
 +      
        onChange(_value, vu);
++      
++      console.timeEnd('DG-2: updateListener-setTimeout-' + instanceId);
++      // console.timeEnd('updateListener-timeoutLatch-' + instanceId);
      }
      onStatistics && onStatistics(getStatistics(vu));
-@@ -108,6 +172,7 @@ export function useCodeMirror(props) {
+   });
+@@ -108,6 +260,7 @@ export function useCodeMirror(props) {
        view.focus();
      }
    }, [autoFocus, view]);
@@ -102,7 +191,7 @@ index eab503a..ee6fa2a 100644
    useEffect(() => {
      if (view) {
        view.dispatch({
-@@ -116,22 +181,35 @@ export function useCodeMirror(props) {
+@@ -116,22 +269,35 @@ export function useCodeMirror(props) {
      }
      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [theme, extensions, height, minHeight, maxHeight, width, minWidth, maxWidth, placeholderStr, editable, readOnly, defaultIndentWithTab, defaultBasicSetup, onChange, onUpdate]);
