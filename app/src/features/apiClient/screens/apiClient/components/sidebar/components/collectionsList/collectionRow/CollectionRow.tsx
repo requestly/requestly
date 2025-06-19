@@ -162,6 +162,14 @@ export const CollectionRow: React.FC<Props> = ({
         const result = await apiClientRecordsRepository.moveAPIEntities([item], record.id);
         onSaveRecord(result[0]);
         forceRefreshApiClientRecords();
+
+        // Expand the collection after successful drop
+        if (!expandedRecordIds.includes(record.id)) {
+          const newExpandedRecordIds = [...expandedRecordIds, record.id];
+          setExpandedRecordIds(newExpandedRecordIds);
+          sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
+        }
+
         setLoadingCollectionId(null);
       } catch (error) {
         notification.error({
@@ -173,7 +181,14 @@ export const CollectionRow: React.FC<Props> = ({
         setLoadingCollectionId(null);
       }
     },
-    [record.id, apiClientRecordsRepository, onSaveRecord, forceRefreshApiClientRecords]
+    [
+      record.id,
+      apiClientRecordsRepository,
+      onSaveRecord,
+      forceRefreshApiClientRecords,
+      expandedRecordIds,
+      setExpandedRecordIds,
+    ]
   );
 
   const checkCanDropItem = useCallback(
