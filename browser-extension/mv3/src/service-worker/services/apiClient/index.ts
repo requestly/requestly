@@ -96,6 +96,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
 
   try {
     const requestStartTime = performance.now();
+
     let responseHeaders: KeyValuePair[] = [];
     apiRequestCorrelationManager.addHandler(
       requestlyId,
@@ -106,6 +107,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
         }));
       }
     );
+
     const response = await fetch(url, {
       method,
       headers,
@@ -113,6 +115,12 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
       credentials: apiRequest.includeCredentials ? "include" : "omit",
     });
     const responseTime = performance.now() - requestStartTime;
+
+    const fetchedResponseHeaders = [];
+    for (const [key, value] of response.headers.entries()) {
+      fetchedResponseHeaders.push({ key, value });
+    }
+    responseHeaders = responseHeaders.length ? responseHeaders : fetchedResponseHeaders;
 
     const responseBlob = await response.blob();
     const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
