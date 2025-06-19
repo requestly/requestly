@@ -2,7 +2,7 @@
   padding-block-start: 1rem;
   margin-inline-start: 1rem;
   color: var(--text-default);
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .sessions-table-header {

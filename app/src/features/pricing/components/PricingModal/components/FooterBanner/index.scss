@@ -16,7 +16,7 @@
 
   &-text {
     color: var(--requestly-color-text-subtle, #bbb);
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px; /* 150% */
   }
 
@@ -24,7 +24,7 @@
   &-link:hover,
   &-link:active,
   &-link:focus {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px;
     text-decoration-line: underline;
     text-decoration-style: solid;

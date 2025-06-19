@@ -25,6 +25,17 @@
 
 .api-request-method-selector.ant-select-dropdown {
   @include request-method-colors("ant-select-item");
+
+  .rc-virtual-list-holder {
+    justify-content: center;
+  }
+
+  .ant-select-item {
+    width: 100%;
+    font-size: var(--requestly-font-size-xs);
+    font-weight: var(--requestly-font-weight-medium);
+    padding: 5px 18px;
+  }
 }
 
 .api-client-view {
@@ -63,7 +74,6 @@
   }
 
   .api-client-body {
-    padding-top: 8px;
     position: sticky;
     overflow: hidden;
 
@@ -88,6 +98,7 @@
       flex: auto;
       height: 32px;
       width: calc(100% - 205px);
+      font-size: var(--requestly-font-size-sm, 12px);
 
       .api-request-method-selector {
         width: 100px;
@@ -96,6 +107,12 @@
       .api-request-method-selector .ant-select-selector {
         border: 1px solid rgba(255, 255, 255, 0.2);
         background: transparent;
+
+        .ant-select-selection-item {
+          min-width: 68px;
+          font-size: var(--requestly-font-size-xs);
+          font-weight: var(--requestly-font-weight-medium);
+        }
       }
 
       .api-request-url {
@@ -105,9 +122,14 @@
         background: transparent;
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-left: none;
+        font-size: var(--requestly-font-size-sm);
 
         &:focus-within {
           border: 1px solid var(--requestly-color-primary);
+        }
+
+        .cm-editor {
+          margin-top: -2px;
         }
       }
 
@@ -130,7 +152,7 @@
   .api-request-tabs {
     height: calc(100% - 20px);
     overflow: hidden;
-    margin-top: 8px;
+    margin-top: 2px;
 
     .ant-tabs-content-holder {
       height: inherit;

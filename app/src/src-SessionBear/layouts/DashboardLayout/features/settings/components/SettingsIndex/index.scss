@@ -66,7 +66,7 @@
   }
 
   .billing-team-member-email {
-    font-size: 11px;
+    font-size: var(--requestly-font-size-xs, 11px);
     letter-spacing: 0.25px;
     line-height: 14px;
     color: var(--neutrals-gray-300);

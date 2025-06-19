@@ -18,14 +18,14 @@
 
 .editor-toast-message {
   padding: 10px;
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   align-self: flex-start;
 }
 
 .editor-toast-close {
   padding: 10px;
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   cursor: pointer;
 

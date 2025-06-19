@@ -1,6 +1,6 @@
 .feature-tag {
   width: fit-content;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 19px;
