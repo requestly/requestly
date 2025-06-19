@@ -10,7 +10,7 @@
 
   .cancel-plan-modal-description {
     color: var(--neutrals-gray-300);
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px;
     letter-spacing: 0.4px;
   }

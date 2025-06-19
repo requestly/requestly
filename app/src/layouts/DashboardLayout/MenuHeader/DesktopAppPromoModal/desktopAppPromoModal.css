@@ -73,7 +73,7 @@
 }
 
 .desktop-app-promo-modal .left-section .caption {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 400;
   line-height: 28px;
   text-align: center;
@@ -84,7 +84,7 @@
 .desktop-app-promo-modal .left-section .download-btn.ant-btn {
   height: 32px;
   max-width: 261px;
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   margin: 0 158px 22px 158px;
   display: inline-flex;

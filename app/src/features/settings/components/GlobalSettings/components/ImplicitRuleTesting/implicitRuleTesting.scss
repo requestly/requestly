@@ -27,7 +27,7 @@
 
     .title {
       color: var(--requestly-color-text-default, #fff);
-      font-size: var(--font-size-sm, 12px);
+      font-size: var(--requestly-font-size-sm, 12px);
       font-style: normal;
       font-weight: var(--requestly-font-weight-medium);
       line-height: 18px;
@@ -36,7 +36,7 @@
 
   .description {
     color: var(--requestly-color-text-default, #fff);
-    font-size: var(--font-size-sm, 12px);
+    font-size: var(--requestly-font-size-sm, 12px);
     line-height: 18px;
     padding: var(--space-2, 4px) var(--space-6, 16px) 0 var(--space-6, 16px);
   }

@@ -18,7 +18,7 @@
 }
 
 .rq-network-table-container .rq-resource-table-container .empty-text.ant-typography {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .rq-network-table-container

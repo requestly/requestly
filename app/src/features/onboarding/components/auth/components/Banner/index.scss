@@ -15,7 +15,7 @@
   }
 
   .banner-text-small {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     color: var(--neutrals-gray-300);
     font-weight: 500;
   }
@@ -26,7 +26,7 @@
     gap: 8px;
     margin-top: 1rem;
     color: var(--neutrals-gray-300);
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
     flex-wrap: nowrap;
 
     & svg {

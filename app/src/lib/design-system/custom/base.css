@@ -241,7 +241,7 @@
 
 .field-error-prompt {
   color: #fa2828cb;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .success {

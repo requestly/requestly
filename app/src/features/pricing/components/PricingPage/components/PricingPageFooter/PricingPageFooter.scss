@@ -94,7 +94,7 @@
           gap: 8px;
           color: var(--requestly-color-text-default, #fff);
           text-align: center;
-          font-size: 14px;
+          font-size: var(--requestly-font-size-md, 14px);
           font-style: normal;
           font-weight: 500;
           line-height: 21px; /* 150% */
@@ -114,7 +114,7 @@
 
         .title {
           color: var(--requestly-color-white, #fff);
-          font-size: 14px;
+          font-size: var(--requestly-font-size-md, 14px);
           font-style: normal;
           font-weight: 500;
           line-height: 21px; /* 150% */
@@ -124,7 +124,7 @@
 
         a.ant-typography {
           color: var(--requestly-color-text-subtle);
-          font-size: 14px;
+          font-size: var(--requestly-font-size-md, 14px);
           font-style: normal;
           font-weight: 400;
           line-height: 21px; /* 150% */
@@ -136,7 +136,7 @@
         align-items: center;
         flex-wrap: wrap;
         color: var(--requestly-color-white, #fff);
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         font-style: normal;
         font-weight: 400;
         line-height: 21px; /* 150% */

@@ -39,7 +39,7 @@
         padding: var(--space-3, 6px) var(--space-5, 12px);
         color: var(--requestly-color-text-default);
         border-radius: 4px;
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         max-height: 26px;
 
         svg {
@@ -68,6 +68,6 @@
   padding: 0 4px;
 
   svg {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 }
