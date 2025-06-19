@@ -292,7 +292,7 @@ const APIClientView: React.FC<Props> = ({
     return apiClientRecords.find((record) => record.id === apiEntryDetails?.collectionId);
   }, [apiClientRecords, apiEntryDetails?.collectionId]);
 
-  //this will only run once when component mounts & no change is there in collection level & request level auth
+  //this will only run once when component mounts & no change is there in collection level
   useEffect(() => {
     if (!apiClientRecords) {
       return;
