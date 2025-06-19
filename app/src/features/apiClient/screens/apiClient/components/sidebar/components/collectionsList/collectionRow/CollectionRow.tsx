@@ -22,7 +22,6 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
 import { useDrag, useDrop } from "react-dnd";
 import "./CollectionRow.scss";
-import { toast } from "utils/Toast";
 import { checkIsParentCollection } from "features/apiClient/screens/apiClient/utils";
 
 interface Props {
@@ -204,11 +203,7 @@ export const CollectionRow: React.FC<Props> = ({
       // For collections, check for circular reference (parent-child relationship)
       if (item.type === RQAPI.RecordType.COLLECTION) {
         const wouldCreateCircularReference = checkIsParentCollection(item.id, record.id, recordsChildParentMap);
-
-        if (wouldCreateCircularReference) {
-          toast.error("Cannot move a collection into its own child collection");
-          return false;
-        }
+        return !wouldCreateCircularReference;
       }
 
       return true;
