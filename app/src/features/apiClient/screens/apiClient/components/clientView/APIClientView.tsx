@@ -59,6 +59,7 @@ import {
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
+import { useParent } from "features/apiClient/store/apiRecords/useParent.hook";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -105,6 +106,10 @@ const APIClientView: React.FC<Props> = ({
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
   const isHistoryPath = location.pathname.includes("history");
+
+  const { version } = useParent(apiEntryDetails.id);
+  debugger;
+  console.log("vvv", version);
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
   const {

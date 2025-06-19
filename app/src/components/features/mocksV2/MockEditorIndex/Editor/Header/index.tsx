@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Row, Layout, Col, Tooltip, Dropdown, Menu, Button } from "antd";
 import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
-import { RQButton } from "lib/design-system/components";
-import { RQBreadcrumb } from "lib/design-system-v2/components";
+import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { MockType } from "components/features/mocksV2/types";
 import "./index.css";
 import { trackMockEditorClosed, trackMockPasswordGenerateClicked } from "modules/analytics/events/features/mocksV2";
@@ -13,6 +12,7 @@ import PasswordPopup from "./PasswordPopup/PasswordPopup";
 import { Conditional } from "components/common/Conditional";
 import { RBACButton } from "features/rbac";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -82,8 +82,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
         <Col span={4} className="header-left-section">
           <Tooltip title={`Back to ${mockType === MockType.API ? "mocks" : "files"}`} placement="bottom">
             <RQButton
-              iconOnly
-              type="text"
+              type="transparent"
               icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
               onClick={() => {
                 trackMockEditorClosed(mockType, "back_button");
@@ -109,16 +108,10 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
                   showDropdown ? "mock-editor-options-dropdown-active" : ""
                 }`}
               >
-                <span className="text-gray">
+                <RQButton>
                   More
-                  <img
-                    width={10}
-                    height={6}
-                    alt="down arrow"
-                    src="/assets/media/common/down-arrow.svg"
-                    className="mock-editor-options-trigger-icon"
-                  />
-                </span>
+                  <MdOutlineKeyboardArrowDown />
+                </RQButton>
               </Dropdown>
             </div>
           </Conditional>
@@ -127,13 +120,13 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             <RQButton
               icon={<ExperimentOutlined />}
               onClick={handleTest}
-              type={isEditorReadOnly ? "primary" : "default"}
+              type={isEditorReadOnly ? "primary" : "secondary"}
             >
               Test
             </RQButton>
           )}
           <RQButton
-            type="default"
+            type="secondary"
             onClick={() => {
               trackMockEditorClosed(mockType, "cancel_button");
               handleClose();

@@ -10,7 +10,7 @@
 
 .learn-more-link,
 .learn-more-link:hover {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   color: var(--text-gray);
 }
 
