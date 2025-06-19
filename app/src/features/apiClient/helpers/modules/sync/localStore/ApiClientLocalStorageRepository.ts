@@ -1,7 +1,6 @@
-import { ApiClientRepositoryInterface } from "../interfaces";
+import { ApiClientLocalStoreMeta, ApiClientRepositoryInterface } from "../interfaces";
 import { LocalStoreEnvSync } from "./services/LocalStoreEnvSync";
 import { LocalStoreRecordsSync } from "./services/LocalStoreRecordsSync";
-import { ApiClientLocalStoreMeta } from "./services/types";
 
 export class ApiClientLocalStoreRepository implements ApiClientRepositoryInterface {
   environmentVariablesRepository: LocalStoreEnvSync;

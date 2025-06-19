@@ -1,7 +1,7 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
-import { EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
+import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { ApiClientLocalStoreMeta, LocalStoreSyncRecords } from "./types";
+import { LocalStoreSyncRecords } from "./types";
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;

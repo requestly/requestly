@@ -1,7 +1,7 @@
 import { RQAPI } from "features/apiClient/types";
-import { ApiClientRecordsInterface } from "../../interfaces";
+import { ApiClientLocalStoreMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { ApiClientLocalStoreMeta, LocalStoreSyncRecords } from "./types";
+import { LocalStoreSyncRecords } from "./types";
 import { sanitizeRecord } from "backend/apiClient/upsertApiRecord";
 import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
