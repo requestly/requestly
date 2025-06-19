@@ -46,6 +46,10 @@ export const initFetchInterceptor = (debug) => {
 
       // Request body can be sent only for request methods other than GET and HEAD.
       const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
+      let requestData;
+      if (canRequestBodyBeSent) {
+        requestData = jsonifyValidJSONString(await request.clone().text()); // cloning because the request will be used to make API call
+      }
 
       const requestRule =
         canRequestBodyBeSent &&
@@ -54,16 +58,16 @@ export const initFetchInterceptor = (debug) => {
           method: method,
           type: "fetch",
           initiator: location.origin, // initiator=origin. Should now contain port and protocol
+          requestData,
         });
 
       if (requestRule) {
-        const originalRequestBody = await request.text();
         const requestBody =
           getCustomRequestBody(requestRule, {
             method: request.method,
             url,
-            body: originalRequestBody,
-            bodyAsJson: jsonifyValidJSONString(originalRequestBody, true),
+            body: requestData,
+            bodyAsJson: jsonifyValidJSONString(requestData, true),
           }) || {};
 
         request = new Request(request.url, {
@@ -88,11 +92,6 @@ export const initFetchInterceptor = (debug) => {
             timeStamp: Date.now(),
           },
         });
-      }
-
-      let requestData;
-      if (canRequestBodyBeSent) {
-        requestData = jsonifyValidJSONString(await request.clone().text()); // cloning because the request will be used to make API call
       }
 
       const responseRule = getMatchedResponseRule({
