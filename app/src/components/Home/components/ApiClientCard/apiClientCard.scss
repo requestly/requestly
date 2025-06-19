@@ -12,7 +12,7 @@
   height: 100%;
   width: 100%;
   line-height: 20px;
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   display: flex;
   align-items: center;

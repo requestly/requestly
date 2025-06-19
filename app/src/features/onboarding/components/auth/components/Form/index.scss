@@ -46,7 +46,7 @@
   height: auto;
 
   & span {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 
   &:hover,
@@ -110,7 +110,7 @@
 .onboarding-continue-button.ant-btn {
   font-weight: 500;
   & span {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 }
 
@@ -119,7 +119,7 @@
   font-weight: 500;
 
   & span {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 }
 
