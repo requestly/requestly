@@ -58,7 +58,7 @@
       border: 1px solid transparent;
       padding: 2px 4px;
       color: var(--requestly-color-text-default, #fff);
-      font-size: var(--font-size-sm, 13px);
+      font-size: var(--requestly-font-size-sm, 13px);
       height: 26px;
 
       &:focus {
@@ -102,7 +102,7 @@
     background: transparent;
     border: 1px solid transparent;
     color: var(--requestly-color-text-default, #fff);
-    font-size: var(--font-size-sm, 13px);
+    font-size: var(--requestly-font-size-sm, 13px);
 
     &:focus {
       box-shadow: none;
@@ -114,7 +114,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: var(--font-size-sm, 13px);
+    font-size: var(--requestly-font-size-sm, 13px);
 
     span {
       font-size: var(--font-size-xs, 12px);

@@ -9,7 +9,7 @@
 
       .banner-text {
         color: var(--requestly-color-text-subtle);
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
       }
 
       .banner-title {
@@ -27,7 +27,7 @@
 
       .input-container {
         .ant-input {
-          font-size: 14px;
+          font-size: var(--requestly-font-size-md, 14px);
         }
       }
     }

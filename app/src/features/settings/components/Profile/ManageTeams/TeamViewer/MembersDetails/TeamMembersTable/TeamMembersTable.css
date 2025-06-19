@@ -17,7 +17,7 @@
 
 .workspace-member-table.ant-table-wrapper .ant-table-thead .ant-table-cell {
   padding: 0px 0px 8px 0px;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   line-height: 16px;
   color: var(--text-gray);
   background-color: var(--component-background);

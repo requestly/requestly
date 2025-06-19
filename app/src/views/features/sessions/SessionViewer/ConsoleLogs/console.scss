@@ -68,13 +68,13 @@
     }
   }
   .console-log-message {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
 
   .see-more-button,
   .see-more-button:hover {
     display: inline;
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
     font-weight: 500;
   }
 }
@@ -103,7 +103,7 @@
   .secondary-message {
     word-break: break-word;
     padding-left: 40px;
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
 
   .console-log-collapse {
