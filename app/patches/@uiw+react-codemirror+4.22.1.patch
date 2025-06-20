@@ -1,5 +1,5 @@
 diff --git a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
-index eab503a..a79673f 100644
+index eab503a..72e05f1 100644
 --- a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
 +++ b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
 @@ -5,6 +5,128 @@ import { getDefaultExtensions } from './getDefaultExtensions';
@@ -140,14 +140,14 @@ index eab503a..a79673f 100644
    var defaultThemeOption = EditorView.theme({
      '&': {
        height,
-@@ -48,12 +172,43 @@ export function useCodeMirror(props) {
+@@ -48,12 +172,42 @@ export function useCodeMirror(props) {
    });
    var updateListener = EditorView.updateListener.of(vu => {
      if (vu.docChanged && typeof onChange === 'function' &&
 -    // Fix echoing of the remote changes:
 -    // If transaction is market as remote we don't have to call `onChange` handler again
      !vu.transactions.some(tr => tr.annotation(External))) {
-+      console.time('updateListener-setTimeout-' + instanceId);
++      console.time('DG: perf-updateListener-' + instanceId);
 +      // console.time('updateListener-timeoutLatch-' + instanceId);
 +      
        var doc = vu.state.doc;
@@ -173,7 +173,6 @@ index eab503a..a79673f 100644
 +      
 +      // APPROACH 2: Timeout Latch approach - PROPER LATCH USAGE
 +      if (instanceState.timeoutLatch) {
-+        console.log("DG-2: Reset latch")
 +        instanceState.timeoutLatch.reset();
 +      } else {
 +        instanceState.timeoutLatch = scheduler.scheduleTimeoutLatch(TYPING_TIMEOUT, function() {
@@ -182,11 +181,11 @@ index eab503a..a79673f 100644
 +      }
 +      
        onChange(_value, vu);
-+      console.timeEnd('updateListener-timeoutLatch-' + instanceId);
++      console.timeEnd('DG: perf-updateListener-' + instanceId);
      }
      onStatistics && onStatistics(getStatistics(vu));
    });
-@@ -108,6 +263,7 @@ export function useCodeMirror(props) {
+@@ -108,6 +262,7 @@ export function useCodeMirror(props) {
        view.focus();
      }
    }, [autoFocus, view]);
@@ -194,7 +193,7 @@ index eab503a..a79673f 100644
    useEffect(() => {
      if (view) {
        view.dispatch({
-@@ -116,22 +272,35 @@ export function useCodeMirror(props) {
+@@ -116,22 +271,35 @@ export function useCodeMirror(props) {
      }
      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [theme, extensions, height, minHeight, maxHeight, width, minWidth, maxWidth, placeholderStr, editable, readOnly, defaultIndentWithTab, defaultBasicSetup, onChange, onUpdate]);
