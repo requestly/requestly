@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
@@ -6,6 +6,8 @@ import { RQAPI } from "features/apiClient/types";
 import { Skeleton } from "antd";
 import "./apiClient.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { useParent } from "features/apiClient/store/apiRecords/useParent.hook";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -27,7 +29,10 @@ type Props = CreateModeProps | EditModeProps;
 export const APIClient: React.FC<Props> = React.memo((props) => {
   const { isCreateMode, isHistoryMode } = props;
   const { history, selectedHistoryIndex, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const [selectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
+  const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
+
+  const { version } = useParent(props?.apiEntryDetails.id);
+  const [getParent] = useAPIRecords((state) => [state.getParent]);
 
   const requestId = isCreateMode === false ? props.requestId : null;
   const onSaveCallback = props.onSaveCallback ?? (() => {});
@@ -63,6 +68,11 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     },
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
   );
+
+  useEffect(() => {
+    const parent = getParent(entryDetails.id);
+    setSelectedEntryDetails((prev) => ({ ...prev, collectionId: parent }));
+  }, [version, entryDetails.id, getParent]);
 
   if (!entryDetails && !isCreateMode && !isHistoryMode) {
     return (

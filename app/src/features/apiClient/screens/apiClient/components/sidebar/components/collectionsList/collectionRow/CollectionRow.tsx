@@ -23,6 +23,7 @@ import { CollectionViewTabSource } from "../../../../clientView/components/Colle
 import { useDrag, useDrop } from "react-dnd";
 import "./CollectionRow.scss";
 import { checkIsParentCollection } from "features/apiClient/screens/apiClient/utils";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -65,6 +66,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
+  const [triggerUpdate] = useAPIRecords((state) => [state.triggerUpdate]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -161,6 +163,7 @@ export const CollectionRow: React.FC<Props> = ({
         const result = await apiClientRecordsRepository.moveAPIEntities([item], record.id);
         onSaveRecord(result[0]);
         forceRefreshApiClientRecords();
+        triggerUpdate(record.id);
 
         // Expand the collection after successful drop
         if (!expandedRecordIds.includes(record.id)) {
@@ -187,6 +190,7 @@ export const CollectionRow: React.FC<Props> = ({
       forceRefreshApiClientRecords,
       expandedRecordIds,
       setExpandedRecordIds,
+      triggerUpdate,
     ]
   );
 
