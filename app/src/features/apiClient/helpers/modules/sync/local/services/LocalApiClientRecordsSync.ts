@@ -478,6 +478,16 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  async batchCreateRecords(records: RQAPI.Record[]): Promise<RQAPI.RecordsPromise> {
+    return {
+      success: true,
+      data: {
+        records: [],
+        erroredRecords: [],
+      },
+    };
+  }
+
   async duplicateApiEntities(entities: RQAPI.Record[]) {
     const result: RQAPI.Record[] = [];
     for (const entity of entities) {
