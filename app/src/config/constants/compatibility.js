@@ -111,44 +111,42 @@ export const FEATURE_COMPATIBLE_VERSION = {
   },
   [FEATURES.EDIT_LOCAL_FILE_PATH]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "1.7.6",
-      platforms: ["macOS"],
+      macOS: "1.7.6",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
 
   [FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "1.7.7",
-      platforms: ["macOS"],
+      macOS: "1.7.7",
+      Windows: null,
+      Linux: null,
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.FRAMELESS_DESKTOP_APP]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "1.8.0",
-      platforms: ["macOS"],
+      macOS: "1.8.0",
+      Windows: null,
+      Linux: null,
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.LOCAL_FILE_SYNC]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "2.0.0",
-      platforms: ["macOS"],
+      macOS: "2.0.0",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.LOCAL_LOG_FILE]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "25.5.23",
-      platforms: ["macOS"],
+      macOS: "25.5.23",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_FOR_LOCAL_FILE]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "25.5.19",
-      platforms: ["macOS"],
+      macOS: "25.5.19",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
@@ -158,8 +156,9 @@ export const FEATURE_COMPATIBLE_VERSION = {
   },
   [FEATURES.LOCAL_WORKSPACE_REFRESH]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      version: "25.6.5",
-      platforms: ["macOS"],
+      macOS: "25.6.5",
+      Windows: null,
+      Linux: null,
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
