@@ -19,15 +19,15 @@ const checkVersionCompatibility = (currentVersion, os, compatibilityCriteria) =>
   }
   let compatibleVersion;
 
-  if (typeof compatibilityCriteria !== "string") {
-    // depend on the user os to determine the compatibility criteria
-    const compatiblePlatforms = compatibilityCriteria.platforms || null;
-    if (compatiblePlatforms && !compatiblePlatforms.includes(os)) {
+  if (typeof compatibilityCriteria === "string") {
+    // version applicable to all platforms
+    compatibleVersion = compatibilityCriteria;
+  } else {
+    const versionCompatibleToPlatform = compatibilityCriteria?.[os];
+    if (!versionCompatibleToPlatform) {
       return false;
     }
-    compatibleVersion = compatibilityCriteria.version;
-  } else {
-    compatibleVersion = compatibilityCriteria;
+    compatibleVersion = versionCompatibleToPlatform;
   }
   try {
     return semver.gte(currentVersion, compatibleVersion);
