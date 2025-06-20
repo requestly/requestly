@@ -1,5 +1,6 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
+import { getUserOS } from "./Misc";
 
 export const getAppDetails = () => {
   let app_mode = null;
@@ -17,8 +18,8 @@ export const getAppDetails = () => {
     app_mode = GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     app_version = "0.0.1"; // DUMMY VERSION for compatibility check
   }
-
-  return { app_mode, app_version, ext_id };
+  const os = getUserOS();
+  return { app_mode, app_version, ext_id, os };
 };
 
 export const isDesktopMode = () => {
