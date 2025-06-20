@@ -25,9 +25,15 @@ export class ApiClientLocalStorage {
     localStorage.setItem(this.getStorageKey(), JSON.stringify(ApiClientLocalStorage.DEFAULT_STATE));
   }
 
-  public static getInstance(metadata: ApiClientLocalStorageMetadata): ApiClientLocalStorage {
+  public static init(metadata: ApiClientLocalStorageMetadata) {
     if (!ApiClientLocalStorage.instance) {
       ApiClientLocalStorage.instance = new ApiClientLocalStorage(metadata);
+    }
+  }
+
+  public static getInstance(): ApiClientLocalStorage {
+    if (!ApiClientLocalStorage.instance) {
+      throw new Error("ApiClientLocalStorage is not initialized, call init() first.");
     }
 
     return ApiClientLocalStorage.instance;
