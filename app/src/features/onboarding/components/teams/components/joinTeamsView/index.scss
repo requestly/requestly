@@ -3,7 +3,7 @@
 }
 .getting-started-join-teams-description {
   color: var(--neutrals-gray-300);
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   line-height: 14px;
 }
 

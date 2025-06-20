@@ -51,7 +51,7 @@ div.n-popup {
   padding: 5px;
   border-radius: 3px;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   z-index: 10;
   pointer-events: none; /* Prevent interaction with the popup */
 }
