@@ -17,7 +17,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   constructor(readonly metadata: ApiClientLocalStoreMeta) {
     this.meta = metadata;
-    this.storageInstance = ApiClientLocalStorage.getInstance(metadata);
+    this.storageInstance = ApiClientLocalStorage.getInstance();
   }
 
   private getNewId() {

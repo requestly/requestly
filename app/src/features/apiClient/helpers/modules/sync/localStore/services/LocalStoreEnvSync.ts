@@ -11,7 +11,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
   constructor(metadata: ApiClientLocalStoreMeta) {
     this.meta = metadata;
-    this.storageInstance = ApiClientLocalStorage.getInstance(metadata);
+    this.storageInstance = ApiClientLocalStorage.getInstance();
   }
 
   private getNewId() {
