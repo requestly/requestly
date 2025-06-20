@@ -46,9 +46,6 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
-
-  generateApiRecordId(parentId?: string): string;
-  generateCollectionId(name: string, parentId?: string): string;
   writeToRawFile(
     id: string,
     record: any,
@@ -66,6 +63,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     entities: Partial<RQAPI.Record>[],
     writeFunction: (entity: RQAPI.Record) => Promise<unknown>
   ): Promise<{ success: boolean; message?: string }>;
+  batchCreateRecords(records: RQAPI.Record[]): Promise<RQAPI.RecordsPromise>;
   duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
   moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
 }
