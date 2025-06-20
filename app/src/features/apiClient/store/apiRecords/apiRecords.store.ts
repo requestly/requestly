@@ -5,20 +5,20 @@ export type VersionState = {
   version: number;
 
   increment: () => void;
-}
+};
 
 export type ApiRecordsState = {
-  childParentMap: Map<string, string>,
-  index: Map<string, RQAPI.Record>,
-  indexStore: Map<string, StoreApi<VersionState>>,
+  childParentMap: Map<string, string>;
+  index: Map<string, RQAPI.Record>;
+  indexStore: Map<string, StoreApi<VersionState>>;
 
-  getParentChain: (id: string) => string[],
-  refresh: (records: RQAPI.Record[]) => void,
-  getData: (id: string) => RQAPI.Record,
-  getParent: (id: string) => string | undefined,
-  getVersionStore: (id: string) => StoreApi<VersionState>,
+  getParentChain: (id: string) => string[];
+  refresh: (records: RQAPI.Record[]) => void;
+  getData: (id: string) => RQAPI.Record;
+  getParent: (id: string) => string | undefined;
+  getVersionStore: (id: string) => StoreApi<VersionState>;
 
-  triggerUpdate: (id: string) => void,
+  triggerUpdate: (id: string) => void;
 };
 
 function parseRecords(records: RQAPI.Record[]) {
@@ -26,28 +26,29 @@ function parseRecords(records: RQAPI.Record[]) {
   const index = new Map<string, RQAPI.Record>();
 
   for (const record of records) {
-    if(record.collectionId) {
+    if (record.collectionId) {
       childParentMap.set(record.id, record.collectionId);
     }
     index.set(record.id, record);
   }
 
-  debugger;
-
   return {
     childParentMap,
     index,
-  }
-};
+  };
+}
 
 function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
   const result: string[] = [];
-  const getImmediateChildren = (id: string) => Array.from(childParentMap.entries()).filter(([_, v]) => v === id).map(([k, _]) => k);
+  const getImmediateChildren = (id: string) =>
+    Array.from(childParentMap.entries())
+      .filter(([_, v]) => v === id)
+      .map(([k, _]) => k);
   const parseRecursively = (id: string) => {
     const children = getImmediateChildren(id);
     result.push(...children);
     children.forEach(parseRecursively);
-  }
+  };
   parseRecursively(initalId);
   return result;
 }
@@ -56,21 +57,20 @@ function incrementVersion(store: StoreApi<VersionState>) {
   store.getState().increment();
 }
 
-
 export function createVersionStore() {
   return create<VersionState>()((set, get) => ({
     version: 0,
 
     increment() {
-      const {version} = get();
+      const { version } = get();
       set({
         version: version + 1,
-      })
-    }
+      });
+    },
   }));
 }
 
-function createIndexStore(index: ApiRecordsState['index']) {
+function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<VersionState>>();
   for (const [id] of index) {
     indexStore.set(id, createVersionStore());
@@ -103,8 +103,6 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
         }
       }
 
-      debugger;
-
       set({
         childParentMap,
         index,
@@ -132,7 +130,7 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
         }
         result.push(parent);
         parseRecursively(parent);
-      }
+      };
       parseRecursively(id);
       return result;
     },
@@ -143,9 +141,9 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
 
       const allChildren = getAllChildren(id, childParentMap);
 
-      allChildren.forEach(cid => {
+      allChildren.forEach((cid) => {
         incrementVersion(indexStore.get(cid));
-      })
+      });
     },
 
     getVersionStore(id) {
@@ -153,6 +151,5 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       const versionStateStore = indexStore.get(id);
       return versionStateStore;
     },
-
   }));
 };

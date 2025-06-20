@@ -101,7 +101,6 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { version } = useParent(apiEntryDetails.id);
-  debugger;
   console.log("vvv", version);
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();

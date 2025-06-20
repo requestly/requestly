@@ -32,7 +32,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     forceRefreshApiClientRecords,
   } = useApiClientContext();
 
-  const triggerUpdate = useAPIRecords(s => s.triggerUpdate);
+  const triggerUpdate = useAPIRecords((s) => s.triggerUpdate);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -81,7 +81,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           });
         });
     },
-    [collection, onSaveRecord, apiClientRecordsRepository]
+    [collection, onSaveRecord, apiClientRecordsRepository, triggerUpdate, collectionId]
   );
 
   const tabItems = useMemo(() => {

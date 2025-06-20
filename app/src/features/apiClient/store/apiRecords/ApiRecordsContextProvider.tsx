@@ -11,11 +11,10 @@ export const ApiRecordsProvider = ({ children, records }: { children: ReactNode;
 
   useEffect(() => {
     store.getState().refresh(records);
-  }, [records]);
+  }, [records, store]);
 
   return <ApiRecordsStoreContext.Provider value={store}>{children}</ApiRecordsStoreContext.Provider>;
 };
-
 
 export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
   const store = useContext(ApiRecordsStoreContext);
