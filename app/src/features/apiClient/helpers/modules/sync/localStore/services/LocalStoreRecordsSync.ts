@@ -7,28 +7,25 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
-  meta: ApiClientLocalStoreMeta;
+  public static meta: ApiClientLocalStoreMeta;
+  public meta: ApiClientLocalStoreMeta;
+  private storageInstance: ApiClientLocalStorage;
 
   constructor(readonly metadata: ApiClientLocalStoreMeta) {
     this.meta = metadata;
-  }
-
-  private getVersion() {
-    return this.meta.version;
-  }
-
-  private getStorageKey() {
-    return `${this.meta.storageKey}:v${this.getVersion()}`;
+    this.storageInstance = ApiClientLocalStorage.getInstance(metadata);
   }
 
   private getNewId() {
-    return `${Date.now()}`; // TODO: has to be uuid
+    return uuidv4();
   }
 
   private getLocalStorageRecords(): LocalStoreSyncRecords {
-    return JSON.parse(localStorage.getItem(this.getStorageKey())) || { apis: [], environments: {} };
+    return this.storageInstance.getRecords();
   }
 
   async getAllRecords() {
@@ -81,7 +78,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
     const records = this.getLocalStorageRecords();
     records.apis.push(newRecord);
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+
+    this.storageInstance.setRecords(records);
     return { success: true, data: newRecord };
   }
 
@@ -111,7 +109,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
     const records = this.getLocalStorageRecords();
     records.apis.push(newRecord);
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    this.storageInstance.setRecords(records);
     return { success: true, data: newRecord };
   }
 
@@ -133,7 +131,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     } as RQAPI.Record;
 
     records.apis[index] = updatedRecord;
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    this.storageInstance.setRecords(records);
     return { success: true, data: updatedRecord };
   }
 
@@ -151,7 +149,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     });
 
     records.apis = updatedApis;
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    this.storageInstance.setRecords(records);
     return { success: true, data: null };
   }
 
@@ -255,6 +253,16 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
+  async batchCreateRecords(records: RQAPI.Record[]): Promise<RQAPI.RecordsPromise> {
+    return {
+      success: true,
+      data: {
+        records: [],
+        erroredRecords: [],
+      },
+    };
+  }
+
   async duplicateApiEntities(entities: RQAPI.Record[]) {
     const result: RQAPI.Record[] = [];
     for (const entity of entities) {
@@ -298,7 +306,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     });
 
     records.apis = updatedRecords;
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    this.storageInstance.setRecords(records);
     return updatedRequests;
   }
 }

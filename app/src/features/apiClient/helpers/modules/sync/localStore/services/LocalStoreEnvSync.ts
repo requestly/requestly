@@ -2,28 +2,24 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { LocalStoreSyncRecords } from "./types";
+import { v4 as uuidv4 } from "uuid";
+import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
+  private storageInstance: ApiClientLocalStorage;
 
   constructor(metadata: ApiClientLocalStoreMeta) {
     this.meta = metadata;
-  }
-
-  private getVersion() {
-    return this.meta.version;
-  }
-
-  private getStorageKey() {
-    return `${this.meta.storageKey}:v${this.getVersion()}`;
+    this.storageInstance = ApiClientLocalStorage.getInstance(metadata);
   }
 
   private getNewId() {
-    return `${Date.now()}`;
+    return uuidv4();
   }
 
   private getLocalStorageRecords(): LocalStoreSyncRecords {
-    return JSON.parse(localStorage.getItem(this.getStorageKey())) || { apis: [], environments: {} };
+    return this.storageInstance.getRecords();
   }
 
   async getAllEnvironments() {
@@ -59,7 +55,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     };
 
     records.environments[newEnvironment.id] = newEnvironment;
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    this.storageInstance.setRecords(records);
     return newEnvironment;
   }
 
@@ -73,7 +69,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     };
 
     records.environments[newEnvironment.id] = newEnvironment;
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+    this.storageInstance.setRecords(records);
     return newEnvironment;
   }
 
@@ -81,7 +77,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     const records = this.getLocalStorageRecords();
     if (records.environments[envId]) {
       delete records.environments[envId];
-      localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+      this.storageInstance.setRecords(records);
       return { success: true };
     } else {
       return { success: false, message: "Something went wrong while deleting the environment" };
@@ -105,7 +101,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       }
 
       records.environments[environmentId] = environment;
-      localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+      this.storageInstance.setRecords(records);
     } else {
       throw new Error("Environment not found");
     }
