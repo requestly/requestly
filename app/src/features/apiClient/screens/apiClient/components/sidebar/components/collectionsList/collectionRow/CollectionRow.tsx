@@ -60,13 +60,12 @@ export const CollectionRow: React.FC<Props> = ({
     setIsDeleteModalOpen,
     onSaveRecord,
     apiClientRecordsRepository,
-    recordsChildParentMap,
     forceRefreshApiClientRecords,
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-  const [triggerUpdate] = useAPIRecords((state) => [state.triggerUpdate]);
+  const [triggerUpdate, childParentMap] = useAPIRecords((state) => [state.triggerUpdate, state.childParentMap]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -206,13 +205,13 @@ export const CollectionRow: React.FC<Props> = ({
 
       // For collections, check for circular reference (parent-child relationship)
       if (item.type === RQAPI.RecordType.COLLECTION) {
-        const wouldCreateCircularReference = checkIsParentCollection(item.id, record.id, recordsChildParentMap);
+        const wouldCreateCircularReference = checkIsParentCollection(item.id, record.id, childParentMap);
         return !wouldCreateCircularReference;
       }
 
       return true;
     },
-    [record.id, recordsChildParentMap]
+    [record.id, childParentMap]
   );
 
   const [{ isDragging }, drag] = useDrag(

@@ -29,6 +29,7 @@ import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/Mov
 import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -48,7 +49,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     onSaveRecord,
     onSaveBulkRecords,
     apiClientRecordsRepository,
-    recordsChildParentMap,
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -60,6 +60,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+
+  const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
@@ -133,11 +135,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         return;
       }
 
-      const processedRecords = filterOutChildrenRecords(
-        selectedRecords,
-        recordsChildParentMap,
-        updatedRecords.recordsMap
-      );
+      const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
       switch (action) {
         case BulkActions.DUPLICATE: {
           const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
@@ -200,7 +198,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     },
     [
       selectedRecords,
-      recordsChildParentMap,
+      childParentMap,
       updatedRecords.recordsMap,
       updatedRecords.collections,
       updatedRecords.requests,
@@ -242,7 +240,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         newSelectedRecords: Set<RQAPI.Record["id"]>
       ) => {
         const { recordsMap } = updatedRecords;
-        let parentId = recordsChildParentMap[recordId];
+        let parentId = childParentMap.get(recordId);
         while (parentId) {
           const parentRecord = recordsMap[parentId];
           if (!parentRecord || !isApiCollection(parentRecord)) break;
@@ -253,7 +251,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           } else if (!checked && parentRecord.data.children.some((child) => !newSelectedRecords.has(child.id))) {
             newSelectedRecords.delete(parentId);
           }
-          parentId = recordsChildParentMap[parentId];
+          parentId = childParentMap.get(parentId);
         }
       };
 
@@ -271,7 +269,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       const totalRecordsCount = updatedRecords.collections.length + updatedRecords.requests.length;
       setIsAllRecordsSelected(newSelection.size === totalRecordsCount);
     },
-    [updatedRecords, recordsChildParentMap]
+    [updatedRecords, childParentMap]
   );
 
   useEffect(() => {
@@ -369,7 +367,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       )}
       {isMoveCollectionModalOpen && (
         <MoveToCollectionModal
-          recordsToMove={filterOutChildrenRecords(selectedRecords, recordsChildParentMap, updatedRecords.recordsMap)}
+          recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
           isOpen={isMoveCollectionModalOpen}
           onClose={() => {
             setIsMoveCollectionModalOpen(false);
