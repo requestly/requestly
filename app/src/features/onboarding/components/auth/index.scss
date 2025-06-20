@@ -59,7 +59,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 500;
   border: none;
   background: none;

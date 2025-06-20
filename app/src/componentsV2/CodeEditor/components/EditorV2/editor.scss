@@ -1,7 +1,7 @@
 .code-editor {
   overflow: auto;
   height: 100%;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   border-radius: 4px 4px 0 0;
   border: 1px solid var(--requestly-color-white-t-10);
   border-bottom: 0;
