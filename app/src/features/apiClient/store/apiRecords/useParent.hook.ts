@@ -3,9 +3,9 @@ import { useStore } from "zustand";
 import { createVersionStore } from "./apiRecords.store";
 
 export function useParent(id: string) {
-  const [childParentMap, indexStore] = useAPIRecords((s) => [s.childParentMap, s.indexStore]);
+  const [getParent, getVersionStore] = useAPIRecords((s) => [s.getParent, s.getVersionStore]);
 
-  const parent = childParentMap.get(id);
-  const versionStateStore = parent ? indexStore.get(parent) : createVersionStore();
+  const parent = getParent(id);
+  const versionStateStore = parent ? getVersionStore(parent) : createVersionStore();
   return useStore(versionStateStore);
 }
