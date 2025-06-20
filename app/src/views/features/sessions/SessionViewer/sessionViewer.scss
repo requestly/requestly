@@ -270,7 +270,7 @@
     .session-panel-content {
       height: 300px;
       overflow: auto;
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
 
       .placeholder {
         height: 100%;
@@ -280,7 +280,7 @@
       }
 
       span.ant-typography.recording-options-message {
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
       }
 
       .empty-table-view {
@@ -428,7 +428,7 @@
       background-color: var(--component-dark-background);
 
       .header {
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         font-weight: 700;
       }
 
@@ -456,7 +456,7 @@
       }
 
       .config-label {
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         line-height: 25px;
         margin-bottom: 12px;
         color: var(--text-gray);

@@ -11,25 +11,19 @@ const FONT_WEIGHT_TOKENS = {
 };
 
 const FONT_SIZE_TOKENS = {
-  "size-2xs": "0.625rem", // 10px
+  "size-2xs": "0.563rem", // 9px
   "size-xs": "0.688rem", // 11px
-  "size-sm": "0.813rem", // 13px
-  "size-md": "0.938rem", // 15px
-  "size-base": "1rem", // 16px
-  "size-lg": "1.25rem", // 20px
-  "size-xl": "1.5rem", // 24px
-  "size-2xl": "1.875rem", // 30px
-  "size-3xl": "2.25rem", // 36px
-  "size-4xl": "3rem", // 48px
-  "size-5xl": "3.75rem", // 60px
+  "size-sm": "0.75rem", // 12px
+  "size-md": "0.875rem", // 14px
+  "size-lg": "1rem", // 16px
+  "size-xl": "1.125rem", // 18px
 };
 
 const LINE_HEIGHT_TOKENS = {
-  "line-height-2xs": "0.75rem", // 12px
+  "line-height-2xs": "0.813rem", // 13px
   "line-height-xs": "0.938rem", // 15px
   "line-height-sm": "1.25rem", // 20px
   "line-height-md": "1.438rem", // 23px
-  "line-height-base": "1.5rem", // 24px
   "line-height-lg": "1.875rem", // 30px
   "line-height-xl": "2.25rem", // 36px
   "line-height-2xl": "2.813rem", // 45px

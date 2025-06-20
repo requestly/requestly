@@ -83,7 +83,7 @@
 
   & .home-templates-card-action-btn.ant-btn {
     font-weight: 500;
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
 }
 

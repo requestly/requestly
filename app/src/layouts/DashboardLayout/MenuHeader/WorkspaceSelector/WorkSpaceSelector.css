@@ -52,7 +52,7 @@
 }
 
 .active-workspace-name-down-icon.anticon {
-  font-size: 9px;
+  font-size: var(--requestly-font-size-2xs, 9px);
   margin-top: 1px;
   margin-left: 10px;
 }
@@ -102,7 +102,7 @@
 
 .workspace-item-wrapper span.ant-tag.ant-tag-gold {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .workspace-name-container {
@@ -176,7 +176,7 @@
   color: var(--text-gray);
   background-color: var(--border-dark);
   border-radius: var(--border-radius-sm);
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .workspace-selector-tooltip.ant-tooltip-placement-bottomRight {

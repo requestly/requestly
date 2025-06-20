@@ -124,7 +124,7 @@
         }
 
         .api-history-url {
-          font-size: 12px;
+          font-size: var(--requestly-font-size-sm, 12px);
           width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;

@@ -24,7 +24,7 @@
         align-items: center;
         gap: 4px;
         color: var(--requestly-color-text-subtle);
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         margin-top: 8px;
 
         &-prefix {

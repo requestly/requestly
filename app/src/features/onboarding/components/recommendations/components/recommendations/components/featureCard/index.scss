@@ -40,7 +40,7 @@
 }
 
 .recommendation-card-subtitle {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   line-height: 16px;
   font-weight: 500;
   color: var(--neutrals-gray-300);
