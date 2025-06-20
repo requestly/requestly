@@ -12,9 +12,11 @@ export type ApiRecordsState = {
   index: Map<string, RQAPI.Record>,
   indexStore: Map<string, StoreApi<VersionState>>,
 
+  getParentChain: (id: string) => string[],
   refresh: (records: RQAPI.Record[]) => void,
   getData: (id: string) => RQAPI.Record,
-  getParent: (id: string) => string,
+  getParent: (id: string) => string | undefined,
+  getVersionStore: (id: string) => StoreApi<VersionState>,
 
   triggerUpdate: (id: string) => void,
 };
@@ -48,7 +50,6 @@ function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
   }
   parseRecursively(initalId);
   return result;
-
 }
 
 function incrementVersion(store: StoreApi<VersionState>) {
@@ -121,6 +122,21 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       return childParentMap.get(id);
     },
 
+    getParentChain(id) {
+      const { getParent } = get();
+      const result: string[] = [];
+      const parseRecursively = (id: string) => {
+        const parent = getParent(id);
+        if (!parent) {
+          return;
+        }
+        result.push(parent);
+        parseRecursively(parent);
+      }
+      parseRecursively(id);
+      return result;
+    },
+
     triggerUpdate(id) {
       const { childParentMap, indexStore } = get();
       incrementVersion(indexStore.get(id));
@@ -130,6 +146,12 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       allChildren.forEach(cid => {
         incrementVersion(indexStore.get(cid));
       })
+    },
+
+    getVersionStore(id) {
+      const { indexStore } = get();
+      const versionStateStore = indexStore.get(id);
+      return versionStateStore;
     },
 
   }));
