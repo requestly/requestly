@@ -106,6 +106,12 @@ export const RulesCard = () => {
     },
     {
       key: "4",
+      label: "Header Editor",
+      icon: <img src="/assets/img/brandLogos/header-editor.png" alt="Header Editor" />,
+      onClick: () => importTriggerHandler(ImporterType.HEADER_EDITOR),
+    },
+    {
+      key: "5",
       label: "Requestly",
       icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
       onClick: () => importTriggerHandler(ImporterType.REQUESTLY),

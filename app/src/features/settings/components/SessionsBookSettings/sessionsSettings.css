@@ -19,7 +19,7 @@
 }
 
 .session-settings-container .header .anticon {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
 }
 
 .automatic-recording-container {
@@ -27,7 +27,7 @@
 }
 
 .automatic-recording-details .heading {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   margin-bottom: 5px;
   color: var(--white);
@@ -83,7 +83,7 @@
 .specific-page-mode-container .add-new-source-btn.ant-btn {
   margin-top: 6px;
   padding: 11px;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   height: auto;
   color: var(--white);
   border: 1px dashed var(--primary);
