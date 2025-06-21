@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "condition": {
+      "resourceTypes": ["xmlhttprequest"]
+    },
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "header": "x-requestly-id",
+          "operation": "remove"
+        }
+      ]
+    }
+  }
+]
