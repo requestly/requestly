@@ -101,7 +101,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     apiRequestCorrelationManager.addHandler(
       requestlyId,
       (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
-        responseHeaders = requestDetails.responseHeaders.map((header) => ({
+        responseHeaders = requestDetails.responseHeaders?.map((header) => ({
           key: header.name,
           value: header.value,
         }));
