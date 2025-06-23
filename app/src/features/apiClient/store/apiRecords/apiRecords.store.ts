@@ -34,8 +34,6 @@ function parseRecords(records: RQAPI.Record[]) {
     index.set(record.id, record);
   }
 
-  debugger;
-
   return {
     childParentMap,
     index,
