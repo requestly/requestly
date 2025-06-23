@@ -7,7 +7,7 @@
 Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.
 
 
-#### ⚡ A Local-first, Beautiful & Powerful alternative to Postman, Insomina & Charles Proxy ⚡
+#### ⚡ A Local-first, Beautiful & Powerful alternative to Postman, Insomnia & Charles Proxy ⚡
 ![requestly-overview](https://github.com/user-attachments/assets/04c32f25-96c4-46d9-a31d-b6887ce7bfdc)
 <br/>
 
