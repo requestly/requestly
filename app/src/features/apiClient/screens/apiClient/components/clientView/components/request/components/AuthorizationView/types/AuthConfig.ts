@@ -124,7 +124,7 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
   }
 
   validate(): boolean {
-    return Boolean(this.username && this.password);
+    return !!(this.username && this.password);
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {
