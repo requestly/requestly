@@ -6,8 +6,8 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
-import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
+import { generateDocumentId } from "backend/utils";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   public static meta: ApiClientLocalStoreMeta;
@@ -20,7 +20,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   private getNewId() {
-    return uuidv4();
+    return generateDocumentId("apis");
   }
 
   private getLocalStorageRecords() {
@@ -58,10 +58,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async createRecord(record: Partial<RQAPI.Record>): RQAPI.RecordPromise {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
-    sanitizedRecord.id = this.getNewId();
 
     const newRecord = {
       ...sanitizedRecord,
+      id: this.getNewId(),
       name: record.name || "Untitled request",
       type: record.type,
       data: sanitizedRecord.data,
@@ -89,10 +89,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   // TODO: refactor this to avoid code duplication
   async createRecordWithId(record: Partial<RQAPI.Record>, id: string) {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
-    sanitizedRecord.id = id;
 
     const newRecord = {
       ...sanitizedRecord,
+      id,
       name: record.name || "Untitled request",
       type: record.type,
       data: sanitizedRecord.data,
@@ -252,7 +252,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async batchCreateRecords(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
     return {
       success: true,
       data: {
