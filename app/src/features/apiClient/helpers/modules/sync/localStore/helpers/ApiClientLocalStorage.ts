@@ -6,17 +6,24 @@ type ApiClientLocalStorageMetadata = { version: number; storageKey: string };
 type ApiClientLocalStorageRecords = {
   apis: RQAPI.Record[];
   environments: EnvironmentMap;
+  metadata: {
+    isSynced: boolean;
+  };
 };
 
 export class ApiClientLocalStorage {
   private static instance: ApiClientLocalStorage = null;
   private readonly metadata: ApiClientLocalStorageMetadata;
-  private static readonly DEFAULT_STATE: ApiClientLocalStorageRecords = { apis: [], environments: {} };
+  private static readonly DEFAULT_STATE: ApiClientLocalStorageRecords = {
+    apis: [],
+    environments: {},
+    metadata: { isSynced: false },
+  };
 
   constructor(metadata: ApiClientLocalStorageMetadata) {
     this.metadata = metadata;
 
-    const isInitialized = this.getRecords();
+    const isInitialized = !!this.getRecords();
 
     if (isInitialized) {
       return;
@@ -33,7 +40,7 @@ export class ApiClientLocalStorage {
 
   public static getInstance(): ApiClientLocalStorage {
     if (!ApiClientLocalStorage.instance) {
-      throw new Error("ApiClientLocalStorage is not initialized, call init() first.");
+      return;
     }
 
     return ApiClientLocalStorage.instance;
@@ -55,7 +62,18 @@ export class ApiClientLocalStorage {
     localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
   }
 
-  public clearRecords(): void {
-    localStorage.removeItem(this.getStorageKey());
+  public resetRecords(): void {
+    this.setRecords({ ...ApiClientLocalStorage.DEFAULT_STATE });
+  }
+
+  public isSynced(): boolean {
+    const records = this.getRecords();
+    return records.metadata.isSynced;
+  }
+
+  public setSyncStatus(isSynced: boolean): void {
+    const records = this.getRecords();
+    records.metadata.isSynced = isSynced;
+    this.setRecords(records);
   }
 }
