@@ -32,7 +32,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     forceRefreshApiClientRecords,
   } = useApiClientContext();
 
-  const triggerUpdate = useAPIRecords(s => s.triggerUpdate);
+  const queueTriggerUpdate = useAPIRecords((s) => s.queueTriggerUpdate);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -52,7 +52,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
   const updateCollectionAuthData = useCallback(
     async (newAuthOptions: RQAPI.Auth) => {
-      triggerUpdate(collectionId);
       const record = {
         ...collection,
         data: {
@@ -64,6 +63,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         .updateCollectionAuthData(record)
         .then((result) => {
           if (result.success) {
+            queueTriggerUpdate(collectionId);
             onSaveRecord(result.data, "open");
           } else {
             notification.error({
@@ -81,7 +81,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           });
         });
     },
-    [collection, onSaveRecord, apiClientRecordsRepository]
+    [collection, apiClientRecordsRepository, onSaveRecord, queueTriggerUpdate, collectionId]
   );
 
   const tabItems = useMemo(() => {
