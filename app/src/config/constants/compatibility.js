@@ -94,11 +94,19 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "24.4.18",
   },
   [FEATURES.BLOCK_LIST]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "1.8.1",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      macOS: "1.8.1",
+      Windows: null,
+      Linux: null,
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "24.7.12",
   },
   [FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "1.7.0",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      macOS: "1.7.0",
+      Windows: null,
+      Linux: null,
+    },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.SCRIPT_RULE_SOURCE_FILTER]: {
@@ -119,16 +127,12 @@ export const FEATURE_COMPATIBLE_VERSION = {
   [FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
       macOS: "1.7.7",
-      Windows: null,
-      Linux: null,
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
   [FEATURES.FRAMELESS_DESKTOP_APP]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
       macOS: "1.8.0",
-      Windows: null,
-      Linux: null,
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
@@ -147,6 +151,8 @@ export const FEATURE_COMPATIBLE_VERSION = {
   [FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_FOR_LOCAL_FILE]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
       macOS: "25.5.19",
+      Windows: null,
+      Linux: null,
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
