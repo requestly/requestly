@@ -168,4 +168,23 @@ export const FEATURE_COMPATIBLE_VERSION = {
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
   },
+
+  [FEATURES.COMPATIBLE_DESKTOP_APP]: {
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      macOS: "25.5.20",
+      Windows: "1.4.20", // about to be updated
+      Linux: "1.4.20",
+    },
+    [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
+  },
+
+  [FEATURES.NON_BREAKING_DESKTOP_APP]: {
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
+      // about to be updated
+      macOS: "1.4.20",
+      Windows: "1.4.20",
+      Linux: "1.4.20",
+    },
+    [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
+  },
 };
