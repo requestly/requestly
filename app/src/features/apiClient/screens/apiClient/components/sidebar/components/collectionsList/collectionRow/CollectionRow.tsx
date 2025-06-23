@@ -53,7 +53,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
-  const [loadingCollectionId, setLoadingCollectionId] = useState<string | null>(null);
+  const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
   const {
     updateRecordsToBeDeleted,
     setIsDeleteModalOpen,
@@ -179,7 +179,7 @@ export const CollectionRow: React.FC<Props> = ({
           placement: "bottomRight",
         });
       } finally {
-        setLoadingCollectionId(null);
+        setIsCollectionRowLoading(false);
       }
     },
     [
@@ -234,7 +234,7 @@ export const CollectionRow: React.FC<Props> = ({
       if (!isOverCurrent) return;
 
       if (item.id === record.id) return;
-      setLoadingCollectionId(record.id);
+      setIsCollectionRowLoading(true);
       handleRecordDrop(item);
     },
     canDrop: checkCanDropItem,
@@ -373,7 +373,7 @@ export const CollectionRow: React.FC<Props> = ({
                 </div>
               }
             >
-              {loadingCollectionId === record.id ? (
+              {isCollectionRowLoading ? (
                 <div className="loading-collection-row">
                   <Skeleton paragraph={{ rows: 4 }} title={false} />
                 </div>
