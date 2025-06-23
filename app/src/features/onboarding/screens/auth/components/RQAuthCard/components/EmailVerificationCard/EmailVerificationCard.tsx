@@ -12,6 +12,7 @@ import {
 import "./emailVerificationCard.scss";
 import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import Logger from "../../../../../../../../../../common/logger";
 
 interface EmailVerificationCardProps {
   onBackClick: () => void;
@@ -60,8 +61,10 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
     onResendEmailClick()
       .then(() => {
         setCountdown(20);
+        Logger.log("[Auth-EmailVerificationCard-handleResendEmailClick] Successfully re-sent email link");
       })
-      .catch(() => {
+      .catch((error) => {
+        Logger.log("[Auth-EmailVerificationCard-handleResendEmailClick] catch", { error });
         throw new Error("Something went wrong, Could not send email link ");
       });
   }, [onResendEmailClick]);

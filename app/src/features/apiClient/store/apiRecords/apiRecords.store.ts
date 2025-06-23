@@ -8,18 +8,51 @@ export type VersionState = {
 };
 
 export type ApiRecordsState = {
+  /**
+   * This maintains a map of child <-> parent. This field is mostly for internal use,
+   * since it will get updated when any relationship changes. So try not to use this
+   * unless you want to listen to all changes.
+   */
   childParentMap: Map<string, string>;
+
+  /**
+   * This is a helper map, which provides actual data for a given id. Again, not for external use
+   * unless neccessary.
+   */
   index: Map<string, RQAPI.Record>;
+
+  /**
+   * This maintains a version for each entity. This version is kept in a zunstand store so that
+   * one can use it as a hook and react whenever it changes.
+   */
   indexStore: Map<string, StoreApi<VersionState>>;
+
+  /**
+   * This is a queue that is pulled and acted upon on refresh. We do this circumvent race conditions
+   * where data is yet to be synced via refresh but a `triggerUpdate` has been called.
+   */
   triggerUpdateQueue: Set<string>;
 
   getParentChain: (id: string) => string[];
+
+  /**
+   * This is called to update/sync the internal data with external changes happening in apiClientRecords.
+   */
   refresh: (records: RQAPI.Record[]) => void;
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
   getVersionStore: (id: string) => StoreApi<VersionState>;
 
+  /**
+   * It updates the version store of given entity. Meaning any component relying on this
+   * will get re-rendered.
+   */
   triggerUpdate: (id: string) => void;
+
+  /**
+   * This is used to queue the triggers than apply them immediately. These will be picked up
+   * on next refresh.
+   */
   queueTriggerUpdate: (id: string) => void;
 };
 
