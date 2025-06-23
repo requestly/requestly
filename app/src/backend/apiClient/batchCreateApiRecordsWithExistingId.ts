@@ -4,7 +4,7 @@ import { collection, doc, getFirestore, Timestamp, writeBatch } from "firebase/f
 import { captureException } from "./utils";
 import { getOwnerId } from "backend/utils";
 
-export const batchCreateApiRecords = async (
+export const batchCreateApiRecordsWithExistingId = async (
   uid: string,
   teamId: string,
   records: RQAPI.Record[]
@@ -14,11 +14,11 @@ export const batchCreateApiRecords = async (
   }
 
   const ownerId = getOwnerId(uid, teamId);
-  const result = await batchCreateApiRecordsInFirebase(uid, ownerId, records);
+  const result = await batchCreateApiRecordsWithExistingIdInFirebase(uid, ownerId, records);
   return result;
 };
 
-const batchCreateApiRecordsInFirebase = async (
+const batchCreateApiRecordsWithExistingIdInFirebase = async (
   uid: string,
   ownerId: string,
   records: RQAPI.Record[]
@@ -29,11 +29,9 @@ const batchCreateApiRecordsInFirebase = async (
     const updatedRecords: RQAPI.Record[] = [];
 
     records.forEach((record) => {
-      const recordRef = doc(collection(db, "apis"));
-
       const updatedRecord: RQAPI.Record = {
         ...record,
-        id: recordRef.id, //  TODO: check in db is same id as path
+        id: record.id,
         deleted: false,
         ownerId: ownerId,
         createdBy: uid,
@@ -42,6 +40,7 @@ const batchCreateApiRecordsInFirebase = async (
         updatedTs: Timestamp.now().toMillis(),
       };
 
+      const recordRef = doc(collection(db, "apis"), `${record.id}`);
       batch.set(recordRef, updatedRecord);
       updatedRecords.push(updatedRecord);
     });
