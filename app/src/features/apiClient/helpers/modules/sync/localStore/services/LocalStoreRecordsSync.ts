@@ -20,7 +20,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   private getNewId() {
-    return uuidv4();
+    return generateDocumentId("apis");
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {
