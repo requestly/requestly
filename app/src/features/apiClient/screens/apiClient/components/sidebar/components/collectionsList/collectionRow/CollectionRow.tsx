@@ -172,8 +172,6 @@ export const CollectionRow: React.FC<Props> = ({
           setExpandedRecordIds(newExpandedRecordIds);
           sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
         }
-
-        setLoadingCollectionId(null);
       } catch (error) {
         notification.error({
           message: "Error moving item",
