@@ -49,6 +49,11 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     return createNonGlobalEnvironmentInDB(this.getPrimaryId(), "Global Environment");
   }
 
+  async createEnvironments(environmentNames: string[]): Promise<EnvironmentData[]> {
+    const promises = environmentNames.map((name) => this.createNonGlobalEnvironment(name));
+    return Promise.all(promises);
+  }
+
   async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
     return duplicateEnvironmentInDB(this.getPrimaryId(), environmentId, allEnvironments);
   }
