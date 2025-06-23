@@ -8,6 +8,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
     success: boolean;
     data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
   }>;
+  createEnvironments(environmentNames: string[]): Promise<EnvironmentData[]>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
@@ -63,7 +64,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     entities: Partial<RQAPI.Record>[],
     writeFunction: (entity: RQAPI.Record) => Promise<unknown>
   ): Promise<{ success: boolean; message?: string }>;
-  batchCreateRecords(records: RQAPI.Record[]): Promise<RQAPI.RecordsPromise>;
+  batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise;
   duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
   moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
 }
