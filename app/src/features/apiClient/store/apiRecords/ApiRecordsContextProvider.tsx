@@ -11,7 +11,7 @@ export const ApiRecordsProvider = ({ children, records }: { children: ReactNode;
 
   useEffect(() => {
     store.getState().refresh(records);
-  }, [records, store]);
+  }, [records]);
 
   return <ApiRecordsStoreContext.Provider value={store}>{children}</ApiRecordsStoreContext.Provider>;
 };
