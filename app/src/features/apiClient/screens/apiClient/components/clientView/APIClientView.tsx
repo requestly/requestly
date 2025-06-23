@@ -52,7 +52,6 @@ import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiCl
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
-import { useParent } from "features/apiClient/store/apiRecords/useParent.hook";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -99,9 +98,6 @@ const APIClientView: React.FC<Props> = ({
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
   const isHistoryPath = location.pathname.includes("history");
-
-  const { version } = useParent(apiEntryDetails.id);
-  console.log("vvv", version);
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
   const {
