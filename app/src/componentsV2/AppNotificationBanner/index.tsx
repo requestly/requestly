@@ -38,6 +38,7 @@ enum BANNER_ACTIONS {
   REDIRECT_TO_ACCELERATOR_FORM = "redirect_to_accelerator_form",
   CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
   SEE_PLANS = "see_plans",
+  REDIRECT_TO_CHROME_STORE_REVIEWS = "redirect_to_chrome_store_reviews",
 }
 
 enum BANNER_ID {
@@ -47,6 +48,7 @@ enum BANNER_ID {
   BLACK_FRIDAY = "black_friday",
   CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
   BILLING_TEAM_PLAN_REMINDER = "billing_team_plan_reminder",
+  CHROME_STORE_REVIEWS = "chrome-store-reviews",
 }
 
 interface Banner {
@@ -75,6 +77,9 @@ export const AppNotificationBanner = () => {
   );
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [isRequestAccessModalOpen, setIsRequestAccessModalOpen] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(
+    () => localStorage.getItem("isRedirectedTOChromeStoreReview") === "true"
+  );
 
   const BILLING_TEAM_PLAN_REMINDER_END_DATE = 1738434600000;
 
@@ -120,6 +125,15 @@ export const AppNotificationBanner = () => {
         type: "primary",
         onClick: () => {
           dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+        },
+      },
+      [BANNER_ACTIONS.REDIRECT_TO_CHROME_STORE_REVIEWS]: {
+        label: "Review Now",
+        type: "primary",
+        onClick: () => {
+          localStorage.setItem("isRedirectedTOChromeStoreReview", "true");
+          setHasReviewed(true);
+          redirectToUrl("https://rqst.ly/chrome-review", true);
         },
       },
       [BANNER_ACTIONS.CONVERT_TO_ANNUAL_PLAN]: {
@@ -188,11 +202,18 @@ export const AppNotificationBanner = () => {
             user?.details?.planDetails?.planName
           )} Monthly plan. Switch to the annual plan and save over 40% on your annual spends with our New Year Deal.`;
         }
+        case BANNER_ID.CHROME_STORE_REVIEWS: {
+          if (!hasReviewed) {
+            return "Enjoying Requestly? Leave a Chrome review and get 1 month Professional Plan free!";
+          } else {
+            return "Thanks! Upload a screenshot of your review via the chatbot (bottom right) to claim your free month.";
+          }
+        }
         default:
           return text;
       }
     },
-    [user.details?.emailType, user.details?.planDetails?.planName, user.details?.profile?.email]
+    [user.details?.emailType, user.details?.planDetails?.planName, user.details?.profile?.email, hasReviewed]
   );
 
   const checkBannerVisibility = useCallback(
@@ -303,6 +324,10 @@ export const AppNotificationBanner = () => {
   };
 
   useEffect(() => {
+    setHasReviewed(localStorage.getItem("isRedirectedTOChromeStoreReview") === "true");
+  }, []);
+
+  useEffect(() => {
     if (newBanners?.length > 0 && isAppBannerVisible) {
       trackAppNotificationBannerViewed(newBanners[0]?.id);
     }
@@ -335,19 +360,23 @@ export const AppNotificationBanner = () => {
               />
             </div>
             <div className="app-banner-action-buttons">
-              {banner?.actions?.map((action: BANNER_ACTIONS) => {
-                return (
-                  <RQButton
-                    type={bannerActionButtons[action]?.type as ButtonType}
-                    onClick={() => {
-                      bannerActionButtons[action].onClick();
-                      trackAppBannerCtaClicked(banner?.id, action);
-                    }}
-                  >
-                    {capitalize(bannerActionButtons[action]?.label)}
-                  </RQButton>
-                );
-              })}
+              {banner?.id === BANNER_ID.CHROME_STORE_REVIEWS && hasReviewed
+                ? null
+                : banner?.actions?.map((action: BANNER_ACTIONS) => {
+                    // For Chrome review, only show button if not reviewed
+                    if (action === BANNER_ACTIONS.REDIRECT_TO_CHROME_STORE_REVIEWS && hasReviewed) return null;
+                    return (
+                      <RQButton
+                        type={bannerActionButtons[action]?.type as ButtonType}
+                        onClick={() => {
+                          bannerActionButtons[action].onClick();
+                          trackAppBannerCtaClicked(banner?.id, action);
+                        }}
+                      >
+                        {capitalize(bannerActionButtons[action]?.label)}
+                      </RQButton>
+                    );
+                  })}
             </div>
             {banner?.isDismissable === false ? null : (
               <div className="close-button-container">
