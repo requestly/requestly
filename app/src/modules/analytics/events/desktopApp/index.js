@@ -11,7 +11,7 @@ import {
   TRAFFIC_TABLE,
   AUTH,
 } from "./constants";
-import { getUserOS } from "utils/Misc";
+import { getUserOS } from "utils/osUtils";
 
 export const trackProxyServerStartedEvent = () => {
   const params = {};

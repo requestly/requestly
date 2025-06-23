@@ -9,7 +9,7 @@ import BlockingDialog from "./BlockingDialog";
 import NonBlockingDialog from "./NonBlockingDialog";
 import { isEqual } from "lodash";
 import BreakingDialog from "./BreakingDialog";
-import { getUserOS } from "utils/Misc";
+import { getUserOS } from "utils/osUtils";
 
 const UpdateDialog = () => {
   const appMode = useSelector(getAppMode);
