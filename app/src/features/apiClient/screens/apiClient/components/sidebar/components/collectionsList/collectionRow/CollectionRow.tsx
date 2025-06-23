@@ -64,7 +64,10 @@ export const CollectionRow: React.FC<Props> = ({
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-  const [triggerUpdate, getParentChain] = useAPIRecords((state) => [state.triggerUpdate, state.getParentChain]);
+  const [queueTriggerUpdate, getParentChain] = useAPIRecords((state) => [
+    state.queueTriggerUpdate,
+    state.getParentChain,
+  ]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -159,9 +162,9 @@ export const CollectionRow: React.FC<Props> = ({
     async (item: Partial<RQAPI.Record>) => {
       try {
         const result = await apiClientRecordsRepository.moveAPIEntities([item], record.id);
+        queueTriggerUpdate(record.id);
         onSaveRecord(result[0]);
         forceRefreshApiClientRecords();
-        triggerUpdate(record.id);
 
         // Expand the collection after successful drop
         if (!expandedRecordIds.includes(record.id)) {
@@ -188,7 +191,7 @@ export const CollectionRow: React.FC<Props> = ({
       forceRefreshApiClientRecords,
       expandedRecordIds,
       setExpandedRecordIds,
-      triggerUpdate,
+      queueTriggerUpdate,
     ]
   );
 
