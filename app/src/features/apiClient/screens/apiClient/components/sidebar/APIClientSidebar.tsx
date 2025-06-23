@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
+import { useRecordsSyncService } from "features/apiClient/hooks/useRecordsSyncService";
 
 interface Props {}
 
@@ -47,6 +48,8 @@ const APIClientSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
     apiClientRecordsRepository,
   } = useApiClientContext();
+
+  useRecordsSyncService();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
@@ -187,7 +190,7 @@ const APIClientSidebar: React.FC<Props> = () => {
 
   return (
     <>
-      <div className={`api-client-sidebar ${user.loggedIn ? "" : "api-client-sidebar-disabled"}`}>
+      <div className={`api-client-sidebar`}>
         <div className="api-client-sidebar-content">
           <ApiClientSidebarHeader
             activeTab={activeKey}
