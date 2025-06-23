@@ -11,7 +11,6 @@ import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -32,8 +31,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     forceRefreshApiClientRecords,
   } = useApiClientContext();
 
-  const triggerUpdate = useAPIRecords((s) => s.triggerUpdate);
-
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
   const { setTitle, getIsNew } = useGenericState();
@@ -52,7 +49,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
   const updateCollectionAuthData = useCallback(
     async (newAuthOptions: RQAPI.Auth) => {
-      triggerUpdate(collectionId);
       const record = {
         ...collection,
         data: {
@@ -81,7 +77,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           });
         });
     },
-    [collection, onSaveRecord, apiClientRecordsRepository, triggerUpdate, collectionId]
+    [collection, onSaveRecord, apiClientRecordsRepository]
   );
 
   const tabItems = useMemo(() => {
