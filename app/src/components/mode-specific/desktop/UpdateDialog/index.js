@@ -1,17 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import * as semver from "semver";
-
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "config/constants";
 import { getAppMode } from "store/selectors";
 import NonBlockingDialog from "./NonBlockingDialog";
 import { isEqual } from "lodash";
-import { getUserOS } from "utils/osUtils";
 import { getLinkWithMetadata } from "modules/analytics/metadata";
 import MandatoryUpdateScreen from "./MandatoryUpdateScreen";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
-/* CURRENTLY ONLY FOR MACOS */
 const UpdateDialog = () => {
   const appMode = useSelector(getAppMode);
 
@@ -58,50 +55,14 @@ const UpdateDialog = () => {
     });
   };
 
-  const isIncompatible = () => {
-    // users is being forced to update because this version would become breaking soon
-    if (getUserOS() !== "macOS") return true;
-    const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
+  const isIncompatible = () => !isFeatureCompatible(FEATURES.COMPATIBLE_DESKTOP_APP);
+  const isBreaking = () => !isFeatureCompatible(FEATURES.NON_BREAKING_DESKTOP_APP);
 
-    if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION) {
-      if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION)) {
-        return true;
-      }
-    }
-    return false;
-  };
+  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP || !isUpdateAvailable) return null;
 
-  const isBreaking = () => {
-    // users needs to update manually
-    if (getUserOS() !== "macOS") return false;
-
-    const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
-    if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION) {
-      if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION)) {
-        console.log("DG: breaking");
-        return true;
-      }
-    }
-    console.log("DG: not breaking");
-    return false;
-  };
-
-  if (
-    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
-    getUserOS() !== "macOS" || // todo: handle once windows release is ready
-    !isUpdateAvailable
-  )
-    return null;
-
-  return isBreaking() ? (
-    <MandatoryUpdateScreen handleCTAClick={redirectToDownloadPage} CTAText="Download Now" />
-  ) : isUpdateDownloaded ? (
-    isIncompatible() ? (
-      <MandatoryUpdateScreen handleCTAClick={quitAndInstall} CTAText="Install Now" />
-    ) : (
-      <NonBlockingDialog updateDetails={updateDetailsRef.current} quitAndInstall={quitAndInstall} />
-    )
-  ) : null;
+  if (isBreaking()) return <MandatoryUpdateScreen handleCTAClick={redirectToDownloadPage} CTAText="Download Now" />;
+  if (isIncompatible()) return <MandatoryUpdateScreen handleCTAClick={quitAndInstall} CTAText="Install Now" />;
+  return <NonBlockingDialog updateDetails={updateDetailsRef.current} quitAndInstall={quitAndInstall} />;
 };
 
 export default UpdateDialog;
