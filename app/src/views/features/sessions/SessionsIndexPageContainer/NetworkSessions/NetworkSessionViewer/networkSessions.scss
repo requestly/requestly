@@ -80,7 +80,7 @@
 }
 
 .mock-responses-popover-overlay {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   z-index: 20000;
 }
 
@@ -89,7 +89,7 @@
   cursor: pointer;
 
   & .mock-responses-popover-dropdown-text {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
   & .mock-responses-popover-dropdown-btn {
     margin-top: 6px;
@@ -101,6 +101,6 @@
 
 .session-mock-input.rq-input {
   &::placeholder {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
 }

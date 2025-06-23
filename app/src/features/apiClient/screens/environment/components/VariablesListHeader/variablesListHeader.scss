@@ -12,7 +12,7 @@
     font-size: var(--requestly-font-size-xs, 11px);
 
     svg {
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
       position: relative;
       top: 2px;
       color: var(--requestly-color-text-subtle);

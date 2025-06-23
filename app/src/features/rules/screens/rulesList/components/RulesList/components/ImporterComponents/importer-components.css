@@ -48,7 +48,7 @@
 }
 
 .importer-heading {
-  font-size: var(--requestly-font-size-base);
+  font-size: var(--requestly-font-size-lg);
   font-weight: var(--requestly-font-weight-medium);
   gap: 8px;
   display: flex;
@@ -94,7 +94,7 @@
 }
 
 .parsed-rules-error-info {
-  font-size: var(--requestly-font-size-base);
+  font-size: var(--requestly-font-size-lg);
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;

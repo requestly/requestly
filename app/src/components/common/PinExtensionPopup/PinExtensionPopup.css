@@ -52,7 +52,7 @@
 }
 
 .pin-extension-popup .subtitle {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   font-weight: 600;
   line-height: 21px;
   margin-bottom: 8px;
@@ -93,7 +93,7 @@
 }
 
 .pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   padding: 10px 12px;
 }
 
@@ -133,7 +133,7 @@
   padding: 0;
   height: 16px;
   color: var(--white);
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   line-height: 16px;
   display: inline-flex;
   align-items: center;
