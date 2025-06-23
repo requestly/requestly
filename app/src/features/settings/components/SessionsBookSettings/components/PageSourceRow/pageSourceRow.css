@@ -10,7 +10,7 @@
 }
 
 .page-source-row .source-label {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   max-width: 80ch;
   display: block;
   overflow: hidden;
