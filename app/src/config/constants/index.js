@@ -104,9 +104,9 @@ APP_CONSTANTS.TRIAL_MODE_START_DATE = "2022-02-28";
 APP_CONSTANTS.COOKIES = COOKIES;
 
 // Desktop App
-// Controls the blocking update dialog
-APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION = "1.4.20";
-APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION = "1.4.20";
+// Controls the blocking update dialog -- ONLY FOR MACOS FOR NOW
+APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION = "25.5.20"; // release version that introduced new cert in DR
+APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION = "24.6.19"; // todo: update
 
 APP_CONSTANTS.PROD_RULES_URL = "https://app.requestly.io/rules";
 

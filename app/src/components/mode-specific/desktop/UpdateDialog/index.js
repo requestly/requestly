@@ -5,17 +5,18 @@ import * as semver from "semver";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { getAppMode } from "store/selectors";
-import BlockingDialog from "./BlockingDialog";
 import NonBlockingDialog from "./NonBlockingDialog";
 import { isEqual } from "lodash";
-import BreakingDialog from "./BreakingDialog";
 import { getUserOS } from "utils/osUtils";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
+import MandatoryUpdateScreen from "./MandatoryUpdateScreen";
 
+/* CURRENTLY ONLY FOR MACOS */
 const UpdateDialog = () => {
   const appMode = useSelector(getAppMode);
 
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
-  const [updateProgress, setUpdateProgress] = useState(null);
+  const [, setUpdateProgress] = useState(null);
   const [isUpdateDownloaded, setIsUpdateDownloaded] = useState(false);
   const updateDetailsRef = useRef({});
 
@@ -51,48 +52,56 @@ const UpdateDialog = () => {
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("quit-and-install", {});
     }
   };
+  const redirectToDownloadPage = () => {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
+      link: getLinkWithMetadata("https://requestly.com/desktop"),
+    });
+  };
 
-  const isUICompatible = () => {
+  const isIncompatible = () => {
+    // users is being forced to update because this version would become breaking soon
+    if (getUserOS() !== "macOS") return true;
     const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
 
     if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION) {
       if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION)) {
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const isBreaking = () => {
-    if (getUserOS() === "macOS") {
-      const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
-      if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION) {
-        if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION)) {
-          return true;
-        }
+        return true;
       }
     }
     return false;
   };
 
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-    if (isBreaking()) {
-      return <BreakingDialog />;
-    } else if (!isUICompatible()) {
-      return (
-        <BlockingDialog
-          quitAndInstall={quitAndInstall}
-          updateDetails={updateDetailsRef.current}
-          isUpdateAvailable={isUpdateAvailable}
-          isUpdateDownloaded={isUpdateDownloaded}
-          updateProgress={updateProgress}
-        />
-      );
-    } else if (isUpdateDownloaded) {
-      return <NonBlockingDialog updateDetails={updateDetailsRef.current} quitAndInstall={quitAndInstall} />;
+  const isBreaking = () => {
+    // users needs to update manually
+    if (getUserOS() !== "macOS") return false;
+
+    const desktop_app_version = window?.RQ?.DESKTOP?.VERSION;
+    if (desktop_app_version && APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION) {
+      if (semver.lt(desktop_app_version, APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION)) {
+        console.log("DG: breaking");
+        return true;
+      }
     }
-  }
-  return null;
+    console.log("DG: not breaking");
+    return false;
+  };
+
+  if (
+    appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+    getUserOS() !== "macOS" || // todo: handle once windows release is ready
+    !isUpdateAvailable
+  )
+    return null;
+
+  return isBreaking() ? (
+    <MandatoryUpdateScreen handleCTAClick={redirectToDownloadPage} CTAText="Download Now" />
+  ) : isUpdateDownloaded ? (
+    isIncompatible() ? (
+      <MandatoryUpdateScreen handleCTAClick={quitAndInstall} CTAText="Install Now" />
+    ) : (
+      <NonBlockingDialog updateDetails={updateDetailsRef.current} quitAndInstall={quitAndInstall} />
+    )
+  ) : null;
 };
 
 export default UpdateDialog;
