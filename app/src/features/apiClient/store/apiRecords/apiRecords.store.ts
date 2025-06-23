@@ -11,6 +11,7 @@ export type ApiRecordsState = {
   childParentMap: Map<string, string>,
   index: Map<string, RQAPI.Record>,
   indexStore: Map<string, StoreApi<VersionState>>,
+  triggerUpdateQueue: Set<string>,
 
   getParentChain: (id: string) => string[],
   refresh: (records: RQAPI.Record[]) => void,
@@ -19,6 +20,7 @@ export type ApiRecordsState = {
   getVersionStore: (id: string) => StoreApi<VersionState>,
 
   triggerUpdate: (id: string) => void,
+  queueTriggerUpdate: (id: string) => void,
 };
 
 function parseRecords(records: RQAPI.Record[]) {
@@ -84,11 +86,12 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
   return create<ApiRecordsState>()((set, get) => ({
     childParentMap: initialChildParentMap,
     index: initialIndex,
+    triggerUpdateQueue: new Set(),
 
     indexStore: createIndexStore(initialIndex),
 
     refresh(records) {
-      const { indexStore } = get();
+      const { indexStore, triggerUpdateQueue, triggerUpdate } = get();
       const { childParentMap, index } = parseRecords(records);
 
       for (const [id] of index) {
@@ -110,6 +113,14 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
         index,
         indexStore,
       });
+
+      for (const pendingId of triggerUpdateQueue) {
+        triggerUpdate(pendingId);
+      }
+
+      set({
+        triggerUpdateQueue: new Set(),
+      })
     },
 
     getData(id) {
@@ -152,6 +163,15 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       const { indexStore } = get();
       const versionStateStore = indexStore.get(id);
       return versionStateStore;
+    },
+
+    queueTriggerUpdate(id) {
+      const { triggerUpdateQueue } = get();
+      triggerUpdateQueue.add(id);
+
+      set({
+        triggerUpdateQueue,
+      })
     },
 
   }));
