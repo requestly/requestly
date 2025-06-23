@@ -1,9 +1,9 @@
 import {
-  batchCreateApiRecords,
   deleteApiRecords,
   getApiRecord,
   getApiRecords,
   upsertApiRecord,
+  batchCreateApiRecordsWithExistingId,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
@@ -160,24 +160,15 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     }
   }
 
-  async batchCreateRecords(records: RQAPI.Record[]): RQAPI.RecordsPromise {
-    try {
-      if (records.length === 0) {
-        return {
-          success: true,
-          data: { records: [], erroredRecords: [] },
-        };
-      }
-
-      const result = await batchCreateApiRecords(this.meta.uid, this.meta.teamId, records);
-      return result;
-    } catch (error) {
+  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+    if (records.length === 0) {
       return {
-        success: false,
-        message: error.message,
-        data: null,
+        success: true,
+        data: { records: [], erroredRecords: [] },
       };
     }
+
+    return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
   }
 
   async duplicateApiEntities(entities: RQAPI.Record[]) {
