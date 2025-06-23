@@ -106,8 +106,6 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
         }
       }
 
-      debugger;
-
       set({
         childParentMap,
         index,
