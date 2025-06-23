@@ -70,10 +70,4 @@ export class ApiClientLocalStorage {
     const records = this.getRecords();
     return records.metadata.isSynced;
   }
-
-  public setSyncStatus(isSynced: boolean): void {
-    const records = this.getRecords();
-    records.metadata.isSynced = isSynced;
-    this.setRecords(records);
-  }
 }
