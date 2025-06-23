@@ -22,7 +22,6 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
 import { useDrag, useDrop } from "react-dnd";
 import "./CollectionRow.scss";
-import { checkIsParentCollection } from "features/apiClient/screens/apiClient/utils";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface Props {
@@ -65,7 +64,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-  const [triggerUpdate, childParentMap] = useAPIRecords((state) => [state.triggerUpdate, state.childParentMap]);
+  const [triggerUpdate, getParentChain] = useAPIRecords((state) => [state.triggerUpdate, state.getParentChain]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -205,13 +204,14 @@ export const CollectionRow: React.FC<Props> = ({
 
       // For collections, check for circular reference (parent-child relationship)
       if (item.type === RQAPI.RecordType.COLLECTION) {
-        const wouldCreateCircularReference = checkIsParentCollection(item.id, record.id, childParentMap);
+        const parentIds = getParentChain(record.id);
+        const wouldCreateCircularReference = parentIds.includes(item.id);
         return !wouldCreateCircularReference;
       }
 
       return true;
     },
-    [record.id, childParentMap]
+    [getParentChain, record.id]
   );
 
   const [{ isDragging }, drag] = useDrag(

@@ -562,14 +562,3 @@ export const processRecordsForDuplication = (
 
   return recordsToDuplicate;
 };
-
-export const checkIsParentCollection = (
-  potentialParentId: string,
-  targetRecordId: string,
-  recordsChildParentMap: Map<string, string>
-): boolean => {
-  if (potentialParentId === targetRecordId) return true;
-  if (!targetRecordId || !recordsChildParentMap.get(targetRecordId)) return false;
-
-  return checkIsParentCollection(potentialParentId, recordsChildParentMap.get(targetRecordId), recordsChildParentMap);
-};
