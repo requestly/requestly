@@ -156,8 +156,6 @@ export const CollectionRow: React.FC<Props> = ({
     sessionStorage.removeItem("collapsed_collection_keys");
   }, []);
 
-  const isRootCollection = !record.collectionId;
-
   const handleRecordDrop = useCallback(
     async (item: Partial<RQAPI.Record>) => {
       try {
@@ -223,7 +221,7 @@ export const CollectionRow: React.FC<Props> = ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record.id, record.type, isRootCollection]
+    [record.id, record.type]
   );
 
   const [{ isOver }, drop] = useDrop(() => ({
