@@ -1,7 +1,6 @@
 import { RQAPI } from "features/apiClient/types";
 import { ApiClientLocalStoreMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { LocalStoreSyncRecords } from "./types";
 import { sanitizeRecord } from "backend/apiClient/upsertApiRecord";
 import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -24,7 +23,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return uuidv4();
   }
 
-  private getLocalStorageRecords(): LocalStoreSyncRecords {
+  private getLocalStorageRecords() {
     return this.storageInstance.getRecords();
   }
 
@@ -253,7 +252,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async batchCreateRecords(records: RQAPI.Record[]): Promise<RQAPI.RecordsPromise> {
+  async batchCreateRecords(records: RQAPI.Record[]): RQAPI.RecordsPromise {
     return {
       success: true,
       data: {

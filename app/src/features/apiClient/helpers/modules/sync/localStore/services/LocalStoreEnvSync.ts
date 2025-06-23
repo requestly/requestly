@@ -1,7 +1,6 @@
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
-import { LocalStoreSyncRecords } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
 
@@ -18,7 +17,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     return uuidv4();
   }
 
-  private getLocalStorageRecords(): LocalStoreSyncRecords {
+  private getLocalStorageRecords() {
     return this.storageInstance.getRecords();
   }
 
@@ -71,6 +70,11 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     records.environments[newEnvironment.id] = newEnvironment;
     this.storageInstance.setRecords(records);
     return newEnvironment;
+  }
+
+  async createEnvironments(environmentNames: string[]): Promise<EnvironmentData[]> {
+    const promises = environmentNames.map((name) => this.createNonGlobalEnvironment(name));
+    return Promise.all(promises);
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
