@@ -1,3 +1,5 @@
+import { apiRequestCorrelationManager } from "./ApiRequestCorrelationManager";
+
 /* TYPES */
 enum RequestMethod {
   GET = "GET",
@@ -42,6 +44,8 @@ interface Response {
   redirectedUrl: string;
 }
 
+export const REQUESTLY_ID_HEADER = "x-requestly-id";
+
 /* UTIL */
 
 const isFormRequest = (
@@ -74,6 +78,9 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     headers.append(key, value);
   });
 
+  const requestlyId = crypto.randomUUID();
+  headers.append(REQUESTLY_ID_HEADER, requestlyId);
+
   if (isFormRequest(apiRequest.method, apiRequest.contentType, body)) {
     const formData = new FormData();
     body?.forEach(({ key, value }) => {
@@ -89,6 +96,18 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
 
   try {
     const requestStartTime = performance.now();
+
+    let responseHeaders: KeyValuePair[] = [];
+    apiRequestCorrelationManager.addHandler(
+      requestlyId,
+      (requestDetails: chrome.webRequest.WebResponseHeadersDetails) => {
+        responseHeaders = requestDetails.responseHeaders?.map((header) => ({
+          key: header.name,
+          value: header.value,
+        }));
+      }
+    );
+
     const response = await fetch(url, {
       method,
       headers,
@@ -97,10 +116,11 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     });
     const responseTime = performance.now() - requestStartTime;
 
-    const responseHeaders: KeyValuePair[] = [];
+    const fetchedResponseHeaders = [];
     for (const [key, value] of response.headers.entries()) {
-      responseHeaders.push({ key, value });
+      fetchedResponseHeaders.push({ key, value });
     }
+    responseHeaders = responseHeaders.length ? responseHeaders : fetchedResponseHeaders;
 
     const responseBlob = await response.blob();
     const contentType = responseHeaders.find((header) => header.key.toLowerCase() === "content-type")?.value;
@@ -131,5 +151,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
     return {
       error: e.message,
     };
+  } finally {
+    apiRequestCorrelationManager.removeHandler(requestlyId);
   }
 }

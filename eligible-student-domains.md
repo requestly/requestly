@@ -46,6 +46,7 @@ The following domains are eligible for the student programme:
     "edu.co",
     "hunterschools.org",
     "epitech.eu",
+    "uni.au.dk",
     "student.su.se",
     "strayer.edu",
     "purdueglobal.edu"
