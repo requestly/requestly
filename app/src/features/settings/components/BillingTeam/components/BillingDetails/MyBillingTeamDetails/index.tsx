@@ -24,11 +24,14 @@ export const MyBillingTeamDetails: React.FC = () => {
         [PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(
           billingTeamDetails?.subscriptionDetails?.rqSubscriptionType
         ) || billingTeamDetails?.subscriptionDetails?.plan === "lite"
-      ) || billingTeamDetails.browserstackGroupId,
+      ) ||
+      billingTeamDetails.browserstackGroupId ||
+      Object.keys(billingTeamDetails.members || {}).length > 1,
     [
-      billingTeamDetails?.subscriptionDetails?.plan,
       billingTeamDetails?.subscriptionDetails?.rqSubscriptionType,
-      billingTeamDetails.browserstackGroupId,
+      billingTeamDetails?.subscriptionDetails?.plan,
+      billingTeamDetails?.browserstackGroupId,
+      billingTeamDetails?.members,
     ]
   );
 

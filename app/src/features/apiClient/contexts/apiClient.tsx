@@ -451,9 +451,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   return (
     <ApiClientContext.Provider value={value}>
-      <ApiRecordsProvider records={apiClientRecords}>
-        {children}
-      </ApiRecordsProvider>
+      <ApiRecordsProvider records={apiClientRecords}>{children}</ApiRecordsProvider>
     </ApiClientContext.Provider>
   );
 };
