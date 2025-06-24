@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { BANNER_ID, Banner } from "./banner.types";
 import { ChromeReviewBanner } from "./components/ChromeReviewBanner";
-import { GeneralBanner } from "./components/GeneralBanner";
+import { GenericAppBanner } from "./components/GenericAppBanner";
 import { OrgNotificationBanner } from "./OrgNotificationBanner";
 import { getAppNotificationBannerDismissTs, getIsAppBannerVisible } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
@@ -48,6 +48,6 @@ export const AppNotificationBanner: React.FC = () => {
       return <ChromeReviewBanner banner={banner} onClose={handleDismiss} />;
 
     default:
-      return <GeneralBanner banner={banner} onClose={handleDismiss} />;
+      return <GenericAppBanner banner={banner} onClose={handleDismiss} />;
   }
 };
