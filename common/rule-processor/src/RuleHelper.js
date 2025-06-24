@@ -367,7 +367,7 @@ class RuleMatcher {
     const targettedValue = requestPayloadFilter?.value;
 
     // tagettedKey is the json path e.g. a.b.0.c
-    if (targettedKey && typeof targetedValue !== "undefined") {
+    if (targettedKey && typeof targettedValue !== "undefined") {
       const valueInRequestData = traverseJsonByPath(requestData, targettedKey);
       const operator = requestPayloadFilter?.operator;
 
