@@ -3,7 +3,13 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "./sub/features";
 
 // set null if the version is never compatiable on appMode
-// for desktop app, by default assumes that the feature is compatible on all platforms if not specified
+/* for desktop: 
+  - use string to define the same compatible version for all platforms.
+  - use an object if feature is compatible on specific versions for specific platforms
+  - omitting platform from the object or setting it's value as null/undefined implies feature is not available for that platform
+
+  keys of the object are case sensitive. refer existing objects or confirm with the ParsedOS enum in osUtils
+ */
 export const FEATURE_COMPATIBLE_VERSION = {
   [FEATURES.RESPONSE_MAP_LOCAL]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "0.0.29-beta",
@@ -186,5 +192,9 @@ export const FEATURE_COMPATIBLE_VERSION = {
       Linux: "1.4.20",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
+  },
+  [FEATURES.API_CLIENT_INCLUDE_CREDENTIALS]: {
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: null,
+    [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "25.6.10",
   },
 };

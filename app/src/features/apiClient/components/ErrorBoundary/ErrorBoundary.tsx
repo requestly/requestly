@@ -1,3 +1,4 @@
+/* global globalUnhandledRejectionHandlers */
 import React, { useEffect, useRef } from "react";
 import { RenderableError } from "../../../../errors/RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
@@ -6,9 +7,11 @@ import "./errorboundary.scss";
 import { NativeError } from "errors/NativeError";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 interface Props {
   children: React.ReactNode;
+  defaultTags?: Record<string, string>;
 }
 
 interface State {
@@ -16,9 +19,14 @@ interface State {
   error: Error | null;
 }
 
-function sendErrorToSentry(error: Error) {
+function sendErrorToSentry(error: Error, defaultTags?: Record<string, string>) {
   Sentry.withScope((scope) => {
     scope.setTag("caught_by", "api_client_error_boundary");
+    if (defaultTags) {
+      for (const key in defaultTags) {
+        scope.setTag(key, defaultTags[key]);
+      }
+    }
     if (error instanceof NativeError) {
       scope.setExtra("details", error.details);
     }
@@ -61,7 +69,15 @@ const ErrorBoundaryWrapper = (props: Props) => {
     }
   }, [activeWorkspace?.id]);
 
-  return <ApiClientErrorBoundary ref={errorBoundaryRef} {...props} />;
+  let defaultTags: Record<string, string> = {};
+  if (activeWorkspace?.workspaceType === WorkspaceType.LOCAL) {
+    defaultTags = {
+      ...defaultTags,
+      source: "local_fs",
+    };
+  }
+
+  return <ApiClientErrorBoundary ref={errorBoundaryRef} {...props} defaultTags={defaultTags} />;
 };
 
 class ApiClientErrorBoundary extends React.Component<Props, State> {
@@ -79,7 +95,7 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: unknown) {
-    sendErrorToSentry(sanitizeError(error));
+    sendErrorToSentry(sanitizeError(error), this.props.defaultTags);
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent) => {

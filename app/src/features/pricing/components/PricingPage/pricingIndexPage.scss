@@ -129,7 +129,7 @@
 
       .annual-bill {
         span {
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
           line-height: 17px;
         }
       }

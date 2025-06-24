@@ -4,13 +4,12 @@ import { AuthFormInput } from "../RQAuthCard/components/AuthFormInput/AuthFormIn
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { AuthSyncMetadata } from "../../types";
-import { AuthProvider } from "../../types";
-import { getSSOProviderId } from "backend/auth/sso";
 import { isEmailValid } from "utils/FormattingHelper";
 import { useAuthScreenContext } from "../../context";
 import LINKS from "config/constants/sub/links";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import { trackLoginEmailEntered } from "modules/analytics/events/common/auth/signup";
+import Logger from "../../../../../../../../common/logger";
 
 interface EnterEmailCardProps {
   onEmailChange: (email: string) => void;
@@ -18,7 +17,7 @@ interface EnterEmailCardProps {
 }
 
 export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, onAuthSyncVerification }) => {
-  const { email, setSSOProviderId, isOnboarding, eventSource } = useAuthScreenContext();
+  const { email, isOnboarding, eventSource } = useAuthScreenContext();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -33,6 +32,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
     const processedEmail = email.trim();
 
     if (!isEmailValid(processedEmail)) {
+      Logger.log("[Auth-handleOnContinue] Invalid email");
       toast.error("Please enter a valid email address");
       setIsLoading(false);
       return;
@@ -40,21 +40,19 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
 
     const getUserAuthSyncDetails = httpsCallable(getFunctions(), "users-getAuthSyncData");
     try {
-      const ssoProviderId = await getSSOProviderId(processedEmail);
       getUserAuthSyncDetails({ email: processedEmail }).then(({ data }: { data: AuthSyncMetadata }) => {
         if (data.success) {
           const metadata = data.syncData;
-          if (ssoProviderId) {
-            metadata.providers = [...(metadata.providers || []), AuthProvider.SSO];
-            setSSOProviderId(ssoProviderId);
-          }
           onAuthSyncVerification(metadata);
+          Logger.log("[Auth-handleOnContinue] metadata", { metadata });
           return;
         }
+        Logger.log("[Auth-handleOnContinue] Error getting user auth sync details", { data });
         toast.error("Something went wrong! Please try again or contact support.");
         setIsLoading(false);
       });
     } catch (error) {
+      Logger.log("[Auth-handleOnContinue] catch", { error });
       toast.error("Something went wrong! Please try again or contact support.");
       setIsLoading(false);
     }

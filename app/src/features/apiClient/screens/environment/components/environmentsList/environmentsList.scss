@@ -97,6 +97,6 @@
   text-overflow: ellipsis;
 
   span {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
 }

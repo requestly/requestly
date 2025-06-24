@@ -3,7 +3,7 @@
 }
 
 .rule-info-dialog-container.ant-row .rule-info-dialog-title {
-  font-size: 16px;
+  font-size: var(--requestly-font-size-lg, 16px);
   font-weight: 500;
   line-height: 26px;
 }

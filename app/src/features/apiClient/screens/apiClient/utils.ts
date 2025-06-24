@@ -1,10 +1,10 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { AbortReason, KeyValuePair, QueryParamSyncType, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortReason, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
 import * as curlconverter from "curlconverter";
-import { forEach, isEmpty, omit, split, unionBy } from "lodash";
+import { forEach, omit, split } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
 import { Request as HarRequest } from "har-format";
 import { getDefaultAuth } from "./components/clientView/components/request/components/AuthorizationView/defaults";
@@ -35,6 +35,9 @@ export const makeRequest = async (
       };
       signal.addEventListener("abort", abortListener);
     }
+
+    //TODO: make the default value false if and when the feature flag is turned on
+    request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
       getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
@@ -134,15 +137,25 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
   return ![RequestMethod.GET, RequestMethod.HEAD].includes(method);
 };
 
-export const generateKeyValuePairsFromJson = (json: Record<string, string> = {}): KeyValuePair[] => {
-  return Object.entries(json || {}).map(([key, value, isEnabled = true]) => {
-    return {
-      key: key || "",
-      value,
-      id: Math.random(),
-      isEnabled,
+export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
+  const result: KeyValuePair[] = [];
+  if (typeof data === "string") {
+    data = {
+      [data]: "",
     };
-  });
+  }
+  for (const [key, rawValue] of Object.entries(data)) {
+    const valueArray = Array.isArray(rawValue) ? rawValue : [rawValue];
+    for (const value of valueArray) {
+      result.push({
+        key: key || "",
+        value,
+        id: Math.random(),
+        isEnabled: true,
+      });
+    }
+  }
+  return result;
 };
 
 export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
@@ -178,23 +191,22 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const requestJsonString = curlconverter.toJsonString(curl);
   const requestJson = JSON.parse(requestJsonString);
-
-  const queryParamsFromJson = generateKeyValuePairsFromJson(requestJson.queries);
+  const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests
       so parsing it manually from URL and populating queryParams property
     */
   const requestUrlParams = new URL(requestJson.url).searchParams;
-  const paramsFromUrl = generateKeyValuePairsFromJson(Object.fromEntries(requestUrlParams.entries()));
+  const paramsFromUrl = generateKeyValuePairs(Object.fromEntries(requestUrlParams.entries()));
 
-  const headers = filterHeadersToImport(generateKeyValuePairsFromJson(requestJson.headers));
+  const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers));
   const contentType = getContentTypeFromRequestHeaders(headers);
   let body: RQAPI.RequestBody;
 
   if (contentType === RequestContentType.JSON) {
     body = JSON.stringify(requestJson.data);
   } else if (contentType === RequestContentType.FORM) {
-    body = generateKeyValuePairsFromJson(requestJson.data);
+    body = generateKeyValuePairs(requestJson.data);
   } else {
     body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
   }
@@ -348,65 +360,6 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
     .join("&");
 
   return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
-};
-
-export const syncQueryParams = (
-  queryParams: KeyValuePair[],
-  url: string,
-  type: QueryParamSyncType = QueryParamSyncType.SYNC
-) => {
-  const updatedQueryParams = extractQueryParams(url);
-
-  switch (type) {
-    case QueryParamSyncType.SYNC: {
-      const updatedUrl = queryParamsToURLString(queryParams, url);
-
-      // Dont sync if URL is same
-      if (updatedUrl !== url) {
-        const combinedParams = unionBy(queryParams, updatedQueryParams, "id");
-        const deduplicatedParams: KeyValuePair[] = [];
-        const seenPairs = new Set();
-
-        combinedParams.forEach((param) => {
-          const pair = `${param.key}=${param.value}`;
-          if (!seenPairs.has(pair)) {
-            seenPairs.add(pair);
-            deduplicatedParams.push(param);
-          }
-        });
-
-        return { queryParams: deduplicatedParams, url: queryParamsToURLString(deduplicatedParams, url) };
-      }
-
-      return { queryParams, url };
-    }
-    case QueryParamSyncType.TABLE: {
-      const updatedQueryParamsCopy = [...updatedQueryParams];
-
-      // Adding disabled key value pairs
-      queryParams.forEach((queryParam, index) => {
-        if (!(queryParam.isEnabled ?? true)) {
-          updatedQueryParamsCopy.splice(index, 0, queryParam);
-        }
-      });
-
-      return {
-        queryParams: isEmpty(updatedQueryParamsCopy) ? [getEmptyPair()] : updatedQueryParamsCopy,
-      };
-    }
-
-    case QueryParamSyncType.URL: {
-      const updatedUrl = queryParamsToURLString(queryParams, url);
-
-      return { url: updatedUrl };
-    }
-
-    default:
-      return {
-        queryParams,
-        url,
-      };
-  }
 };
 
 export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
