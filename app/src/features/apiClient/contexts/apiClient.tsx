@@ -31,6 +31,7 @@ import { DraftRequestContainerTabSource } from "../screens/apiClient/components/
 import { RequestViewTabSource } from "../screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
+import { ApiRecordsProvider } from "../store/apiRecords/ApiRecordsContextProvider";
 
 interface ApiClientContextInterface {
   apiClientRecords: RQAPI.Record[];
@@ -448,7 +449,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     forceRefreshApiClientRecords,
   };
 
-  return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
+  return (
+    <ApiClientContext.Provider value={value}>
+      <ApiRecordsProvider records={apiClientRecords}>{children}</ApiRecordsProvider>
+    </ApiClientContext.Provider>
+  );
 };
 
 export const useApiClientContext = () => useContext(ApiClientContext);
