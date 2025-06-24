@@ -1,27 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Collapse, Popconfirm, Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
-import {
-  getCurrentlySelectedRuleData,
-  getRequestRuleResourceType,
-  getResponseRuleResourceType,
-} from "../../../../store/selectors";
+import { getCurrentlySelectedRuleData } from "../../../../store/selectors";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import ResponseRuleResourceTypes from "./RequestResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
 import { useRBAC } from "features/rbac";
 import "./RulePairs.css";
 import { RuleType } from "@requestly/shared/types/entities/rules";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const ruleResourceType =
-    useSelector(
-      currentlySelectedRuleData.ruleType === "Response" ? getResponseRuleResourceType : getRequestRuleResourceType
-    ) || "restApi"; //TODO@nafees: compatibility check
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("http_rule", "create");
 
@@ -80,16 +74,24 @@ const RulePairs = (props) => {
   const activePanelKey = getFirstFiveRuleIds(currentlySelectedRuleData?.pairs);
   const rulePairHeading = currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
 
-  const isRequestOrResponseRule = [RuleType.REQUEST, RuleType.RESPONSE].includes(
-    props.currentlySelectedRuleConfig.TYPE
-  );
-  const shouldShowCollapse = !isRequestOrResponseRule || ruleResourceType !== "";
+  const isRequestRule = currentlySelectedRuleData?.ruleType === RuleType.REQUEST;
+  const isResponseRule = currentlySelectedRuleData?.ruleType === RuleType.RESPONSE;
+  const isRequestOrResponseRule = isRequestRule || isResponseRule;
 
-  const renderRuleResourceTypes = isRequestOrResponseRule && (
-    <div className="rule-pairs-container">
-      <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
-    </div>
-  );
+  const shouldShowCollapse = useMemo(() => {
+    if (!isRequestOrResponseRule) {
+      return true;
+    }
+
+    return props.mode === "edit";
+  }, [isRequestOrResponseRule, props.mode]);
+
+  const renderRuleResourceTypes = useMemo(() => {
+    if (isResponseRule || (isRequestRule && isFeatureCompatible(FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD))) {
+      return <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />;
+    }
+    return null;
+  }, [isInputDisabled, isRequestRule, isResponseRule, props.currentlySelectedRuleConfig]);
 
   return (
     <>

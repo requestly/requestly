@@ -157,6 +157,12 @@ export namespace RequestRule {
     CODE = "code",
     STATIC = "static",
   }
+
+  export enum ResourceType {
+    UNKNOWN = "unknown",
+    REST_API = "restApi",
+    GRAPHQL_API = "graphqlApi",
+  }
 }
 
 export namespace ResponseRule {
