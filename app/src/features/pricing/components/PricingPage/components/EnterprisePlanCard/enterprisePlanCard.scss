@@ -7,7 +7,7 @@
 
 .enterprise-plan-name {
   color: var(--requestly-color-text-default);
-  font-size: var(--requestly-font-size-base);
+  font-size: var(--requestly-font-size-lg);
   font-weight: 500;
   line-height: 22px;
 }
@@ -38,7 +38,7 @@
   .enterprise-plan-feature {
     color: var(--requestly-color-text-subtle);
     line-height: 18px;
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
 
     img {
       width: 12px;

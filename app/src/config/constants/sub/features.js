@@ -75,6 +75,7 @@ FEATURES.PERSONA_SURVEY = "persona-survey";
 FEATURES.NETWORK_SESSIONS = "network-sessions"; // todo: replace redundancy
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
+FEATURES.API_CLIENT_INCLUDE_CREDENTIALS = "api-client-include-credentials";
 
 // session recording
 FEATURES.SESSION_ONBOARDING = "session_onboarding";

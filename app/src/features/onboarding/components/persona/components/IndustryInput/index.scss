@@ -33,7 +33,7 @@
   background-color: #383838;
 
   & .ant-select-item {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
     color: var(--white);
   }
 }

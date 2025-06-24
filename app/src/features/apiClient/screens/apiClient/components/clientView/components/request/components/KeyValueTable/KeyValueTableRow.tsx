@@ -3,6 +3,9 @@ import { Checkbox, Form, FormInstance } from "antd";
 import { KeyValuePair } from "features/apiClient/types";
 import { EnvironmentVariables } from "backend/environment/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import InfoIcon from "components/misc/InfoIcon";
+import { Conditional } from "components/common/Conditional";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -28,6 +31,7 @@ interface EditableCellProps {
   record: KeyValuePair;
   variables: EnvironmentVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
+  checkInvalidCharacter: boolean;
 }
 
 export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -38,6 +42,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   record,
   variables,
   handleUpdatePair,
+  checkInvalidCharacter,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
@@ -68,16 +73,44 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
             }}
           />
         ) : (
-          <SingleLineEditor
-            className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
-            placeholder={dataIndex === "key" ? "Key" : "Value"}
-            defaultValue={record?.[dataIndex] as string}
-            onChange={(value) => {
-              form.setFieldsValue({ [dataIndex]: value });
-              save();
-            }}
-            variables={variables}
-          />
+          <div
+            className={`key-value-input-container 
+          ${
+            INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
+              ? "error-state"
+              : ""
+          }
+        `}
+          >
+            <SingleLineEditor
+              className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
+              placeholder={dataIndex === "key" ? "Key" : "Value"}
+              defaultValue={record?.[dataIndex] as string}
+              onChange={(value) => {
+                form.setFieldsValue({ [dataIndex]: value });
+                save();
+              }}
+              variables={variables}
+            />
+            <Conditional
+              condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
+            >
+              <div className="key-value-table-error-icon">
+                <InfoIcon
+                  text="Invalid character used in key"
+                  tooltipPlacement="right"
+                  showArrow={false}
+                  style={{
+                    color: "var(--requestly-color-error)",
+                    marginTop: "2px",
+                    width: "16px",
+                    height: "16px",
+                    fontFamily: "Material Symbols Outlined",
+                  }}
+                />
+              </div>
+            </Conditional>
+          </div>
         )}
       </Form.Item>
     </td>

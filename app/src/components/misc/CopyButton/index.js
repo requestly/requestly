@@ -13,6 +13,7 @@ const CopyButton = ({
   disabled = false,
   trackCopiedEvent = null,
   tooltipText = "Copy",
+  icon = null,
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
@@ -24,7 +25,7 @@ const CopyButton = ({
       <RQButton
         type={type}
         size={"small" | size}
-        icon={showIcon && (copyClicked ? <CheckCircleFilled style={{ color: "green" }} /> : <CopyOutlined />)}
+        icon={showIcon && (copyClicked ? <CheckCircleFilled style={{ color: "green" }} /> : icon ?? <CopyOutlined />)}
         onClick={(e) => {
           e.stopPropagation();
           navigator.clipboard.writeText(copyText);

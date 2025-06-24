@@ -3,12 +3,13 @@ import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/vi
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
-import { EditorPopover } from "componentsV2/CodeEditor/components/EditorV2/components/PopOver";
-import "componentsV2/CodeEditor/components/EditorV2/components/PopOver/popover.scss";
+import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
+import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
 import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
+import { Conditional } from "components/common/Conditional";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -168,14 +169,14 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       className={`${className ?? ""} editor-popup-container ant-input`}
       onMouseLeave={() => setHoveredVariable(null)}
     >
-      {hoveredVariable && (
-        <EditorPopover
+      <Conditional condition={hoveredVariable}>
+        <VariablePopover
           editorRef={editorRef}
           hoveredVariable={hoveredVariable}
           popupPosition={popupPosition}
           variables={variables}
         />
-      )}
+      </Conditional>
     </div>
   );
 };

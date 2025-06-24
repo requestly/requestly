@@ -167,7 +167,7 @@
 }
 
 .clear-logs-filter-btn.ant-btn {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 500;
   margin-top: 1.6rem;
   color: var(--primary);

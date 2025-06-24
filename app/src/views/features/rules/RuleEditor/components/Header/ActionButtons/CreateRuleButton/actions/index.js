@@ -247,6 +247,7 @@ export const validateRule = (rule, dispatch, appMode) => {
           };
         }
 
+        const headerNameRegex = /^[a-zA-Z0-9-_]+$/;
         // Iterate over request headers
         pair.modifications.Request?.forEach((modification) => {
           //Header name shouldn't be empty
@@ -265,6 +266,14 @@ export const validateRule = (rule, dispatch, appMode) => {
               error: "missing request header value",
             };
           }
+
+          if (modification.header && !headerNameRegex.test(modification.header)) {
+            output = {
+              result: false,
+              message: `Invalid request header: ${modification.header}. It can only contain alphanumeric characters, hyphens, and underscores.`,
+              error: `invalid request header name ${modification.header}`,
+            };
+          }
         });
 
         // Iterate over response headers
@@ -277,12 +286,21 @@ export const validateRule = (rule, dispatch, appMode) => {
               error: "missing response header name",
             };
           }
+
           //Header value shouldn't be empty unless you're removing it
           if (modification.type !== "Remove" && isEmpty(modification.value)) {
             output = {
               result: false,
               message: `Please enter the response header value`,
               error: "missing request header value",
+            };
+          }
+
+          if (modification.header && !headerNameRegex.test(modification.header)) {
+            output = {
+              result: false,
+              message: `Invalid response header: ${modification.header}. It can only contain alphanumeric characters, hyphens, and underscores.`,
+              error: `invalid response header name ${modification.header}`,
             };
           }
         });

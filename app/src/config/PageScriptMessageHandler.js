@@ -4,6 +4,7 @@ const PageScriptMessageHandler = {
   eventCallbackMap: {},
   messageListeners: {},
   requestId: 1,
+  isInitialized: false,
 
   constants: {
     SOURCE: "page_script",
@@ -104,7 +105,10 @@ const PageScriptMessageHandler = {
       this.constants.DOMAIN = this.constants.DOMAIN.replace(".io", ".in");
     }
 
-    window.addEventListener("message", this.handleMessageReceived.bind(this));
+    if (!this.isInitialized) {
+      window.addEventListener("message", this.handleMessageReceived.bind(this));
+      this.isInitialized = true;
+    }
   },
 };
 

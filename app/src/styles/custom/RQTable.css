@@ -23,7 +23,7 @@
   gap: 8px;
   color: var(--text-gray);
   font-weight: 400;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 .rq-table-header .ant-table-cell .rq-col-title svg {
   width: 16px;

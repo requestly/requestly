@@ -50,6 +50,10 @@ const RulesFeatureContainer = () => {
                     here.
                   </a>
                 </span>
+              ) : message.error?.match(
+                  /Rule with id \d+ specifies an incorrect value for the "action.redirect.regexSubstitution" key/
+                ) ? (
+                <span>The rule has an invalid value for regex substitution. Please check the rule.</span>
               ) : (
                 "Please contact support."
               )}

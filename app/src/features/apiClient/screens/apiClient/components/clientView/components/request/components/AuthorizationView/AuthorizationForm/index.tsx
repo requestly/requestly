@@ -6,6 +6,9 @@ import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
 import { RQAPI } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import InfoIcon from "components/misc/InfoIcon";
+import { Conditional } from "components/common/Conditional";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   defaultAuthValues?: RQAPI.Auth;
@@ -14,6 +17,11 @@ interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig>
   onChangeHandler: (config: AuthConfig<AuthType> | null) => void;
   variables: EnvironmentVariables;
 }
+
+const addToOptions = {
+  HEADER: "HEADER",
+  QUERY: "QUERY",
+};
 
 const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
   defaultAuthValues,
@@ -30,7 +38,7 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
         <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
-            {generateFields(formField, index, variables, formType, handleFormChange, formState[formField.id])}
+            {generateFields(formField, index, variables, formType, handleFormChange, formState)}
           </div>
         </div>
       ))}
@@ -44,25 +52,54 @@ function generateFields(
   currentEnvironmentVariables: EnvironmentVariables,
   formType: Authorization.Type,
   onChangeHandler: (value: string, id: string) => void,
-  value: string
+  formState: Record<string, string>
 ) {
+  const hasInvalidCharacter = INVALID_KEY_CHARACTERS.test(formState[field.id]);
+  //this is used as on mount the formState is undefinded so added a fallback
+  const isHeader = (formState.addTo || addToOptions.HEADER) === addToOptions.HEADER;
+  /*
+  TODO: Make a component for singleLineEditor error-state to avoid repetition
+  */
   switch (field.type) {
     case AuthForm.FIELD_TYPE.INPUT:
       return (
-        <SingleLineEditor
-          key={`${formType}-${index}`}
-          className={field.className ?? ""}
-          placeholder={field.placeholder}
-          defaultValue={value}
-          onChange={(value) => onChangeHandler(value, field.id)}
-          variables={currentEnvironmentVariables}
-        />
+        <div
+          className={`input-container ${
+            hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader
+              ? "error-state"
+              : ""
+          }`}
+        >
+          <SingleLineEditor
+            key={`${formType}-${index}`}
+            className={field.className ?? ""}
+            placeholder={field.placeholder}
+            defaultValue={formState[field.id]}
+            onChange={(value) => onChangeHandler(value, field.id)}
+            variables={currentEnvironmentVariables}
+          />
+          <Conditional
+            condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}
+          >
+            <div className="error-icon">
+              <InfoIcon
+                text="Invalid character used in key"
+                tooltipPlacement="right"
+                showArrow={false}
+                style={{
+                  color: "var(--requestly-color-error)",
+                  fontFamily: "Material Symbols Outlined",
+                }}
+              />
+            </div>
+          </Conditional>
+        </div>
       );
     case AuthForm.FIELD_TYPE.SELECT:
       return (
         <Select
           key={`${formType}-${index}`}
-          value={value}
+          value={formState[field.id]}
           options={field.options}
           defaultValue={field.defaultValue}
           className={field.className ?? ""}

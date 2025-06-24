@@ -1,1 +1,0 @@
-export { GrrWarningHoc } from "./components";

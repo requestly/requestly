@@ -21,9 +21,10 @@ export const ApiClientErrorPlaceholder: React.FC<{
             <div className="api-client-error-placeholder-content__title">{`Error while executing the ${error.source}`}</div>
           )}
           <div className="error-container">
-            <span className="error-name">{`${error.name}:`}</span>
-            {""}
-            <span className="error-message">{error.message}</span>
+            <span className="error-message">
+              <span className="error-name">{`${error.name}:  `}</span>
+              {error.message}
+            </span>
           </div>
           <RQButton icon={<MdOutlineRefresh />} onClick={onRetry}>
             Try Again

@@ -29,6 +29,7 @@ The following domains are eligible for the student programme:
     ".edu.es",
     ".edu.tr",
     ".edu.vn",
+    ".edu.pe",
     ".ac.id",
     "bennington.edu",
     "udg.mx",
@@ -45,6 +46,9 @@ The following domains are eligible for the student programme:
     "edu.co",
     "hunterschools.org",
     "epitech.eu",
+    "uni.au.dk",
+    "student.aiuonline.edu",
+    "student.su.se",
     "strayer.edu",
     "purdueglobal.edu"
   ]
