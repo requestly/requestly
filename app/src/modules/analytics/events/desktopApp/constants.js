@@ -42,3 +42,8 @@ export const AUTH = {
   REDIRECTED: "auth_redirected_from_desktop_app",
   REDIRECT_URL_COPIED: "auth_redirect_url_copied",
 };
+
+export const UPDATE_DIALOG = {
+  UPDATE_AVAILABLE: "update_available",
+  UPDATE_DONWLOADED: "update_downloaded",
+};
