@@ -30,7 +30,6 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
   disabled,
   ruleDetails,
 }) => {
-  console.log("!!!debug", "dis", disabled);
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -98,7 +97,6 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
           disabled={isSampleRule || disabled}
           value={ruleResourceType}
           onChange={(e) => {
-            console.log("!!!debug", "onchange");
             if (e.target.value !== ResponseRule.ResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
           }}
         >
