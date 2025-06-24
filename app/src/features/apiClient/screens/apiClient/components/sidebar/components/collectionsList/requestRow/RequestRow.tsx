@@ -62,6 +62,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
       id: record.id,
       type: record.type,
       collectionId: record.collectionId,
+      data: record.data,
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),

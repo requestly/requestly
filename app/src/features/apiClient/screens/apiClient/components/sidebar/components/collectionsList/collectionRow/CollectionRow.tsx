@@ -216,7 +216,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.COLLECTION,
-      item: { id: record.id, type: record.type, collectionId: record.collectionId },
+      item: { id: record.id, type: record.type, collectionId: record.collectionId, data: record.data },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),

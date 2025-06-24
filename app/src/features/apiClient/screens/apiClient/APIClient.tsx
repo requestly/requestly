@@ -32,7 +32,7 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   const { history, selectedHistoryIndex, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
   const [selectedEntryDetails, setSelectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
 
-  const { version } = useParent(props?.apiEntryDetails.id);
+  const { version } = useParent(props?.apiEntryDetails?.id);
   const [getParent] = useAPIRecords((state) => [state.getParent]);
 
   const requestId = isCreateMode === false ? props.requestId : null;
@@ -71,9 +71,9 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
   );
 
   useEffect(() => {
-    const parent = getParent(entryDetails.id);
+    const parent = getParent(entryDetails?.id);
     setSelectedEntryDetails((prev) => ({ ...prev, collectionId: parent }));
-  }, [version, entryDetails.id, getParent]);
+  }, [version, entryDetails?.id, getParent]);
 
   if (!entryDetails && !isCreateMode && !isHistoryMode) {
     return (
