@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import PageLoader from "components/misc/PageLoader";
 import firebaseApp from "firebase";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
-import Logger from "lib/logger";
+import Logger from "../../../../../common/logger";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +72,7 @@ const LoginHandler: React.FC = () => {
           window.open(url, "_self");
         }
       } catch (error) {
+        Logger.log("[LoginHandler-redirect] catch", { error });
         Sentry.captureException(error, {
           extra: { url },
         });
@@ -157,7 +158,7 @@ const LoginHandler: React.FC = () => {
         }
       })
       .catch((error) => {
-        Logger.error("Error signing in with custom token:", error);
+        Logger.log("[LoginHandler-signInWithCustomToken] catch", { error });
         // @ts-ignore
         trackSignUpFailedEvent({
           error: error?.message,

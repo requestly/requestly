@@ -110,8 +110,7 @@ const LINKS = {
   CHROME_EXTENSION:
     "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa",
 
-  CHROME_STORE_REVIEWS:
-    "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa/reviews",
+  CHROME_STORE_REVIEWS: "https://rqst.ly/chrome-review",
   //Firefox
   FIREFOX_EXTENSION: "https://app.requestly.in/firefox/builds/requestly-latest.xpi",
   //Edge

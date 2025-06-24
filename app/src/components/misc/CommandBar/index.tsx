@@ -17,7 +17,7 @@ import {
   trackCommandPaletteOptionSelected,
 } from "modules/analytics/events/misc/commandBar";
 import { config } from "./config";
-import { getUserOS } from "utils/Misc";
+import { getUserOS } from "utils/osUtils";
 import { CommandBarItem, CommandItemType, PageConfig, Page } from "./types";
 import "./index.css";
 
