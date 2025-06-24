@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BANNER_ACTIONS } from "../banner.types";
+import { BANNER_ACTIONS, BannerActionConfig } from "../banner.types";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { redirectToUrl } from "utils/RedirectionUtils";
@@ -8,13 +8,7 @@ import LINKS from "config/constants/sub/links";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
-import { ButtonType } from "antd/lib/button";
-
-type BannerActionConfig = {
-  label: string;
-  type: ButtonType;
-  onClick: () => void;
-};
+import STORAGE from "config/constants/sub/storage";
 
 export const useBannerAction = (
   actions: BANNER_ACTIONS[],
@@ -72,7 +66,7 @@ export const useBannerAction = (
         label: "Review Now",
         type: "primary",
         onClick: () => {
-          localStorage.setItem("isRedirectedTOChromeStoreReview", "true");
+          localStorage.setItem(STORAGE.LOCAL_STORAGE.REDIRECT_TO_CHROME_STORE_REVIEW, "true");
           redirectToUrl(LINKS.CHROME_STORE_REVIEWS, true);
         },
       },
