@@ -9,7 +9,7 @@ interface Props {
   onClose: (e: React.MouseEvent) => void;
 }
 
-export const GeneralBanner: React.FC<Props> = ({ banner, onClose }) => {
+export const GenericAppBanner: React.FC<Props> = ({ banner, onClose }) => {
   const renderText = useRenderBannerText(banner);
   const [isRequestAccessModalOpen, setIsRequestAccessModalOpen] = useState(false);
   const actionsConfig = useBannerAction(banner.actions || [], setIsRequestAccessModalOpen);
