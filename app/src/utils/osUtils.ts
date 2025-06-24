@@ -1,4 +1,11 @@
-export const getUserOS = () => {
+export enum ParsedOS {
+  macOS = "macOS",
+  ios = "iOS",
+  windows = "Windows",
+  android = "Android",
+  linux = "Linux",
+}
+export const getUserOS = (): ParsedOS | null => {
   let userAgent = window.navigator.userAgent,
     platform = window.navigator.platform,
     macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
@@ -7,15 +14,15 @@ export const getUserOS = () => {
     os = null;
 
   if (macosPlatforms.indexOf(platform) !== -1) {
-    os = "macOS";
+    os = ParsedOS.macOS;
   } else if (iosPlatforms.indexOf(platform) !== -1) {
-    os = "iOS";
+    os = ParsedOS.ios;
   } else if (windowsPlatforms.indexOf(platform) !== -1) {
-    os = "Windows";
+    os = ParsedOS.windows;
   } else if (/Android/.test(userAgent)) {
-    os = "Android";
+    os = ParsedOS.android;
   } else if (!os && /Linux/.test(platform)) {
-    os = "Linux";
+    os = ParsedOS.linux;
   }
 
   return os;
