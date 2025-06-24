@@ -50,7 +50,10 @@ export const processRqImportData = (
   collections.forEach((collection: RQAPI.CollectionRecord) => {
     const oldId = collection.id;
     delete collection.id;
-    const newId = apiClientRecordsRepository.generateCollectionId(collection.name, "");
+    const newId = apiClientRecordsRepository.generateCollectionId(
+      collection.name,
+      oldToNewIdMap[collection.collectionId]
+    );
     collection.id = newId;
     oldToNewIdMap[oldId] = newId;
   });
