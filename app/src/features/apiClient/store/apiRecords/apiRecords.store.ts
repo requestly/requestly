@@ -5,7 +5,7 @@ export type VersionState = {
   version: number;
 
   increment: () => void;
-}
+};
 
 export type ApiRecordsState = {
   /**
@@ -13,47 +13,47 @@ export type ApiRecordsState = {
    * since it will get updated when any relationship changes. So try not to use this
    * unless you want to listen to all changes.
    */
-  childParentMap: Map<string, string>,
+  childParentMap: Map<string, string>;
 
   /**
    * This is a helper map, which provides actual data for a given id. Again, not for external use
    * unless neccessary.
    */
-  index: Map<string, RQAPI.Record>,
+  index: Map<string, RQAPI.Record>;
 
   /**
    * This maintains a version for each entity. This version is kept in a zunstand store so that
    * one can use it as a hook and react whenever it changes.
    */
-  indexStore: Map<string, StoreApi<VersionState>>,
+  indexStore: Map<string, StoreApi<VersionState>>;
 
   /**
    * This is a queue that is pulled and acted upon on refresh. We do this circumvent race conditions
    * where data is yet to be synced via refresh but a `triggerUpdate` has been called.
    */
-  triggerUpdateQueue: Set<string>,
+  triggerUpdateQueue: Set<string>;
 
-  getParentChain: (id: string) => string[],
+  getParentChain: (id: string) => string[];
 
   /**
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
-  refresh: (records: RQAPI.Record[]) => void,
-  getData: (id: string) => RQAPI.Record,
-  getParent: (id: string) => string | undefined,
-  getVersionStore: (id: string) => StoreApi<VersionState>,
+  refresh: (records: RQAPI.Record[]) => void;
+  getData: (id: string) => RQAPI.Record;
+  getParent: (id: string) => string | undefined;
+  getVersionStore: (id: string) => StoreApi<VersionState>;
 
   /**
    * It updates the version store of given entity. Meaning any component relying on this
    * will get re-rendered.
    */
-  triggerUpdate: (id: string) => void,
+  triggerUpdate: (id: string) => void;
 
   /**
    * This is used to queue the triggers than apply them immediately. These will be picked up
    * on next refresh.
    */
-  queueTriggerUpdate: (id: string) => void,
+  queueTriggerUpdate: (id: string) => void;
 };
 
 function parseRecords(records: RQAPI.Record[]) {
@@ -61,7 +61,7 @@ function parseRecords(records: RQAPI.Record[]) {
   const index = new Map<string, RQAPI.Record>();
 
   for (const record of records) {
-    if(record.collectionId) {
+    if (record.collectionId) {
       childParentMap.set(record.id, record.collectionId);
     }
     index.set(record.id, record);
@@ -70,17 +70,20 @@ function parseRecords(records: RQAPI.Record[]) {
   return {
     childParentMap,
     index,
-  }
-};
+  };
+}
 
 function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
   const result: string[] = [];
-  const getImmediateChildren = (id: string) => Array.from(childParentMap.entries()).filter(([_, v]) => v === id).map(([k, _]) => k);
+  const getImmediateChildren = (id: string) =>
+    Array.from(childParentMap.entries())
+      .filter(([_, v]) => v === id)
+      .map(([k, _]) => k);
   const parseRecursively = (id: string) => {
     const children = getImmediateChildren(id);
     result.push(...children);
     children.forEach(parseRecursively);
-  }
+  };
   parseRecursively(initalId);
   return result;
 }
@@ -89,21 +92,20 @@ function incrementVersion(store: StoreApi<VersionState>) {
   store.getState().increment();
 }
 
-
 export function createVersionStore() {
   return create<VersionState>()((set, get) => ({
     version: 0,
 
     increment() {
-      const {version} = get();
+      const { version } = get();
       set({
         version: version + 1,
-      })
-    }
+      });
+    },
   }));
 }
 
-function createIndexStore(index: ApiRecordsState['index']) {
+function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<VersionState>>();
   for (const [id] of index) {
     indexStore.set(id, createVersionStore());
@@ -149,7 +151,7 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
 
       set({
         triggerUpdateQueue: new Set(),
-      })
+      });
     },
 
     getData(id) {
@@ -172,7 +174,7 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
         }
         result.push(parent);
         parseRecursively(parent);
-      }
+      };
       parseRecursively(id);
       return result;
     },
@@ -183,9 +185,9 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
 
       const allChildren = getAllChildren(id, childParentMap);
 
-      allChildren.forEach(cid => {
+      allChildren.forEach((cid) => {
         incrementVersion(indexStore.get(cid));
-      })
+      });
     },
 
     getVersionStore(id) {
@@ -200,8 +202,7 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
 
       set({
         triggerUpdateQueue,
-      })
+      });
     },
-
   }));
 };

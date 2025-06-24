@@ -16,7 +16,6 @@ export const ApiRecordsProvider = ({ children, records }: { children: ReactNode;
   return <ApiRecordsStoreContext.Provider value={store}>{children}</ApiRecordsStoreContext.Provider>;
 };
 
-
 export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
   const store = useContext(ApiRecordsStoreContext);
   if (!store) {
