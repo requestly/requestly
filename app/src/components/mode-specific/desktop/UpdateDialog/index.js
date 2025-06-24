@@ -61,6 +61,7 @@ const UpdateDialog = () => {
   if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP || !isUpdateAvailable) return null;
 
   if (isBreaking()) return <MandatoryUpdateScreen handleCTAClick={redirectToDownloadPage} CTAText="Download Now" />;
+  if (!isUpdateDownloaded) return null;
   if (isIncompatible()) return <MandatoryUpdateScreen handleCTAClick={quitAndInstall} CTAText="Install Now" />;
   return <NonBlockingDialog updateDetails={updateDetailsRef.current} quitAndInstall={quitAndInstall} />;
 };
