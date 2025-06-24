@@ -18,9 +18,10 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const ruleResourceType = useSelector(
-    currentlySelectedRuleData.ruleType === "Response" ? getResponseRuleResourceType : getRequestRuleResourceType
-  );
+  const ruleResourceType =
+    useSelector(
+      currentlySelectedRuleData.ruleType === "Response" ? getResponseRuleResourceType : getRequestRuleResourceType
+    ) || "restApi"; //TODO@nafees: compatibility check
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("http_rule", "create");
 
@@ -79,24 +80,29 @@ const RulePairs = (props) => {
   const activePanelKey = getFirstFiveRuleIds(currentlySelectedRuleData?.pairs);
   const rulePairHeading = currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
 
-  if ([RuleType.REQUEST, RuleType.RESPONSE].includes(props.currentlySelectedRuleConfig.TYPE) && !ruleResourceType) {
-    return (
-      <div className="rule-pairs-container">
-        <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
-      </div>
-    );
-  }
+  const isRequestOrResponseRule = [RuleType.REQUEST, RuleType.RESPONSE].includes(
+    props.currentlySelectedRuleConfig.TYPE
+  );
+  const shouldShowCollapse = !isRequestOrResponseRule || ruleResourceType !== "";
+
+  const renderRuleResourceTypes = isRequestOrResponseRule && (
+    <div className="rule-pairs-container">
+      <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
+    </div>
+  );
 
   return (
     <>
-      <Collapse
-        className="rule-pairs-collapse"
-        defaultActiveKey={activePanelKey}
-        key={activePanelKey[activePanelKey.length - 1]}
-        expandIconPosition="end"
-      >
-        {currentlySelectedRuleData?.pairs?.length > 0
-          ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
+      {renderRuleResourceTypes}
+      {shouldShowCollapse && (
+        <Collapse
+          className="rule-pairs-collapse"
+          defaultActiveKey={activePanelKey}
+          key={activePanelKey[activePanelKey.length - 1]}
+          expandIconPosition="end"
+        >
+          {currentlySelectedRuleData?.pairs?.length > 0 &&
+            currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
               <Collapse.Panel
                 key={pair.id || pairIndex}
                 className="rule-pairs-panel"
@@ -105,9 +111,9 @@ const RulePairs = (props) => {
               >
                 {getPairMarkup(pair, pairIndex)}
               </Collapse.Panel>
-            ))
-          : null}
-      </Collapse>
+            ))}
+        </Collapse>
+      )}
     </>
   );
 };
