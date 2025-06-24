@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { BANNER_ID, Banner } from "./banner.types";
@@ -16,7 +16,10 @@ export const AppNotificationBanner: React.FC = () => {
   const isBannerVisible = useSelector(getIsAppBannerVisible);
   const lastDismissTs = useSelector(getAppNotificationBannerDismissTs);
   const banners = useFeatureValue("app_banner", []);
-  const newBanners: Banner[] = banners.filter((b: Banner) => b.createdTs > (lastDismissTs || 0));
+  const newBanners = useMemo(() => {
+    return banners.filter((b: Banner) => b.createdTs > (lastDismissTs || 0));
+  }, [banners, lastDismissTs]);
+
   const banner = newBanners[0] || null;
   const checkBannerVisibility = useBannerVisibility(banner?.id);
 

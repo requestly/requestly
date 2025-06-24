@@ -1,6 +1,14 @@
+import { ButtonType } from "antd/lib/button";
+
 export enum BANNER_TYPE {
   WARNING = "warning",
 }
+
+export type BannerActionConfig = {
+  label: string;
+  type: ButtonType;
+  onClick: () => void;
+};
 
 export enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
