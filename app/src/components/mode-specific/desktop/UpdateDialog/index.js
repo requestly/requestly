@@ -8,6 +8,7 @@ import { getLinkWithMetadata } from "modules/analytics/metadata";
 import MandatoryUpdateScreen from "./MandatoryUpdateScreen";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { trackUpdateAvailable, trackUpdateDownloadComplete } from "modules/analytics/events/desktopApp";
 
 const UpdateDialog = () => {
   const appMode = useSelector(getAppMode);
@@ -23,6 +24,7 @@ const UpdateDialog = () => {
         if (payload && !isEqual(payload, updateDetailsRef.current)) {
           setIsUpdateDownloaded(true);
           updateDetailsRef.current = payload;
+          trackUpdateDownloadComplete();
         }
       });
 
@@ -36,6 +38,7 @@ const UpdateDialog = () => {
         console.log(payload);
         setIsUpdateAvailable(true);
         updateDetailsRef.current = payload;
+        trackUpdateAvailable();
       });
 
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("check-for-updates-and-notify", {});
