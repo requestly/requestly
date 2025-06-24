@@ -30,8 +30,8 @@ export const MyBillingTeamDetails: React.FC = () => {
     [
       billingTeamDetails?.subscriptionDetails?.rqSubscriptionType,
       billingTeamDetails?.subscriptionDetails?.plan,
-      billingTeamDetails.browserstackGroupId,
-      billingTeamDetails.members,
+      billingTeamDetails?.browserstackGroupId,
+      billingTeamDetails?.members,
     ]
   );
 
