@@ -8,8 +8,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   meta: ApiClientLocalStoreMeta;
   private storageInstance: ApiClientLocalStorage;
 
-  constructor(metadata: ApiClientLocalStoreMeta) {
-    this.meta = metadata;
+  constructor() {
     this.storageInstance = ApiClientLocalStorage.getInstance();
   }
 
@@ -17,19 +16,18 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     return uuidv4();
   }
 
-  private getLocalStorageRecords() {
-    return this.storageInstance.getRecords();
-  }
-
   async getAllEnvironments() {
-    const records = this.getLocalStorageRecords();
-    const environments = records.environments;
+    const environments = await this.storageInstance.getEnvironments();
+    const environmentsMap = environments.reduce((result, env) => {
+      result[env.id] = env;
+      return result;
+    }, {} as EnvironmentMap);
 
-    if (Object.keys(environments).length > 0) {
+    if (Object.keys(environmentsMap).length > 0) {
       return {
         success: true,
         data: {
-          environments,
+          environments: environmentsMap,
           erroredRecords: [] as ErroredRecord[],
         },
       };
@@ -45,55 +43,46 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   }
 
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
-    const records = this.getLocalStorageRecords();
-
     const newEnvironment: EnvironmentData = {
       id: this.getNewId(),
       name: environmentName,
       variables: {},
     };
 
-    records.environments[newEnvironment.id] = newEnvironment;
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.createEnvironment(newEnvironment);
     return newEnvironment;
   }
 
   async createGlobalEnvironment(): Promise<EnvironmentData> {
-    const records = this.getLocalStorageRecords();
-
     const newEnvironment: EnvironmentData = {
       id: this.getGlobalEnvironmentId(),
       name: "Global Environment",
       variables: {},
     };
 
-    records.environments[newEnvironment.id] = newEnvironment;
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.createEnvironment(newEnvironment);
     return newEnvironment;
   }
 
-  async createEnvironments(environmentNames: string[]): Promise<EnvironmentData[]> {
-    const promises = environmentNames.map((name) => this.createNonGlobalEnvironment(name));
-    return Promise.all(promises);
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    const environmentsWithIds = environments.map((env) => {
+      return { ...env, id: env.id || this.getNewId() };
+    });
+
+    await this.storageInstance.createBulkEnvironments(environmentsWithIds);
+    return environmentsWithIds;
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
-    const records = this.getLocalStorageRecords();
-    if (records.environments[envId]) {
-      delete records.environments[envId];
-      this.storageInstance.setRecords(records);
-      return { success: true };
-    } else {
-      return { success: false, message: "Something went wrong while deleting the environment" };
-    }
+    await this.storageInstance.deleteEnvironment(envId);
+    return { success: true };
   }
 
   async updateEnvironment(
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
-    const records = this.getLocalStorageRecords();
-    const environment = records.environments[environmentId];
+    const environment = await this.storageInstance.getEnvironment(environmentId);
 
     if (environment) {
       if (updates.name) {
@@ -104,8 +93,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
         environment.variables = { ...environment.variables, ...updates.variables };
       }
 
-      records.environments[environmentId] = environment;
-      this.storageInstance.setRecords(records);
+      await this.storageInstance.updateEnvironment(environmentId, environment);
     } else {
       throw new Error("Environment not found");
     }
