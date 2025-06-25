@@ -1,73 +1,84 @@
-import { EnvironmentMap } from "backend/environment/types";
+import { EnvironmentData } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import Dexie, { UpdateSpec, EntityTable } from "dexie";
 
-type ApiClientLocalStorageMetadata = { version: number; storageKey: string };
-
-type ApiClientLocalStorageRecords = {
-  apis: RQAPI.Record[];
-  environments: EnvironmentMap;
-  metadata: {
-    isSynced: boolean;
-  };
-};
+type ApiClientLocalStorageMetadata = { version: number };
 
 export class ApiClientLocalStorage {
+  private db: Dexie = null;
   private static instance: ApiClientLocalStorage = null;
-  private readonly metadata: ApiClientLocalStorageMetadata;
-  private static readonly DEFAULT_STATE: ApiClientLocalStorageRecords = {
-    apis: [],
-    environments: {},
-    metadata: { isSynced: false },
-  };
 
   constructor(metadata: ApiClientLocalStorageMetadata) {
-    this.metadata = metadata;
-
-    const isInitialized = !!this.getRecords();
-
-    if (isInitialized) {
-      return;
+    if (ApiClientLocalStorage.instance) {
+      return ApiClientLocalStorage.instance;
     }
 
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(ApiClientLocalStorage.DEFAULT_STATE));
+    this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
+      apis: EntityTable<RQAPI.Record, "id">; // indexed by id
+      environments: EntityTable<EnvironmentData, "id">;
+    };
+
+    this.db.version(metadata.version).stores({
+      apis: "id",
+      environments: "id",
+    });
   }
 
-  public static init(metadata: ApiClientLocalStorageMetadata) {
-    if (!ApiClientLocalStorage.instance) {
-      ApiClientLocalStorage.instance = new ApiClientLocalStorage(metadata);
-    }
-  }
-
-  public static getInstance(): ApiClientLocalStorage {
-    if (!ApiClientLocalStorage.instance) {
-      return;
-    }
-
+  public static getInstance(): ApiClientLocalStorage | null {
     return ApiClientLocalStorage.instance;
   }
 
-  private getVersion() {
-    return this.metadata.version;
+  public async getApiRecord<T extends RQAPI.Record>(id: string) {
+    return this.db.table<T>("apis").get(id);
   }
 
-  private getStorageKey() {
-    return `${this.metadata.storageKey}:v${this.getVersion()}`;
+  public async getApiRecords<T extends RQAPI.Record>() {
+    return this.db.table<T>("apis").toArray((records) => {
+      return records.filter((record) => !record.deleted);
+    });
   }
 
-  public getRecords(): ApiClientLocalStorageRecords {
-    return JSON.parse(localStorage.getItem(this.getStorageKey()));
+  public async updateApiRecord<T extends RQAPI.Record>(id: string, record: T) {
+    return this.db.table<T>("apis").put(record, id);
   }
 
-  public setRecords(records: ApiClientLocalStorageRecords): void {
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(records));
+  public async createApiRecord<T extends RQAPI.Record>(record: T) {
+    return this.db.table<T>("apis").add(record);
   }
 
-  public resetRecords(): void {
-    this.setRecords({ ...ApiClientLocalStorage.DEFAULT_STATE });
+  public async getEnvironments() {
+    return this.db.table<EnvironmentData>("environments").toArray();
   }
 
-  public isSynced(): boolean {
-    const records = this.getRecords();
-    return records.metadata.isSynced;
+  public async createBulkApiRecords<T extends RQAPI.Record>(records: T[]) {
+    return this.db.table<T>("apis").bulkAdd(records);
+  }
+
+  public async updateApiRecords<T extends RQAPI.Record>(updates: Partial<T>[]) {
+    return this.db.table<T>("apis").bulkUpdate(
+      updates.map((update) => {
+        return {
+          key: update.id,
+          changes: update as UpdateSpec<T>,
+        };
+      })
+    );
+  }
+
+  async clearAllTables() {
+    return this.db
+      .transaction("readwrite", this.db.tables, async () => {
+        await Promise.all(this.db.tables.map((table) => table.clear()));
+      })
+      .then(() => {
+        console.log("All tables cleared successfully.");
+      })
+      .catch((error) => {
+        console.error("Error clearing tables:", error);
+      });
+  }
+
+  public async resetDb() {
+    return this.clearAllTables();
   }
 }
