@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { useLocation } from "react-router-dom";
 import { Typography, Row, Col } from "antd";
 import { ReadOutlined, CalendarOutlined, ApiOutlined } from "@ant-design/icons";
 import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
@@ -12,11 +11,8 @@ import "./Footer.css";
 import { getAppVersion, isAppInstalled } from "actions/DesktopActions";
 
 const { Text } = Typography;
-const { PATHS } = APP_CONSTANTS;
-const PAGES_WITHOUT_FOOTER = [PATHS.SETTINGS.RELATIVE];
 
 const AppFooter: React.FC = () => {
-  const { pathname } = useLocation();
   const SHOW_YC_BRANDING = false;
 
   const footerLinksConfig = useMemo(
@@ -69,8 +65,6 @@ const AppFooter: React.FC = () => {
       </Text>
     );
   };
-
-  if (PAGES_WITHOUT_FOOTER.some((path) => pathname.includes(path))) return null;
 
   return (
     <>

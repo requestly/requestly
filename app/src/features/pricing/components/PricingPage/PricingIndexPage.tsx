@@ -1,17 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Col, Layout, Row, Switch } from "antd";
-import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Col, Row, Switch } from "antd";
+import { useSearchParams } from "react-router-dom";
 import { PricingTable } from "../PricingTable";
 import { PRICING } from "features/pricing/constants/pricing";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { redirectToRules } from "utils/RedirectionUtils";
 import { EnterprisePlanCard } from "./components/EnterprisePlanCard/EnterprisePlanCard";
 import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
 import { StatsCard } from "./components/StatsCard/StatsCard";
-// import HowToClaimVolumeDiscounts from "./components/HowToClaimVolumeDiscounts";
 import OtherWaysToMakePurchase from "./components/OtherWaysToMakePurchase";
-// import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
 import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
@@ -26,7 +22,6 @@ import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business
 import "./pricingIndexPage.scss";
 
 export const PricingIndexPage = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isBrowserStackIntegrationOn = useIsBrowserStackIntegrationOn();
   const checkoutErrorMessage = searchParams.get("errorMsg");
@@ -58,17 +53,6 @@ export const PricingIndexPage = () => {
             </span>
           </div>
         )}
-        <Layout.Header className="pricing-navbar">
-          <div className="pricing-navbar-content">
-            <img
-              className="logo"
-              src={`/assets/media/common/${isBrowserStackIntegrationOn ? "RQ-BStack Logo.svg" : "rq_logo_full.svg"}`}
-              alt="requestly logo"
-              onClick={() => redirectToRules(navigate)}
-            />
-            <HeaderUser />
-          </div>
-        </Layout.Header>
         <div className="pricing-page-body-wrapper">
           <EnterpriseRequestBanner />
           <div className="pricing-page-body">

@@ -26,6 +26,8 @@ import { networkInspectorRoutes } from "features/networkInspector";
 import RouterError from "components/misc/PageError/RouterError";
 import { BStackAuthStart } from "features/onboarding/screens/BStackAuthStart/BStackAuthStart";
 import ExtensionInstalledScreen from "views/misc/ExtensionInstalledScreen/";
+import { pricingRoutes } from "features/pricing/routes";
+import { commonRoutes } from "features/common/routes";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -55,7 +57,6 @@ export const routesV2: RouteObject[] = [
           ...desktopRoutes,
           ...mockServerRoutes,
           ...onboardingRoutes,
-          ...settingRoutes,
           ...miscRoutes,
           ...desktopSessionsRoutes,
           ...networkInspectorRoutes,
@@ -63,8 +64,14 @@ export const routesV2: RouteObject[] = [
       },
       {
         path: "",
+        element: <DashboardLayout sidebar={false} />,
+        children: [...settingRoutes],
+      },
+
+      {
+        path: "",
         element: <MinimalLayout />,
-        children: [...inviteRoutes, ...paymentRoutes],
+        children: [...inviteRoutes, ...paymentRoutes, ...pricingRoutes, ...commonRoutes],
       },
       /**  non-iframe full screen routes **/
       {
