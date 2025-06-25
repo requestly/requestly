@@ -1,7 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import Updates from "views/features/Updates";
-import Goodbye from "components/misc/Goodbye";
 import ExtensionInstalled from "components/misc/ExtensionInstalled";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import Page403 from "views/misc/ServerResponses/403";
@@ -10,7 +9,6 @@ import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
 import { Home } from "components/Home";
-import { PricingIndexPage } from "features/pricing/components/PricingPage";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
 import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
@@ -34,18 +32,6 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.UPDATES.RELATIVE,
     element: <Updates />,
-  },
-  {
-    path: PATHS.PRICING.RELATIVE,
-    element: <PricingIndexPage />,
-  },
-  {
-    path: PATHS.GOODBYE.RELATIVE,
-    element: <Goodbye />,
-  },
-  {
-    path: PATHS.LEGACY.GOODBYE.ABSOLUTE,
-    element: <Navigate to={PATHS.GOODBYE.RELATIVE} />,
   },
   {
     path: PATHS.PAGE403.RELATIVE,
