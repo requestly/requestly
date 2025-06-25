@@ -10,6 +10,27 @@ import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 
+/**
+ * Step1: ~1hr
+ * - Implement indexDb changes for
+ *  - [DONE] apis
+ *  - environments
+ * - [DONE] Implement batch write for apis
+ * - Implement batch write for environments
+ * - Test all
+ * - update DB init as per TS - optional
+ * - Cut the PR from here
+ *
+ * Step2: ~15mins
+ * - Create new PR for sync changes
+ * - test
+ * - Cut the PR from here
+ *
+ * Step3: ~1hr
+ * - Fix environment variables flow
+ * - Test importers
+ */
+
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
   private queryService: ApiClientLocalDbQueryService<RQAPI.Record>;
