@@ -16,7 +16,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
-import { useRecordsSyncService } from "features/apiClient/hooks/useRecordsSyncService";
 
 interface Props {}
 
@@ -48,8 +47,6 @@ const APIClientSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
     apiClientRecordsRepository,
   } = useApiClientContext();
-
-  useRecordsSyncService();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
