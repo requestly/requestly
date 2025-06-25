@@ -7,7 +7,7 @@ import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
-import { getUserOS } from "utils/Misc";
+import { getUserOS } from "utils/osUtils";
 
 interface Props {
   skipWorkspaceCheck: boolean;

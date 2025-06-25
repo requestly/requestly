@@ -40,9 +40,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
+  const [apiClientRecords, isLoadingApiClientRecords] = useAPIRecords((state) => [
+    state.apiClientRecords,
+    state.isApiClientRecordsLoading,
+  ]);
   const {
-    isLoadingApiClientRecords,
-    apiClientRecords,
     isRecordBeingCreated,
     setIsDeleteModalOpen,
     updateRecordsToBeDeleted,

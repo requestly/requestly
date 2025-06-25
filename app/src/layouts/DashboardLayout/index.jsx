@@ -18,7 +18,7 @@ import SupportPanel from "components/misc/SupportPanel";
 import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
 import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
-import { getUserOS } from "utils/Misc";
+import { getUserOS } from "utils/osUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import useRootPathRedirector from "hooks/useRootPathRedirector";
