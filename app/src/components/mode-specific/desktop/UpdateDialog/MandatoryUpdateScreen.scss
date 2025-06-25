@@ -1,0 +1,28 @@
+.full-screen-dialog {
+  &.ant-modal {
+    width: 100% !important;
+    height: 100%;
+    max-width: none;
+    top: 0;
+  }
+
+  .ant-modal-content {
+    padding-top: 72px;
+    border-radius: 20px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .content {
+    max-width: 520px;
+
+    button {
+      margin-top: 1em;
+      span {
+        margin-left: 8px;
+      }
+    }
+  }
+}
