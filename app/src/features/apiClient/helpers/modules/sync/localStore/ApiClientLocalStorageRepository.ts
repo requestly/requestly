@@ -8,9 +8,9 @@ export class ApiClientLocalStoreRepository implements ApiClientRepositoryInterfa
   apiClientRecordsRepository: LocalStoreRecordsSync;
 
   constructor(meta: ApiClientLocalStoreMeta) {
-    ApiClientLocalStorage.init(meta);
-    this.environmentVariablesRepository = new LocalStoreEnvSync(meta);
-    this.apiClientRecordsRepository = new LocalStoreRecordsSync(meta);
+    new ApiClientLocalStorage(meta);
+    this.environmentVariablesRepository = new LocalStoreEnvSync();
+    this.apiClientRecordsRepository = new LocalStoreRecordsSync();
   }
 }
 
