@@ -14,7 +14,6 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
-import SupportPanel from "components/misc/SupportPanel";
 import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
 import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
@@ -101,7 +100,6 @@ const DashboardLayout = () => {
             <div className="app-main-content">
               <DashboardContent />
             </div>
-            <SupportPanel />
             <div className="app-footer">
               <Footer />
             </div>
