@@ -3,6 +3,10 @@
   overflow: hidden;
   border-radius: 8px;
 
+  .bottomsheet-layout-container {
+    height: inherit;
+  }
+
   .bottom-sheet-container {
     .ant-tabs,
     .ant-tabs-content-holder,

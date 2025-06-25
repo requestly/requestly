@@ -1,3 +1,4 @@
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
 
@@ -8,6 +9,16 @@ export type VersionState = {
 };
 
 export type ApiRecordsState = {
+  /**
+   * This is the list of records that are currently in the apiClientRecords.
+   */
+  apiClientRecords: RQAPI.Record[];
+
+  /**
+   * This is the list of records that have errors.
+   */
+  erroredRecords: ErroredRecord[];
+
   /**
    * This maintains a map of child <-> parent. This field is mostly for internal use,
    * since it will get updated when any relationship changes. So try not to use this
@@ -33,15 +44,30 @@ export type ApiRecordsState = {
    */
   triggerUpdateQueue: Set<string>;
 
+  /**
+   * This is a flag that indicates if the apiClientRecords are still loading.
+   */
+  isApiClientRecordsLoading: boolean;
+
   getParentChain: (id: string) => string[];
 
   /**
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.Record[]) => void;
+  setErroredRecords: (erroredRecords: ErroredRecord[]) => void;
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
   getVersionStore: (id: string) => StoreApi<VersionState>;
+
+  /**
+   * This is used to set the loading state of the apiClientRecords.
+   */
+  setIsApiClientRecordsLoading: (isLoading: boolean) => void;
+
+  addNewRecord: (record: RQAPI.Record) => void;
+  updateRecord: (record: RQAPI.Record) => void;
+  deleteRecords: (recordIds: string[]) => void;
 
   /**
    * It updates the version store of given entity. Meaning any component relying on this
@@ -114,14 +140,19 @@ function createIndexStore(index: ApiRecordsState["index"]) {
   return indexStore;
 }
 
-export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
-  const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(intialRecords);
+export const createApiRecordsStore = (initialRecords: RQAPI.Record[]) => {
+  const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords);
   return create<ApiRecordsState>()((set, get) => ({
+    apiClientRecords: initialRecords,
+    erroredRecords: [],
+
     childParentMap: initialChildParentMap,
     index: initialIndex,
     triggerUpdateQueue: new Set(),
 
     indexStore: createIndexStore(initialIndex),
+
+    isApiClientRecordsLoading: false,
 
     refresh(records) {
       const { indexStore, triggerUpdateQueue, triggerUpdate } = get();
@@ -140,6 +171,7 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       }
 
       set({
+        apiClientRecords: records,
         childParentMap,
         index,
         indexStore,
@@ -151,6 +183,18 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
 
       set({
         triggerUpdateQueue: new Set(),
+      });
+    },
+
+    setErroredRecords(erroredRecords) {
+      set({
+        erroredRecords,
+      });
+    },
+
+    setIsApiClientRecordsLoading(isLoading: boolean) {
+      set({
+        isApiClientRecordsLoading: isLoading,
       });
     },
 
@@ -188,6 +232,23 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       allChildren.forEach((cid) => {
         incrementVersion(indexStore.get(cid));
       });
+    },
+
+    addNewRecord(record) {
+      const updatedRecords = [...get().apiClientRecords, record];
+      console.log("newRecords", updatedRecords);
+      get().refresh(updatedRecords);
+    },
+
+    updateRecord(record) {
+      const updatedRecords = get().apiClientRecords.map((r) => (r.id === record.id ? record : r));
+      console.log("updatedRecords", updatedRecords);
+      get().refresh(updatedRecords);
+    },
+
+    deleteRecords(recordIds) {
+      const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
+      get().refresh(updatedRecords);
     },
 
     getVersionStore(id) {
