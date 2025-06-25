@@ -10,6 +10,7 @@ import {
   PROXY_PORT_CHANGE_REQUESTED,
   TRAFFIC_TABLE,
   AUTH,
+  UPDATE_DIALOG,
 } from "./constants";
 import { getUserOS } from "utils/osUtils";
 
@@ -112,4 +113,14 @@ export const trackAuthRedirectedFromDesktopApp = () => {
 
 export const trackAuthRedirectUrlCopied = () => {
   trackEvent(AUTH.REDIRECT_URL_COPIED, {});
+};
+
+export const trackUpdateAvailable = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.UPDATE_AVAILABLE, params);
+};
+
+export const trackUpdateDownloadComplete = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.UPDATE_DONWLOADED, params);
 };
