@@ -56,9 +56,13 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     return newEnvironment;
   }
 
-  async createEnvironments(environmentNames: string[]): Promise<EnvironmentData[]> {
-    const promises = environmentNames.map((name) => this.createNonGlobalEnvironment(name));
-    return Promise.all(promises);
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    const environmentsWithIds = environments.map((env) => {
+      return { ...env, id: env.id || this.getNewId() };
+    });
+
+    await this.storageInstance.createBulkEnvironments(environmentsWithIds);
+    return environmentsWithIds;
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
