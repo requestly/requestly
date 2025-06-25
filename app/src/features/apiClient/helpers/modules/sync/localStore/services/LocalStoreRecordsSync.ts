@@ -9,6 +9,27 @@ import { omit } from "lodash";
 import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
 import { generateDocumentId } from "backend/utils";
 
+/**
+ * Step1: ~1hr
+ * - Implement indexDb changes for
+ *  - [DONE] apis
+ *  - environments
+ * - [DONE] Implement batch write for apis
+ * - Implement batch write for environments
+ * - Test all
+ * - update DB init as per TS - optional
+ * - Cut the PR from here
+ *
+ * Step2: ~15mins
+ * - Create new PR for sync changes
+ * - test
+ * - Cut the PR from here
+ *
+ * Step3: ~1hr
+ * - Fix environment variables flow
+ * - Test importers
+ */
+
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   public static meta: ApiClientLocalStoreMeta;
   public meta: ApiClientLocalStoreMeta;
@@ -23,32 +44,28 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return generateDocumentId("apis");
   }
 
-  private getLocalStorageRecords() {
-    return this.storageInstance.getRecords();
-  }
-
-  async getAllRecords() {
-    const records = this.getLocalStorageRecords();
+  async getAllRecords(): RQAPI.RecordsPromise {
+    const apis = await this.storageInstance.getApiRecords();
 
     return {
       success: true,
       data: {
-        records: records.apis.filter((record) => !record.deleted),
+        records: apis,
         erroredRecords: [] as ErroredRecord[],
       },
     };
   }
 
   async getApiRecord(recordId: string): RQAPI.RecordPromise {
-    const records = this.getLocalStorageRecords();
-    const record = records.apis.find((record) => record.id === recordId);
+    const record = await this.storageInstance.getApiRecord(recordId);
+
     if (record) {
       return {
         success: true,
         data: record,
       };
     } else {
-      return { success: false, data: null, message: "Not found!" };
+      return { success: false, data: null, message: "Record not found!" };
     }
   }
 
@@ -75,10 +92,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    const records = this.getLocalStorageRecords();
-    records.apis.push(newRecord);
-
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.createApiRecord(newRecord);
     return { success: true, data: newRecord };
   }
 
@@ -106,49 +120,33 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    const records = this.getLocalStorageRecords();
-    records.apis.push(newRecord);
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.createApiRecord(newRecord);
     return { success: true, data: newRecord };
   }
 
   async updateRecord(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
-    sanitizedRecord.id = id;
-
-    const records = this.getLocalStorageRecords();
-    const index = records.apis.findIndex((record) => record.id === id);
-
-    if (index === -1) {
-      return { success: false, data: null, message: "Record not found!" };
-    }
 
     const updatedRecord = {
-      ...records.apis[index],
       ...sanitizedRecord,
+      id,
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    records.apis[index] = updatedRecord;
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.updateApiRecord(id, updatedRecord);
     return { success: true, data: updatedRecord };
   }
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
-    const records = this.getLocalStorageRecords();
-    const updatedApis = records.apis.map((record) => {
-      if (recordIds.includes(record.id)) {
-        return {
-          ...record,
-          deleted: true,
-          updatedTs: Timestamp.now().toMillis(),
-        };
-      }
-      return record;
+    const recordsToBeDeleted = recordIds.map((id) => {
+      return {
+        id,
+        deleted: true,
+        updatedTs: Timestamp.now().toMillis(),
+      };
     });
 
-    records.apis = updatedApis;
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.updateApiRecords(recordsToBeDeleted);
     return { success: true, data: null };
   }
 
@@ -280,32 +278,18 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
-    const updatedRequests = entities.map((record) =>
-      isApiCollection(record)
+    const updatedRequests = entities.map((record) => {
+      return isApiCollection(record)
         ? {
             ...record,
             updatedTs: Timestamp.now().toMillis(),
             collectionId: newParentId,
             data: omit(record.data, "children"),
           }
-        : { ...record, updatedTs: Timestamp.now().toMillis(), collectionId: newParentId }
-    );
-
-    const updatedRequestsMap = entities.reduce(
-      (result, record) => ({ ...result, [record.id]: record }),
-      {} as Record<string, RQAPI.Record>
-    );
-
-    const records = this.getLocalStorageRecords();
-    const updatedRecords = records.apis.map((record) => {
-      if (updatedRequestsMap[record.id]) {
-        return updatedRequestsMap[record.id];
-      }
-      return record;
+        : { ...record, updatedTs: Timestamp.now().toMillis(), collectionId: newParentId };
     });
 
-    records.apis = updatedRecords;
-    this.storageInstance.setRecords(records);
+    await this.storageInstance.updateApiRecords(updatedRequests as Partial<RQAPI.Record>[]);
     return updatedRequests;
   }
 }
