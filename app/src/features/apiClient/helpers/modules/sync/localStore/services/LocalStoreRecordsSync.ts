@@ -31,12 +31,10 @@ import { generateDocumentId } from "backend/utils";
  */
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
-  public static meta: ApiClientLocalStoreMeta;
-  public meta: ApiClientLocalStoreMeta;
+  meta: ApiClientLocalStoreMeta;
   private storageInstance: ApiClientLocalStorage;
 
-  constructor(readonly metadata: ApiClientLocalStoreMeta) {
-    this.meta = metadata;
+  constructor() {
     this.storageInstance = ApiClientLocalStorage.getInstance();
   }
 

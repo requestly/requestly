@@ -4,6 +4,11 @@ import Dexie, { UpdateSpec, EntityTable } from "dexie";
 
 type ApiClientLocalStorageMetadata = { version: number };
 
+enum Table {
+  APIS = "apis",
+  ENVIRONMENTS = "environments",
+}
+
 export class ApiClientLocalStorage {
   private db: Dexie = null;
   private static instance: ApiClientLocalStorage = null;
@@ -14,13 +19,13 @@ export class ApiClientLocalStorage {
     }
 
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
-      apis: EntityTable<RQAPI.Record, "id">; // indexed by id
-      environments: EntityTable<EnvironmentData, "id">;
+      [Table.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
+      [Table.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
     };
 
     this.db.version(metadata.version).stores({
-      apis: "id",
-      environments: "id",
+      [Table.APIS]: "id",
+      [Table.ENVIRONMENTS]: "id",
     });
   }
 
@@ -28,34 +33,31 @@ export class ApiClientLocalStorage {
     return ApiClientLocalStorage.instance;
   }
 
+  // apis
   public async getApiRecord<T extends RQAPI.Record>(id: string) {
-    return this.db.table<T>("apis").get(id);
+    return this.db.table<T>(Table.APIS).get(id);
   }
 
   public async getApiRecords<T extends RQAPI.Record>() {
-    return this.db.table<T>("apis").toArray((records) => {
+    return this.db.table<T>(Table.APIS).toArray((records) => {
       return records.filter((record) => !record.deleted);
     });
   }
 
   public async updateApiRecord<T extends RQAPI.Record>(id: string, record: T) {
-    return this.db.table<T>("apis").put(record, id);
+    return this.db.table<T>(Table.APIS).update(id, record as UpdateSpec<T>);
   }
 
   public async createApiRecord<T extends RQAPI.Record>(record: T) {
-    return this.db.table<T>("apis").add(record);
-  }
-
-  public async getEnvironments() {
-    return this.db.table<EnvironmentData>("environments").toArray();
+    return this.db.table<T>(Table.APIS).add(record);
   }
 
   public async createBulkApiRecords<T extends RQAPI.Record>(records: T[]) {
-    return this.db.table<T>("apis").bulkAdd(records);
+    return this.db.table<T>(Table.APIS).bulkAdd(records);
   }
 
   public async updateApiRecords<T extends RQAPI.Record>(updates: Partial<T>[]) {
-    return this.db.table<T>("apis").bulkUpdate(
+    return this.db.table<T>(Table.APIS).bulkUpdate(
       updates.map((update) => {
         return {
           key: update.id,
@@ -65,6 +67,32 @@ export class ApiClientLocalStorage {
     );
   }
 
+  // environments
+  public async getEnvironments<T extends EnvironmentData>() {
+    return this.db.table<T>(Table.ENVIRONMENTS).toArray();
+  }
+
+  public async getEnvironment<T extends EnvironmentData>(id: string) {
+    return this.db.table<T>(Table.ENVIRONMENTS).get(id);
+  }
+
+  public async createEnvironment<T extends EnvironmentData>(record: T) {
+    return this.db.table<T>(Table.ENVIRONMENTS).add(record);
+  }
+
+  public async createBulkEnvironments<T extends EnvironmentData>(records: T[]) {
+    return this.db.table<T>(Table.ENVIRONMENTS).bulkAdd(records);
+  }
+
+  public async updateEnvironment<T extends EnvironmentData>(id: string, record: T) {
+    return this.db.table<T>(Table.ENVIRONMENTS).update(id, record as UpdateSpec<T>);
+  }
+
+  public async deleteEnvironment<T extends EnvironmentData>(id: string) {
+    return this.db.table<T>(Table.ENVIRONMENTS).delete(id);
+  }
+
+  // common
   async clearAllTables() {
     return this.db
       .transaction("readwrite", this.db.tables, async () => {

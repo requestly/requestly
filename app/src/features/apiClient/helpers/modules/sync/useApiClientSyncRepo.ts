@@ -18,7 +18,7 @@ export const useGetApiClientSyncRepo = () => {
 
   const getRepository: () => ApiClientRepositoryInterface = useCallback(() => {
     if (!user.loggedIn) {
-      return new ApiClientLocalStoreRepository({ storageKey: "apiClientLocalStorage", version: 0 });
+      return new ApiClientLocalStoreRepository({ version: 1 });
     }
 
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
