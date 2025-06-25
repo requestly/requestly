@@ -27,10 +27,8 @@ export class ApiClientLocalStorage {
       [Table.APIS]: "id",
       [Table.ENVIRONMENTS]: "id",
     });
-  }
 
-  public static getInstance(): ApiClientLocalStorage | null {
-    return ApiClientLocalStorage.instance;
+    ApiClientLocalStorage.instance = this;
   }
 
   // apis
@@ -67,6 +65,10 @@ export class ApiClientLocalStorage {
     );
   }
 
+  async clearApiRecords() {
+    return this.db.table(Table.APIS).clear();
+  }
+
   // environments
   public async getEnvironments<T extends EnvironmentData>() {
     return this.db.table<T>(Table.ENVIRONMENTS).toArray();
@@ -92,21 +94,7 @@ export class ApiClientLocalStorage {
     return this.db.table<T>(Table.ENVIRONMENTS).delete(id);
   }
 
-  // common
-  async clearAllTables() {
-    return this.db
-      .transaction("readwrite", this.db.tables, async () => {
-        await Promise.all(this.db.tables.map((table) => table.clear()));
-      })
-      .then(() => {
-        console.log("All tables cleared successfully.");
-      })
-      .catch((error) => {
-        console.error("Error clearing tables:", error);
-      });
-  }
-
-  public async resetDb() {
-    return this.clearAllTables();
+  async clearEnvironments() {
+    return this.db.table(Table.ENVIRONMENTS).clear();
   }
 }
