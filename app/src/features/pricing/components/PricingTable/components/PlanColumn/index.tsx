@@ -361,5 +361,3 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     </Col>
   );
 };
-
-// isOpenedFromModal
