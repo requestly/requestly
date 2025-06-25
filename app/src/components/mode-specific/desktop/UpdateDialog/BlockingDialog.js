@@ -4,6 +4,7 @@ import "./BlockingDialog.scss";
 
 const { Text, Title } = Typography;
 
+/* NOT BEING USED */
 const BlockingDialog = ({ updateDetails, isUpdateAvailable, isUpdateDownloaded, quitAndInstall, updateProgress }) => {
   const handleUpdateClick = () => {
     quitAndInstall();
