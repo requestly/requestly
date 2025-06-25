@@ -229,7 +229,7 @@ export const CollectionRow: React.FC<Props> = ({
                         }}
                       />
                     </Tooltip>
-                    <Tooltip title={"Add Folder"}>
+                    <Tooltip title={"Add Collection"}>
                       <RQButton
                         size="small"
                         type="transparent"
