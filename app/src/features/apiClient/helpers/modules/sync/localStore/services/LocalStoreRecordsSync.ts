@@ -13,8 +13,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   meta: ApiClientLocalStoreMeta;
   private storageInstance: ApiClientLocalStorage;
 
-  constructor() {
-    this.storageInstance = ApiClientLocalStorage.getInstance();
+  constructor(meta: ApiClientLocalStoreMeta) {
+    this.storageInstance = new ApiClientLocalStorage(meta);
   }
 
   private getNewId() {
@@ -27,7 +27,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return {
       success: true,
       data: {
-        records: apis,
+        records: apis ?? [],
         erroredRecords: [] as ErroredRecord[],
       },
     };
@@ -276,5 +276,9 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
     await this.storageInstance.updateApiRecords(updatedRequests as Partial<RQAPI.Record>[]);
     return updatedRequests;
+  }
+
+  async clear() {
+    await this.storageInstance.clearApiRecords();
   }
 }

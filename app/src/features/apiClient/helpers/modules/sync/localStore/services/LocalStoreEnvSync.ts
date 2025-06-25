@@ -8,8 +8,8 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   meta: ApiClientLocalStoreMeta;
   private storageInstance: ApiClientLocalStorage;
 
-  constructor() {
-    this.storageInstance = ApiClientLocalStorage.getInstance();
+  constructor(meta: ApiClientLocalStoreMeta) {
+    this.storageInstance = new ApiClientLocalStorage(meta);
   }
 
   private getNewId() {
@@ -18,7 +18,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
   async getAllEnvironments() {
     const environments = await this.storageInstance.getEnvironments();
-    const environmentsMap = environments.reduce((result, env) => {
+    const environmentsMap = (environments ?? []).reduce((result, env) => {
       result[env.id] = env;
       return result;
     }, {} as EnvironmentMap);
@@ -116,5 +116,9 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
   attachListener(params: EnvironmentListenerParams): () => any {
     return () => {};
+  }
+
+  async clear() {
+    await this.storageInstance.clearEnvironments();
   }
 }
