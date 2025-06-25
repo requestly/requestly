@@ -11,6 +11,7 @@ import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -23,13 +24,11 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    isLoadingApiClientRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const [apiClientRecords, isLoadingApiClientRecords] = useAPIRecords((state) => [
+    state.apiClientRecords,
+    state.isApiClientRecordsLoading,
+  ]);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 

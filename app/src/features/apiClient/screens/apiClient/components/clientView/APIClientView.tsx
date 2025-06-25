@@ -52,6 +52,7 @@ import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiCl
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -100,12 +101,11 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    apiClientWorkloadManager,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+
+  const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
+
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
