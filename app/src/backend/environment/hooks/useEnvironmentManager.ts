@@ -28,6 +28,7 @@ import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
 import { MutexTimeoutError } from "../fetch-lock";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -44,7 +45,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { initFetchers } = options;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+  const { onSaveRecord } = useApiClientContext();
   const errorEnvFiles = useSelector(getErrorEnvFiles);
 
   const user = useSelector(getUserAuthDetails);
