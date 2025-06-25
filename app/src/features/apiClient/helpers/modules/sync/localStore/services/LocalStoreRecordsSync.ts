@@ -163,6 +163,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async updateCollectionDescription(id: string, description: string) {
     const result = await this.updateRecord({ id, description }, id);
+
+    if (result.success) {
+      return {
+        success: result.success,
+        data: result.data.description,
+      };
+    }
+
     return {
       success: result.success,
       data: result.data.description,
