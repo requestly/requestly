@@ -10,7 +10,9 @@ import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 
-export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
+export class LocalStoreRecordsSync
+  implements ApiClientLocalDbInterface, ApiClientRecordsInterface<ApiClientLocalStoreMeta>
+{
   meta: ApiClientLocalStoreMeta;
   private queryService: ApiClientLocalDbQueryService<RQAPI.Record>;
 
@@ -21,6 +23,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   private getNewId() {
     return generateDocumentId("apis");
+  }
+
+  private getAdapter() {
+    return apiClientLocalDbAdapterProvider.get<RQAPI.Record>(this.meta);
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {
