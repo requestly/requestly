@@ -19,7 +19,6 @@ export const useGetApiClientSyncRepo = () => {
     if (!user.loggedIn) {
       throw new Error("Data can not be synced unless you log in!");
     }
-
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       return new ApiClientLocalRepository({
         rootPath: activeWorkspace?.rootPath,
