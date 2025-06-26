@@ -8,7 +8,6 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
     success: boolean;
     data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
   }>;
-  createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
