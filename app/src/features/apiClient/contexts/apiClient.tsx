@@ -145,20 +145,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     openTab(new DraftRequestContainerTabSource());
   }, [openTab]);
 
-  // useEffect(() => {
-  //   if (!user.loggedIn) {
-  //     setApiClientRecords([]);
-  //   }
-  // }, [user.loggedIn]);
-
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    // if (!uid) {
-    //   return;
-    // }
-
     const updateCollectionVariablesOnInit = (records: RQAPI.Record[]) => {
       const collections = records.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
       const collectionVariables: Record<string, { variables: EnvironmentVariables }> = collections.reduce(
