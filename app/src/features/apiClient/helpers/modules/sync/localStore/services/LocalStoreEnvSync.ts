@@ -15,7 +15,7 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
   }
 
   private getNewId() {
-    return uuidv4().split("-").join("");
+    return uuidv4();
   }
 
   private getAdapter() {
