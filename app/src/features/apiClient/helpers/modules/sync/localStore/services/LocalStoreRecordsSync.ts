@@ -6,35 +6,42 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
-import { ApiClientLocalDb } from "../helpers/ApiClientLocalDb";
+import apiClientLocalDbAdapterProvider from "../helpers/ApiClientLocalDb";
 import { generateDocumentId } from "backend/utils";
+import { ApiClientLocalDbInterface, ApiClientLocalDbTable } from "../helpers/types";
 
-export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
+export class LocalStoreRecordsSync
+  implements ApiClientLocalDbInterface, ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private storageInstance: ApiClientLocalDb;
+  tableName: ApiClientLocalDbTable;
 
   constructor(meta: ApiClientLocalStoreMeta) {
-    this.storageInstance = new ApiClientLocalDb(meta);
+    this.meta = meta;
+    this.tableName = ApiClientLocalDbTable.APIS;
   }
 
   private getNewId() {
     return generateDocumentId("apis");
   }
 
+  private getAdapter() {
+    return apiClientLocalDbAdapterProvider.get<RQAPI.Record>(this.meta);
+  }
+
   async getAllRecords(): RQAPI.RecordsPromise {
-    const apis = await this.storageInstance.getApiRecords();
+    const apis = await this.getAdapter().getRecords(this.tableName);
 
     return {
       success: true,
       data: {
-        records: apis ?? [],
+        records: apis.filter((record) => !record.deleted),
         erroredRecords: [] as ErroredRecord[],
       },
     };
   }
 
   async getApiRecord(recordId: string): RQAPI.RecordPromise {
-    const record = await this.storageInstance.getApiRecord(recordId);
+    const record = await this.getAdapter().getRecord(this.tableName, recordId);
 
     if (record) {
       return {
@@ -69,7 +76,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    await this.storageInstance.createApiRecord(newRecord);
+    await this.getAdapter().createRecord(this.tableName, newRecord);
     return { success: true, data: newRecord };
   }
 
@@ -97,7 +104,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    await this.storageInstance.createApiRecord(newRecord);
+    await this.getAdapter().createRecord(this.tableName, newRecord);
     return { success: true, data: newRecord };
   }
 
@@ -110,7 +117,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    await this.storageInstance.updateApiRecord(id, updatedRecord);
+    await this.getAdapter().updateRecord(this.tableName, id, updatedRecord);
     return { success: true, data: updatedRecord };
   }
 
@@ -123,7 +130,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       };
     });
 
-    await this.storageInstance.updateApiRecords(recordsToBeDeleted);
+    await this.getAdapter().updateRecords(this.tableName, recordsToBeDeleted);
     return { success: true, data: null };
   }
 
@@ -274,11 +281,11 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         : { ...record, updatedTs: Timestamp.now().toMillis(), collectionId: newParentId };
     });
 
-    await this.storageInstance.updateApiRecords(updatedRequests as Partial<RQAPI.Record>[]);
+    await this.getAdapter().updateRecords(this.tableName, updatedRequests);
     return updatedRequests;
   }
 
   async clear() {
-    await this.storageInstance.clearApiRecords();
+    await this.getAdapter().clearAllRecords(this.tableName);
   }
 }

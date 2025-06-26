@@ -1,61 +1,49 @@
 import { EnvironmentData } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import Dexie, { UpdateSpec, EntityTable } from "dexie";
+import { ApiClientLocalDbMetadata, ApiClientLocalDbTable } from "./types";
 
-type ApiClientLocalDbMetadata = { version: number };
-
-enum Table {
-  APIS = "apis",
-  ENVIRONMENTS = "environments",
-}
-
-export class ApiClientLocalDb {
+class ApiClientLocalDb<T> {
   private db: Dexie = null;
-  private static instance: ApiClientLocalDb = null;
 
   constructor(metadata: ApiClientLocalDbMetadata) {
-    if (ApiClientLocalDb.instance) {
-      return ApiClientLocalDb.instance;
-    }
-
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
-      [Table.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
-      [Table.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
+      [ApiClientLocalDbTable.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
+      [ApiClientLocalDbTable.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
     };
 
     this.db.version(metadata.version).stores({
-      [Table.APIS]: "id",
-      [Table.ENVIRONMENTS]: "id",
-    });
-
-    ApiClientLocalDb.instance = this;
-  }
-
-  // apis
-  public async getApiRecord<T extends RQAPI.Record>(id: string) {
-    return this.db.table<T>(Table.APIS).get(id);
-  }
-
-  public async getApiRecords<T extends RQAPI.Record>() {
-    return this.db.table<T>(Table.APIS).toArray((records) => {
-      return records.filter((record) => !record.deleted);
+      [ApiClientLocalDbTable.APIS]: "id",
+      [ApiClientLocalDbTable.ENVIRONMENTS]: "id",
     });
   }
 
-  public async updateApiRecord<T extends RQAPI.Record>(id: string, record: T) {
-    return this.db.table<T>(Table.APIS).update(id, record as UpdateSpec<T>);
+  private getTable(tableName: ApiClientLocalDbTable) {
+    return this.db.table<T>(tableName);
   }
 
-  public async createApiRecord<T extends RQAPI.Record>(record: T) {
-    return this.db.table<T>(Table.APIS).add(record);
+  async getRecord(tableName: ApiClientLocalDbTable, id: string) {
+    return this.getTable(tableName).get(id);
   }
 
-  public async createBulkApiRecords<T extends RQAPI.Record>(records: T[]) {
-    return this.db.table<T>(Table.APIS).bulkAdd(records);
+  async getRecords(tableName: ApiClientLocalDbTable) {
+    return this.getTable(tableName).toArray();
   }
 
-  public async updateApiRecords<T extends RQAPI.Record>(updates: Partial<T>[]) {
-    return this.db.table<T>(Table.APIS).bulkUpdate(
+  async updateRecord(tableName: ApiClientLocalDbTable, id: string, record: T) {
+    return this.getTable(tableName).update(id, record as UpdateSpec<T>);
+  }
+
+  async createRecord(tableName: ApiClientLocalDbTable, record: T) {
+    return this.getTable(tableName).add(record);
+  }
+
+  async createBulkRecords(tableName: ApiClientLocalDbTable, records: T[]) {
+    return this.getTable(tableName).bulkAdd(records);
+  }
+
+  async updateRecords(tableName: ApiClientLocalDbTable, updates: (Partial<T> & { id: string })[]) {
+    return this.getTable(tableName).bulkUpdate(
       updates.map((update) => {
         return {
           key: update.id,
@@ -65,36 +53,25 @@ export class ApiClientLocalDb {
     );
   }
 
-  async clearApiRecords() {
-    return this.db.table(Table.APIS).clear();
+  async deleteRecord(tableName: ApiClientLocalDbTable, id: string) {
+    return this.getTable(tableName).delete(id);
   }
 
-  // environments
-  public async getEnvironments<T extends EnvironmentData>() {
-    return this.db.table<T>(Table.ENVIRONMENTS).toArray();
-  }
-
-  public async getEnvironment<T extends EnvironmentData>(id: string) {
-    return this.db.table<T>(Table.ENVIRONMENTS).get(id);
-  }
-
-  public async createEnvironment<T extends EnvironmentData>(record: T) {
-    return this.db.table<T>(Table.ENVIRONMENTS).add(record);
-  }
-
-  public async createBulkEnvironments<T extends EnvironmentData>(records: T[]) {
-    return this.db.table<T>(Table.ENVIRONMENTS).bulkAdd(records);
-  }
-
-  public async updateEnvironment<T extends EnvironmentData>(id: string, record: T) {
-    return this.db.table<T>(Table.ENVIRONMENTS).update(id, record as UpdateSpec<T>);
-  }
-
-  public async deleteEnvironment<T extends EnvironmentData>(id: string) {
-    return this.db.table<T>(Table.ENVIRONMENTS).delete(id);
-  }
-
-  async clearEnvironments() {
-    return this.db.table(Table.ENVIRONMENTS).clear();
+  async clearAllRecords(tableName: ApiClientLocalDbTable) {
+    return this.getTable(tableName).clear();
   }
 }
+
+export class ApiClientLocalDbAdapterProvider {
+  private cache: ApiClientLocalDb<unknown> = null;
+
+  get<T>(metadata: ApiClientLocalDbMetadata) {
+    if (!this.cache) {
+      this.cache = new ApiClientLocalDb<T>(metadata);
+    }
+    return this.cache as ApiClientLocalDb<T>;
+  }
+}
+
+const apiClientLocalDbAdapterProvider = new ApiClientLocalDbAdapterProvider();
+export default apiClientLocalDbAdapterProvider;
