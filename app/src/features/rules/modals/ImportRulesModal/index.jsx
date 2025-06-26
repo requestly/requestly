@@ -9,6 +9,7 @@ import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
 import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
+import HeaderEditorIcon from "assets/icons/header-editor-icon.png";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
@@ -26,6 +27,7 @@ import {
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
   trackResourceOverrideSettingsImportStarted,
+  trackHeaderEditorSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
@@ -387,6 +389,17 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                   >
                     <img src={ResourceOverrideIcon} width={11} height={10} alt="Resource override icon" />
                     &nbsp; Import from Resource Override
+                  </RQButton>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromHeaderEditorModalOpen(true);
+                      trackHeaderEditorSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
+                    <img src={HeaderEditorIcon} width={11} height={10} alt="Header Editor icon" />
+                    &nbsp; Import from Header Editor
                   </RQButton>
                 </div>
               ) : null}
