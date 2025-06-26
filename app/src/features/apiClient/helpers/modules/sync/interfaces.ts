@@ -66,7 +66,6 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): Promise<{ success: boolean; message?: string }>;
   duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
   moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
-  clear?(): Promise<void>;
 }
 
 export interface ApiClientRepositoryInterface {
