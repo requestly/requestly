@@ -19,3 +19,17 @@ export class ApiClientLocalDb {
     });
   }
 }
+
+export class ApiClientLocalDbAdapterProvider {
+  private cache: ApiClientLocalDb<unknown> = null;
+
+  get<T>(metadata: ApiClientLocalDbMetadata) {
+    if (!this.cache) {
+      this.cache = new ApiClientLocalDb<T>(metadata);
+    }
+    return this.cache as ApiClientLocalDb<T>;
+  }
+}
+
+const apiClientLocalDbAdapterProvider = new ApiClientLocalDbAdapterProvider();
+export default apiClientLocalDbAdapterProvider;
