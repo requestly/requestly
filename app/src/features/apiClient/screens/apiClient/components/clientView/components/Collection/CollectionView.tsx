@@ -25,9 +25,9 @@ interface CollectionViewProps {
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const [apiClientRecords, isLoadingApiClientRecords] = useAPIRecords((state) => [
-    state.apiClientRecords,
+  const [isLoadingApiClientRecords, getDataFromId] = useAPIRecords((state) => [
     state.isApiClientRecordsLoading,
+    state.getData,
   ]);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
@@ -36,8 +36,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   const isNewCollection = getIsNew();
 
   const collection = useMemo(() => {
-    return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-  }, [apiClientRecords, collectionId]);
+    return getDataFromId(collectionId) as RQAPI.CollectionRecord;
+  }, [collectionId, getDataFromId]);
 
   useEffect(() => {
     // To sync title for tabs opened from deeplinks

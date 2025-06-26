@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { StoreApi, useStore } from "zustand";
 import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
 import { useShallow } from "zustand/shallow";
@@ -7,20 +7,24 @@ import { ApiClientProvider } from "features/apiClient/contexts/apiClient";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { notification } from "antd";
+import { RQAPI } from "features/apiClient/types";
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
-  const [store] = useState(() => createApiRecordsStore([]));
   const user = useSelector(getUserAuthDetails);
+  const [data, setData] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!user.loggedIn) {
       return;
     }
 
-    store.getState().setIsApiClientRecordsLoading(true);
     apiClientRecordsRepository.getAllRecords().then((result) => {
       if (!result.success) {
         notification.error({
@@ -28,19 +32,36 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
           description: result?.message,
           placement: "bottomRight",
         });
-        store.getState().setIsApiClientRecordsLoading(false);
         return;
       }
-
-      store.getState().refresh(result.data.records);
-      store.getState().setErroredRecords(result.data.erroredRecords);
-      store.getState().setIsApiClientRecordsLoading(false);
+      setData(result.data);
+      setIsLoading(false);
     });
-  }, [apiClientRecordsRepository, store, user.loggedIn]);
+  }, [apiClientRecordsRepository, user.loggedIn]);
+
+  if (isLoading) return null;
+
+  return (
+    <RecordsProvider data={data} repository={apiClientRecordsRepository}>
+      {children}
+    </RecordsProvider>
+  );
+};
+
+const RecordsProvider = ({
+  children,
+  data,
+  repository,
+}: {
+  children: ReactNode;
+  data: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] };
+  repository: ApiClientRecordsInterface<Record<string, any>>;
+}) => {
+  const store = useMemo(() => createApiRecordsStore(data), [data]);
 
   return (
     <ApiRecordsStoreContext.Provider value={store}>
-      <ApiClientProvider repository={apiClientRecordsRepository}>{children}</ApiClientProvider>
+      <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
     </ApiRecordsStoreContext.Provider>
   );
 };

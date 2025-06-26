@@ -118,6 +118,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     updateRecord,
     refreshRecords,
     setErroredRecords,
+    getData,
   ] = useAPIRecords((state) => [
     state.apiClientRecords,
     state.isApiClientRecordsLoading,
@@ -125,6 +126,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     state.updateRecord,
     state.refresh,
     state.setErroredRecords,
+    state.getData,
   ]);
 
   const location = useLocation();
@@ -235,10 +237,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   const onSaveRecord: ApiClientContextInterface["onSaveRecord"] = useCallback(
     (apiClientRecord, onSaveTabAction) => {
       const recordId = apiClientRecord.id;
-      console.log("exist", apiClientRecords);
-      const isRecordExist = apiClientRecords.find((record) => record.id === recordId);
 
-      if (isRecordExist) {
+      const doesRecordExist = !!getData(recordId);
+
+      if (doesRecordExist) {
         updateRecord(apiClientRecord);
       } else {
         addNewRecord(apiClientRecord);
@@ -254,13 +256,17 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
 
         if (apiClientRecord.type === RQAPI.RecordType.COLLECTION) {
           openTab(
-            new CollectionViewTabSource({ id: recordId, title: apiClientRecord.name, focusBreadcrumb: !isRecordExist })
+            new CollectionViewTabSource({
+              id: recordId,
+              title: apiClientRecord.name,
+              focusBreadcrumb: !doesRecordExist,
+            })
           );
           return;
         }
       }
     },
-    [apiClientRecords, updateRecord, addNewRecord, openTab]
+    [getData, updateRecord, addNewRecord, openTab]
   );
 
   const updateRecordsToBeDeleted = useCallback((record: RQAPI.Record[]) => {
