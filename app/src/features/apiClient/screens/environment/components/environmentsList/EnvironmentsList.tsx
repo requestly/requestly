@@ -1,11 +1,7 @@
 import { useCallback, useState, useMemo } from "react";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useDispatch, useSelector } from "react-redux";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
-import { globalActions } from "store/slices/global/slice";
-import APP_CONSTANTS from "config/constants";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
@@ -23,8 +19,6 @@ import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabS
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const {
     getAllEnvironments,
     addNewEnvironment,
@@ -63,8 +57,6 @@ export const EnvironmentsList = () => {
               setCurrentEnvironment(newEnvironment.id);
             }
 
-            // const targetPath = `${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${encodeURIComponent(newEnvironment.id)}`;
-
             openTab(new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name }));
             trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
           }
@@ -82,23 +74,9 @@ export const EnvironmentsList = () => {
       return;
     }
 
-    if (!user.loggedIn) {
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            eventSource: EnvironmentAnalyticsSource.ENVIRONMENTS_LIST,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            warningMessage: "Please log in to create a new environment",
-          },
-        })
-      );
-      return;
-    }
     trackCreateEnvironmentClicked(EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
     return createNewEnvironment();
-  }, [user.loggedIn, dispatch, createNewEnvironment, isValidPermission, getRBACValidationFailureErrorMessage]);
+  }, [createNewEnvironment, isValidPermission, getRBACValidationFailureErrorMessage]);
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {

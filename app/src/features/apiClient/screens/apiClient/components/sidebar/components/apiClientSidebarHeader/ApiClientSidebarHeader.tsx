@@ -9,10 +9,6 @@ import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
-import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
@@ -46,9 +42,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
-  const dispatch = useDispatch();
   const { state } = useLocation();
-  const user = useSelector(getUserAuthDetails);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
@@ -64,21 +58,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </div>
         ),
         onClick: () => {
-          if (!user.loggedIn) {
-            dispatch(
-              globalActions.toggleActiveModal({
-                modalName: "authModal",
-                newValue: true,
-                newProps: {
-                  eventSource: "api_client_sidebar",
-                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                  warningMessage: `Please log in to import a cURL request`,
-                },
-              })
-            );
-          } else {
-            onImportClick();
-          }
+          onImportClick();
         },
       },
       {
@@ -91,21 +71,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         ),
         onClick: () => {
           trackImportStarted(ApiClientImporterType.REQUESTLY);
-          if (!user.loggedIn) {
-            dispatch(
-              globalActions.toggleActiveModal({
-                modalName: "authModal",
-                newValue: true,
-                newProps: {
-                  eventSource: "api_client_sidebar",
-                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                  warningMessage: `Please log in to import collections`,
-                },
-              })
-            );
-          } else {
-            setIsImportModalOpen(true);
-          }
+          setIsImportModalOpen(true);
         },
       },
       {
@@ -117,21 +83,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         ),
         onClick: () => {
           trackImportStarted(ApiClientImporterType.POSTMAN);
-          if (!user.loggedIn) {
-            dispatch(
-              globalActions.toggleActiveModal({
-                modalName: "authModal",
-                newValue: true,
-                newProps: {
-                  eventSource: "api_client_sidebar",
-                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                  warningMessage: `Please log in to import Postman collections`,
-                },
-              })
-            );
-          } else {
-            setIsPostmanImporterModalOpen(true);
-          }
+          setIsPostmanImporterModalOpen(true);
         },
       },
       {
@@ -143,25 +95,11 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         ),
         onClick: () => {
           trackImportStarted(ApiClientImporterType.BRUNO);
-          if (!user.loggedIn) {
-            dispatch(
-              globalActions.toggleActiveModal({
-                modalName: "authModal",
-                newValue: true,
-                newProps: {
-                  eventSource: "api_client_sidebar",
-                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                  warningMessage: `Please log in to import Bruno exports`,
-                },
-              })
-            );
-          } else {
-            setIsBrunoImporterModalOpen(true);
-          }
+          setIsBrunoImporterModalOpen(true);
         },
       },
     ],
-    [user.loggedIn, dispatch, onImportClick]
+    [onImportClick]
   );
 
   const items: DropdownProps["menu"]["items"] = [
@@ -174,23 +112,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         </div>
       ),
       onClick: () => {
-        if (!user.loggedIn) {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "authModal",
-              newValue: true,
-              newProps: {
-                eventSource: "api_client_sidebar_header",
-                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                src: APP_CONSTANTS.FEATURES.API_CLIENT,
-                warningMessage: "Please log in to create a new request!",
-              },
-            })
-          );
-
-          return;
-        }
-
         onNewClick(RQAPI.RecordType.API);
       },
     },
@@ -203,23 +124,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         </div>
       ),
       onClick: () => {
-        if (!user.loggedIn) {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "authModal",
-              newValue: true,
-              newProps: {
-                src: APP_CONSTANTS.FEATURES.API_CLIENT,
-                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                eventSource: "api_client_sidebar_header",
-                warningMessage: "Please log in to create a new collection!",
-              },
-            })
-          );
-
-          return;
-        }
-
         onNewClick(RQAPI.RecordType.COLLECTION);
       },
     },
@@ -232,22 +136,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         </div>
       ),
       onClick: () => {
-        if (!user.loggedIn) {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "authModal",
-              newValue: true,
-              newProps: {
-                src: APP_CONSTANTS.FEATURES.API_CLIENT,
-                eventSource: "api_client_sidebar_header",
-                authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                warningMessage: "Please log in to create a new environment!",
-              },
-            })
-          );
-
-          return;
-        }
         trackCreateEnvironmentClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.ENVIRONMENT);
       },
@@ -312,7 +200,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </RQButton>
         ) : null}
 
-        {user.loggedIn && <EnvironmentSwitcher />}
+        <EnvironmentSwitcher />
       </div>
 
       {isImportModalOpen && (

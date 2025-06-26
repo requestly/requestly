@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useDispatch } from "react-redux";
 import { RQAPI } from "../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -24,7 +23,6 @@ import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../helpers/modules/sync/local/services/types";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
@@ -122,9 +120,6 @@ const trackUserProperties = (records: RQAPI.Record[]) => {
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
@@ -150,19 +145,19 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     openTab(new DraftRequestContainerTabSource());
   }, [openTab]);
 
-  useEffect(() => {
-    if (!user.loggedIn) {
-      setApiClientRecords([]);
-    }
-  }, [user.loggedIn]);
+  // useEffect(() => {
+  //   if (!user.loggedIn) {
+  //     setApiClientRecords([]);
+  //   }
+  // }, [user.loggedIn]);
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!uid) {
-      return;
-    }
+    // if (!uid) {
+    //   return;
+    // }
 
     const updateCollectionVariablesOnInit = (records: RQAPI.Record[]) => {
       const collections = records.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
@@ -195,7 +190,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       }
       setIsLoadingApiClientRecords(false);
     });
-  }, [apiClientRecordsRepository, uid, dispatch]);
+  }, [apiClientRecordsRepository, dispatch]);
 
   useEffect(() => {
     debouncedTrackUserProperties();
@@ -317,13 +312,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(
-            uid,
-            activeWorkspaceId,
-            recordType,
-            collectionId,
-            apiClientRecordsRepository
-          ).then((result) => {
+          return createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data, "open");
           });
@@ -332,7 +321,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, activeWorkspaceId, recordType, collectionId, apiClientRecordsRepository)
+          return createBlankApiRecord(recordType, collectionId, apiClientRecordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -382,8 +371,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       }
     },
     [
-      uid,
-      activeWorkspaceId,
       apiClientRecordsRepository,
       openDraftRequest,
       onSaveRecord,
