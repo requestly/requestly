@@ -23,7 +23,7 @@ export class ApiClientLocalDb {
 export class ApiClientLocalDbAdapterProvider {
   private cache: ApiClientLocalDb<unknown> = null;
 
-  get<T>(metadata: ApiClientLocalDbMetadata) {
+  get<T>(metadata: ApiClientLocalStoreMeta) {
     if (!this.cache) {
       this.cache = new ApiClientLocalDb<T>(metadata);
     }
