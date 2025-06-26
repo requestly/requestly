@@ -1,12 +1,13 @@
 import { EnvironmentData } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import Dexie, { UpdateSpec, EntityTable } from "dexie";
-import { ApiClientLocalDbMetadata, ApiClientLocalDbTable } from "./types";
+import { ApiClientLocalDbTable } from "./types";
+import { ApiClientLocalStoreMeta } from "../../interfaces";
 
 class ApiClientLocalDb<T> {
   private db: Dexie = null;
 
-  constructor(metadata: ApiClientLocalDbMetadata) {
+  constructor(metadata: ApiClientLocalStoreMeta) {
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
       [ApiClientLocalDbTable.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
       [ApiClientLocalDbTable.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
@@ -65,7 +66,7 @@ class ApiClientLocalDb<T> {
 export class ApiClientLocalDbAdapterProvider {
   private cache: ApiClientLocalDb<unknown> = null;
 
-  get<T>(metadata: ApiClientLocalDbMetadata) {
+  get<T>(metadata: ApiClientLocalStoreMeta) {
     if (!this.cache) {
       this.cache = new ApiClientLocalDb<T>(metadata);
     }
