@@ -487,7 +487,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const setCollectionVariables = useCallback(
     async (variables: EnvironmentVariables, collectionId: string) => {
-      // Use getData to get the current collection instead of relying on potentially stale apiClientRecords
       let collection: RQAPI.CollectionRecord;
       try {
         const existingRecord = getData(collectionId);

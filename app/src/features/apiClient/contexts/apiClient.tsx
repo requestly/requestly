@@ -147,82 +147,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     openTab(new DraftRequestContainerTabSource());
   }, [openTab]);
 
-  console.log("apiClientRecords", apiClientRecords);
-
-  // useEffect(() => {
-  //   if (!user.loggedIn) {
-  //     setApiClientRecords([]);
-  //   }
-  // }, [user.loggedIn]);
-
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // useEffect(() => {
-  //   if (!uid) {
-  //     return;
-  //   }
-
-  //   const updateCollectionVariablesOnInit = (records: RQAPI.Record[]) => {
-  //     const collections = records.filter((record) => record.type === RQAPI.RecordType.COLLECTION);
-  //     const collectionVariables: Record<string, { variables: EnvironmentVariables }> = collections.reduce(
-  //       (acc: Record<string, { variables: EnvironmentVariables }>, current: RQAPI.CollectionRecord) => {
-  //         acc[current.id] = {
-  //           variables: current.data.variables || {},
-  //         };
-  //         return acc;
-  //       },
-  //       {}
-  //     );
-  //     dispatch(variablesActions.setCollectionVariables(collectionVariables));
-  //   };
-
-  //   setIsLoadingApiClientRecords(true);
-  //   repository.getAllRecords().then((result) => {
-  //     if (!result.success) {
-  //       notification.error({
-  //         message: "Could not fetch records!",
-  //         description: result?.message,
-  //         placement: "bottomRight",
-  //       });
-  //       setApiClientRecords([]);
-  //       return;
-  //     } else {
-  //       setApiClientRecords(result.data.records);
-  //       setErrorFiles(result.data.erroredRecords);
-  //       updateCollectionVariablesOnInit(result.data.records);
-  //     }
-  //     setIsLoadingApiClientRecords(false);
-  //   });
-  // }, [repository, uid, dispatch]);
 
   useEffect(() => {
     debouncedTrackUserProperties();
   }, [apiClientRecords, debouncedTrackUserProperties]);
-
-  // const onNewRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-  //   setApiClientRecords((prev) => [...prev, { ...apiClientRecord }]);
-  // }, []);
-
-  // const onRemoveRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-  //   setApiClientRecords((prev) => prev.filter((record) => record.id !== apiClientRecord.id));
-  // }, []);
-
-  // const onUpdateRecord = useCallback((apiClientRecord: RQAPI.Record) => {
-  //   setApiClientRecords((prev) =>
-  //     prev.map((record) => (record.id === apiClientRecord.id ? { ...record, ...apiClientRecord } : record))
-  //   );
-  // }, []);
-
-  // const onDeleteRecords = useCallback((recordIdsToBeDeleted: RQAPI.Record["id"][]) => {
-  //   clearExpandedRecordIdsFromSession(recordIdsToBeDeleted);
-
-  //   setApiClientRecords((prev) =>
-  //     prev.filter((record) => {
-  //       return !recordIdsToBeDeleted.includes(record.id);
-  //     })
-  //   );
-  // }, []);
 
   const onSaveBulkRecords = useCallback((records: RQAPI.Record[]) => {
     // setApiClientRecords((previousRecords: RQAPI.Record[]) => {
