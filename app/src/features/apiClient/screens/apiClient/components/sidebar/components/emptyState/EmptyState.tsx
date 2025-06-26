@@ -15,6 +15,7 @@ export interface EmptyStateProps {
   message: string;
   newRecordBtnText: string;
   onNewRecordClick: () => Promise<void>;
+  onNewRequestClick?: () => Promise<void>;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -23,6 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   newRecordBtnText,
   onNewRecordClick,
   analyticEventSource = "collections_empty_state",
+  onNewRequestClick,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -70,7 +72,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         >
           {newRecordBtnText}
         </RQButton>
-        <Link className="new-request-link" onClick={() => {}}>
+        <Link className="new-request-link" onClick={onNewRequestClick}>
           Add a request
         </Link>
       </div>
