@@ -13,7 +13,6 @@ import {
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { useLocation } from "react-router-dom";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
@@ -113,24 +112,22 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [
     apiClientRecords,
-    isLoadingApiClientRecords,
     addNewRecord,
     updateRecord,
+    updateRecords,
     refreshRecords,
     setErroredRecords,
     getData,
   ] = useAPIRecords((state) => [
     state.apiClientRecords,
-    state.isApiClientRecordsLoading,
     state.addNewRecord,
     state.updateRecord,
+    state.updateRecords,
     state.refresh,
     state.setErroredRecords,
     state.getData,
   ]);
 
-  const location = useLocation();
-  const [locationState, setLocationState] = useState(location?.state);
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -154,15 +151,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     debouncedTrackUserProperties();
   }, [apiClientRecords, debouncedTrackUserProperties]);
 
-  const onSaveBulkRecords = useCallback((records: RQAPI.Record[]) => {
-    // setApiClientRecords((previousRecords: RQAPI.Record[]) => {
-    //   const currentRecordsMap = new Map(previousRecords.map((record) => [record.id, record]));
-    //   records.forEach((record) => {
-    //     currentRecordsMap.set(record.id, record);
-    //   });
-    //   return Array.from(currentRecordsMap.values());
-    // });
-  }, []);
+  const onSaveBulkRecords = useCallback(
+    (records: RQAPI.Record[]) => {
+      updateRecords(records);
+    },
+    [updateRecords]
+  );
 
   const onSaveRecord: ApiClientContextInterface["onSaveRecord"] = useCallback(
     (apiClientRecord, onSaveTabAction) => {
@@ -328,13 +322,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     setErroredRecords(recordsToRefresh.data.erroredRecords);
     return true;
   }, [repository, refreshRecords, setErroredRecords]);
-
-  useEffect(() => {
-    if (!isLoadingApiClientRecords) {
-      locationState?.action === "create" && onNewClick("home_screen", locationState?.type);
-      setLocationState({});
-    }
-  }, [isLoadingApiClientRecords, locationState?.action, locationState?.type, onNewClick]);
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 

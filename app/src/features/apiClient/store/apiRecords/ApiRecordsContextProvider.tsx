@@ -10,6 +10,7 @@ import { notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
@@ -39,7 +40,7 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [apiClientRecordsRepository, user.loggedIn]);
 
-  if (isLoading) return null;
+  if (isLoading) return <ApiClientLoadingView />;
 
   return (
     <RecordsProvider data={data} repository={apiClientRecordsRepository}>

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
-import { notification, Typography } from "antd";
+import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
@@ -40,10 +40,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, isLoadingApiClientRecords] = useAPIRecords((state) => [
-    state.apiClientRecords,
-    state.isApiClientRecordsLoading,
-  ]);
+  const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
   const {
     isRecordBeingCreated,
     setIsDeleteModalOpen,
@@ -297,11 +294,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       )}
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
-          {isLoadingApiClientRecords ? (
-            <div className="api-client-sidebar-placeholder">
-              <Typography.Text type="secondary">Loading...</Typography.Text>
-            </div>
-          ) : updatedRecords.count > 0 ? (
+          {updatedRecords.count > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
                 return (

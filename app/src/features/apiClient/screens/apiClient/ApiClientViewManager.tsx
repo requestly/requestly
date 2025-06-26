@@ -3,7 +3,6 @@ import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
-import { Skeleton } from "antd";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { useSelf } from "features/apiClient/hooks/useSelf.hook";
 import "./apiClient.scss";
@@ -40,15 +39,6 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     },
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
   );
-
-  if (!selectedEntryDetails && !isCreateMode && !isHistoryMode) {
-    return (
-      <>
-        <Skeleton className="api-client-header-skeleton" paragraph={{ rows: 1, width: "100%" }} />
-        <Skeleton className="api-client-body-skeleton" />
-      </>
-    );
-  }
 
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>

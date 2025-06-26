@@ -1,4 +1,4 @@
-import { notification, Result, Skeleton, Tabs } from "antd";
+import { notification, Result, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -25,10 +25,7 @@ interface CollectionViewProps {
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const [isLoadingApiClientRecords, getDataFromId] = useAPIRecords((state) => [
-    state.isApiClientRecordsLoading,
-    state.getData,
-  ]);
+  const [getDataFromId] = useAPIRecords((state) => [state.getData]);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -134,14 +131,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     },
     [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
-
-  if (isLoadingApiClientRecords) {
-    return (
-      <div className="collection-view-container__loading">
-        <Skeleton />
-      </div>
-    );
-  }
 
   const collectionName = collection?.name || "New Collection";
 

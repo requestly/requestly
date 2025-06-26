@@ -38,11 +38,6 @@ export type ApiRecordsState = {
    */
   indexStore: Map<string, StoreApi<RecordState>>;
 
-  /**
-   * This is a flag that indicates if the apiClientRecords are still loading.
-   */
-  isApiClientRecordsLoading: boolean;
-
   getParentChain: (id: string) => string[];
 
   /**
@@ -54,13 +49,9 @@ export type ApiRecordsState = {
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState>;
 
-  /**
-   * This is used to set the loading state of the apiClientRecords.
-   */
-  setIsApiClientRecordsLoading: (isLoading: boolean) => void;
-
   addNewRecord: (record: RQAPI.Record) => void;
   updateRecord: (record: RQAPI.Record) => void;
+  updateRecords: (records: RQAPI.Record[]) => void;
   deleteRecords: (recordIds: string[]) => void;
 };
 
@@ -114,8 +105,6 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
     indexStore: createIndexStore(initialIndex),
 
-    isApiClientRecordsLoading: false,
-
     refresh(records) {
       const { indexStore } = get();
       const { childParentMap, index } = parseRecords(records);
@@ -143,12 +132,6 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
     setErroredRecords(erroredRecords) {
       set({
         erroredRecords,
-      });
-    },
-
-    setIsApiClientRecordsLoading(isLoading: boolean) {
-      set({
-        isApiClientRecordsLoading: isLoading,
       });
     },
 
@@ -187,6 +170,16 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       const updatedRecords = get().apiClientRecords.map((r) => (r.id === record.id ? record : r));
       get().refresh(updatedRecords);
       get().getRecordStore(record.id).getState().updateRecordState(record);
+    },
+
+    updateRecords(records) {
+      const currentRecordsMap = new Map(get().apiClientRecords.map((r) => [r.id, r]));
+      for (const record of records) {
+        currentRecordsMap.set(record.id, record);
+        get().getRecordStore(record.id).getState().updateRecordState(record);
+      }
+      const updatedRecords = Array.from(currentRecordsMap.values());
+      get().refresh(updatedRecords);
     },
 
     deleteRecords(recordIds) {
