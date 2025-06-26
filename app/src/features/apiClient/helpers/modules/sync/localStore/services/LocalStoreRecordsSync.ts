@@ -6,15 +6,15 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
-import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
+import { ApiClientLocalDb } from "../helpers/ApiClientLocalDb";
 import { generateDocumentId } from "backend/utils";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private storageInstance: ApiClientLocalStorage;
+  private storageInstance: ApiClientLocalDb;
 
   constructor(meta: ApiClientLocalStoreMeta) {
-    this.storageInstance = new ApiClientLocalStorage(meta);
+    this.storageInstance = new ApiClientLocalDb(meta);
   }
 
   private getNewId() {

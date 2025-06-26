@@ -2,18 +2,18 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { v4 as uuidv4 } from "uuid";
-import { ApiClientLocalStorage } from "../helpers/ApiClientLocalStorage";
+import { ApiClientLocalDb } from "../helpers/ApiClientLocalDb";
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private storageInstance: ApiClientLocalStorage;
+  private storageInstance: ApiClientLocalDb;
 
   constructor(meta: ApiClientLocalStoreMeta) {
-    this.storageInstance = new ApiClientLocalStorage(meta);
+    this.storageInstance = new ApiClientLocalDb(meta);
   }
 
   private getNewId() {
-    return uuidv4();
+    return uuidv4().split("-").join("");
   }
 
   async getAllEnvironments() {
@@ -23,23 +23,13 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       return result;
     }, {} as EnvironmentMap);
 
-    if (Object.keys(environmentsMap).length > 0) {
-      return {
-        success: true,
-        data: {
-          environments: environmentsMap,
-          erroredRecords: [] as ErroredRecord[],
-        },
-      };
-    } else {
-      return {
-        success: true,
-        data: {
-          environments: {},
-          erroredRecords: [],
-        },
-      };
-    }
+    return {
+      success: true,
+      data: {
+        environments: environmentsMap,
+        erroredRecords: [] as ErroredRecord[],
+      },
+    };
   }
 
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {

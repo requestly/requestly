@@ -2,20 +2,20 @@ import { EnvironmentData } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import Dexie, { UpdateSpec, EntityTable } from "dexie";
 
-type ApiClientLocalStorageMetadata = { version: number };
+type ApiClientLocalDbMetadata = { version: number };
 
 enum Table {
   APIS = "apis",
   ENVIRONMENTS = "environments",
 }
 
-export class ApiClientLocalStorage {
+export class ApiClientLocalDb {
   private db: Dexie = null;
-  private static instance: ApiClientLocalStorage = null;
+  private static instance: ApiClientLocalDb = null;
 
-  constructor(metadata: ApiClientLocalStorageMetadata) {
-    if (ApiClientLocalStorage.instance) {
-      return ApiClientLocalStorage.instance;
+  constructor(metadata: ApiClientLocalDbMetadata) {
+    if (ApiClientLocalDb.instance) {
+      return ApiClientLocalDb.instance;
     }
 
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
@@ -28,7 +28,7 @@ export class ApiClientLocalStorage {
       [Table.ENVIRONMENTS]: "id",
     });
 
-    ApiClientLocalStorage.instance = this;
+    ApiClientLocalDb.instance = this;
   }
 
   // apis
