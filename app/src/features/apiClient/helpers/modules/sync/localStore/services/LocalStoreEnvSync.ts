@@ -15,7 +15,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   }
 
   private getNewId() {
-    return uuidv4();
+    return uuidv4().split("-").join("");
   }
 
   async getAllEnvironments() {
