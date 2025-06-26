@@ -1,3 +1,4 @@
+/* global globalUnhandledRejectionHandlers */
 import React, { useEffect, useRef } from "react";
 import { RenderableError } from "../../../../errors/RenderableError";
 import { RQButton } from "lib/design-system-v2/components";
@@ -10,7 +11,7 @@ import { WorkspaceType } from "types";
 
 interface Props {
   children: React.ReactNode;
-  defaultTags?: Record<string, string>,
+  defaultTags?: Record<string, string>;
 }
 
 interface State {
@@ -73,16 +74,10 @@ const ErrorBoundaryWrapper = (props: Props) => {
     defaultTags = {
       ...defaultTags,
       source: "local_fs",
-    }
+    };
   }
 
-  return (
-    <ApiClientErrorBoundary
-      ref={errorBoundaryRef}
-      {...props}
-      defaultTags={defaultTags}
-    />
-  );
+  return <ApiClientErrorBoundary ref={errorBoundaryRef} {...props} defaultTags={defaultTags} />;
 };
 
 class ApiClientErrorBoundary extends React.Component<Props, State> {
