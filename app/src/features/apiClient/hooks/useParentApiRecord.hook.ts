@@ -3,7 +3,7 @@ import { useStore } from "zustand";
 import { createRecordStore } from "../store/apiRecords/apiRecords.store";
 import { RQAPI } from "../types";
 
-export function useParent(id: string) {
+export function useParentApiRecord(id: string) {
   const [getParent, getRecordStore] = useAPIRecords((s) => [s.getParent, s.getRecordStore]);
 
   const parent = getParent(id);

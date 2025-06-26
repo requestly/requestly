@@ -4,7 +4,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
-import { useSelf } from "features/apiClient/hooks/useSelf.hook";
+import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import "./apiClient.scss";
 
 type BaseProps = {
@@ -27,7 +27,7 @@ type Props = CreateModeProps | EditModeProps;
 export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   const { isCreateMode, isHistoryMode } = props;
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const selectedEntryDetails = useSelf(props?.apiEntryDetails?.id);
+  const selectedEntryDetails = useApiRecord(props?.apiEntryDetails?.id);
 
   const onSaveCallback = props.onSaveCallback ?? (() => {});
   const handleAppRequestFinished = useCallback(

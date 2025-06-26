@@ -1,7 +1,7 @@
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useStore } from "zustand";
 
-export const useSelf = (id: string) => {
+export const useApiRecord = (id: string) => {
   const [getRecordStore] = useAPIRecords((s) => [s.getRecordStore]);
 
   const recordStore = getRecordStore(id);
