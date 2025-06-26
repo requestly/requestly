@@ -267,13 +267,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     };
   }, [ownerId, initFetchers, dispatch, syncRepository]);
 
-  // useEffect(() => {
-  //   if (!user.loggedIn) {
-  //     unsubscribeListener?.();
-  //     dispatch(variablesActions.resetState());
-  //   }
-  // }, [dispatch, user.loggedIn]);
-
   const getCurrentEnvironment = useCallback(() => {
     return {
       currentEnvironmentName: activeOwnerEnvironments[currentEnvironmentId]?.name,
