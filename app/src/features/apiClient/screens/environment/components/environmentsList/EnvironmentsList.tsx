@@ -91,7 +91,7 @@ export const EnvironmentsList = () => {
   return (
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
-        <div className="mt-8">
+        <div className="environments-empty-state-wrapper">
           <EmptyState
             onNewRecordClick={handleAddEnvironmentClick}
             message="No environment created yet"
