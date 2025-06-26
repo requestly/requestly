@@ -3,7 +3,6 @@
 
   & .ant-collapse-header {
     border: 1px solid #303030;
-    border-bottom: none;
   }
   & > .ant-collapse {
     border: none !important;
@@ -17,6 +16,7 @@
   }
   & > .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
     border-radius: unset !important;
+    height: 30px;
   }
 
   & .ant-collapse-content {
@@ -25,7 +25,25 @@
   & .ant-table-container {
     border-radius: unset !important;
   }
+
+  & .ant-collapse-expand-icon {
+    position: relative;
+    bottom: 5px;
+    left: 3px;
+
+    svg {
+      stroke-width: 50;
+      stroke: var(--requestly-color-text-default);
+      height: 9px;
+      width: 9px;
+    }
+  }
+  & {
+    border: none !important;
+  }
+
   .heading-text {
+    position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 10px;
@@ -34,10 +52,16 @@
     line-height: 13px;
     letter-spacing: 1px;
     text-transform: uppercase;
+    bottom: 5px;
   }
 
   .collapse-button {
     cursor: pointer;
+  }
+
+  & .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table,
+  .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table {
+    border: none !important;
   }
 
   .api-key-value-table {
