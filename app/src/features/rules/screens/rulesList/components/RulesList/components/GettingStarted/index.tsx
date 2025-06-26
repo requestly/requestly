@@ -6,6 +6,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
 import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
+import HeaderEditorIcon from "assets/icons/header-editor-icon.png";
 import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -342,13 +343,7 @@ export const GettingStarted: React.FC = () => {
                   type="link"
                   className="link-btn"
                   icon={
-                    <img
-                      src="/assets/img/brandLogos/header-editor.png"
-                      width={11}
-                      height={10}
-                      alt="Header Editor icon"
-                      className="anticon"
-                    />
+                    <img src={HeaderEditorIcon} width={11} height={10} alt="Header Editor icon" className="anticon" />
                   }
                   onClick={() => {
                     toggleImportHeaderEditorRulesModal();
