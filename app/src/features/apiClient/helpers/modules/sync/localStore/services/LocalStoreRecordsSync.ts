@@ -6,7 +6,7 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
-import { ApiClientLocalDbQueryService } from "../helpers/ApiClientLocalDb";
+import { ApiClientLocalDbQueryService } from "../helpers";
 import { generateDocumentId } from "backend/utils";
 import { ApiClientLocalDbTable } from "../helpers/types";
 
