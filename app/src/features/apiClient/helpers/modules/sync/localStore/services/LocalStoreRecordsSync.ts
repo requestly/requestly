@@ -25,10 +25,6 @@ export class LocalStoreRecordsSync
     return generateDocumentId("apis");
   }
 
-  private getAdapter() {
-    return apiClientLocalDbAdapterProvider.get<RQAPI.Record>(this.meta);
-  }
-
   async getAllRecords(): RQAPI.RecordsPromise {
     const apis = await this.queryService.getRecords();
 
