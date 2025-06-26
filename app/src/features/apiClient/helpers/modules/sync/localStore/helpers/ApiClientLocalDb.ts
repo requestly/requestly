@@ -8,6 +8,7 @@ export class ApiClientLocalDb {
   db: Dexie;
 
   constructor(metadata: ApiClientLocalStoreMeta) {
+    console.log("Initializing ApiClientLocalDb with metadata:", metadata);
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
       [ApiClientLocalDbTable.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
       [ApiClientLocalDbTable.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
@@ -19,17 +20,3 @@ export class ApiClientLocalDb {
     });
   }
 }
-
-export class ApiClientLocalDbAdapterProvider {
-  private cache: ApiClientLocalDb<unknown> = null;
-
-  get<T>(metadata: ApiClientLocalStoreMeta) {
-    if (!this.cache) {
-      this.cache = new ApiClientLocalDb<T>(metadata);
-    }
-    return this.cache as ApiClientLocalDb<T>;
-  }
-}
-
-const apiClientLocalDbAdapterProvider = new ApiClientLocalDbAdapterProvider();
-export default apiClientLocalDbAdapterProvider;
