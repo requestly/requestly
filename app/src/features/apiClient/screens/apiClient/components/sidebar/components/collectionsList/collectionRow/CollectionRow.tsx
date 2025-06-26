@@ -64,11 +64,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-  const [getParentChain, getRecordDataFromId, updateRecord] = useAPIRecords((state) => [
-    state.getParentChain,
-    state.getData,
-    state.updateRecord,
-  ]);
+  const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -162,8 +158,7 @@ export const CollectionRow: React.FC<Props> = ({
       try {
         const entryToMove = getRecordDataFromId(item.id);
         const result = await apiClientRecordsRepository.moveAPIEntities([entryToMove], record.id);
-
-        updateRecord(result[0]);
+        onSaveRecord(result[0]);
         forceRefreshApiClientRecords();
 
         // Expand the collection after successful drop
@@ -173,6 +168,7 @@ export const CollectionRow: React.FC<Props> = ({
           sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
         }
       } catch (error) {
+        console.log("error DBG", error);
         notification.error({
           message: "Error moving item",
           description: error?.message || "Failed to move item. Please try again.",
@@ -185,11 +181,11 @@ export const CollectionRow: React.FC<Props> = ({
     [
       record.id,
       apiClientRecordsRepository,
+      onSaveRecord,
+      forceRefreshApiClientRecords,
       expandedRecordIds,
       setExpandedRecordIds,
       getRecordDataFromId,
-      updateRecord,
-      forceRefreshApiClientRecords,
     ]
   );
 
@@ -226,21 +222,24 @@ export const CollectionRow: React.FC<Props> = ({
     [record.id, record.type]
   );
 
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-    drop: (item: Partial<RQAPI.Record>, monitor) => {
-      const isOverCurrent = monitor.isOver({ shallow: true });
-      if (!isOverCurrent) return;
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      drop: (item: Partial<RQAPI.Record>, monitor) => {
+        const isOverCurrent = monitor.isOver({ shallow: true });
+        if (!isOverCurrent) return;
 
-      if (item.id === record.id) return;
-      setIsCollectionRowLoading(true);
-      handleRecordDrop(item);
-    },
-    canDrop: checkCanDropItem,
-    collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: true }),
+        if (item.id === record.id) return;
+        setIsCollectionRowLoading(true);
+        handleRecordDrop(item);
+      },
+      canDrop: checkCanDropItem,
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+      }),
     }),
-  }));
+    [handleRecordDrop, checkCanDropItem]
+  );
 
   return (
     <>

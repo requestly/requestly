@@ -45,7 +45,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { initFetchers } = options;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+  const [getData] = useAPIRecords((state) => [state.getData]);
   const { onSaveRecord } = useApiClientContext();
   const errorEnvFiles = useSelector(getErrorEnvFiles);
 
@@ -336,8 +336,17 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       // Function to get all parent collection variables recursively
       const getParentVariables = (collectionId: string) => {
-        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-        if (!collection) return;
+        let collection: RQAPI.CollectionRecord;
+        try {
+          const existingRecord = getData(collectionId);
+          if (existingRecord.type !== RQAPI.RecordType.COLLECTION) {
+            return;
+          }
+          collection = existingRecord as RQAPI.CollectionRecord;
+        } catch (error) {
+          // Collection not found, skip
+          return;
+        }
 
         // Add current collection's variables
         Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
@@ -367,7 +376,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       return allVariables;
     },
-    [activeOwnerEnvironments, currentEnvironmentId, apiClientRecords, collectionVariables, syncRepository]
+    [activeOwnerEnvironments, currentEnvironmentId, getData, collectionVariables, syncRepository]
   );
 
   const renderVariables = useCallback(
@@ -478,9 +487,15 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const setCollectionVariables = useCallback(
     async (variables: EnvironmentVariables, collectionId: string) => {
-      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-
-      if (!collection) {
+      // Use getData to get the current collection instead of relying on potentially stale apiClientRecords
+      let collection: RQAPI.CollectionRecord;
+      try {
+        const existingRecord = getData(collectionId);
+        if (existingRecord.type !== RQAPI.RecordType.COLLECTION) {
+          throw new Error("Record is not a collection");
+        }
+        collection = existingRecord as RQAPI.CollectionRecord;
+      } catch (error) {
         throw new Error("Collection not found");
       }
 
@@ -511,7 +526,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           });
         });
     },
-    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
+    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, getData]
   );
 
   return {
