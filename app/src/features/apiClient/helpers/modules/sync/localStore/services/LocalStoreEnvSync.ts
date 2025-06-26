@@ -100,6 +100,8 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
 
     if (environment) {
       const newEnvironment = await this.createNonGlobalEnvironment(`${environment.name} (Copy)`);
+      newEnvironment.variables = { ...environment.variables };
+      await this.updateEnvironment(newEnvironment.id, { variables: newEnvironment.variables });
       return newEnvironment;
     } else {
       throw new Error("Environment not found for duplication");
