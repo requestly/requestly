@@ -6,9 +6,9 @@ import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContext
 import "./apiClient.scss";
 
 type Props = {
-  apiEntryDetails: RQAPI.ApiRecord;
+  apiEntryDetails?: RQAPI.ApiRecord;
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
-  handleAppRequestFinished: (entry: RQAPI.Entry) => void;
+  handleAppRequestFinished?: (entry: RQAPI.Entry) => void;
   isCreateMode: boolean;
 };
 
@@ -17,7 +17,7 @@ export const GenericApiClient: React.FC<Props> = React.memo(
     return (
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
         <div className="api-client-container-content">
-          <QueryParamsProvider entry={apiEntryDetails.data}>
+          <QueryParamsProvider entry={apiEntryDetails?.data}>
             <APIClientView
               apiEntryDetails={apiEntryDetails}
               notifyApiRequestFinished={handleAppRequestFinished}
