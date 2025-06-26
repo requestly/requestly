@@ -5,7 +5,7 @@ import dbProvider from "./ApiClientLocalDbProvider";
 import { ApiClientLocalDbTable } from "./types";
 
 export class ApiClientLocalDbQueryService<T> {
-  private dbInstance: ApiClientLocalDb = null;
+  private dbInstance: ApiClientLocalDb;
 
   constructor(meta: ApiClientLocalStoreMeta, readonly tableName: ApiClientLocalDbTable) {
     this.tableName = tableName;

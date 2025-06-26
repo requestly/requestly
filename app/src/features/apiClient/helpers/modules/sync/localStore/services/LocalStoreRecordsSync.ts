@@ -6,20 +6,21 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
+import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
-import { generateDocumentId } from "backend/utils";
 import { ApiClientLocalDbTable } from "../helpers/types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private queryService: ApiClientLocalDbQueryService<RQAPI.Record> = null;
+  private queryService: ApiClientLocalDbQueryService<RQAPI.Record>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
+    this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<RQAPI.Record>(meta, ApiClientLocalDbTable.APIS);
   }
 
   private getNewId() {
-    return generateDocumentId("apis");
+    return uuidv4();
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {

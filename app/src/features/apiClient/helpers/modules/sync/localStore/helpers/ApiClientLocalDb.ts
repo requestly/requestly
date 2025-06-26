@@ -5,7 +5,7 @@ import { ApiClientLocalDbTable } from "./types";
 import { ApiClientLocalStoreMeta } from "../../interfaces";
 
 export class ApiClientLocalDb {
-  db: Dexie = null;
+  db: Dexie;
 
   constructor(metadata: ApiClientLocalStoreMeta) {
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {

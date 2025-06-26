@@ -7,9 +7,10 @@ import { ApiClientLocalDbTable } from "../helpers/types";
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private queryService: ApiClientLocalDbQueryService<EnvironmentData> = null;
+  private queryService: ApiClientLocalDbQueryService<EnvironmentData>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
+    this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<EnvironmentData>(meta, ApiClientLocalDbTable.ENVIRONMENTS);
   }
 
