@@ -2,7 +2,7 @@ import { ApiClientLocalStoreMeta, ApiClientRepositoryInterface } from "../interf
 import { LocalStoreEnvSync } from "./services/LocalStoreEnvSync";
 import { LocalStoreRecordsSync } from "./services/LocalStoreRecordsSync";
 
-class ApiClientLocalStoreRepository implements ApiClientRepositoryInterface {
+export class ApiClientLocalStoreRepository implements ApiClientRepositoryInterface {
   environmentVariablesRepository: LocalStoreEnvSync;
   apiClientRecordsRepository: LocalStoreRecordsSync;
 
@@ -12,5 +12,5 @@ class ApiClientLocalStoreRepository implements ApiClientRepositoryInterface {
   }
 }
 
-const localStoreRepository = new ApiClientLocalStoreRepository({ version: 1 });
-export default localStoreRepository;
+// const localStoreRepository = new ApiClientLocalStoreRepository({ version: 1 });
+// export default localStoreRepository;

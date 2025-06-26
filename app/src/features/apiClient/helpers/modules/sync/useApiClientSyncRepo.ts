@@ -8,7 +8,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { ApiClientRepositoryInterface } from "./interfaces";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
-import { ApiClientLocalStoreRepository } from "./localStore";
 
 export const useGetApiClientSyncRepo = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -18,7 +17,7 @@ export const useGetApiClientSyncRepo = () => {
 
   const getRepository: () => ApiClientRepositoryInterface = useCallback(() => {
     if (!user.loggedIn) {
-      return new ApiClientLocalStoreRepository({ version: 1 });
+      throw new Error("Data can not be synced unless you log in!");
     }
 
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
