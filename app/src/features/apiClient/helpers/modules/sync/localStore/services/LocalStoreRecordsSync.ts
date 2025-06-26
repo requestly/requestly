@@ -6,30 +6,24 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
-import apiClientLocalDbAdapterProvider from "../helpers/ApiClientLocalDb";
+import { ApiClientLocalDbQueryService } from "../helpers/ApiClientLocalDb";
 import { generateDocumentId } from "backend/utils";
-import { ApiClientLocalDbInterface, ApiClientLocalDbTable } from "../helpers/types";
+import { ApiClientLocalDbTable } from "../helpers/types";
 
-export class LocalStoreRecordsSync
-  implements ApiClientLocalDbInterface, ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
+export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  tableName: ApiClientLocalDbTable;
+  private queryService: ApiClientLocalDbQueryService<RQAPI.Record> = null;
 
   constructor(meta: ApiClientLocalStoreMeta) {
-    this.meta = meta;
-    this.tableName = ApiClientLocalDbTable.APIS;
+    this.queryService = new ApiClientLocalDbQueryService<RQAPI.Record>(meta, ApiClientLocalDbTable.APIS);
   }
 
   private getNewId() {
     return generateDocumentId("apis");
   }
 
-  private getAdapter() {
-    return apiClientLocalDbAdapterProvider.get<RQAPI.Record>(this.meta);
-  }
-
   async getAllRecords(): RQAPI.RecordsPromise {
-    const apis = await this.getAdapter().getRecords(this.tableName);
+    const apis = await this.queryService.getRecords();
 
     return {
       success: true,
@@ -41,7 +35,7 @@ export class LocalStoreRecordsSync
   }
 
   async getApiRecord(recordId: string): RQAPI.RecordPromise {
-    const record = await this.getAdapter().getRecord(this.tableName, recordId);
+    const record = await this.queryService.getRecord(recordId);
 
     if (record) {
       return {
@@ -76,7 +70,7 @@ export class LocalStoreRecordsSync
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    await this.getAdapter().createRecord(this.tableName, newRecord);
+    await this.queryService.createRecord(newRecord);
     return { success: true, data: newRecord };
   }
 
@@ -104,7 +98,7 @@ export class LocalStoreRecordsSync
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    await this.getAdapter().createRecord(this.tableName, newRecord);
+    await this.queryService.createRecord(newRecord);
     return { success: true, data: newRecord };
   }
 
@@ -117,7 +111,7 @@ export class LocalStoreRecordsSync
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.Record;
 
-    await this.getAdapter().updateRecord(this.tableName, id, updatedRecord);
+    await this.queryService.updateRecord(id, updatedRecord);
     return { success: true, data: updatedRecord };
   }
 
@@ -130,7 +124,7 @@ export class LocalStoreRecordsSync
       };
     });
 
-    await this.getAdapter().updateRecords(this.tableName, recordsToBeDeleted);
+    await this.queryService.updateRecords(recordsToBeDeleted);
     return { success: true, data: null };
   }
 
@@ -281,11 +275,11 @@ export class LocalStoreRecordsSync
         : { ...record, updatedTs: Timestamp.now().toMillis(), collectionId: newParentId };
     });
 
-    await this.getAdapter().updateRecords(this.tableName, updatedRequests);
+    await this.queryService.updateRecords(updatedRequests);
     return updatedRequests;
   }
 
   async clear() {
-    await this.getAdapter().clearAllRecords(this.tableName);
+    await this.queryService.clearAllRecords();
   }
 }

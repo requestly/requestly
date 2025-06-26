@@ -4,10 +4,11 @@ import Dexie, { UpdateSpec, EntityTable } from "dexie";
 import { ApiClientLocalDbTable } from "./types";
 import { ApiClientLocalStoreMeta } from "../../interfaces";
 
-class ApiClientLocalDb<T> {
-  private db: Dexie = null;
+class ApiClientLocalDb {
+  db: Dexie = null;
 
   constructor(metadata: ApiClientLocalStoreMeta) {
+    console.log("Initializing ApiClientLocalDb with metadata:", metadata);
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
       [ApiClientLocalDbTable.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
       [ApiClientLocalDbTable.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
@@ -18,33 +19,55 @@ class ApiClientLocalDb<T> {
       [ApiClientLocalDbTable.ENVIRONMENTS]: "id",
     });
   }
+}
 
-  private getTable(tableName: ApiClientLocalDbTable) {
-    return this.db.table<T>(tableName);
+class ApiClientLocalDbProvider {
+  private cache: ApiClientLocalDb = null;
+
+  get(metadata: ApiClientLocalStoreMeta) {
+    if (!this.cache) {
+      this.cache = new ApiClientLocalDb(metadata);
+    }
+    return this.cache as ApiClientLocalDb;
+  }
+}
+
+const dbProvider = new ApiClientLocalDbProvider();
+
+export class ApiClientLocalDbQueryService<T> {
+  private dbInstance: ApiClientLocalDb = null;
+
+  constructor(meta: ApiClientLocalStoreMeta, readonly tableName: ApiClientLocalDbTable) {
+    this.tableName = tableName;
+    this.dbInstance = dbProvider.get(meta);
   }
 
-  async getRecord(tableName: ApiClientLocalDbTable, id: string) {
-    return this.getTable(tableName).get(id);
+  private getTable() {
+    return this.dbInstance.db.table<T>(this.tableName);
   }
 
-  async getRecords(tableName: ApiClientLocalDbTable) {
-    return this.getTable(tableName).toArray();
+  async getRecord(id: string) {
+    return this.getTable().get(id);
   }
 
-  async updateRecord(tableName: ApiClientLocalDbTable, id: string, record: T) {
-    return this.getTable(tableName).update(id, record as UpdateSpec<T>);
+  async getRecords() {
+    return this.getTable().toArray();
   }
 
-  async createRecord(tableName: ApiClientLocalDbTable, record: T) {
-    return this.getTable(tableName).add(record);
+  async updateRecord(id: string, record: T) {
+    return this.getTable().update(id, record as UpdateSpec<T>);
   }
 
-  async createBulkRecords(tableName: ApiClientLocalDbTable, records: T[]) {
-    return this.getTable(tableName).bulkAdd(records);
+  async createRecord(record: T) {
+    return this.getTable().add(record);
   }
 
-  async updateRecords(tableName: ApiClientLocalDbTable, updates: (Partial<T> & { id: string })[]) {
-    return this.getTable(tableName).bulkUpdate(
+  async createBulkRecords(records: T[]) {
+    return this.getTable().bulkAdd(records);
+  }
+
+  async updateRecords(updates: (Partial<T> & { id: string })[]) {
+    return this.getTable().bulkUpdate(
       updates.map((update) => {
         return {
           key: update.id,
@@ -54,25 +77,11 @@ class ApiClientLocalDb<T> {
     );
   }
 
-  async deleteRecord(tableName: ApiClientLocalDbTable, id: string) {
-    return this.getTable(tableName).delete(id);
+  async deleteRecord(id: string) {
+    return this.getTable().delete(id);
   }
 
-  async clearAllRecords(tableName: ApiClientLocalDbTable) {
-    return this.getTable(tableName).clear();
-  }
-}
-
-export class ApiClientLocalDbAdapterProvider {
-  private cache: ApiClientLocalDb<unknown> = null;
-
-  get<T>(metadata: ApiClientLocalStoreMeta) {
-    if (!this.cache) {
-      this.cache = new ApiClientLocalDb<T>(metadata);
-    }
-    return this.cache as ApiClientLocalDb<T>;
+  async clearAllRecords() {
+    return this.getTable().clear();
   }
 }
-
-const apiClientLocalDbAdapterProvider = new ApiClientLocalDbAdapterProvider();
-export default apiClientLocalDbAdapterProvider;

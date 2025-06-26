@@ -2,28 +2,23 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { v4 as uuidv4 } from "uuid";
-import apiClientLocalDbAdapterProvider from "../helpers/ApiClientLocalDb";
-import { ApiClientLocalDbInterface, ApiClientLocalDbTable } from "../helpers/types";
+import { ApiClientLocalDbQueryService } from "../helpers/ApiClientLocalDb";
+import { ApiClientLocalDbTable } from "../helpers/types";
 
-export class LocalStoreEnvSync implements ApiClientLocalDbInterface, EnvironmentInterface<ApiClientLocalStoreMeta> {
+export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  tableName: ApiClientLocalDbTable;
+  private queryService: ApiClientLocalDbQueryService<EnvironmentData> = null;
 
   constructor(meta: ApiClientLocalStoreMeta) {
-    this.meta = meta;
-    this.tableName = ApiClientLocalDbTable.ENVIRONMENTS;
+    this.queryService = new ApiClientLocalDbQueryService<EnvironmentData>(meta, ApiClientLocalDbTable.ENVIRONMENTS);
   }
 
   private getNewId() {
     return uuidv4();
   }
 
-  private getAdapter() {
-    return apiClientLocalDbAdapterProvider.get<EnvironmentData>(this.meta);
-  }
-
   async getAllEnvironments() {
-    const environments = await this.getAdapter().getRecords(this.tableName);
+    const environments = await this.queryService.getRecords();
     const environmentsMap = (environments ?? []).reduce((result, env) => {
       result[env.id] = env;
       return result;
@@ -45,7 +40,7 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
       variables: {},
     };
 
-    await this.getAdapter().createRecord(this.tableName, newEnvironment);
+    await this.queryService.createRecord(newEnvironment);
     return newEnvironment;
   }
 
@@ -56,7 +51,7 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
       variables: {},
     };
 
-    await this.getAdapter().createRecord(this.tableName, newEnvironment);
+    await this.queryService.createRecord(newEnvironment);
     return newEnvironment;
   }
 
@@ -65,12 +60,12 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
       return { ...env, id: env.id || this.getNewId() };
     });
 
-    await this.getAdapter().createBulkRecords(this.tableName, environmentsWithIds);
+    await this.queryService.createBulkRecords(environmentsWithIds);
     return environmentsWithIds;
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
-    await this.getAdapter().deleteRecord(this.tableName, envId);
+    await this.queryService.deleteRecord(envId);
     return { success: true };
   }
 
@@ -78,7 +73,7 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
-    const environment = await this.getAdapter().getRecord(this.tableName, environmentId);
+    const environment = await this.queryService.getRecord(environmentId);
 
     if (environment) {
       if (updates.name) {
@@ -89,7 +84,7 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
         environment.variables = { ...environment.variables, ...updates.variables };
       }
 
-      await this.getAdapter().updateRecord(this.tableName, environmentId, environment);
+      await this.queryService.updateRecord(environmentId, environment);
     } else {
       throw new Error("Environment not found");
     }
@@ -117,6 +112,6 @@ export class LocalStoreEnvSync implements ApiClientLocalDbInterface, Environment
   }
 
   async clear() {
-    await this.getAdapter().clearAllRecords(this.tableName);
+    await this.queryService.clearAllRecords();
   }
 }
