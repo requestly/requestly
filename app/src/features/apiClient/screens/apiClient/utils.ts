@@ -287,8 +287,6 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
 export const createBlankApiRecord = (
-  uid: string,
-  teamId: string,
   recordType: RQAPI.RecordType,
   collectionId: string,
   apiClientRecordsRepository: ApiClientRecordsInterface<any>

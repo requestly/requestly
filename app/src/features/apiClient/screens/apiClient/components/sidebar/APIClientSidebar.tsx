@@ -12,8 +12,6 @@ import { EnvironmentsList } from "../../../environment/components/environmentsLi
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../modals";
 import { getEmptyAPIEntry } from "../../utils";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
 
@@ -26,7 +24,6 @@ export enum ApiClientSidebarTabKey {
 }
 
 const APIClientSidebar: React.FC<Props> = () => {
-  const user = useSelector(getUserAuthDetails);
   const { state } = useLocation();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
@@ -141,9 +138,6 @@ const APIClientSidebar: React.FC<Props> = () => {
   // TODO: Move this import logic and the import modal to the api client container which wraps all the routes.
   const handleImportRequest = useCallback(
     async (request: RQAPI.Request) => {
-      if (!user?.loggedIn) {
-        return;
-      }
       setIsLoading(true);
 
       try {
@@ -176,7 +170,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         setIsLoading(false);
       }
     },
-    [user?.loggedIn, onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
+    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
   );
 
   useEffect(() => {
@@ -187,7 +181,7 @@ const APIClientSidebar: React.FC<Props> = () => {
 
   return (
     <>
-      <div className={`api-client-sidebar ${user.loggedIn ? "" : "api-client-sidebar-disabled"}`}>
+      <div className="api-client-sidebar">
         <div className="api-client-sidebar-content">
           <ApiClientSidebarHeader
             activeTab={activeKey}

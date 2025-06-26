@@ -637,7 +637,7 @@ const APIClientView: React.FC<Props> = ({
         />
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
-            <Conditional condition={user.loggedIn && !openInModal}>
+            <Conditional condition={!openInModal}>
               <RQBreadcrumb
                 placeholder="Untitled request"
                 recordName={apiEntryDetails?.name}
@@ -701,7 +701,7 @@ const APIClientView: React.FC<Props> = ({
               Send
             </RQButton>
 
-            <Conditional condition={user.loggedIn && !openInModal}>
+            <Conditional condition={!openInModal}>
               <RBACButton
                 permission="create"
                 resource="api_client_request"
