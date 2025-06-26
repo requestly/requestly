@@ -34,6 +34,7 @@
 .bottom-sheet-panel-container.ant-col {
   & .ant-tabs-nav {
     padding: 8px;
+    padding-top: 6px;
     margin-bottom: 0;
     padding-bottom: 0;
   }
@@ -42,7 +43,7 @@
     padding: 4px 0;
     background: none;
     transition: all 0.2s ease-out;
-    font-size: var(--requestly-font-size-xs);
+    font-size: var(--requestly-font-size-sm);
 
     &:hover,
     &:focus,

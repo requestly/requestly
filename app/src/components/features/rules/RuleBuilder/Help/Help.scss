@@ -1,5 +1,5 @@
 .rule-editor-help-content-container {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   line-height: 22px;
   padding: 1rem;
 }
@@ -213,7 +213,7 @@
   margin-bottom: 8px;
 }
 .rule-editor-docs .notion .notion-h3 {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
 }
 .rule-editor-docs .notion .notion-h2 {
   font-size: 15px;
@@ -222,13 +222,13 @@
 
 .rule-editor-docs .notion .notion-text {
   color: var(--text-gray);
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
   line-height: 22px;
 }
 .rule-editor-docs .notion .notion-list {
   padding-left: 0;
   color: var(--text-gray);
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
 }
 .rule-editor-docs .notion a {
   color: #3ba0ff;
@@ -245,7 +245,7 @@
 }
 
 .rule-editor-docs .notion .notion-toggle summary {
-  font-size: 14px;
+  font-size: var(--requestly-font-size-md, 14px);
 }
 
 .rule-editor-docs .notion b {

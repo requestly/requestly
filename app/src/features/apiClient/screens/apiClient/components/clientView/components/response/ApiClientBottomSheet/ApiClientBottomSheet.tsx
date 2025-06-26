@@ -151,7 +151,10 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       )}
       {!error && warning && !isRequestCancelled && <ApiClientWarningPanel warning={warning} />}
       <div className="api-client-sheet-panel">
-        <BottomSheet items={bottomSheetTabItems} tabBarExtraContent={<StatusLine response={response} />} />
+        <BottomSheet
+          items={bottomSheetTabItems}
+          tabBarExtraContent={!isLoading && <StatusLine response={response} />}
+        />
       </div>
     </div>
   );

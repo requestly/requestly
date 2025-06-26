@@ -158,7 +158,7 @@ export const CollectionRow: React.FC<Props> = ({
         <Collapse
           activeKey={activeKey}
           onChange={collapseChangeHandler}
-          collapsible={activeKey === record.id ? "icon" : "header"}
+          collapsible={"header"}
           defaultActiveKey={[record.id]}
           ghost
           className="collections-list-item collection"
@@ -229,7 +229,7 @@ export const CollectionRow: React.FC<Props> = ({
                         }}
                       />
                     </Tooltip>
-                    <Tooltip title={"Add Folder"}>
+                    <Tooltip title={"Add Collection"}>
                       <RQButton
                         size="small"
                         type="transparent"
