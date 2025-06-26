@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 
-export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
+export class LocalStoreEnvSync implements ApiClientLocalDbInterface, EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
   private queryService: ApiClientLocalDbQueryService<EnvironmentData>;
 
@@ -16,6 +16,10 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
   private getNewId() {
     return uuidv4().split("-").join("");
+  }
+
+  private getAdapter() {
+    return apiClientLocalDbAdapterProvider.get<EnvironmentData>(this.meta);
   }
 
   async getAllEnvironments() {
@@ -61,7 +65,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       return { ...env, id: env.id || this.getNewId() };
     });
 
-    await this.storageInstance.createBulkEnvironments(environmentsWithIds);
+    await this.getAdapter().createBulkRecords(this.tableName, environmentsWithIds);
     return environmentsWithIds;
   }
 
