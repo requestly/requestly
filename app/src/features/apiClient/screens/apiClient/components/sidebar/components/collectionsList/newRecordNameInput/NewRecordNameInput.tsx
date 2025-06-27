@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Input, notification } from "antd";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -33,8 +32,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   analyticEventSource = "",
 }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const [updateTabBySource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.updateTabBySource,
@@ -50,7 +47,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const saveNewRecord = useCallback(async () => {
     setIsLoading(true);
 
-    if (!uid || !recordName) {
+    if (!recordName) {
       setIsLoading(false);
       onSuccess?.();
       return;
@@ -105,7 +102,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     setIsLoading(false);
     onSuccess?.();
   }, [
-    uid,
     recordName,
     defaultRecordName,
     recordType,
@@ -119,10 +115,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
   const updateRecord = useCallback(async () => {
     setIsLoading(true);
-
-    if (!uid) {
-      return;
-    }
 
     if (!recordName || recordName === recordToBeEdited.name) {
       setIsLoading(false);
@@ -168,7 +160,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     recordType,
     recordToBeEdited,
     recordName,
-    uid,
     onSaveRecord,
     onSuccess,
     apiClientRecordsRepository,

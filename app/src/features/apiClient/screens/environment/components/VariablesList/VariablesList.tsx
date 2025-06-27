@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useDispatch, useSelector } from "react-redux";
 import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
@@ -9,8 +7,6 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
-import { globalActions } from "store/slices/global/slice";
-import APP_CONSTANTS from "config/constants";
 import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
 
@@ -23,8 +19,6 @@ interface VariablesListProps {
 export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
 
 export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
   const { validatePermission } = useRBAC();
@@ -65,10 +59,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
 
   const handleVariableChange = useCallback(
     (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
-      if (!user.loggedIn) {
-        return;
-      }
-
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
@@ -81,7 +71,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
         onVariablesChange(variableRows);
       }
     },
-    [dataSource, onVariablesChange, user.loggedIn]
+    [dataSource, onVariablesChange]
   );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
@@ -153,22 +143,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   }, [variables]);
 
   const handleAddVariable = () => {
-    if (!user.loggedIn) {
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            eventSource: EnvironmentAnalyticsSource.VARIABLES_LIST,
-            warningMessage: "Please log in to add a new variable",
-          },
-        })
-      );
-    } else {
-      trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
-      handleAddNewRow(dataSource);
-    }
+    trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
+    handleAddNewRow(dataSource);
   };
 
   return (
