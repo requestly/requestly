@@ -2,7 +2,7 @@ import React from "react";
 import { Row, Col } from "antd";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import RequestBodyRow from "../Rows/RowsMarkup/RequestBodyRow";
-import { ResponseRule } from "@requestly/shared/types/entities/rules";
+import { RequestRule } from "@requestly/shared/types/entities/rules";
 import GraphqlRequestPayload from "../ResponseRulePair/GraphqlRequestPayload";
 import { getRequestRuleResourceType } from "store/selectors";
 import { useSelector } from "react-redux";
@@ -23,7 +23,7 @@ const RequestRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
           />
         </Col>
       </Row>
-      {requestRuleResourceType === ResponseRule.ResourceType.GRAPHQL_API && (
+      {requestRuleResourceType === RequestRule.ResourceType.GRAPHQL_API && (
         <Row className="response-rule-inputs-row">
           <Col span={24}>
             <GraphqlRequestPayload pairIndex={pairIndex} isInputDisabled={isInputDisabled} />

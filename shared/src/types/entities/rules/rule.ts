@@ -149,7 +149,7 @@ export namespace RequestRule {
     request: {
       type: BodyType;
       value: string;
-      statusCode?: string;
+      resourceType?: ResourceType;
     };
   }
 
