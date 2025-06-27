@@ -42,7 +42,6 @@ export const useRecordsSyncService = () => {
         return localStoreRepository.apiClientRecordsRepository.clear();
       })
       .catch((error) => {
-        console.error("Error syncing APIs:", error);
         Sentry.captureException(error);
         setApisSyncStatus(RecordsSyncStatus.ERROR);
       });
