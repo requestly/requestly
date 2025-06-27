@@ -39,6 +39,7 @@ export const useRecordsSyncService = () => {
       })
       .then(() => {
         setApisSyncStatus(RecordsSyncStatus.SUCCESS);
+        syncRepository.apiClientRecordsRepository.getRecordsForForceRefresh();
         return localStoreRepository.apiClientRecordsRepository.clear();
       })
       .catch((error) => {
