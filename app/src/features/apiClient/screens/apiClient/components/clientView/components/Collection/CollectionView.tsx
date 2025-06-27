@@ -1,4 +1,4 @@
-import { notification, Result, Skeleton, Tabs } from "antd";
+import { notification, Result, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -11,6 +11,7 @@ import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -23,13 +24,10 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    isLoadingApiClientRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const [getDataFromId] = useAPIRecords((state) => [state.getData]);
+
+  const queueTriggerUpdate = useAPIRecords((s) => s.queueTriggerUpdate);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -37,8 +35,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   const isNewCollection = getIsNew();
 
   const collection = useMemo(() => {
-    return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-  }, [apiClientRecords, collectionId]);
+    return getDataFromId(collectionId) as RQAPI.CollectionRecord;
+  }, [collectionId, getDataFromId]);
 
   useEffect(() => {
     // To sync title for tabs opened from deeplinks
@@ -60,6 +58,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         .updateCollectionAuthData(record)
         .then((result) => {
           if (result.success) {
+            queueTriggerUpdate(collectionId);
             onSaveRecord(result.data, "open");
           } else {
             notification.error({
@@ -77,7 +76,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           });
         });
     },
-    [collection, onSaveRecord, apiClientRecordsRepository]
+    [collection, apiClientRecordsRepository, onSaveRecord, queueTriggerUpdate, collectionId]
   );
 
   const tabItems = useMemo(() => {
@@ -135,14 +134,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     },
     [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
-
-  if (isLoadingApiClientRecords) {
-    return (
-      <div className="collection-view-container__loading">
-        <Skeleton />
-      </div>
-    );
-  }
 
   const collectionName = collection?.name || "New Collection";
 

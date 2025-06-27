@@ -23,6 +23,7 @@ import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
+import { useDrag } from "react-dnd";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -54,6 +55,18 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
       return activeTabSource.getSourceId();
     }
   }, [activeTabSource]);
+
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: RQAPI.RecordType.API,
+    item: {
+      id: record.id,
+      type: record.type,
+      collectionId: record.collectionId,
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);
@@ -177,7 +190,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           }}
         />
       ) : (
-        <div className={`request-row`}>
+        <div className={`request-row`} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
           <div
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
             onClick={() => {

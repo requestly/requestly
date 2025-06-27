@@ -12,11 +12,13 @@ import { RBACButton } from "features/rbac";
 import "./apiClientEmptyView.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
-  const { apiClientRecords, onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
