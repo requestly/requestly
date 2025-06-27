@@ -114,12 +114,11 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    apiClientWorkloadManager,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+
+  const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
+
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,

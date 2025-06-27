@@ -11,6 +11,7 @@ import { isApiCollection } from "../../../utils";
 import { head, isEmpty, omit } from "lodash";
 import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import * as Sentry from "@sentry/react";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface Props {
   recordsToMove: RQAPI.Record[];
@@ -19,8 +20,8 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
   const {
-    apiClientRecords,
     onSaveRecord,
     onSaveBulkRecords,
     apiClientRecordsRepository,
