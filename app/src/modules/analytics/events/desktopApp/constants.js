@@ -46,4 +46,6 @@ export const AUTH = {
 export const UPDATE_DIALOG = {
   UPDATE_AVAILABLE: "update_available",
   UPDATE_DONWLOADED: "update_downloaded",
+  TRIGGERED_REDIRECT_FOR_MANUAL_INSTALL: "triggered_redirect_for_manual_install",
+  TRIGGERED_QUIT_AND_INSTALL: "triggered_quit_and_install",
 };
