@@ -337,6 +337,9 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       // Function to get all parent collection variables recursively
       const getParentVariables = (collectionId: string) => {
         const collection = getData(collectionId);
+        if (!collection) {
+          return;
+        }
         // Add current collection's variables
         Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
           // Only add if not already present (maintain precedence) with sub collections
