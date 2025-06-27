@@ -332,6 +332,7 @@ export const initXhrInterceptor = (debug) => {
         method: this.rqProxyXhr._method,
         type: "xmlhttprequest",
         initiator: location.origin, // initiator=origin. Should now contain port and protocol
+        requestData: data,
       });
 
       if (requestRule) {

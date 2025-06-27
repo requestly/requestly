@@ -11,6 +11,7 @@ export const trackRuleCreatedEvent = ({
   header_types,
   header_actions,
   save_type,
+  resource_type,
 }) => {
   const params = {
     rule_type,
@@ -23,6 +24,7 @@ export const trackRuleCreatedEvent = ({
   if (num_characters !== undefined) params.num_characters = num_characters;
   if (header_types) params.header_types = header_types;
   if (header_actions) params.header_actions = header_actions;
+  if (resource_type) params.resource_type = resource_type;
 
   trackEvent(RULES.RULE_CREATED, params);
 };
@@ -36,6 +38,7 @@ export const trackRuleEditedEvent = ({
   header_types,
   header_actions,
   save_type,
+  resource_type,
 }) => {
   const params = {
     rule_type,
@@ -47,6 +50,7 @@ export const trackRuleEditedEvent = ({
   if (num_characters != null) params.num_characters = num_characters;
   if (header_types) params.header_types = header_types;
   if (header_actions) params.header_actions = header_actions;
+  if (resource_type) params.resource_type = resource_type;
 
   trackEvent(RULES.RULE_EDITED, params);
 };

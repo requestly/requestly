@@ -51,9 +51,12 @@ const getEventParams = (rule) => {
     case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
       eventParams.resource_type = rule.pairs[0].response?.resourceType;
       eventParams.num_characters = rule.pairs[0].response?.value?.length;
+      eventParams.body_types = getAllResponseBodyTypes(rule);
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
       eventParams.num_characters = rule.pairs[0].request?.value?.length;
+      eventParams.resource_type = rule.pairs[0].request?.resourceType;
+      eventParams.body_types = rule.pairs[0].request?.type;
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.HEADERS: {
       const headerTypes = new Set();
@@ -193,12 +196,8 @@ const CreateRuleButton = ({
                   ? getAllRedirectDestinationTypes(finalRuleData)
                   : null,
               source: ruleCreatedEventSource,
-              body_types:
-                finalRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
-                  ? getAllResponseBodyTypes(finalRuleData)
-                  : null,
-              ...getEventParams(finalRuleData),
               save_type: saveType,
+              ...getEventParams(finalRuleData),
             });
           } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
             trackRuleEditedEvent({
@@ -209,8 +208,8 @@ const CreateRuleButton = ({
                   ? getAllRedirectDestinationTypes(finalRuleData)
                   : null,
               source: ruleCreatedEventSource,
-              ...getEventParams(finalRuleData),
               save_type: saveType,
+              ...getEventParams(finalRuleData),
             });
           }
           ruleModifiedAnalytics(user);

@@ -53,6 +53,7 @@ FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT = "desktop-ios-simulator-support";
 FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
 FEATURES.FRAMELESS_DESKTOP_APP = "frameless-desktop-app";
 FEATURES.EXTENSION_STATUS_NOTIFICATION = "extension-status-notification";
+FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD = "request-rule-graphql-payload";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";
