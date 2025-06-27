@@ -14,6 +14,7 @@ import { DeleteApiRecordModal, ImportFromCurlModal } from "../modals";
 import { getEmptyAPIEntry } from "../../utils";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
+import { useRecordsSyncService } from "features/apiClient/helpers/modules/sync/useRecordsSyncService";
 
 interface Props {}
 
@@ -44,6 +45,8 @@ const APIClientSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
     apiClientRecordsRepository,
   } = useApiClientContext();
+
+  useRecordsSyncService();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
