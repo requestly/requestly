@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -22,6 +22,7 @@ export const useRecordsSyncService = () => {
   const uid = user?.details?.profile?.uid;
   const syncRepository = useGetApiClientSyncRepo();
 
+  const syncingRef = useRef(false);
   useEffect(() => {
     if (!uid) {
       return;
@@ -31,6 +32,11 @@ export const useRecordsSyncService = () => {
       return;
     }
 
+    if (syncingRef.current) {
+      return;
+    }
+
+    syncingRef.current = true;
     setApisSyncStatus(RecordsSyncStatus.SYNCING);
     localStoreRepository.apiClientRecordsRepository
       .getAllRecords()
