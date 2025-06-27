@@ -62,12 +62,13 @@ export const initFetchInterceptor = (debug) => {
         });
 
       if (requestRule) {
+        const originalRequestBody = await request.text();
         const requestBody =
           getCustomRequestBody(requestRule, {
             method: request.method,
             url,
-            body: requestData,
-            bodyAsJson: jsonifyValidJSONString(requestData, true),
+            body: originalRequestBody,
+            bodyAsJson: jsonifyValidJSONString(originalRequestBody, true),
           }) || {};
 
         request = new Request(request.url, {
