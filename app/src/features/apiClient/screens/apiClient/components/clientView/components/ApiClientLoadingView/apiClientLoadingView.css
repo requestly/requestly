@@ -1,0 +1,24 @@
+.api-client-loading-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  background: var(--requestly-color-background);
+}
+
+.api-client-loading-sidebar {
+  width: 320px;
+  padding: 16px;
+  border-right: 1px solid var(--requestly-color-white-t-10);
+}
+
+.api-client-loading-view {
+  flex: 1;
+}
+
+.api-client-header-skeleton {
+  padding: 8px 16px;
+}
+
+.api-client-body-skeleton {
+  padding: 0 16px;
+}

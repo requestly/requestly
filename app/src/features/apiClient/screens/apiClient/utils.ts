@@ -516,11 +516,11 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
 
 export const filterOutChildrenRecords = (
   selectedRecords: Set<RQAPI.Record["id"]>,
-  childParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>,
+  childParentMap: Map<RQAPI.Record["id"], RQAPI.Record["id"]>,
   recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
 ) =>
   [...selectedRecords]
-    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
+    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id)))
     .map((id) => recordsMap[id]);
 
 export const processRecordsForDuplication = (

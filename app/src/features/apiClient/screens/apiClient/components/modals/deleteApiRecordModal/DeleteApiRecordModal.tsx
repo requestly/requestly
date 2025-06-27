@@ -11,6 +11,7 @@ import { isEmpty, partition } from "lodash";
 import * as Sentry from "@sentry/react";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { notification } from "antd";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -20,7 +21,8 @@ interface DeleteApiRecordModalProps {
 }
 
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
-  const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
+  const deleteRecords = useAPIRecords((state) => state.deleteRecords);
+  const { apiClientRecordsRepository } = useApiClientContext();
   const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -68,7 +70,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
 
     // Check if both deletions were successful
     if (recordDeletionResult.success && collectionsDeletionResult.success) {
-      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
+      deleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
 
       apiRecordIds.forEach((recordId) => {

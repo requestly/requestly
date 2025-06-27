@@ -1,5 +1,4 @@
 import React from "react";
-import { ApiClientProvider } from "./contexts";
 import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
@@ -8,6 +7,7 @@ import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextPro
 import ApiClientLoggedOutView from "./components/common/LoggedOutView/LoggedOutView";
 import { LocalSyncRefreshHandler } from "./LocalSyncRefreshHandler";
 import "./container.scss";
+import { ApiRecordsProvider } from "./store/apiRecords/ApiRecordsContextProvider";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -18,15 +18,13 @@ const ApiClientFeatureContainer: React.FC = () => {
 
   return (
     <TabServiceProvider>
-      <ApiClientProvider>
-        <>
-          <LocalSyncRefreshHandler />
-          <div className="api-client-container">
-            <APIClientSidebar />
-            {user.loggedIn ? <TabsContainer /> : <ApiClientLoggedOutView />}
-          </div>
-        </>
-      </ApiClientProvider>
+      <ApiRecordsProvider>
+        <LocalSyncRefreshHandler />
+        <div className="api-client-container">
+          <APIClientSidebar />
+          {user.loggedIn ? <TabsContainer /> : <ApiClientLoggedOutView />}
+        </div>
+      </ApiRecordsProvider>
     </TabServiceProvider>
   );
 };
