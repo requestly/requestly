@@ -10,6 +10,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
   }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
+  createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]>;
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
     environmentId: string,
