@@ -336,18 +336,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       // Function to get all parent collection variables recursively
       const getParentVariables = (collectionId: string) => {
-        let collection: RQAPI.CollectionRecord;
-        try {
-          const existingRecord = getData(collectionId);
-          if (existingRecord.type !== RQAPI.RecordType.COLLECTION) {
-            return;
-          }
-          collection = existingRecord as RQAPI.CollectionRecord;
-        } catch (error) {
-          // Collection not found, skip
-          return;
-        }
-
+        const collection = getData(collectionId);
         // Add current collection's variables
         Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
           // Only add if not already present (maintain precedence) with sub collections
