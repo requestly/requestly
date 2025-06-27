@@ -7,6 +7,5 @@ export const useApiRecord = (id: string) => {
   const recordStore = getRecordStore(id);
   const { record } = useStore(recordStore);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return record;
 };
