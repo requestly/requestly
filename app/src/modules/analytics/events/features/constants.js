@@ -115,6 +115,15 @@ export const RULES = {
     IMPORT_COMPLETE: "resource_override_settings_import_completed",
     DOCS_CLICKED: "resource_override_settings_import_docs_clicked",
   },
+
+  HEADER_EDITOR_SETTINGS: {
+    VIEWED: "header_editor_settings_import_viewed",
+    IMPORT_STARTED: "header_editor_settings_import_started",
+    PARSED: "header_editor_settings_parsed",
+    IMPORT_FAILED: "header_editor_settings_import_failed",
+    IMPORT_COMPLETE: "header_editor_settings_import_completed",
+    DOCS_CLICKED: "header_editor_settings_import_docs_clicked",
+  },
 };
 
 // TODO: cleanup
