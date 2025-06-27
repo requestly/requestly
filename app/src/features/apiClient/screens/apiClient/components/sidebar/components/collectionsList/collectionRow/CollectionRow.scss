@@ -1,3 +1,34 @@
+.ant-collapse.collections-list-item {
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  box-sizing: border-box;
+
+  // TEMP FIX: Added left padding to colllection name because drag preview of collection looks broken;
+  // TODO: Rever this when drap preview is implemented
+  .ant-collapse-header.ant-collapse-icon-collapsible-only {
+    gap: unset !important;
+
+    .collection-name-container {
+      padding-left: 8px;
+    }
+  }
+
+  .loading-collection-row {
+    li {
+      margin-top: 8px;
+      width: 100% !important;
+      height: 8px;
+    }
+  }
+}
 .collection-dropdown-menu .ant-dropdown-menu {
   min-width: 160px;
+}
+
+.collection-drop-target {
+  & > .ant-collapse.collections-list-item {
+    background: #004eeb33;
+    border-color: var(--requestly-color-primary-600);
+  }
 }

@@ -243,3 +243,5 @@ export enum PostmanBodyMode {
 export enum AbortReason {
   USER_CANCELLED = "user_cancelled",
 }
+
+export type UnwrappedPromise<T> = T extends Promise<infer R> ? R : T;
