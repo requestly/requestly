@@ -1,9 +1,35 @@
 .auto-gen-table-container {
   margin-bottom: 16px;
 
+  &.collapsed {
+    .heading-text {
+      color: var(--requestly-color-text-subtle);
+    }
+    svg {
+      stroke: var(--requestly-color-text-subtle);
+    }
+    & > .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
+      border-radius: 4px !important;
+    }
+  }
+
+  &.expanded {
+    .heading-text {
+      color: var(--requestly-color-text-default);
+    }
+    svg {
+      stroke: var(--requestly-color-text-default);
+    }
+    & > .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
+      border-radius: 4px 4px 0 0 !important;
+    }
+    & .ant-table-content {
+      border-radius: 0 0 4px 4px !important;
+    }
+  }
+
   & .ant-collapse-header {
     border: 1px solid #303030;
-    border-bottom: none;
   }
   & > .ant-collapse {
     border: none !important;
@@ -16,7 +42,9 @@
     padding: 8px 12px !important;
   }
   & > .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
+    background: var(--requestly-color-surface-0);
     border-radius: unset !important;
+    height: 30px;
   }
 
   & .ant-collapse-content {
@@ -25,19 +53,42 @@
   & .ant-table-container {
     border-radius: unset !important;
   }
+
+  & .ant-collapse-expand-icon {
+    position: relative;
+    bottom: 7px;
+    left: 3px;
+
+    svg {
+      stroke-width: 50;
+      height: 8px;
+      width: 8px;
+    }
+  }
+  & {
+    border: none !important;
+  }
+
   .heading-text {
+    position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 10px;
+    font-size: var(--requestly-font-size-2xs);
     font-style: normal;
     font-weight: 500;
     line-height: 13px;
     letter-spacing: 1px;
     text-transform: uppercase;
+    bottom: 6px;
   }
 
   .collapse-button {
     cursor: pointer;
+  }
+
+  & .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table,
+  .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table {
+    border: none !important;
   }
 
   .api-key-value-table {
@@ -51,6 +102,9 @@
       }
 
       td.ant-table-cell {
+        color: var(--requestly-color-text-subtle) !important;
+        cursor: not-allowed;
+
         .key-value-delete-btn.ant-btn.ant-btn-icon-only {
           opacity: 1;
         }
