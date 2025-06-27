@@ -1,0 +1,235 @@
+diff --git a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
+index eab503a..8e65c8f 100644
+--- a/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
++++ b/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
+@@ -5,6 +5,128 @@ import { getDefaultExtensions } from './getDefaultExtensions';
+ import { getStatistics } from './utils';
+ var External = Annotation.define();
+ var emptyExtensions = [];
++var TYPING_TIMEOUT = 200; //ms
++var editorInstances = {};
++var instanceCounter = 0;
++
++// Timeout Latch Implementation (Alternative approach)
++var TimeoutLatch = function(timeoutMS, callback) {
++  this.timeLeftMS = timeoutMS;
++  this.timeoutMS = timeoutMS;
++  this.isCancelled = false;
++  this.isTimeExhausted = false;
++  this.callback = callback;
++};
++
++TimeoutLatch.prototype.reduceTimeLeft = function(timeMS) {
++  if (this.isCancelled || this.isTimeExhausted) return;
++  this.timeLeftMS -= timeMS;
++  if (this.timeLeftMS <= 0) {
++    this.isTimeExhausted = true;
++    if (this.callback) this.callback();
++  }
++};
++
++TimeoutLatch.prototype.cancel = function() {
++  this.isCancelled = true;
++};
++
++TimeoutLatch.prototype.reset = function() {
++  this.timeLeftMS = this.timeoutMS;
++};
++
++TimeoutLatch.prototype.isDone = function() {
++  return this.isCancelled || this.isTimeExhausted;
++};
++
++var scheduler = {
++  latches: [],
++  timer: null,
++  isRunning: false,
++  
++  tick: function() {
++    for (var i = this.latches.length - 1; i >= 0; i--) {
++      var latch = this.latches[i];
++      if (!latch.isDone()) {
++        latch.reduceTimeLeft(1);
++      } else {
++        this.latches.splice(i, 1);
++      }
++    }
++    
++    if (this.latches.length === 0) {
++      this.stop();
++    }
++  },
++  
++  start: function() {
++    if (this.isRunning) return;
++    this.timer = setInterval(this.tick.bind(this), 1);
++    this.isRunning = true;
++  },
++  
++  stop: function() {
++    if (!this.isRunning) return;
++    clearInterval(this.timer);
++    this.isRunning = false;
++  },
++  
++  scheduleTimeoutLatch: function(timeoutMS, callback) {
++    var latch = new TimeoutLatch(timeoutMS, callback);
++    this.latches.push(latch);
++    if (!this.isRunning) {
++      this.start();
++    }
++    return latch;
++  }
++};
++
++function getInstanceState(instanceId) {
++  if (!editorInstances[instanceId]) {
++    editorInstances[instanceId] = {
++      userIsTyping: false,
++      typingTimer: null,
++      pendingValueUpdate: null,
++      lastTypingTime: 0,
++      timeoutLatch: null
++    };
++  }
++  return editorInstances[instanceId];
++}
++
++function cleanupInstance(instanceId) {
++  var state = editorInstances[instanceId];
++  if (state) {
++    if (state.typingTimer) {
++      clearTimeout(state.typingTimer);
++    }
++    if (state.timeoutLatch) {
++      state.timeoutLatch.cancel();
++    }
++    delete editorInstances[instanceId];
++  }
++}
++
++function handleTypingSessionEnd(instanceState) {
++  instanceState.userIsTyping = false;
++  
++  if (instanceState.pendingValueUpdate) {
++    if (instanceState.pendingValueUpdate.timestamp < instanceState.lastTypingTime) {
++      instanceState.pendingValueUpdate = null;
++      return;
++    }
++    
++    var currentVal = instanceState.pendingValueUpdate.view.state.doc.toString();
++    if (instanceState.pendingValueUpdate.value !== currentVal) {
++      console.log("DG-42: CURSOR JUMP RISK - Executing view.dispatch that replaces entire content");
++      instanceState.pendingValueUpdate.view.dispatch({
++        changes: { from: 0, to: currentVal.length, insert: instanceState.pendingValueUpdate.value || '' },
++        annotations: [External.of(true)],
++      });
++    }
++    instanceState.pendingValueUpdate = null;
++  }
++}
+ export function useCodeMirror(props) {
+   var {
+     value,
+@@ -33,6 +155,8 @@ export function useCodeMirror(props) {
+   var [container, setContainer] = useState();
+   var [view, setView] = useState();
+   var [state, setState] = useState();
++  
++  var [instanceId] = useState('rq-cm-instance-' + (++instanceCounter));
+   var defaultThemeOption = EditorView.theme({
+     '&': {
+       height,
+@@ -48,11 +172,39 @@ export function useCodeMirror(props) {
+   });
+   var updateListener = EditorView.updateListener.of(vu => {
+     if (vu.docChanged && typeof onChange === 'function' &&
+-    // Fix echoing of the remote changes:
+-    // If transaction is market as remote we don't have to call `onChange` handler again
+     !vu.transactions.some(tr => tr.annotation(External))) {
++      // console.time('updateListener-timeoutLatch-' + instanceId);
++      
+       var doc = vu.state.doc;
+       var _value = doc.toString();
++      
++      var instanceState = getInstanceState(instanceId);
++      
++      instanceState.userIsTyping = true;
++      instanceState.lastTypingTime = Date.now();
++      
++      if (instanceState.pendingValueUpdate) {
++        instanceState.pendingValueUpdate = null;
++      }
++      
++      // APPROACH 1: setTimeout approach (current patch) - COMMENT OUT TO USE TIMEOUT LATCH
++      // if (instanceState.typingTimer) {
++      //   clearTimeout(instanceState.typingTimer);
++      // }
++      
++      // instanceState.typingTimer = setTimeout(() => {
++      //   handleTypingSessionEnd(instanceState);
++      // }, TYPING_TIMEOUT);
++      
++      // APPROACH 2: Timeout Latch approach - PROPER LATCH USAGE
++      if (instanceState.timeoutLatch) {
++        instanceState.timeoutLatch.reset();
++      } else {
++        instanceState.timeoutLatch = scheduler.scheduleTimeoutLatch(TYPING_TIMEOUT, function() {
++          handleTypingSessionEnd(instanceState);
++        });
++      }
++      
+       onChange(_value, vu);
+     }
+     onStatistics && onStatistics(getStatistics(vu));
+@@ -108,6 +260,7 @@ export function useCodeMirror(props) {
+       view.focus();
+     }
+   }, [autoFocus, view]);
++
+   useEffect(() => {
+     if (view) {
+       view.dispatch({
+@@ -116,22 +269,35 @@ export function useCodeMirror(props) {
+     }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [theme, extensions, height, minHeight, maxHeight, width, minWidth, maxWidth, placeholderStr, editable, readOnly, defaultIndentWithTab, defaultBasicSetup, onChange, onUpdate]);
++
+   useEffect(() => {
+     if (value === undefined) {
+       return;
+     }
++    
+     var currentValue = view ? view.state.doc.toString() : '';
+     if (view && value !== currentValue) {
++      var instanceState = getInstanceState(instanceId);
++      
++      if (instanceState.userIsTyping) {
++        instanceState.pendingValueUpdate = { value: value, view: view, timestamp: Date.now() };
++        return;
++      }
++      
++      console.log("DG-41: CURSOR JUMP RISK - Executing view.dispatch that replaces entire content");
+       view.dispatch({
+-        changes: {
+-          from: 0,
+-          to: currentValue.length,
+-          insert: value || ''
+-        },
+-        annotations: [External.of(true)]
++        changes: { from: 0, to: currentValue.length, insert: value || '' },
++        annotations: [External.of(true)],
+       });
+     }
+-  }, [value, view]);
++  }, [value, view, instanceId]);
++  
++  useEffect(() => {
++    return () => {
++      cleanupInstance(instanceId);
++    };
++  }, [instanceId]);
++
+   return {
+     state,
+     setState,
