@@ -45,7 +45,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
-    return;
+    return this.getAllRecords();
   }
 
   async getRecord(recordId: string) {
