@@ -124,3 +124,13 @@ export const trackUpdateDownloadComplete = () => {
   const params = { detectedOS: getUserOS() };
   trackEvent(UPDATE_DIALOG.UPDATE_DONWLOADED, params);
 };
+
+export const trackTriggeredRedirectedToManuallyInstall = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.TRIGGERED_REDIRECT_FOR_MANUAL_INSTALL, params);
+};
+
+export const trackTriggerManualClickAndInstall = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.TRIGGERED_REDIRECT_FOR_MANUAL_INSTALL, params);
+};
