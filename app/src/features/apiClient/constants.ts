@@ -68,4 +68,4 @@ export const DEFAULT_SCRIPT_VALUES = {
     "// **********************************************\n// 🛠️ Use JavaScript to visualize responses: https://docs.requestly.com/general/api-client/scripts\n// **********************************************\n",
 };
 
-export const INVALID_KEY_CHARACTERS = /[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
+export const INVALID_KEY_CHARACTERS = /^(?!\{\{.*\}\}|^\{\{?$|^\}\}?$)[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
