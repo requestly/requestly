@@ -8,6 +8,7 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
   message,
   newRecordBtnText,
   onNewRecordClick,
+  onNewRequestClick,
   analyticEventSource,
 }) => {
   return (
@@ -18,6 +19,7 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
           message={message}
           newRecordBtnText={newRecordBtnText}
           onNewRecordClick={onNewRecordClick}
+          onNewRequestClick={onNewRequestClick}
           analyticEventSource={analyticEventSource}
         />
       </div>
