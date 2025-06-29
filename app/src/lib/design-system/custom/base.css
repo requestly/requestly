@@ -253,6 +253,12 @@
 .warning {
   color: var(--warning);
 }
+.error {
+  color: var(--error);
+}
+.info {
+  color: var(--info);
+}
 
 .relative {
   position: relative;
