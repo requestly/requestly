@@ -1,13 +1,10 @@
 import { RouteObject } from "react-router-dom";
-
 import DashboardLayout from "../layouts/DashboardLayout";
 import FullScreenLayout from "layouts/FullScreenLayout";
-
 import PATHS from "config/constants/sub/paths";
-
 import SeleniumImporter from "views/misc/SeleniumImporter";
+import { automationRoutes } from "views/misc/Automation/routes";
 import AppLayout from "layouts/AppLayout";
-
 import { ruleRoutes } from "features/rules/routes";
 import { sessionRoutes } from "features/sessionBook";
 import { apiClientRoutes } from "features/apiClient";
@@ -26,6 +23,7 @@ import { networkInspectorRoutes } from "features/networkInspector";
 import RouterError from "components/misc/PageError/RouterError";
 import { BStackAuthStart } from "features/onboarding/screens/BStackAuthStart/BStackAuthStart";
 import ExtensionInstalledScreen from "views/misc/ExtensionInstalledScreen/";
+import AutomationTemplate from "views/misc/Automation/layout";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -36,6 +34,11 @@ export const routesV2: RouteObject[] = [
   {
     path: PATHS.SELENIUM_IMPORTER.RELATIVE,
     element: <SeleniumImporter />,
+  },
+  {
+    path: PATHS.AUTOMATION.RELATIVE,
+    element: <AutomationTemplate />,
+    children: [...automationRoutes],
   },
   {
     path: "",
