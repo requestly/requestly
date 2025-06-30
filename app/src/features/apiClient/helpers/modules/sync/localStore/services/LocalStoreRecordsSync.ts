@@ -8,7 +8,7 @@ import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
-import { generateDocumentId } from "backend/utils";
+import { v4 as uuidv4 } from "uuid";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -20,7 +20,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   private getNewId() {
-    return generateDocumentId("apis");
+    return uuidv4();
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {
