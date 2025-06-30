@@ -105,8 +105,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async updateRecord(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+    const existingRecord = await this.getApiRecord(id);
 
     const updatedRecord = {
+      ...existingRecord.data,
       ...sanitizedRecord,
       id,
       updatedTs: Timestamp.now().toMillis(),
