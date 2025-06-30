@@ -19,7 +19,7 @@ import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types"
 import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateHeaders, validateStatusCode } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
-import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
+import { APIClientModal, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
@@ -492,7 +492,7 @@ const MockEditor: React.FC<Props> = ({
               </div>
             </BottomSheetLayout>
             {!isNew ? (
-              <APIClient
+              <APIClientModal
                 request={apiRequest}
                 openInModal
                 modalTitle="Test mock endpoint"
@@ -538,7 +538,7 @@ const MockEditor: React.FC<Props> = ({
             </div>
           </div>
           {!isNew ? (
-            <APIClient
+            <APIClientModal
               request={apiRequest}
               openInModal
               modalTitle="Test mock endpoint"
