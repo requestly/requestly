@@ -574,7 +574,7 @@ export const resolveAuth = (
 ): RQAPI.Auth => {
   //create a record array
   const apiRecords: RQAPI.Record[] = [];
-  const parentChainIds = getParentChain(childDetails.id);
+  const parentChainIds = getParentChain(childDetails?.id);
   for (const parentId in parentChainIds) {
     const parentRecord = getData(parentChainIds[parentId]);
     if (parentRecord) {

@@ -46,9 +46,6 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
-
-  generateApiRecordId(parentId?: string): string;
-  generateCollectionId(name: string, parentId?: string): string;
   writeToRawFile(
     id: string,
     record: any,
@@ -82,6 +79,10 @@ export type ApiClientCloudMeta = {
 
 export type ApiClientLocalMeta = {
   rootPath: string;
+};
+
+export type ApiClientLocalStoreMeta = {
+  version: number;
 };
 
 export type EnvironmentListenerParams =

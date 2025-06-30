@@ -8,7 +8,12 @@ import { getLinkWithMetadata } from "modules/analytics/metadata";
 import MandatoryUpdateScreen from "./MandatoryUpdateScreen";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { trackUpdateAvailable, trackUpdateDownloadComplete } from "modules/analytics/events/desktopApp";
+import {
+  trackTriggeredRedirectedToManuallyInstall,
+  trackTriggerManualClickAndInstall,
+  trackUpdateAvailable,
+  trackUpdateDownloadComplete,
+} from "modules/analytics/events/desktopApp";
 
 const UpdateDialog = () => {
   const appMode = useSelector(getAppMode);
@@ -48,7 +53,7 @@ const UpdateDialog = () => {
   const quitAndInstall = () => {
     console.log("quit and install");
     if (window.RQ && window.RQ && window.RQ.DESKTOP && isUpdateDownloaded) {
-      console.log("invoking install in main");
+      trackTriggerManualClickAndInstall();
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("quit-and-install", {});
     }
   };
@@ -56,6 +61,7 @@ const UpdateDialog = () => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
       link: getLinkWithMetadata("https://requestly.com/desktop"),
     });
+    trackTriggeredRedirectedToManuallyInstall();
   };
 
   const isIncompatible = () => !isFeatureCompatible(FEATURES.COMPATIBLE_DESKTOP_APP);
