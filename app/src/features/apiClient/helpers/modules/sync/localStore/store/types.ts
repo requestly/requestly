@@ -18,6 +18,6 @@ export namespace APIClientSyncService {
     resetSyncStatus: () => void;
     syncApis: (syncRepository: ApiClientRepositoryInterface) => Promise<void>;
     syncEnvs: (syncRepository: ApiClientRepositoryInterface) => Promise<void>;
-    syncAll: (syncRepository: ApiClientRepositoryInterface) => Promise<boolean>;
+    syncAll: (syncRepository: ApiClientRepositoryInterface) => Promise<void>;
   };
 }
