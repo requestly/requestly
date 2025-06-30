@@ -385,7 +385,7 @@ class RuleMatcher {
       }
 
       if (operator === "Contains") {
-        return valueInRequestDataString.includes(targettedValue);
+        return valueInRequestDataString?.includes(targettedValue);
       }
     }
 

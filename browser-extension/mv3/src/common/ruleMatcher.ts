@@ -164,7 +164,7 @@ const matchRequestPayload = (requestPayloadFilter: RequestPayloadFilter, request
     }
 
     if (operator === "Contains") {
-      return valueInRequestDataString.includes(targetedValue);
+      return valueInRequestDataString?.includes(targetedValue);
     }
   }
 
