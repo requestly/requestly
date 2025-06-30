@@ -73,7 +73,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           });
         });
     },
-    [collection, onSaveRecord, apiClientRecordsRepository]
+    [collection, apiClientRecordsRepository, onSaveRecord]
   );
 
   const tabItems = useMemo(() => {

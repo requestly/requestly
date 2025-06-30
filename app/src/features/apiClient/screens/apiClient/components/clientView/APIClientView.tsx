@@ -685,8 +685,8 @@ const APIClientView: React.FC<Props> = ({
     getCollectionVariables,
     getGlobalVariables,
     handleUpdatesFromExecutionWorker,
-    renderVariables,
     apiClientExecutor,
+    renderVariables,
   ]);
 
   const handleRevertChanges = () => {

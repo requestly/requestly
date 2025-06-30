@@ -77,7 +77,6 @@ export class ApiClientExecutor {
     );
 
     this.entryDetails.auth = effectiveAuth;
-
     const { renderVariables } = this.internalFunctions;
     const { renderedVariables, result } = renderVariables(this.entryDetails, this.collectionId);
 

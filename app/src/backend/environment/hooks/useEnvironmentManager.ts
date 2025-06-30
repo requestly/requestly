@@ -380,6 +380,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       result: T;
     } => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
+
       const { renderedTemplate, renderedVariables } = renderTemplate(template, variablesWithPrecedence);
       return { renderedVariables, result: renderedTemplate };
     },
