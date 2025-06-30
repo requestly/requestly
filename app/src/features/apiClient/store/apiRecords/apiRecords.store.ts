@@ -6,6 +6,7 @@ export type RecordState = {
   version: number;
   record: RQAPI.Record;
   updateRecordState: (record: RQAPI.Record) => void;
+  incrementVersion: () => void;
 };
 
 export type ApiRecordsState = {
@@ -41,6 +42,12 @@ export type ApiRecordsState = {
   getParentChain: (id: string) => string[];
 
   /**
+    * It updates the version of children of given entity. Meaning any component relying on version
+    * will get re-rendered.
+    */
+  triggerUpdateForChildren: (id: string) => void;
+
+  /**
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.Record[]) => void;
@@ -54,6 +61,21 @@ export type ApiRecordsState = {
   updateRecords: (records: RQAPI.Record[]) => void;
   deleteRecords: (recordIds: string[]) => void;
 };
+
+function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
+  const result: string[] = [];
+  const getImmediateChildren = (id: string) =>
+    Array.from(childParentMap.entries())
+      .filter(([_, v]) => v === id)
+      .map(([k, _]) => k);
+  const parseRecursively = (id: string) => {
+    const children = getImmediateChildren(id);
+    result.push(...children);
+    children.forEach(parseRecursively);
+  };
+  parseRecursively(initalId);
+  return result;
+}
 
 function parseRecords(records: RQAPI.Record[]) {
   const childParentMap = new Map<string, string>();
@@ -79,6 +101,12 @@ export function createRecordStore(record: RQAPI.Record) {
     updateRecordState: (record: RQAPI.Record) => {
       set({
         record,
+        version: get().version + 1,
+      });
+    },
+
+    incrementVersion: () => {
+      set({
         version: get().version + 1,
       });
     },
@@ -160,6 +188,15 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       return result;
     },
 
+    triggerUpdateForChildren(id) {
+      const { childParentMap, indexStore } = get();
+      const allChildren = getAllChildren(id, childParentMap);
+
+      allChildren.forEach((cid) => {
+        indexStore.get(cid).getState().incrementVersion();
+      });
+    },
+
     addNewRecord(record) {
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
@@ -170,6 +207,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       const updatedRecords = get().apiClientRecords.map((r) => (r.id === record.id ? record : r));
       get().refresh(updatedRecords);
       get().getRecordStore(record.id).getState().updateRecordState(record);
+      get().triggerUpdateForChildren(record.id);
     },
 
     updateRecords(records) {
@@ -177,6 +215,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       for (const record of records) {
         currentRecordsMap.set(record.id, record);
         get().getRecordStore(record.id).getState().updateRecordState(record);
+        get().triggerUpdateForChildren(record.id);
       }
       const updatedRecords = Array.from(currentRecordsMap.values());
       get().refresh(updatedRecords);
