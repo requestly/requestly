@@ -57,7 +57,7 @@ export function inheritAuthFromParent(
       authConfigStore: {},
     };
   }
-  let parentAuth = parentRecord.data.auth;
+  let parentAuth = parentRecord?.data?.auth;
 
   if (isEmpty(parentAuth)) {
     return {
