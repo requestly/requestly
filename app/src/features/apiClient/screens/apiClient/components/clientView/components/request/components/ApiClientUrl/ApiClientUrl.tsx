@@ -2,13 +2,14 @@ import { EnvironmentVariableValue } from "backend/environment/types";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { extractQueryParams, queryParamsToURLString } from "features/apiClient/screens/apiClient/utils";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import { KeyValuePair } from "features/apiClient/types";
 import { useCallback } from "react";
 
 interface ApiClientUrlProps {
   url: string;
   currentEnvironmentVariables: Record<string, EnvironmentVariableValue>;
   onEnterPress: (e: KeyboardEvent) => void;
-  onUrlChange: (value: string) => void;
+  onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }
 
 export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
@@ -16,7 +17,6 @@ export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, o
 
   const handleUrlChange = useCallback(
     (value: string) => {
-      onUrlChange(value);
       const paramsFromUrl = extractQueryParams(value);
       const finalParams = [];
 
@@ -41,6 +41,7 @@ export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, o
       }
 
       setQueryParams(finalParams);
+      onUrlChange(value, finalParams);
     },
     [onUrlChange, queryParams, setQueryParams]
   );
