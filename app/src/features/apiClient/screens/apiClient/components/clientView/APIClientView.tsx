@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
@@ -610,10 +610,10 @@ const APIClientView: React.FC<Props> = ({
     setEntry(apiEntryDetails?.data);
   };
 
-  const handleOnUrlChange = (value: string) => {
+  const handleOnUrlChange = (value: string, params: KeyValuePair[]) => {
     setEntry((prevEntry) => ({
       ...prevEntry,
-      request: { ...prevEntry.request, url: value },
+      request: { ...prevEntry.request, url: value, queryParams: params },
     }));
     setUnsaved(true);
   };
