@@ -10,7 +10,6 @@ export const createSyncServiceStore = () => {
     isSyncStatusLoading: false,
     apisSyncStatus: APIClientSyncService.Status.IDLE,
     envsSyncStatus: APIClientSyncService.Status.IDLE,
-    syncedApiRecords: [],
 
     resetSyncStatus() {
       set({
