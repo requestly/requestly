@@ -9,7 +9,6 @@ import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
 import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
-import HeaderEditorIcon from "assets/icons/header-editor-icon.png";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
@@ -398,7 +397,12 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                       trackHeaderEditorSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
-                    <img src={HeaderEditorIcon} width={11} height={10} alt="Header Editor icon" />
+                    <img
+                      src="/assets/img/brandLogos/header-editor-custom-icon.png"
+                      width={11}
+                      height={10}
+                      alt="Header Editor icon"
+                    />
                     &nbsp; Import from Header Editor
                   </RQButton>
                 </div>
