@@ -12,12 +12,11 @@ export namespace APIClientSyncService {
   }
 
   export type State = {
-    isSyncStatusLoading: boolean;
     apisSyncStatus: Status;
     envsSyncStatus: Status;
 
     resetSyncStatus: () => void;
-    updateSyncStatus: () => Promise<void>;
+    getSyncStatus: () => Promise<Status[]>;
     getEntitySyncStatus: (
       respository:
         | ApiClientLocalStoreRepository["apiClientRecordsRepository"]
