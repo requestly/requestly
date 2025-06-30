@@ -1,0 +1,97 @@
+.auto-gen-table-container {
+  margin-bottom: 16px;
+
+  & .ant-collapse-header {
+    border: 1px solid #303030;
+    border-bottom: none;
+  }
+  & > .ant-collapse {
+    border: none !important;
+  }
+
+  & > .ant-collapse > .ant-collapse-item {
+    border-bottom: none !important;
+  }
+  & > .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    padding: 8px 12px !important;
+  }
+  & > .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
+    border-radius: unset !important;
+  }
+
+  & .ant-collapse-content {
+    border-top: none !important;
+  }
+  & .ant-table-container {
+    border-radius: unset !important;
+  }
+  .heading-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .collapse-button {
+    cursor: pointer;
+  }
+
+  .api-key-value-table {
+    &.rq-content-list-table {
+      border: none !important;
+      padding-bottom: unset;
+    }
+    tr {
+      td.ant-table-cell:nth-last-child(2) {
+        border-right: none !important;
+      }
+
+      td.ant-table-cell {
+        .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+          opacity: 1;
+        }
+      }
+
+      td.ant-table-cell:nth-last-child(2) {
+        border-right: 1px solid #303030 !important;
+      }
+    }
+
+    td.ant-table-cell {
+      padding: 8px 12px !important;
+
+      .key-value-delete-btn.ant-btn.ant-btn-icon-only {
+        width: 30px;
+        opacity: 0;
+      }
+    }
+    .key-value-table-input {
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 4px 6px !important;
+      height: 24px;
+      font-size: var(--requestly-font-size-sm);
+      width: 100%;
+
+      &:hover {
+        border: 1px solid transparent;
+      }
+
+      &-disabled {
+        opacity: 0.5;
+      }
+
+      .cm-editor {
+        margin-top: -7px;
+      }
+    }
+
+    .ant-table-footer {
+      background: var(--requestly-color-background);
+    }
+  }
+}
