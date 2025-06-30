@@ -69,7 +69,7 @@ export const createSyncServiceStore = () => {
         },
 
         syncAll: async (syncRepository) => {
-          const { apisSyncStatus, envsSyncStatus } = get();
+          const { apisSyncStatus, envsSyncStatus, syncApis, syncEnvs } = get();
           if (
             apisSyncStatus === APIClientSyncService.Status.SUCCESS &&
             envsSyncStatus === APIClientSyncService.Status.SUCCESS
@@ -78,7 +78,7 @@ export const createSyncServiceStore = () => {
             return;
           }
 
-          await Promise.allSettled([get().syncApis(syncRepository), get().syncEnvs(syncRepository)]);
+          await Promise.allSettled([syncApis(syncRepository), syncEnvs(syncRepository)]);
           console.log("syncing all completed...");
 
           return true;
