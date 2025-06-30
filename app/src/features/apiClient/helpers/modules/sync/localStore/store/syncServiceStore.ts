@@ -7,13 +7,11 @@ import { EnvironmentData } from "backend/environment/types";
 
 export const createSyncServiceStore = () => {
   const syncServiceStore = create<APIClientSyncService.State>((set, get) => ({
-    isSyncStatusLoading: false,
     apisSyncStatus: APIClientSyncService.Status.IDLE,
     envsSyncStatus: APIClientSyncService.Status.IDLE,
 
     resetSyncStatus() {
       set({
-        isSyncStatusLoading: false,
         apisSyncStatus: APIClientSyncService.Status.IDLE,
         envsSyncStatus: APIClientSyncService.Status.IDLE,
       });
@@ -28,18 +26,11 @@ export const createSyncServiceStore = () => {
       }
     },
 
-    async updateSyncStatus() {
+    async getSyncStatus() {
       const { getEntitySyncStatus } = get();
-      set({ isSyncStatusLoading: true });
-
       const apisSyncStatus = await getEntitySyncStatus(localStoreRepository.apiClientRecordsRepository);
       const envsSyncStatus = await getEntitySyncStatus(localStoreRepository.environmentVariablesRepository);
-
-      set({
-        apisSyncStatus,
-        envsSyncStatus,
-        isSyncStatusLoading: false,
-      });
+      return [apisSyncStatus, envsSyncStatus];
     },
 
     async syncApis(syncRepository) {
@@ -91,29 +82,23 @@ export const createSyncServiceStore = () => {
     },
 
     async syncAll(syncRepository) {
-      const { apisSyncStatus, envsSyncStatus, syncApis, syncEnvs, isSyncStatusLoading, updateSyncStatus } = get();
-
-      const defaultData = {
-        success: true,
-        data: {
-          records: [] as RQAPI.Record[],
-          environments: [] as EnvironmentData[],
-        },
-      };
-
-      if (isSyncStatusLoading) {
-        return defaultData;
-      }
-
-      await updateSyncStatus();
+      const { syncApis, syncEnvs, getSyncStatus } = get();
+      const [apisSyncStatus, envsSyncStatus] = await getSyncStatus();
 
       if (
         apisSyncStatus === APIClientSyncService.Status.SUCCESS &&
         envsSyncStatus === APIClientSyncService.Status.SUCCESS
       ) {
-        return defaultData;
+        return {
+          success: true,
+          data: {
+            records: [] as RQAPI.Record[],
+            environments: [] as EnvironmentData[],
+          },
+        };
       }
 
+      set({ apisSyncStatus, envsSyncStatus });
       const [apis, envs] = await Promise.allSettled([syncApis(syncRepository), syncEnvs(syncRepository)]);
       const records = apis.status === "fulfilled" ? apis.value.data : [];
       const environments = envs.status === "fulfilled" ? envs.value.data : [];

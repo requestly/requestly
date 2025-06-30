@@ -7,14 +7,13 @@ import { WorkspaceType } from "features/workspaces/types";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { RQAPI } from "features/apiClient/types";
 import { useGetApiClientSyncRepo } from "../../useApiClientSyncRepo";
-import { useIsAllSynced, useSyncService } from "../store/hooks";
+import { useSyncService } from "../store/hooks";
 
 export const AutoSyncLocalStoreDaemon: React.FC<{ records: RQAPI.Record[] }> = ({ records }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const uid = user?.details?.profile?.uid;
   const syncRepository = useGetApiClientSyncRepo();
-  const isSynced = useIsAllSynced();
   const [syncAll, resetSyncStatus] = useSyncService((state) => [state.syncAll, state.resetSyncStatus]);
   const [addNewRecords] = useAPIRecords((state) => [state.addNewRecords]);
   const [syncedLocalApiRecords, setSyncedLocalApiRecords] = useState<RQAPI.Record[]>([]);
@@ -29,17 +28,13 @@ export const AutoSyncLocalStoreDaemon: React.FC<{ records: RQAPI.Record[] }> = (
       return;
     }
 
-    if (isSynced) {
-      return;
-    }
-
     getTabServiceActions().resetTabs();
     syncAll(syncRepository).then((result) => {
       if (result.success) {
         setSyncedLocalApiRecords(result.data.records);
       }
     });
-  }, [uid, activeWorkspace?.workspaceType, syncRepository, isSynced, syncAll, resetSyncStatus]);
+  }, [uid, activeWorkspace?.workspaceType, syncRepository, syncAll, resetSyncStatus]);
 
   useEffect(() => {
     if (!uid) {
@@ -54,16 +49,13 @@ export const AutoSyncLocalStoreDaemon: React.FC<{ records: RQAPI.Record[] }> = (
       return;
     }
 
-    if (isSynced) {
-      // If local synced records where not shown in sidebar then check and update it.
-      const shownRecordIds = records.map((record) => record.id);
-      const recordsToShow = syncedLocalApiRecords.filter((record) => !shownRecordIds.includes(record.id));
+    const shownRecordIds = records.map((record) => record.id);
+    const recordsToShow = syncedLocalApiRecords.filter((record) => !shownRecordIds.includes(record.id));
 
-      addNewRecords(recordsToShow);
-      setSyncedLocalApiRecords([]);
-      return;
-    }
-  }, [uid, records, syncedLocalApiRecords, activeWorkspace?.workspaceType, addNewRecords, isSynced]);
+    addNewRecords(recordsToShow);
+    setSyncedLocalApiRecords([]);
+    return;
+  }, [uid, records, syncedLocalApiRecords, activeWorkspace?.workspaceType, addNewRecords]);
 
   return <></>;
 };
