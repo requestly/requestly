@@ -3,7 +3,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "./sub/features";
 
 // set null if the version is never compatiable on appMode
-/* for desktop: 
+/* for desktop:
   - use string to define the same compatible version for all platforms.
   - use an object if feature is compatible on specific versions for specific platforms
   - omitting platform from the object or setting it's value as null/undefined implies feature is not available for that platform
@@ -76,7 +76,7 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "23.9.18",
   },
   [FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.5.24",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.6.29",
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "23.10.18",
   },
   [FEATURES.CUSTOM_LAUNCH_OPTIONS]: {
@@ -197,7 +197,7 @@ export const FEATURE_COMPATIBLE_VERSION = {
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "25.6.10",
   },
   [FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD]: {
-    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.6.1",
-    [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "25.6.1",
+    [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: "25.6.29",
+    [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: "25.6.29",
   },
 };
