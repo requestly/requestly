@@ -11,17 +11,13 @@ export namespace APIClientSyncService {
   export type State = {
     apisSyncStatus: Status;
     envsSyncStatus: Status;
-  };
 
-  export type Actions = {
     setApisSyncStatus: (status: Status) => void;
     setEnvsSyncStatus: (status: Status) => void;
 
-    reset: () => void;
+    resetSyncStatus: () => void;
     syncApis: (syncRepository: ApiClientRepositoryInterface) => Promise<void>;
     syncEnvs: (syncRepository: ApiClientRepositoryInterface) => Promise<void>;
     syncAll: (syncRepository: ApiClientRepositoryInterface) => Promise<boolean>;
   };
-
-  export type Store = State & Actions;
 }
