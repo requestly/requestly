@@ -20,7 +20,6 @@ export const useGetApiClientSyncRepo = () => {
     if (!user.loggedIn) {
       return localStoreRepository;
     }
-
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       return new ApiClientLocalRepository({
         rootPath: activeWorkspace?.rootPath,
