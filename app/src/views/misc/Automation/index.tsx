@@ -18,8 +18,8 @@ export const AutomationPage = () => {
       title="Requestly for Automation"
       description={
         <>
-          Pass your <code>API key</code> in the query parameters to automatically fetch and apply rules from your
-          Requestly account in the automation extension.
+          Include your <code>API key</code> in the query parameters to automatically fetch and apply rules from your
+          Requestly account using the automation extension
         </>
       }
       queryParams={dataSource}

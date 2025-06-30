@@ -31,7 +31,7 @@ export const AddRequestHeader: React.FC = () => {
         </>
       }
       queryParams={dataSource}
-      instructionText="This will create header modification for you and insert it into the requestly extension, append your headers like this:"
+      instructionText="This will create a Header Modification Rule and automatically add it to your Requestly extension. To use it, just append your headers like this:"
       exampleCode="?<headerName1>=<headerValue1>&<headerName2>=<headerValue2>"
       isLoading={isLoading}
       success={success}
