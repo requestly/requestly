@@ -5,7 +5,6 @@ import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useGetApiClientSyncRepo } from "./useApiClientSyncRepo";
 import { useIsAllSynced, useSyncServiceStore } from "./localStore/store/hooks";
 
-let i = 0;
 export const useAutoSync = () => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -19,8 +18,6 @@ export const useAutoSync = () => {
       resetSyncStatus();
       return;
     }
-
-    console.log("syncing...", i++);
 
     if (activeWorkspace?.id || isSynced) {
       return;

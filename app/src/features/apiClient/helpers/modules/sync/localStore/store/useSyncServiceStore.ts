@@ -23,8 +23,6 @@ export const createSyncServiceStore = () => {
             return;
           }
 
-          console.log("syncing apis...");
-
           set({ apisSyncStatus: APIClientSyncService.Status.SYNCING });
 
           try {
@@ -34,9 +32,7 @@ export const createSyncServiceStore = () => {
 
             await localStoreRepository.apiClientRecordsRepository.clear();
             set({ apisSyncStatus: APIClientSyncService.Status.SUCCESS });
-            console.log("syncing apis completed...");
           } catch (error) {
-            console.log("syncing error::", error);
             Sentry.captureException(error);
             set({ apisSyncStatus: APIClientSyncService.Status.ERROR });
           }
@@ -46,8 +42,6 @@ export const createSyncServiceStore = () => {
           if (get().envsSyncStatus === APIClientSyncService.Status.SUCCESS) {
             return;
           }
-
-          console.log("syncing envs...");
 
           set({ envsSyncStatus: APIClientSyncService.Status.SYNCING });
 
@@ -60,9 +54,7 @@ export const createSyncServiceStore = () => {
 
             await localStoreRepository.environmentVariablesRepository.clear();
             set({ envsSyncStatus: APIClientSyncService.Status.SUCCESS });
-            console.log("syncing envs completed...");
           } catch (error) {
-            console.log("syncing envs error::", error);
             Sentry.captureException(error);
             set({ envsSyncStatus: APIClientSyncService.Status.ERROR });
           }
@@ -74,18 +66,14 @@ export const createSyncServiceStore = () => {
             apisSyncStatus === APIClientSyncService.Status.SUCCESS &&
             envsSyncStatus === APIClientSyncService.Status.SUCCESS
           ) {
-            console.log("syncing already completed...");
             return;
           }
 
           await Promise.allSettled([syncApis(syncRepository), syncEnvs(syncRepository)]);
-          console.log("syncing all completed...");
-
-          return true;
         },
       }),
       {
-        name: "apiClientSyncServiceStore:v1",
+        name: "apiClientSyncServiceStore:v0",
         partialize: (state) => ({
           apisSyncStatus: state.apisSyncStatus,
           envsSyncStatus: state.envsSyncStatus,
