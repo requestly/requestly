@@ -5,6 +5,7 @@ import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useGetApiClientSyncRepo } from "./useApiClientSyncRepo";
 import { useIsAllSynced, useSyncService } from "./localStore/store/hooks";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { WorkspaceType } from "features/workspaces/types";
 
 export const useAutoSync = () => {
   const user = useSelector(getUserAuthDetails);
@@ -20,11 +21,15 @@ export const useAutoSync = () => {
       return;
     }
 
-    if (activeWorkspace?.id || isSynced) {
+    if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
+      return;
+    }
+
+    if (isSynced) {
       return;
     }
 
     getTabServiceActions().resetTabs();
     syncAll(syncRepository);
-  }, [uid, activeWorkspace?.id, syncRepository, isSynced, syncAll, resetSyncStatus]);
+  }, [uid, activeWorkspace?.workspaceType, syncRepository, isSynced, syncAll, resetSyncStatus]);
 };
