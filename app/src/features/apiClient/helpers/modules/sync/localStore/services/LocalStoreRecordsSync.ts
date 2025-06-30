@@ -283,4 +283,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async clear() {
     await this.queryService.clearAllRecords();
   }
+
+  async getIsAllCleared(): Promise<boolean> {
+    return this.queryService.getIsAllCleared();
+  }
 }
