@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback } from "react";
 import APIClientView from "./components/clientView/APIClientView";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { RQAPI } from "features/apiClient/types";
-import { Skeleton } from "antd";
-import "./apiClient.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import "./apiClient.scss";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -24,36 +24,12 @@ type EditModeProps = BaseProps & {
 
 type Props = CreateModeProps | EditModeProps;
 
-export const APIClient: React.FC<Props> = React.memo((props) => {
+export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   const { isCreateMode, isHistoryMode } = props;
-  const { history, selectedHistoryIndex, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const [selectedEntryDetails] = useState<RQAPI.ApiRecord>(props?.apiEntryDetails);
+  const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
+  const selectedEntryDetails = useApiRecord(props?.apiEntryDetails?.id);
 
-  const requestId = isCreateMode === false ? props.requestId : null;
   const onSaveCallback = props.onSaveCallback ?? (() => {});
-
-  const requestHistoryEntry = useMemo(() => {
-    if (!isHistoryMode) {
-      return;
-    }
-
-    if (history?.length === 0) {
-      return;
-    }
-
-    const entryDetails: Partial<RQAPI.ApiRecord> = {
-      type: RQAPI.RecordType.API,
-      data: { ...history[selectedHistoryIndex] },
-    };
-
-    return entryDetails;
-  }, [isHistoryMode, history, selectedHistoryIndex]);
-
-  const entryDetails = useMemo(
-    () => (isHistoryMode && !requestId ? requestHistoryEntry : selectedEntryDetails) as RQAPI.ApiRecord,
-    [isHistoryMode, requestHistoryEntry, selectedEntryDetails, requestId]
-  );
-
   const handleAppRequestFinished = useCallback(
     (entry: RQAPI.Entry) => {
       if (isHistoryMode) {
@@ -64,21 +40,12 @@ export const APIClient: React.FC<Props> = React.memo((props) => {
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
   );
 
-  if (!entryDetails && !isCreateMode && !isHistoryMode) {
-    return (
-      <>
-        <Skeleton className="api-client-header-skeleton" paragraph={{ rows: 1, width: "100%" }} />
-        <Skeleton className="api-client-body-skeleton" />
-      </>
-    );
-  }
-
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
-        <QueryParamsProvider entry={entryDetails?.data}>
+        <QueryParamsProvider entry={selectedEntryDetails?.data as RQAPI.Entry}>
           <APIClientView
-            apiEntryDetails={entryDetails}
+            apiEntryDetails={selectedEntryDetails as RQAPI.ApiRecord}
             notifyApiRequestFinished={handleAppRequestFinished}
             onSaveCallback={onSaveCallback}
             isCreateMode={isCreateMode}
