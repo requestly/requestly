@@ -50,8 +50,6 @@ export class ApiClientExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.Entry;
   private collectionId: RQAPI.Record["collectionId"];
-  private recordId: RQAPI.Record["id"];
-  private apiRecords: RQAPI.Record[];
   private internalFunctions: InternalFunctions;
   private renderedVariables: Record<string, unknown> = {};
   constructor(
@@ -70,13 +68,6 @@ export class ApiClientExecutor {
     this.entryDetails.request.queryParams = [];
     this.renderedVariables = {};
 
-    const effectiveAuth = getEffectiveAuthForEntry(
-      this.entryDetails,
-      { id: this.recordId, parentId: this.collectionId },
-      this.apiRecords
-    );
-
-    this.entryDetails.auth = effectiveAuth;
     const { renderVariables } = this.internalFunctions;
     const { renderedVariables, result } = renderVariables(this.entryDetails, this.collectionId);
 
@@ -208,11 +199,6 @@ export class ApiClientExecutor {
   }) {
     this.entryDetails = entryDetails.entry;
     this.collectionId = entryDetails.collectionId;
-    this.recordId = entryDetails.recordId;
-  }
-
-  updateApiRecords(apiRecords: RQAPI.Record[]) {
-    this.apiRecords = apiRecords;
   }
 
   updateInternalFunctions(internalFunctions: InternalFunctions) {
