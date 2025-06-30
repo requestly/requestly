@@ -6,7 +6,7 @@ import { globalActions } from "store/slices/global/slice";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
-import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
+import { APIClientModal, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import RuleEditorModal from "components/common/RuleEditorModal";
 import { copyToClipBoard } from "utils/Misc";
 import { snakeCase } from "lodash";
@@ -196,7 +196,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
           />
 
           {isApiClientModalOpen && (
-            <APIClient
+            <APIClientModal
               openInModal
               modalTitle="Replay request"
               request={selectedRequestData}
