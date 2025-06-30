@@ -4,26 +4,26 @@ import localStoreRepository from "../ApiClientLocalStorageRepository";
 import * as Sentry from "@sentry/react";
 import { APIClientSyncService } from "./types";
 
-const initialState: APIClientSyncService.State = {
-  apisSyncStatus: APIClientSyncService.Status.IDLE,
-  envsSyncStatus: APIClientSyncService.Status.IDLE,
-};
-
 export const createSyncServiceStore = () => {
-  const syncServiceStore = create<APIClientSyncService.Store>()(
+  const syncServiceStore = create<APIClientSyncService.State>()(
     persist(
       (set, get) => ({
-        ...initialState,
+        apisSyncStatus: APIClientSyncService.Status.IDLE,
+        envsSyncStatus: APIClientSyncService.Status.IDLE,
 
         setApisSyncStatus: (status) => set({ apisSyncStatus: status }),
         setEnvsSyncStatus: (status) => set({ envsSyncStatus: status }),
 
-        reset: () => set({ ...initialState }),
+        resetSyncStatus: () => {
+          set({ apisSyncStatus: APIClientSyncService.Status.IDLE, envsSyncStatus: APIClientSyncService.Status.IDLE });
+        },
 
         syncApis: async (syncRepository) => {
           if (get().apisSyncStatus === APIClientSyncService.Status.SUCCESS) {
             return;
           }
+
+          console.log("syncing apis...");
 
           set({ apisSyncStatus: APIClientSyncService.Status.SYNCING });
 
@@ -32,9 +32,11 @@ export const createSyncServiceStore = () => {
 
             await syncRepository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(result.data.records);
 
-            localStoreRepository.apiClientRecordsRepository.clear();
+            await localStoreRepository.apiClientRecordsRepository.clear();
             set({ apisSyncStatus: APIClientSyncService.Status.SUCCESS });
+            console.log("syncing apis completed...");
           } catch (error) {
+            console.log("syncing error::", error);
             Sentry.captureException(error);
             set({ apisSyncStatus: APIClientSyncService.Status.ERROR });
           }
@@ -45,6 +47,8 @@ export const createSyncServiceStore = () => {
             return;
           }
 
+          console.log("syncing envs...");
+
           set({ envsSyncStatus: APIClientSyncService.Status.SYNCING });
 
           try {
@@ -54,9 +58,11 @@ export const createSyncServiceStore = () => {
               Object.values(result.data.environments)
             );
 
-            localStoreRepository.environmentVariablesRepository.clear();
+            await localStoreRepository.environmentVariablesRepository.clear();
             set({ envsSyncStatus: APIClientSyncService.Status.SUCCESS });
+            console.log("syncing envs completed...");
           } catch (error) {
+            console.log("syncing envs error::", error);
             Sentry.captureException(error);
             set({ envsSyncStatus: APIClientSyncService.Status.ERROR });
           }
@@ -68,10 +74,12 @@ export const createSyncServiceStore = () => {
             apisSyncStatus === APIClientSyncService.Status.SUCCESS &&
             envsSyncStatus === APIClientSyncService.Status.SUCCESS
           ) {
+            console.log("syncing already completed...");
             return;
           }
 
           await Promise.allSettled([get().syncApis(syncRepository), get().syncEnvs(syncRepository)]);
+          console.log("syncing all completed...");
 
           return true;
         },
