@@ -9,14 +9,14 @@ import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
 import VirtualTableV2 from "./VirtualTableV2";
-import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
+import { APIClientRequest } from "features/apiClient/components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 import { Checkbox, Typography } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 import { REQUEST_METHOD_COLORS, RequestMethod } from "../../../../../../../../constants/requestMethodColors";
-import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./index.scss";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { APIClientModal } from "features/apiClient/components/common/APIClient";
 
 export const ITEM_SIZE = 30;
 
@@ -271,15 +271,12 @@ const NetworkTable: React.FC<Props> = ({
         />
       </div>
       {isReplayRequestModalOpen ? (
-        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-          <APIClient
-            request={apiClientRequestForSelectedRowRef.current}
-            openInModal
-            modalTitle="Replay request"
-            isModalOpen
-            onModalClose={onReplayRequestModalClose}
-          />
-        </BottomSheetProvider>
+        <APIClientModal
+          request={apiClientRequestForSelectedRowRef.current}
+          openInModal
+          isModalOpen
+          onModalClose={onReplayRequestModalClose}
+        />
       ) : null}
     </>
   );
