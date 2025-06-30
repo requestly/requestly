@@ -50,6 +50,10 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
   }
 
   async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    if (environments.length === 0) {
+      return [];
+    }
+
     const promises = environments.map(async (env) => {
       return this.createNonGlobalEnvironment(env.name).then((envData) => {
         this.updateEnvironment(envData.id, { variables: env.variables });
