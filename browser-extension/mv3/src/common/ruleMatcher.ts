@@ -146,7 +146,7 @@ const matchRequestPayload = (requestPayloadFilter: RequestPayloadFilter, request
   const targetedValue = requestPayloadFilter?.value;
 
   // tagetedKey is the json path e.g. a.b.0.c
-  if (targetedKey && typeof targetedValue !== undefined) {
+  if (targetedKey && typeof targetedValue !== "undefined") {
     const valueInRequestData = traverseJsonByPath(requestData, targetedKey);
     const operator = requestPayloadFilter?.operator;
 
@@ -164,7 +164,7 @@ const matchRequestPayload = (requestPayloadFilter: RequestPayloadFilter, request
     }
 
     if (operator === "Contains") {
-      return valueInRequestDataString.includes(targetedValue);
+      return valueInRequestDataString?.includes(targetedValue);
     }
   }
 
