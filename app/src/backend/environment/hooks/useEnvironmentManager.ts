@@ -28,6 +28,7 @@ import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
 import { MutexTimeoutError } from "../fetch-lock";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 let unsubscribeListener: () => void = null;
 let unsubscribeCollectionListener: () => void = null;
@@ -44,7 +45,8 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const { initFetchers } = options;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const { apiClientRecords, onSaveRecord } = useApiClientContext();
+  const [getData] = useAPIRecords((state) => [state.getData]);
+  const { onSaveRecord } = useApiClientContext();
   const errorEnvFiles = useSelector(getErrorEnvFiles);
 
   const user = useSelector(getUserAuthDetails);
@@ -334,9 +336,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       // Function to get all parent collection variables recursively
       const getParentVariables = (collectionId: string) => {
-        const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-        if (!collection) return;
-
+        const collection = getData(collectionId);
+        if (!collection) {
+          return;
+        }
         // Add current collection's variables
         Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
           // Only add if not already present (maintain precedence) with sub collections
@@ -365,7 +368,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
       return allVariables;
     },
-    [activeOwnerEnvironments, currentEnvironmentId, apiClientRecords, collectionVariables, syncRepository]
+    [activeOwnerEnvironments, currentEnvironmentId, getData, collectionVariables, syncRepository]
   );
 
   const renderVariables = useCallback(
@@ -477,9 +480,14 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const setCollectionVariables = useCallback(
     async (variables: EnvironmentVariables, collectionId: string) => {
-      const collection = apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-
-      if (!collection) {
+      let collection: RQAPI.CollectionRecord;
+      try {
+        const existingRecord = getData(collectionId);
+        if (existingRecord.type !== RQAPI.RecordType.COLLECTION) {
+          throw new Error("Record is not a collection");
+        }
+        collection = existingRecord as RQAPI.CollectionRecord;
+      } catch (error) {
         throw new Error("Collection not found");
       }
 
@@ -510,7 +518,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           });
         });
     },
-    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, apiClientRecords]
+    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, getData]
   );
 
   return {

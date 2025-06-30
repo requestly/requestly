@@ -81,6 +81,7 @@
     "codemirror": "^5.65.2",
     "comlink": "^4.4.2",
     "curlconverter": "^4.10.1",
+    "dexie": "^4.0.11",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
     "firebase": "^10.8.1",
