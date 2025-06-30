@@ -95,4 +95,7 @@ FEATURES.CONNECT_EXTENSION = "connect_extension";
 FEATURES.EDIT_LOCAL_FILE_PATH = "edit_local_file_path";
 FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
 
+FEATURES.COMPATIBLE_DESKTOP_APP = "compatible_desktop_app";
+FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
+
 export default FEATURES;

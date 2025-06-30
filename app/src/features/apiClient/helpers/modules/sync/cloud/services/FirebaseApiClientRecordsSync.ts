@@ -51,7 +51,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
-    return this.updateRecord({ id, name: newName }, id);
+    return this.updateRecord({ id, name: newName }, id, RQAPI.RecordType.COLLECTION);
   }
 
   async createRecord(record: Partial<RQAPI.Record>) {
@@ -66,9 +66,12 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
-  async updateRecord(record: Partial<RQAPI.Record>, id: string) {
+  async updateRecord(record: Partial<RQAPI.Record>, id: string, type?: RQAPI.Record['type']) {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
     sanitizedRecord.id = id;
+    if (type) {
+      sanitizedRecord.type = type;
+    }
     return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 

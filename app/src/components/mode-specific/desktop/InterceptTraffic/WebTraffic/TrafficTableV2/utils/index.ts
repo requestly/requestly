@@ -33,13 +33,13 @@ export const getAppNameFromUA = (userAgent: any) => {
 
   let appName;
   if (browser.name === "Electron") {
-    appName = userAgent.split(")")[2].split("/")[0];
+    appName = userAgent?.split(")")[2]?.split("/")[0];
   } else if (!browser.name) {
-    appName = userAgent.split("/")[0];
+    appName = userAgent?.split("/")[0];
   } else {
     appName = browser.name;
   }
-  return appName;
+  return appName ?? "Unknown App";
 };
 
 type STATUS_CODE_LABEL = "1xx" | "2xx" | "3xx" | "4xx" | "5xx";

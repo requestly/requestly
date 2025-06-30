@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { RQAPI, RequestContentType, RequestMethod } from "../../../../types";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
 import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
@@ -52,6 +52,7 @@ import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiCl
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -100,12 +101,11 @@ const APIClientView: React.FC<Props> = ({
   const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    apiClientWorkloadManager,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+
+  const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
+
   const environmentManager = useEnvironmentManager();
   const {
     getVariablesWithPrecedence,
@@ -610,10 +610,10 @@ const APIClientView: React.FC<Props> = ({
     setEntry(apiEntryDetails?.data);
   };
 
-  const handleOnUrlChange = (value: string) => {
+  const handleOnUrlChange = (value: string, params: KeyValuePair[]) => {
     setEntry((prevEntry) => ({
       ...prevEntry,
-      request: { ...prevEntry.request, url: value },
+      request: { ...prevEntry.request, url: value, queryParams: params },
     }));
     setUnsaved(true);
   };

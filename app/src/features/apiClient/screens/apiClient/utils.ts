@@ -139,10 +139,10 @@ export const supportsRequestBody = (method: RequestMethod): boolean => {
 
 export const generateKeyValuePairs = (data: string | Record<string, string | string[]> = {}): KeyValuePair[] => {
   const result: KeyValuePair[] = [];
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     data = {
-      [data]: '',
-    }
+      [data]: "",
+    };
   }
   for (const [key, rawValue] of Object.entries(data)) {
     const valueArray = Array.isArray(rawValue) ? rawValue : [rawValue];
@@ -152,7 +152,7 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
         value,
         id: Math.random(),
         isEnabled: true,
-      })
+      });
     }
   }
   return result;
@@ -516,11 +516,11 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
 
 export const filterOutChildrenRecords = (
   selectedRecords: Set<RQAPI.Record["id"]>,
-  childParentMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>,
+  childParentMap: Map<RQAPI.Record["id"], RQAPI.Record["id"]>,
   recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
 ) =>
   [...selectedRecords]
-    .filter((id) => !childParentMap[id] || !selectedRecords.has(childParentMap[id]))
+    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id)))
     .map((id) => recordsMap[id]);
 
 export const processRecordsForDuplication = (

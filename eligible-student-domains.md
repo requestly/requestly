@@ -6,6 +6,7 @@ The following domains are eligible for the student programme:
 {
   "eligible_domains": [
     ".edu",
+    ".ac.il",
     ".ac.in",
     ".ac.at",
     ".edu.au",
@@ -29,6 +30,7 @@ The following domains are eligible for the student programme:
     ".edu.es",
     ".edu.tr",
     ".edu.vn",
+    ".edu.pk",
     ".edu.pe",
     ".ac.id",
     "bennington.edu",
@@ -43,7 +45,12 @@ The following domains are eligible for the student programme:
     "duke.edu",
     "fau.de",
     "sch.gr",
+    "lhr.nu.edu.pk",
     "edu.co",
+    "bearsmail.org",
+    "utoronto.ca",
+    "yorku.ca",
+    "torontomu.ca",
     "hunterschools.org",
     "epitech.eu",
     "uni.au.dk",

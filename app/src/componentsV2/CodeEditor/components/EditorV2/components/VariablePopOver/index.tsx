@@ -18,12 +18,16 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   variables = {},
 }) => {
   const variableData = variables[hoveredVariable];
-  const popoverContent = variableData ? <VariableInfo
-    variable={{
-      name: hoveredVariable,
-      ...variableData,
-    }}
-  /> : <VariableNotFound />;
+  const popoverContent = variableData ? (
+    <VariableInfo
+      variable={{
+        name: hoveredVariable,
+        ...variableData,
+      }}
+    />
+  ) : (
+    <VariableNotFound />
+  );
 
   const popupStyle: React.CSSProperties = {
     position: "absolute",
@@ -34,21 +38,14 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   return (
     <Popover
-      content={
-        <div className="variable-info-body">
-          {popoverContent}
-        </div>
-      }
+      content={<div className="variable-info-body">{popoverContent}</div>}
       open
       destroyTooltipOnHide
       placement="bottom"
       showArrow={false}
       overlayClassName="variable-info-popover"
     >
-      <div
-        style={popupStyle}
-        className="variable-info-div"
-      ></div>
+      <div style={popupStyle} className="variable-info-div"></div>
     </Popover>
   );
 };
@@ -59,20 +56,20 @@ function getSanitizedVariableValue(variable: EnvironmentVariableValue) {
   const makeRenderable = (value: VariableValueType) => `${value}`;
 
   const sanitize = pipe(
-    (value: VariableValueType) => (value === undefined || value === null) ? '': value,
+    (value: VariableValueType) => (value === undefined || value === null ? "" : value),
     isSecret ? makeSecret : makeRenderable
   );
 
   return {
     syncValue: sanitize(variable.syncValue),
     localValue: sanitize(variable.localValue),
-  }
+  };
 }
 
 const VariableInfo: React.FC<{
   variable: { name: string } & EnvironmentVariableValue;
 }> = ({ variable }) => {
-  const { syncValue, localValue  } = getSanitizedVariableValue(variable);
+  const { syncValue, localValue } = getSanitizedVariableValue(variable);
   const infoFields = [
     { label: "Type", value: capitalize(variable.type) },
     { label: "Initial Value", value: syncValue },
