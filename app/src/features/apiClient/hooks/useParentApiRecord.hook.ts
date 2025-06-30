@@ -10,6 +10,6 @@ export function useParentApiRecord(id: string) {
 
   const parent = getParent(id);
   // Returning an empty object because hook cannot be conditionally returned for records that don't have a parent
-  const versionStateStore = parent ? getRecordStore(parent) : noopStore;
-  return useStore(versionStateStore);
+  const recordStore = parent ? getRecordStore(parent) : noopStore;
+  return useStore(recordStore);
 }
