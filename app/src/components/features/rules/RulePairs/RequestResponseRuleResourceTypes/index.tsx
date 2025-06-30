@@ -62,7 +62,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
         pairs: [{ ...updatedPair }],
       };
 
-      const responseValue = updatedRule?.pairs?.[pairIndex]?.response?.value;
+      const responseValue = updatedRule?.pairs?.[pairIndex]?.[ruleTypeKey]?.value;
 
       const isDefaultValue = ["", "{}", ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]].includes(responseValue);
 

@@ -83,8 +83,9 @@ const RulePairs = (props) => {
       return true;
     }
 
-    return props.mode === "edit";
-  }, [isRequestOrResponseRule, props.mode]);
+    const ruleTypeKey = isResponseRule ? "response" : "request";
+    return props.mode === "edit" || currentlySelectedRuleData?.pairs[0]?.[ruleTypeKey]?.resourceType !== "";
+  }, [currentlySelectedRuleData?.pairs, isRequestOrResponseRule, isResponseRule, props.mode]);
 
   const renderRuleResourceTypes = useMemo(() => {
     if (isResponseRule || (isRequestRule && isFeatureCompatible(FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD))) {
