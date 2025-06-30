@@ -9,6 +9,7 @@ import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
+import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
@@ -55,6 +56,7 @@ const RecordsProvider = ({
 
   return (
     <ApiRecordsStoreContext.Provider value={store}>
+      <AutoSyncLocalStoreDaemon records={data.records} />
       <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
     </ApiRecordsStoreContext.Provider>
   );
