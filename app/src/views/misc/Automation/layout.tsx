@@ -27,7 +27,8 @@ const AutomationTemplate = () => {
       {!isAutomation && (
         <div className="page-error-message-banner">
           <span>
-            <b>Note:</b> This page only works in automation mode. If you're using it manually, things will not work.
+            <b>Note:</b> This page only works in automation environment. If you're accessing it manually, it won’t
+            function as expected.
           </span>
         </div>
       )}

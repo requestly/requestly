@@ -122,12 +122,12 @@ export const AutomationTemplate: React.FC<AutomationTemplateProps> = ({
       <Card bordered className="card-dark">
         <Title level={4}>
           <InfoCircleOutlined style={{ marginRight: 8, color: "#3b82f6" }} />
-          How to Use with Requestly in Selenium Automation
+          How to Use Requestly in Automation
         </Title>
         <Paragraph>
-          This page helps you integrate Requestly with Selenium or other headless automation tools. By passing your API
-          key as a query parameter, you can automatically fetch and apply rules from your Requestly account in the
-          automation extension.
+          This guide shows you how to integrate Requestly with Selenium or other headless automation tools. By including
+          your API key as a query parameter, the automation extension can automatically fetch and apply rules from your
+          Requestly account.
         </Paragraph>
         <a href={LINKS.AUTOMATION_DOC}>Learn more about using Requestly in automated testing -&gt;</a>
       </Card>

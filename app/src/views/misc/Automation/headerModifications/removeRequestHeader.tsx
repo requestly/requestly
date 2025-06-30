@@ -30,7 +30,7 @@ export const RemoveRequestHeader: React.FC = () => {
         </>
       }
       queryParams={dataSource}
-      instructionText="This will create header modification for you and insert it into the requestly extension, append your header names like this:"
+      instructionText="This will create a Header Modification rule and add it to your Requestly extension. To use it, append your headers like this:"
       exampleCode="?<headerName1>&<headerName2>&<headerName3>"
       exampleData={[{ key: "<HEADER_NAME>", value: "NA" }]}
       isLoading={isLoading}
