@@ -6,6 +6,7 @@ The following domains are eligible for the student programme:
 {
   "eligible_domains": [
     ".edu",
+    ".ac.il",
     ".ac.in",
     ".ac.at",
     ".edu.au",
