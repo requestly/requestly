@@ -84,6 +84,17 @@
 
         .ant-tabs-tab + .ant-tabs-tab {
           margin: 0;
+          position: relative;
+
+          &::before {
+            content: "";
+            position: absolute;
+            left: -6px;
+            top: 20%;
+            bottom: 20%;
+            width: 1px;
+            background-color: var(--requestly-color-surface-2);
+          }
         }
 
         .ant-tabs-tab-active {
