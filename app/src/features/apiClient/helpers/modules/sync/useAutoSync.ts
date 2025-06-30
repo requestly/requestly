@@ -4,6 +4,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useGetApiClientSyncRepo } from "./useApiClientSyncRepo";
 import { useIsAllSynced, useSyncServiceStore } from "./localStore/store/hooks";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 
 export const useAutoSync = () => {
   const user = useSelector(getUserAuthDetails);
@@ -23,6 +24,7 @@ export const useAutoSync = () => {
       return;
     }
 
+    getTabServiceActions().resetTabs();
     syncAll(syncRepository);
   }, [uid, activeWorkspace?.id, syncRepository, isSynced, syncAll, resetSyncStatus]);
 };
