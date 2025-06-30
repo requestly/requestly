@@ -79,13 +79,28 @@ const RulePairs = (props) => {
   const isRequestOrResponseRule = isRequestRule || isResponseRule;
 
   const shouldShowCollapse = useMemo(() => {
-    if (!isRequestOrResponseRule) {
+    // Always show collapse for non-request/response rules or non-create mode
+    if (!isRequestOrResponseRule || props.mode !== "create") {
       return true;
     }
 
-    const ruleTypeKey = isResponseRule ? "response" : "request";
-    return props.mode === "edit" || currentlySelectedRuleData?.pairs[0]?.[ruleTypeKey]?.resourceType !== "";
-  }, [currentlySelectedRuleData?.pairs, isRequestOrResponseRule, isResponseRule, props.mode]);
+    // For response rules in create mode, check if resourceType is set
+    if (isResponseRule) {
+      return currentlySelectedRuleData?.pairs[0]?.response?.resourceType !== "";
+    }
+
+    // For request rules in create mode
+    if (isRequestRule) {
+      // If GraphQL payload feature is compatible, check if resourceType is set
+      if (isFeatureCompatible(FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD)) {
+        return currentlySelectedRuleData?.pairs[0]?.request?.resourceType !== "";
+      }
+      // Otherwise, always show collapse
+      return true;
+    }
+
+    return true;
+  }, [currentlySelectedRuleData?.pairs, isRequestOrResponseRule, isRequestRule, isResponseRule, props.mode]);
 
   const renderRuleResourceTypes = useMemo(() => {
     if (isResponseRule || (isRequestRule && isFeatureCompatible(FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD))) {
