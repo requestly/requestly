@@ -115,4 +115,8 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   async clear() {
     await this.queryService.clearAllRecords();
   }
+
+  async getIsAllCleared(): Promise<boolean> {
+    return this.queryService.getIsAllCleared();
+  }
 }

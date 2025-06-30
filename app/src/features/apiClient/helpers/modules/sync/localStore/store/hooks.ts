@@ -8,8 +8,14 @@ export const useSyncService = <T>(selector: (state: APIClientSyncService.State) 
 };
 
 export const useIsAllSynced = () => {
-  const [apisSyncStatus, envsSyncStatus] = useSyncService((state) => [state.apisSyncStatus, state.envsSyncStatus]);
+  const [apisSyncStatus, envsSyncStatus, isSyncStatusLoading] = useSyncService((state) => [
+    state.apisSyncStatus,
+    state.envsSyncStatus,
+    state.isSyncStatusLoading,
+  ]);
   return (
-    apisSyncStatus === APIClientSyncService.Status.SUCCESS && envsSyncStatus === APIClientSyncService.Status.SUCCESS
+    !isSyncStatusLoading &&
+    apisSyncStatus === APIClientSyncService.Status.SUCCESS &&
+    envsSyncStatus === APIClientSyncService.Status.SUCCESS
   );
 };

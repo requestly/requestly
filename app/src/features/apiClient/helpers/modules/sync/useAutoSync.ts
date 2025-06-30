@@ -7,6 +7,7 @@ import { useIsAllSynced, useSyncService } from "./localStore/store/hooks";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { WorkspaceType } from "features/workspaces/types";
 
+let i = 0;
 export const useAutoSync = () => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -28,6 +29,8 @@ export const useAutoSync = () => {
     if (isSynced) {
       return;
     }
+
+    console.log("Auto-syncing API Client data...", i++);
 
     getTabServiceActions().resetTabs();
     syncAll(syncRepository);

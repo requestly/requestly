@@ -54,4 +54,9 @@ export class ApiClientLocalDbQueryService<T> {
   async clearAllRecords() {
     return this.getTable().clear();
   }
+
+  async getIsAllCleared() {
+    const count = await this.getTable().count();
+    return count === 0;
+  }
 }
