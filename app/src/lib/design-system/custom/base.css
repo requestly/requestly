@@ -244,16 +244,6 @@
   font-size: var(--requestly-font-size-sm, 12px);
 }
 
-.success {
-  color: var(--success);
-}
-.danger {
-  color: var(--danger);
-}
-.warning {
-  color: var(--warning);
-}
-
 .relative {
   position: relative;
 }

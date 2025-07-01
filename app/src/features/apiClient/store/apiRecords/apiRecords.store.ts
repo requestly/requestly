@@ -42,9 +42,9 @@ export type ApiRecordsState = {
   getParentChain: (id: string) => string[];
 
   /**
-    * It updates the version of children of given entity. Meaning any component relying on version
-    * will get re-rendered.
-    */
+   * It updates the version of children of given entity. Meaning any component relying on version
+   * will get re-rendered.
+   */
   triggerUpdateForChildren: (id: string) => void;
 
   /**
