@@ -5,7 +5,7 @@ import { create, StoreApi } from "zustand";
 export type RecordState = {
   version: number;
   record: RQAPI.Record;
-  updateRecordState: (record: RQAPI.Record) => void;
+  updateRecordState: (patch: RQAPI.Record) => void;
   incrementVersion: () => void;
 };
 
@@ -98,9 +98,11 @@ export function createRecordStore(record: RQAPI.Record) {
   return create<RecordState>()((set, get) => ({
     version: 0,
     record,
-    updateRecordState: (record: RQAPI.Record) => {
+    updateRecordState: (patch: Partial<RQAPI.Record>) => {
+      const record = get().record;
+      const updatedRecord = { ...record, ...patch } as RQAPI.Record;
       set({
-        record,
+        record: updatedRecord,
         version: get().version + 1,
       });
     },
@@ -203,26 +205,26 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       get().getRecordStore(record.id).getState().updateRecordState(record);
     },
 
-    updateRecord(record) {
-      const updatedRecords = get().apiClientRecords.map((r) => (r.id === record.id ? { ...r, ...record } : r));
+    updateRecord(patch) {
+      const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
       get().refresh(updatedRecords);
-      get().getRecordStore(record.id).getState().updateRecordState(record);
-      get().triggerUpdateForChildren(record.id);
+      get().getRecordStore(patch.id).getState().updateRecordState(patch);
+      get().triggerUpdateForChildren(patch.id);
     },
 
-    updateRecords(records) {
-      const recordMap = new Map(records.map((r) => [r.id, r]));
+    updateRecords(patches) {
+      const patchMap = new Map(patches.map((r) => [r.id, r]));
       const updatedRecords = get().apiClientRecords.map((r) =>
-        recordMap.has(r.id) ? { ...r, ...recordMap.get(r.id) } : r
+        patchMap.has(r.id) ? { ...r, ...patchMap.get(r.id) } : r
       );
       get().refresh(updatedRecords);
 
       const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
-      for (const record of records) {
-        const updatedRecord = updatedRecordMap.get(record.id);
+      for (const patch of patches) {
+        const updatedRecord = updatedRecordMap.get(patch.id);
         if (updatedRecord) {
-          get().getRecordStore(record.id).getState().updateRecordState(updatedRecord);
-          get().triggerUpdateForChildren(record.id);
+          get().getRecordStore(patch.id).getState().updateRecordState(updatedRecord);
+          get().triggerUpdateForChildren(patch.id);
         }
       }
     },
