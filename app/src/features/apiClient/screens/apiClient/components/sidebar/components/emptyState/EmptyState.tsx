@@ -14,7 +14,7 @@ export interface EmptyStateProps {
   analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
-  onNewRecordClick: () => Promise<void>;
+  onNewRecordClick?: () => Promise<void>;
   onNewRequestClick?: () => Promise<void>;
 }
 
