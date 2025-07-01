@@ -383,7 +383,7 @@ export const CollectionRow: React.FC<Props> = ({
                       disabled={isReadOnly}
                       analyticEventSource="collection_row"
                       message="No requests created yet"
-                      newRecordBtnText="New request"
+                      newRecordBtnText="New collection"
                       onNewClick={onNewClick}
                     />
                   ) : (
