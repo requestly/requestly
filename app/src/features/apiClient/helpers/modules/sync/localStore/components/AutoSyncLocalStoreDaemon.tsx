@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { WorkspaceType } from "features/workspaces/types";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useApiClientRepository } from "../../useApiClientSyncRepo";
@@ -24,8 +23,6 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
     if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
       return;
     }
-
-    getTabServiceActions().resetTabs();
 
     (async () => {
       const syncedRecordIds: string[] = [...getAllRecords().map((r) => r.id)];
