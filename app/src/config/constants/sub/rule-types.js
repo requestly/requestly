@@ -264,7 +264,7 @@ const RULE_TYPES_CONFIG = {
       request: {
         type: "static",
         value: "",
-        statusCode: "",
+        resourceType: "",
       },
     },
     ALLOW_ADD_PAIR: false,

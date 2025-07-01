@@ -1,19 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Collapse, Popconfirm, Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
-import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
+import { getCurrentlySelectedRuleData } from "../../../../store/selectors";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
-import ResponseRuleResourceTypes from "./ResponseRuleResourceTypes";
+import ResponseRuleResourceTypes from "./RequestResponseRuleResourceTypes";
 import { rulePairComponents } from "./Pairs";
 import { useRBAC } from "features/rbac";
 import "./RulePairs.css";
+import { RuleType } from "@requestly/shared/types/entities/rules";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("http_rule", "create");
 
@@ -72,33 +74,64 @@ const RulePairs = (props) => {
   const activePanelKey = getFirstFiveRuleIds(currentlySelectedRuleData?.pairs);
   const rulePairHeading = currentlySelectedRuleData?.ruleType === "Script" ? "If page" : "If request";
 
+  const isRequestRule = currentlySelectedRuleData?.ruleType === RuleType.REQUEST;
+  const isResponseRule = currentlySelectedRuleData?.ruleType === RuleType.RESPONSE;
+  const isRequestOrResponseRule = isRequestRule || isResponseRule;
+
+  const shouldShowCollapse = useMemo(() => {
+    // Always show collapse for non-request/response rules or non-create mode
+    if (!isRequestOrResponseRule || props.mode !== "create") {
+      return true;
+    }
+
+    // For response rules in create mode, check if resourceType is set
+    if (isResponseRule) {
+      return currentlySelectedRuleData?.pairs[0]?.response?.resourceType !== "";
+    }
+
+    // For request rules in create mode
+    if (isRequestRule) {
+      // If GraphQL payload feature is compatible, check if resourceType is set
+      if (isFeatureCompatible(FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD)) {
+        return currentlySelectedRuleData?.pairs[0]?.request?.resourceType !== "";
+      }
+      // Otherwise, always show collapse
+      return true;
+    }
+
+    return true;
+  }, [currentlySelectedRuleData?.pairs, isRequestOrResponseRule, isRequestRule, isResponseRule, props.mode]);
+
+  const renderRuleResourceTypes = useMemo(() => {
+    if (isResponseRule || (isRequestRule && isFeatureCompatible(FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD))) {
+      return <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />;
+    }
+    return null;
+  }, [isInputDisabled, isRequestRule, isResponseRule, props.currentlySelectedRuleConfig]);
+
   return (
     <>
-      {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
-        <ResponseRuleResourceTypes disabled={isInputDisabled} ruleDetails={props.currentlySelectedRuleConfig} />
-      ) : null}
-
-      {props.currentlySelectedRuleConfig.TYPE !== "Response" || responseRuleResourceType !== "" ? (
+      {renderRuleResourceTypes}
+      {shouldShowCollapse && (
         <Collapse
           className="rule-pairs-collapse"
           defaultActiveKey={activePanelKey}
           key={activePanelKey[activePanelKey.length - 1]}
           expandIconPosition="end"
         >
-          {currentlySelectedRuleData?.pairs?.length > 0
-            ? currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
-                <Collapse.Panel
-                  key={pair.id || pairIndex}
-                  className="rule-pairs-panel"
-                  extra={deleteButton(pairIndex)}
-                  header={<span className="panel-header">{rulePairHeading}</span>}
-                >
-                  {getPairMarkup(pair, pairIndex)}
-                </Collapse.Panel>
-              ))
-            : null}
+          {currentlySelectedRuleData?.pairs?.length > 0 &&
+            currentlySelectedRuleData.pairs.map((pair, pairIndex) => (
+              <Collapse.Panel
+                key={pair.id || pairIndex}
+                className="rule-pairs-panel"
+                extra={deleteButton(pairIndex)}
+                header={<span className="panel-header">{rulePairHeading}</span>}
+              >
+                {getPairMarkup(pair, pairIndex)}
+              </Collapse.Panel>
+            ))}
         </Collapse>
-      ) : null}
+      )}
     </>
   );
 };
