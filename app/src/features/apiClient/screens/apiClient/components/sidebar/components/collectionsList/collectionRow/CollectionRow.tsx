@@ -379,13 +379,12 @@ export const CollectionRow: React.FC<Props> = ({
                 <>
                   {record.data.children?.length === 0 ? (
                     <ApiRecordEmptyState
+                      record={record}
                       disabled={isReadOnly}
                       analyticEventSource="collection_row"
                       message="No requests created yet"
-                      newRecordBtnText="New request"
-                      onNewRecordClick={() =>
-                        onNewClick("collection_list_empty_state", RQAPI.RecordType.API, record.id)
-                      }
+                      newRecordBtnText="New collection"
+                      onNewClick={onNewClick}
                     />
                   ) : (
                     record.data.children?.map((apiRecord) => {
