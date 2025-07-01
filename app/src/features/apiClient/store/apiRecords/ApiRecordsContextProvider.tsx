@@ -56,7 +56,7 @@ const RecordsProvider = ({
 
   return (
     <ApiRecordsStoreContext.Provider value={store}>
-      <AutoSyncLocalStoreDaemon records={data.records} />
+      <AutoSyncLocalStoreDaemon/>
       <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
     </ApiRecordsStoreContext.Provider>
   );

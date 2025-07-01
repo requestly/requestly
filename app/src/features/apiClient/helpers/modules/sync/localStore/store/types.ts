@@ -1,11 +1,10 @@
 import { EnvironmentData } from "backend/environment/types";
 import { ApiClientRepositoryInterface } from "../../interfaces";
-import { ApiClientLocalStoreRepository } from "../ApiClientLocalStorageRepository";
 import { RQAPI } from "features/apiClient/types";
 
 export namespace APIClientSyncService {
   export enum Status {
-    IDLE = "idle",
+    PENDING_RECORDS = "PENDING_RECORDS",
     ERROR = "error",
     SYNCING = "syncing",
     SUCCESS = "success",
@@ -15,24 +14,16 @@ export namespace APIClientSyncService {
     apisSyncStatus: Status;
     envsSyncStatus: Status;
 
-    resetSyncStatus: () => void;
-    getSyncStatus: () => Promise<Status[]>;
-    getEntitySyncStatus: (
-      respository:
-        | ApiClientLocalStoreRepository["apiClientRecordsRepository"]
-        | ApiClientLocalStoreRepository["environmentVariablesRepository"]
-    ) => Promise<Status>;
+    updateSyncStatus: () => Promise<{ apisSyncStatus: APIClientSyncService.Status; envsSyncStatus: APIClientSyncService.Status; }>;
 
-    syncApis: (syncRepository: ApiClientRepositoryInterface) => Promise<{ success: boolean; data: RQAPI.Record[] }>;
-    syncEnvs: (syncRepository: ApiClientRepositoryInterface) => Promise<{ success: boolean; data: EnvironmentData[] }>;
+    syncApis: (syncRepository: ApiClientRepositoryInterface, recordsToSkip?: Set<string>) => Promise<{ success: true; data: RQAPI.Record[] } | {success: false, error: string}>;
+    syncEnvs: (syncRepository: ApiClientRepositoryInterface, recordsToSkip?: Set<string>) => Promise<{ success: true; data: EnvironmentData[] } | {success: false, error: string}>;
     syncAll: (
-      syncRepository: ApiClientRepositoryInterface
+      syncRepository: ApiClientRepositoryInterface,
+      recordsToSkip?: Set<string>,
     ) => Promise<{
-      success: boolean;
-      data: {
-        records: RQAPI.Record[];
-        environments: EnvironmentData[];
-      };
+      records: RQAPI.Record[];
+      environments: EnvironmentData[];
     }>;
   };
 }
