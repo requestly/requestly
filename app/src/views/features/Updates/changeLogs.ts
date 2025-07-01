@@ -9,6 +9,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.7.1",
+    logs: [
+      "[ENGG-3727] fix(style): update font size as per design system",
+      "[ENGG-3788] show all response headers for API client requests",
+      "[ENGG-3798] feat: graphql payload targeting in modify request rule",
+    ],
+  },
+  {
     version: "25.6.11",
     logs: [
       "[ENGG-3742] fix: [extension] include credentials in API requests",
