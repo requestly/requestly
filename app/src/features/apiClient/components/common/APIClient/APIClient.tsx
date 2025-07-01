@@ -23,13 +23,12 @@ import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecor
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
-  openInModal?: boolean;
   isModalOpen?: boolean;
   onModalClose?: () => void;
   modalTitle?: string;
 }
 
-export const APIClientModal: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
+export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
@@ -87,38 +86,30 @@ export const APIClientModal: React.FC<Props> = ({ request, openInModal, isModalO
     return null;
   }
 
-  return openInModal ? (
-    <ApiRecordsProvider>
-      <Modal
-        className="api-client-modal"
-        centered
-        title={<BetaBadge text={modalTitle || "API Client"} />}
-        open={isModalOpen}
-        onCancel={onModalClose}
-        footer={null}
-        width="70%"
-        destroyOnClose
-      >
-        <WindowsAndLinuxGatedHoc featureName="API client">
-          <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-            {user.loggedIn ? (
+  return (
+    <Modal
+      className="api-client-modal"
+      centered
+      title={<BetaBadge text={modalTitle || "API Client"} />}
+      open={isModalOpen}
+      onCancel={onModalClose}
+      footer={null}
+      width="70%"
+      destroyOnClose
+    >
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+          {user.loggedIn ? (
+            <ApiRecordsProvider>
               <QueryParamsProvider entry={apiEntry}>
-                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
               </QueryParamsProvider>
-            ) : (
-              <ApiClientLoggedOutView />
-            )}
-          </BottomSheetProvider>
-        </WindowsAndLinuxGatedHoc>
-      </Modal>
-    </ApiRecordsProvider>
-  ) : (
-    <ApiRecordsProvider>
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-        <QueryParamsProvider entry={apiEntry}>
-          <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
-        </QueryParamsProvider>
-      </BottomSheetProvider>
-    </ApiRecordsProvider>
+            </ApiRecordsProvider>
+          ) : (
+            <ApiClientLoggedOutView />
+          )}
+        </BottomSheetProvider>
+      </WindowsAndLinuxGatedHoc>
+    </Modal>
   );
 };
