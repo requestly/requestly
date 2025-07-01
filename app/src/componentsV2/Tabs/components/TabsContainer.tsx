@@ -22,6 +22,7 @@ export const TabsContainer: React.FC = () => {
     closeTabById,
     incrementVersion,
     resetPreviewTab,
+    consumeIgnorePath,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.activeTabSource,
@@ -32,6 +33,7 @@ export const TabsContainer: React.FC = () => {
     state.closeTabById,
     state.incrementVersion,
     state.resetPreviewTab,
+    state.consumeIgnorePath,
   ]);
 
   const { setUrl } = useSetUrl();
@@ -57,12 +59,13 @@ export const TabsContainer: React.FC = () => {
 
   const matchedTabSource = useMatchedTabSource();
   useEffect(() => {
-    if (!matchedTabSource) {
+    const ignorePath = consumeIgnorePath();
+    if (!matchedTabSource || ignorePath) {
       return;
     }
 
     openTab(matchedTabSource.sourceFactory(matchedTabSource.matchedPath));
-  }, [matchedTabSource, openTab]);
+  }, [matchedTabSource, openTab, consumeIgnorePath]);
 
   const isInitialLoadRef = useRef(true);
   useEffect(() => {
