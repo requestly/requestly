@@ -8,7 +8,7 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { useApiClientRepository } from "../../useApiClientSyncRepo";
 import { useSyncService } from "../store/hooks";
 
-export const AutoSyncLocalStoreDaemon: React.FC<{ }> = () => {
+export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const uid = user?.details?.profile?.uid;
@@ -28,12 +28,12 @@ export const AutoSyncLocalStoreDaemon: React.FC<{ }> = () => {
     getTabServiceActions().resetTabs();
 
     (async () => {
-      const syncedRecordIds: string[] = [...getAllRecords().map(r => r.id)];
-      const syncedEnvironmentIds: string[] = [...getAllRecords().map(r => r.id)];
+      const syncedRecordIds: string[] = [...getAllRecords().map((r) => r.id)];
+      const syncedEnvironmentIds: string[] = [...getAllRecords().map((r) => r.id)];
       const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
       if (environments.success) {
-        const envs = Object.values(environments.data.environments);
-        const envIds = envs.map(e => e.id);
+        const envs = Object.values(environments.data.environments ?? {});
+        const envIds = envs.map((e) => e.id);
         syncedEnvironmentIds.push(...envIds);
       }
       const recordsToSkip = new Set(syncedRecordIds);
