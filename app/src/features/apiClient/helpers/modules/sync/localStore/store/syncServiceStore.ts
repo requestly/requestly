@@ -29,9 +29,8 @@ export const createSyncServiceStore = () => {
       const [apisSyncStatus, envsSyncStatus] = await getSyncStatus();
       set({ apisSyncStatus, envsSyncStatus });
       return {
-        apisSyncStatus,
-        envsSyncStatus,
-      };
+        apisSyncStatus, envsSyncStatus
+      }
     },
 
     async syncApis(syncRepository, recordsToSkip) {
@@ -43,18 +42,13 @@ export const createSyncServiceStore = () => {
 
       try {
         const result = await localStoreRepository.apiClientRecordsRepository.getAllRecords();
-        const recordsToSync = recordsToSkip
-          ? result.data.records.filter((r) => !recordsToSkip.has(r.id))
-          : result.data.records;
-
-        const syncedRecords = await syncRepository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(
-          recordsToSync
-        );
+        const recordsToSync = recordsToSkip ? result.data.records.filter(r => !recordsToSkip.has(r.id)) : result.data.records;
+        await syncRepository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(recordsToSync);
 
         await localStoreRepository.apiClientRecordsRepository.clear();
         set({ apisSyncStatus: APIClientSyncService.Status.SUCCESS });
 
-        return { success: true, data: syncedRecords.data.records };
+        return { success: true, data: result.data.records };
       } catch (error) {
         Sentry.captureException(error);
         set({ apisSyncStatus: APIClientSyncService.Status.ERROR });
@@ -72,8 +66,10 @@ export const createSyncServiceStore = () => {
       try {
         const result = await localStoreRepository.environmentVariablesRepository.getAllEnvironments();
         const rawEnvironments = Object.values(result.data.environments);
-        const recordsToSync = recordsToSkip ? rawEnvironments.filter((r) => !recordsToSkip.has(r.id)) : rawEnvironments;
-        const environments = await syncRepository.environmentVariablesRepository.createEnvironments(recordsToSync);
+        const recordsToSync = recordsToSkip ? rawEnvironments.filter(r => !recordsToSkip.has(r.id)) : rawEnvironments;
+        const environments = await syncRepository.environmentVariablesRepository.createEnvironments(
+          recordsToSync
+        );
 
         await localStoreRepository.environmentVariablesRepository.clear();
         set({ envsSyncStatus: APIClientSyncService.Status.SUCCESS });
@@ -100,12 +96,9 @@ export const createSyncServiceStore = () => {
         };
       }
 
-      const [apis, envs] = await Promise.allSettled([
-        syncApis(syncRepository, recordsToSkip),
-        syncEnvs(syncRepository, recordsToSkip),
-      ]);
-      const records = apis.status === "fulfilled" ? (apis.value.success ? apis.value.data : []) : [];
-      const environments = envs.status === "fulfilled" ? (envs.value.success ? envs.value.data : []) : [];
+      const [apis, envs] = await Promise.allSettled([syncApis(syncRepository, recordsToSkip), syncEnvs(syncRepository, recordsToSkip)]);
+      const records = apis.status === "fulfilled" ? apis.value.success ? apis.value.data : [] : [];
+      const environments = envs.status === "fulfilled" ? envs.value.success ? envs.value.data: [] : [];
 
       return {
         records,
