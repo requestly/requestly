@@ -204,21 +204,27 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
     },
 
     updateRecord(record) {
-      const updatedRecords = get().apiClientRecords.map((r) => (r.id === record.id ? record : r));
+      const updatedRecords = get().apiClientRecords.map((r) => (r.id === record.id ? { ...r, ...record } : r));
       get().refresh(updatedRecords);
       get().getRecordStore(record.id).getState().updateRecordState(record);
       get().triggerUpdateForChildren(record.id);
     },
 
     updateRecords(records) {
-      const currentRecordsMap = new Map(get().apiClientRecords.map((r) => [r.id, r]));
-      for (const record of records) {
-        currentRecordsMap.set(record.id, record);
-        get().getRecordStore(record.id).getState().updateRecordState(record);
-        get().triggerUpdateForChildren(record.id);
-      }
-      const updatedRecords = Array.from(currentRecordsMap.values());
+      const recordMap = new Map(records.map((r) => [r.id, r]));
+      const updatedRecords = get().apiClientRecords.map((r) =>
+        recordMap.has(r.id) ? { ...r, ...recordMap.get(r.id) } : r
+      );
       get().refresh(updatedRecords);
+
+      const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
+      for (const record of records) {
+        const updatedRecord = updatedRecordMap.get(record.id);
+        if (updatedRecord) {
+          get().getRecordStore(record.id).getState().updateRecordState(updatedRecord);
+          get().triggerUpdateForChildren(record.id);
+        }
+      }
     },
 
     deleteRecords(recordIds) {
