@@ -122,6 +122,10 @@ export class ApiClientExecutor {
   }
 
   private preValidateRequest() {
+    const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
+      return INVALID_KEY_CHARACTERS.test(header.key);
+    });
+
     if (!this.entryDetails.request.url) {
       throw new Error("Request URL cannot be empty!");
     }
@@ -140,6 +144,9 @@ export class ApiClientExecutor {
 
     if (!isUrlProtocolValid(this.entryDetails.request.url)) {
       throw new Error(`Invalid URL protocol: ${this.entryDetails.request.url}`);
+    }
+    if (invalidHeader) {
+      throw new Error(`Invalid header key: "${invalidHeader.key}". Header keys must not contain special characters.`);
     }
   }
 
@@ -236,13 +243,6 @@ export class ApiClientExecutor {
 
     try {
       this.preValidateRequest();
-      const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
-        return INVALID_KEY_CHARACTERS.test(header.key);
-      });
-
-      if (invalidHeader) {
-        throw new Error(`Invalid header key: "${invalidHeader.key}". Header keys must not contain special characters.`);
-      }
     } catch (err) {
       const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.PRE_VALIDATION);
       return {
