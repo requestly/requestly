@@ -21,7 +21,7 @@ export const MyBillingTeamDetails: React.FC = () => {
   const showBillingActions = useMemo(
     () =>
       !(
-        [PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(
+        [PlanType.STUDENT, PlanType.SIGNUP_TRIAL, PlanType.APPSUMO].includes(
           billingTeamDetails?.subscriptionDetails?.rqSubscriptionType
         ) || billingTeamDetails?.subscriptionDetails?.plan === "lite"
       ) ||
