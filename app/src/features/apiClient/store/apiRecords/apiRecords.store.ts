@@ -1,13 +1,25 @@
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
 
-export type VersionState = {
+export type RecordState = {
   version: number;
-
-  increment: () => void;
+  record: RQAPI.Record;
+  updateRecordState: (patch: RQAPI.Record) => void;
+  incrementVersion: () => void;
 };
 
 export type ApiRecordsState = {
+  /**
+   * This is the list of records that are currently in the apiClientRecords.
+   */
+  apiClientRecords: RQAPI.Record[];
+
+  /**
+   * This is the list of records that have errors.
+   */
+  erroredRecords: ErroredRecord[];
+
   /**
    * This maintains a map of child <-> parent. This field is mostly for internal use,
    * since it will get updated when any relationship changes. So try not to use this
@@ -25,36 +37,45 @@ export type ApiRecordsState = {
    * This maintains a version for each entity. This version is kept in a zunstand store so that
    * one can use it as a hook and react whenever it changes.
    */
-  indexStore: Map<string, StoreApi<VersionState>>;
-
-  /**
-   * This is a queue that is pulled and acted upon on refresh. We do this circumvent race conditions
-   * where data is yet to be synced via refresh but a `triggerUpdate` has been called.
-   */
-  triggerUpdateQueue: Set<string>;
+  indexStore: Map<string, StoreApi<RecordState>>;
 
   getParentChain: (id: string) => string[];
+
+  /**
+   * It updates the version of children of given entity. Meaning any component relying on version
+   * will get re-rendered.
+   */
+  triggerUpdateForChildren: (id: string) => void;
 
   /**
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.Record[]) => void;
+  setErroredRecords: (erroredRecords: ErroredRecord[]) => void;
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
-  getVersionStore: (id: string) => StoreApi<VersionState>;
+  getRecordStore: (id: string) => StoreApi<RecordState>;
 
-  /**
-   * It updates the version store of given entity. Meaning any component relying on this
-   * will get re-rendered.
-   */
-  triggerUpdate: (id: string) => void;
-
-  /**
-   * This is used to queue the triggers than apply them immediately. These will be picked up
-   * on next refresh.
-   */
-  queueTriggerUpdate: (id: string) => void;
+  addNewRecord: (record: RQAPI.Record) => void;
+  updateRecord: (record: RQAPI.Record) => void;
+  updateRecords: (records: RQAPI.Record[]) => void;
+  deleteRecords: (recordIds: string[]) => void;
 };
+
+function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
+  const result: string[] = [];
+  const getImmediateChildren = (id: string) =>
+    Array.from(childParentMap.entries())
+      .filter(([_, v]) => v === id)
+      .map(([k, _]) => k);
+  const parseRecursively = (id: string) => {
+    const children = getImmediateChildren(id);
+    result.push(...children);
+    children.forEach(parseRecursively);
+  };
+  parseRecursively(initalId);
+  return result;
+}
 
 function parseRecords(records: RQAPI.Record[]) {
   const childParentMap = new Map<string, string>();
@@ -73,63 +94,54 @@ function parseRecords(records: RQAPI.Record[]) {
   };
 }
 
-function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
-  const result: string[] = [];
-  const getImmediateChildren = (id: string) =>
-    Array.from(childParentMap.entries())
-      .filter(([_, v]) => v === id)
-      .map(([k, _]) => k);
-  const parseRecursively = (id: string) => {
-    const children = getImmediateChildren(id);
-    result.push(...children);
-    children.forEach(parseRecursively);
-  };
-  parseRecursively(initalId);
-  return result;
-}
-
-function incrementVersion(store: StoreApi<VersionState>) {
-  store.getState().increment();
-}
-
-export function createVersionStore() {
-  return create<VersionState>()((set, get) => ({
+export function createRecordStore(record: RQAPI.Record) {
+  return create<RecordState>()((set, get) => ({
     version: 0,
-
-    increment() {
-      const { version } = get();
+    record,
+    updateRecordState: (patch: Partial<RQAPI.Record>) => {
+      const record = get().record;
+      const updatedRecord = { ...record, ...patch } as RQAPI.Record;
       set({
-        version: version + 1,
+        record: updatedRecord,
+        version: get().version + 1,
+      });
+    },
+
+    incrementVersion: () => {
+      set({
+        version: get().version + 1,
       });
     },
   }));
 }
 
 function createIndexStore(index: ApiRecordsState["index"]) {
-  const indexStore = new Map<string, StoreApi<VersionState>>();
+  const indexStore = new Map<string, StoreApi<RecordState>>();
   for (const [id] of index) {
-    indexStore.set(id, createVersionStore());
+    indexStore.set(id, createRecordStore(index.get(id)));
   }
 
   return indexStore;
 }
 
-export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
-  const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(intialRecords);
+export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] }) => {
+  const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
   return create<ApiRecordsState>()((set, get) => ({
+    apiClientRecords: initialRecords.records,
+    erroredRecords: initialRecords.erroredRecords,
+
     childParentMap: initialChildParentMap,
     index: initialIndex,
-    triggerUpdateQueue: new Set(),
 
     indexStore: createIndexStore(initialIndex),
 
     refresh(records) {
-      const { indexStore, triggerUpdateQueue, triggerUpdate } = get();
+      const { indexStore } = get();
       const { childParentMap, index } = parseRecords(records);
 
       for (const [id] of index) {
         if (!indexStore.has(id)) {
-          indexStore.set(id, createVersionStore());
+          indexStore.set(id, createRecordStore(index.get(id)));
         }
       }
 
@@ -140,17 +152,16 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       }
 
       set({
+        apiClientRecords: records,
         childParentMap,
         index,
         indexStore,
       });
+    },
 
-      for (const pendingId of triggerUpdateQueue) {
-        triggerUpdate(pendingId);
-      }
-
+    setErroredRecords(erroredRecords) {
       set({
-        triggerUpdateQueue: new Set(),
+        erroredRecords,
       });
     },
 
@@ -179,30 +190,52 @@ export const createApiRecordsStore = (intialRecords: RQAPI.Record[]) => {
       return result;
     },
 
-    triggerUpdate(id) {
+    triggerUpdateForChildren(id) {
       const { childParentMap, indexStore } = get();
-      incrementVersion(indexStore.get(id));
-
       const allChildren = getAllChildren(id, childParentMap);
 
       allChildren.forEach((cid) => {
-        incrementVersion(indexStore.get(cid));
+        indexStore.get(cid).getState().incrementVersion();
       });
     },
 
-    getVersionStore(id) {
+    addNewRecord(record) {
+      const updatedRecords = [...get().apiClientRecords, record];
+      get().refresh(updatedRecords);
+      get().getRecordStore(record.id).getState().updateRecordState(record);
+    },
+
+    updateRecord(patch) {
+      const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? {...r, ...patch} : r));
+      get().refresh(updatedRecords);
+      get().getRecordStore(patch.id).getState().updateRecordState(patch);
+      get().triggerUpdateForChildren(patch.id);
+    },
+
+    updateRecords(patches) {
+      const patchMap = new Map(patches.map((r) => [r.id, r]));
+      const updatedRecords = get().apiClientRecords.map((r) => (patchMap.has(r.id) ? {...r, ...patchMap.get(r.id)} : r));
+      get().refresh(updatedRecords);
+
+      const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
+      for (const patch of patches) {
+        const updatedRecord = updatedRecordMap.get(patch.id);
+        if (updatedRecord) {
+          get().getRecordStore(patch.id).getState().updateRecordState(updatedRecord);
+          get().triggerUpdateForChildren(patch.id);
+        }
+      }
+    },
+
+    deleteRecords(recordIds) {
+      const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
+      get().refresh(updatedRecords);
+    },
+
+    getRecordStore(id) {
       const { indexStore } = get();
-      const versionStateStore = indexStore.get(id);
-      return versionStateStore;
-    },
-
-    queueTriggerUpdate(id) {
-      const { triggerUpdateQueue } = get();
-      triggerUpdateQueue.add(id);
-
-      set({
-        triggerUpdateQueue,
-      });
+      const recordStore = indexStore.get(id);
+      return recordStore;
     },
   }));
 };

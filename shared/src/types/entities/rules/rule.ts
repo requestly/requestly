@@ -149,13 +149,19 @@ export namespace RequestRule {
     request: {
       type: BodyType;
       value: string;
-      statusCode?: string;
+      resourceType?: ResourceType;
     };
   }
 
   enum BodyType {
     CODE = "code",
     STATIC = "static",
+  }
+
+  export enum ResourceType {
+    UNKNOWN = "unknown",
+    REST_API = "restApi",
+    GRAPHQL_API = "graphqlApi",
   }
 }
 

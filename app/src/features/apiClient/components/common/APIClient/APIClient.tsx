@@ -19,16 +19,16 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
-  openInModal?: boolean;
   isModalOpen?: boolean;
   onModalClose?: () => void;
   modalTitle?: string;
 }
 
-const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
+export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
@@ -86,7 +86,7 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
     return null;
   }
 
-  return openInModal ? (
+  return (
     <Modal
       className="api-client-modal"
       centered
@@ -100,22 +100,16 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
           {user.loggedIn ? (
-            <QueryParamsProvider entry={apiEntry}>
-              <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
-            </QueryParamsProvider>
+            <ApiRecordsProvider>
+              <QueryParamsProvider entry={apiEntry}>
+                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
+              </QueryParamsProvider>
+            </ApiRecordsProvider>
           ) : (
             <ApiClientLoggedOutView />
           )}
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>
-  ) : (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-      <QueryParamsProvider entry={apiEntry}>
-        <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
-      </QueryParamsProvider>
-    </BottomSheetProvider>
   );
 };
-
-export default APIClient;

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { Input, Row, Col, Tooltip, Select, Button } from "antd";
@@ -17,6 +17,7 @@ import "./GraphqlRequestPayload.css";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { ResponseRule } from "@requestly/shared/types/entities/rules";
+import getObjectValue from "../../../Filters/actions/getObjectValue";
 
 const {
   SOURCE_REQUEST_PAYLOAD,
@@ -37,19 +38,33 @@ interface RequestPayload {
 
 interface GraphqlRequestPayloadProps {
   pairIndex: number;
-  gqlOperationFilter: RequestPayload;
-  setGqlOperationFilter: React.Dispatch<React.SetStateAction<RequestPayload>>;
   isInputDisabled?: boolean;
 }
 
-const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
-  pairIndex,
-  gqlOperationFilter,
-  setGqlOperationFilter,
-  isInputDisabled = false,
-}) => {
+const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({ pairIndex, isInputDisabled = false }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+
+  const currentPayloadKey = useMemo(
+    () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_KEY),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
+  const currentPayloadOperator = useMemo(
+    () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_OPERATOR),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
+  const currentPayloadValue = useMemo(
+    () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
+  const [gqlOperationFilter, setGqlOperationFilter] = useState<RequestPayload>({
+    key: currentPayloadKey,
+    operator: currentPayloadOperator,
+    value: currentPayloadValue,
+  });
 
   useEffect(() => {
     if (gqlOperationFilter.key && gqlOperationFilter.value) {
