@@ -82,7 +82,7 @@ export const createSyncServiceStore = () => {
       }
     },
 
-    async syncAll(syncRepository, recordsToSkip) {
+    async syncAll(syncRepository, skip) {
       const { syncApis, syncEnvs, updateSyncStatus } = get();
       const { apisSyncStatus, envsSyncStatus } = await updateSyncStatus();
 
@@ -96,7 +96,7 @@ export const createSyncServiceStore = () => {
         };
       }
 
-      const [apis, envs] = await Promise.allSettled([syncApis(syncRepository, recordsToSkip), syncEnvs(syncRepository, recordsToSkip)]);
+      const [apis, envs] = await Promise.allSettled([syncApis(syncRepository, skip?.recordsToSkip), syncEnvs(syncRepository, skip?.environmentsToSkip)]);
       const records = apis.status === "fulfilled" ? apis.value.success ? apis.value.data : [] : [];
       const environments = envs.status === "fulfilled" ? envs.value.success ? envs.value.data: [] : [];
 

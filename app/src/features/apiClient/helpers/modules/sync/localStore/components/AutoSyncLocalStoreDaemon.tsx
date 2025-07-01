@@ -28,8 +28,21 @@ export const AutoSyncLocalStoreDaemon: React.FC<{ }> = () => {
     getTabServiceActions().resetTabs();
 
     (async () => {
-      const recordsToSkip = new Set(getAllRecords().map(r => r.id));
-      const syncedRecords = await syncAll(syncRepository, recordsToSkip);
+      const syncedRecordIds: string[] = [...getAllRecords().map(r => r.id)];
+      const syncedEnvironmentIds: string[] = [...getAllRecords().map(r => r.id)];
+      const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
+      if (environments.success) {
+        const envs = Object.values(environments.data.environments);
+        const envIds = envs.map(e => e.id);
+        syncedEnvironmentIds.push(...envIds);
+      }
+      const recordsToSkip = new Set(syncedRecordIds);
+      const environmentsToSkip = new Set(syncedEnvironmentIds);
+      const syncedRecords = await syncAll(syncRepository, {
+        recordsToSkip,
+        environmentsToSkip,
+      });
+
       if (syncedRecords.records.length) {
         addNewRecords(syncedRecords.records);
       }

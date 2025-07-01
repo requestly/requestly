@@ -20,7 +20,10 @@ export namespace APIClientSyncService {
     syncEnvs: (syncRepository: ApiClientRepositoryInterface, recordsToSkip?: Set<string>) => Promise<{ success: true; data: EnvironmentData[] } | {success: false, error: string}>;
     syncAll: (
       syncRepository: ApiClientRepositoryInterface,
-      recordsToSkip?: Set<string>,
+      skip?: {
+        recordsToSkip: Set<string>,
+        environmentsToSkip: Set<string>,
+      },
     ) => Promise<{
       records: RQAPI.Record[];
       environments: EnvironmentData[];
