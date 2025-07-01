@@ -5,14 +5,14 @@ import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { WorkspaceType } from "features/workspaces/types";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useGetApiClientSyncRepo } from "../../useApiClientSyncRepo";
+import { useApiClientRepository } from "../../useApiClientSyncRepo";
 import { useSyncService } from "../store/hooks";
 
 export const AutoSyncLocalStoreDaemon: React.FC<{ }> = () => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const uid = user?.details?.profile?.uid;
-  const syncRepository = useGetApiClientSyncRepo();
+  const syncRepository = useApiClientRepository();
   const [syncAll] = useSyncService((state) => [state.syncAll]);
   const [addNewRecords, getAllRecords] = useAPIRecords((state) => [state.addNewRecords, state.getAllRecords]);
 
