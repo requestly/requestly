@@ -23,13 +23,12 @@ import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecor
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
-  openInModal?: boolean;
   isModalOpen?: boolean;
   onModalClose?: () => void;
   modalTitle?: string;
 }
 
-export const APIClientModal: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
+export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
@@ -103,7 +102,7 @@ export const APIClientModal: React.FC<Props> = ({ request, openInModal, isModalO
           {user.loggedIn ? (
             <ApiRecordsProvider>
               <QueryParamsProvider entry={apiEntry}>
-                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
               </QueryParamsProvider>
             </ApiRecordsProvider>
           ) : (
