@@ -197,7 +197,6 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
 
           {isApiClientModalOpen && (
             <APIClientModal
-              openInModal
               modalTitle="Replay request"
               request={selectedRequestData}
               isModalOpen={isApiClientModalOpen}
