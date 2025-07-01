@@ -96,9 +96,9 @@ const App: React.FC = () => {
                 <CommandBar />
                 <UpdateDialog />
                 <GlobalModals />
-                <BlockScreenHoc>
-                  <Outlet />
-                </BlockScreenHoc>
+                {/* <BlockScreenHoc> */}
+                <Outlet />
+                {/* </BlockScreenHoc> */}
               </div>
             </LazyMotion>
           </ConfigProvider>
