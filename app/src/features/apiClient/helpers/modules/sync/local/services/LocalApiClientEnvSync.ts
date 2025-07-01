@@ -84,6 +84,17 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return null;
   }
 
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    const promises = environments.map(async (env) => {
+      return this.createNonGlobalEnvironment(env.name).then((envData) => {
+        this.updateEnvironment(envData.id, { variables: env.variables });
+        return envData;
+      });
+    });
+
+    return Promise.all(promises);
+  }
+
   async deleteEnvironment(envId: string) {
     const service = await this.getAdapter();
     const result = await service.deleteRecord(envId);

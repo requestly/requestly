@@ -2,23 +2,25 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import { StoreApi, useStore } from "zustand";
 import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
 import { useShallow } from "zustand/shallow";
-import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { ApiClientProvider } from "features/apiClient/contexts/apiClient";
 import { notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
+import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
-  const { apiClientRecordsRepository } = useGetApiClientSyncRepo();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const [data, setData] = useState(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     apiClientRecordsRepository.getAllRecords().then((result) => {
       if (!result.success) {
         notification.error({
@@ -29,6 +31,14 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       setData(result.data);
+    }).catch(e => {
+      notification.error({
+        message: "Could not fetch records!",
+        description: e.message,
+        placement: "bottomRight",
+      });
+      return;
+    }).finally(() => {
       setIsLoading(false);
     });
   }, [apiClientRecordsRepository]);
@@ -55,6 +65,7 @@ const RecordsProvider = ({
 
   return (
     <ApiRecordsStoreContext.Provider value={store}>
+      <AutoSyncLocalStoreDaemon/>
       <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
     </ApiRecordsStoreContext.Provider>
   );

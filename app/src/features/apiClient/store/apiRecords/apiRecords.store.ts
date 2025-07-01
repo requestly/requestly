@@ -55,8 +55,10 @@ export type ApiRecordsState = {
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState>;
+  getAllRecords: () => RQAPI.Record[];
 
   addNewRecord: (record: RQAPI.Record) => void;
+  addNewRecords: (records: RQAPI.Record[]) => void;
   updateRecord: (record: RQAPI.Record) => void;
   updateRecords: (records: RQAPI.Record[]) => void;
   deleteRecords: (recordIds: string[]) => void;
@@ -202,7 +204,11 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
     addNewRecord(record) {
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
-      get().getRecordStore(record.id).getState().updateRecordState(record);
+    },
+
+    addNewRecords(records) {
+      const updatedRecords = [...get().apiClientRecords, ...records];
+      get().refresh(updatedRecords);
     },
 
     updateRecord(patch) {
@@ -238,6 +244,10 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       const { indexStore } = get();
       const recordStore = indexStore.get(id);
       return recordStore;
+    },
+
+    getAllRecords() {
+      return get().apiClientRecords;
     },
   }));
 };
