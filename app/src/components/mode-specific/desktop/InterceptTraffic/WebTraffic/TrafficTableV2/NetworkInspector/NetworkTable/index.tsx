@@ -273,7 +273,6 @@ const NetworkTable: React.FC<Props> = ({
       {isReplayRequestModalOpen ? (
         <APIClientModal
           request={apiClientRequestForSelectedRowRef.current}
-          openInModal
           isModalOpen
           onModalClose={onReplayRequestModalClose}
         />

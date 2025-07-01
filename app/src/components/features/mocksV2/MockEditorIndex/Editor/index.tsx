@@ -494,7 +494,6 @@ const MockEditor: React.FC<Props> = ({
             {!isNew ? (
               <APIClientModal
                 request={apiRequest}
-                openInModal
                 modalTitle="Test mock endpoint"
                 isModalOpen={isTestModalOpen}
                 onModalClose={() => setIsTestModalOpen(false)}
@@ -540,7 +539,6 @@ const MockEditor: React.FC<Props> = ({
           {!isNew ? (
             <APIClientModal
               request={apiRequest}
-              openInModal
               modalTitle="Test mock endpoint"
               isModalOpen={isTestModalOpen}
               onModalClose={() => setIsTestModalOpen(false)}
