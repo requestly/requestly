@@ -66,7 +66,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
-  async updateRecord(record: Partial<RQAPI.Record>, id: string, type?: RQAPI.Record['type']) {
+  async updateRecord(record: Partial<RQAPI.Record>, id: string, type?: RQAPI.Record["type"]) {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
     sanitizedRecord.id = id;
     if (type) {
