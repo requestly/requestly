@@ -63,9 +63,6 @@
   /* Old Color scheme but new tokens */
   --danger: var(--red-red-500);
   --success: var(--green-green-500);
-  --error: var(--red-red-500);
-  --info: var(--blue-blue-500);
-  --neutral: var(--neutrals-gray-500);
   --text-default: var(--neutrals-white);
   --text-subtle: #bbbbbb;
   --warning: #e09400;
