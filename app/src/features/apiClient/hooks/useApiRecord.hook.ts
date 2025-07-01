@@ -6,7 +6,10 @@ export const useApiRecord = (id: string) => {
   const [getRecordStore] = useAPIRecords((s) => [s.getRecordStore]);
 
   const recordStore = getRecordStore(id);
-  const record = useStore(recordStore, useShallow(s => s.record));
+  const record = useStore(
+    recordStore,
+    useShallow((s) => s.record)
+  );
 
   return record;
 };
