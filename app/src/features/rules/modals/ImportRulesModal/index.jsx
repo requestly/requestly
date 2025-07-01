@@ -26,6 +26,7 @@ import {
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
   trackResourceOverrideSettingsImportStarted,
+  trackHeaderEditorSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
@@ -387,6 +388,22 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                   >
                     <img src={ResourceOverrideIcon} width={11} height={10} alt="Resource override icon" />
                     &nbsp; Import from Resource Override
+                  </RQButton>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromHeaderEditorModalOpen(true);
+                      trackHeaderEditorSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
+                    <img
+                      src="/assets/img/brandLogos/header-editor-custom-icon.png"
+                      width={11}
+                      height={10}
+                      alt="Header Editor icon"
+                    />
+                    &nbsp; Import from Header Editor
                   </RQButton>
                 </div>
               ) : null}
