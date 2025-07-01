@@ -353,7 +353,7 @@ class RuleMatcher {
     this.removeHeader(headers, newHeader.name);
     this.addHeader(headers, newHeader);
   }
-  // Copied from browser-extension - responseRuleHandler.js
+  // Copied from browser-extension - browser-extension/mv3/src/common/ruleMatcher.ts
   static isRequestPayloadFilterApplicable(requestData, requestPayloadFilter) {
     if (!requestPayloadFilter) return true;
     if (typeof requestPayloadFilter === "object" && Object.keys(requestPayloadFilter).length === 0) return true;
@@ -364,11 +364,29 @@ class RuleMatcher {
 
     requestPayloadFilter = requestPayloadFilter || {};
     const targettedKey = requestPayloadFilter?.key;
+    const targettedValue = requestPayloadFilter?.value;
 
     // tagettedKey is the json path e.g. a.b.0.c
-    if (targettedKey) {
+    if (targettedKey && typeof targettedValue !== "undefined") {
       const valueInRequestData = traverseJsonByPath(requestData, targettedKey);
-      return valueInRequestData == requestPayloadFilter?.value;
+      const operator = requestPayloadFilter?.operator;
+
+      let valueInRequestDataString = "";
+
+      if (typeof valueInRequestData === "object") {
+        // Do nothing for now.
+        // valueInRequestDataString = JSON.stringify(valueInRequestData);
+      } else {
+        valueInRequestDataString = valueInRequestData?.toString();
+      }
+
+      if (!operator || operator === "Equals") {
+        return valueInRequestDataString === targettedValue;
+      }
+
+      if (operator === "Contains") {
+        return valueInRequestDataString?.includes(targettedValue);
+      }
     }
 
     return false;
