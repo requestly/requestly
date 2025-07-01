@@ -6,9 +6,9 @@ import { Timestamp } from "firebase/firestore";
 import { EnvironmentVariables } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
-import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
+import { v4 as uuidv4 } from "uuid";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -105,8 +105,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async updateRecord(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+    const existingRecord = await this.getApiRecord(id);
 
     const updatedRecord = {
+      ...existingRecord.data,
       ...sanitizedRecord,
       id,
       updatedTs: Timestamp.now().toMillis(),
@@ -282,5 +284,9 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async clear() {
     await this.queryService.clearAllRecords();
+  }
+
+  async getIsAllCleared(): Promise<boolean> {
+    return this.queryService.getIsAllCleared();
   }
 }

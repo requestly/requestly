@@ -10,6 +10,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
   }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
+  createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]>;
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
     environmentId: string,
@@ -65,6 +66,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): Promise<{ success: boolean; message?: string }>;
   duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
   moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
+  batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise;
 }
 
 export interface ApiClientRepositoryInterface {

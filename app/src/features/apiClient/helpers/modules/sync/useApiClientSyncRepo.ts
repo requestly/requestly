@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -33,3 +33,13 @@ export const useGetApiClientSyncRepo = () => {
 
   return repository;
 };
+
+export const ApiClientRepositoryContext = createContext<ApiClientRepositoryInterface>(null);
+export function useApiClientRepository() {
+  const repository = useContext(ApiClientRepositoryContext);
+  if (!repository) {
+    throw new Error("No API Client repository in context!");
+  }
+
+  return repository;
+}

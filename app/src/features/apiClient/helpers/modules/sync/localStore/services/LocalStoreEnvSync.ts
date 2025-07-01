@@ -56,6 +56,15 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     return newEnvironment;
   }
 
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    const environmentsWithIds = environments.map((env) => {
+      return { ...env, id: env.id || this.getNewId() };
+    });
+
+    await this.queryService.createBulkRecords(environmentsWithIds);
+    return environmentsWithIds;
+  }
+
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
     await this.queryService.deleteRecord(envId);
     return { success: true };
@@ -105,5 +114,9 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
   async clear() {
     await this.queryService.clearAllRecords();
+  }
+
+  async getIsAllCleared(): Promise<boolean> {
+    return this.queryService.getIsAllCleared();
   }
 }

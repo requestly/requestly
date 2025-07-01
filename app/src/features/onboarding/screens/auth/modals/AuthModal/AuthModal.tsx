@@ -15,6 +15,7 @@ import { redirectToOAuthUrl } from "utils/RedirectionUtils";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import { setRedirectMetadata } from "features/onboarding/utils";
 import "./authModal.scss";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -62,6 +63,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     if (isWebAppSignup && isOpen) {
       setRedirectMetadata({ source: eventSource, redirectURL });
       redirectToOAuthUrl(navigate);
+      getTabServiceActions().resetTabs(true);
     }
   }, [isWebAppSignup, isOpen, eventSource, navigate, redirectURL]);
 
