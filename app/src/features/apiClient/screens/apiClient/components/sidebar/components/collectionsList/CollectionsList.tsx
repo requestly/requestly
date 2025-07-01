@@ -280,18 +280,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {apiClientRecords.length > 0 && (
-        <div className="api-client-sidebar-header-container">
-          <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
-          {showSelection && (
-            <ActionMenu
-              isAllRecordsSelected={isAllRecordsSelected}
-              toggleSelection={toggleSelection}
-              bulkActionsHandler={bulkActionHandler}
-            />
-          )}
-        </div>
-      )}
+      <div className="api-client-sidebar-header-container">
+        <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+        {showSelection && (
+          <ActionMenu
+            isAllRecordsSelected={isAllRecordsSelected}
+            toggleSelection={toggleSelection}
+            bulkActionsHandler={bulkActionHandler}
+          />
+        )}
+      </div>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
           {updatedRecords.count > 0 ? (
@@ -336,15 +334,13 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
             </div>
           ) : (
-            <div style={{ paddingTop: 6 }}>
-              <ApiRecordEmptyState
-                disabled={!isValidPermission}
-                newRecordBtnText="New collection"
-                message={searchValue ? "No collection or request found" : "No collections created yet"}
-                onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION)}
-                analyticEventSource="collection_list_empty_state"
-              />
-            </div>
+            <ApiRecordEmptyState
+              disabled={!isValidPermission}
+              newRecordBtnText="Create a collection"
+              message={searchValue ? "No collection or request found" : "No content available yet"}
+              onNewClick={onNewClick}
+              analyticEventSource="collection_list_empty_state"
+            />
           )}
         </div>
       </div>

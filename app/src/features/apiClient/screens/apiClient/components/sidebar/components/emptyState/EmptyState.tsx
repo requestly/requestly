@@ -7,13 +7,15 @@ import { globalActions } from "store/slices/global/slice";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environment/types";
 import "./emptyState.scss";
+import Link from "antd/lib/typography/Link";
 
 export interface EmptyStateProps {
   disabled?: boolean;
   analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
-  onNewRecordClick: () => Promise<void>;
+  onNewRecordClick?: () => Promise<void>;
+  onNewRequestClick?: () => Promise<void>;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -22,6 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   newRecordBtnText,
   onNewRecordClick,
   analyticEventSource = "collections_empty_state",
+  onNewRequestClick,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -58,18 +61,21 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <div className="empty-state-container">
-      <img
-        className="empty-card-image"
-        width={40}
-        height={40}
-        src={"/assets/media/apiClient/empty-card.svg"}
-        alt="Empty collection list"
-      />
       <div className="empty-message">{message}</div>
-
-      <RQButton disabled={disabled} loading={isLoading} size="small" className="new-record-btn" onClick={handleOnClick}>
-        {newRecordBtnText}
-      </RQButton>
+      <div className="empty-state-actions">
+        <RQButton
+          disabled={disabled}
+          loading={isLoading}
+          size="small"
+          className="new-record-btn"
+          onClick={handleOnClick}
+        >
+          {newRecordBtnText}
+        </RQButton>
+        <Link className="new-request-link" onClick={onNewRequestClick}>
+          Add a request
+        </Link>
+      </div>
     </div>
   );
 };
