@@ -15,7 +15,7 @@ export const ExampleCollectionsDaemon: React.FC<{ store: UseBoundStore<StoreApi<
   const uid = user?.details?.profile?.uid;
   const syncRepository = useApiClientRepository();
   const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
-  const { forceRefreshEnvironments } = useEnvironmentManager();
+  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
 
   useEffect(() => {
     if (uid) {
