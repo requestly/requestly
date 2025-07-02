@@ -184,6 +184,8 @@ export const GA_EVENTS = {
     SUBSCRIPTION_STATUS: "subscription_status",
     IS_ACCELERATOR_AVAILABLE: "is_accelerator_available",
     BROWSERSTACK_ID: "browserstack_id",
+
+    CUSTOM_DEVICE_ID: "deviceId",
   },
   VALUES: {
     PAYPAL: "paypal",
