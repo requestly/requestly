@@ -138,6 +138,11 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
 
       if (params.scope === VariableScope.ENVIRONMENT || params.scope === VariableScope.GLOBAL) {
         const env = await this.queryService.getRecord(params.id);
+
+        if (!env) {
+          return;
+        }
+
         params.callback(env);
         return;
       }
