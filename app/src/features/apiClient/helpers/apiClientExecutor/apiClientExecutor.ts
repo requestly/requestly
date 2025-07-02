@@ -20,7 +20,6 @@ import { isEmpty } from "lodash";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 
 type InternalFunctions = {
   getEnvironmentVariables(): EnvironmentVariables;
@@ -122,8 +121,9 @@ export class ApiClientExecutor {
   }
 
   private preValidateRequest() {
+    const INVALID_CHARACTERS = /[^!#$%&'*+\-.0-9A-Z^_a-z|~]/;
     const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
-      return INVALID_KEY_CHARACTERS.test(header.key);
+      return INVALID_CHARACTERS.test(header.key);
     });
 
     if (!this.entryDetails.request.url) {
