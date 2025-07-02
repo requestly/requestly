@@ -63,14 +63,14 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
   useEffect(() => {
-    const handleIdUpdates = () => {
+    const handleUpdates = () => {
       setExpandedRecordIds(sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []));
     };
 
-    window.addEventListener("expandedRecordIdsUpdated", handleIdUpdates);
+    window.addEventListener("expandedRecordIdsUpdated", handleUpdates);
 
     return () => {
-      window.removeEventListener("expandedRecordIdsUpdated", handleIdUpdates);
+      window.removeEventListener("expandedRecordIdsUpdated", handleUpdates);
     };
   }, []);
 
