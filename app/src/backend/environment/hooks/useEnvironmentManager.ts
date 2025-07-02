@@ -370,11 +370,12 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       requestCollectionId: string = ""
     ): {
       renderedVariables?: Record<string, unknown>;
-      renderedEntryDetails: T;
+      result: T;
     } => {
       const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
+
       const { renderedTemplate, renderedVariables } = renderTemplate(template, variablesWithPrecedence);
-      return { renderedVariables, renderedEntryDetails: renderedTemplate };
+      return { renderedVariables, result: renderedTemplate };
     },
     [getVariablesWithPrecedence]
   );
