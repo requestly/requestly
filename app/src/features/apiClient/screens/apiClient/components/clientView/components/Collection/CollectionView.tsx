@@ -11,7 +11,6 @@ import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 
 const TAB_KEYS = {

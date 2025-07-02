@@ -26,7 +26,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [pendingVariables, setPendingVariables] = useState(
-    mapToEnvironmentArray(collectionVariables[collection.id]?.variables) || []
+    mapToEnvironmentArray(collectionVariables[collection.id]?.variables ?? collection.data?.variables) || []
   );
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -47,10 +47,10 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
       handleSetPendingVariables(
         pendingVariablesRef.current.length > 0
           ? pendingVariablesRef.current
-          : mapToEnvironmentArray(collectionVariables[collection.id]?.variables)
+          : mapToEnvironmentArray(collectionVariables[collection.id]?.variables ?? collection.data.variables)
       );
     }
-  }, [collection.id, collectionVariables, isSaving]);
+  }, [collection.id, collection?.data?.variables, collectionVariables, isSaving]);
 
   const handleSetPendingVariables = (variables: EnvironmentVariableTableRow[]) => {
     setPendingVariables(variables);

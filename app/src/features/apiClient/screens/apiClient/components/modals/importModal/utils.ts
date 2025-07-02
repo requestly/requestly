@@ -3,7 +3,7 @@ import { isApiCollection, isApiRequest } from "../../../utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
-interface ImportData {
+export interface RQImportData {
   records: (RQAPI.ApiRecord | RQAPI.CollectionRecord)[];
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
 }
@@ -14,7 +14,7 @@ interface UpdatedApiRecordsToImport {
 }
 
 export const processRqImportData = (
-  fileContent: ImportData,
+  fileContent: RQImportData,
   uid: string | null,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): {

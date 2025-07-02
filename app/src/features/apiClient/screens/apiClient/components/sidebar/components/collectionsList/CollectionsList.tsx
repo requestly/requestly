@@ -30,6 +30,7 @@ import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -61,6 +62,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
   const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
+
+  useEffect(() => {
+    const handleUpdates = () => {
+      setExpandedRecordIds(sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []));
+    };
+
+    window.addEventListener(EXPANDED_RECORD_IDS_UPDATED, handleUpdates);
+    return () => {
+      window.removeEventListener(EXPANDED_RECORD_IDS_UPDATED, handleUpdates);
+    };
+  }, []);
 
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
