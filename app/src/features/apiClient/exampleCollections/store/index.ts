@@ -13,6 +13,8 @@ import exampleCollections from "../examples/collections.json";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { sessionStorage } from "utils/sessionStorage";
 
+export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
+
 enum ExampleCollectionsImportStatus {
   NOT_IMPORTED = "NOT_IMPORTED",
   IMPORTING = "IMPORTING",
@@ -104,7 +106,7 @@ const createExampleCollectionsStore = () => {
                 ...collectionsToBeExpanded,
               ]);
 
-              const event = new CustomEvent("expandedRecordIdsUpdated");
+              const event = new CustomEvent(EXPANDED_RECORD_IDS_UPDATED);
               window.dispatchEvent(event);
 
               recordsStore.getState().addNewRecords(recordsResult.data.records);
