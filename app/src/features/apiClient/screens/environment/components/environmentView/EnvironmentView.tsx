@@ -101,7 +101,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
               isSaving={isSaving}
               exportActions={{
                 showExport: isGlobalEnvironment(envId),
-                enableExport: !isEmpty(variables),
+                enableExport: !isEmpty(variables) && !hasUnsavedChanges,
                 onExportClick: () => setIsExportModalOpen(true),
               }}
             />
