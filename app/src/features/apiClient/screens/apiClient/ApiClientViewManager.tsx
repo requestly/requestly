@@ -5,6 +5,7 @@ import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSh
 import { RQAPI } from "features/apiClient/types";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { Result } from "antd";
 import "./apiClient.scss";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 
@@ -40,6 +41,10 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     },
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
   );
+
+  if (!selectedEntryDetails.data) {
+    return <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />;
+  }
 
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
