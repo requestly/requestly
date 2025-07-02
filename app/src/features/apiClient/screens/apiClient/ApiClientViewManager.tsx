@@ -5,7 +5,9 @@ import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSh
 import { RQAPI } from "features/apiClient/types";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { Result } from "antd";
 import "./apiClient.scss";
+import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 
 type BaseProps = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
@@ -40,17 +42,23 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]
   );
 
+  if (!selectedEntryDetails.data) {
+    return <Result status="error" title="Request not found" subTitle="Oops! Looks like this request doesn't exist." />;
+  }
+
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
       <div className="api-client-container-content">
-        <QueryParamsProvider entry={selectedEntryDetails?.data as RQAPI.Entry}>
-          <APIClientView
-            apiEntryDetails={selectedEntryDetails as RQAPI.ApiRecord}
-            notifyApiRequestFinished={handleAppRequestFinished}
-            onSaveCallback={onSaveCallback}
-            isCreateMode={isCreateMode}
-          />
-        </QueryParamsProvider>
+        <AutogenerateProvider>
+          <QueryParamsProvider entry={selectedEntryDetails?.data as RQAPI.Entry}>
+            <APIClientView
+              apiEntryDetails={selectedEntryDetails as RQAPI.ApiRecord}
+              notifyApiRequestFinished={handleAppRequestFinished}
+              onSaveCallback={onSaveCallback}
+              isCreateMode={isCreateMode}
+            />
+          </QueryParamsProvider>
+        </AutogenerateProvider>
       </div>
     </BottomSheetProvider>
   );

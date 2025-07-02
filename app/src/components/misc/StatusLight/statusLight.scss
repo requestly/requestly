@@ -1,23 +1,23 @@
 .status-light {
   display: inline-block;
 
-  &.success::before {
-    background-color: #268e6c;
+  &.success {
+    color: var(--requestly-color-success-600);
   }
 
-  &.warning::before {
-    background-color: #d3a403;
+  &.warning {
+    color: var(--requestly-color-warning-300);
   }
 
-  &.error::before {
-    background-color: #ff4d4f;
+  &.error {
+    color: var(--requestly-color-error-400);
   }
 
-  &.info::before {
-    background-color: #157af3;
+  &.info {
+    color: var(--requestly-color-primary-soft);
   }
 
-  &.neutral::before {
-    background-color: #5c5c5c;
+  &.neutral {
+    color: var(--requestly-color-neutral-600);
   }
 }
