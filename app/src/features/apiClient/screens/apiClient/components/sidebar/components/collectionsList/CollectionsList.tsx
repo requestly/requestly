@@ -62,6 +62,18 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
+  useEffect(() => {
+    const handleIdUpdates = () => {
+      setExpandedRecordIds(sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []));
+    };
+
+    window.addEventListener("expandedRecordIdsUpdated", handleIdUpdates);
+
+    return () => {
+      window.removeEventListener("expandedRecordIdsUpdated", handleIdUpdates);
+    };
+  }, []);
+
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);

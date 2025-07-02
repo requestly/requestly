@@ -6,10 +6,12 @@ import {
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
-import { EXAMPLE_COLLECTIONS } from "./constants";
 import * as Sentry from "@sentry/react";
 import { markAsSample } from "./utils";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
+import exampleCollections from "../examples/collections.json";
+import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
+import { sessionStorage } from "utils/sessionStorage";
 
 enum ExampleCollectionsImportStatus {
   NOT_IMPORTED = "NOT_IMPORTED",
@@ -63,8 +65,7 @@ const createExampleCollectionsStore = () => {
           set({ importStatus: ExampleCollectionsImportStatus.IMPORTING });
 
           try {
-            //
-            const dataToImport: RQImportData = { records: EXAMPLE_COLLECTIONS.collections.records, environments: [] };
+            const dataToImport = ({ records: exampleCollections.records, environments: [] } as unknown) as RQImportData;
             const proccessedData = processRqImportData(dataToImport, ownerId, respository.apiClientRecordsRepository);
 
             proccessedData.apis = proccessedData.apis.map((api) => {
@@ -95,6 +96,17 @@ const createExampleCollectionsStore = () => {
             );
 
             if (recordsResult.success && recordsResult.data.records.length > 0) {
+              const collectionsToBeExpanded = proccessedData.collections.map((collection) => collection.id);
+              const existingExpandedCollections = sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []);
+
+              sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [
+                ...existingExpandedCollections,
+                ...collectionsToBeExpanded,
+              ]);
+
+              const event = new CustomEvent("expandedRecordIdsUpdated");
+              window.dispatchEvent(event);
+
               recordsStore.getState().addNewRecords(recordsResult.data.records);
             }
 
@@ -104,7 +116,6 @@ const createExampleCollectionsStore = () => {
 
             set({ importStatus: ExampleCollectionsImportStatus.IMPORTED });
           } catch (error) {
-            console.error("Failed to import example collections!", error);
             Sentry.captureException(error);
             set({ importStatus: ExampleCollectionsImportStatus.FAILED });
           }
