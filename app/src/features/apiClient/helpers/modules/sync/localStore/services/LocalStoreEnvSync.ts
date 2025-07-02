@@ -1,9 +1,11 @@
-import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
+import { EnvironmentData, EnvironmentMap, VariableScope } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
+import dbProvider from "../helpers/ApiClientLocalDbProvider";
+import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -108,7 +110,39 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     return "global";
   }
 
-  attachListener(params: EnvironmentListenerParams): () => any {
+  /**
+   * We are esseentially mocking the Firebase listener here.
+   * This is done for all variable scopes because firebase listener
+   * also does this, which is bad. Ideally a repo should not be making
+   * raw queries to the database, let alone other databases.
+   *
+   * FIXME: This is a temporary solution to mock the Firebase listener.
+   */
+  attachListener(params: EnvironmentListenerParams): () => void {
+    const dbInstance = dbProvider.get(this.meta);
+
+    (async () => {
+      if (params.scope === VariableScope.COLLECTION) {
+        const collections = await dbInstance.db
+          .table<RQAPI.CollectionRecord>(ApiClientLocalDbTable.APIS)
+          .toArray((records) => records.filter((r) => r.type === RQAPI.RecordType.COLLECTION));
+
+        const collectionVariableMap: CollectionVariableMap = {};
+        collections.forEach((record) => {
+          collectionVariableMap[record.id] = { variables: record.data.variables || {} };
+        });
+
+        params.callback(collectionVariableMap);
+        return;
+      }
+
+      if (params.scope === VariableScope.ENVIRONMENT || params.scope === VariableScope.GLOBAL) {
+        const env = await this.queryService.getRecord(params.id);
+        params.callback(env);
+        return;
+      }
+    })();
+
     return () => {};
   }
 
