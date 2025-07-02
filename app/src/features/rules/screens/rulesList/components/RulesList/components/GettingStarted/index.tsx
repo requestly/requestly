@@ -22,6 +22,7 @@ import {
   trackUploadRulesButtonClicked,
   trackCharlesSettingsImportStarted,
   trackResourceOverrideSettingsImportStarted,
+  trackHeaderEditorSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
 import { MdOutlineAddCircleOutline } from "@react-icons/all-files/md/MdOutlineAddCircleOutline";
@@ -43,6 +44,7 @@ import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceO
 import { ImporterType } from "components/Home/types";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { getLinkWithMetadata } from "modules/analytics/metadata";
+import { HeaderEditorImporterModal } from "../ImporterComponents/HeaderEditorImporter/HeaderEditorImporterModal";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -58,6 +60,7 @@ export const GettingStarted: React.FC = () => {
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
   const [isImportResourceOverrideRulesModalActive, setIsImportResourceOverrideRulesModalActive] = useState(false);
+  const [isImportHeaderEditorRulesModalActive, setIsImportHeaderEditorRulesModalActive] = useState(false);
   const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
   const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
@@ -78,6 +81,9 @@ export const GettingStarted: React.FC = () => {
   };
   const toggleImportResourceOverrideRulesModal = () => {
     setIsImportResourceOverrideRulesModalActive((prev) => !prev);
+  };
+  const toggleImportHeaderEditorRulesModal = () => {
+    setIsImportHeaderEditorRulesModalActive((prev) => !prev);
   };
 
   const handleNewRuleClick = (source: string) => {
@@ -102,6 +108,9 @@ export const GettingStarted: React.FC = () => {
           break;
         case ImporterType.RESOURCE_OVERRIDE:
           toggleImportResourceOverrideRulesModal();
+          break;
+        case ImporterType.HEADER_EDITOR:
+          toggleImportHeaderEditorRulesModal();
           break;
         case ImporterType.REQUESTLY:
           handleUploadRulesClick();
@@ -329,6 +338,26 @@ export const GettingStarted: React.FC = () => {
                 >
                   Import from Resource Override
                 </Button>
+                <Button
+                  type="link"
+                  className="link-btn"
+                  icon={
+                    <img
+                      src="/assets/img/brandLogos/header-editor-custom-icon.png"
+                      width={11}
+                      height={10}
+                      alt="Header Editor icon"
+                      className="anticon"
+                    />
+                  }
+                  onClick={() => {
+                    toggleImportHeaderEditorRulesModal();
+                    trackRulesEmptyStateClicked("import_header_editor");
+                    trackHeaderEditorSettingsImportStarted(SOURCE.GETTING_STARTED);
+                  }}
+                >
+                  Import from Header Editor
+                </Button>
               </div>
             ) : null}
           </div>
@@ -374,6 +403,14 @@ export const GettingStarted: React.FC = () => {
         <ImportFromResourceOverrideModal
           isOpen={isImportResourceOverrideRulesModalActive}
           toggle={toggleImportResourceOverrideRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+
+      {isImportHeaderEditorRulesModalActive ? (
+        <HeaderEditorImporterModal
+          isOpen={isImportHeaderEditorRulesModalActive}
+          toggle={toggleImportHeaderEditorRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}

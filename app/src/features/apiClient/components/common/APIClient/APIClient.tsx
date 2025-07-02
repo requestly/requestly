@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
