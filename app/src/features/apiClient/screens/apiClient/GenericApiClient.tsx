@@ -4,6 +4,7 @@ import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSh
 import { RQAPI } from "features/apiClient/types";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import "./apiClient.scss";
+import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 
 type Props = {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -17,14 +18,16 @@ export const GenericApiClient: React.FC<Props> = React.memo(
     return (
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
         <div className="api-client-container-content">
-          <QueryParamsProvider entry={apiEntryDetails?.data}>
-            <APIClientView
-              apiEntryDetails={apiEntryDetails}
-              notifyApiRequestFinished={handleAppRequestFinished}
-              onSaveCallback={onSaveCallback}
-              isCreateMode={isCreateMode}
-            />
-          </QueryParamsProvider>
+          <AutogenerateProvider>
+            <QueryParamsProvider entry={apiEntryDetails?.data}>
+              <APIClientView
+                apiEntryDetails={apiEntryDetails}
+                notifyApiRequestFinished={handleAppRequestFinished}
+                onSaveCallback={onSaveCallback}
+                isCreateMode={isCreateMode}
+              />
+            </QueryParamsProvider>
+          </AutogenerateProvider>
         </div>
       </BottomSheetProvider>
     );
