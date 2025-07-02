@@ -102,9 +102,11 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
           {user.loggedIn ? (
             <ApiRecordsProvider>
-              <QueryParamsProvider entry={apiEntry}>
-                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
-              </QueryParamsProvider>
+              <AutogenerateProvider>
+                <QueryParamsProvider entry={apiEntry}>
+                  <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
+                </QueryParamsProvider>
+              </AutogenerateProvider>
             </ApiRecordsProvider>
           ) : (
             <ApiClientLoggedOutView />
