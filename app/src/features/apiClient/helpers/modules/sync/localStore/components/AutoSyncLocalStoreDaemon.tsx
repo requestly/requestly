@@ -27,17 +27,18 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
 
     (async () => {
       try {
-        toast.loading("Getting your local APIs...", 15 * 1000);
-        const syncedRecordIds: string[] = [...getAllRecords().map((r) => r.id)];
-        const syncedEnvironmentIds: string[] = [...getAllRecords().map((r) => r.id)];
+        const syncedEnvironmentIds: string[] = [];
         const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
         if (environments.success) {
           const envs = Object.values(environments.data.environments ?? {});
           const envIds = envs.map((e) => e.id);
           syncedEnvironmentIds.push(...envIds);
         }
+
+        const syncedRecordIds: string[] = getAllRecords().map((r) => r.id);
         const recordsToSkip = new Set(syncedRecordIds);
         const environmentsToSkip = new Set(syncedEnvironmentIds);
+
         const syncedRecords = await syncAll(syncRepository, {
           recordsToSkip,
           environmentsToSkip,
@@ -45,9 +46,8 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
 
         if (syncedRecords.records.length) {
           addNewRecords(syncedRecords.records);
+          toast.success("Your local APIs are ready");
         }
-
-        toast.success("Your local APIs are ready");
       } catch (error) {
         toast.error("Something went wrong while loading your local APIs");
       }
