@@ -30,7 +30,6 @@ type ExampleCollectionsState = {
 };
 
 type ExampleCollectionsActions = {
-  getIsImported: () => boolean;
   importExampleCollections: (params: {
     respository: ApiClientRepositoryInterface;
     ownerId: string | null;
@@ -54,15 +53,12 @@ const createExampleCollectionsStore = () => {
       (set, get) => ({
         ...initialState,
 
-        getIsImported: () => {
-          const { importStatus } = get();
-          return importStatus === ExampleCollectionsImportStatus.IMPORTED;
-        },
-
         importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore }) => {
-          const { getIsImported } = get();
+          const { importStatus } = get();
 
-          if (getIsImported()) {
+          if (
+            [ExampleCollectionsImportStatus.IMPORTING, ExampleCollectionsImportStatus.IMPORTED].includes(importStatus)
+          ) {
             return;
           }
 

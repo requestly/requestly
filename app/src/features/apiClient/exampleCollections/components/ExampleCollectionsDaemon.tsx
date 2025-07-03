@@ -8,17 +8,18 @@ import { WorkspaceType } from "features/workspaces/types";
 import { StoreApi, UseBoundStore } from "zustand";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { getOwnerId, LOGGED_OUT_STATE_UID } from "backend/utils";
 
 export const ExampleCollectionsDaemon: React.FC<{ store: UseBoundStore<StoreApi<ApiRecordsState>> }> = ({ store }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const uid = user?.details?.profile?.uid;
+  const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
   const syncRepository = useApiClientRepository();
   const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
   const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
 
   useEffect(() => {
-    if (uid) {
+    if (uid !== LOGGED_OUT_STATE_UID) {
       return;
     }
 
