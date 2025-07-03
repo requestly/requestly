@@ -1,6 +1,12 @@
 import { trackEvent } from "modules/analytics";
 import { API_CLIENT } from "../constants";
 
+// Example collections
+// TODO: To be removed once analysis done
+export const trackExampleCollectionsImported = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_IMPORTED, params);
+};
+
 // Request
 export const trackAPIRequestSent = (params = {}) => {
   trackEvent(API_CLIENT.REQUEST_SENT, params);

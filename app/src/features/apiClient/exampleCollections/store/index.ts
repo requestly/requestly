@@ -15,6 +15,7 @@ import { sessionStorage } from "utils/sessionStorage";
 import { variablesActions } from "store/features/variables/slice";
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
 import { Dispatch } from "react";
+import { trackExampleCollectionsImported } from "modules/analytics/events/features/apiClient";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
 
@@ -126,6 +127,8 @@ const createExampleCollectionsStore = () => {
             if (envsResult.length > 0) {
               envsStore.forceRefreshEnvironments();
             }
+
+            trackExampleCollectionsImported();
 
             set({ importStatus: ExampleCollectionsImportStatus.IMPORTED });
           } catch (error) {
