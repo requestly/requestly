@@ -12,6 +12,7 @@ import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { isEmpty } from "lodash";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -35,7 +36,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
   useEffect(() => {
     // To sync title for tabs opened from deeplinks
-    if (collection) {
+    if (!isEmpty(collection)) {
       setTitle(collection.name);
     }
   }, [collection, setTitle]);
@@ -133,7 +134,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
   return (
     <div className="collection-view-container">
-      {!collection && collectionId !== "new" ? (
+      {isEmpty(collection) && collectionId !== "new" ? (
         <Result
           status="error"
           title="Collection not found"
