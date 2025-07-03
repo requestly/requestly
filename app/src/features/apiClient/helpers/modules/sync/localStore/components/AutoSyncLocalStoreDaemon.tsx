@@ -27,7 +27,6 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
 
     (async () => {
       try {
-        toast.loading("Getting your local APIs...", 15 * 1000);
         const syncedRecordIds: string[] = [...getAllRecords().map((r) => r.id)];
         const syncedEnvironmentIds: string[] = [...getAllRecords().map((r) => r.id)];
         const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
