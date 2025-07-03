@@ -51,9 +51,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         >
           {newRecordBtnText}
         </RQButton>
-        <Link className="new-request-link" onClick={onNewRequestClick}>
-          Add a request
-        </Link>
+        {analyticEventSource === EnvironmentAnalyticsSource.ENVIRONMENTS_LIST ? null : (
+          <Link className="new-request-link" onClick={onNewRequestClick}>
+            Add a request
+          </Link>
+        )}
       </div>
     </div>
   );
