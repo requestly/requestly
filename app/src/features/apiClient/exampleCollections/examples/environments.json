@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "environments": [
+    {
+      "id": "d81d5863-769d-41e5-87e9-24e7ab124ab1",
+      "name": "Sample Environment",
+      "variables": {
+        "token": {
+          "id": 0,
+          "syncValue": "er",
+          "type": "string"
+        }
+      },
+      "isGlobal": false
+    }
+  ]
+}
