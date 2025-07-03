@@ -126,10 +126,6 @@ export const createSyncServiceStore = () => {
         }
       }
 
-      if (apis.status !== "fulfilled" || envs.status !== "fulfilled") {
-        throw new Error("Could not sync!");
-      }
-
       return {
         records,
         environments,
