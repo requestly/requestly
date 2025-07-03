@@ -9,6 +9,7 @@ import { useShallow } from "zustand/shallow";
 import * as Sentry from "@sentry/react";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import exampleCollections from "../examples/collections.json";
+import exampleEnvironments from "../examples/environments.json";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { sessionStorage } from "utils/sessionStorage";
 
@@ -68,9 +69,12 @@ const createExampleCollectionsStore = () => {
           set({ importStatus: ExampleCollectionsImportStatus.IMPORTING });
 
           try {
-            const dataToImport = ({ records: exampleCollections.records, environments: [] } as unknown) as RQImportData;
-            const proccessedData = processRqImportData(dataToImport, ownerId, respository.apiClientRecordsRepository);
+            const dataToImport = ({
+              records: exampleCollections.records,
+              environments: exampleEnvironments.environments,
+            } as unknown) as RQImportData;
 
+            const proccessedData = processRqImportData(dataToImport, ownerId, respository.apiClientRecordsRepository);
             proccessedData.apis = proccessedData.apis.map((api) => {
               // TODD: Fix this in "processRqImportData" itself
               const newCollectionId = proccessedData.collections.find(
