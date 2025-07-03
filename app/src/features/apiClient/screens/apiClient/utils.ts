@@ -607,3 +607,19 @@ export const parseRequestEntry = (
   }
   return result;
 };
+
+export const getRequestTypeForAnalyticEvent = (
+  isExample: RQAPI.ApiRecord["isExample"],
+  url: RQAPI.ApiRecord["data"]["request"]["url"]
+): string => {
+  if (isExample) {
+    return "example_collection";
+  }
+
+  const echoEndpoint = "https://app.requestly.io/echo";
+  if (url === echoEndpoint) {
+    return "echo";
+  }
+
+  return "custom";
+};
