@@ -40,7 +40,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const result = await service.getAllEnvironments();
     if (result.type === "success") {
       const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
-      const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
+      const globalEnvPath = `${this.meta.rootPath}/apis/environments/global.json`;
       if (!parsedEnvs[globalEnvPath]) {
         const globalEnv = await this.createGlobalEnvironment();
         parsedEnvs[globalEnvPath] = globalEnv;
