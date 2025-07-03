@@ -5,6 +5,7 @@ import { APIClientSyncService } from "./types";
 import { LocalStoreRecordsSync } from "../services/LocalStoreRecordsSync";
 import { LocalStoreEnvSync } from "../services/LocalStoreEnvSync";
 import { toast } from "utils/Toast";
+import { trackLocalStorageSyncStarted } from "modules/analytics/events/features/apiClient";
 
 async function getSyncStatus() {
   const apisSyncStatus = await getEntitySyncStatus(localStoreRepository.apiClientRecordsRepository);
@@ -105,6 +106,7 @@ export const createSyncServiceStore = () => {
         };
       }
 
+      trackLocalStorageSyncStarted({ type: "api" });
       toast.loading("Getting your local APIs ready...", 15 * 1000);
 
       const [apis, envs] = await Promise.allSettled([
