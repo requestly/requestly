@@ -54,7 +54,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         .updateCollectionAuthData(record)
         .then((result) => {
           if (result.success) {
-            onSaveRecord(result.data, "open");
+            onSaveRecord(result.data);
           } else {
             notification.error({
               message: `Could not update collection authorization changes!`,
@@ -114,7 +114,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           return;
         }
 
-        onSaveRecord(result.data, "open");
+        onSaveRecord(result.data);
         const wasForceRefreshed = await forceRefreshApiClientRecords();
         if (wasForceRefreshed) {
           closeTab(
