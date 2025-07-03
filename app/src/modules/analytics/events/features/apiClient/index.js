@@ -68,8 +68,8 @@ export const trackCollectionRenamed = () => {
   trackEvent(API_CLIENT.COLLECTION_RENAMED);
 };
 
-export const trackCollectionDeleted = () => {
-  trackEvent(API_CLIENT.COLLECTION_DELETED);
+export const trackCollectionDeleted = (type) => {
+  trackEvent(API_CLIENT.COLLECTION_DELETED, { type });
 };
 
 export const trackExportCollectionsClicked = () => {
