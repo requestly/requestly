@@ -119,9 +119,14 @@ export class ApiClientExecutor {
   }
 
   private preValidateRequest() {
-    const INVALID_CHARACTERS = /[^!#$%&'*+\-.0-9A-Z^_a-z|~]/;
+    /*
+    Header is checked if it is unresolved at this step
+    Check flags invalid characters & incomplete/undeclared variables
+    For Ex: {{RQ_CLIENT_ID}} not defined in environment table & {{RQ_CLIENT_ID} which is invalid expression
+    */
+    const INVALID_HEADER_CHARACTERS = /[^!#$%&'*+\-.0-9A-Z^_a-z|~]/;
     const invalidHeader = this.entryDetails?.request?.headers?.find((header) => {
-      return INVALID_CHARACTERS.test(header.key);
+      return INVALID_HEADER_CHARACTERS.test(header.key);
     });
 
     if (!this.entryDetails.request.url) {
