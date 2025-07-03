@@ -119,15 +119,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   async deleteRecords(recordIds: string[]): Promise<{ success: boolean; data: unknown; message?: string }> {
-    const recordsToBeDeleted = recordIds.map((id) => {
-      return {
-        id,
-        deleted: true,
-        updatedTs: Timestamp.now().toMillis(),
-      };
-    });
-
-    await this.queryService.updateRecords(recordsToBeDeleted);
+    await this.queryService.deleteRecords(recordIds);
     return { success: true, data: null };
   }
 
