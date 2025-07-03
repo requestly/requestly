@@ -47,7 +47,14 @@ export const createSyncServiceStore = () => {
         const recordsToSync = recordsToSkip
           ? result.data.records.filter((r) => !recordsToSkip.has(r.id))
           : result.data.records;
-        await syncRepository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(recordsToSync);
+
+        const syncResult = await syncRepository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(
+          recordsToSync
+        );
+
+        if (!syncResult.success) {
+          throw new Error(syncResult.message);
+        }
 
         await localStoreRepository.apiClientRecordsRepository.clear();
         set({ apisSyncStatus: APIClientSyncService.Status.SUCCESS });
@@ -99,12 +106,25 @@ export const createSyncServiceStore = () => {
       }
 
       toast.loading("Getting your local APIs ready...", 15 * 1000);
+
       const [apis, envs] = await Promise.allSettled([
         syncApis(syncRepository, skip?.recordsToSkip),
         syncEnvs(syncRepository, skip?.environmentsToSkip),
       ]);
       const records = apis.status === "fulfilled" ? (apis.value.success ? apis.value.data : []) : [];
       const environments = envs.status === "fulfilled" ? (envs.value.success ? envs.value.data : []) : [];
+
+      if (apis.status === "fulfilled") {
+        if (!apis.value.success) {
+          throw new Error("Not able to sync local APIs");
+        }
+      }
+
+      if (envs.status === "fulfilled") {
+        if (!envs.value.success) {
+          throw new Error("Not able to sync local Environments");
+        }
+      }
 
       return {
         records,
