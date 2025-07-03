@@ -7,13 +7,14 @@ import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
 import * as Sentry from "@sentry/react";
-import { markAsSample } from "./utils";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import exampleCollections from "../examples/collections.json";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { sessionStorage } from "utils/sessionStorage";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
+
+const markAsExample = <T>(record: T) => ({ ...(record ?? {}), isExample: true } as T);
 
 enum ExampleCollectionsImportStatus {
   NOT_IMPORTED = "NOT_IMPORTED",
@@ -82,11 +83,11 @@ const createExampleCollectionsStore = () => {
                 id: respository.apiClientRecordsRepository.generateApiRecordId(newCollectionId),
               };
 
-              return markAsSample(updatedApi);
+              return markAsExample(updatedApi);
             });
 
-            proccessedData.collections = proccessedData.collections.map((r) => markAsSample(r));
-            proccessedData.environments = proccessedData.environments.map((r) => markAsSample(r));
+            proccessedData.collections = proccessedData.collections.map((r) => markAsExample(r));
+            proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r));
 
             const recordsToImport = [...proccessedData.apis, ...proccessedData.collections];
             const recordsResult = await respository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(
