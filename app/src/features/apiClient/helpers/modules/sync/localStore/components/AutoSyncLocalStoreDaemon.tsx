@@ -6,6 +6,7 @@ import { WorkspaceType } from "features/workspaces/types";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useApiClientRepository } from "../../useApiClientSyncRepo";
 import { useSyncService } from "../store/hooks";
+import { toast } from "utils/Toast";
 
 export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
   const user = useSelector(getUserAuthDetails);
@@ -25,23 +26,30 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
     }
 
     (async () => {
-      const syncedRecordIds: string[] = [...getAllRecords().map((r) => r.id)];
-      const syncedEnvironmentIds: string[] = [...getAllRecords().map((r) => r.id)];
-      const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
-      if (environments.success) {
-        const envs = Object.values(environments.data.environments ?? {});
-        const envIds = envs.map((e) => e.id);
-        syncedEnvironmentIds.push(...envIds);
-      }
-      const recordsToSkip = new Set(syncedRecordIds);
-      const environmentsToSkip = new Set(syncedEnvironmentIds);
-      const syncedRecords = await syncAll(syncRepository, {
-        recordsToSkip,
-        environmentsToSkip,
-      });
+      try {
+        toast.loading("Getting your local APIs...");
+        const syncedRecordIds: string[] = [...getAllRecords().map((r) => r.id)];
+        const syncedEnvironmentIds: string[] = [...getAllRecords().map((r) => r.id)];
+        const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
+        if (environments.success) {
+          const envs = Object.values(environments.data.environments ?? {});
+          const envIds = envs.map((e) => e.id);
+          syncedEnvironmentIds.push(...envIds);
+        }
+        const recordsToSkip = new Set(syncedRecordIds);
+        const environmentsToSkip = new Set(syncedEnvironmentIds);
+        const syncedRecords = await syncAll(syncRepository, {
+          recordsToSkip,
+          environmentsToSkip,
+        });
 
-      if (syncedRecords.records.length) {
-        addNewRecords(syncedRecords.records);
+        if (syncedRecords.records.length) {
+          addNewRecords(syncedRecords.records);
+        }
+
+        toast.success("Your local APIs are ready");
+      } catch (error) {
+        toast.error("Something went wrong while loading your local APIs");
       }
     })();
   }, [uid, activeWorkspace?.workspaceType, syncRepository, syncAll, getAllRecords, addNewRecords]);
