@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useExampleCollections } from "../store";
@@ -17,6 +17,7 @@ export const ExampleCollectionsDaemon: React.FC<{ store: UseBoundStore<StoreApi<
   const syncRepository = useApiClientRepository();
   const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
   const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (uid !== LOGGED_OUT_STATE_UID) {
@@ -33,8 +34,17 @@ export const ExampleCollectionsDaemon: React.FC<{ store: UseBoundStore<StoreApi<
       respository: syncRepository,
       recordsStore: store,
       envsStore,
+      dispatch,
     });
-  }, [uid, activeWorkspace.workspaceType, syncRepository, importExampleCollections, store, forceRefreshEnvironments]);
+  }, [
+    uid,
+    activeWorkspace.workspaceType,
+    syncRepository,
+    importExampleCollections,
+    store,
+    forceRefreshEnvironments,
+    dispatch,
+  ]);
 
   return <></>;
 };

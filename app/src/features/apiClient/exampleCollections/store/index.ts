@@ -12,6 +12,9 @@ import exampleCollections from "../examples/collections.json";
 import exampleEnvironments from "../examples/environments.json";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { sessionStorage } from "utils/sessionStorage";
+import { variablesActions } from "store/features/variables/slice";
+import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
+import { Dispatch } from "react";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
 
@@ -37,6 +40,7 @@ type ExampleCollectionsActions = {
     envsStore: {
       forceRefreshEnvironments: () => void;
     };
+    dispatch: Dispatch<unknown>;
   }) => Promise<void>;
 };
 
@@ -53,7 +57,7 @@ const createExampleCollectionsStore = () => {
       (set, get) => ({
         ...initialState,
 
-        importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore }) => {
+        importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore, dispatch }) => {
           const { importStatus } = get();
 
           if (
@@ -63,6 +67,12 @@ const createExampleCollectionsStore = () => {
           }
 
           set({ importStatus: ExampleCollectionsImportStatus.IMPORTING });
+
+          dispatch(
+            variablesActions.setCurrentEnvironment({
+              environmentId: localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId(),
+            })
+          );
 
           try {
             const dataToImport = ({

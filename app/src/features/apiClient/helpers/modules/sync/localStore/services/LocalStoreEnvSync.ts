@@ -1,3 +1,4 @@
+import { withTimeout, Mutex } from "async-mutex";
 import { EnvironmentData, EnvironmentMap, VariableScope } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
@@ -6,6 +7,8 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import dbProvider from "../helpers/ApiClientLocalDbProvider";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
+
+const createGlobalEnvironmentLock = withTimeout(new Mutex(), 1000);
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -59,8 +62,18 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       variables: {},
     };
 
-    await this.queryService.createRecord(newEnvironment);
-    return newEnvironment;
+    const release = await createGlobalEnvironmentLock.acquire();
+    try {
+      const globalEnv = await this.queryService.getRecord(this.getGlobalEnvironmentId());
+      if (globalEnv) {
+        return globalEnv;
+      }
+
+      await this.queryService.createRecord(newEnvironment);
+      return newEnvironment;
+    } finally {
+      release();
+    }
   }
 
   async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
