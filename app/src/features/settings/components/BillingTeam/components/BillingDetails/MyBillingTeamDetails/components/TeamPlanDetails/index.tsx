@@ -88,7 +88,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               cancelAtPeriodEnd={billingTeamDetails?.subscriptionDetails?.cancel_at_period_end}
             />
           </Col>
-          {isUserManager ? (
+          {isUserManager && !billingTeamDetails?.migratedToBrowserstack ? (
             billingTeamDetails.browserstackGroupId ? (
               <BstackTeamPlanActionButtons subscriptionDetails={billingTeamDetails.subscriptionDetails} />
             ) : (
