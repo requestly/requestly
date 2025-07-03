@@ -782,6 +782,7 @@ const APIClientView: React.FC<Props> = ({
 
             <Conditional condition={user.loggedIn && !openInModal}>
               <RBACButton
+                disabled={!hasUnsavedChanges}
                 permission="create"
                 resource="api_client_request"
                 showHotKeyText
