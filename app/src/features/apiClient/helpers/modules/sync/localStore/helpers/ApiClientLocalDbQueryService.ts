@@ -51,6 +51,10 @@ export class ApiClientLocalDbQueryService<T> {
     return this.getTable().delete(id);
   }
 
+  async deleteRecords(ids: string[]) {
+    return this.getTable().bulkDelete(ids);
+  }
+
   async clearAllRecords() {
     return this.getTable().clear();
   }
