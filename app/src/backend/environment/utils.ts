@@ -138,11 +138,6 @@ export const mergeLocalAndSyncVariables = (
         type: value.type,
       };
 
-      // // Remove localValue if it doesn't exist
-      // if (!updatedValue.localValue) {
-      //   delete updatedValue.localValue;
-      // }
-
       return [key, updatedValue];
     })
   );
