@@ -27,6 +27,11 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       return result;
     }, {} as EnvironmentMap);
 
+    const globalId = this.getGlobalEnvironmentId();
+    if (!environmentsMap[globalId]) {
+      environmentsMap[globalId] = await this.createGlobalEnvironment();
+    }
+
     return {
       success: true,
       data: {
