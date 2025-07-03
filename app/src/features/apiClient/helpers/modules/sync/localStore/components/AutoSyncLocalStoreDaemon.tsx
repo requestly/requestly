@@ -7,6 +7,11 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { useApiClientRepository } from "../../useApiClientSyncRepo";
 import { useSyncService } from "../store/hooks";
 import { toast } from "utils/Toast";
+import {
+  trackLocalStorageSyncCompleted,
+  trackLocalStorageSyncFailed,
+} from "modules/analytics/events/features/apiClient";
+import * as Sentry from "@sentry/react";
 
 export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
   const user = useSelector(getUserAuthDetails);
@@ -45,10 +50,13 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
         });
 
         if (syncedRecords.records.length) {
+          trackLocalStorageSyncCompleted({ type: "api" });
           addNewRecords(syncedRecords.records);
           toast.success("Your local APIs are ready");
         }
       } catch (error) {
+        trackLocalStorageSyncFailed({ type: "api" });
+        Sentry.captureException(error);
         toast.error("Something went wrong while loading your local APIs");
       }
     })();

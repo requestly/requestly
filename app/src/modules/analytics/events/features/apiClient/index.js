@@ -7,6 +7,19 @@ export const trackExampleCollectionsImported = (params = {}) => {
   trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_IMPORTED, params);
 };
 
+// Local store sync
+export const trackLocalStorageSyncStarted = (params = {}) => {
+  trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_STARTED, params);
+};
+
+export const trackLocalStorageSyncFailed = (params = {}) => {
+  trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_FAILED, params);
+};
+
+export const trackLocalStorageSyncCompleted = (params = {}) => {
+  trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_COMPLETED, params);
+};
+
 // Request
 export const trackAPIRequestSent = (params = {}) => {
   trackEvent(API_CLIENT.REQUEST_SENT, params);
