@@ -197,6 +197,7 @@ export namespace RQAPI {
     name: string;
     description?: string;
     collectionId: string | null;
+    isExample?: boolean;
     ownerId: string;
     deleted: boolean;
     createdBy: string;
