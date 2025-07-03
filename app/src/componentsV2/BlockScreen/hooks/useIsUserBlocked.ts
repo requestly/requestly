@@ -24,9 +24,9 @@ export const useIsUserBlocked = () => {
   const uid = user?.details?.profile?.uid;
   const email = user?.details?.profile?.email;
 
-  const [domainBlockConfig, setDomainBlockConfig] = useState<BlockConfig>({});
-  const [userBlockConfig, setUserBlockConfig] = useState<BlockConfig>({});
-  const [finalBlockConfig, setFinalBlockConfig] = useState<BlockConfig>({});
+  const [domainBlockConfig, setDomainBlockConfig] = useState<BlockConfig | undefined>(undefined);
+  const [userBlockConfig, setUserBlockConfig] = useState<BlockConfig | undefined>(undefined);
+  const [finalBlockConfig, setFinalBlockConfig] = useState<BlockConfig | undefined>(undefined);
 
   useEffect(() => {
     if (!isLoggedIn || !uid) {
@@ -71,15 +71,15 @@ export const useIsUserBlocked = () => {
 
   useEffect(() => {
     if (!isLoggedIn || !uid) {
-      setFinalBlockConfig({});
-      setDomainBlockConfig({});
-      setUserBlockConfig({});
+      setFinalBlockConfig(undefined);
+      setDomainBlockConfig(undefined);
+      setUserBlockConfig(undefined);
       return;
     }
 
     // console.log({ userBlockConfig, domainBlockConfig });
 
-    for (const [key, value] of Object.entries(userBlockConfig)) {
+    for (const [key, value] of Object.entries(userBlockConfig || {})) {
       if (value?.isBlocked) {
         setFinalBlockConfig({
           [key]: {
@@ -90,7 +90,7 @@ export const useIsUserBlocked = () => {
       }
     }
 
-    for (const [key, value] of Object.entries(domainBlockConfig)) {
+    for (const [key, value] of Object.entries(domainBlockConfig || {})) {
       if (value?.isBlocked) {
         setFinalBlockConfig({
           [key]: {
@@ -103,7 +103,7 @@ export const useIsUserBlocked = () => {
   }, [domainBlockConfig, isLoggedIn, uid, userBlockConfig]);
 
   return {
-    isBlocked: Object.values(finalBlockConfig).some((value) => value.isBlocked),
-    blockConfig: finalBlockConfig,
+    isBlocked: !!finalBlockConfig && Object.values(finalBlockConfig).some((value) => value.isBlocked),
+    blockConfig: finalBlockConfig ?? {},
   };
 };
