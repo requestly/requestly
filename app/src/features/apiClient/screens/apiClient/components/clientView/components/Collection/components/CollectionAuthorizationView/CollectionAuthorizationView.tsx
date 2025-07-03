@@ -31,12 +31,14 @@ const CollectionAuthorizationView: React.FC<Props> = ({
 }) => {
   const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
-  const { setPreview, setUnsaved } = useGenericState();
+  const { setPreview, setUnsaved, getIsActive } = useGenericState();
 
   const { getVariablesWithPrecedence } = useEnvironmentManager();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);
+
+  const isActiveTab = getIsActive();
 
   useEffect(() => {
     setUnsaved(hasUnsavedChanges);
@@ -63,11 +65,12 @@ const CollectionAuthorizationView: React.FC<Props> = ({
       <div className="authorization-save-btn">
         <RQButton
           showHotKeyText
-          hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
+          hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION.hotKey}
           type="primary"
           onClick={onSaveAuthData}
           disabled={!hasUnsavedChanges}
           loading={isSaving}
+          enableHotKey={isActiveTab}
         >
           Save
         </RQButton>
