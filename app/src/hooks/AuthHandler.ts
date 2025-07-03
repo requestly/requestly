@@ -22,7 +22,6 @@ import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { getEmailType } from "utils/mailCheckerUtils";
 import { EmailType } from "@requestly/shared/types/common";
-import { useAuthState } from "store/authStore";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -235,8 +234,6 @@ const AuthHandler: React.FC<{}> = () => {
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
     hasAuthHandlerBeenSet = true;
-
-    useAuthState.getState().increment();
 
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {

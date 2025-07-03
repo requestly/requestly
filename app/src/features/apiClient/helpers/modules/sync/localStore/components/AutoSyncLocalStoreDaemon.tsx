@@ -7,7 +7,6 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { useApiClientRepository } from "../../useApiClientSyncRepo";
 import { useSyncService } from "../store/hooks";
 import { toast } from "utils/Toast";
-import { useAuthState } from "store/authStore";
 
 export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
   const user = useSelector(getUserAuthDetails);
@@ -26,8 +25,6 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
       return;
     }
 
-    const authVersion = useAuthState.getState().version;
-
     (async () => {
       try {
         const syncedEnvironmentIds: string[] = [];
@@ -42,20 +39,12 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
         const recordsToSkip = new Set(syncedRecordIds);
         const environmentsToSkip = new Set(syncedEnvironmentIds);
 
-        const currentAuthVersion = useAuthState.getState().version;
-        if (currentAuthVersion !== authVersion) {
-          return;
-        }
         const syncedRecords = await syncAll(syncRepository, {
           recordsToSkip,
           environmentsToSkip,
         });
 
         if (syncedRecords.records.length) {
-          const currentAuthVersion = useAuthState.getState().version;
-          if (currentAuthVersion !== authVersion) {
-            return;
-          }
           addNewRecords(syncedRecords.records);
           toast.success("Your local APIs are ready");
         }
