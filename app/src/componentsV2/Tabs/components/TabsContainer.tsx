@@ -10,7 +10,7 @@ import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import "./tabsContainer.scss";
-
+const isQuitting = true;
 export const TabsContainer: React.FC = () => {
   const [
     activeTabId,
@@ -39,6 +39,7 @@ export const TabsContainer: React.FC = () => {
   const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved);
 
   unstable_useBlocker(({ nextLocation }) => {
+    if (isQuitting) return false;
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
     const shouldBlock = !isNextLocationApiClientView && hasUnsavedChanges;
 
@@ -122,7 +123,7 @@ export const TabsContainer: React.FC = () => {
                 className="tab-close-button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  closeTabById(tabState.id);
+                  closeTabById(tabState.id, isQuitting);
                 }}
                 icon={<MdClose />}
               />
