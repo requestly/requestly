@@ -138,10 +138,14 @@ export const mergeLocalAndSyncVariables = (
         type: value.type,
       };
 
-      // Remove localValue if it doesn't exist
-      if (!updatedValue.localValue) {
-        delete updatedValue.localValue;
-      }
+      /* 
+      Commented the code belowe as this merge logic removes the localValue if it doesn't exist which leads to tabs showing unsaved changes because of the localValue missing from variable object
+       */
+
+      // // Remove localValue if it doesn't exist
+      // if (!updatedValue.localValue) {
+      //   delete updatedValue.localValue;
+      // }
 
       return [key, updatedValue];
     })
