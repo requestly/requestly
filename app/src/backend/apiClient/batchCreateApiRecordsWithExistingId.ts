@@ -49,6 +49,6 @@ const batchCreateApiRecordsWithExistingIdInFirebase = async (
     return { success: true, data: { records: updatedRecords, erroredRecords: [] } };
   } catch (error) {
     captureException(error);
-    return { success: false, data: null };
+    return { success: false, data: null, message: error?.message };
   }
 };
