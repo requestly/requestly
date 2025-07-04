@@ -102,7 +102,7 @@ export default function HeaderUser() {
                 })
               );
 
-              getTabServiceActions().resetTabs();
+              getTabServiceActions().resetTabs(true);
             })
             .finally(() => setLoading(false));
         },
@@ -140,6 +140,7 @@ export default function HeaderUser() {
   }
 
   const handleSignupClick = () => {
+    getTabServiceActions().resetTabs(true);
     trackSignUpButtonClicked(SOURCE.NAVBAR);
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);

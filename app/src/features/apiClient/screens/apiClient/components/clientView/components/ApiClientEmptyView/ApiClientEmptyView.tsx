@@ -1,27 +1,20 @@
 import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useDispatch } from "react-redux";
 import { RQAPI } from "features/apiClient/types";
-import { globalActions } from "store/slices/global/slice";
-import APP_CONSTANTS from "config/constants";
 import { useState } from "react";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
 import { RBACButton } from "features/rbac";
-import "./apiClientEmptyView.scss";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import "./apiClientEmptyView.scss";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
   const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
-
-  const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
 
@@ -32,22 +25,8 @@ export const ApiClientEmptyView = () => {
       ? trackNewRequestClicked("api_client_home")
       : trackNewCollectionClicked("api_client_home");
 
-    if (!user.loggedIn) {
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            src: APP_CONSTANTS.FEATURES.API_CLIENT,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            eventSource: "api_client_empty_view",
-          },
-        })
-      );
-      return;
-    }
     setIsRecordCreating(recordType);
-    createBlankApiRecord(user?.details?.profile?.uid, activeWorkspaceId, recordType, "", apiClientRecordsRepository)
+    createBlankApiRecord(recordType, "", apiClientRecordsRepository)
       .then((result) => {
         if (result.success) {
           onSaveRecord(result.data, "open");

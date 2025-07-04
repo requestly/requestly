@@ -219,6 +219,14 @@ export const API_CLIENT = {
   CURL_IMPORTED: "api_client_curl_imported",
   CURL_IMPORT_FAILED: "api_client_curl_import_failed",
 
+  // Example collection
+  EXAMPLE_COLLECTIONS_IMPORTED: "api_client_example_collections_imported",
+
+  // Local store sync
+  LOCAL_STORAGE_SYNC_STARTED: "local_storage_sync_started",
+  LOCAL_STORAGE_SYNC_FAILED: "local_storage_sync_failed",
+  LOCAL_STORAGE_SYNC_COMPLETED: "local_storage_sync_completed",
+
   // Request
   REQUEST_SENT: "api_client_request_sent",
   NEW_REQUEST_CLICKED: "api_client_new_request_clicked",

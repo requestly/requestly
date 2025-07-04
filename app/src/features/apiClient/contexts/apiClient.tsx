@@ -1,6 +1,5 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useDispatch } from "react-redux";
 import { RQAPI } from "../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -20,7 +19,6 @@ import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
@@ -105,28 +103,18 @@ const trackUserProperties = (records: RQAPI.Record[]) => {
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, repository }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [
-    apiClientRecords,
-    addNewRecord,
-    updateRecord,
-    updateRecords,
-    refreshRecords,
-    setErroredRecords,
-    getData,
-  ] = useAPIRecords((state) => [
-    state.apiClientRecords,
-    state.addNewRecord,
-    state.updateRecord,
-    state.updateRecords,
-    state.refresh,
-    state.setErroredRecords,
-    state.getData,
-  ]);
+  const [apiClientRecords, addNewRecord, updateRecord, updateRecords, refreshRecords, setErroredRecords, getData] =
+    useAPIRecords((state) => [
+      state.apiClientRecords,
+      state.addNewRecord,
+      state.updateRecord,
+      state.updateRecords,
+      state.refresh,
+      state.setErroredRecords,
+      state.getData,
+    ]);
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -241,7 +229,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(uid, activeWorkspaceId, recordType, collectionId, repository).then((result) => {
+          return createBlankApiRecord(recordType, collectionId, repository).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data, "open");
           });
@@ -250,7 +238,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(uid, activeWorkspaceId, recordType, collectionId, repository)
+          return createBlankApiRecord(recordType, collectionId, repository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -300,8 +288,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
       }
     },
     [
-      uid,
-      activeWorkspaceId,
       repository,
       openDraftRequest,
       onSaveRecord,

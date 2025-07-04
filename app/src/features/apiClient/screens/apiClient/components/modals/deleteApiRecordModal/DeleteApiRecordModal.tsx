@@ -71,7 +71,9 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
     // Check if both deletions were successful
     if (recordDeletionResult.success && collectionsDeletionResult.success) {
       deleteRecords([...apiRecordIds, ...collectionRecordIds]);
-      trackCollectionDeleted();
+
+      const isExampleCollection = collectionRecords.some((record) => !!record.isExample);
+      trackCollectionDeleted(isExampleCollection ? "example" : "");
 
       apiRecordIds.forEach((recordId) => {
         closeTabBySource(recordId, "request", true);
