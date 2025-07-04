@@ -147,7 +147,7 @@ export const AutomationTemplate: React.FC<AutomationTemplateProps> = ({
                   type="link"
                   download
                   className="button-link"
-                  onClick={() => window.open(LINKS.DOWNLAOD_CRX, "_blank")}
+                  onClick={() => window.open(LINKS.DOWNLOAD_CRX, "_blank")}
                 >
                   CRX
                 </Button>
@@ -248,8 +248,8 @@ export const AutomationTemplate: React.FC<AutomationTemplateProps> = ({
                 const normalize = (url: string) => url.replace(/\/+$/, "") || "/";
                 return normalize(rule.url) !== normalize(location.pathname);
               })
-              .map((rule, idx) => (
-                <Col xs={24} sm={12} key={idx}>
+              .map((rule) => (
+                <Col xs={24} sm={12} key={rule.url}>
                   <Card
                     className="card-dark"
                     headStyle={{ padding: "8px 16px", color: "#fff" }}

@@ -8,6 +8,7 @@ import {
   RecordStatus,
   RecordType,
 } from "@requestly/shared/types/entities/rules";
+import { ExtensionRule, HeaderOperation, RuleActionType } from "modules/extension/types";
 
 interface HeaderModification {
   header: string;
@@ -54,7 +55,7 @@ export const getHeaderModificationConfig = async (
       (newHeaderRule as any).version = 2;
 
       const headerPair = newHeaderRule.pairs[0];
-      headerPair.id = Math.random().toString(36).substr(2, 5);
+      headerPair.id = Math.random().toString(36).slice(2, 5);
       headerPair.modifications = {
         Request: headerType === "Request" ? modifications : [],
         Response: headerType === "Response" ? modifications : [],
@@ -66,7 +67,7 @@ export const getHeaderModificationConfig = async (
         value: "",
       };
 
-      const extensionRule: any = {
+      const extensionRule: ExtensionRule = {
         condition: {
           excludedInitiatorDomains: ["requestly.io"],
           excludedRequestDomains: ["requestly.io"],
@@ -74,20 +75,20 @@ export const getHeaderModificationConfig = async (
           regexFilter: ".*",
         },
         action: {
-          type: "modifyHeaders",
+          type: RuleActionType.MODIFY_HEADERS,
         },
       };
 
       if (headerType === "Request") {
         extensionRule.action.requestHeaders = headers.map((headerInfo) => ({
           header: headerInfo.header,
-          operation: operation === "add" ? "set" : "remove",
+          operation: operation === "add" ? HeaderOperation.SET : HeaderOperation.REMOVE,
           value: operation === "add" ? headerInfo.value : undefined,
         }));
       } else {
         extensionRule.action.responseHeaders = headers.map((headerInfo) => ({
           header: headerInfo.header,
-          operation: operation === "add" ? "set" : "remove",
+          operation: operation === "add" ? HeaderOperation.SET : HeaderOperation.REMOVE,
           value: operation === "add" ? headerInfo.value : undefined,
         }));
       }
