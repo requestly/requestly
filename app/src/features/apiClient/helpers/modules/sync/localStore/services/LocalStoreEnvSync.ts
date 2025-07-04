@@ -44,6 +44,22 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     };
   }
 
+  async _getAllEnvironments() {
+    const environments = await this.queryService.getRecords();
+    const environmentsMap = (environments ?? []).reduce((result, env) => {
+      result[env.id] = env;
+      return result;
+    }, {} as EnvironmentMap);
+
+    return {
+      success: true,
+      data: {
+        environments: environmentsMap,
+        erroredRecords: [] as ErroredRecord[],
+      },
+    };
+  }
+
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
     const newEnvironment: EnvironmentData = {
       id: this.getNewId(),
