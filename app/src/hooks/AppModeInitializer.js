@@ -194,11 +194,6 @@ const AppModeInitializer = () => {
             );
             trackDesktopBGEvent("helper-server-hit");
           });
-          window.RQ.DESKTOP.SERVICES.IPC.registerEvent("check-unsaved-changes", () => {
-            // todo check for both rules and api client
-            const confirmed = window.confirm("All unsaved changes will be lost");
-            window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("unsaved-changes-confirm", confirmed);
-          });
         });
       }
     }
@@ -208,6 +203,9 @@ const AppModeInitializer = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
+      });
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("intimate-app-close", () => {
+        navigate(PATHS.DESKTOP.QUIT.ABSOLUTE);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

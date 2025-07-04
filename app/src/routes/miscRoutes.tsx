@@ -16,8 +16,13 @@ import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList
 import SeleniumImporter from "views/misc/SeleniumImporter";
 import { ImportFromResourceOverrideWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ResourceOverrideImporter";
 import { HeaderEditorImportScreen } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/HeaderEditorImporter/HeaderEditorImporterScreen";
+import QuitDesktop from "components/misc/QuitDesktop";
 
 export const miscRoutes: RouteObject[] = [
+  {
+    path: PATHS.DESKTOP.QUIT.RELATIVE,
+    element: <QuitDesktop />,
+  },
   {
     path: PATHS.EXTENSION_INSTALLED.RELATIVE,
     element: <ExtensionInstalled />,
