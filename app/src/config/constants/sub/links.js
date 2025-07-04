@@ -161,7 +161,7 @@ const LINKS = {
 
   AUTOMATION_DOC: "https://rqst.ly/automation",
 
-  DOWNLAOD_CRX: "https://requestly.com/downloads/crx/",
+  DOWNLOAD_CRX: "https://requestly.com/downloads/crx/",
 
   DOWNLOAD_CHROME_EXTENSION_ZIP: "https://rqst.ly/chrome/zip",
 };

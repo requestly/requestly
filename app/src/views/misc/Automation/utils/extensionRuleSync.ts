@@ -18,7 +18,6 @@ export const saveRulesToExtension = async (rules: Rule[]) => {
 
   try {
     await clientStorageService.saveStorageObject(formattedObject);
-    window.postMessage({ action: "RQ_REFRESH_RULES" }, "*");
   } catch (error) {
     throw new Error("Failed to save rules to extension storage");
   }
