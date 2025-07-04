@@ -22,7 +22,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import { getOwnerId } from "backend/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
-import { useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
@@ -56,7 +56,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const collectionVariables = useSelector(getCollectionVariables);
   const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
-  const syncRepository = useGetApiClientSyncRepo();
+  const syncRepository = useApiClientRepository();
 
   const activeOwnerEnvironments = useMemo(() => {
     return allEnvironmentData?.[ownerId] ?? {};
@@ -266,13 +266,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       unsubscribeCollectionListener?.();
     };
   }, [ownerId, initFetchers, dispatch, syncRepository]);
-
-  useEffect(() => {
-    if (!user.loggedIn) {
-      unsubscribeListener?.();
-      dispatch(variablesActions.resetState());
-    }
-  }, [dispatch, user.loggedIn]);
 
   const getCurrentEnvironment = useCallback(() => {
     return {

@@ -2,10 +2,17 @@ import { collection, doc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../firebase";
 import { updateRecordMetaData } from "./apiClient/utils";
 
+export const LOGGED_OUT_STATE_UID = "local";
+
 export const getOwnerId = (uid: string, teamId?: string) => {
   if (teamId) {
     return `team-${teamId}`;
   }
+
+  if (!uid) {
+    return LOGGED_OUT_STATE_UID;
+  }
+
   return uid;
 };
 

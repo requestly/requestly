@@ -25,12 +25,12 @@ type TabServiceState = {
   previewTabSource: AbstractTabSource | null;
   tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
   tabs: Map<TabId, TabStore>;
-
+  ignorePath: boolean;
   _version: number;
 };
 
 type TabActions = {
-  reset: () => void;
+  reset: (ignorePath?: boolean) => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySource: (
     sourceId: SourceId,
@@ -49,6 +49,7 @@ type TabActions = {
   incrementVersion: () => void;
   getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
   getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
+  consumeIgnorePath: () => boolean;
 };
 
 export type TabServiceStore = TabServiceState & TabActions;
@@ -61,6 +62,7 @@ const initialState: TabServiceState = {
   previewTabSource: null,
   tabsIndex: new Map(),
   tabs: new Map(),
+  ignorePath: false,
 
   _version: 0,
 };
@@ -71,8 +73,17 @@ const createTabServiceStore = () => {
       (set, get) => ({
         ...initialState,
 
-        reset() {
-          set({ ...initialState, tabsIndex: new Map(), tabs: new Map() });
+        consumeIgnorePath() {
+          const { ignorePath } = get();
+          if (!ignorePath) {
+            return false;
+          }
+          set({ ignorePath: false });
+          return ignorePath;
+        },
+
+        reset(ignorePath = false) {
+          set({ ...initialState, tabsIndex: new Map(), tabs: new Map(), ignorePath });
           tabServiceStore.persist.clearStorage();
         },
 

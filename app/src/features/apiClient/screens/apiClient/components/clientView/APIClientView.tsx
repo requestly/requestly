@@ -8,6 +8,7 @@ import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
   getEmptyPair,
+  getRequestTypeForAnalyticEvent,
   parseRequestEntry,
   resolveAuth,
   sanitizeEntry,
@@ -22,6 +23,7 @@ import {
   trackRequestSaved,
   trackRequestRenamed,
   trackApiRequestDone,
+  trackAPIRequestSent,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -373,6 +375,12 @@ const APIClientView: React.FC<Props> = ({
       collectionId: apiEntryDetails?.collectionId,
     });
 
+    trackAPIRequestSent({
+      has_scripts: Boolean(entry?.scripts?.preRequest),
+      auth_type: entry?.auth?.currentAuthType,
+      request_type: getRequestTypeForAnalyticEvent(apiEntryDetails?.isExample, entry?.request?.url),
+    });
+
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
 
@@ -444,6 +452,7 @@ const APIClientView: React.FC<Props> = ({
   }, [
     apiEntryDetails?.id,
     apiEntryDetails?.collectionId,
+    apiEntryDetails?.isExample,
     entry,
     toggleBottomSheet,
     apiClientExecutor,
@@ -717,7 +726,7 @@ const APIClientView: React.FC<Props> = ({
         />
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
-            <Conditional condition={user.loggedIn && !openInModal}>
+            <Conditional condition={!openInModal}>
               <RQBreadcrumb
                 placeholder="Untitled request"
                 recordName={apiEntryDetails?.name}
@@ -780,7 +789,7 @@ const APIClientView: React.FC<Props> = ({
               Send
             </RQButton>
 
-            <Conditional condition={user.loggedIn && !openInModal}>
+            <Conditional condition={!openInModal}>
               <RBACButton
                 disabled={!hasUnsavedChanges}
                 permission="create"

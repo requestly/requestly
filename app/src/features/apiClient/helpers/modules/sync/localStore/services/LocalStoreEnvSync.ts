@@ -1,9 +1,14 @@
-import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
+import { withTimeout, Mutex } from "async-mutex";
+import { EnvironmentData, EnvironmentMap, VariableScope } from "backend/environment/types";
 import { ApiClientLocalStoreMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { v4 as uuidv4 } from "uuid";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
+import dbProvider from "../helpers/ApiClientLocalDbProvider";
+import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
+
+const createGlobalEnvironmentLock = withTimeout(new Mutex(), 1000);
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -19,6 +24,27 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   }
 
   async getAllEnvironments() {
+    const environments = await this.queryService.getRecords();
+    const environmentsMap = (environments ?? []).reduce((result, env) => {
+      result[env.id] = env;
+      return result;
+    }, {} as EnvironmentMap);
+
+    const globalId = this.getGlobalEnvironmentId();
+    if (!environmentsMap[globalId]) {
+      environmentsMap[globalId] = await this.createGlobalEnvironment();
+    }
+
+    return {
+      success: true,
+      data: {
+        environments: environmentsMap,
+        erroredRecords: [] as ErroredRecord[],
+      },
+    };
+  }
+
+  async _getAllEnvironments() {
     const environments = await this.queryService.getRecords();
     const environmentsMap = (environments ?? []).reduce((result, env) => {
       result[env.id] = env;
@@ -52,8 +78,27 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
       variables: {},
     };
 
-    await this.queryService.createRecord(newEnvironment);
-    return newEnvironment;
+    const release = await createGlobalEnvironmentLock.acquire();
+    try {
+      const globalEnv = await this.queryService.getRecord(this.getGlobalEnvironmentId());
+      if (globalEnv) {
+        return globalEnv;
+      }
+
+      await this.queryService.createRecord(newEnvironment);
+      return newEnvironment;
+    } finally {
+      release();
+    }
+  }
+
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    const environmentsWithIds = environments.map((env) => {
+      return { ...env, id: env.id || this.getNewId() };
+    });
+
+    await this.queryService.createBulkRecords(environmentsWithIds);
+    return environmentsWithIds;
   }
 
   async deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }> {
@@ -99,11 +144,52 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     return "global";
   }
 
-  attachListener(params: EnvironmentListenerParams): () => any {
+  /**
+   * We are esseentially mocking the Firebase listener here.
+   * This is done for all variable scopes because firebase listener
+   * also does this, which is bad. Ideally a repo should not be making
+   * raw queries to the database, let alone other databases.
+   *
+   * FIXME: This is a temporary solution to mock the Firebase listener.
+   */
+  attachListener(params: EnvironmentListenerParams): () => void {
+    const dbInstance = dbProvider.get(this.meta);
+
+    (async () => {
+      if (params.scope === VariableScope.COLLECTION) {
+        const collections = await dbInstance.db
+          .table<RQAPI.CollectionRecord>(ApiClientLocalDbTable.APIS)
+          .toArray((records) => records.filter((r) => r.type === RQAPI.RecordType.COLLECTION));
+
+        const collectionVariableMap: CollectionVariableMap = {};
+        collections.forEach((record) => {
+          collectionVariableMap[record.id] = { variables: record.data.variables || {} };
+        });
+
+        params.callback(collectionVariableMap);
+        return;
+      }
+
+      if (params.scope === VariableScope.ENVIRONMENT || params.scope === VariableScope.GLOBAL) {
+        const env = await this.queryService.getRecord(params.id);
+
+        if (!env) {
+          return;
+        }
+
+        params.callback(env);
+        return;
+      }
+    })();
+
     return () => {};
   }
 
   async clear() {
     await this.queryService.clearAllRecords();
+  }
+
+  async getIsAllCleared(): Promise<boolean> {
+    return this.queryService.getIsAllCleared();
   }
 }
