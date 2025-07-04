@@ -30,6 +30,7 @@ import ActionMenu from "./BulkActionsMenu";
 import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -62,12 +63,31 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
+  useEffect(() => {
+    const handleUpdates = () => {
+      setExpandedRecordIds(sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, []));
+    };
+
+    window.addEventListener(EXPANDED_RECORD_IDS_UPDATED, handleUpdates);
+    return () => {
+      window.removeEventListener(EXPANDED_RECORD_IDS_UPDATED, handleUpdates);
+    };
+  }, []);
+
   const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
+      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
+        return -1;
+      }
+
+      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
+        return -1;
+      }
+
       if (recordA.type !== recordB.type) {
         return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
       }

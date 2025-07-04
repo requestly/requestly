@@ -13,10 +13,7 @@ import {
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import ApiClientLoggedOutView from "../LoggedOutView/LoggedOutView";
 import "./apiClient.scss";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
@@ -30,7 +27,6 @@ interface Props {
 }
 
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
-  const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
       return null;
@@ -100,17 +96,13 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-          {user.loggedIn ? (
-            <ApiRecordsProvider>
-              <AutogenerateProvider>
-                <QueryParamsProvider entry={apiEntry}>
-                  <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
-                </QueryParamsProvider>
-              </AutogenerateProvider>
-            </ApiRecordsProvider>
-          ) : (
-            <ApiClientLoggedOutView />
-          )}
+          <ApiRecordsProvider>
+            <AutogenerateProvider>
+              <QueryParamsProvider entry={apiEntry}>
+                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
+              </QueryParamsProvider>
+            </AutogenerateProvider>
+          </ApiRecordsProvider>
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>

@@ -1,4 +1,10 @@
-import { deleteApiRecords, getApiRecord, getApiRecords, upsertApiRecord } from "backend/apiClient";
+import {
+  deleteApiRecords,
+  getApiRecord,
+  getApiRecords,
+  upsertApiRecord,
+  batchCreateApiRecordsWithExistingId,
+} from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
@@ -167,5 +173,16 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         : { ...record, collectionId: newParentId }
     );
     return await firebaseBatchWrite("apis", updatedRequests);
+  }
+
+  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+    if (records.length === 0) {
+      return {
+        success: true,
+        data: { records: [], erroredRecords: [] },
+      };
+    }
+
+    return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
   }
 }

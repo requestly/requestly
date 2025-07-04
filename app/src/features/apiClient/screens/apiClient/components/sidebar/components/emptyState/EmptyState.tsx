@@ -1,9 +1,5 @@
 import React, { useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import APP_CONSTANTS from "config/constants";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { globalActions } from "store/slices/global/slice";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environment/types";
 import "./emptyState.scss";
@@ -26,26 +22,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   analyticEventSource = "collections_empty_state",
   onNewRequestClick,
 }) => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOnClick = () => {
-    if (!user.loggedIn) {
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            src: APP_CONSTANTS.FEATURES.API_CLIENT,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-            eventSource: analyticEventSource,
-          },
-        })
-      );
-
-      return;
-    }
     setIsLoading(true);
     onNewRecordClick()
       .then(() => {
@@ -72,9 +51,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         >
           {newRecordBtnText}
         </RQButton>
-        <Link className="new-request-link" onClick={onNewRequestClick}>
-          Add a request
-        </Link>
+        {analyticEventSource === EnvironmentAnalyticsSource.ENVIRONMENTS_LIST ? null : (
+          <Link className="new-request-link" onClick={onNewRequestClick}>
+            Add a request
+          </Link>
+        )}
       </div>
     </div>
   );

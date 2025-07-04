@@ -290,8 +290,6 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
 export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", value: "", isEnabled: true });
 
 export const createBlankApiRecord = (
-  uid: string,
-  teamId: string,
   recordType: RQAPI.RecordType,
   collectionId: string,
   apiClientRecordsRepository: ApiClientRecordsInterface<any>
@@ -608,4 +606,20 @@ export const parseRequestEntry = (
     result.content_type = parseContentType(entry.request.contentType);
   }
   return result;
+};
+
+export const getRequestTypeForAnalyticEvent = (
+  isExample: RQAPI.ApiRecord["isExample"],
+  url: RQAPI.ApiRecord["data"]["request"]["url"]
+): string => {
+  if (isExample) {
+    return "example_collection";
+  }
+
+  const echoEndpoint = "https://app.requestly.io/echo";
+  if (url === echoEndpoint) {
+    return "echo";
+  }
+
+  return "custom";
 };
