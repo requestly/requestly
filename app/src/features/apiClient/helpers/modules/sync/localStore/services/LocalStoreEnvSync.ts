@@ -8,7 +8,7 @@ import { ApiClientLocalDbTable } from "../helpers/types";
 import dbProvider from "../helpers/ApiClientLocalDbProvider";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 
-const createGlobalEnvironmentLock = withTimeout(new Mutex(), 1000);
+const createGlobalEnvironmentLock = withTimeout(new Mutex(), 10 * 1000);
 
 export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
