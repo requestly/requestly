@@ -92,10 +92,38 @@ export const createSyncServiceStore = () => {
       }
     },
 
-    async syncAll(syncRepository, skip) {
-      const { syncApis, syncEnvs, updateSyncStatus } = get();
-      const { apisSyncStatus, envsSyncStatus } = await updateSyncStatus();
+    async syncGlobalEnv(syncRepository) {
+      const allEnvs = await localStoreRepository.environmentVariablesRepository._getAllEnvironments();
+      if (!allEnvs.success) {
+        throw new Error("Could not get all environments!");
+      }
 
+      const envs = Object.values(allEnvs.data.environments);
+      const isJustGlobalEnv =
+        envs.length === 1 &&
+        envs[0].id === localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+
+      if (!isJustGlobalEnv) {
+        return;
+      }
+
+      // const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      // const globalEnv = allEnvs.data.environments[globalEnvId];
+      // if (globalEnv.variables && Object.keys(globalEnv.variables).length) {
+      //   await syncRepository.environmentVariablesRepository.updateEnvironment(globalEnvId, {
+      //     variables: globalEnv.variables,
+      //   });
+      // }
+
+      await localStoreRepository.environmentVariablesRepository.clear();
+    },
+
+    async syncAll(syncRepository, skip) {
+      const { syncApis, syncEnvs, updateSyncStatus, syncGlobalEnv } = get();
+
+      await syncGlobalEnv(syncRepository);
+
+      const { apisSyncStatus, envsSyncStatus } = await updateSyncStatus();
       if (
         apisSyncStatus === APIClientSyncService.Status.SUCCESS &&
         envsSyncStatus === APIClientSyncService.Status.SUCCESS
@@ -107,7 +135,7 @@ export const createSyncServiceStore = () => {
       }
 
       trackLocalStorageSyncStarted({ type: "api" });
-      toast.loading("Getting your local APIs ready...", 15 * 1000);
+      toast.loading("Getting your local APIs ready...", 8 * 1000);
 
       const [apis, envs] = await Promise.allSettled([
         syncApis(syncRepository, skip?.recordsToSkip),
