@@ -18,6 +18,7 @@ import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
+import { ApiClientRepositoryContext, useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -79,9 +80,14 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     return entry;
   }, [request]);
 
+  const repository = useGetApiClientSyncRepo();
+  const key = repository.constructor.name;
+
   if (!apiEntry) {
     return null;
   }
+
+
 
   return (
     <Modal
@@ -96,13 +102,15 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-          <ApiRecordsProvider>
-            <AutogenerateProvider>
-              <QueryParamsProvider entry={apiEntry}>
-                <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
-              </QueryParamsProvider>
-            </AutogenerateProvider>
-          </ApiRecordsProvider>
+          <ApiClientRepositoryContext.Provider value={repository} key={key}>
+            <ApiRecordsProvider>
+              <AutogenerateProvider>
+                <QueryParamsProvider entry={apiEntry}>
+                  <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
+                </QueryParamsProvider>
+              </AutogenerateProvider>
+            </ApiRecordsProvider>
+          </ApiClientRepositoryContext.Provider>
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>
