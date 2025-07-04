@@ -17,6 +17,7 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<EnvironmentData>(meta, ApiClientLocalDbTable.ENVIRONMENTS);
+    this.createGlobalEnvironment();
   }
 
   private getNewId() {
