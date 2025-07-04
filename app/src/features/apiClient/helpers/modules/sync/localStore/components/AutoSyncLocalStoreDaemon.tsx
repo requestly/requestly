@@ -50,8 +50,11 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
         });
 
         if (syncedRecords.records.length) {
-          trackLocalStorageSyncCompleted({ type: "api" });
           addNewRecords(syncedRecords.records);
+        }
+
+        if (syncedRecords.records.length || syncedRecords.environments.length) {
+          trackLocalStorageSyncCompleted({ type: "api" });
           toast.success("Your local APIs are ready");
         }
       } catch (error) {
