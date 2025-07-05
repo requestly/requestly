@@ -8,7 +8,7 @@
   border: 1px solid var(--requestly-color-neutral-800, #282828);
   border-bottom: 0px;
   border-radius: 12px;
-  grid-template-columns: fit-content(var(--automation-layout-sidebar-width)) 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: fit-content(var(--automation-layout-header-height)) 1fr fit-content(
       var(--automation-layout-footer-height)
     );
