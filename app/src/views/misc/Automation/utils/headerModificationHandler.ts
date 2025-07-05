@@ -4,10 +4,6 @@ import { saveRulesToExtension, clearExtensionStorage } from "./extensionRuleSync
 import { getHeaderModificationConfig } from "./getHeaderModificationConfig";
 import { isEnvAutomation } from "utils/EnvUtils";
 
-interface HeaderModification {
-  header: string;
-  value: string;
-}
 interface ReturnProps {
   success: boolean;
   error?: string;
@@ -15,7 +11,7 @@ interface ReturnProps {
 }
 
 export const useHeaderModification = (
-  headers: HeaderModification[],
+  headers: { header: string; value: string }[],
   headerType: "Request" | "Response",
   operation: "add" | "remove"
 ): ReturnProps => {
@@ -52,7 +48,7 @@ export const useHeaderModification = (
       }
     }
 
-    setResult((prev) => ({ ...prev, isLoading: true }));
+    setResult({ success: false, error: undefined, isLoading: true });
     getHeaderModificationConfig(headers, headerType, operation)
       .then((rules) => clearExtensionStorage().then(() => rules))
       .then((rules) => saveRulesToExtension(rules))

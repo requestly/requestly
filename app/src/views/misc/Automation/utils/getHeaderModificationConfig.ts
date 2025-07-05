@@ -10,13 +10,8 @@ import {
 } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule, HeaderOperation, RuleActionType } from "modules/extension/types";
 
-interface HeaderModification {
-  header: string;
-  value: string;
-}
-
 export const getHeaderModificationConfig = async (
-  headers: HeaderModification[],
+  headers: { header: string; value: string }[],
   headerType: "Request" | "Response",
   operation: "add" | "remove"
 ): Promise<Rule[]> => {
