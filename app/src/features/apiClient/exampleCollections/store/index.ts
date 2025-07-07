@@ -15,7 +15,10 @@ import { sessionStorage } from "utils/sessionStorage";
 import { variablesActions } from "store/features/variables/slice";
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
 import { Dispatch } from "react";
-import { trackExampleCollectionsImported } from "modules/analytics/events/features/apiClient";
+import {
+  trackExampleCollectionsImported,
+  trackExampleCollectionsImportFailed,
+} from "modules/analytics/events/features/apiClient";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
 
@@ -144,6 +147,7 @@ const createExampleCollectionsStore = () => {
             set({ importStatus: ExampleCollectionsImportStatus.IMPORTED });
           } catch (error) {
             Sentry.captureException(error);
+            trackExampleCollectionsImportFailed();
             set({ importStatus: ExampleCollectionsImportStatus.FAILED });
           }
         },

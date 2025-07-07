@@ -31,6 +31,7 @@ import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
+import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -314,6 +315,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         <div className="collections-list-content">
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
+              <ExampleCollectionsNudge />
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
@@ -354,12 +356,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
             </div>
           ) : (
-            <ApiRecordEmptyState
-              disabled={!isValidPermission}
-              newRecordBtnText="Create a collection"
-              message={searchValue ? "No collection or request found" : "No content available yet"}
-              onNewClick={onNewClick}
-              analyticEventSource="collection_list_empty_state"
+            <ExampleCollectionsNudge
+              fallback={
+                <ApiRecordEmptyState
+                  disabled={!isValidPermission}
+                  newRecordBtnText="Create a collection"
+                  message={searchValue ? "No collection or request found" : "No content available yet"}
+                  onNewClick={onNewClick}
+                  analyticEventSource="collection_list_empty_state"
+                />
+              }
             />
           )}
         </div>
