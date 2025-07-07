@@ -55,7 +55,7 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
         dispatch,
       });
 
-      if (importStatus === ExampleCollectionsImportStatus.FAILED) {
+      if (importStatus !== ExampleCollectionsImportStatus.IMPORTED) {
         throw new Error("Failed to import example collections");
       }
 
