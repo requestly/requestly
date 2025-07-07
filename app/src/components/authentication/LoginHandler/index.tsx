@@ -76,7 +76,6 @@ const LoginHandler: React.FC = () => {
         Sentry.captureException(error, {
           extra: { url },
         });
-
         redirectToHome(appMode, navigate);
       }
     },
@@ -159,6 +158,12 @@ const LoginHandler: React.FC = () => {
       })
       .catch((error) => {
         Logger.log("[LoginHandler-signInWithCustomToken] catch", { error });
+        Sentry.captureMessage("[Auth] Sign in with custom token failed", {
+          tags: {
+            flow: "auth",
+          },
+          extra: { error, source: "LoginHandler-signInWithCustomToken" },
+        });
         // @ts-ignore
         trackSignUpFailedEvent({
           error: error?.message,
