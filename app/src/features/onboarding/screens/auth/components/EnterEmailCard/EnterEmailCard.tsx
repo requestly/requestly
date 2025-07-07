@@ -10,6 +10,7 @@ import LINKS from "config/constants/sub/links";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 import { trackLoginEmailEntered } from "modules/analytics/events/common/auth/signup";
 import Logger from "../../../../../../../../common/logger";
+import * as Sentry from "@sentry/react";
 
 interface EnterEmailCardProps {
   onEmailChange: (email: string) => void;
@@ -33,6 +34,12 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
 
     if (!isEmailValid(processedEmail)) {
       Logger.log("[Auth-handleOnContinue] Invalid email");
+      Sentry.captureMessage("[Auth] Invalid email address", {
+        tags: {
+          logType: "debug",
+        },
+        extra: { email, source: "EnterEmailCard-handleOnContinue" },
+      });
       toast.error("Please enter a valid email address");
       setIsLoading(false);
       return;
@@ -45,14 +52,32 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
           const metadata = data.syncData;
           onAuthSyncVerification(metadata);
           Logger.log("[Auth-handleOnContinue] metadata", { metadata });
+          Sentry.captureMessage("[Auth] User auth sync details fetched successfully", {
+            tags: {
+              logType: "debug",
+            },
+            extra: { email, metadata, source: "EnterEmailCard-handleOnContinue" },
+          });
           return;
         }
         Logger.log("[Auth-handleOnContinue] Error getting user auth sync details", { data });
+        Sentry.captureMessage("[Auth] Error getting user auth sync details", {
+          tags: {
+            logType: "debug",
+          },
+          extra: { email, data, source: "EnterEmailCard-handleOnContinue" },
+        });
         toast.error("Something went wrong! Please try again or contact support.");
         setIsLoading(false);
       });
     } catch (error) {
       Logger.log("[Auth-handleOnContinue] catch", { error });
+      Sentry.captureMessage("[Auth] Error getting user auth sync details", {
+        tags: {
+          logType: "debug",
+        },
+        extra: { error, source: "EnterEmailCard-handleOnContinue" },
+      });
       toast.error("Something went wrong! Please try again or contact support.");
       setIsLoading(false);
     }

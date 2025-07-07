@@ -13,6 +13,7 @@ import "./emailVerificationCard.scss";
 import { trackLoginSuccessEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import Logger from "../../../../../../../../../../common/logger";
+import * as Sentry from "@sentry/react";
 
 interface EmailVerificationCardProps {
   onBackClick: () => void;
@@ -65,9 +66,15 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
       })
       .catch((error) => {
         Logger.log("[Auth-EmailVerificationCard-handleResendEmailClick] catch", { error });
+        Sentry.captureMessage("[Auth] Error sending email link", {
+          tags: {
+            logType: "debug",
+          },
+          extra: { email, error, source: "EmailVerificationCard-handleResendEmailClick" },
+        });
         throw new Error("Something went wrong, Could not send email link ");
       });
-  }, [onResendEmailClick]);
+  }, [onResendEmailClick, email]);
 
   return (
     <div className="rq-auth-card email-verification-card">

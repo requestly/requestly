@@ -10,6 +10,7 @@ import { trackLoginWithGoogleClicked } from "modules/analytics/events/common/aut
 import "./googleAuthButton.scss";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import Logger from "../../../../../../../../../../common/logger";
+import * as Sentry from "@sentry/react";
 
 interface GoogleAuthButtonProps {
   onGoogleAuthClick?: () => void;
@@ -35,9 +36,15 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   const onFail = useCallback(
     (code: AuthErrorCode) => {
       Logger.log("[Auth-GoogleAuthButton-onFail] Error logging in with Google", { code });
+      Sentry.captureMessage("[Auth] Error logging in with Google", {
+        tags: {
+          logType: "debug",
+        },
+        extra: { email, code, source: "GoogleAuthButton-onFail" },
+      });
       failedLoginCallback(code, AUTH_PROVIDERS.GMAIL);
     },
-    [failedLoginCallback]
+    [failedLoginCallback, email]
   );
 
   const handleGoogleAuth = useCallback(
@@ -47,6 +54,12 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       onGoogleAuthClick();
       if (!credentialResponse) {
         Logger.log("[Auth-GoogleAuthButton-handleGoogleAuth] No credential response");
+        Sentry.captureMessage("[Auth] No credential response in Google auth", {
+          tags: {
+            logType: "debug",
+          },
+          extra: { email, code: AuthErrorCode.NONE, source: "GoogleAuthButton-handleGoogleAuth" },
+        });
         toast.error("Something went wrong. Please try again.");
         setIsLoading(false);
         return;
@@ -56,6 +69,12 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       if (decodedCredential.email !== email) {
         onFail(AuthErrorCode.DIFFERENT_USER);
         Logger.log("[Auth-GoogleAuthButton-handleGoogleAuth] Different user");
+        Sentry.captureMessage("[Auth] Different user auth detected with Google", {
+          tags: {
+            logType: "debug",
+          },
+          extra: { email, code: AuthErrorCode.DIFFERENT_USER, source: "GoogleAuthButton-handleGoogleAuth" },
+        });
         setIsLoading(false);
         return;
       }
