@@ -21,7 +21,7 @@ export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
 
 const markAsExample = <T>(record: T) => ({ ...(record ?? {}), isExample: true } as T);
 
-enum ExampleCollectionsImportStatus {
+export enum ExampleCollectionsImportStatus {
   NOT_IMPORTED = "NOT_IMPORTED",
   IMPORTING = "IMPORTING",
   IMPORTED = "IMPORTED",
@@ -34,6 +34,7 @@ type ExampleCollectionsState = {
 };
 
 type ExampleCollectionsActions = {
+  closeNudge: () => void;
   getIsExampleCollectionsImported: () => boolean;
   importExampleCollections: (params: {
     respository: ApiClientRepositoryInterface;
@@ -58,6 +59,10 @@ const createExampleCollectionsStore = () => {
     persist(
       (set, get) => ({
         ...initialState,
+
+        closeNudge: () => {
+          set({ isNudgePermanentlyClosed: true });
+        },
 
         getIsExampleCollectionsImported: () => {
           const { importStatus } = get();
