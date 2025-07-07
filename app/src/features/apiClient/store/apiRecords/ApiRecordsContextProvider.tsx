@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { StoreApi, useStore } from "zustand";
+import { StoreApi, UseBoundStore, useStore } from "zustand";
 import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
 import { useShallow } from "zustand/shallow";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
@@ -84,4 +84,13 @@ export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
   }
 
   return useStore(store, useShallow(selector));
+}
+
+export function useAPIRecordsStore() {
+  const store = useContext(ApiRecordsStoreContext);
+  if (!store) {
+    throw new Error("store not found!");
+  }
+
+  return store as UseBoundStore<StoreApi<ApiRecordsState>>;
 }
