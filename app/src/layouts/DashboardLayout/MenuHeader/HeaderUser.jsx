@@ -112,6 +112,7 @@ export default function HeaderUser() {
   );
 
   const handleAuthButtonClick = (authMode) => {
+    getTabServiceActions().resetTabs(true);
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
