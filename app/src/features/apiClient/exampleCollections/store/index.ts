@@ -47,7 +47,7 @@ type ExampleCollectionsActions = {
       forceRefreshEnvironments: () => void;
     };
     dispatch: Dispatch<unknown>;
-  }) => Promise<void>;
+  }) => Promise<{ success: true } | { success: false; message: string }>;
 };
 
 type ExampleCollectionsStore = ExampleCollectionsState & ExampleCollectionsActions;
@@ -145,10 +145,12 @@ const createExampleCollectionsStore = () => {
             trackExampleCollectionsImported();
 
             set({ importStatus: ExampleCollectionsImportStatus.IMPORTED });
+            return { success: true };
           } catch (error) {
             Sentry.captureException(error);
             trackExampleCollectionsImportFailed();
             set({ importStatus: ExampleCollectionsImportStatus.FAILED });
+            return { success: false, message: "Failed to import example collections" };
           }
         },
       }),

@@ -47,7 +47,7 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
   const handleImportClick = async () => {
     trackExampleCollectionsNudgeImportClicked();
     try {
-      await importExampleCollections({
+      const result = await importExampleCollections({
         ownerId: uid,
         respository: syncRepository,
         recordsStore: recordsStore,
@@ -55,8 +55,8 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
         dispatch,
       });
 
-      if (importStatus !== ExampleCollectionsImportStatus.IMPORTED) {
-        throw new Error("Failed to import example collections");
+      if (result.success === false) {
+        throw new Error(result.message);
       }
 
       toast.success("Example collections imported successfully!");
