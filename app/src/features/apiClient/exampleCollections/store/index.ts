@@ -29,11 +29,12 @@ enum ExampleCollectionsImportStatus {
 }
 
 type ExampleCollectionsState = {
-  isBannerPermanentlyClosed: boolean;
+  isNudgePermanentlyClosed: boolean;
   importStatus: ExampleCollectionsImportStatus;
 };
 
 type ExampleCollectionsActions = {
+  getIsExampleCollectionsImported: () => boolean;
   importExampleCollections: (params: {
     respository: ApiClientRepositoryInterface;
     ownerId: string | null;
@@ -48,7 +49,7 @@ type ExampleCollectionsActions = {
 type ExampleCollectionsStore = ExampleCollectionsState & ExampleCollectionsActions;
 
 const initialState: ExampleCollectionsState = {
-  isBannerPermanentlyClosed: false,
+  isNudgePermanentlyClosed: false,
   importStatus: ExampleCollectionsImportStatus.NOT_IMPORTED,
 };
 
@@ -57,6 +58,11 @@ const createExampleCollectionsStore = () => {
     persist(
       (set, get) => ({
         ...initialState,
+
+        getIsExampleCollectionsImported: () => {
+          const { importStatus } = get();
+          return importStatus === ExampleCollectionsImportStatus.IMPORTED;
+        },
 
         importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore, dispatch }) => {
           const { importStatus } = get();
@@ -141,7 +147,7 @@ const createExampleCollectionsStore = () => {
         name: "rqExampleCollectionsStore",
         partialize: (state) => ({
           importStatus: state.importStatus,
-          isBannerPermanentlyClosed: state.isBannerPermanentlyClosed,
+          isNudgePermanentlyClosed: state.isNudgePermanentlyClosed,
         }),
       }
     )
