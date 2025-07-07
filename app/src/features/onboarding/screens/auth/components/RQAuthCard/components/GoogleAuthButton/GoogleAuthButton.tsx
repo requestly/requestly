@@ -38,7 +38,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       Logger.log("[Auth-GoogleAuthButton-onFail] Error logging in with Google", { code });
       Sentry.captureMessage("[Auth] Error logging in with Google", {
         tags: {
-          logType: "debug",
+          log_type: "debug",
         },
         extra: { email, code, source: "GoogleAuthButton-onFail" },
       });
@@ -56,7 +56,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
         Logger.log("[Auth-GoogleAuthButton-handleGoogleAuth] No credential response");
         Sentry.captureMessage("[Auth] No credential response in Google auth", {
           tags: {
-            logType: "debug",
+            log_type: "debug",
           },
           extra: { email, code: AuthErrorCode.NONE, source: "GoogleAuthButton-handleGoogleAuth" },
         });
@@ -71,7 +71,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
         Logger.log("[Auth-GoogleAuthButton-handleGoogleAuth] Different user");
         Sentry.captureMessage("[Auth] Different user auth detected with Google", {
           tags: {
-            logType: "debug",
+            log_type: "debug",
           },
           extra: { email, code: AuthErrorCode.DIFFERENT_USER, source: "GoogleAuthButton-handleGoogleAuth" },
         });

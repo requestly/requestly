@@ -44,7 +44,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
       Logger.log("[Auth-EmailAuthForm-handleSignInWithEmailAndPassword] catch", { error });
       Sentry.captureMessage("[Auth] Error logging in with email and password", {
         tags: {
-          logType: "debug",
+          log_type: "debug",
         },
         extra: { email, error, source: "EmailAuthForm-handleSignInWithEmailAndPassword" },
       });

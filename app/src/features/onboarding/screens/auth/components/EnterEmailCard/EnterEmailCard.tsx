@@ -36,7 +36,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
       Logger.log("[Auth-handleOnContinue] Invalid email");
       Sentry.captureMessage("[Auth] Invalid email address", {
         tags: {
-          logType: "debug",
+          log_type: "debug",
         },
         extra: { email, source: "EnterEmailCard-handleOnContinue" },
       });
@@ -54,7 +54,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
           Logger.log("[Auth-handleOnContinue] metadata", { metadata });
           Sentry.captureMessage("[Auth] User auth sync details fetched successfully", {
             tags: {
-              logType: "debug",
+              log_type: "debug",
             },
             extra: { email, metadata, source: "EnterEmailCard-handleOnContinue" },
           });
@@ -63,7 +63,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
         Logger.log("[Auth-handleOnContinue] Error getting user auth sync details", { data });
         Sentry.captureMessage("[Auth] Error getting user auth sync details", {
           tags: {
-            logType: "debug",
+            log_type: "debug",
           },
           extra: { email, data, source: "EnterEmailCard-handleOnContinue" },
         });
@@ -74,7 +74,7 @@ export const EnterEmailCard: React.FC<EnterEmailCardProps> = ({ onEmailChange, o
       Logger.log("[Auth-handleOnContinue] catch", { error });
       Sentry.captureMessage("[Auth] Error getting user auth sync details", {
         tags: {
-          logType: "debug",
+          log_type: "debug",
         },
         extra: { error, source: "EnterEmailCard-handleOnContinue" },
       });

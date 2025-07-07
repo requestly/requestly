@@ -68,7 +68,7 @@ export const EmailVerificationCard: React.FC<EmailVerificationCardProps> = ({
         Logger.log("[Auth-EmailVerificationCard-handleResendEmailClick] catch", { error });
         Sentry.captureMessage("[Auth] Error sending email link", {
           tags: {
-            logType: "debug",
+            log_type: "debug",
           },
           extra: { email, error, source: "EmailVerificationCard-handleResendEmailClick" },
         });
