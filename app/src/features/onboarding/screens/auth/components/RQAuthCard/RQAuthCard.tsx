@@ -55,7 +55,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
       Logger.log("[Auth-handleSSOLogin] Error logging in with SSO", { err });
       Sentry.captureMessage("[Auth] Error logging in with SSO", {
         tags: {
-          log_type: "debug",
+          flow: "auth",
         },
         extra: { email, err, source: "RQAuthCard-handleSSOLogin" },
       });

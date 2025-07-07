@@ -160,7 +160,7 @@ const LoginHandler: React.FC = () => {
         Logger.log("[LoginHandler-signInWithCustomToken] catch", { error });
         Sentry.captureMessage("[Auth] Sign in with custom token failed", {
           tags: {
-            log_type: "debug",
+            flow: "auth",
           },
           extra: { error, source: "LoginHandler-signInWithCustomToken" },
         });
