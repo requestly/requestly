@@ -8,6 +8,7 @@ import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
+import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -272,11 +273,16 @@ export const CollectionRow: React.FC<Props> = ({
                       />
                     </div>
                   )}
-                  {isActive ? (
-                    <PiFolderOpen className="collection-expand-icon" />
-                  ) : (
-                    <MdOutlineFolder className="collection-expand-icon" />
-                  )}
+                  {
+                    // @ts-ignore
+                    record.isRoot ? (
+                      <MdOutlineFolderSpecial className="collection-expand-icon" />
+                    ) : isActive ? (
+                      <PiFolderOpen className="collection-expand-icon" />
+                    ) : (
+                      <MdOutlineFolder className="collection-expand-icon" />
+                    )
+                  }
                 </>
               );
             }}

@@ -111,7 +111,15 @@ const createExampleCollectionsStore = () => {
               return markAsExample(updatedApi);
             });
 
-            proccessedData.collections = proccessedData.collections.map((r) => markAsExample(r));
+            proccessedData.collections = proccessedData.collections.map((r, index) => {
+              if (index === 0) {
+                // Mark parent collection as root, this will be use to show special collection icon on UI
+                // @ts-ignore
+                r["isRoot"] = true;
+              }
+
+              return markAsExample(r);
+            });
             proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r));
 
             const recordsToImport = [...proccessedData.apis, ...proccessedData.collections];
