@@ -12,7 +12,7 @@ import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/compo
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
 
-export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
+export const ApiRecordsStoreContext = createContext<UseBoundStore<StoreApi<ApiRecordsState>>>(null);
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
@@ -92,5 +92,5 @@ export function useAPIRecordsStore() {
     throw new Error("store not found!");
   }
 
-  return store as UseBoundStore<StoreApi<ApiRecordsState>>;
+  return store;
 }
