@@ -313,9 +313,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       </div>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
+          <ExampleCollectionsNudge />
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
-              <ExampleCollectionsNudge />
               {updatedRecords.collections.map((record) => {
                 return (
                   <CollectionRow
@@ -356,16 +356,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               )}
             </div>
           ) : (
-            <ExampleCollectionsNudge
-              fallback={
-                <ApiRecordEmptyState
-                  disabled={!isValidPermission}
-                  newRecordBtnText="Create a collection"
-                  message={searchValue ? "No collection or request found" : "No content available yet"}
-                  onNewClick={onNewClick}
-                  analyticEventSource="collection_list_empty_state"
-                />
-              }
+            <ApiRecordEmptyState
+              disabled={!isValidPermission}
+              newRecordBtnText="Create a collection"
+              message={searchValue ? "No collection or request found" : "No content available yet"}
+              onNewClick={onNewClick}
+              analyticEventSource="collection_list_empty_state"
             />
           )}
         </div>
