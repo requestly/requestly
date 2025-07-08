@@ -73,11 +73,15 @@ const createExampleCollectionsStore = () => {
         },
 
         importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore, dispatch }) => {
-          const { importStatus } = get();
+          const { importStatus, isNudgePermanentlyClosed } = get();
 
           if (
             [ExampleCollectionsImportStatus.IMPORTING, ExampleCollectionsImportStatus.IMPORTED].includes(importStatus)
           ) {
+            return;
+          }
+
+          if (isNudgePermanentlyClosed) {
             return;
           }
 
@@ -115,7 +119,7 @@ const createExampleCollectionsStore = () => {
               if (index === 0) {
                 // Mark parent collection as root, this will be use to show special collection icon on UI
                 // @ts-ignore
-                r["isRoot"] = true;
+                r["isExampleRoot"] = true;
               }
 
               return markAsExample(r);

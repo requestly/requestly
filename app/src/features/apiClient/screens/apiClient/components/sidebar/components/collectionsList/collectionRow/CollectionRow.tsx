@@ -275,7 +275,7 @@ export const CollectionRow: React.FC<Props> = ({
                   )}
                   {
                     // @ts-ignore
-                    record.isRoot ? (
+                    record.isExampleRoot ? (
                       <MdOutlineFolderSpecial className="collection-expand-icon" />
                     ) : isActive ? (
                       <PiFolderOpen className="collection-expand-icon" />
