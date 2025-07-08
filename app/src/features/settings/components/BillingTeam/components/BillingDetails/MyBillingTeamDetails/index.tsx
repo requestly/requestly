@@ -42,8 +42,13 @@ export const MyBillingTeamDetails: React.FC = () => {
       <div className="w-full" style={{ maxWidth: "1000px" }}>
         {billingTeamDetails?.migratedToBrowserstack && (
           <Alert
-            type="info"
-            description="Subscription renewal for this billing team is under process right now. If you want to make any modification, please reach out to us at support@requestly.io"
+            type="warning"
+            description={
+              <>
+                Subscription renewal for this billing team is under process right now. If you want to make any
+                modifications, please reach out to us at <b>support@requestly.io</b>
+              </>
+            }
             style={{ marginBottom: "12px" }}
           />
         )}
