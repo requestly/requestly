@@ -3,7 +3,7 @@ import {
   processRqImportData,
   RQImportData,
 } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
-import { create, StoreApi, UseBoundStore, useStore } from "zustand";
+import { create, StoreApi, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
 import * as Sentry from "@sentry/react";
@@ -42,7 +42,7 @@ type ExampleCollectionsActions = {
   importExampleCollections: (params: {
     respository: ApiClientRepositoryInterface;
     ownerId: string | null;
-    recordsStore: UseBoundStore<StoreApi<ApiRecordsState>>;
+    recordsStore: StoreApi<ApiRecordsState>;
     envsStore: {
       forceRefreshEnvironments: () => void;
     };

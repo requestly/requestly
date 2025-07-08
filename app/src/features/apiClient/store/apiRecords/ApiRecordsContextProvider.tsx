@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { StoreApi, UseBoundStore, useStore } from "zustand";
+import { StoreApi, useStore } from "zustand";
 import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
 import { useShallow } from "zustand/shallow";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
@@ -12,7 +12,7 @@ import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/compo
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
 
-export const ApiRecordsStoreContext = createContext<UseBoundStore<StoreApi<ApiRecordsState>>>(null);
+export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
