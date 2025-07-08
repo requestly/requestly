@@ -520,6 +520,7 @@ const CurrentTrafficTable = ({
         const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
         return getLogAvatar(key, logNameURI, avatarUrl);
       } catch (e) {
+        console.log("faulty logname: ", logName);
         captureException(e);
         const avatarUrl = "https://www.google.com/s2/favicons?domain=randooooom.com"; // random url to show the unfound icon
         const name = `unknown-${key}`;
