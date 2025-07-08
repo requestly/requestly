@@ -26,6 +26,7 @@ The following domains are eligible for the student programme:
     ".edu.kh",
     ".edu.tw",
     ".edu.cn",
+    ".edu.mx",
     ".edu.al",
     ".edu.es",
     ".edu.tr",
