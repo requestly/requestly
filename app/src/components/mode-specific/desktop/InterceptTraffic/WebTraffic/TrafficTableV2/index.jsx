@@ -49,7 +49,7 @@ import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
-import { captureException } from "backend/apiClient/utils";
+import * as Sentry from "@sentry/react";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -490,7 +490,6 @@ const CurrentTrafficTable = ({
   const getLogAvatar = useCallback(
     (key, logName = "", avatarUrl) => {
       const isSelected = trafficTableFilters[key].includes(logName);
-      console.log("DG-2: all trafficTableFilters", trafficTableFilters);
       return (
         <RQTooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""}>
           <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
@@ -514,18 +513,16 @@ const CurrentTrafficTable = ({
 
   const getApplogAvatar = useCallback(
     (key, logName) => {
+      let logNameURI;
       try {
-        const logNameURI = decodeURIComponent(logName.trim());
-        const avatarDomain = APPNAMES[logNameURI.split(" ")[0].toLowerCase()];
-        const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
-        return getLogAvatar(key, logNameURI, avatarUrl);
+        logNameURI = decodeURIComponent(logName.trim());
       } catch (e) {
-        console.log("faulty logname: ", logName);
-        captureException(e);
-        const avatarUrl = "https://www.google.com/s2/favicons?domain=randooooom.com"; // random url to show the unfound icon
-        const name = `unknown-${key}`;
-        return getLogAvatar(key, name, avatarUrl);
+        Logger.log("faulty logname: ", logName);
+        Sentry.captureMessage(e);
       }
+      const avatarDomain = logNameURI ? APPNAMES[logNameURI.split(" ")[0].toLowerCase()] : "randooooom.com"; // random domain to show the 404-like icon
+      const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
+      return getLogAvatar(key, logNameURI, avatarUrl);
     },
     [getLogAvatar]
   );
