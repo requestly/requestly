@@ -38,6 +38,7 @@ type InternalFunctions = {
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
+  COOKIE = "SET_COOKIE_ERR",
 }
 
 enum RequestErrorMessage {
@@ -177,7 +178,14 @@ export class ApiClientExecutor {
   }
 
   private buildErrorObjectFromHeader(header: KeyValuePair): RQAPI.ExecutionError {
-    switch (header.value) {
+    function getHeaderValueType(header: string): RQErrorHeaderValue | undefined {
+      if (header.includes("SET_COOKIE_ERR")) {
+        return RQErrorHeaderValue.COOKIE;
+      } else if (header === RQErrorHeaderValue.DNS_RESOLUTION_ERROR) {
+        return RQErrorHeaderValue.DNS_RESOLUTION_ERROR;
+      }
+    }
+    switch (getHeaderValueType(header.value)) {
       case RQErrorHeaderValue.DNS_RESOLUTION_ERROR:
         return this.buildExecutionErrorObject(
           {
@@ -188,6 +196,17 @@ export class ApiClientExecutor {
           },
           "request",
           RQAPI.ApiClientErrorType.CORE
+        );
+      case RQErrorHeaderValue.COOKIE:
+        return this.buildExecutionErrorObject(
+          {
+            name: "Warning",
+            message: header.value,
+            type: RQAPI.ApiClientErrorType.COOKIE,
+            source: "response",
+          },
+          "response",
+          RQAPI.ApiClientErrorType.COOKIE
         );
       default:
         return this.buildExecutionErrorObject(
@@ -288,7 +307,7 @@ export class ApiClientExecutor {
       if (rqErrorHeader) {
         return {
           status: RQAPI.ExecutionStatus.ERROR,
-          executedEntry: { ...this.entryDetails, response: null },
+          executedEntry: { ...this.entryDetails, response },
           error: this.buildErrorObjectFromHeader(rqErrorHeader),
         };
       }

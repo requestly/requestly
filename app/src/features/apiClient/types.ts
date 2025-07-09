@@ -231,6 +231,7 @@ export namespace RQAPI {
     CORE = "core",
     ABORT = "abort",
     SCRIPT = "script",
+    COOKIE = "cookie",
   }
 }
 
