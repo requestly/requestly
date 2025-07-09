@@ -204,7 +204,7 @@ const AppModeInitializer = () => {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
       });
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("intimate-app-close", () => {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("initiate-app-close", () => {
         navigate(PATHS.DESKTOP.QUIT.ABSOLUTE);
       });
     }

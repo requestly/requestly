@@ -6,7 +6,7 @@ const QuitDesktop: React.FC = () => {
     if (window.RQ?.DESKTOP?.SERVICES?.IPC) {
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("quit-app");
     }
-  });
+  }, []);
   return <SpinnerCard />;
 };
 
