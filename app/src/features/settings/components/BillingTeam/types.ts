@@ -33,6 +33,7 @@ export interface BillingTeamDetails {
   };
   isAcceleratorTeam?: boolean;
   browserstackGroupId?: string;
+  migratedToBrowserstack?: boolean;
 }
 
 export enum BillingTeamRoles {
