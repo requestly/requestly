@@ -135,7 +135,7 @@ export const createSyncServiceStore = () => {
       }
 
       trackLocalStorageSyncStarted({ type: "api" });
-      toast.loading("Getting your local APIs ready...", 8 * 1000);
+      toast.loading("Getting your local APIs ready...", 15);
 
       const [apis, envs] = await Promise.allSettled([
         syncApis(syncRepository, skip?.recordsToSkip),
