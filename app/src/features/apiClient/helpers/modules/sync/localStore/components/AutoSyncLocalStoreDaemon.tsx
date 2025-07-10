@@ -12,6 +12,8 @@ import {
   trackLocalStorageSyncFailed,
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
+import { syncServiceStore } from "../store/syncServiceStore";
+import { APIClientSyncService } from "../store/types";
 
 export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
   const user = useSelector(getUserAuthDetails);
@@ -19,12 +21,29 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
   const uid = user?.details?.profile?.uid;
   const syncRepository = useApiClientRepository();
   const [syncAll] = useSyncService((state) => [state.syncAll]);
-  const [addNewRecords, getAllRecords] = useAPIRecords((state) => [state.addNewRecords, state.getAllRecords]);
+  const [addNewRecords, getAllRecords, refresh] = useAPIRecords((state) => [
+    state.addNewRecords,
+    state.getAllRecords,
+    state.refresh,
+  ]);
 
   useEffect(() => {
+    let unsubscribe = () => {};
     if (!uid) {
+      unsubscribe = syncServiceStore.subscribe(
+        (state) => state.apisSyncStatus,
+        (apisSyncStatus) => {
+          if (apisSyncStatus === APIClientSyncService.Status.SUCCESS) {
+            refresh([]);
+            unsubscribe();
+          }
+        }
+      );
       return;
     }
+
+    // Unsubscribe from the previous subscription if any from logged out state
+    unsubscribe();
 
     if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
       return;
@@ -63,7 +82,7 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
         toast.error("Something went wrong while loading your local APIs");
       }
     })();
-  }, [uid, activeWorkspace?.workspaceType, syncRepository, syncAll, getAllRecords, addNewRecords]);
+  }, [uid, activeWorkspace?.workspaceType, syncRepository, syncAll, getAllRecords, addNewRecords, refresh]);
 
   return <></>;
 };
