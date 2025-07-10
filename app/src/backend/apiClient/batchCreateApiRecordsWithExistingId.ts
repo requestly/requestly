@@ -45,9 +45,6 @@ const batchCreateApiRecordsWithExistingIdInFirebase = async (
         updatedRecords.push(updatedRecord);
       });
     });
-    await new Promise((resolve) => {
-      setTimeout(resolve, 5000);
-    });
 
     return { success: true, data: { records: updatedRecords, erroredRecords: [] } };
   } catch (error) {

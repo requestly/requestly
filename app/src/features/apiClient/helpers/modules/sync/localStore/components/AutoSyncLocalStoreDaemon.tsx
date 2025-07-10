@@ -12,6 +12,7 @@ import {
   trackLocalStorageSyncFailed,
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
+import { syncServiceStore } from "../store/syncServiceStore";
 
 const LoggedInDaemon: React.FC<{}> = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -25,6 +26,12 @@ const LoggedInDaemon: React.FC<{}> = () => {
 
   useEffect(() => {
     if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
+      return;
+    }
+
+    const existingTask = syncServiceStore.getState().syncTask;
+
+    if (existingTask) {
       return;
     }
 
