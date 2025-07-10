@@ -12,44 +12,23 @@ import {
   trackLocalStorageSyncFailed,
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
-import { syncServiceStore } from "../store/syncServiceStore";
-import { APIClientSyncService } from "../store/types";
 
-export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
-  const user = useSelector(getUserAuthDetails);
+const LoggedInDaemon: React.FC<{}> = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const uid = user?.details?.profile?.uid;
   const syncRepository = useApiClientRepository();
-  const [syncAll] = useSyncService((state) => [state.syncAll]);
-  const [addNewRecords, getAllRecords, refresh] = useAPIRecords((state) => [
+  const [syncAll, setSyncTask] = useSyncService((state) => [state.syncAll, state.setSyncTask]);
+  const [addNewRecords, getAllRecords] = useAPIRecords((state) => [
     state.addNewRecords,
     state.getAllRecords,
     state.refresh,
   ]);
 
   useEffect(() => {
-    let unsubscribe = () => {};
-    if (!uid) {
-      unsubscribe = syncServiceStore.subscribe(
-        (state) => state.apisSyncStatus,
-        (apisSyncStatus) => {
-          if (apisSyncStatus === APIClientSyncService.Status.SUCCESS) {
-            refresh([]);
-            unsubscribe();
-          }
-        }
-      );
-      return;
-    }
-
-    // Unsubscribe from the previous subscription if any from logged out state
-    unsubscribe();
-
     if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
       return;
     }
 
-    (async () => {
+    const task = (async () => {
       try {
         const syncedEnvironmentIds: string[] = [];
         const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
@@ -82,7 +61,50 @@ export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
         toast.error("Something went wrong while loading your local APIs");
       }
     })();
-  }, [uid, activeWorkspace?.workspaceType, syncRepository, syncAll, getAllRecords, addNewRecords, refresh]);
+
+    setSyncTask(task);
+  }, [activeWorkspace?.workspaceType, syncRepository, syncAll, getAllRecords, addNewRecords, setSyncTask]);
 
   return <></>;
+};
+
+const LoggedOutDaemon: React.FC<{}> = () => {
+  const [syncTask] = useSyncService((state) => [state.syncTask]);
+  const [getAllRecords, refresh] = useAPIRecords((state) => [state.getAllRecords, state.refresh]);
+
+  useEffect(() => {
+    if (!syncTask) {
+      return;
+    }
+
+    (async () => {
+      try {
+        await syncTask;
+        const records = getAllRecords();
+
+        // If there is no data, then there' no need to reset anything
+        if (!records.length) {
+          return;
+        }
+
+        // But if there are records, we reset them since syncing has been successful
+        refresh([]);
+      } catch (e) {
+        // This is a noop, since syncing failing in logged out state
+        // doesn't warrant any action.
+      }
+    })();
+  }, [syncTask, getAllRecords, refresh]);
+
+  return <></>;
+};
+
+export const AutoSyncLocalStoreDaemon: React.FC<{}> = () => {
+  const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
+
+  if (!uid) {
+    return <LoggedOutDaemon />;
+  }
+  return <LoggedInDaemon />;
 };

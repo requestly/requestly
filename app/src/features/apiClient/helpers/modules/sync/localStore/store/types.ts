@@ -14,6 +14,8 @@ export namespace APIClientSyncService {
     apisSyncStatus: Status;
     envsSyncStatus: Status;
 
+    syncTask?: Promise<unknown>;
+
     updateSyncStatus: () => Promise<{
       apisSyncStatus: APIClientSyncService.Status;
       envsSyncStatus: APIClientSyncService.Status;
@@ -39,5 +41,7 @@ export namespace APIClientSyncService {
     }>;
 
     syncGlobalEnv(syncRepository: ApiClientRepositoryInterface): Promise<void>;
+
+    setSyncTask(task: Promise<unknown>): void;
   };
 }

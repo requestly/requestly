@@ -165,6 +165,16 @@ export const createSyncServiceStore = () => {
           environments,
         };
       },
+
+      setSyncTask(task) {
+        const existingTask = get().syncTask;
+        if (existingTask) {
+          throw new Error("Multiple sync tasks started!");
+        }
+        set({
+          syncTask: task,
+        });
+      },
     }))
   );
 
