@@ -7,6 +7,22 @@ export const trackExampleCollectionsImported = (params = {}) => {
   trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_IMPORTED, params);
 };
 
+export const trackExampleCollectionsImportFailed = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_IMPORT_FAILED, params);
+};
+
+export const trackExampleCollectionsNudgeShown = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_NUDGE_SHOWN, params);
+};
+
+export const trackExampleCollectionsNudgeCloseClicked = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_NUDGE_CLOSE_CLICKED, params);
+};
+
+export const trackExampleCollectionsNudgeImportClicked = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_NUDGE_IMPORT_CLICKED, params);
+};
+
 // Local store sync
 export const trackLocalStorageSyncStarted = (params = {}) => {
   trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_STARTED, params);
