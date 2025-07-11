@@ -18,6 +18,7 @@ import { getConnectedAppsCount } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const { appsList } = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const systemWideSource = appsList["system-wide"];
+  const isSystemWideSourceVisible = useFeatureValue("show_systemwide_source", false);
 
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
@@ -170,7 +172,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
         <RQButton type="primary" onClick={openConnectedAppsModal}>
           Connect apps
         </RQButton>
-        {systemWideSource.isAvailable ? (
+        {systemWideSource.isAvailable && isSystemWideSourceVisible ? (
           <>
             <Typography.Text>Or</Typography.Text>
             <Typography.Text>Capture all the requests from this device</Typography.Text>
@@ -182,6 +184,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
       </>
     );
   }, [
+    isSystemWideSourceVisible,
     connectSystemWide,
     disconnectSystemWide,
     isStaticPreview,
