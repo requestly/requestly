@@ -10,11 +10,26 @@ export namespace APIClientSyncService {
     SUCCESS = "success",
   }
 
+  type SyncTask = Promise<
+    | {
+        success: true;
+        data: {
+          records: RQAPI.Record[];
+          environments: EnvironmentData[];
+        };
+      }
+    | {
+        success: false;
+        message: string;
+      }
+  >;
+
   export type State = {
     apisSyncStatus: Status;
     envsSyncStatus: Status;
 
-    syncTask?: Promise<unknown>;
+    syncTask?: SyncTask;
+    setSyncTask(task: SyncTask): void;
 
     updateSyncStatus: () => Promise<{
       apisSyncStatus: APIClientSyncService.Status;
@@ -41,7 +56,5 @@ export namespace APIClientSyncService {
     }>;
 
     syncGlobalEnv(syncRepository: ApiClientRepositoryInterface): Promise<void>;
-
-    setSyncTask(task: Promise<unknown>): void;
   };
 }
