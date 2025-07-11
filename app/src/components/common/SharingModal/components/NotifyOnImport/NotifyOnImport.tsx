@@ -1,0 +1,51 @@
+import React, { useState } from "react";
+import Checkbox, { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { Tooltip } from "antd";
+import { toast } from "utils/Toast";
+import { updateSharedListNotificationStatus } from "../../actions";
+import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
+
+export const NotifyOnImport: React.FC<{ sharedListId: string; disabled: boolean }> = ({ sharedListId, disabled }) => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [notifyOnImport, setNotifyOnImport] = useState(false);
+
+  const handleOnChange = async (e: CheckboxChangeEvent) => {
+    try {
+      setIsUpdating(true);
+      setNotifyOnImport(e.target.checked);
+
+      const result = await updateSharedListNotificationStatus(sharedListId, e.target.checked);
+
+      if (!result.data.success) {
+        throw new Error("Failed to update notification status");
+      }
+    } catch (error) {
+      toast.error("Failed to update shared list notification status");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <div>
+      <Checkbox
+        value={notifyOnImport}
+        disabled={disabled || isUpdating}
+        onChange={handleOnChange}
+        className="notify-on-import-checkbox"
+      >
+        <span className="notify-on-import-checkbox-label">
+          Enable email notification for shared list import
+          <Tooltip
+            showArrow={false}
+            placement="rightTop"
+            overlayClassName="share-link-radio-btn-label-tooltip"
+            title="Get an email when someone imports your shared list, including their email and timestamp."
+          >
+            <AiOutlineInfoCircle />
+          </Tooltip>
+        </span>
+      </Checkbox>
+    </div>
+  );
+};

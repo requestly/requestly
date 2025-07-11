@@ -98,7 +98,6 @@
   width: var(--size);
   height: var(--size);
   color: var(--requestly-color-text-subtle);
-  margin-bottom: 2px;
 }
 
 .share-link-radio-btn-label-tooltip.ant-tooltip {
@@ -106,16 +105,51 @@
 }
 
 .share-link-radio-btn-label-tooltip .ant-tooltip-inner {
-  width: max-content;
+  width: 100%;
+  max-width: 216px;
 }
 
 .shared-list-container .copy-value-wrapper {
   height: 44px;
 }
 
+.shared-list-container .notify-on-import-checkbox {
+  margin-top: 16px;
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm, 12px);
+  line-height: 18px; /* 150% */
+}
+
+.shared-list-container .notify-on-import-checkbox .notify-on-import-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shared-list-container .notify-on-import-checkbox .notify-on-import-checkbox-label svg {
+  --size: 14px;
+
+  width: var(--size);
+  height: var(--size);
+  color: var(--requestly-color-text-subtle);
+}
+
+.shared-list-container .success-message {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shared-list-container .success-message svg {
+  display: flex;
+  align-items: center;
+  color: var(--requestly-color-success);
+  margin-bottom: 2px;
+}
+
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-radio-wrapper > span:nth-child(2) {
   width: 100%;
-  font-size: var(--requestly-font-size-sm, 13px);
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .sharing-modal-wrapper .link-generation-loader {
@@ -123,8 +157,9 @@
   align-items: center;
   gap: 8px;
   margin-top: 8px;
-  font-size: var(--requestly-font-size-sm, 13px);
+  font-size: var(--requestly-font-size-sm, 12px);
   color: var(--requestly-color-text-subtle);
+  height: 40px;
 }
 
 .sharing-modal-wrapper .shared-list-name-input-wrapper {

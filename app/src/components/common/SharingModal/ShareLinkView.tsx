@@ -22,8 +22,9 @@ import { trackSharedListUrlCopied } from "features/rules/screens/sharedLists";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import "./index.css";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import { NotifyOnImport } from "./components/NotifyOnImport/NotifyOnImport";
+import "./index.css";
 
 interface ShareLinkProps {
   selectedRules: StorageRecord["id"][];
@@ -42,6 +43,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
   const [shareableLinkData, setShareableLinkData] = useState(null);
+  const [sharedListId, setSharedListId] = useState<string>("");
   const [isLinkGenerating, setIsLinkGenerating] = useState(false);
   const [isMailSent, setIsMailSent] = useState(false);
   const [error, setError] = useState(null);
@@ -161,6 +163,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
       }).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
         trackRQLastActivity("sharedList_created");
         onSharedLinkCreated();
+        setSharedListId(sharedListId);
         if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
           sendSharedListShareEmail({
             sharedListData: sharedListData,
@@ -257,7 +260,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
                 <>
                   {isMailSent && (
                     <div className="mt-8 text-gray success-message">
-                      <AiFillCheckCircle className="success" /> Invites sent!
+                      <AiFillCheckCircle className="success" /> <span>Invites sent!</span>
                     </div>
                   )}
                 </>
@@ -313,6 +316,8 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
             </>
           )}
         </>
+
+        <NotifyOnImport sharedListId={sharedListId} disabled={isLinkGenerating} />
       </div>
     </div>
   );
