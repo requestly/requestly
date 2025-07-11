@@ -93,6 +93,7 @@ export const SharingModal: React.FC<ModalProps> = ({
       open={isOpen}
       destroyOnClose
       onCancel={toggleModal}
+      maskClosable={false}
       centered
     >
       <div className="rq-modal-content">
