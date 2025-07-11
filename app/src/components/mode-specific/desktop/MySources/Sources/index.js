@@ -36,6 +36,7 @@ import { getAndroidDevices, getIosSimulators } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import IosBtn from "./iosBtn";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getUserOS } from "utils/osUtils";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -59,7 +60,11 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const { appsList } = desktopSpecificDetails;
   const systemWideSource = appsList["system-wide"];
   const appsListRef = useRef(null);
-  const isSystemWideSourceVisible = useFeatureValue("show_systemwide_source", false);
+  const platformsForSystemWideProxy = useFeatureValue("show_systemwide_source", {
+    whitelist: ["Windows"],
+  });
+
+  const isSystemWideSourceVisible = platformsForSystemWideProxy.whitelist?.includes(getUserOS());
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
   const getAppCount = useCallback(() => getConnectedAppsCount(appsListArray), [appsListArray]);

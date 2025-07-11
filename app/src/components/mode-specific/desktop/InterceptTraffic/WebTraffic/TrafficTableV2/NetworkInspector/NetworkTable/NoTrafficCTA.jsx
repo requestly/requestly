@@ -19,6 +19,7 @@ import { toast } from "utils/Toast";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getUserOS } from "utils/osUtils";
 
 const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const dispatch = useDispatch();
@@ -27,8 +28,11 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const { appsList } = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const systemWideSource = appsList["system-wide"];
-  const isSystemWideSourceVisible = useFeatureValue("show_systemwide_source", false);
+  const platformsForSystemWideProxy = useFeatureValue("show_systemwide_source", {
+    whitelist: ["Windows"],
+  });
 
+  const isSystemWideSourceVisible = platformsForSystemWideProxy.whitelist?.includes(getUserOS());
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
   useEffect(() => {
