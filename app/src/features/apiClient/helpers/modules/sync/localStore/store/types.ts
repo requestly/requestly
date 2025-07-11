@@ -10,7 +10,7 @@ export namespace APIClientSyncService {
     SUCCESS = "success",
   }
 
-  export type SyncTask = Promise<
+  export type SyncTask = null | Promise<
     | {
         success: true;
         data: {
@@ -28,7 +28,7 @@ export namespace APIClientSyncService {
     apisSyncStatus: Status;
     envsSyncStatus: Status;
 
-    syncTask?: SyncTask;
+    syncTask: SyncTask;
     setSyncTask(task: SyncTask): void;
 
     updateSyncStatus: () => Promise<{

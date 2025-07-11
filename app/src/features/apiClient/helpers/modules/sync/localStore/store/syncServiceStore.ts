@@ -26,6 +26,7 @@ export const createSyncServiceStore = () => {
   const syncServiceStore = create<APIClientSyncService.State>((set, get) => ({
     apisSyncStatus: APIClientSyncService.Status.PENDING_RECORDS,
     envsSyncStatus: APIClientSyncService.Status.PENDING_RECORDS,
+    syncTask: null,
 
     async updateSyncStatus() {
       const [apisSyncStatus, envsSyncStatus] = await getSyncStatus();
