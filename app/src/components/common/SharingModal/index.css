@@ -53,6 +53,23 @@
   font-size: var(--requestly-font-size-sm, 13px);
 }
 
+.shared-list-visibility-options {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.shared-list-visibility-options .ant-radio-wrapper {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.shared-list-visibility-options .ant-radio-wrapper .ant-radio {
+  margin-right: 6px;
+}
+
 .share-link-radio-btn-label {
   font-size: var(--requestly-font-size-sm, 13px);
 }
@@ -67,10 +84,21 @@
   font-size: var(--requestly-font-size-md, 14px);
 }
 
-.share-link-radio-btn-label span {
+.share-link-radio-btn-label span:nth-child(2) {
   display: inline-flex;
   align-items: center;
-  column-gap: 6px;
+  gap: 4px;
+  padding: 0;
+  padding-top: 2px;
+}
+
+.share-link-radio-btn-label span:nth-child(2) svg {
+  --size: 14px;
+
+  width: var(--size);
+  height: var(--size);
+  color: var(--requestly-color-text-subtle);
+  margin-bottom: 2px;
 }
 
 .share-link-radio-btn-label-tooltip.ant-tooltip {
@@ -79,6 +107,10 @@
 
 .share-link-radio-btn-label-tooltip .ant-tooltip-inner {
   width: max-content;
+}
+
+.shared-list-container .copy-value-wrapper {
+  height: 44px;
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-radio-wrapper > span:nth-child(2) {
