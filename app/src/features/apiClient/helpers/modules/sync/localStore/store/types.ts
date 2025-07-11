@@ -10,7 +10,7 @@ export namespace APIClientSyncService {
     SUCCESS = "success",
   }
 
-  type SyncTask = Promise<
+  export type SyncTask = Promise<
     | {
         success: true;
         data: {

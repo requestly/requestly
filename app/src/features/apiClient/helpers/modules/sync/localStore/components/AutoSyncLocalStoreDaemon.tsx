@@ -13,6 +13,7 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
 import { syncServiceStore } from "../store/syncServiceStore";
+import { APIClientSyncService } from "../store/types";
 
 const LoggedInDaemon: React.FC<{}> = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -35,7 +36,7 @@ const LoggedInDaemon: React.FC<{}> = () => {
       return;
     }
 
-    const task = (async () => {
+    const task: APIClientSyncService.SyncTask = (async () => {
       try {
         const syncedEnvironmentIds: string[] = [];
         const environments = await syncRepository.environmentVariablesRepository.getAllEnvironments();
@@ -62,10 +63,19 @@ const LoggedInDaemon: React.FC<{}> = () => {
           trackLocalStorageSyncCompleted({ type: "api" });
           toast.success("Your local APIs are ready");
         }
+
+        return { success: true, data: { records: syncedRecords.records, environments: syncedRecords.environments } };
       } catch (error) {
         trackLocalStorageSyncFailed({ type: "api" });
         Sentry.captureException(error);
         toast.error("Something went wrong while loading your local APIs");
+
+        return {
+          success: false,
+          message: "Syncing failed",
+        };
+      } finally {
+        setSyncTask(null);
       }
     })();
 
@@ -76,7 +86,7 @@ const LoggedInDaemon: React.FC<{}> = () => {
 };
 
 const LoggedOutDaemon: React.FC<{}> = () => {
-  const [syncTask] = useSyncService((state) => [state.syncTask]);
+  const [syncTask, setSyncTask] = useSyncService((state) => [state.syncTask, state.setSyncTask]);
   const [getAllRecords, refresh] = useAPIRecords((state) => [state.getAllRecords, state.refresh]);
 
   useEffect(() => {
@@ -86,22 +96,26 @@ const LoggedOutDaemon: React.FC<{}> = () => {
 
     (async () => {
       try {
-        await syncTask;
-        const records = getAllRecords();
+        const result = await syncTask;
+        setSyncTask(null);
 
-        // If there is no data, then there' no need to reset anything
-        if (!records.length) {
+        if (!result.success) {
           return;
         }
 
-        // But if there are records, we reset them since syncing has been successful
-        refresh([]);
+        const syncedRecords = result.data.records;
+        const syncedRecordIds = new Set(syncedRecords.map((r) => r.id));
+
+        const records = getAllRecords();
+        const recordsToBeShown = records.filter((r) => !syncedRecordIds.has(r.id));
+
+        refresh(recordsToBeShown);
       } catch (e) {
         // This is a noop, since syncing failing in logged out state
         // doesn't warrant any action.
       }
     })();
-  }, [syncTask, getAllRecords, refresh]);
+  }, [syncTask, setSyncTask, getAllRecords, refresh]);
 
   return <></>;
 };
