@@ -35,6 +35,7 @@ import LaunchButtonDropdown from "./LaunchButtonDropDown";
 import { getAndroidDevices, getIosSimulators } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import IosBtn from "./iosBtn";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const { appsList } = desktopSpecificDetails;
   const systemWideSource = appsList["system-wide"];
   const appsListRef = useRef(null);
+  const isSystemWideSourceVisible = useFeatureValue("show_systemwide_source", false);
 
   const getAppName = (appId) => appsListRef.current[appId]?.name;
   const getAppCount = useCallback(() => getConnectedAppsCount(appsListArray), [appsListArray]);
@@ -591,7 +593,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               Intercept traffic
             </RQButton>
           </Col>
-        ) : systemWideSource.isAvailable ? (
+        ) : systemWideSource.isAvailable && isSystemWideSourceVisible ? (
           <Col className="rq-modal-footer system-wide-source text-gray">{renderInterceptSystemWideSourceToggle()}</Col>
         ) : null}
       </RQModal>
