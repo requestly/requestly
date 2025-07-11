@@ -26,6 +26,7 @@ export const createSyncServiceStore = () => {
   const syncServiceStore = create<APIClientSyncService.State>((set, get) => ({
     apisSyncStatus: APIClientSyncService.Status.PENDING_RECORDS,
     envsSyncStatus: APIClientSyncService.Status.PENDING_RECORDS,
+    syncTask: null,
 
     async updateSyncStatus() {
       const [apisSyncStatus, envsSyncStatus] = await getSyncStatus();
@@ -107,14 +108,6 @@ export const createSyncServiceStore = () => {
         return;
       }
 
-      // const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
-      // const globalEnv = allEnvs.data.environments[globalEnvId];
-      // if (globalEnv.variables && Object.keys(globalEnv.variables).length) {
-      //   await syncRepository.environmentVariablesRepository.updateEnvironment(globalEnvId, {
-      //     variables: globalEnv.variables,
-      //   });
-      // }
-
       await localStoreRepository.environmentVariablesRepository.clear();
     },
 
@@ -135,7 +128,7 @@ export const createSyncServiceStore = () => {
       }
 
       trackLocalStorageSyncStarted({ type: "api" });
-      toast.loading("Getting your local APIs ready...", 8 * 1000);
+      toast.loading("Getting your local APIs ready...", 15);
 
       const [apis, envs] = await Promise.allSettled([
         syncApis(syncRepository, skip?.recordsToSkip),
@@ -160,6 +153,25 @@ export const createSyncServiceStore = () => {
         records,
         environments,
       };
+    },
+
+    setSyncTask(task) {
+      const existingTask = get().syncTask;
+      if (task === null) {
+        set({
+          syncTask: task,
+        });
+
+        return;
+      }
+
+      if (existingTask) {
+        throw new Error("Multiple sync tasks started!");
+      }
+
+      set({
+        syncTask: task,
+      });
     },
   }));
 
