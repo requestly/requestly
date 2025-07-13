@@ -113,8 +113,26 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const updatedRecords = useMemo(() => {
     const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
     const recordsToRender = prepareRecordsToRender(filteredRecords);
+
+    if (searchValue.trim()) {
+      const recordsToExpand = new Set<string>();
+      filteredRecords.forEach((record) => {
+        if (record.collectionId) {
+          recordsToExpand.add(record.collectionId);
+          let parentId = childParentMap.get(record.collectionId);
+          while (parentId) {
+            recordsToExpand.add(parentId);
+            parentId = childParentMap.get(parentId);
+          }
+        }
+      });
+      setExpandedRecordIds((prev: string[]) => {
+        const newExpanded = [...prev, ...Array.from(recordsToExpand)];
+        return [...new Set(newExpanded)];
+      });
+    }
     return recordsToRender;
-  }, [apiClientRecords, prepareRecordsToRender, searchValue]);
+  }, [apiClientRecords, childParentMap, prepareRecordsToRender, searchValue]);
 
   const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
