@@ -15,6 +15,7 @@ interface NotifyOnImportProps {
   disabled?: boolean;
   initialValue?: boolean;
   infoTooltipPlacement?: TooltipProps["placement"];
+  callback?: () => void;
 }
 
 export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
@@ -23,6 +24,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
   sharedListId,
   infoTooltipPlacement,
   initialValue = false,
+  callback = () => {},
 }) => {
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -51,6 +53,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
       toast.error("Failed to update shared list notification status");
     } finally {
       setIsUpdating(false);
+      callback();
     }
   };
 

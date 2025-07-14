@@ -12,9 +12,10 @@ import "./sharedListsTable.scss";
 
 interface SharedListsTableProps {
   sharedLists: SharedList[];
+  forceRender: () => void;
 }
 
-export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists }) => {
+export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists, forceRender }) => {
   const user = useSelector(getUserAuthDetails);
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
   const [isDeleteSharedListModalVisible, setIsDeleteSharedListModalVisible] = useState(false);
@@ -27,6 +28,7 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists 
   };
 
   const tableColumns = useSharedListsTableColumns({
+    forceRender,
     handleDeleteSharedListClick,
   });
 

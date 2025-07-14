@@ -22,10 +22,11 @@ import { RQTooltip, RQButton } from "lib/design-system-v2/components";
 import { NotifyOnImport } from "components/common/SharingModal/components/NotifyOnImport/NotifyOnImport";
 
 interface Props {
+  forceRender: () => void;
   handleDeleteSharedListClick: (sharedListId: string) => void;
 }
 
-export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Props) => {
+export const useSharedListsTableColumns = ({ forceRender, handleDeleteSharedListClick }: Props) => {
   const navigate = useNavigate();
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
@@ -117,6 +118,9 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 initialValue={record.notifyOnImport}
                 label="Enable import notification"
                 infoTooltipPlacement="bottomRight"
+                callback={() => {
+                  forceRender();
+                }}
               />
             ),
           },
