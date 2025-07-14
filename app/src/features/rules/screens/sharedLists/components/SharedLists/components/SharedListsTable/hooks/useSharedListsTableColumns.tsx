@@ -144,7 +144,7 @@ export const useSharedListsTableColumns = ({ forceRender, handleDeleteSharedList
               </RQTooltip>
             </RoleBasedComponent>
 
-            <Dropdown trigger={["click"]} menu={{ items }} placement="bottomLeft">
+            <Dropdown destroyPopupOnHide trigger={["click"]} menu={{ items }} placement="bottomLeft">
               <RQButton type="transparent" icon={<MdOutlineMoreHoriz />} />
             </Dropdown>
           </div>
