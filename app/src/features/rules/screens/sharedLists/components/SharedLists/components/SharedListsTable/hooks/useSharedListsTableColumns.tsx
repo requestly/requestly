@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { SharedList } from "../../../types";
-import { Table, Tooltip } from "antd";
+import { Table } from "antd";
 import moment from "moment";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
@@ -109,19 +109,19 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
         return (
           <div className="sharedlist-table-actions-container">
             <CopyToClipboard text={sharedListURL} onCopy={() => handleOnURLCopy(record.shareId)}>
-              <Tooltip title={record.shareId === copiedSharedListId ? "Copied!" : "Copy URL"}>
+              <RQTooltip title={record.shareId === copiedSharedListId ? "Copied!" : "Copy URL"}>
                 <RQButton icon={<MdOutlineFileCopy />} iconOnly />
-              </Tooltip>
+              </RQTooltip>
             </CopyToClipboard>
 
             <RoleBasedComponent resource="http_rule" permission="delete">
-              <Tooltip title="Delete">
+              <RQTooltip title="Delete">
                 <RQButton
                   icon={<RiDeleteBinLine />}
                   iconOnly
                   onClick={() => handleDeleteSharedListClick(record.shareId)}
                 />
-              </Tooltip>
+              </RQTooltip>
             </RoleBasedComponent>
           </div>
         );
