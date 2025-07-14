@@ -99,13 +99,13 @@ export const createSyncServiceStore = () => {
         throw new Error("Could not get all environments!");
       }
 
-      const envs = Object.values(allEnvs.data.environments);
-      const isJustGlobalEnv =
-        envs.length === 1 &&
-        envs[0].id === localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnv = allEnvs.data.environments[globalEnvId];
 
-      if (!isJustGlobalEnv) {
-        return;
+      if (globalEnv.variables && Object.keys(globalEnv.variables).length) {
+        await syncRepository.environmentVariablesRepository.updateEnvironment(globalEnvId, {
+          variables: globalEnv.variables,
+        });
       }
 
       await localStoreRepository.environmentVariablesRepository.clear();
