@@ -85,7 +85,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 : "Not yet"}
             </div>
 
-            {!record.notifyOnImport ? (
+            {record.notifyOnImport ? (
               <RQTooltip
                 showArrow={false}
                 placement="rightTop"
