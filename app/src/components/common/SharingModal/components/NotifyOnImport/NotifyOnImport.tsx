@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Checkbox, { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { TooltipProps } from "antd";
 import { toast } from "utils/Toast";
@@ -11,6 +11,7 @@ interface NotifyOnImportProps {
   label: string;
   sharedListId: string;
   disabled?: boolean;
+  initialValue?: boolean;
   infoTooltipPlacement?: TooltipProps["placement"];
 }
 
@@ -19,9 +20,14 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
   disabled,
   sharedListId,
   infoTooltipPlacement,
+  initialValue = false,
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [notifyOnImport, setNotifyOnImport] = useState(false);
+
+  useEffect(() => {
+    setNotifyOnImport(initialValue);
+  }, [initialValue]);
 
   const handleOnChange = async (e: CheckboxChangeEvent) => {
     try {
