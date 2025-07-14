@@ -1,16 +1,31 @@
 import React, { useState } from "react";
 import Checkbox, { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { Tooltip } from "antd";
+import { TooltipProps } from "antd";
 import { toast } from "utils/Toast";
 import { updateSharedListNotificationStatus } from "../../actions";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
+import { RQTooltip } from "lib/design-system-v2/components";
+import "./notifyOnImport.scss";
 
-export const NotifyOnImport: React.FC<{ sharedListId: string; disabled: boolean }> = ({ sharedListId, disabled }) => {
+interface NotifyOnImportProps {
+  label: string;
+  sharedListId: string;
+  disabled?: boolean;
+  infoTooltipPlacement?: TooltipProps["placement"];
+}
+
+export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
+  label,
+  disabled,
+  sharedListId,
+  infoTooltipPlacement,
+}) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [notifyOnImport, setNotifyOnImport] = useState(false);
 
   const handleOnChange = async (e: CheckboxChangeEvent) => {
     try {
+      // TODO: add analytics event for toggling notification
       setIsUpdating(true);
       setNotifyOnImport(e.target.checked);
 
@@ -35,15 +50,15 @@ export const NotifyOnImport: React.FC<{ sharedListId: string; disabled: boolean 
         className="notify-on-import-checkbox"
       >
         <span className="notify-on-import-checkbox-label">
-          Enable email notification for shared list import
-          <Tooltip
+          {label}
+          <RQTooltip
             showArrow={false}
-            placement="rightTop"
+            placement={infoTooltipPlacement ?? "rightTop"}
             overlayClassName="share-link-radio-btn-label-tooltip"
             title="Get an email when someone imports your shared list, including their email and timestamp."
           >
             <AiOutlineInfoCircle />
-          </Tooltip>
+          </RQTooltip>
         </span>
       </Checkbox>
     </div>

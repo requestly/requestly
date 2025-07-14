@@ -1,12 +1,12 @@
 import { useCallback, useState } from "react";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { SharedList } from "../../../types";
-import { Table } from "antd";
+import { Dropdown, MenuProps, Table } from "antd";
 import moment from "moment";
-import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { MdOutlineFileCopy } from "@react-icons/all-files/md/MdOutlineFileCopy";
 import { MdOutlineNotificationsActive } from "@react-icons/all-files/md/MdOutlineNotificationsActive";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 // @ts-ignore
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { getSharedListURL } from "utils/PathUtils";
@@ -18,7 +18,8 @@ import { useSelector } from "react-redux";
 import { UserAvatar } from "componentsV2/UserAvatar";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RoleBasedComponent } from "features/rbac";
-import { RQTooltip } from "lib/design-system-v2/components";
+import { RQTooltip, RQButton } from "lib/design-system-v2/components";
+import { NotifyOnImport } from "components/common/SharingModal/components/NotifyOnImport/NotifyOnImport";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -106,23 +107,40 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
       render: (_: any, record: SharedList) => {
         const sharedListURL = getSharedListURL(record.shareId, record.listName); // change here
 
+        const items: MenuProps["items"] = [
+          {
+            key: "0",
+            label: (
+              <NotifyOnImport
+                sharedListId={record.shareId}
+                label="Enable import notification"
+                infoTooltipPlacement="bottomRight"
+              />
+            ),
+          },
+        ];
+
         return (
           <div className="sharedlist-table-actions-container">
             <CopyToClipboard text={sharedListURL} onCopy={() => handleOnURLCopy(record.shareId)}>
               <RQTooltip title={record.shareId === copiedSharedListId ? "Copied!" : "Copy URL"}>
-                <RQButton icon={<MdOutlineFileCopy />} iconOnly />
+                <RQButton type="transparent" icon={<MdOutlineFileCopy />} />
               </RQTooltip>
             </CopyToClipboard>
 
             <RoleBasedComponent resource="http_rule" permission="delete">
               <RQTooltip title="Delete">
                 <RQButton
+                  type="transparent"
                   icon={<RiDeleteBinLine />}
-                  iconOnly
                   onClick={() => handleDeleteSharedListClick(record.shareId)}
                 />
               </RQTooltip>
             </RoleBasedComponent>
+
+            <Dropdown trigger={["click"]} menu={{ items }} placement="bottomLeft">
+              <RQButton type="transparent" icon={<MdOutlineMoreHoriz />} />
+            </Dropdown>
           </div>
         );
       },

@@ -317,7 +317,12 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
           )}
         </>
 
-        <NotifyOnImport sharedListId={sharedListId} disabled={isLinkGenerating} />
+        <NotifyOnImport
+          key={sharedListId}
+          sharedListId={sharedListId}
+          disabled={isLinkGenerating}
+          label="Enable email notification for shared list import"
+        />
       </div>
     </div>
   );

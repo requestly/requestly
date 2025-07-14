@@ -115,23 +115,10 @@
 
 .shared-list-container .notify-on-import-checkbox {
   margin-top: 16px;
-  color: var(--requestly-color-text-subtle);
-  font-size: var(--requestly-font-size-sm, 12px);
-  line-height: 18px; /* 150% */
 }
 
-.shared-list-container .notify-on-import-checkbox .notify-on-import-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.shared-list-container .notify-on-import-checkbox .notify-on-import-checkbox-label svg {
-  --size: 14px;
-
-  width: var(--size);
-  height: var(--size);
-  color: var(--requestly-color-text-subtle);
+.shared-list-container .notify-on-import-checkbox.ant-checkbox-wrapper .ant-checkbox {
+  margin-top: -6px;
 }
 
 .shared-list-container .success-message {
