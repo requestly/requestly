@@ -111,6 +111,7 @@ const LINKS = {
     "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa",
 
   CHROME_STORE_REVIEWS: "https://rqst.ly/chrome-review",
+  CHROME_STORE_REVIEW_FORM: "https://app.formbricks.com/s/cmd2qhh4vnxezyq01ailfaszm",
   //Firefox
   FIREFOX_EXTENSION: "https://app.requestly.in/firefox/builds/requestly-latest.xpi",
   //Edge
