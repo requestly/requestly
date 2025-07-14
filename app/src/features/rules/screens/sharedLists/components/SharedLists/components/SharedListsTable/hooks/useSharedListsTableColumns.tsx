@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { UserAvatar } from "componentsV2/UserAvatar";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { RoleBasedComponent } from "features/rbac";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -83,10 +84,16 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 : "Not yet"}
             </div>
 
-            {record.notifyOnImport ? (
-              <div className="notification-status">
-                <MdOutlineNotificationsActive /> Enabled
-              </div>
+            {!record.notifyOnImport ? (
+              <RQTooltip
+                showArrow={false}
+                placement="rightTop"
+                title="Email notifications are enabled for this shared list."
+              >
+                <div className="notification-status">
+                  <MdOutlineNotificationsActive /> Enabled
+                </div>
+              </RQTooltip>
             ) : null}
           </div>
         );
