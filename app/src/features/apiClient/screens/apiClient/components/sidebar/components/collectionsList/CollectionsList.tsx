@@ -114,7 +114,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
     const recordsToRender = prepareRecordsToRender(filteredRecords);
 
-    if (searchValue.trim()) {
+    if (searchValue) {
       const recordsToExpand = new Set<string>();
       filteredRecords.forEach((record) => {
         if (record.collectionId) {
@@ -128,7 +128,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       });
       setExpandedRecordIds((prev: string[]) => {
         const newExpanded = [...prev, ...Array.from(recordsToExpand)];
-        return [...new Set(newExpanded)];
+        return newExpanded;
       });
     }
     return recordsToRender;
