@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Checkbox, { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { TooltipProps } from "antd";
 import { toast } from "utils/Toast";
 import { updateSharedListNotificationStatus } from "../../actions";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { RQTooltip } from "lib/design-system-v2/components";
-import "./notifyOnImport.scss";
-import { useSelector } from "react-redux";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { trackSharedListImportNotificationStatusUpdated } from "features/rules/screens/sharedLists";
+import { captureException } from "backend/apiClient/utils";
+import "./notifyOnImport.scss";
 
 interface NotifyOnImportProps {
   label: string;
@@ -36,15 +38,16 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
 
   const handleOnChange = async (e: CheckboxChangeEvent) => {
     try {
-      // TODO: add analytics event for toggling notification
+      const updatedValue = e.target.checked;
       toast.loading("Updating import notification status...");
+
       setIsUpdating(true);
-      setNotifyOnImport(e.target.checked);
+      setNotifyOnImport(updatedValue);
 
       const result = await updateSharedListNotificationStatus({
         id: sharedListId,
         teamId: activeWorkspaceId,
-        notifyOnImport: e.target.checked,
+        notifyOnImport: updatedValue,
       });
 
       if (!result.data.success) {
@@ -52,7 +55,9 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
       }
 
       toast.success("Import notification status updated");
+      trackSharedListImportNotificationStatusUpdated(sharedListId, updatedValue);
     } catch (error) {
+      captureException(error);
       toast.error("Failed to update import notification status!");
     } finally {
       setIsUpdating(false);
