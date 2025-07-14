@@ -39,7 +39,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
   const handleOnChange = async (e: CheckboxChangeEvent) => {
     try {
       const updatedValue = e.target.checked;
-      toast.loading("Updating import notification status...");
+      toast.loading("Updating shared list import notification status...");
 
       setIsUpdating(true);
       setNotifyOnImport(updatedValue);
@@ -54,11 +54,11 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
         throw new Error("Failed to update notification status");
       }
 
-      toast.success("Import notification status updated");
+      toast.success(`Shared list import notifications ${updatedValue ? "enabled" : "disabled"}`);
       trackSharedListImportNotificationStatusUpdated(sharedListId, updatedValue);
     } catch (error) {
       captureException(error);
-      toast.error("Failed to update import notification status!");
+      toast.error("Failed to update shared list import notification status!");
     } finally {
       setIsUpdating(false);
       callback();
