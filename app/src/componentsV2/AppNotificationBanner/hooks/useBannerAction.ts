@@ -67,7 +67,7 @@ export const useBannerAction = (
         type: "primary",
         onClick: () => {
           localStorage.setItem(STORAGE.LOCAL_STORAGE.REDIRECT_TO_CHROME_STORE_REVIEW, "true");
-          redirectToUrl(LINKS.CHROME_STORE_REVIEWS, true);
+          redirectToUrl(LINKS.CHROME_STORE_REVIEW_FORM, true);
         },
       },
       [BANNER_ACTIONS.CONVERT_TO_ANNUAL_PLAN]: {
