@@ -6,6 +6,7 @@ import moment from "moment";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { MdOutlineFileCopy } from "@react-icons/all-files/md/MdOutlineFileCopy";
+import { MdOutlineNotificationsActive } from "@react-icons/all-files/md/MdOutlineNotificationsActive";
 // @ts-ignore
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { getSharedListURL } from "utils/PathUtils";
@@ -47,7 +48,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     Table.SELECTION_COLUMN,
     {
       title: "Name",
-      width: 400,
+      width: 370,
       render: (_: any, record: SharedList) => {
         return (
           <span
@@ -70,14 +71,23 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     },
     {
       title: "Imported",
-      width: 100,
+      width: 130,
+      align: "left",
 
       render: (_: any, record: SharedList) => {
         return (
-          <div className="text-center shared-list-import-count">
-            {record.importCount > 0
-              ? `${record.importCount} ${record.importCount === 1 ? "time" : "times"}`
-              : "Not yet"}
+          <div className="shared-list-import-count">
+            <div className="import-count">
+              {record.importCount > 0
+                ? `${record.importCount} ${record.importCount === 1 ? "Import" : "Imports"}`
+                : "Not yet"}
+            </div>
+
+            {record.notifyOnImport ? (
+              <div className="notification-status">
+                <MdOutlineNotificationsActive /> Enabled
+              </div>
+            ) : null}
           </div>
         );
       },
