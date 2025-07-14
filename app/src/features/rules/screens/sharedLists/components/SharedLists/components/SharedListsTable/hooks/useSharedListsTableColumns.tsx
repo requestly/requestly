@@ -112,7 +112,9 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
             key: "0",
             label: (
               <NotifyOnImport
+                key={record.shareId}
                 sharedListId={record.shareId}
+                initialValue={record.notifyOnImport}
                 label="Enable import notification"
                 infoTooltipPlacement="bottomRight"
               />

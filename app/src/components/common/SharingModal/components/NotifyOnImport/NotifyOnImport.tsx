@@ -6,6 +6,8 @@ import { updateSharedListNotificationStatus } from "../../actions";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { RQTooltip } from "lib/design-system-v2/components";
 import "./notifyOnImport.scss";
+import { useSelector } from "react-redux";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 interface NotifyOnImportProps {
   label: string;
@@ -22,6 +24,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
   infoTooltipPlacement,
   initialValue = false,
 }) => {
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [isUpdating, setIsUpdating] = useState(false);
   const [notifyOnImport, setNotifyOnImport] = useState(false);
 
@@ -35,7 +38,11 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
       setIsUpdating(true);
       setNotifyOnImport(e.target.checked);
 
-      const result = await updateSharedListNotificationStatus(sharedListId, e.target.checked);
+      const result = await updateSharedListNotificationStatus({
+        id: sharedListId,
+        teamId: activeWorkspaceId,
+        notifyOnImport: e.target.checked,
+      });
 
       if (!result.data.success) {
         throw new Error("Failed to update notification status");
@@ -50,7 +57,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
   return (
     <div>
       <Checkbox
-        value={notifyOnImport}
+        checked={notifyOnImport}
         disabled={disabled || isUpdating}
         onChange={handleOnChange}
         className="notify-on-import-checkbox"

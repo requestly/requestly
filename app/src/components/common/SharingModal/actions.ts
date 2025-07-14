@@ -112,10 +112,19 @@ export const duplicateRulesToTargetWorkspace = async (
   return StorageService(appMode).saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
 };
 
-export const updateSharedListNotificationStatus = async (id: string, notifyOnImport: boolean) => {
+export const updateSharedListNotificationStatus = async ({
+  id,
+  teamId,
+  notifyOnImport,
+}: {
+  teamId: string;
+  id: string;
+  notifyOnImport: boolean;
+}) => {
   const functions = getFunctions();
   const updateStatus = httpsCallable<
     {
+      teamId: string;
       sharedListId: string;
       notifyOnImport: boolean;
     },
@@ -129,6 +138,6 @@ export const updateSharedListNotificationStatus = async (id: string, notifyOnImp
       }
   >(functions, "sharedLists-updateNotificationStatus");
 
-  const result = await updateStatus({ sharedListId: id, notifyOnImport });
+  const result = await updateStatus({ teamId, sharedListId: id, notifyOnImport });
   return result;
 };
