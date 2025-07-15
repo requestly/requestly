@@ -6,6 +6,7 @@ import { LocalStoreRecordsSync } from "../services/LocalStoreRecordsSync";
 import { LocalStoreEnvSync } from "../services/LocalStoreEnvSync";
 import { toast } from "utils/Toast";
 import { trackLocalStorageSyncStarted } from "modules/analytics/events/features/apiClient";
+import { EnvironmentData } from "backend/environment/types";
 
 async function getSyncStatus() {
   const apisSyncStatus = await getEntitySyncStatus(localStoreRepository.apiClientRecordsRepository);
@@ -99,16 +100,34 @@ export const createSyncServiceStore = () => {
         throw new Error("Could not get all environments!");
       }
 
-      const envs = Object.values(allEnvs.data.environments);
-      const isJustGlobalEnv =
-        envs.length === 1 &&
-        envs[0].id === localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnv = allEnvs.data.environments[globalEnvId];
 
-      if (!isJustGlobalEnv) {
+      if (!globalEnv.variables || Object.keys(globalEnv.variables).length === 0) {
+        await localStoreRepository.environmentVariablesRepository.deleteEnvironment(globalEnvId);
         return;
       }
 
-      await localStoreRepository.environmentVariablesRepository.clear();
+      const syncedGlobalEnvId = syncRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const result = await syncRepository.environmentVariablesRepository.getEnvironmentById(syncedGlobalEnvId);
+      const syncedVariables = result.data?.variables ?? {};
+
+      let syncedVariablesCount = Object.values(syncedVariables).length;
+      const variablesToBeSynced: EnvironmentData["variables"] = { ...syncedVariables, ...globalEnv.variables };
+
+      // Update id for new variables, it maintains order in table ie appending new variables
+      Object.keys(globalEnv.variables).forEach((key) => {
+        if (!syncedVariables[key]) {
+          variablesToBeSynced[key].id = syncedVariablesCount;
+          syncedVariablesCount += 1;
+        }
+      });
+
+      await syncRepository.environmentVariablesRepository.updateEnvironment(globalEnvId, {
+        variables: variablesToBeSynced,
+      });
+
+      await localStoreRepository.environmentVariablesRepository.deleteEnvironment(globalEnvId);
     },
 
     async syncAll(syncRepository, skip) {
