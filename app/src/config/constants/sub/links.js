@@ -157,6 +157,14 @@ const LINKS = {
   OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
 
   ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
+
+  API_KEY_FORM: "https://app.formbricks.com/s/clryn62s316gjdeho9j03t7oa",
+
+  AUTOMATION_DOC: "https://rqst.ly/automation",
+
+  DOWNLOAD_CRX: "https://requestly.com/downloads/crx/",
+
+  DOWNLOAD_CHROME_EXTENSION_ZIP: "https://rqst.ly/chrome/zip",
 };
 
 export default LINKS;
