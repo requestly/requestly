@@ -104,7 +104,7 @@ export const createSyncServiceStore = () => {
       const globalEnv = allEnvs.data.environments[globalEnvId];
 
       if (!globalEnv.variables || Object.keys(globalEnv.variables).length === 0) {
-        await localStoreRepository.environmentVariablesRepository.clear();
+        await localStoreRepository.environmentVariablesRepository.deleteEnvironment(globalEnvId);
         return;
       }
 
@@ -127,7 +127,7 @@ export const createSyncServiceStore = () => {
         variables: variablesToBeSynced,
       });
 
-      await localStoreRepository.environmentVariablesRepository.clear();
+      await localStoreRepository.environmentVariablesRepository.deleteEnvironment(globalEnvId);
     },
 
     async syncAll(syncRepository, skip) {
