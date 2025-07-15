@@ -66,7 +66,10 @@ const RecordsProvider = ({
   data: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] };
   repository: ApiClientRecordsInterface<Record<string, any>>;
 }) => {
+  //initializing the store here
+  //const appmode = get("appmode");
   const store = useMemo(() => createApiRecordsStore(data), [data]);
+  //const filesStore = useMemo(() => createFilesStore);
 
   return (
     <ApiRecordsStoreContext.Provider value={store}>
