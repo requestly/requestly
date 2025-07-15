@@ -6,7 +6,7 @@ export const isGlobalEnvironment = (environmentId: string) => {
   if (!environmentId) {
     return false;
   }
-  return environmentId === "global" || environmentId.endsWith("/environments/global.json");
+  return environmentId === "global" || environmentId.endsWith("/environments/global.json") || environmentId.endsWith("/apis/environments/global.json");
 };
 
 export const mapToEnvironmentArray = (variables: EnvironmentVariables) => {
