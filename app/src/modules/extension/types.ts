@@ -24,6 +24,12 @@ export type ExtensionRule = {
   priority?: number;
 };
 
+export enum HeaderOperation {
+  APPEND = "append",
+  SET = "set",
+  REMOVE = "remove",
+}
+
 export enum RuleActionType {
   BLOCK = "block",
   REDIRECT = "redirect",
