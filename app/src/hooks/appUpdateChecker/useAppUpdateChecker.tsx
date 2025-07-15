@@ -4,9 +4,7 @@ import firebaseApp from "firebase";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect } from "react";
 import { InfoCircleOutlined } from "@ant-design/icons";
-
 import "./index.scss";
-import Logger from "../../../../common/logger";
 
 const useAppUpdateChecker = () => {
   useEffect(() => {
@@ -21,10 +19,10 @@ const useAppUpdateChecker = () => {
         const latestAppVersion = appVersions?.latestAppVersion;
         const currentAppVersion = process.env.REACT_APP_VERSION;
 
-        Logger.log("[Debug] App Versions", { latestAppVersion, currentAppVersion });
+        console.log("[Debug] App Versions", { latestAppVersion, currentAppVersion });
 
         if (!currentAppVersion || (latestAppVersion && semver.gt(latestAppVersion, currentAppVersion))) {
-          Logger.log("[Debug] New version available");
+          console.log("[Debug] New version available");
           notification.open({
             message: (
               <Row justify={"space-between"} className="app-update-notification-content" align={"middle"}>
@@ -47,11 +45,11 @@ const useAppUpdateChecker = () => {
             className: "app-update-notification",
           });
         } else {
-          Logger.log("[Debug] App is up to date");
+          console.log("[Debug] App is up to date");
         }
       },
       (err) => {
-        Logger.log("[Debug] Error in onValue listener", err);
+        console.log("[Debug] Error in onValue listener", err);
       }
     );
 

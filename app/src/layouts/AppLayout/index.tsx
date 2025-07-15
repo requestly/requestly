@@ -77,6 +77,7 @@ const App: React.FC = () => {
       <AutomationNotAllowedNotice />
       <AppModeInitializer />
       <AuthHandler />
+
       <GrowthBookProvider growthbook={growthbook}>
         <DBListeners />
         {/* <RuleExecutionsSyncer /> */}
