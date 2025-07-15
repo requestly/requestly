@@ -6,9 +6,9 @@ import { toast } from "utils/Toast";
 import { updateSharedListNotificationStatus } from "../../actions";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { RQTooltip } from "lib/design-system-v2/components";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 import { trackSharedListImportNotificationStatusUpdated } from "features/rules/screens/sharedLists";
 import { captureException } from "backend/apiClient/utils";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import "./notifyOnImport.scss";
 
 interface NotifyOnImportProps {
@@ -28,7 +28,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
   initialValue = false,
   callback = () => {},
 }) => {
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const [isUpdating, setIsUpdating] = useState(false);
   const [notifyOnImport, setNotifyOnImport] = useState(false);
 
@@ -46,7 +46,7 @@ export const NotifyOnImport: React.FC<NotifyOnImportProps> = ({
 
       const result = await updateSharedListNotificationStatus({
         id: sharedListId,
-        teamId: activeWorkspaceId,
+        teamId: activeWorkspace?.id,
         notifyOnImport: updatedValue,
       });
 
