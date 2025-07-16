@@ -224,7 +224,7 @@ const SeleniumImporterPage = () => {
         {toastMessage && <div className="toast">{toastMessage}</div>}
       </div>
       <footer className="footer">
-        <p>© 2024 RQ Labs, Inc.</p>
+        <p>© 2025 BrowserStack Inc.</p>
         <div className="footer-links">
           <a href="/">Go to Main App</a> | <a href="https://requestly.com/privacy/">Privacy Policy</a> |{" "}
           <a href="https://requestly.com/terms/">Disclaimer</a>
