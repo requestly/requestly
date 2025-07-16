@@ -1,7 +1,6 @@
 import { Modal } from "antd";
 import React, { useMemo } from "react";
 import { APIClientRequest } from "./types";
-import BetaBadge from "components/misc/BetaBadge";
 import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
@@ -18,7 +17,10 @@ import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
-import { ApiClientRepositoryContext, useGetApiClientSyncRepo } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import {
+  ApiClientRepositoryContext,
+  useGetApiClientSyncRepo,
+} from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -87,13 +89,11 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     return null;
   }
 
-
-
   return (
     <Modal
       className="api-client-modal"
       centered
-      title={<BetaBadge text={modalTitle || "API Client"} />}
+      title={modalTitle || "API Client"}
       open={isModalOpen}
       onCancel={onModalClose}
       footer={null}
