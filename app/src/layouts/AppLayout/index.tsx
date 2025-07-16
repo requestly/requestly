@@ -25,13 +25,13 @@ import { LazyMotion, domMax } from "framer-motion";
 import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
-import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
 import { BlockScreenHoc } from "componentsV2/BlockScreen/BlockScreenHoc";
+import { AppUpdateNotifier } from "componentsV2/AppUpdateNotifier/AppUpdateNotifier";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -50,7 +50,6 @@ const App: React.FC = () => {
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
-  useAppUpdateChecker();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
@@ -77,6 +76,7 @@ const App: React.FC = () => {
       <AutomationNotAllowedNotice />
       <AppModeInitializer />
       <AuthHandler />
+      <AppUpdateNotifier />
 
       <GrowthBookProvider growthbook={growthbook}>
         <DBListeners />
