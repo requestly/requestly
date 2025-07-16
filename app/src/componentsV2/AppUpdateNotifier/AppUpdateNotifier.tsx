@@ -43,15 +43,15 @@ export const AppUpdateNotifier: React.FC = () => {
             return;
           }
 
-          // v1 <= v2: force refresh
-          if (semver.lte(currentAppVersion, breakingAppVersion)) {
-            window.location.reload();
-            return;
-          }
-
           // v1 > v2: minor version, show refresh option
           if (semver.gt(currentAppVersion, breakingAppVersion)) {
             setShowRefreshOption(true);
+            return;
+          }
+
+          // v1 <= v2: force refresh
+          if (semver.lte(currentAppVersion, breakingAppVersion)) {
+            window.location.reload();
             return;
           }
         } catch (e) {
