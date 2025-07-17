@@ -88,7 +88,7 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
-  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
+  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
   export type RequestHtmlBody = string;

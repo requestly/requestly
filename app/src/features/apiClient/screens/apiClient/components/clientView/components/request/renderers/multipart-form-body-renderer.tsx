@@ -1,14 +1,18 @@
 import { Col, Input } from "antd";
 import { displayMultiFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
-import { useApiClientFilesStore } from "features/apiClient/store/apiClientFilesStore";
+import { apiClientFilesStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton } from "lib/design-system/components";
 import react from "react";
 import { RequestBodyProps } from "../request-body-types";
+import { RQAPI } from "features/apiClient/types";
 
 export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyProps["setRequestEntry"] }> = ({
   setRequestEntry,
 }) => {
-  const { _addFile } = useApiClientFilesStore((state) => state);
+  const { _addFile, files } = apiClientFilesStore((state) => state);
+  // requestBody to be extracted from useFormBody and requestBodyStateManager
+  // Match the file id with the files in the store and render the file error state wherever requiered
+  console.log("!!!debug", "files in multipart renderer", files);
 
   return (
     <Col>
@@ -18,17 +22,49 @@ export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyP
           displayMultiFileSelector(
             (selectedFilePaths: string[]) => {
               console.log("Selected files:", selectedFilePaths);
-              selectedFilePaths.forEach((filePath) => {
+              const selectedFiles = selectedFilePaths.map((filePath) => {
                 const fileName = filePath.split("/").pop();
-                const fileId = `${fileName}-${Date.now()}`; // we can use uuid as well
-                _addFile(fileId, {
+                const fileId = fileName + "-" + Date.now(); // Generate a unique ID for the file
+                return {
+                  id: fileId,
                   name: fileName,
                   path: filePath,
+                  source: "desktop",
+                };
+              });
+              selectedFiles.forEach((file) => {
+                _addFile(file.id, {
+                  name: file.name,
+                  path: file.path,
                   source: "desktop",
                   isFileValid: true,
                 });
               });
               // add the file details to requestEntry using setRequestEntry
+              // @aarush to fix it with bodyContainer logic
+              setRequestEntry((prev) => {
+                return {
+                  ...prev,
+                  contentType: "multipart/form-data",
+                  request: {
+                    ...prev.request,
+                    body: [
+                      {
+                        id: 1,
+                        key: "jsonFile",
+                        isEnabled: true,
+                        value: selectedFiles,
+                      },
+                      // {
+                      //   id: 2,
+                      //   key: "stringValue",
+                      //   isEnabled: true,
+                      //   value: "stringified value",
+                      // },
+                    ] as RQAPI.MultipartFormBody, // Assuming this is the correct type
+                  },
+                };
+              });
             },
             {
               properties: ["multiSelections", "openFile", "openDirectory"],

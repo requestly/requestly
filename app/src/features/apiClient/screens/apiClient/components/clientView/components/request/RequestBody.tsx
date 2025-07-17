@@ -1,4 +1,4 @@
-import { Col, Radio, Select } from "antd";
+import { Radio, Select } from "antd";
 import React, { useMemo } from "react";
 import { RQAPI, RequestContentType } from "../../../../../../types";
 import { FormBody } from "./renderers/form-body-renderer";
@@ -6,8 +6,6 @@ import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
 import { RequestBodyProps } from "./request-body-types";
 import "./requestBody.scss";
-import { RQButton } from "lib/design-system/components";
-import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { MultipartFormBodyRenderer } from "./renderers/multipart-form-body-renderer";
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
@@ -74,7 +72,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         >
           <Radio value="text">Raw</Radio>
           <Radio value={RequestContentType.FORM}>Form</Radio>
-          <Radio value={"multipart"}>Multipart Form Data</Radio>
+          <Radio value={"multipart/form-data"}>Multipart Form Data</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -113,8 +111,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       case RequestContentType.FORM:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
-      case "multipart":
-        return <MultipartFormBodyRenderer />;
+      case "multipart/form-data":
+        return <MultipartFormBodyRenderer setRequestEntry={setRequestEntry} />;
 
       default:
         return null;
