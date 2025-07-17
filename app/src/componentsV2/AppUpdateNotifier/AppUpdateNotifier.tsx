@@ -58,7 +58,7 @@ export const AppUpdateNotifier: React.FC = () => {
           // v1 <= v2: force refresh
           if (semver.lte(currentAppVersion, breakingAppVersion)) {
             trackAppUpdateForceReload(currentAppVersion, breakingAppVersion);
-            window.location.reload();
+            window.location.replace(window.location.href);
             return;
           }
         } catch (e) {
@@ -82,7 +82,7 @@ export const AppUpdateNotifier: React.FC = () => {
 
   const handleRefresh = () => {
     trackAppUpdateNotificationClicked("app_update", "app_refresh");
-    window.location.reload();
+    window.location.replace(window.location.href);
   };
 
   return showRefreshOption ? (
