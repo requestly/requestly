@@ -7,6 +7,7 @@ import {
   BearerTokenAuthorizationConfig,
 } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
+import { FileStoreId } from "./store/apiRecords/apiFiles.store";
 
 export enum RequestMethod {
   GET = "GET",
@@ -21,18 +22,35 @@ export enum RequestMethod {
 export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
-  FORM = "application/x-www-form-urlencoded",
+  FORM = "application/x-www-form-urlencoded", // ignore/ need to be removed
+  urlEncodedForm = "application/x-www-form-urlencoded",
+  multiPartForm = "multipart-form; prettify<to be calculated boundary>",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
 }
 
-export interface KeyValuePair {
+type MultipartFileValue = {
+  id: FileStoreId;
+  name: "filename";
+  path: "some path string";
+  createdAt: "extension" | "desktop";
+  // file?:File // not needed here
+};
+export interface KeyValuePairRaw {
   id: number;
   key: string;
-  value: string;
+  value: any;
   isEnabled: boolean;
-  type?: string; // added for special identifiers like auth
+}
+
+export interface KeyValuePair extends KeyValuePairRaw {
+  value: string;
+  type?: string;
+}
+
+export interface FormDataKeyValuePair extends KeyValuePairRaw {
+  value: MultipartFileValue[];
 }
 
 export enum KeyValueFormType {
