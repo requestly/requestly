@@ -10,9 +10,26 @@ export namespace APIClientSyncService {
     SUCCESS = "success",
   }
 
+  export type SyncTask = null | Promise<
+    | {
+        success: true;
+        data: {
+          records: RQAPI.Record[];
+          environments: EnvironmentData[];
+        };
+      }
+    | {
+        success: false;
+        message: string;
+      }
+  >;
+
   export type State = {
     apisSyncStatus: Status;
     envsSyncStatus: Status;
+
+    syncTask: SyncTask;
+    setSyncTask(task: SyncTask): void;
 
     updateSyncStatus: () => Promise<{
       apisSyncStatus: APIClientSyncService.Status;
