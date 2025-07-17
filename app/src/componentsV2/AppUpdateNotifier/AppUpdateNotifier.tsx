@@ -7,6 +7,11 @@ import { TbRefreshDot } from "@react-icons/all-files/tb/TbRefreshDot";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { RQButton } from "lib/design-system-v2/components";
 import "./appUpdateNotifier.scss";
+import {
+  trackAppUpdateForceReload,
+  trackAppUpdateNotificationClicked,
+  trackAppUpdateNotificationViewed,
+} from "./analytics";
 
 type AppVersions = {
   latestAppVersion: string;
@@ -45,12 +50,14 @@ export const AppUpdateNotifier: React.FC = () => {
 
           // v1 > v2: minor version, show refresh option
           if (semver.gt(currentAppVersion, breakingAppVersion)) {
+            trackAppUpdateNotificationViewed("app_update");
             setShowRefreshOption(true);
             return;
           }
 
           // v1 <= v2: force refresh
           if (semver.lte(currentAppVersion, breakingAppVersion)) {
+            trackAppUpdateForceReload(currentAppVersion, breakingAppVersion);
             window.location.reload();
             return;
           }
@@ -69,12 +76,12 @@ export const AppUpdateNotifier: React.FC = () => {
   }, []);
 
   const handleClose = () => {
-    // TODO: analytics
+    trackAppUpdateNotificationClicked("app_update", "close");
     setShowRefreshOption(false);
   };
 
   const handleRefresh = () => {
-    // TODO: analytics
+    trackAppUpdateNotificationClicked("app_update", "refresh");
     window.location.reload();
   };
 
