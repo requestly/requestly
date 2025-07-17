@@ -45,6 +45,18 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     };
   }
 
+  async getEnvironmentById(
+    envId: string
+  ): Promise<{
+    success: boolean;
+    data: EnvironmentData | null;
+  }> {
+    return {
+      success: true,
+      data: null,
+    };
+  }
+
   async _getAllEnvironments() {
     const environments = await this.queryService.getRecords();
     const environmentsMap = (environments ?? []).reduce((result, env) => {
