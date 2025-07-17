@@ -24,6 +24,7 @@ export const createApiClientFilesStore = (appMode: "desktop") => {
     isFilePresentLocally: async (fileId: FileId) => {
       const { files } = get();
       const file = files.get(fileId);
+      console.log("!!!debug", "file present locally", file);
       const doesFileExist = await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("does-file-exist", file.path);
       files.set(fileId, {
         ...file,
@@ -50,4 +51,4 @@ export const createApiClientFilesStore = (appMode: "desktop") => {
   }));
 };
 
-export const useApiClientFilesStore = createApiClientFilesStore("desktop");
+export const apiClientFilesStore = createApiClientFilesStore("desktop");
