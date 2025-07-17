@@ -95,6 +95,18 @@ export namespace RQAPI {
   export type RequestJavascriptBody = string;
   export type RequestXmlBody = string;
   export type RequestFormBody = KeyValuePair[];
+  export type MultipartFormBody = FormDataKeyValuePair[];
+
+  type FormDataKeyValuePair = KeyValuePair & {
+    value: string | MultipartFileValue[];
+  };
+
+  type MultipartFileValue = {
+    id: string; // file id for each multipart key value pair
+    name: string;
+    path: string;
+    source: "extension" | "desktop";
+  };
 
   export type RequestBodyContainer = {
     text?: string;

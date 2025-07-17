@@ -3,8 +3,11 @@ import { displayMultiFileSelector } from "components/mode-specific/desktop/misc/
 import { useApiClientFilesStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton } from "lib/design-system/components";
 import react from "react";
+import { RequestBodyProps } from "../request-body-types";
 
-export const MultipartFormBodyRenderer: react.FC = () => {
+export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyProps["setRequestEntry"] }> = ({
+  setRequestEntry,
+}) => {
   const { _addFile } = useApiClientFilesStore((state) => state);
 
   return (
@@ -25,7 +28,7 @@ export const MultipartFormBodyRenderer: react.FC = () => {
                   isFileValid: true,
                 });
               });
-              // Update the file details with key in key Value pair
+              // add the file details to requestEntry using setRequestEntry
             },
             {
               properties: ["multiSelections", "openFile", "openDirectory"],
