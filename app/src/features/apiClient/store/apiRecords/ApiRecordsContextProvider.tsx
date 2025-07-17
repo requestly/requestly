@@ -11,6 +11,7 @@ import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sy
 import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
+import { apiClientFilesStore } from "../apiClientFilesStore";
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
@@ -67,6 +68,28 @@ const RecordsProvider = ({
   repository: ApiClientRecordsInterface<Record<string, any>>;
 }) => {
   const store = useMemo(() => createApiRecordsStore(data), [data]);
+  const { addFile } = apiClientFilesStore((state) => state);
+
+  useEffect(() => {
+    if (data.records.length > 0) {
+      const { records } = data;
+      for (const record of records) {
+        if (record.type === RQAPI.RecordType.API) {
+          if (record.data.request.contentType === "multipart/form-data") {
+            const requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+            for (const bodyEntry of requestBody) {
+              const bodyValue = bodyEntry.value;
+              if (typeof bodyValue === "object") {
+                bodyValue?.forEach((file) => {
+                  addFile(file.id, file);
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }, [addFile, data]);
 
   return (
     <ApiRecordsStoreContext.Provider value={store}>

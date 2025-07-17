@@ -13,8 +13,8 @@ export interface ApiClientFilesStore {
   files: Map<FileId, ApiClientFile>;
   appMode: "desktop" | "extension"; // Currently only "desktop" is supported
   isFilePresentLocally: (fileId: FileId) => Promise<boolean>;
-  _addFile: (fileId: FileId, fileDetails: any) => void;
-  _removeFile: (fileId: FileId) => void;
+  addFile: (fileId: FileId, fileDetails: any) => void;
+  removeFile: (fileId: FileId) => void;
 }
 
 export const createApiClientFilesStore = (appMode: "desktop") => {
@@ -33,7 +33,7 @@ export const createApiClientFilesStore = (appMode: "desktop") => {
       set({ files: new Map(files) });
       return doesFileExist;
     },
-    _addFile: (fileId: FileId, fileDetails: any) => {
+    addFile: (fileId: FileId, fileDetails: any) => {
       const { files } = get();
       files.set(fileId, {
         name: fileDetails.name,
@@ -43,10 +43,16 @@ export const createApiClientFilesStore = (appMode: "desktop") => {
       });
       set({ files: new Map(files) });
     },
-    _removeFile: (fileId: FileId) => {
+    removeFile: (fileId: FileId) => {
       const { files } = get();
       files.delete(fileId);
       set({ files: new Map(files) });
+    },
+    reset: () => {
+      set({
+        files: new Map<FileId, ApiClientFile>(),
+        appMode: "desktop",
+      });
     },
   }));
 };
