@@ -119,6 +119,7 @@ export class ApiClientExecutor {
   }
 
   private async validateFiles() {
+    // TODO @aarush: enable the if block when contentType PR is ready
     // if(contentType==="formbody"){
     const fileBodies = this.entryDetails.request.body?.filter((body) => typeof body.value !== "string");
     const validateFiles = apiClientFilesStore.getState().isFilePresentLocally;
@@ -253,6 +254,7 @@ export class ApiClientExecutor {
     const areFilesValid = await this.validateFiles();
     if (!areFilesValid) {
       // Dummy error.
+      // TODO: @aarush: this dummy state to be updated as the the error states
       // This block to be only used for aborting the request execution if invalid files are present.
       return {
         executedEntry: { ...this.entryDetails },
