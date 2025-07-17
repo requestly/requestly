@@ -242,6 +242,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
     if (value === SharedLinkVisibility.PRIVATE) {
       // reset
       setShareableLinkData(null);
+      setSharedListRecipients([]);
     }
   };
 
