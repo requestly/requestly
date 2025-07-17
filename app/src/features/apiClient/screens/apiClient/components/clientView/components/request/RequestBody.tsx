@@ -125,7 +125,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
+      {/* {contentType === RequestContentType.FORM ? requestBodyOptions : null} */}
+      {requestBodyOptions}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );

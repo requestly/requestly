@@ -9,8 +9,8 @@ import { RQAPI } from "features/apiClient/types";
 export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyProps["setRequestEntry"] }> = ({
   setRequestEntry,
 }) => {
-  const { _addFile, files } = apiClientFilesStore((state) => state);
-  // requestBody to be extracted from useFormBody and requestBodyStateManager
+  const { addFile, files } = apiClientFilesStore((state) => state);
+  // TODO:aarush requestBody to be extracted from useFormBody and requestBodyStateManager
   // Match the file id with the files in the store and render the file error state wherever requiered
   console.log("!!!debug", "files in multipart renderer", files);
 
@@ -33,7 +33,7 @@ export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyP
                 };
               });
               selectedFiles.forEach((file) => {
-                _addFile(file.id, {
+                addFile(file.id, {
                   name: file.name,
                   path: file.path,
                   source: "desktop",
@@ -41,7 +41,7 @@ export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyP
                 });
               });
               // add the file details to requestEntry using setRequestEntry
-              // @aarush to fix it with bodyContainer logic
+              // TODO: @aarush to fix it with bodyContainer logic
               setRequestEntry((prev) => {
                 return {
                   ...prev,
