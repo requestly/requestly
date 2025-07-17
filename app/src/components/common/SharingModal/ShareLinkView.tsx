@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
-import { Radio, Tooltip } from "antd";
+import { Radio, RadioChangeEvent, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
 import { getSharedListIdFromImportURL } from "features/rules/screens/sharedLists";
@@ -235,6 +235,16 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
     }
   }, [shareableLinkData?.visibility, sharedLinkVisibility, handleSharedListCreation]);
 
+  const handleSharedListVisibilityChange = (e: RadioChangeEvent) => {
+    const value = e.target.value as SharedLinkVisibility;
+    setSharedLinkVisibility(value);
+
+    if (value === SharedLinkVisibility.PRIVATE) {
+      // reset
+      setShareableLinkData(null);
+    }
+  };
+
   return (
     <div className="sharing-modal-body">
       <div className="shared-list-container">
@@ -244,7 +254,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
               <Radio
                 value={option.value}
                 checked={sharedLinkVisibility === option.value}
-                onChange={() => setSharedLinkVisibility(option.value)}
+                onChange={handleSharedListVisibilityChange}
                 className="text-white text-bold share-link-radio-btn-label"
               >
                 {option.label}
@@ -320,7 +330,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
         <NotifyOnImport
           key={sharedListId}
           sharedListId={sharedListId}
-          disabled={isLinkGenerating}
+          disabled={isLinkGenerating || !shareableLinkData}
           label="Enable email notification for shared list import"
         />
       </div>
