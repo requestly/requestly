@@ -12,7 +12,7 @@ function parseSingleModeBody(params: {
 }): RQAPI.RequestBodyContainer {
   const { contentType, body } = params;
   switch (contentType) {
-    case RequestContentType.FORM:
+    case RequestContentType.urlEncodedForm:
       return {
         form: body as RQAPI.RequestFormBody,
       };
@@ -70,7 +70,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           }
         >
           <Radio value="text">Raw</Radio>
-          <Radio value={RequestContentType.FORM}>Form</Radio>
+          <Radio value={RequestContentType.urlEncodedForm}>Form</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -106,7 +106,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           />
         );
 
-      case RequestContentType.FORM:
+      case RequestContentType.urlEncodedForm:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       default:
@@ -120,7 +120,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
+      {contentType === RequestContentType.urlEncodedForm ? requestBodyOptions : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );

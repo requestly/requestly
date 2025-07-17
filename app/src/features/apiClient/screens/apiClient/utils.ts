@@ -116,7 +116,7 @@ export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => 
   if (entry.request.body != null) {
     if (!supportsRequestBody(entry.request.method)) {
       sanitizedEntry.request.body = null;
-    } else if (entry.request.contentType === RequestContentType.FORM) {
+    } else if (entry.request.contentType === RequestContentType.urlEncodedForm) {
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
         entry.request.body as RQAPI.RequestFormBody,
         removeDisabledKeys
@@ -208,7 +208,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
 
   if (contentType === RequestContentType.JSON) {
     body = JSON.stringify(requestJson.data);
-  } else if (contentType === RequestContentType.FORM) {
+  } else if (contentType === RequestContentType.urlEncodedForm) {
     body = generateKeyValuePairs(requestJson.data);
   } else {
     body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
@@ -504,9 +504,9 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
         mimeType: RequestContentType.JSON,
         text: apiRequest.body as string,
       };
-    } else if (apiRequest?.contentType === RequestContentType.FORM) {
+    } else if (apiRequest?.contentType === RequestContentType.urlEncodedForm) {
       harRequest.postData = {
-        mimeType: RequestContentType.FORM,
+        mimeType: RequestContentType.urlEncodedForm,
         params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
       };
     }
