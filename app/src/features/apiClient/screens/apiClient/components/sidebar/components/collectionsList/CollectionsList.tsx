@@ -115,19 +115,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     const recordsToRender = prepareRecordsToRender(filteredRecords);
 
     if (searchValue) {
-      const recordsToExpand = new Set<string>();
+      const recordsToExpand: string[] = [];
       filteredRecords.forEach((record) => {
         if (record.collectionId) {
-          recordsToExpand.add(record.collectionId);
+          recordsToExpand.push(record.collectionId);
           let parentId = childParentMap.get(record.collectionId);
           while (parentId) {
-            recordsToExpand.add(parentId);
+            recordsToExpand.push(parentId);
             parentId = childParentMap.get(parentId);
           }
         }
       });
       setExpandedRecordIds((prev: string[]) => {
-        const newExpanded = [...prev, ...Array.from(recordsToExpand)];
+        const newExpanded = prev.concat(recordsToExpand);
         return newExpanded;
       });
     }
