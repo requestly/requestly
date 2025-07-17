@@ -19,6 +19,7 @@ export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyP
       <Input />
       <RQButton
         onClick={() =>
+          // TODO @aarush to handle file removal as well
           displayMultiFileSelector(
             (selectedFilePaths: string[]) => {
               console.log("Selected files:", selectedFilePaths);
