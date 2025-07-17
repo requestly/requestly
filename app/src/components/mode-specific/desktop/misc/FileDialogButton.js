@@ -17,6 +17,26 @@ export function displayFileSelector(callback) {
   }
 }
 
+export function displayMultiFileSelector(callback, config = {}) {
+  const handleDialogPromise = (result) => {
+    const { canceled, filePaths } = result;
+    console.log("!!!debug", "result", result);
+    if (!canceled) {
+      if (callback) {
+        return callback(filePaths);
+      }
+    }
+  };
+
+  if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {
+      properties: ["openFile", "multiSelections", "openDirectory"],
+    }).then((result) => {
+      handleDialogPromise(result);
+    });
+  }
+}
+
 export const displayFolderSelector = (callback, onCancelCallback) => {
   const handleDialogPromise = (result) => {
     const { canceled, filePaths } = result;
