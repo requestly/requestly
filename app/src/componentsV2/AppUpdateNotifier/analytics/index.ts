@@ -7,7 +7,7 @@ const APP_NOTIFICATION = {
 };
 
 type NotificationType = "app_update";
-type ActionOnNotification = "close" | "refresh";
+type ActionOnNotification = "close" | "app_refresh";
 
 export const trackAppUpdateNotificationViewed = (notificationType: NotificationType) => {
   trackEvent(APP_NOTIFICATION.VIEWED, { notification_type: notificationType });

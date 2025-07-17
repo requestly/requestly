@@ -81,7 +81,7 @@ export const AppUpdateNotifier: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    trackAppUpdateNotificationClicked("app_update", "refresh");
+    trackAppUpdateNotificationClicked("app_update", "app_refresh");
     window.location.reload();
   };
 
