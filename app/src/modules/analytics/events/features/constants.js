@@ -221,6 +221,10 @@ export const API_CLIENT = {
 
   // Example collection
   EXAMPLE_COLLECTIONS_IMPORTED: "api_client_example_collections_imported",
+  EXAMPLE_COLLECTIONS_IMPORT_FAILED: "api_client_example_collections_import_failed",
+  EXAMPLE_COLLECTIONS_NUDGE_SHOWN: "api_client_example_collections_nudge_shown",
+  EXAMPLE_COLLECTIONS_NUDGE_CLOSE_CLICKED: "api_client_example_collections_nudge_close_clicked",
+  EXAMPLE_COLLECTIONS_NUDGE_IMPORT_CLICKED: "api_client_example_collections_nudge_import_clicked",
 
   // Local store sync
   LOCAL_STORAGE_SYNC_STARTED: "local_storage_sync_started",

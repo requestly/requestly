@@ -31,6 +31,7 @@ import { useRBAC } from "features/rbac";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
+import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -312,6 +313,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       </div>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
+          <ExampleCollectionsNudge />
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {

@@ -315,7 +315,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                     },
                   }}
                   trigger={["click"]}
-                  disabled={!isUserAdmin}
+                  disabled={!isUserAdmin || billingTeamDetails?.migratedToBrowserstack}
                   overlayStyle={{ width: "200px" }}
                   overlayClassName="billing-team-members-table-dropdown"
                 >
@@ -343,6 +343,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       checkIsPendingMember,
       getMemberRoleTag,
       billingTeamDetails.browserstackGroupId,
+      billingTeamDetails?.migratedToBrowserstack,
     ]
   );
 
@@ -371,7 +372,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                 icon={<IoMdAdd />}
                 className="billing-team-members-section-header-btn"
                 onClick={openDrawer}
-                disabled={!isUserAdmin}
+                disabled={!isUserAdmin || billingTeamDetails?.migratedToBrowserstack}
               >
                 Assign license
               </RQButton>
