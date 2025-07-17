@@ -7,6 +7,7 @@ import {
   deleteEnvironmentFromDB,
   duplicateEnvironmentInDB,
   fetchAllEnvironmentDetails,
+  getEnvironment,
   updateEnvironmentInDB,
 } from "backend/environment";
 import { getOwnerId } from "backend/utils";
@@ -31,6 +32,14 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
         environments: result,
         erroredRecords: [] as ErroredRecord[],
       },
+    };
+  }
+
+  async getEnvironmentById(envId: string) {
+    const result = await getEnvironment(envId, this.getPrimaryId());
+    return {
+      success: true,
+      data: result,
     };
   }
 
