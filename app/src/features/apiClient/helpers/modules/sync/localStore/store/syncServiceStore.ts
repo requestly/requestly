@@ -6,6 +6,7 @@ import { LocalStoreRecordsSync } from "../services/LocalStoreRecordsSync";
 import { LocalStoreEnvSync } from "../services/LocalStoreEnvSync";
 import { toast } from "utils/Toast";
 import { trackLocalStorageSyncStarted } from "modules/analytics/events/features/apiClient";
+import { EnvironmentData } from "backend/environment/types";
 
 async function getSyncStatus() {
   const apisSyncStatus = await getEntitySyncStatus(localStoreRepository.apiClientRecordsRepository);
@@ -26,6 +27,7 @@ export const createSyncServiceStore = () => {
   const syncServiceStore = create<APIClientSyncService.State>((set, get) => ({
     apisSyncStatus: APIClientSyncService.Status.PENDING_RECORDS,
     envsSyncStatus: APIClientSyncService.Status.PENDING_RECORDS,
+    syncTask: null,
 
     async updateSyncStatus() {
       const [apisSyncStatus, envsSyncStatus] = await getSyncStatus();
@@ -98,24 +100,34 @@ export const createSyncServiceStore = () => {
         throw new Error("Could not get all environments!");
       }
 
-      const envs = Object.values(allEnvs.data.environments);
-      const isJustGlobalEnv =
-        envs.length === 1 &&
-        envs[0].id === localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const globalEnv = allEnvs.data.environments[globalEnvId];
 
-      if (!isJustGlobalEnv) {
+      if (!globalEnv.variables || Object.keys(globalEnv.variables).length === 0) {
+        await localStoreRepository.environmentVariablesRepository.deleteEnvironment(globalEnvId);
         return;
       }
 
-      // const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
-      // const globalEnv = allEnvs.data.environments[globalEnvId];
-      // if (globalEnv.variables && Object.keys(globalEnv.variables).length) {
-      //   await syncRepository.environmentVariablesRepository.updateEnvironment(globalEnvId, {
-      //     variables: globalEnv.variables,
-      //   });
-      // }
+      const syncedGlobalEnvId = syncRepository.environmentVariablesRepository.getGlobalEnvironmentId();
+      const result = await syncRepository.environmentVariablesRepository.getEnvironmentById(syncedGlobalEnvId);
+      const syncedVariables = result.data?.variables ?? {};
 
-      await localStoreRepository.environmentVariablesRepository.clear();
+      let syncedVariablesCount = Object.values(syncedVariables).length;
+      const variablesToBeSynced: EnvironmentData["variables"] = { ...syncedVariables, ...globalEnv.variables };
+
+      // Update id for new variables, it maintains order in table ie appending new variables
+      Object.keys(globalEnv.variables).forEach((key) => {
+        if (!syncedVariables[key]) {
+          variablesToBeSynced[key].id = syncedVariablesCount;
+          syncedVariablesCount += 1;
+        }
+      });
+
+      await syncRepository.environmentVariablesRepository.updateEnvironment(globalEnvId, {
+        variables: variablesToBeSynced,
+      });
+
+      await localStoreRepository.environmentVariablesRepository.deleteEnvironment(globalEnvId);
     },
 
     async syncAll(syncRepository, skip) {
@@ -135,7 +147,7 @@ export const createSyncServiceStore = () => {
       }
 
       trackLocalStorageSyncStarted({ type: "api" });
-      toast.loading("Getting your local APIs ready...", 8 * 1000);
+      toast.loading("Getting your local APIs ready...", 15);
 
       const [apis, envs] = await Promise.allSettled([
         syncApis(syncRepository, skip?.recordsToSkip),
@@ -160,6 +172,25 @@ export const createSyncServiceStore = () => {
         records,
         environments,
       };
+    },
+
+    setSyncTask(task) {
+      const existingTask = get().syncTask;
+      if (task === null) {
+        set({
+          syncTask: task,
+        });
+
+        return;
+      }
+
+      if (existingTask) {
+        throw new Error("Multiple sync tasks started!");
+      }
+
+      set({
+        syncTask: task,
+      });
     },
   }));
 

@@ -63,6 +63,18 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     }
   }
 
+  async getEnvironmentById(
+    envId: string
+  ): Promise<{
+    success: boolean;
+    data: EnvironmentData | null;
+  }> {
+    return {
+      success: true,
+      data: null,
+    };
+  }
+
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment(environmentName, false);
