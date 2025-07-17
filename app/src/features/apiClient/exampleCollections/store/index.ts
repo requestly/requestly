@@ -3,7 +3,7 @@ import {
   processRqImportData,
   RQImportData,
 } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
-import { create, StoreApi, UseBoundStore, useStore } from "zustand";
+import { create, StoreApi, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/shallow";
 import * as Sentry from "@sentry/react";
@@ -15,13 +15,16 @@ import { sessionStorage } from "utils/sessionStorage";
 import { variablesActions } from "store/features/variables/slice";
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
 import { Dispatch } from "react";
-import { trackExampleCollectionsImported } from "modules/analytics/events/features/apiClient";
+import {
+  trackExampleCollectionsImported,
+  trackExampleCollectionsImportFailed,
+} from "modules/analytics/events/features/apiClient";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
 
 const markAsExample = <T>(record: T) => ({ ...(record ?? {}), isExample: true } as T);
 
-enum ExampleCollectionsImportStatus {
+export enum ExampleCollectionsImportStatus {
   NOT_IMPORTED = "NOT_IMPORTED",
   IMPORTING = "IMPORTING",
   IMPORTED = "IMPORTED",
@@ -29,26 +32,28 @@ enum ExampleCollectionsImportStatus {
 }
 
 type ExampleCollectionsState = {
-  isBannerPermanentlyClosed: boolean;
+  isNudgePermanentlyClosed: boolean;
   importStatus: ExampleCollectionsImportStatus;
 };
 
 type ExampleCollectionsActions = {
+  closeNudge: () => void;
+  getIsExampleCollectionsImported: () => boolean;
   importExampleCollections: (params: {
     respository: ApiClientRepositoryInterface;
     ownerId: string | null;
-    recordsStore: UseBoundStore<StoreApi<ApiRecordsState>>;
+    recordsStore: StoreApi<ApiRecordsState>;
     envsStore: {
       forceRefreshEnvironments: () => void;
     };
     dispatch: Dispatch<unknown>;
-  }) => Promise<void>;
+  }) => Promise<{ success: true } | { success: false; message: string }>;
 };
 
 type ExampleCollectionsStore = ExampleCollectionsState & ExampleCollectionsActions;
 
 const initialState: ExampleCollectionsState = {
-  isBannerPermanentlyClosed: false,
+  isNudgePermanentlyClosed: false,
   importStatus: ExampleCollectionsImportStatus.NOT_IMPORTED,
 };
 
@@ -58,12 +63,25 @@ const createExampleCollectionsStore = () => {
       (set, get) => ({
         ...initialState,
 
-        importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore, dispatch }) => {
+        closeNudge: () => {
+          set({ isNudgePermanentlyClosed: true });
+        },
+
+        getIsExampleCollectionsImported: () => {
           const { importStatus } = get();
+          return importStatus === ExampleCollectionsImportStatus.IMPORTED;
+        },
+
+        importExampleCollections: async ({ respository, ownerId, recordsStore, envsStore, dispatch }) => {
+          const { importStatus, isNudgePermanentlyClosed } = get();
 
           if (
             [ExampleCollectionsImportStatus.IMPORTING, ExampleCollectionsImportStatus.IMPORTED].includes(importStatus)
           ) {
+            return;
+          }
+
+          if (isNudgePermanentlyClosed) {
             return;
           }
 
@@ -97,7 +115,15 @@ const createExampleCollectionsStore = () => {
               return markAsExample(updatedApi);
             });
 
-            proccessedData.collections = proccessedData.collections.map((r) => markAsExample(r));
+            proccessedData.collections = proccessedData.collections.map((r, index) => {
+              if (index === 0) {
+                // Mark parent collection as root, this will be use to show special collection icon on UI
+                // @ts-ignore
+                r["isExampleRoot"] = true;
+              }
+
+              return markAsExample(r);
+            });
             proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r));
 
             const recordsToImport = [...proccessedData.apis, ...proccessedData.collections];
@@ -131,9 +157,12 @@ const createExampleCollectionsStore = () => {
             trackExampleCollectionsImported();
 
             set({ importStatus: ExampleCollectionsImportStatus.IMPORTED });
+            return { success: true };
           } catch (error) {
             Sentry.captureException(error);
+            trackExampleCollectionsImportFailed();
             set({ importStatus: ExampleCollectionsImportStatus.FAILED });
+            return { success: false, message: "Failed to import example collections" };
           }
         },
       }),
@@ -141,7 +170,7 @@ const createExampleCollectionsStore = () => {
         name: "rqExampleCollectionsStore",
         partialize: (state) => ({
           importStatus: state.importStatus,
-          isBannerPermanentlyClosed: state.isBannerPermanentlyClosed,
+          isNudgePermanentlyClosed: state.isNudgePermanentlyClosed,
         }),
       }
     )

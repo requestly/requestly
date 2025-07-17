@@ -1,8 +1,6 @@
 import React from "react";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { RQDropdown } from "lib/design-system/components";
-import { RQBadge } from "lib/design-system/components/RQBadge";
-import { PRODUCT_FEATURES } from "./staticData";
 import { RQButton } from "lib/design-system-v2/components";
 import { EmptyCardOptions, ImportOptions } from "../Card/types";
 import { CardIcon } from "../CardIcon";
@@ -31,7 +29,6 @@ export const HomepageEmptyCard: React.FC<Props> = ({
 
             <div className="title-badge-container">
               <h1 className="homepage-emptycard-title">{title}</h1>
-              {title === PRODUCT_FEATURES.API_CLIENT.title && <RQBadge badgeText="BETA" />}
             </div>
           </div>
 

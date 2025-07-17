@@ -85,3 +85,12 @@ export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
 
   return useStore(store, useShallow(selector));
 }
+
+export function useAPIRecordsStore() {
+  const store = useContext(ApiRecordsStoreContext);
+  if (!store) {
+    throw new Error("store not found!");
+  }
+
+  return store;
+}

@@ -5,12 +5,12 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useExampleCollections } from "../store";
 import { WorkspaceType } from "features/workspaces/types";
-import { StoreApi, UseBoundStore } from "zustand";
+import { StoreApi } from "zustand";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { getOwnerId, LOGGED_OUT_STATE_UID } from "backend/utils";
 
-export const ExampleCollectionsDaemon: React.FC<{ store: UseBoundStore<StoreApi<ApiRecordsState>> }> = ({ store }) => {
+export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsState> }> = ({ store }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
