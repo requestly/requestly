@@ -24,11 +24,13 @@ export const createApiClientFilesStore = (appMode: "desktop") => {
     isFilePresentLocally: async (fileId: FileId) => {
       const { files } = get();
       const file = files.get(fileId);
-      if (file.isFileValid) {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async check
-        return true; // Simulate that the file is present
-      }
-      return file.isFileValid;
+      const doesFileExist = await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("does-file-exist", file.path);
+      files.set(fileId, {
+        ...file,
+        isFileValid: doesFileExist,
+      });
+      set({ files: new Map(files) });
+      return doesFileExist;
     },
     _addFile: (fileId: FileId, fileDetails: any) => {
       const { files } = get();
