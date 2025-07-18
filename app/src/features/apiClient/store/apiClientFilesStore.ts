@@ -1,6 +1,7 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-interface ApiClientFile {
+export interface ApiClientFile {
   name: string;
   path: string;
   source: "desktop";
@@ -10,51 +11,62 @@ interface ApiClientFile {
 export type FileId = string;
 
 export interface ApiClientFilesStore {
-  files: Map<FileId, ApiClientFile>;
+  files: Record<FileId, ApiClientFile>;
   appMode: "desktop" | "extension"; // Currently only "desktop" is supported
   isFilePresentLocally: (fileId: FileId) => Promise<boolean>;
   addFile: (fileId: FileId, fileDetails: any) => void;
   removeFile: (fileId: FileId) => void;
 }
 
-export const createApiClientFilesStore = (appMode: "desktop") => {
-  return create<ApiClientFilesStore>()((set, get) => ({
-    files: new Map<FileId, ApiClientFile>(),
-    appMode,
-    isFilePresentLocally: async (fileId: FileId) => {
-      const { files } = get();
-      const file = files.get(fileId);
-      console.log("!!!debug", "file present locally", file);
-      const doesFileExist = await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("does-file-exist", file.path);
-      files.set(fileId, {
-        ...file,
-        isFileValid: doesFileExist,
-      });
-      set({ files: new Map(files) });
-      return doesFileExist;
-    },
-    addFile: (fileId: FileId, fileDetails: any) => {
-      const { files } = get();
-      files.set(fileId, {
-        name: fileDetails.name,
-        path: fileDetails.path,
-        source: fileDetails.source,
-        isFileValid: true, // Assuming the file is valid when added
-      });
-      set({ files: new Map(files) });
-    },
-    removeFile: (fileId: FileId) => {
-      const { files } = get();
-      files.delete(fileId);
-      set({ files: new Map(files) });
-    },
-    reset: () => {
-      set({
-        files: new Map<FileId, ApiClientFile>(),
-        appMode: "desktop",
-      });
-    },
-  }));
+export const createApiClientFilesStore = (appMode: "desktop", initialFiles: Record<FileId, ApiClientFile>) => {
+  return create<ApiClientFilesStore>()(
+    persist(
+      (set, get) => ({
+        files: initialFiles,
+        appMode,
+        isFilePresentLocally: async (fileId: FileId) => {
+          const { files } = get();
+          const file = files[fileId];
+          console.log("!!!debug", "file present locally", file);
+          const doesFileExist = await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.(
+            "does-file-exist",
+            file.path
+          );
+          files[fileId] = {
+            ...file,
+            isFileValid: doesFileExist,
+          };
+          set({ files });
+          return doesFileExist;
+        },
+        addFile: (fileId: FileId, fileDetails: any) => {
+          const { files } = get();
+          files[fileId] = {
+            ...fileDetails,
+            isFileValid: true, // Assuming the file is valid when added
+          };
+          set({ files });
+        },
+        removeFile: (fileId: FileId) => {
+          const { files } = get();
+          delete files[fileId];
+          set({ files });
+        },
+        reset: () => {
+          set({
+            files: {},
+            appMode: "desktop",
+          });
+        },
+      }),
+      {
+        name: "apiClientFilesStore",
+        version: 1,
+        partialize: (state) => ({
+          files: state.files,
+          appMode: state.appMode,
+        }),
+      }
+    )
+  );
 };
-
-export const apiClientFilesStore = createApiClientFilesStore("desktop");

@@ -25,6 +25,7 @@ export enum RequestContentType {
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
+  MULTIPARTFORM = "multipart/form-data",
 }
 
 export interface KeyValuePair {
