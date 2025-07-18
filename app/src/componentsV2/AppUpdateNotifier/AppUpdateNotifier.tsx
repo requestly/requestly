@@ -37,11 +37,24 @@ export const AppUpdateNotifier: React.FC = () => {
           const currentAppVersion = process.env.REACT_APP_VERSION;
 
           const appVersions: AppVersions = snapshot.val();
-          const latestAppVersion = appVersions.latestAppVersion;
-          const breakingAppVersion = appVersions.breakingAppVersion;
+          let latestAppVersion = appVersions.latestAppVersion;
+          let breakingAppVersion = appVersions.breakingAppVersion;
+          const FALLBACK_DEFAULT_VERSION = "0.0.0";
 
-          if (semver.valid(latestAppVersion) === null || semver.valid(breakingAppVersion) === null) {
-            throw new Error("Invalid app version format");
+          if (!semver.valid(latestAppVersion)) {
+            latestAppVersion = FALLBACK_DEFAULT_VERSION;
+
+            Sentry.captureMessage("Invalid latest app version format", {
+              extra: { latestAppVersion },
+            });
+          }
+
+          if (!semver.valid(breakingAppVersion)) {
+            breakingAppVersion = FALLBACK_DEFAULT_VERSION;
+
+            Sentry.captureMessage("Invalid breaking app version format", {
+              extra: { breakingAppVersion },
+            });
           }
 
           // We forgot to update the latestAppVersion in DB
