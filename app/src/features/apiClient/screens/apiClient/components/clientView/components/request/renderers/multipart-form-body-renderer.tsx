@@ -1,15 +1,15 @@
 import { Col, Input } from "antd";
 import { displayMultiFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
-import { apiClientFilesStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton } from "lib/design-system/components";
 import react from "react";
 import { RequestBodyProps } from "../request-body-types";
 import { RQAPI } from "features/apiClient/types";
+import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFileStore.hook";
 
 export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyProps["setRequestEntry"] }> = ({
   setRequestEntry,
 }) => {
-  const { addFile, files } = apiClientFilesStore((state) => state);
+  const { addFile, files } = useApiClientFileStore((state) => state);
   // TODO:aarush requestBody to be extracted from useFormBody and requestBodyStateManager
   // Match the file id with the files in the store and render the file error state wherever requiered
   console.log("!!!debug", "files in multipart renderer", files);
@@ -25,7 +25,7 @@ export const MultipartFormBodyRenderer: react.FC<{ setRequestEntry: RequestBodyP
               console.log("Selected files:", selectedFilePaths);
               const selectedFiles = selectedFilePaths.map((filePath) => {
                 const fileName = filePath.split("/").pop();
-                const fileId = fileName + "-" + Date.now(); // Generate a unique ID for the file
+                const fileId = fileName + "-" + Date.now(); // Generate a unique ID for the file/uuid can be used as well
                 return {
                   id: fileId,
                   name: fileName,
