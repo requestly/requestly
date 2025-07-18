@@ -16,6 +16,9 @@ interface HeaderEntry {
   placeHolder?: string;
 }
 
+/*
+Resolve the headers having prettyValue
+*/
 const resolveContentTypeHeaders = (value: string): HeaderEntry => {
   switch (value) {
     case RequestContentType.MULTI_PART_FORM:
