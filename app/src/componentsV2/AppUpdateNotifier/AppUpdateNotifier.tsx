@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, onValue, ref } from "firebase/database";
 import firebaseApp from "firebase";
 import * as semver from "semver";
-import { captureException } from "backend/apiClient/utils";
 import { TbRefreshDot } from "@react-icons/all-files/tb/TbRefreshDot";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { RQButton } from "lib/design-system-v2/components";
@@ -35,6 +34,11 @@ export const AppUpdateNotifier: React.FC = () => {
           }
 
           const currentAppVersion = process.env.REACT_APP_VERSION;
+
+          if (!semver.valid(currentAppVersion)) {
+            Sentry.captureException(new Error("Invalid current app version format"), { extra: { currentAppVersion } });
+            return;
+          }
 
           const appVersions: AppVersions = snapshot.val();
           let latestAppVersion = appVersions.latestAppVersion;
@@ -79,11 +83,11 @@ export const AppUpdateNotifier: React.FC = () => {
             return;
           }
         } catch (e) {
-          captureException(e);
+          Sentry.captureException(e);
         }
       },
       (e) => {
-        captureException(e);
+        Sentry.captureException(e);
       }
     );
 
