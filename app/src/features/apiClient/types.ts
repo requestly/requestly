@@ -99,8 +99,7 @@ export namespace RQAPI {
 
   export type RequestBodyContainer = {
     text?: string;
-    formURLEncoded?: KeyValuePair[];
-    multipartForm?: KeyValuePair[];
+    form?: KeyValuePair[];
   };
 
   export type Auth = {

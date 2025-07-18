@@ -12,13 +12,9 @@ function parseSingleModeBody(params: {
 }): RQAPI.RequestBodyContainer {
   const { contentType, body } = params;
   switch (contentType) {
-    case RequestContentType.MULTI_PART_FORM:
+    case RequestContentType.FORM:
       return {
-        multipartForm: body as RQAPI.RequestFormBody,
-      };
-    case RequestContentType.URL_ENCODED_FORM:
-      return {
-        formURLEncoded: body as RQAPI.RequestFormBody,
+        form: body as RQAPI.RequestFormBody,
       };
     case RequestContentType.JSON:
       return {
@@ -74,8 +70,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           }
         >
           <Radio value="text">Raw</Radio>
-          <Radio value={RequestContentType.URL_ENCODED_FORM}>Form</Radio>
-          <Radio value={RequestContentType.MULTI_PART_FORM}>Multipart</Radio>
+          <Radio value={RequestContentType.FORM}>Form</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -111,8 +106,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           />
         );
 
-      case RequestContentType.URL_ENCODED_FORM:
-      case RequestContentType.MULTI_PART_FORM:
+      case RequestContentType.FORM:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       default:
@@ -126,9 +120,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.URL_ENCODED_FORM || contentType === RequestContentType.MULTI_PART_FORM
-        ? requestBodyOptions
-        : null}
+      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );
