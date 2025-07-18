@@ -13,7 +13,7 @@ import "./sharedLists.scss";
 export const SharedLists = () => {
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const [searchValue, setSearchValue] = useState("");
-  const { sharedLists, isSharedListsLoading } = useFetchSharedLists();
+  const { sharedLists, isSharedListsLoading, triggerForceRender } = useFetchSharedLists();
 
   const filteredSharedLists = useMemo(() => {
     if (!sharedLists) return [];
@@ -39,7 +39,7 @@ export const SharedLists = () => {
           searchValue={searchValue}
           handleSearchValueUpdate={(value: string) => setSearchValue(value)}
         />
-        <SharedListsTable sharedLists={filteredSharedLists} />
+        <SharedListsTable sharedLists={filteredSharedLists} forceRender={triggerForceRender} />
       </div>
     );
   } else return <CreateSharedListCTA />;

@@ -21,12 +21,12 @@ import {
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { globalActions } from "store/slices/global/slice";
-import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
 import APP_CONSTANTS from "config/constants";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import { Group, Rule } from "@requestly/shared/types/entities/rules";
 import { useRBAC } from "features/rbac";
+import { captureException } from "backend/apiClient/utils";
 
 interface ContentHeaderProps {
   searchValue: string;
@@ -127,10 +127,10 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
         });
       });
     } catch (error) {
+      captureException(error);
       setAreRulesImporting(false);
       trackSharedListImportFailed(sharedListId, sharedListRules.length);
       toast.error("Unable to import invalid shared list!");
-      Logger.log("Error while processing sharedlist", error);
     }
   }, [
     sharedListRules,
