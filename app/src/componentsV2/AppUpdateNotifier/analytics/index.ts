@@ -14,7 +14,7 @@ export const trackAppUpdateNotificationViewed = (notificationType: NotificationT
 };
 
 export const trackAppUpdateNotificationClicked = (notificationType: NotificationType, action: ActionOnNotification) => {
-  trackEvent(APP_NOTIFICATION.VIEWED, { notification_type: notificationType, action });
+  trackEvent(APP_NOTIFICATION.CLICKED, { notification_type: notificationType, action });
 };
 
 export const trackAppUpdateForceReload = (currentVersion: string, breakingAppVersion: string) => {
