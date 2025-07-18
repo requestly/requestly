@@ -12,6 +12,7 @@ import {
   trackAppUpdateNotificationClicked,
   trackAppUpdateNotificationViewed,
 } from "./analytics";
+import * as Sentry from "@sentry/react";
 
 type AppVersions = {
   latestAppVersion: string;
@@ -43,22 +44,25 @@ export const AppUpdateNotifier: React.FC = () => {
             throw new Error("Invalid app version format");
           }
 
-          // v1 === v2: NOOP
-          if (semver.eq(currentAppVersion, latestAppVersion)) {
+          // We forgot to update the latestAppVersion in DB
+          if (semver.gt(currentAppVersion, latestAppVersion)) {
+            Sentry.captureMessage("[App update notifier] Current version is greater than latest version", {
+              extra: {
+                currentAppVersion,
+                latestAppVersion,
+                breakingAppVersion,
+              },
+            });
             return;
           }
 
-          // v1 > v2: minor version, show refresh option
-          if (semver.gt(currentAppVersion, breakingAppVersion)) {
-            trackAppUpdateNotificationViewed("app_update");
-            setShowRefreshOption(true);
-            return;
-          }
-
-          // v1 <= v2: force refresh
-          if (semver.lte(currentAppVersion, breakingAppVersion)) {
+          if (semver.lt(currentAppVersion, breakingAppVersion)) {
             trackAppUpdateForceReload(currentAppVersion, breakingAppVersion);
             window.location.replace(window.location.href);
+          } else if (semver.lt(currentAppVersion, latestAppVersion)) {
+            trackAppUpdateNotificationViewed("app_update");
+            setShowRefreshOption(true);
+          } else {
             return;
           }
         } catch (e) {
