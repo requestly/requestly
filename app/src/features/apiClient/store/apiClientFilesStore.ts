@@ -4,7 +4,8 @@ import { persist } from "zustand/middleware";
 export interface ApiClientFile {
   name: string;
   path: string;
-  source: "desktop";
+  source: "desktop" | "extension"; // Currently only "desktop" is supported
+  // isFileValid indicates whether the file exists and is valid in the local filesystem
   isFileValid: boolean;
 }
 
