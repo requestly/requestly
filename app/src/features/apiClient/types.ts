@@ -99,7 +99,7 @@ export namespace RQAPI {
   export type MultipartFormBody = FormDataKeyValuePair[];
   // TODO:nafees will need to add discriminant based on contentType
 
-  type FormDataKeyValuePair = KeyValuePair & {
+  export type FormDataKeyValuePair = KeyValuePair & {
     value: string | MultipartFileValue[];
   };
 

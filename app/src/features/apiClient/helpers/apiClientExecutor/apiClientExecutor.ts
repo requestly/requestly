@@ -119,15 +119,19 @@ export class ApiClientExecutor {
     };
   }
 
-  private async validateFiles() {
+  private async validateMultipartFormBodyFiles() {
     // TODO @aarush: enable the if block when contentType PR is ready
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPARTFORM) {
-      const fileBodies = this.entryDetails.request.body?.filter((body) => typeof body.value !== "string");
+      const fileBodies = (this.entryDetails.request.body as RQAPI.MultipartFormBody)?.filter(
+        (body) => typeof body.value !== "string"
+      );
       const validateFile = this.apiClientFilesStore.getState().isFilePresentLocally;
 
       let filesExistenceCheckerResponse;
-      for (const body of fileBodies || []) {
-        filesExistenceCheckerResponse = await Promise.all(body.value.map((file) => validateFile(file.id)));
+      for (const body of fileBodies) {
+        if (Array.isArray(body.value)) {
+          filesExistenceCheckerResponse = await Promise.all(body.value.map((file) => validateFile(file.id)));
+        }
       }
 
       return filesExistenceCheckerResponse.every((exists) => exists);
@@ -252,7 +256,7 @@ export class ApiClientExecutor {
   }
 
   async execute(): Promise<RQAPI.ExecutionResult> {
-    const areFilesValid = await this.validateFiles();
+    const areFilesValid = await this.validateMultipartFormBodyFiles();
     if (!areFilesValid) {
       // Dummy error.
       // TODO: @aarush: this dummy state to be updated as the the error states
