@@ -5,6 +5,7 @@ import {
   deleteDoc,
   deleteField,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   onSnapshot,
@@ -46,6 +47,17 @@ export const createNonGlobalEnvironmentInDB = async (
       variables,
     };
   });
+};
+
+export const getEnvironment = async (id: string, ownerId: string): Promise<EnvironmentData | null> => {
+  const envRef = doc(db, "environments", ownerId, "environments", id);
+  const envSnapshot = await getDoc(envRef);
+
+  if (!envSnapshot.exists()) {
+    return null;
+  }
+
+  return envSnapshot.data() as EnvironmentData;
 };
 
 export const updateEnvironmentInDB = async (
