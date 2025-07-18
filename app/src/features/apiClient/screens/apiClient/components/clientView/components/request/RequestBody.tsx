@@ -6,6 +6,7 @@ import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
 import { RequestBodyProps } from "./request-body-types";
 import "./requestBody.scss";
+import { MultipartFormBodyRenderer } from "./renderers/multipart-form-body-renderer";
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -71,6 +72,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         >
           <Radio value="text">Raw</Radio>
           <Radio value={RequestContentType.FORM}>Form</Radio>
+          <Radio value={"multipart/form-data"}>Multipart Form Data</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -109,6 +111,9 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       case RequestContentType.FORM:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
+      case "multipart/form-data":
+        return <MultipartFormBodyRenderer setRequestEntry={setRequestEntry} />;
+
       default:
         return null;
     }
@@ -120,7 +125,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
+      {/* {contentType === RequestContentType.FORM ? requestBodyOptions : null} */}
+      {requestBodyOptions}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );
