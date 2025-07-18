@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
+import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
 import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
@@ -69,7 +69,6 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
-        {currentEnvironmentName && <MdOutlineSyncAlt />}
         <Typography.Text
           ellipsis={{
             tooltip: {
@@ -80,6 +79,7 @@ export const EnvironmentSwitcher = () => {
         >
           {currentEnvironmentName || "No environment"}
         </Typography.Text>
+        {<RiArrowDropDownLine />}
       </RQButton>
     </Dropdown>
   );
