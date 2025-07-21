@@ -19,6 +19,31 @@
     font-size: var(--requestly-font-size-sm);
   }
 
+  .shared-list-import-count {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6, 16px);
+    color: var(--requestly-color-text-subtle);
+
+    .import-count {
+      flex-shrink: 0;
+      min-width: 64px;
+    }
+
+    .notification-status {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 4px);
+
+      svg {
+        --size: 14px;
+        width: var(--size);
+        height: var(--size);
+      }
+    }
+  }
+
   .sharedlist-table-actions-container {
     display: flex;
     justify-content: flex-end;
