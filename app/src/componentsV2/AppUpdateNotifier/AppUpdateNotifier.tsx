@@ -12,14 +12,19 @@ import {
   trackAppUpdateNotificationViewed,
 } from "./analytics";
 import * as Sentry from "@sentry/react";
+import { useSearchParams } from "react-router-dom";
 
 type AppVersions = {
   latestAppVersion: string;
   breakingAppVersion: string;
 };
 
+const FORCE_REFRESH_PARAM = "forceRefresh";
+
 export const AppUpdateNotifier: React.FC = () => {
   const [showRefreshOption, setShowRefreshOption] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isForceRefresh = searchParams.get(FORCE_REFRESH_PARAM) === "true";
 
   useEffect(() => {
     const database = getDatabase(firebaseApp);
@@ -33,7 +38,8 @@ export const AppUpdateNotifier: React.FC = () => {
             throw new Error("App data does not exist");
           }
 
-          const currentAppVersion = process.env.REACT_APP_VERSION;
+          // const currentAppVersion = process.env.REACT_APP_VERSION;
+          const currentAppVersion = "20.5.16-12.26";
 
           if (!semver.valid(currentAppVersion)) {
             Sentry.captureException(new Error("Invalid current app version format"), { extra: { currentAppVersion } });
@@ -73,8 +79,14 @@ export const AppUpdateNotifier: React.FC = () => {
           //   return;
           // }
 
-          if (semver.lt(currentAppVersion, breakingAppVersion)) {
+          if (semver.lt(currentAppVersion, breakingAppVersion) && !isForceRefresh) {
             trackAppUpdateForceReload(currentAppVersion, breakingAppVersion);
+
+            setSearchParams((params) => {
+              params.set(FORCE_REFRESH_PARAM, "true");
+              return params;
+            });
+
             window.location.replace(window.location.href);
           } else if (semver.lt(currentAppVersion, latestAppVersion)) {
             trackAppUpdateNotificationViewed("app_update");
@@ -94,7 +106,7 @@ export const AppUpdateNotifier: React.FC = () => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [isForceRefresh, setSearchParams]);
 
   const handleClose = () => {
     trackAppUpdateNotificationClicked("app_update", "close");
