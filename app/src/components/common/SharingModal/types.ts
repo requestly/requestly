@@ -12,12 +12,15 @@ export enum SharedLinkVisibility {
   PRIVATE = "custom",
 }
 
+// TODO: move into shared module
 export type SharedListData = {
   rules: NewRule[];
   updatedGroups: NewGroup[];
   sharedListName: string;
   sharedListVisibility: SharedLinkVisibility;
   sharedListRecipients: unknown;
+  notifyOnImport: boolean;
+  importCount?: number;
   teamId?: string;
 };
 
