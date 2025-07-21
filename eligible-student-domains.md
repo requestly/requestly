@@ -58,6 +58,7 @@ The following domains are eligible for the student programme:
     "student.aiuonline.edu",
     "student.su.se",
     "strayer.edu",
+    "student.unsika.ac.id",
     "purdueglobal.edu"
   ]
 }
