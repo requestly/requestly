@@ -38,8 +38,7 @@ export const AppUpdateNotifier: React.FC = () => {
             throw new Error("App data does not exist");
           }
 
-          // const currentAppVersion = process.env.REACT_APP_VERSION;
-          const currentAppVersion = "20.5.16-12.26";
+          const currentAppVersion = process.env.REACT_APP_VERSION;
 
           if (!semver.valid(currentAppVersion)) {
             Sentry.captureException(new Error("Invalid current app version format"), { extra: { currentAppVersion } });
