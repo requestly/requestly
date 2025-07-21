@@ -21,6 +21,7 @@ export const useFetchSharedLists = () => {
   const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
   const [sharedLists, setSharedLists] = useState(null);
+  const [forceRender, setForceRender] = useState(false);
   const [isSharedListsLoading, setIsSharedListsLoading] = useState(true);
 
   const updateCollection = useCallback(() => {
@@ -42,7 +43,18 @@ export const useFetchSharedLists = () => {
     } else {
       setIsSharedListsLoading(false);
     }
-  }, [updateCollection, isRefreshSharesListsPending, user.loggedIn, isExtensionEnabled, user?.details?.profile]);
+  }, [
+    forceRender,
+    updateCollection,
+    isRefreshSharesListsPending,
+    user.loggedIn,
+    isExtensionEnabled,
+    user?.details?.profile,
+  ]);
 
-  return { sharedLists, isSharedListsLoading };
+  const triggerForceRender = useCallback(() => {
+    setForceRender((prev) => !prev);
+  }, []);
+
+  return { sharedLists, isSharedListsLoading, triggerForceRender };
 };
