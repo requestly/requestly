@@ -10,3 +10,8 @@ export const trackSharedListDeleteClicked = (id: string) => {
   const params = { id };
   trackEvent(SHARED_LIST.DELETE_CLICKED, params);
 };
+
+export const trackSharedListImportNotificationStatusUpdated = (id: string, value: boolean) => {
+  const params = { id, value };
+  trackEvent(SHARED_LIST.IMPORT_NOTIFICATION_STATUS_UPDATED, params);
+};
