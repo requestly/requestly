@@ -51,7 +51,7 @@ export const useSharedListsTableColumns = ({ forceRender, handleDeleteSharedList
     Table.SELECTION_COLUMN,
     {
       title: "Name",
-      width: 370,
+      width: 350,
       render: (_: any, record: SharedList) => {
         return (
           <span
@@ -74,7 +74,7 @@ export const useSharedListsTableColumns = ({ forceRender, handleDeleteSharedList
     },
     {
       title: "Imported",
-      width: 130,
+      width: 180,
       align: "left",
 
       render: (_: any, record: SharedList) => {
@@ -104,7 +104,7 @@ export const useSharedListsTableColumns = ({ forceRender, handleDeleteSharedList
 
     {
       title: "",
-      width: 300,
+      width: 200,
       render: (_: any, record: SharedList) => {
         const sharedListURL = getSharedListURL(record.shareId, record.listName); // change here
 
@@ -157,8 +157,9 @@ export const useSharedListsTableColumns = ({ forceRender, handleDeleteSharedList
     columns.splice(3, 0, {
       key: "createdBy",
       title: <div className="text-center">Created by</div>,
-      width: 65,
+      width: 120,
       className: "text-gray",
+      align: "center",
       render: (_: any, record: SharedList) => {
         return (
           <div className="mock-table-user-icon">
