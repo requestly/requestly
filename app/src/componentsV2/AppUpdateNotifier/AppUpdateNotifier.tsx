@@ -62,16 +62,16 @@ export const AppUpdateNotifier: React.FC = () => {
           }
 
           // We forgot to update the latestAppVersion in DB
-          if (semver.gt(currentAppVersion, latestAppVersion)) {
-            Sentry.captureMessage("[App update notifier] Current version is greater than latest version", {
-              extra: {
-                currentAppVersion,
-                latestAppVersion,
-                breakingAppVersion,
-              },
-            });
-            return;
-          }
+          // if (semver.gt(currentAppVersion, latestAppVersion)) {
+          //   Sentry.captureMessage("[App update notifier] Current version is greater than latest version", {
+          //     extra: {
+          //       currentAppVersion,
+          //       latestAppVersion,
+          //       breakingAppVersion,
+          //     },
+          //   });
+          //   return;
+          // }
 
           if (semver.lt(currentAppVersion, breakingAppVersion)) {
             trackAppUpdateForceReload(currentAppVersion, breakingAppVersion);
