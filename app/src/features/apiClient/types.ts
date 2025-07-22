@@ -18,14 +18,19 @@ export enum RequestMethod {
   OPTIONS = "OPTIONS",
 }
 
+export enum FormDropDownOptions {
+  "FILE" = "file",
+  "TEXT" = "text",
+}
+
 export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  MULTIPARTFORM = "multipart/form-data",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
-  MULTIPARTFORM = "multipart/form-data",
 }
 
 export interface KeyValuePair {
@@ -113,6 +118,7 @@ export namespace RQAPI {
   export type RequestBodyContainer = {
     text?: string;
     form?: KeyValuePair[];
+    multiPartForm?: FormDataKeyValuePair[];
   };
 
   export type Auth = {
