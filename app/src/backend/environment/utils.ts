@@ -123,6 +123,7 @@ const collectAndEscapeVariablesFromTemplate = (
 
     // If variable name contains dots, wrap it in square brackets for Handlebars
     // otherwise a.b gets parsed as nested object path
+    // https://handlebarsjs.com/guide/expressions.html#literal-segments
     if (varName.includes(".")) {
       return `{{[${varName}]}}`;
     }
