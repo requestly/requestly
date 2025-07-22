@@ -120,7 +120,6 @@ export class ApiClientExecutor {
   }
 
   private async validateMultipartFormBodyFiles() {
-    // TODO @aarush: enable the if block when contentType PR is ready
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPARTFORM) {
       const fileBodies = (this.entryDetails.request.body as RQAPI.MultipartFormBody)?.filter(
         (body) => typeof body.value !== "string"
@@ -266,7 +265,7 @@ export class ApiClientExecutor {
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
           name: "Error",
-          message: "One or more files are missing",
+          message: "Request not sent-file missing",
           type: RQAPI.ApiClientErrorType.CORE,
           source: "request",
         },

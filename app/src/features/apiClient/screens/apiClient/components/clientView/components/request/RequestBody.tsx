@@ -7,6 +7,9 @@ import { RequestBodyContext, RequestBodyStateManager } from "./request-body-stat
 import { RequestBodyProps } from "./request-body-types";
 import "./requestBody.scss";
 import { MultipartFormBodyRenderer } from "./renderers/multipart-form-body-renderer";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
+import MultipartFormRedirectScreen from "components/misc/MultipartFormRedirectScreen";
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -16,6 +19,10 @@ function parseSingleModeBody(params: {
     case RequestContentType.FORM:
       return {
         form: body as RQAPI.RequestFormBody,
+      };
+    case RequestContentType.MULTIPARTFORM:
+      return {
+        multiPartForm: body as RQAPI.MultipartFormBody,
       };
     case RequestContentType.JSON:
       return {
@@ -46,6 +53,9 @@ function parseSingleModeBody(params: {
 
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
+  const appMode = useSelector(getAppMode);
+
+  console.log("appMode", appMode);
 
   const requestBodyStateManager = useMemo(
     () =>
@@ -71,8 +81,8 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           }
         >
           <Radio value="text">Raw</Radio>
-          <Radio value={RequestContentType.FORM}>Form</Radio>
-          <Radio value={"multipart/form-data"}>Multipart Form Data</Radio>
+          <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
+          <Radio value={RequestContentType.MULTIPARTFORM}>multipart/form-data</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -111,13 +121,17 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       case RequestContentType.FORM:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
-      case "multipart/form-data":
-        return <MultipartFormBodyRenderer setRequestEntry={setRequestEntry} />;
+      case RequestContentType.MULTIPARTFORM:
+        return appMode === "DESKTOP" ? (
+          <MultipartFormBodyRenderer environmentVariables={variables} setRequestEntry={setRequestEntry} />
+        ) : (
+          <MultipartFormRedirectScreen />
+        );
 
       default:
         return null;
     }
-  }, [contentType, variables, setRequestEntry, requestBodyOptions]);
+  }, [contentType, variables, setRequestEntry, requestBodyOptions, appMode]);
 
   /*
   In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
@@ -125,8 +139,9 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {/* {contentType === RequestContentType.FORM ? requestBodyOptions : null} */}
-      {requestBodyOptions}
+      {contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPARTFORM
+        ? requestBodyOptions
+        : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );

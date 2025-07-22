@@ -1,0 +1,70 @@
+.key-value-table-file-dropdown {
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: self-start !important;
+  gap: 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--requestly-color-white-t-20) !important;
+  background-color: var(--requestly-color-surface-0) !important;
+  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32) !important;
+
+  .file-dropdown-item-container {
+    display: flex;
+    padding: 0px 4px;
+    align-items: center;
+    gap: 24px;
+    align-self: stretch;
+    border-radius: 4px;
+
+    .file-info {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+
+      .invalid-icon {
+        color: var(--requestly-color-error-soft);
+      }
+      .file-name.file-invalid {
+        color: var(--requestly-color-error-soft);
+      }
+    }
+  }
+
+  .add-more-file-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--requestly-color-white-t-20);
+    padding-top: 20px;
+    padding-left: 300px;
+  }
+}
+
+.key-value-table-file-button {
+  gap: 8px !important;
+
+  .invalid-icon {
+    color: var(--requestly-color-error-soft) !important;
+  }
+
+  .file-counter {
+    flex-direction: column;
+    padding: 0px 4px;
+    gap: 0px;
+    border-radius: 4px;
+    background-color: var(--requestly-color-white-t-10);
+  }
+
+  .button-text.file-invalid {
+    color: var(--requestly-color-error-soft);
+  }
+  &.rq-custom-btn.ant-btn.ant-btn-default .down-outlined-icon svg {
+    width: 10px !important;
+    height: 10px !important;
+    stroke: #ffffff;
+    stroke-width: 50px;
+  }
+}
