@@ -2,10 +2,15 @@ import { Button } from "antd";
 
 export function displayFileSelector(callback) {
   const handleDialogPromise = (result) => {
-    const { canceled, filePaths } = result;
+    const { canceled, filePaths, files } = result;
     if (!canceled) {
       if (callback) {
-        return callback(filePaths[0]);
+        if (filePaths) {
+          // for compatibility with how the UI expected open-file-dialog to respond earlier
+          return callback(filePaths[0]);
+        } else {
+          return callback(files[0]?.path);
+        }
       }
     }
   };
@@ -19,11 +24,11 @@ export function displayFileSelector(callback) {
 
 export function displayMultiFileSelector(callback, config = {}) {
   const handleDialogPromise = (result) => {
-    const { canceled, filePaths } = result;
+    const { canceled, files } = result;
     console.log("!!!debug", "result", result);
     if (!canceled) {
       if (callback) {
-        return callback(filePaths);
+        return callback(files);
       }
     }
   };

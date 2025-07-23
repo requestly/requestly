@@ -140,49 +140,31 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
             </Conditional>
 
             {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && Object.keys(files).length === 0 && (
-              //using button instead of input tag, because support for electron desktop app
-              // understand this in more depth why it happens
               <RQButton
                 className="key-value-table-file-button"
                 onClick={() => {
-                  displayMultiFileSelector((selectedFilePaths: string[]) => {
-                    console.log("Selected files:", selectedFilePaths);
+                  displayMultiFileSelector((files: { name: string; path: string; size: number }[]) => {
+                    const selectedFiles = files.map(({ name, path, size }) => {
+                      const fileId = name + "-" + Date.now();
 
-                    (async () => {
-                      const selectedFiles = await Promise.all(
-                        selectedFilePaths.map(async (filePath) => {
-                          const fileName = filePath.split("/").pop();
-                          const fileId = fileName + "-" + Date.now();
-
-                          const fileSize =
-                            (await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("get-file-size", filePath)) ||
-                            0;
-
-                          return {
-                            id: fileId,
-                            name: fileName,
-                            path: filePath,
-                            source: "desktop",
-                            size: fileSize,
-                          };
-                        })
-                      );
-
-                      // Add files to store with size information
-                      selectedFiles.forEach((file) => {
-                        addFile(file.id, {
-                          name: file.name,
-                          path: file.path,
-                          size: file.size,
-                          source: "desktop",
-                          isFileValid: true,
-                        });
+                      addFile(fileId, {
+                        name,
+                        path,
+                        size,
+                        source: "desktop",
+                        isFileValid: true,
                       });
 
-                      console.log("Files", selectedFiles, files);
-                      form.setFieldsValue({ [dataIndex]: selectedFiles });
-                      save();
-                    })();
+                      return {
+                        id: fileId,
+                        name,
+                        path,
+                        size,
+                        source: "desktop",
+                      };
+                    });
+                    form.setFieldsValue({ [dataIndex]: selectedFiles });
+                    save();
                   });
                 }}
               >
@@ -193,43 +175,31 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
             {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && Object.keys(files).length > 0 && (
               <DropdownFile
                 onAddMoreFiles={() => {
-                  displayMultiFileSelector((selectedFilePaths: string[]) => {
-                    (async () => {
-                      const newSelectedFiles = await Promise.all(
-                        selectedFilePaths.map(async (filePath) => {
-                          const fileName = filePath.split("/").pop();
-                          const fileId = fileName + "-" + Date.now();
+                  displayMultiFileSelector((files: { name: string; path: string; size: number }[]) => {
+                    const newSelectedFiles = files.map(({ name, path, size }) => {
+                      const fileId = name + "-" + Date.now();
 
-                          const fileSize =
-                            (await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("get-file-size", filePath)) ||
-                            0;
-
-                          return {
-                            id: fileId,
-                            name: fileName,
-                            path: filePath,
-                            source: "desktop",
-                            size: fileSize,
-                          };
-                        })
-                      );
-
-                      // Add files to store with size information
-                      newSelectedFiles.forEach((file) => {
-                        addFile(file.id, {
-                          name: file.name,
-                          path: file.path,
-                          size: file.size,
-                          source: "desktop",
-                          isFileValid: true,
-                        });
+                      addFile(fileId, {
+                        name,
+                        path,
+                        size,
+                        source: "desktop",
+                        isFileValid: true,
                       });
 
-                      const existingFiles: any[] = Array.isArray(record.value) ? record.value : [];
-                      const updatedFiles = [...existingFiles, ...newSelectedFiles];
-                      form.setFieldsValue({ [dataIndex]: updatedFiles });
-                      save();
-                    })();
+                      return {
+                        id: fileId,
+                        name,
+                        path,
+                        size,
+                        source: "desktop",
+                      };
+                    });
+
+                    const existingFiles: any[] = Array.isArray(record.value) ? record.value : [];
+                    const updatedFiles = [...existingFiles, ...newSelectedFiles];
+                    form.setFieldsValue({ [dataIndex]: updatedFiles });
+                    save();
                   });
                 }}
                 onDeleteFile={(fileId: string) => {
