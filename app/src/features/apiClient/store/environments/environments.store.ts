@@ -1,7 +1,7 @@
 import { EnvironmentMap } from "backend/environment/types";
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesStore } from "../variables/variables.store";
-import { NativeError } from "errors/NativeError";
 
 type EnvironmentData = {
   variables: StoreApi<VariablesStore>;
@@ -18,7 +18,7 @@ type GlobalEnvironment = Environment;
 type EnvironmentsStore = {
   // state
   version: number;
-  activeEnvironment: Environment | null;
+  activeEnvironment?: Environment;
   globalEnvironment: GlobalEnvironment;
   environments: Map<Environment["id"], Environment>;
 
@@ -26,13 +26,13 @@ type EnvironmentsStore = {
   delete: (id: string) => void;
   create: (params: Omit<Environment, "data">) => void;
   update: (id: string, updates: Pick<Environment, "name">) => void;
-  getEnvironment: (id: string) => Environment | undefined;
-  getAll: () => Map<Environment["id"], Environment>;
+  getEnvironment: (id: string) => Environment;
+  getAll: () => Environment[];
   setActive: (id?: string) => void;
   incrementVersion: () => void;
 };
 
-const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsStore["environments"] => {
+const getEnvironmentsWithVariableStore = (rawEnvironments: EnvironmentMap): EnvironmentsStore["environments"] => {
   const environmentsWithVariableStore = Object.values(rawEnvironments).map((value) => {
     return [
       value.id,
@@ -49,26 +49,21 @@ const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsStore["
 
 export const createEnvironmentsStore = ({
   environments,
-  globalEnvironment,
+  erroredRecords,
 }: {
   environments: EnvironmentMap;
-  globalEnvironment: GlobalEnvironment;
+  erroredRecords: ErroredRecord[];
 }) => {
-  const environmentsWithVariableStore = parseEnvironments(environments);
+  const environmentsWithVariableStore = getEnvironmentsWithVariableStore(environments);
 
   return create<EnvironmentsStore>()((set, get) => ({
     version: 0,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
-    globalEnvironment: globalEnvironment,
+    globalEnvironment: environmentsWithVariableStore.get("global"), // FIXME: update hard coded id
 
     delete(id) {
       const { environments } = get();
-
-      if (!environments.has(id)) {
-        return;
-      }
-
       environments.delete(id);
       set({ environments });
       get().incrementVersion();
@@ -84,11 +79,6 @@ export const createEnvironmentsStore = ({
     update(id, updates) {
       const { environments } = get();
       const existingValue = environments.get(id);
-
-      if (!existingValue) {
-        throw new NativeError("Environment does not exist!").addContext({ environmentId: id });
-      }
-
       const updatedValue = { ...existingValue, name: updates.name };
       environments.set(id, updatedValue);
 
@@ -102,13 +92,13 @@ export const createEnvironmentsStore = ({
     },
 
     getAll() {
-      return get().environments;
+      const { environments } = get();
+      return Object.values(environments).filter((env) => env.id !== "global");
     },
 
     setActive(id) {
       if (!id) {
         set({ activeEnvironment: null });
-        get().incrementVersion();
         return;
       }
 
