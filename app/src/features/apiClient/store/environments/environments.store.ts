@@ -58,6 +58,7 @@ export const createEnvironmentsStore = ({
 
   return create<EnvironmentsState>()((set, get) => ({
     version: 0,
+    erroredRecords,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
     globalEnvironment: globalEnvironment,
