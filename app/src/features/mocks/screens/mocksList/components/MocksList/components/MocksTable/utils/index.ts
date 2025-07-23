@@ -42,8 +42,9 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
   const mockCollections: {
     [id: RQMockMetadataSchema["id"]]: MockTableRecord;
   } = {};
+  const definedRecords = records.filter((r) => !!r);
 
-  records.forEach((record) => {
+  definedRecords.forEach((record) => {
     if (isCollection(record)) {
       mockCollections[record.id] = { ...record, children: [] };
     }
@@ -51,7 +52,7 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
 
   const otherRecords: RQMockMetadataSchema[] = [];
 
-  records.forEach((record) => {
+  definedRecords.forEach((record) => {
     if (isMockInCollection(record)) {
       if (mockCollections[record.collectionId]) {
         mockCollections[record.collectionId].children.push(record);
