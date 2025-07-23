@@ -1,4 +1,7 @@
+// TODO: move all in types "features/apiClient"
 export type VariableValueType = string | number | boolean;
+
+export type EnvironmentVariableKey = string;
 
 export interface EnvironmentVariableValue {
   localValue?: VariableValueType;
@@ -7,7 +10,7 @@ export interface EnvironmentVariableValue {
   id: number;
 }
 
-export type EnvironmentVariables = Record<string, EnvironmentVariableValue>;
+export type EnvironmentVariables = Record<EnvironmentVariableKey, EnvironmentVariableValue>;
 
 export interface EnvironmentData {
   id: string;
@@ -25,7 +28,7 @@ export enum EnvironmentVariableType {
 }
 
 export type VariableExport = EnvironmentVariableValue & {
-  key: string;
+  key: EnvironmentVariableKey;
 };
 
 export enum VariableScope {
