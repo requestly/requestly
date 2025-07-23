@@ -2,8 +2,10 @@ import { EnvironmentVariableKey, EnvironmentVariables, EnvironmentVariableValue 
 import { create } from "zustand";
 
 export type VariablesStore = {
+  // state
   data: Map<EnvironmentVariableKey, EnvironmentVariableValue>;
 
+  // actions
   delete: (key: EnvironmentVariableKey) => void;
   add: (key: EnvironmentVariableKey, variable: EnvironmentVariableValue) => void;
   update: (key: EnvironmentVariableKey, updates: Omit<EnvironmentVariableValue, "id">) => void;
