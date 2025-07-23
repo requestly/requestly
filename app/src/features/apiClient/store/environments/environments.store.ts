@@ -18,6 +18,7 @@ type GlobalEnvironment = Environment;
 type EnvironmentsStore = {
   // state
   version: number;
+  erroredRecords: ErroredRecord[];
   activeEnvironment?: Environment;
   globalEnvironment: GlobalEnvironment;
   environments: Map<Environment["id"], Environment>;
@@ -58,6 +59,7 @@ export const createEnvironmentsStore = ({
 
   return create<EnvironmentsStore>()((set, get) => ({
     version: 0,
+    erroredRecords,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
     globalEnvironment: environmentsWithVariableStore.get("global"), // FIXME: update hard coded id
