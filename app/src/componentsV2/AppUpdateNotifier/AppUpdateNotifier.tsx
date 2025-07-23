@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getDatabase, onValue, ref } from "firebase/database";
 import firebaseApp from "firebase";
 import * as semver from "semver";
@@ -12,7 +12,6 @@ import {
   trackAppUpdateNotificationViewed,
 } from "./analytics";
 import * as Sentry from "@sentry/react";
-import { useSearchParams } from "react-router-dom";
 
 type AppVersions = {
   latestAppVersion: string;
@@ -21,10 +20,29 @@ type AppVersions = {
 
 const FORCE_REFRESH_PARAM = "forceRefresh";
 
+const checkIfForceRefreshParamPresent = (): boolean => {
+  try {
+    let params = new URLSearchParams(window.location.search);
+    const isForceRefresh = params.get(FORCE_REFRESH_PARAM) === "true";
+    return isForceRefresh;
+  } catch (e) {
+    Sentry.captureException(e);
+  }
+};
+
+const getURLWithForceRefreshParam = (): string => {
+  try {
+    const urlObj = new URL(window.location.href);
+    urlObj.searchParams.set(FORCE_REFRESH_PARAM, "true");
+    return urlObj.toString();
+  } catch (e) {
+    Sentry.captureException(e);
+    return window.location.href;
+  }
+};
+
 export const AppUpdateNotifier: React.FC = () => {
   const [showRefreshOption, setShowRefreshOption] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const isForceRefresh = searchParams.get(FORCE_REFRESH_PARAM) === "true";
 
   useEffect(() => {
     const database = getDatabase(firebaseApp);
@@ -78,15 +96,13 @@ export const AppUpdateNotifier: React.FC = () => {
           //   return;
           // }
 
+          const isForceRefresh = checkIfForceRefreshParamPresent();
+
           if (semver.lt(currentAppVersion, breakingAppVersion) && !isForceRefresh) {
             trackAppUpdateForceReload(currentAppVersion, breakingAppVersion);
 
-            setSearchParams((params) => {
-              params.set(FORCE_REFRESH_PARAM, "true");
-              return params;
-            });
-
-            window.location.replace(window.location.href);
+            const updatedURL = getURLWithForceRefreshParam();
+            window.location.replace(updatedURL);
           } else if (semver.lt(currentAppVersion, latestAppVersion)) {
             trackAppUpdateNotificationViewed("app_update");
             setShowRefreshOption(true);
@@ -105,7 +121,7 @@ export const AppUpdateNotifier: React.FC = () => {
     return () => {
       unsubscribe();
     };
-  }, [isForceRefresh, setSearchParams]);
+  }, []);
 
   const handleClose = () => {
     trackAppUpdateNotificationClicked("app_update", "close");
