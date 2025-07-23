@@ -257,16 +257,13 @@ export class ApiClientExecutor {
   async execute(): Promise<RQAPI.ExecutionResult> {
     const areFilesValid = await this.validateMultipartFormBodyFiles();
     if (!areFilesValid) {
-      // Dummy error.
-      // TODO: @aarush: this dummy state to be updated as the the error states
-      // This block to be only used for aborting the request execution if invalid files are present.
       return {
         executedEntry: { ...this.entryDetails },
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
           name: "Error",
-          message: "Request not sent-file missing",
-          type: RQAPI.ApiClientErrorType.CORE,
+          message: "Request not sent -- some files are missing",
+          type: RQAPI.ApiClientErrorType.MISSING_FILE,
           source: "request",
         },
       };

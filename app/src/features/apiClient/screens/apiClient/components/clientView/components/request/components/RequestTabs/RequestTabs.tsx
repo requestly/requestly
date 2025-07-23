@@ -59,6 +59,8 @@ const RequestTabs: React.FC<Props> = ({
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
+  console.log("requestEntry", requestEntry);
+
   // TODO: remove tabs state
   const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
 

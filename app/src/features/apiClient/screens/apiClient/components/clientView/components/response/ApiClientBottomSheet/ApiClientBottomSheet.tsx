@@ -15,11 +15,13 @@ import { AbortError } from "../../errors/AbortError";
 import { RequestError } from "../../errors/RequestError";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 import "./apiclientBottomSheet.scss";
+import { ApiClientLargeFileLoader } from "../LargeFileLoadingPlaceholder";
 
 interface Props {
   response: RQAPI.Response;
   testResults: TestResult[];
   isLoading: boolean;
+  isLongRequest?: boolean;
   isFailed: boolean;
   isRequestCancelled: boolean;
   onCancelRequest: () => void;
@@ -41,6 +43,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   testResults,
   isLoading,
   isFailed,
+  isLongRequest,
   isRequestCancelled,
   handleTestResultRefresh,
   onCancelRequest,
@@ -49,6 +52,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   executeRequest,
   onDismissError,
 }) => {
+  console.log("isLongRequest", isLongRequest);
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
   }, [response?.headers]);
@@ -85,6 +89,15 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
         children: <TestsView testResults={testResults} handleTestResultRefresh={handleTestResultRefresh} />,
       },
     ];
+
+    if (isLongRequest) {
+      return baseTabItems.map((tabItem) => {
+        return {
+          ...tabItem,
+          children: <ApiClientLargeFileLoader onCancelRequest={onCancelRequest} />,
+        };
+      });
+    }
 
     if (isLoading) {
       return baseTabItems.map((tabItem) => {
@@ -130,18 +143,19 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
 
     return baseTabItems;
   }, [
+    response,
     contentTypeHeader,
-    error,
-    executeRequest,
+    testResultsStats,
+    testResults,
     handleTestResultRefresh,
-    isFailed,
+    isLongRequest,
     isLoading,
     isRequestCancelled,
     onCancelRequest,
-    response,
-    testResults,
-    testResultsStats,
+    error,
+    executeRequest,
     onDismissError,
+    isFailed,
   ]);
 
   return (

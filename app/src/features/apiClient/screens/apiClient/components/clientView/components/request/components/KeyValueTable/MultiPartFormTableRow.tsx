@@ -147,27 +147,42 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                 onClick={() => {
                   displayMultiFileSelector((selectedFilePaths: string[]) => {
                     console.log("Selected files:", selectedFilePaths);
-                    const selectedFiles = selectedFilePaths.map((filePath) => {
-                      const fileName = filePath.split("/").pop();
-                      const fileId = fileName + "-" + Date.now();
-                      return {
-                        id: fileId,
-                        name: fileName,
-                        path: filePath,
-                        source: "desktop",
-                      };
-                    });
-                    selectedFiles.forEach((file) => {
-                      addFile(file.id, {
-                        name: file.name,
-                        path: file.path,
-                        source: "desktop",
-                        isFileValid: true,
+
+                    (async () => {
+                      const selectedFiles = await Promise.all(
+                        selectedFilePaths.map(async (filePath) => {
+                          const fileName = filePath.split("/").pop();
+                          const fileId = fileName + "-" + Date.now();
+
+                          const fileSize =
+                            (await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("get-file-size", filePath)) ||
+                            0;
+
+                          return {
+                            id: fileId,
+                            name: fileName,
+                            path: filePath,
+                            source: "desktop",
+                            size: fileSize,
+                          };
+                        })
+                      );
+
+                      // Add files to store with size information
+                      selectedFiles.forEach((file) => {
+                        addFile(file.id, {
+                          name: file.name,
+                          path: file.path,
+                          size: file.size,
+                          source: "desktop",
+                          isFileValid: true,
+                        });
                       });
-                    });
-                    console.log("Files", selectedFiles, files);
-                    form.setFieldsValue({ [dataIndex]: selectedFiles });
-                    save();
+
+                      console.log("Files", selectedFiles, files);
+                      form.setFieldsValue({ [dataIndex]: selectedFiles });
+                      save();
+                    })();
                   });
                 }}
               >
@@ -179,29 +194,42 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
               <DropdownFile
                 onAddMoreFiles={() => {
                   displayMultiFileSelector((selectedFilePaths: string[]) => {
-                    const newSelectedFiles = selectedFilePaths.map((filePath) => {
-                      const fileName = filePath.split("/").pop();
-                      const fileId = fileName + "-" + Date.now();
-                      return {
-                        id: fileId,
-                        name: fileName,
-                        path: filePath,
-                        source: "desktop",
-                      };
-                    });
-                    newSelectedFiles.forEach((file) => {
-                      addFile(file.id, {
-                        name: file.name,
-                        path: file.path,
-                        source: "desktop",
-                        isFileValid: true,
-                      });
-                    });
+                    (async () => {
+                      const newSelectedFiles = await Promise.all(
+                        selectedFilePaths.map(async (filePath) => {
+                          const fileName = filePath.split("/").pop();
+                          const fileId = fileName + "-" + Date.now();
 
-                    const existingFiles: any[] = Array.isArray(record.value) ? record.value : [];
-                    const updatedFiles = [...existingFiles, ...newSelectedFiles];
-                    form.setFieldsValue({ [dataIndex]: updatedFiles });
-                    save();
+                          const fileSize =
+                            (await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.("get-file-size", filePath)) ||
+                            0;
+
+                          return {
+                            id: fileId,
+                            name: fileName,
+                            path: filePath,
+                            source: "desktop",
+                            size: fileSize,
+                          };
+                        })
+                      );
+
+                      // Add files to store with size information
+                      newSelectedFiles.forEach((file) => {
+                        addFile(file.id, {
+                          name: file.name,
+                          path: file.path,
+                          size: file.size,
+                          source: "desktop",
+                          isFileValid: true,
+                        });
+                      });
+
+                      const existingFiles: any[] = Array.isArray(record.value) ? record.value : [];
+                      const updatedFiles = [...existingFiles, ...newSelectedFiles];
+                      form.setFieldsValue({ [dataIndex]: updatedFiles });
+                      save();
+                    })();
                   });
                 }}
                 onDeleteFile={(fileId: string) => {

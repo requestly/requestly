@@ -112,6 +112,7 @@ export namespace RQAPI {
     id: string; // file id for each multipart key value pair
     name: string;
     path: string;
+    size: number;
     source: "extension" | "desktop";
   };
 
@@ -251,6 +252,7 @@ export namespace RQAPI {
     CORE = "core",
     ABORT = "abort",
     SCRIPT = "script",
+    MISSING_FILE = "missing_file",
   }
 }
 

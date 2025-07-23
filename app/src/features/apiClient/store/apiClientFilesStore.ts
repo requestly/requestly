@@ -5,6 +5,7 @@ export interface ApiClientFile {
   name: string;
   path: string;
   source: "desktop" | "extension"; // Currently only "desktop" is supported
+  size: number;
   // isFileValid indicates whether the file exists and is valid in the local filesystem
   isFileValid: boolean;
 }
