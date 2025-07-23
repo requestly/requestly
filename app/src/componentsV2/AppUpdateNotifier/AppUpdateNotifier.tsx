@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getDatabase, onValue, ref } from "firebase/database";
 import firebaseApp from "firebase";
 import * as semver from "semver";
