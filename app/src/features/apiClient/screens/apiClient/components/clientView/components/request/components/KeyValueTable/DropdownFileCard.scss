@@ -10,24 +10,51 @@
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32) !important;
 
   .file-dropdown-item-container {
-    display: flex;
-    padding: 0px 4px;
+    display: grid;
+    grid-template-columns: 20px 1fr auto auto;
+    padding: 8px 4px;
     align-items: center;
-    gap: 24px;
+    gap: 12px;
     align-self: stretch;
     border-radius: 4px;
 
     .file-info {
-      display: flex;
-      flex-direction: row;
-      gap: 8px;
+      display: contents;
+
+      .file-icon,
+      .invalid-icon {
+        grid-column: 1;
+        justify-self: center;
+      }
 
       .invalid-icon {
         color: var(--requestly-color-error-soft);
       }
-      .file-name.file-invalid {
-        color: var(--requestly-color-error-soft);
+
+      .file-name {
+        grid-column: 2;
+        justify-self: start;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &.file-invalid {
+          color: var(--requestly-color-error-soft);
+        }
       }
+
+      .file-size {
+        grid-column: 3;
+        justify-self: end;
+        font-size: 12px;
+        color: var(--requestly-color-text-subtle);
+        white-space: nowrap;
+      }
+    }
+
+    .file-dropdown-remove-button {
+      grid-column: 4;
+      justify-self: end;
     }
   }
 
