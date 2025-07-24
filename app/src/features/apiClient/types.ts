@@ -109,25 +109,6 @@ export namespace RQAPI {
       [Authorization.Type.BASIC_AUTH]?: BasicAuthAuthorizationConfig["config"];
     };
   };
-  // export interface Request {
-  //   url: string;
-  //   queryParams: KeyValuePair[];
-  //   method: RequestMethod;
-  //   headers: KeyValuePair[];
-  //   body?: RequestBody;
-  //   bodyContainer?: RequestBodyContainer;
-  //   contentType?: RequestContentType;
-  //   includeCredentials?: boolean;
-  // }
-
-  // export interface Response {
-  //   body: string;
-  //   headers: KeyValuePair[];
-  //   status: number;
-  //   statusText: string;
-  //   time: number;
-  //   redirectedUrl: string;
-  // }
 
   export type HttpRequest = {
     url: string;
