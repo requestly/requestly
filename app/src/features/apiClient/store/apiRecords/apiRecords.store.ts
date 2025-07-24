@@ -151,18 +151,18 @@ const createCollectionRecordStore = (record: RQAPI.CollectionRecord) => {
   }));
 };
 
-function createRecordStoreFactory(record: RQAPI.Record) {
+export const createRecordStore = (record: RQAPI.Record) => {
   if (record.type === RQAPI.RecordType.API) {
     return createApiRecordStore(record);
   }
 
   return createCollectionRecordStore(record);
-}
+};
 
 function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<RecordState>>();
   for (const [id] of index) {
-    indexStore.set(id, createRecordStoreFactory(index.get(id)!));
+    indexStore.set(id, createRecordStore(index.get(id)!));
   }
 
   return indexStore;
@@ -185,7 +185,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
       for (const [id] of index) {
         if (!indexStore.has(id)) {
-          indexStore.set(id, createRecordStoreFactory(index.get(id)!));
+          indexStore.set(id, createRecordStore(index.get(id)!));
         }
       }
 
