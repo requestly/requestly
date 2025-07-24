@@ -1,5 +1,5 @@
 import React from "react";
-import { GraphQLRecordProvider } from "features/apiClient/store/graphqlRecord/GraphQLRecordContextProvider";
+import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 import { RQAPI } from "features/apiClient/types";
 import { GraphQLClientView } from "./GraphQLClientView";
 
