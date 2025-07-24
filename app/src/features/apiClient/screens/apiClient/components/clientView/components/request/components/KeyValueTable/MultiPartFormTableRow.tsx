@@ -210,7 +210,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                   removeFile(fileId);
                   const currentFiles: any[] = Array.isArray(record.value) ? record.value : [];
                   const remainingFiles = currentFiles.filter((file) => file.id !== fileId);
-                  console.log("remainingFiles", remainingFiles);
+
                   form.setFieldsValue({ [dataIndex]: remainingFiles });
                   save();
                 }}

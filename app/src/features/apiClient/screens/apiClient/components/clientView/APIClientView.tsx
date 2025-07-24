@@ -153,7 +153,6 @@ const APIClientView: React.FC<Props> = ({
 
   const { setPreview, setUnsaved, setTitle, getIsActive } = useGenericState();
 
-  console.log("OBJECT", apiEntryDetails);
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB

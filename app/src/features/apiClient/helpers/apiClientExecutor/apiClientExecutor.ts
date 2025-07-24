@@ -1,5 +1,5 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { AbortReason, KeyValuePair, RequestContentType, RQAPI } from "../../types";
+import { AbortReason, FormDropDownOptions, KeyValuePair, RequestContentType, RQAPI } from "../../types";
 import { addUrlSchemeIfMissing, makeRequest, queryParamsToURLString } from "../../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { updateRequestWithAuthOptions } from "../auth";
@@ -122,7 +122,7 @@ export class ApiClientExecutor {
   private async validateMultipartFormBodyFiles() {
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPARTFORM) {
       const fileBodies = (this.entryDetails.request.body as RQAPI.MultipartFormBody)?.filter(
-        (body) => body.type === "file" && typeof body.value !== "string"
+        (body) => body.type === FormDropDownOptions.FILE && typeof body.value !== "string"
       );
       if (!fileBodies || fileBodies.length === 0) {
         return true;

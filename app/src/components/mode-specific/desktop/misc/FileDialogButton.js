@@ -25,7 +25,6 @@ export function displayFileSelector(callback) {
 export function displayMultiFileSelector(callback, config = {}) {
   const handleDialogPromise = (result) => {
     const { canceled, files } = result;
-    console.log("!!!debug", "result", result);
     if (!canceled) {
       if (callback) {
         return callback(files);
