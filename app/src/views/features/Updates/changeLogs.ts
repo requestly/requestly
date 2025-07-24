@@ -9,6 +9,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.7.21",
+    logs: ["chore: whitelist testing toolkit extension in manifest"],
+  },
+  {
     version: "25.7.1",
     logs: [
       "[ENGG-3727] fix(style): update font size as per design system",
