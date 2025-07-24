@@ -8,6 +8,7 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MultiEditableCell, MultiEditableRow } from "./MultiPartFormTableRow";
 import "./MultiPartFormTable.scss";
 import { EnvironmentVariables } from "backend/environment/types";
+import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFileStore.hook";
 
 type ColumnTypes = Exclude<TableProps<RQAPI.FormDataKeyValuePair>["columns"], undefined>;
 
@@ -35,6 +36,8 @@ export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
   }, []);
 
   const memoizedData = useMemo(() => (data.length ? data : [createEmptyPair()]), [createEmptyPair, data]);
+
+  const { removeFile } = useApiClientFileStore((state) => state);
 
   const handleUpdateRequestPairs = useCallback(
     (pair: RQAPI.FormDataKeyValuePair, action: "add" | "remove" | "update") => {
@@ -94,8 +97,15 @@ export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
     (pair: RQAPI.FormDataKeyValuePair) => {
       //this is called to remove the whole record from the table(Row)
       handleUpdateRequestPairs(pair, "remove");
+
+      //remove from file store as well
+      if (Array.isArray(pair.value)) {
+        pair.value.forEach((file) => {
+          removeFile(file.id);
+        });
+      }
     },
-    [handleUpdateRequestPairs]
+    [handleUpdateRequestPairs, removeFile]
   );
 
   const columns = useMemo(() => {
