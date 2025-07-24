@@ -20,9 +20,7 @@ const ApiClientFileMissingError: React.FC<{
             <div className="api-client-error-placeholder-content__title">{"Request not sent — file missing"}</div>
           )}
           <div className="file-error-container">
-            <span className="error-message">
-              {"The file seems to have been moved or deleted from your device. Please upload it again to continue."}
-            </span>
+            <span className="error-message">{`${error.reason}`}</span>
           </div>
           <RQButton icon={<MdOutlineRefresh />} onClick={onRetry}>
             Try Again
