@@ -169,12 +169,12 @@ export namespace RQAPI {
   export type GraphQLApiEntry = {
     request: GraphQLRequest;
     response: GraphQLResponse;
-  } & ApiEntryMetaData & { type: ApiEntryType.GRAPHQL };
+  } & ApiEntryMetaData;
 
   export type HttpApiEntry = {
     request: HttpRequest;
     response: HttpResponse;
-  } & ApiEntryMetaData & { type: ApiEntryType.HTTP };
+  } & ApiEntryMetaData;
 
   export type ApiEntry = GraphQLApiEntry | HttpApiEntry;
 
@@ -244,20 +244,21 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  export interface ApiRecord extends RecordMetadata {
+  interface BaseApiRecord extends RecordMetadata {
     type: RecordType.API;
-    data: ApiEntry;
   }
 
-  export interface HttpApiRecord extends RecordMetadata {
-    type: RecordType.API;
+  export interface HttpApiRecord extends BaseApiRecord {
+    entryType: ApiEntryType.HTTP;
     data: HttpApiEntry;
   }
 
-  export interface GraphQLApiRecord extends RecordMetadata {
-    type: RecordType.API;
+  export interface GraphQLApiRecord extends BaseApiRecord {
+    entryType: ApiEntryType.GRAPHQL;
     data: GraphQLApiEntry;
   }
+
+  export type ApiRecord = HttpApiRecord | GraphQLApiRecord;
 
   export interface CollectionRecord extends RecordMetadata {
     type: RecordType.COLLECTION;

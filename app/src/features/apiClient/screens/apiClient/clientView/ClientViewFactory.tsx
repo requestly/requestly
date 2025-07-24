@@ -10,11 +10,11 @@ interface Props {
 }
 
 export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCallback, isCreateMode }: Props) => {
-  switch (apiRecord.data.type) {
+  switch (apiRecord.entryType) {
     case RQAPI.ApiEntryType.HTTP:
       return (
         <HttpClientViewContainer
-          selectedEntryDetails={apiRecord as RQAPI.HttpApiRecord}
+          selectedEntryDetails={apiRecord}
           handleAppRequestFinished={handleRequestFinished}
           onSaveCallback={onSaveCallback}
           isCreateMode={isCreateMode}
