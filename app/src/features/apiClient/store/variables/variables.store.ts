@@ -16,10 +16,14 @@ export type VariablesStore = {
   incrementVersion: () => void;
 };
 
+const parseVariables = (rawVariables: EnvironmentVariables): VariablesStore["data"] => {
+  return new Map(Object.entries(rawVariables));
+};
+
 export const createVariablesStore = ({ variables }: { variables: EnvironmentVariables }) => {
   return create<VariablesStore>()((set, get) => ({
     version: 0,
-    data: new Map(Object.entries(variables)),
+    data: parseVariables(variables),
 
     delete(key) {
       const { data } = get();
