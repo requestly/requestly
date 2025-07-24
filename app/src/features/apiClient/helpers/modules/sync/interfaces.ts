@@ -4,6 +4,7 @@ import { ErroredRecord, FileType } from "./local/services/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
+  // implementors of getAllEnvironments are responsible to ensure creation of the globalEnvironment if doesn't already exist
   getAllEnvironments(): Promise<{
     success: boolean;
     data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
@@ -15,7 +16,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
     data: EnvironmentData | null;
   }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
-  createGlobalEnvironment(): Promise<EnvironmentData>;
+  createGlobalEnvironment(): Promise<EnvironmentData>; // fix-me: should be removed from this interface
   createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]>;
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
@@ -76,6 +77,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
 }
 
 export interface ApiClientRepositoryInterface {
+  // todo: rename to recordsRepository and environmentsRepository
   environmentVariablesRepository: EnvironmentInterface<Record<string, any>>;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>;
 }
