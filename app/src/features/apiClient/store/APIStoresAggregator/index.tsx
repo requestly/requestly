@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useEffect, useState } from "react";
 import { useApiClientRepository } from "../../helpers/modules/sync/useApiClientSyncRepo";
 import { notification } from "antd";
 import { ApiClientLoadingView } from "../../screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
@@ -12,7 +12,7 @@ import { Daemon } from "./Daemon";
 
 import { createEnvironmentsStore, EnvironmentsStore } from "../environments/environments.store";
 
-type StorePool = {
+type AllApiClientStores = {
   records: StoreApi<ApiRecordsState>;
   environments: StoreApi<EnvironmentsStore>;
 };
@@ -23,7 +23,7 @@ type FetchedStoreData = {
   environments: { global: EnvironmentData; nonGlobalEnvironments: FetchedData<EnvironmentMap> };
 };
 
-export const ApiClientStoresContext = createContext<StorePool>(null);
+export const ApiClientStoresContext = createContext<AllApiClientStores>(null);
 
 type AssemblerProps = {
   children?: React.ReactNode;
@@ -57,90 +57,56 @@ const APIStoresAggregator: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [records, setRecords] = useState<FetchedStoreData["records"]>(null);
   const [environments, setEnvironments] = useState<FetchedStoreData["environments"]>(null);
 
-  const [loadingStates, setLoadingStates] = useState<{ records: boolean; variables: boolean }>({
-    records: false,
-    variables: false,
-  });
-  const isLoading = useMemo(() => {
-    return loadingStates.records || loadingStates.variables;
-  }, [loadingStates]);
-
   useEffect(() => {
-    setLoadingStates((prev) => {
-      return { ...prev, records: true };
-    });
-    apiClientRecordsRepository
-      .getAllRecords()
-      .then((result) => {
-        if (!result.success) {
+    (async () => {
+      try {
+        const [recordsResult, envResult] = await Promise.all([
+          apiClientRecordsRepository.getAllRecords(),
+          environmentVariablesRepository.getAllEnvironments(),
+        ]);
+
+        if (!recordsResult.success) {
           notification.error({
             message: "Could not fetch records!",
-            description: result?.message,
+            description: recordsResult.message || "Please try reloading the app", // fix-me: need good copy here
             placement: "bottomRight",
           });
-          return;
+        } else {
+          setRecords(recordsResult.data);
         }
-        setRecords(result.data);
-      })
-      .catch((e) => {
+
+        if (!envResult.success) {
+          notification.error({
+            message: "Could not fetch environments!",
+            description: "Please try reloading the app", // fix-me: need good copy here
+            placement: "bottomRight",
+          });
+        } else {
+          const allEnvironments = envResult.data.environments;
+          const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
+          const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
+
+          if (!globalEnv) throw new Error("Global Environment doesn't exist");
+
+          setEnvironments({
+            global: globalEnv,
+            nonGlobalEnvironments: {
+              records: otherEnvs,
+              erroredRecords: envResult.data.erroredRecords,
+            },
+          });
+        }
+      } catch (e) {
         notification.error({
-          message: "Could not fetch records!",
+          message: "Could not fetch data!",
           description: e.message,
           placement: "bottomRight",
         });
-        return;
-      })
-      .finally(() => {
-        setLoadingStates((prev) => {
-          return { ...prev, records: false };
-        });
-      });
-  }, [apiClientRecordsRepository]);
+      }
+    })();
+  }, [apiClientRecordsRepository, environmentVariablesRepository]);
 
-  useEffect(() => {
-    setLoadingStates((prev) => {
-      return { ...prev, variables: true };
-    });
-    environmentVariablesRepository
-      .getAllEnvironments()
-      .then((result) => {
-        if (!result.success) {
-          notification.error({
-            message: "Could not fetch records!",
-            description: " result?.message",
-            placement: "bottomRight",
-          });
-          return;
-        }
-        const allEnvironments = result.data.environments;
-        const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
-
-        const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
-        if (!globalEnv) throw new Error("Global Environment doesn't exist");
-
-        setEnvironments({
-          global: globalEnv,
-          nonGlobalEnvironments: {
-            records: otherEnvs,
-            erroredRecords: result.data.erroredRecords,
-          },
-        });
-      })
-      .catch((e) => {
-        notification.error({
-          message: "Could not fetch records!",
-          description: e.message,
-        });
-        return;
-      })
-      .finally(() => {
-        setLoadingStates((prev) => {
-          return { ...prev, variables: true };
-        });
-      });
-  }, [environmentVariablesRepository]);
-
-  if (isLoading) return <ApiClientLoadingView />; // todo: decide if we need a new loader
+  if (!records || !environments) return <ApiClientLoadingView />;
 
   return <APIStoresAssembler data={{ records, environments }}>{children}</APIStoresAssembler>;
 };
