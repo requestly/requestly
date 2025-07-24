@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
-import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../types";
-import RequestTabs from "./components/request/components/RequestTabs/RequestTabs";
+import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../../types";
+import RequestTabs from "../components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
@@ -13,7 +13,7 @@ import {
   resolveAuth,
   sanitizeEntry,
   supportsRequestBody,
-} from "../../utils";
+} from "../../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
   trackAPIRequestCancelled,
@@ -29,9 +29,9 @@ import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { CONTENT_TYPE_HEADER } from "../../../../constants";
+import { CONTENT_TYPE_HEADER } from "../../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
-import "./apiClientView.scss";
+import "./httpClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
@@ -41,21 +41,21 @@ import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
-import { ApiClientBottomSheet } from "./components/response/ApiClientBottomSheet/ApiClientBottomSheet";
-import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
+import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
 import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
-import { ApiClientSnippetModal } from "../modals/ApiClientSnippetModal/ApiClientSnippetModal";
+import { ApiClientSnippetModal } from "../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
-import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiClientUrl";
+import { ApiClientUrl } from "../components/request/components/ApiClientUrl/ApiClientUrl";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
-import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
-import { INVALID_KEY_CHARACTERS } from "../../../../constants";
+import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
+import { INVALID_KEY_CHARACTERS } from "../../../../../constants";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
@@ -73,8 +73,8 @@ const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
 
 type BaseProps = {
   openInModal?: boolean;
-  onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
-  notifyApiRequestFinished?: (apiEntry: RQAPI.Entry) => void;
+  onSaveCallback?: (apiEntryDetails: RQAPI.HttpApiRecord) => void;
+  notifyApiRequestFinished?: (apiEntry: RQAPI.HttpApiEntry) => void;
 };
 
 type CreateModeProps = BaseProps & {
@@ -82,23 +82,23 @@ type CreateModeProps = BaseProps & {
   apiEntryDetails:
     | null
     | ({
-        data: RQAPI.Entry; // If you want to prefill the details then only data can be passed in create mode
-      } & Partial<RQAPI.ApiRecord>);
+        data: RQAPI.HttpApiEntry; // If you want to prefill the details then only data can be passed in create mode
+      } & Partial<RQAPI.HttpApiRecord>);
 };
 
 type EditModeProps = BaseProps & {
   isCreateMode: false;
-  apiEntryDetails: RQAPI.ApiRecord;
+  apiEntryDetails: RQAPI.HttpApiRecord;
 };
 
 type HistoryModeProps = BaseProps & {
   isCreateMode: false;
-  apiEntryDetails: RQAPI.ApiRecord;
+  apiEntryDetails: RQAPI.HttpApiRecord;
 };
 
 type Props = CreateModeProps | EditModeProps | HistoryModeProps;
 
-const APIClientView: React.FC<Props> = ({
+const HttpClientView: React.FC<Props> = ({
   isCreateMode,
   openInModal = false,
   onSaveCallback,
@@ -135,7 +135,7 @@ const APIClientView: React.FC<Props> = ({
 
   const { version } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -194,7 +194,7 @@ const APIClientView: React.FC<Props> = ({
 
   const setMethod = useCallback((method: RequestMethod) => {
     setEntry((entry) => {
-      const newEntry: RQAPI.Entry = {
+      const newEntry: RQAPI.HttpApiEntry = {
         ...entry,
         request: {
           ...entry.request,
@@ -211,14 +211,14 @@ const APIClientView: React.FC<Props> = ({
     });
   }, []);
 
-  const setRequestEntry = useCallback((updater: (prev: RQAPI.Entry) => RQAPI.Entry) => {
+  const setRequestEntry = useCallback((updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => {
     setEntry((prev) => updater(prev));
   }, []);
 
   const setContentType = useCallback(
     (contentType: RequestContentType) => {
       setEntry((entry) => {
-        const newEntry: RQAPI.Entry = {
+        const newEntry: RQAPI.HttpApiEntry = {
           ...entry,
           request: {
             ...entry.request,
@@ -855,4 +855,4 @@ const APIClientView: React.FC<Props> = ({
   );
 };
 
-export default React.memo(APIClientView);
+export default React.memo(HttpClientView);
