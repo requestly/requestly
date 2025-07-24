@@ -169,12 +169,12 @@ export namespace RQAPI {
   export type GraphQLApiEntry = {
     request: GraphQLRequest;
     response: GraphQLResponse;
-  } & ApiEntryMetaData & { type: ApiEntryType.GRAPHQL };
+  } & ApiEntryMetaData;
 
   export type HttpApiEntry = {
     request: HttpRequest;
     response: HttpResponse;
-  } & ApiEntryMetaData & { type: ApiEntryType.HTTP };
+  } & ApiEntryMetaData;
 
   export type ApiEntry = GraphQLApiEntry | HttpApiEntry;
 
