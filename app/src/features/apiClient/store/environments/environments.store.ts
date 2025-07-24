@@ -58,7 +58,6 @@ export const createEnvironmentsStore = ({
 
   return create<EnvironmentsState>()((set, get) => ({
     version: 0,
-    erroredRecords,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
     globalEnvironment: globalEnvironment,
@@ -84,6 +83,11 @@ export const createEnvironmentsStore = ({
 
     update(id, updates) {
       const { environments } = get();
+
+      if (!environments.has(id)) {
+        return;
+      }
+
       const existingValue = environments.get(id);
 
       if (!existingValue) {
@@ -99,6 +103,11 @@ export const createEnvironmentsStore = ({
 
     getEnvironment(id) {
       const { environments } = get();
+
+      if (!environments.has(id)) {
+        return;
+      }
+
       return environments.get(id);
     },
 
