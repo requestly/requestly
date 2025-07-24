@@ -139,7 +139,7 @@ export namespace RQAPI {
     url: string;
     headers: KeyValuePair[];
     operation: string;
-    variables: Record<string, unknown>;
+    variables: string;
     operationName?: string;
   };
 
@@ -166,17 +166,25 @@ export namespace RQAPI {
     GRAPHQL = "graphql",
   }
 
+  export type ApiEntryMap<T extends ApiEntryType> = T extends ApiEntryType.HTTP
+    ? HttpApiEntry
+    : T extends ApiEntryType.GRAPHQL
+    ? GraphQLApiEntry
+    : never;
+
   export type GraphQLApiEntry = {
     request: GraphQLRequest;
     response: GraphQLResponse;
-  } & ApiEntryMetaData;
+  } & ApiEntryMetaData & { type: ApiEntryType.GRAPHQL };
 
   export type HttpApiEntry = {
     request: HttpRequest;
     response: HttpResponse;
-  } & ApiEntryMetaData;
+  } & ApiEntryMetaData & { type: ApiEntryType.HTTP };
 
   export type ApiEntry = GraphQLApiEntry | HttpApiEntry;
+
+  export type Request = GraphQLRequest | HttpRequest;
 
   export enum ExecutionStatus {
     SUCCESS = "success",
@@ -244,26 +252,8 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  // export interface HttpApiRecord extends BaseApiRecord {
-  //   entryType: ApiEntryType.HTTP;
-  //   data: HttpApiEntry;
-  // }
-
-  // export interface GraphQLApiRecord extends BaseApiRecord {
-  //   entryType: ApiEntryType.GRAPHQL;
-  //   data: GraphQLApiEntry;
-  // }
-
   export interface BaseApiRecord extends RecordMetadata {
     type: RecordType.API;
-  }
-
-  export interface HttpApiRecord extends BaseApiRecord {
-    data: HttpApiEntry;
-  }
-
-  export interface GraphQLApiRecord extends BaseApiRecord {
-    data: GraphQLApiEntry;
   }
 
   export interface CollectionRecord extends RecordMetadata {
@@ -271,7 +261,14 @@ export namespace RQAPI {
     data: Collection;
   }
 
-  export type ApiRecord = HttpApiRecord | GraphQLApiRecord;
+  export type ApiRecord = {
+    type: RecordType.API;
+    data: HttpApiEntry | GraphQLApiEntry;
+  } & BaseApiRecord;
+
+  export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
+
+  export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
 
   export type ApiClientRecord = ApiRecord | CollectionRecord;
 
