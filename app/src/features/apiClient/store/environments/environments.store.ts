@@ -1,5 +1,4 @@
 import { EnvironmentMap } from "backend/environment/types";
-import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesStore } from "../variables/variables.store";
 
@@ -18,8 +17,7 @@ type GlobalEnvironment = Environment;
 type EnvironmentsStore = {
   // state
   version: number;
-  erroredRecords: ErroredRecord[];
-  activeEnvironment?: Environment;
+  activeEnvironment: Environment | null;
   globalEnvironment: GlobalEnvironment;
   environments: Map<Environment["id"], Environment>;
 
@@ -27,13 +25,13 @@ type EnvironmentsStore = {
   delete: (id: string) => void;
   create: (params: Omit<Environment, "data">) => void;
   update: (id: string, updates: Pick<Environment, "name">) => void;
-  getEnvironment: (id: string) => Environment;
+  getEnvironment: (id: string) => Environment | undefined;
   getAll: () => Environment[];
   setActive: (id?: string) => void;
   incrementVersion: () => void;
 };
 
-const getEnvironmentsWithVariableStore = (rawEnvironments: EnvironmentMap): EnvironmentsStore["environments"] => {
+const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsStore["environments"] => {
   const environmentsWithVariableStore = Object.values(rawEnvironments).map((value) => {
     return [
       value.id,
@@ -50,22 +48,26 @@ const getEnvironmentsWithVariableStore = (rawEnvironments: EnvironmentMap): Envi
 
 export const createEnvironmentsStore = ({
   environments,
-  erroredRecords,
+  globalEnvironment,
 }: {
   environments: EnvironmentMap;
-  erroredRecords: ErroredRecord[];
+  globalEnvironment: GlobalEnvironment;
 }) => {
-  const environmentsWithVariableStore = getEnvironmentsWithVariableStore(environments);
+  const environmentsWithVariableStore = parseEnvironments(environments);
 
   return create<EnvironmentsStore>()((set, get) => ({
     version: 0,
-    erroredRecords,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
-    globalEnvironment: environmentsWithVariableStore.get("global"), // FIXME: update hard coded id
+    globalEnvironment: globalEnvironment,
 
     delete(id) {
       const { environments } = get();
+
+      if (!environments.has(id)) {
+        return;
+      }
+
       environments.delete(id);
       set({ environments });
       get().incrementVersion();
@@ -80,6 +82,11 @@ export const createEnvironmentsStore = ({
 
     update(id, updates) {
       const { environments } = get();
+
+      if (!environments.has(id)) {
+        return;
+      }
+
       const existingValue = environments.get(id);
       const updatedValue = { ...existingValue, name: updates.name };
       environments.set(id, updatedValue);
@@ -90,17 +97,23 @@ export const createEnvironmentsStore = ({
 
     getEnvironment(id) {
       const { environments } = get();
+
+      if (!environments.has(id)) {
+        return;
+      }
+
       return environments.get(id);
     },
 
     getAll() {
       const { environments } = get();
-      return Object.values(environments).filter((env) => env.id !== "global");
+      return Object.values(environments); // TODO: check which format is most used in components and return that
     },
 
     setActive(id) {
       if (!id) {
         set({ activeEnvironment: null });
+        get().incrementVersion();
         return;
       }
 
