@@ -55,6 +55,7 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     return createNonGlobalEnvironmentInDB(this.getPrimaryId(), environmentName);
   }
   async createGlobalEnvironment(): Promise<EnvironmentData> {
+    // this is incorrectly implemented but isn't used anywhere
     return createNonGlobalEnvironmentInDB(this.getPrimaryId(), "Global Environment");
   }
 
