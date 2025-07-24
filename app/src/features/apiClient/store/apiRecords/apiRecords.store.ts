@@ -120,7 +120,7 @@ export function createRecordStore(record: RQAPI.Record) {
 function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<RecordState>>();
   for (const [id] of index) {
-    indexStore.set(id, createRecordStore(index.get(id)));
+    indexStore.set(id, createRecordStore(index.get(id)!));
   }
 
   return indexStore;
@@ -143,7 +143,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
       for (const [id] of index) {
         if (!indexStore.has(id)) {
-          indexStore.set(id, createRecordStore(index.get(id)));
+          indexStore.set(id, createRecordStore(index.get(id)!));
         }
       }
 
@@ -169,7 +169,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
     getData(id) {
       const { index } = get();
-      return index.get(id);
+      return index.get(id)!;
     },
 
     getParent(id) {
@@ -197,7 +197,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       const allChildren = getAllChildren(id, childParentMap);
 
       allChildren.forEach((cid) => {
-        indexStore.get(cid).getState().incrementVersion();
+        indexStore.get(cid)!.getState().incrementVersion();
       });
     },
 
@@ -243,7 +243,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
     getRecordStore(id) {
       const { indexStore } = get();
       const recordStore = indexStore.get(id);
-      return recordStore;
+      return recordStore!;
     },
 
     getAllRecords() {
