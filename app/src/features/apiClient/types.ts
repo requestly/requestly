@@ -139,7 +139,7 @@ export namespace RQAPI {
     url: string;
     headers: KeyValuePair[];
     operation: string;
-    variables: Record<string, unknown>;
+    variables: string;
     operationName?: string;
   };
 
@@ -230,7 +230,7 @@ export namespace RQAPI {
     auth: Auth;
   }
 
-  interface RecordMetadata {
+  export interface RecordMetadata {
     id: string;
     name: string;
     description?: string;
