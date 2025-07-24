@@ -119,24 +119,36 @@ export class ApiClientExecutor {
     };
   }
 
-  private async validateMultipartFormBodyFiles() {
+  private async validateMultipartFormBodyFiles(): Promise<{
+    invalidFiles: string[];
+  }> {
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPARTFORM) {
       const fileBodies = (this.entryDetails.request.body as RQAPI.MultipartFormBody)?.filter(
         (body) => body.type === FormDropDownOptions.FILE && typeof body.value !== "string"
       );
-      if (!fileBodies || fileBodies.length === 0) {
-        return true;
-      }
+
       const validateFile = this.apiClientFilesStore.getState().isFilePresentLocally;
 
-      let filesExistenceCheckerResponse;
+      const invalidFiles: string[] = [];
+
       for (const body of fileBodies) {
         if (Array.isArray(body.value)) {
-          filesExistenceCheckerResponse = await Promise.all(body.value.map((file) => validateFile(file.id)));
+          const filesExistenceCheckerResponse = await Promise.all(
+            body.value.map(async (file) => ({
+              id: file.id,
+              exists: await validateFile(file.id),
+            }))
+          );
+
+          filesExistenceCheckerResponse.forEach(({ id, exists }) => {
+            if (!exists) {
+              invalidFiles.push(id);
+            }
+          });
         }
       }
 
-      return filesExistenceCheckerResponse.every((exists) => exists);
+      return { invalidFiles };
     }
   }
 
@@ -258,14 +270,19 @@ export class ApiClientExecutor {
   }
 
   async execute(): Promise<RQAPI.ExecutionResult> {
-    const areFilesValid = await this.validateMultipartFormBodyFiles();
-    if (!areFilesValid) {
+    const { invalidFiles } = await this.validateMultipartFormBodyFiles();
+    const isInvalid = invalidFiles.length > 0;
+    if (isInvalid) {
       return {
         executedEntry: { ...this.entryDetails },
         status: RQAPI.ExecutionStatus.ERROR,
         error: {
           name: "Error",
           message: "Request not sent -- some files are missing",
+          reason:
+            invalidFiles.length > 1
+              ? "Some files appear to be missing or unavailable on your device. Please upload them again to proceed."
+              : "The file seems to have been moved or deleted from your device.Please upload it again to continue.",
           type: RQAPI.ApiClientErrorType.MISSING_FILE,
           source: "request",
         },
