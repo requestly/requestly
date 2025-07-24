@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useStore } from "zustand";
-import { GraphQLRecordStoreContext } from "../store/graphqlRecord/GraphQLRecordContextProvider";
-import { GraphQLRecordState } from "../store/graphqlRecord/graphqlRecord.store";
+import { GraphQLRecordStoreContext } from "../store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
+import { GraphQLRecordState } from "../store/apiRecord/graphqlRecord/graphqlRecord.store";
 import { useShallow } from "zustand/shallow";
 
 export function useGraphQLRecordStore<T>(selector: (state: GraphQLRecordState) => T) {
