@@ -14,7 +14,7 @@ import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
 
-// to be replaced and encapsulated within StoreProvider
+// to be replaced and encapsulated within APIStoresAggregator
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
   const [data, setData] = useState(null);
@@ -58,7 +58,7 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// to be replaced and encapsulated within APIClientContextHub
+// to be replaced and encapsulated within APIStoresAssembler
 const RecordsProvider = ({
   children,
   data,
