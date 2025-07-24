@@ -18,7 +18,7 @@ export type ApiRecordsState = {
   /**
    * This is the list of records that have errors.
    */
-  erroredRecords: ErroredRecord[];
+  erroredRecords: ErroredRecord[]; // TODO: remove this and use erroredRecordsStore
 
   /**
    * This maintains a map of child <-> parent. This field is mostly for internal use,
@@ -51,7 +51,7 @@ export type ApiRecordsState = {
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.Record[]) => void;
-  setErroredRecords: (erroredRecords: ErroredRecord[]) => void;
+  setErroredRecords: (erroredRecords: ErroredRecord[]) => void; // TODO: remove this and use erroredRecordsStore
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState>;
