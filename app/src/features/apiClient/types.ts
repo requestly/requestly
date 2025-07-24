@@ -166,6 +166,12 @@ export namespace RQAPI {
     GRAPHQL = "graphql",
   }
 
+  export type ApiEntryMap<T extends ApiEntryType> = T extends ApiEntryType.HTTP
+    ? HttpApiEntry
+    : T extends ApiEntryType.GRAPHQL
+    ? GraphQLApiEntry
+    : never;
+
   export type GraphQLApiEntry = {
     request: GraphQLRequest;
     response: GraphQLResponse;
@@ -177,6 +183,8 @@ export namespace RQAPI {
   } & ApiEntryMetaData & { type: ApiEntryType.HTTP };
 
   export type ApiEntry = GraphQLApiEntry | HttpApiEntry;
+
+  export type Request = GraphQLRequest | HttpRequest;
 
   export enum ExecutionStatus {
     SUCCESS = "success",
@@ -244,25 +252,23 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  export interface ApiRecord extends RecordMetadata {
+  export interface BaseApiRecord extends RecordMetadata {
     type: RecordType.API;
-    data: ApiEntry;
-  }
-
-  export interface HttpApiRecord extends RecordMetadata {
-    type: RecordType.API;
-    data: HttpApiEntry;
-  }
-
-  export interface GraphQLApiRecord extends RecordMetadata {
-    type: RecordType.API;
-    data: GraphQLApiEntry;
   }
 
   export interface CollectionRecord extends RecordMetadata {
     type: RecordType.COLLECTION;
     data: Collection;
   }
+
+  export type ApiRecord = {
+    type: RecordType.API;
+    data: HttpApiEntry | GraphQLApiEntry;
+  } & BaseApiRecord;
+
+  export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
+
+  export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
 
   export type ApiClientRecord = ApiRecord | CollectionRecord;
 
