@@ -26,7 +26,7 @@ type EnvironmentsStore = {
   create: (params: Omit<Environment, "data">) => void;
   update: (id: string, updates: Pick<Environment, "name">) => void;
   getEnvironment: (id: string) => Environment | undefined;
-  getAll: () => Environment[];
+  getAll: () => Map<Environment["id"], Environment>;
   setActive: (id?: string) => void;
   incrementVersion: () => void;
 };
@@ -101,8 +101,7 @@ export const createEnvironmentsStore = ({
     },
 
     getAll() {
-      const { environments } = get();
-      return Object.values(environments); // TODO: check which format is most used in components and return that
+      return get().environments;
     },
 
     setActive(id) {
