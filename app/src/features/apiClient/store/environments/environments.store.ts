@@ -15,7 +15,7 @@ type Environment = {
 
 type GlobalEnvironment = Environment;
 
-type EnvironmentsStore = {
+export type EnvironmentsStore = {
   // state
   version: number;
   activeEnvironment: Environment | null;
