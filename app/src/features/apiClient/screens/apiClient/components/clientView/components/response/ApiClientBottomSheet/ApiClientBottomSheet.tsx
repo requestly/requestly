@@ -52,7 +52,6 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   executeRequest,
   onDismissError,
 }) => {
-  console.log("isLongRequest", isLongRequest);
   const contentTypeHeader = useMemo(() => {
     return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
   }, [response?.headers]);

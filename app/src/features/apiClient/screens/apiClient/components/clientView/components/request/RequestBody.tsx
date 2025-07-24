@@ -55,8 +55,6 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
   const appMode = useSelector(getAppMode);
 
-  console.log("appMode", appMode);
-
   const requestBodyStateManager = useMemo(
     () =>
       new RequestBodyStateManager(

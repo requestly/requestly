@@ -647,11 +647,8 @@ export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
 
   if (Array.isArray(body)) {
     return body.some((item: any) => {
-      // Check if this is a file type field
       if (item.type === "file" && item.value && Array.isArray(item.value)) {
-        // Check each file in the value array
         return item.value.some((file: any) => {
-          // Check if file has size property and it exceeds the limit
           return file.size && file.size > LARGE_FILE_SIZE;
         });
       }
@@ -659,5 +656,5 @@ export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
     });
   }
 
-  return false; // Changed from true to false as default case
+  return false;
 };

@@ -9,7 +9,6 @@ import { MultiEditableCell, MultiEditableRow } from "./MultiPartFormTableRow";
 import "./MultiPartFormTable.scss";
 import { EnvironmentVariables } from "backend/environment/types";
 
-// NOTE: Partially understood why there is a need of this ?
 type ColumnTypes = Exclude<TableProps<RQAPI.FormDataKeyValuePair>["columns"], undefined>;
 
 interface KeyValueTableProps {
@@ -25,9 +24,6 @@ export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
   variables,
   checkInvalidCharacter = false,
 }) => {
-  /*
-    NOTE: Think on how file & text will be handle in the same table
-  */
   const createEmptyPair = useCallback(() => {
     return {
       id: Date.now(),
@@ -42,7 +38,6 @@ export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
 
   const handleUpdateRequestPairs = useCallback(
     (pair: RQAPI.FormDataKeyValuePair, action: "add" | "remove" | "update") => {
-      console.log("update", pair);
       let FormDataKeyValuePairs = [...memoizedData];
       if (pair) {
         switch (action) {
