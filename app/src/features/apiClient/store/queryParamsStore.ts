@@ -8,7 +8,7 @@ export type QueryParamsStore = {
   setQueryParams: (params: KeyValuePair[]) => void;
 };
 
-const getSyncedQueryParams = (entry: RQAPI.Entry) => {
+const getSyncedQueryParams = (entry: RQAPI.HttpApiEntry) => {
   const { request } = entry || {};
   if (!request) {
     return [];
@@ -33,7 +33,7 @@ const getSyncedQueryParams = (entry: RQAPI.Entry) => {
   return finalParams || [];
 };
 
-export const createQueryParamsStore = (entry: RQAPI.Entry) => {
+export const createQueryParamsStore = (entry: RQAPI.HttpApiEntry) => {
   return create<QueryParamsStore>()((set) => ({
     queryParams: getSyncedQueryParams(entry),
     isInitialized: false,

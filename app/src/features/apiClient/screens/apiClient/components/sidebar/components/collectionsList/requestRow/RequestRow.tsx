@@ -14,7 +14,7 @@ import {
   trackMoveRequestToCollectionClicked,
   trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
-import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import { LocalWorkspaceTooltip } from "../../../../views/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import "./RequestRow.scss";
 import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
 import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
@@ -22,7 +22,7 @@ import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
+import { RequestViewTabSource } from "../../../../views/components/RequestView/requestViewTabSource";
 import { useDrag } from "react-dnd";
 
 interface Props {

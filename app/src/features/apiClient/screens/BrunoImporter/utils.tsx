@@ -1,7 +1,7 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { Bruno } from "./types";
-import { Authorization } from "../apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "../apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 export const processBrunoScripts = (request: Bruno.Request) => {
