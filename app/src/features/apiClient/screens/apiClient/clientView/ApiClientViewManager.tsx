@@ -53,7 +53,7 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
         <AutogenerateProvider>
           <ClientViewFactory
             apiRecord={selectedEntryDetails}
-            handleRequestFinished={handleAppRequestFinished} //TODO: rename prop
+            handleRequestFinished={handleAppRequestFinished}
             onSaveCallback={onSaveCallback}
             isCreateMode={isCreateMode}
           />
