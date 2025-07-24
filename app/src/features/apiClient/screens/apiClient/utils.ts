@@ -623,3 +623,11 @@ export const getRequestTypeForAnalyticEvent = (
 
   return "custom";
 };
+
+export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpApiRecord {
+  return record.data.type === RQAPI.ApiEntryType.HTTP;
+}
+
+export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.GraphQLApiRecord {
+  return record.data.type === RQAPI.ApiEntryType.GRAPHQL;
+}
