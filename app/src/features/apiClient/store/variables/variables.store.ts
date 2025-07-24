@@ -47,6 +47,11 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
 
     update(key, updates) {
       const { data } = get();
+
+      if (!data.has(key)) {
+        return;
+      }
+
       const existingValue = data.get(key);
 
       if (!existingValue) {
