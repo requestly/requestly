@@ -26,6 +26,7 @@ import { RequestViewTabSource } from "../screens/apiClient/components/clientView
 import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
+import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 
 interface ApiClientContextInterface {
   onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => void;
@@ -91,7 +92,6 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
 
 interface ApiClientProviderProps {
   children: ReactNode;
-  repository: ApiClientRecordsInterface<Record<any, any>>;
 }
 
 const trackUserProperties = (records: RQAPI.Record[]) => {
@@ -101,20 +101,29 @@ const trackUserProperties = (records: RQAPI.Record[]) => {
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
 };
 
-export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, repository }) => {
+// suggestion: could be renamed to ApiClientStoreEnabler
+export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
+  const { apiClientRecordsRepository: recordsRepository } = useApiClientRepository();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, addNewRecord, updateRecord, updateRecords, refreshRecords, setErroredRecords, getData] =
-    useAPIRecords((state) => [
-      state.apiClientRecords,
-      state.addNewRecord,
-      state.updateRecord,
-      state.updateRecords,
-      state.refresh,
-      state.setErroredRecords,
-      state.getData,
-    ]);
+  const [
+    apiClientRecords,
+    addNewRecord,
+    updateRecord,
+    updateRecords,
+    refreshRecords,
+    setErroredRecords,
+    getData,
+  ] = useAPIRecords((state) => [
+    state.apiClientRecords,
+    state.addNewRecord,
+    state.updateRecord,
+    state.updateRecords,
+    state.refresh,
+    state.setErroredRecords,
+    state.getData,
+  ]);
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
@@ -229,7 +238,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, repository).then((result) => {
+          return createBlankApiRecord(recordType, collectionId, recordsRepository).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data, "open");
           });
@@ -238,7 +247,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, repository)
+          return createBlankApiRecord(recordType, collectionId, recordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
@@ -288,7 +297,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
       }
     },
     [
-      repository,
+      recordsRepository,
       openDraftRequest,
       onSaveRecord,
       dispatch,
@@ -300,14 +309,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   );
 
   const forceRefreshApiClientRecords = useCallback(async () => {
-    const recordsToRefresh = await repository.getRecordsForForceRefresh();
+    const recordsToRefresh = await recordsRepository.getRecordsForForceRefresh();
     if (!recordsToRefresh || !recordsToRefresh.success) {
       return false;
     }
     refreshRecords(recordsToRefresh.data.records);
     setErroredRecords(recordsToRefresh.data.erroredRecords);
     return true;
-  }, [repository, refreshRecords, setErroredRecords]);
+  }, [recordsRepository, refreshRecords, setErroredRecords]);
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
@@ -335,7 +344,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     onImportRequestModalClose,
     onNewClick,
     apiClientWorkloadManager: workloadManager,
-    apiClientRecordsRepository: repository,
+    apiClientRecordsRepository: recordsRepository,
     forceRefreshApiClientRecords,
   };
 
