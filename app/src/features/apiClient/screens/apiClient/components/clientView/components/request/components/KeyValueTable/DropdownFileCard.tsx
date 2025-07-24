@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { DownOutlined } from "@ant-design/icons";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { Dropdown } from "antd";
@@ -9,40 +9,33 @@ import { BiError } from "@react-icons/all-files/bi/BiError";
 import "./DropdownFileCard.scss";
 import { formatBytes, truncateString } from "features/apiClient/screens/apiClient/utils";
 import InfoIcon from "components/misc/InfoIcon";
+import { RQAPI } from "features/apiClient/types";
 
 interface DropdownFileProps {
+  MultipartFormEntry: RQAPI.FormDataKeyValuePair;
   onAddMoreFiles: () => void;
   onDeleteFile: (fileId: string) => void;
 }
 
-const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFile }) => {
-  const { files, isFilePresentLocally } = useApiClientFileStore((state) => state);
+const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFile, MultipartFormEntry }) => {
+  const { getFilesByIds } = useApiClientFileStore((state) => state);
+  const MultipartFormFileIds = Array.isArray(MultipartFormEntry.value)
+    ? MultipartFormEntry.value.map((file) => file.id)
+    : [];
 
-  const storedFiles = Object.keys(files).map((id) => ({
-    id,
-    ...files[id],
-  }));
+  const filesFromStore = getFilesByIds(MultipartFormFileIds);
 
-  //check if this is called only for the removal case of file
-  useEffect(() => {
-    storedFiles.forEach((file) => {
-      isFilePresentLocally(file.id)
-        .then((isValid) => {
-          console.log(`File ${file.id} is valid:`, isValid);
-        })
-        .catch((error) => {
-          console.error(`Error checking file ${file.id}:`, error);
-        });
-    });
-  }, [isFilePresentLocally, storedFiles]);
+  if (filesFromStore.length === 0) {
+    return null;
+  }
 
   //Filter the files that are larger than 100MB
-  const largeFiles = storedFiles.filter((file) => file.size >= 104857600);
+  const largeFiles = filesFromStore.filter((file) => file.size >= 104857600);
   const hasLargeFiles = largeFiles.length > 0;
   const hasMultipleLargeFiles = largeFiles.length > 1;
 
   const getDropDownItems = () => {
-    const FileSeperator = storedFiles.map((file) => ({
+    const FileSeperator = filesFromStore.map((file) => ({
       key: file.id,
       label: (
         <div className="file-dropdown-item-container">
@@ -103,13 +96,13 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
         trigger={["click"]}
       >
         <RQButton className="key-value-table-file-button">
-          {storedFiles[0].isFileValid ? (
+          {filesFromStore[0].isFileValid ? (
             <FaRegFileLines className="bin-icon" />
           ) : (
             <>
               <RQTooltip
                 title={
-                  storedFiles.length > 1
+                  filesFromStore.length > 1
                     ? "Some files are no longer available on the selected path on your device. Please remove and upload them again to continue."
                     : "This file is no longer available on the selected path on your device. Please remove and upload it again to continue."
                 }
@@ -119,10 +112,10 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
               </RQTooltip>
             </>
           )}
-          <span className={`button-text ${storedFiles[0].isFileValid ? "" : "file-invalid"}`}>
-            {truncateString(storedFiles[0]?.name, 15)}
+          <span className={`button-text ${filesFromStore[0].isFileValid ? "" : "file-invalid"}`}>
+            {truncateString(filesFromStore[0].name, 15)}
           </span>
-          <span className="file-counter">{storedFiles.length > 1 && ` +${storedFiles.length - 1}`}</span>
+          <span className="file-counter">{filesFromStore.length > 1 && ` +${filesFromStore.length - 1}`}</span>
           <DownOutlined className="down-outlined-icon" />
         </RQButton>
       </Dropdown>

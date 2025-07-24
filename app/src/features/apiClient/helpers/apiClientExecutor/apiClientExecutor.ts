@@ -122,8 +122,11 @@ export class ApiClientExecutor {
   private async validateMultipartFormBodyFiles() {
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPARTFORM) {
       const fileBodies = (this.entryDetails.request.body as RQAPI.MultipartFormBody)?.filter(
-        (body) => typeof body.value !== "string"
+        (body) => body.type === "file" && typeof body.value !== "string"
       );
+      if (!fileBodies || fileBodies.length === 0) {
+        return true;
+      }
       const validateFile = this.apiClientFilesStore.getState().isFilePresentLocally;
 
       let filesExistenceCheckerResponse;

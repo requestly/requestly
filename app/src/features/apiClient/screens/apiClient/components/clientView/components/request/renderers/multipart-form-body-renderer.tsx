@@ -15,8 +15,8 @@ export const MultipartFormBodyRenderer: react.FC<{
   const handleMultiPartFormChange = useCallback(
     (updatedPairs: RQAPI.FormDataKeyValuePair[]) => {
       console.log("updated pairs", updatedPairs);
+      setMultiPartForm(updatedPairs);
       setRequestEntry((prev) => {
-        setMultiPartForm(updatedPairs);
         return {
           ...prev,
           request: {
