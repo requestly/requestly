@@ -1,6 +1,7 @@
 import { EnvironmentMap } from "backend/environment/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesStore } from "../variables/variables.store";
+import { NativeError } from "errors/NativeError";
 
 type EnvironmentData = {
   variables: StoreApi<VariablesStore>;
@@ -85,7 +86,7 @@ export const createEnvironmentsStore = ({
       const existingValue = environments.get(id);
 
       if (!existingValue) {
-        return;
+        throw new NativeError("Environment does not exist!").addContext({ environmentId: id });
       }
 
       const updatedValue = { ...existingValue, name: updates.name };
