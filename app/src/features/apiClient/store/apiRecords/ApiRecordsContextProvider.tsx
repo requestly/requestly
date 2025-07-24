@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { StoreApi, useStore } from "zustand";
 import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
 import { useShallow } from "zustand/shallow";
@@ -7,92 +7,139 @@ import { ApiClientProvider } from "features/apiClient/contexts/apiClient";
 import { notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
-import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
-import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
-import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
+import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
+import { createEnvironmentsStore, EnvironmentsStore } from "../environments/environments.store";
+import { Daemon } from "./Daemon";
 
-export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
+type AllApiClientStores = {
+  records: StoreApi<ApiRecordsState>;
+  environments: StoreApi<EnvironmentsStore>;
+};
 
-// to be replaced and encapsulated within APIStoresAggregator
+type FetchedData<T> = { records: T; erroredRecords: ErroredRecord[] };
+type FetchedStoreData = {
+  records: FetchedData<RQAPI.Record[]>;
+  environments: { global: EnvironmentData; nonGlobalEnvironments: FetchedData<EnvironmentMap> };
+};
+/* todo: rename both context and provider to something close to AllApiClientStores */
+export const ApiRecordsStoreContext = createContext<AllApiClientStores>(null);
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
-  const { apiClientRecordsRepository } = useApiClientRepository();
-  const [data, setData] = useState(null);
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [records, setRecords] = useState<FetchedStoreData["records"]>(null);
+  const [environments, setEnvironments] = useState<FetchedStoreData["environments"]>(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    apiClientRecordsRepository
-      .getAllRecords()
-      .then((result) => {
-        if (!result.success) {
+    (async () => {
+      try {
+        const [recordsResult, envResult] = await Promise.all([
+          apiClientRecordsRepository.getAllRecords(),
+          environmentVariablesRepository.getAllEnvironments(),
+        ]);
+
+        if (!recordsResult.success) {
           notification.error({
             message: "Could not fetch records!",
-            description: result?.message,
+            description: recordsResult.message || "Please try reloading the app", // fix-me: need good copy here
             placement: "bottomRight",
           });
-          return;
+        } else {
+          setRecords(recordsResult.data);
         }
-        setData(result.data);
-      })
-      .catch((e) => {
+
+        if (!envResult.success) {
+          notification.error({
+            message: "Could not fetch environments!",
+            description: "Please try reloading the app", // fix-me: need good copy here
+            placement: "bottomRight",
+          });
+        } else {
+          const allEnvironments = envResult.data.environments;
+          const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
+          const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
+
+          if (!globalEnv) throw new Error("Global Environment doesn't exist");
+
+          setEnvironments({
+            global: globalEnv,
+            nonGlobalEnvironments: {
+              records: otherEnvs,
+              erroredRecords: envResult.data.erroredRecords,
+            },
+          });
+        }
+      } catch (e) {
         notification.error({
-          message: "Could not fetch records!",
+          message: "Could not fetch data!",
           description: e.message,
           placement: "bottomRight",
         });
-        return;
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [apiClientRecordsRepository]);
+      }
+    })();
+  }, [apiClientRecordsRepository, environmentVariablesRepository]);
 
-  if (isLoading) return <ApiClientLoadingView />;
+  if (!records || !environments) return <ApiClientLoadingView />;
 
-  return (
-    <RecordsProvider data={data} repository={apiClientRecordsRepository}>
-      {children}
-    </RecordsProvider>
-  );
+  return <RecordsProvider data={{ records, environments }}>{children}</RecordsProvider>;
 };
 
-// to be replaced and encapsulated within APIStoresAssembler
-const RecordsProvider = ({
-  children,
-  data,
-  repository,
-}: {
-  children: ReactNode;
-  data: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] };
-  repository: ApiClientRecordsInterface<Record<string, any>>;
-}) => {
-  const store = useMemo(() => createApiRecordsStore(data), [data]);
+type RecordsProviderProps = {
+  children?: React.ReactNode;
+  data: FetchedStoreData;
+};
+const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { environments, records } }) => {
+  const environmentStore = createEnvironmentsStore({
+    environments: environments.nonGlobalEnvironments.records,
+    erroredRecords: environments.nonGlobalEnvironments.erroredRecords,
+  });
+  const apiRecordsStore = createApiRecordsStore(records);
 
   return (
-    <ApiRecordsStoreContext.Provider value={store}>
-      <ExampleCollectionsDaemon store={store} />
-      <AutoSyncLocalStoreDaemon />
+    <ApiRecordsStoreContext.Provider
+      value={{
+        records: apiRecordsStore,
+        environments: environmentStore,
+      }}
+    >
+      <Daemon />
       <ApiClientProvider>{children}</ApiClientProvider>
     </ApiRecordsStoreContext.Provider>
   );
 };
 
 export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
-  const store = useContext(ApiRecordsStoreContext);
-  if (!store) {
-    throw new Error("store not found!");
+  const { records } = useContext(ApiRecordsStoreContext);
+  if (!records) {
+    throw new Error("records store not found!");
   }
 
-  return useStore(store, useShallow(selector));
+  return useStore(records, useShallow(selector));
 }
 
 export function useAPIRecordsStore() {
-  const store = useContext(ApiRecordsStoreContext);
-  if (!store) {
-    throw new Error("store not found!");
+  const { records } = useContext(ApiRecordsStoreContext);
+  if (!records) {
+    throw new Error("records store not found!");
   }
 
-  return store;
+  return records;
+}
+
+export function useAPIEnvironment<T>(selector: (state: EnvironmentsStore) => T) {
+  const { environments } = useContext(ApiRecordsStoreContext);
+  if (!environments) {
+    throw new Error("environments store not found!");
+  }
+
+  return useStore(environments, useShallow(selector));
+}
+
+export function useAPIEnvironmentStore() {
+  const { environments } = useContext(ApiRecordsStoreContext);
+  if (!environments) {
+    throw new Error("environments store not found!");
+  }
+
+  return environments;
 }
