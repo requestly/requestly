@@ -30,9 +30,9 @@ import { notification } from "antd";
 import { MutexTimeoutError } from "../fetch-lock";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
-let unsubscribeListener: () => void = null;
-let unsubscribeCollectionListener: () => void = null;
-let unsubscribeGlobalVariablesListener: () => void = null;
+let unsubscribeListener: null | (() => void) = null;
+let unsubscribeCollectionListener: null | (() => void) = null;
+let unsubscribeGlobalVariablesListener: null | (() => void) = null;
 
 // higher precedence is given to environment variables
 const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
@@ -476,6 +476,10 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       let collection: RQAPI.CollectionRecord;
       try {
         const existingRecord = getData(collectionId);
+        if (!existingRecord) {
+          throw new Error("Collection not found");
+        }
+
         if (existingRecord.type !== RQAPI.RecordType.COLLECTION) {
           throw new Error("Record is not a collection");
         }
