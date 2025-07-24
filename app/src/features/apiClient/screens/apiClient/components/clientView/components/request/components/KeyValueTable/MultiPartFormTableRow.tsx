@@ -49,7 +49,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
   checkInvalidCharacter,
   ...restProps
 }) => {
-  const { addFile, removeFile, files } = useApiClientFileStore((state) => state);
+  const { addFile, removeFile } = useApiClientFileStore((state) => state);
   const form = useContext(EditableContext);
 
   const save = async () => {
@@ -100,6 +100,9 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                 defaultValue={record?.type ?? FormDropDownOptions.TEXT}
                 onChange={(value) => {
                   record.type = value;
+                  //clear the value if type is changed to file, because earlier value remains there
+                  const newValue: string | [] = value === FormDropDownOptions.FILE ? [] : "";
+                  form.setFieldsValue({ value: newValue });
                   save();
                 }}
               />
@@ -139,7 +142,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
               </div>
             </Conditional>
 
-            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && Object.keys(files).length === 0 && (
+            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length === 0 && (
               <RQButton
                 className="key-value-table-file-button"
                 onClick={() => {
@@ -172,8 +175,9 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
               </RQButton>
             )}
 
-            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && Object.keys(files).length > 0 && (
+            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length > 0 && (
               <DropdownFile
+                MultipartFormEntry={record}
                 onAddMoreFiles={() => {
                   displayMultiFileSelector((files: { name: string; path: string; size: number }[]) => {
                     const newSelectedFiles = files.map(({ name, path, size }) => {
@@ -204,10 +208,9 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
                 }}
                 onDeleteFile={(fileId: string) => {
                   removeFile(fileId);
-                  const remainingFiles = Object.keys(files).map((id) => ({
-                    id,
-                    ...files[id],
-                  }));
+                  const currentFiles: any[] = Array.isArray(record.value) ? record.value : [];
+                  const remainingFiles = currentFiles.filter((file) => file.id !== fileId);
+                  console.log("remainingFiles", remainingFiles);
                   form.setFieldsValue({ [dataIndex]: remainingFiles });
                   save();
                 }}
