@@ -170,7 +170,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
     getData(id) {
       const { index } = get();
-      return index.get(id);
+      return index.get(id)!;
     },
 
     getParent(id) {
@@ -263,7 +263,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
     getRecordStore(id) {
       const { indexStore } = get();
       const recordStore = indexStore.get(id);
-      return recordStore;
+      return recordStore!;
     },
 
     getAllRecords() {
