@@ -11,10 +11,12 @@ import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/compo
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { createEnvironmentsStore, EnvironmentsStore } from "../environments/environments.store";
 import { Daemon } from "./Daemon";
+import { createErroredRecordsStore, ErroredRecordsStore } from "../erroredRecords/erroredRecords.store";
 
 type AllApiClientStores = {
   records: StoreApi<ApiRecordsState>;
   environments: StoreApi<EnvironmentsStore>;
+  errorRecords: StoreApi<ErroredRecordsStore>;
 };
 
 type FetchedData<T> = { records: T; erroredRecords: ErroredRecord[] };
@@ -23,12 +25,12 @@ type FetchedStoreData = {
   environments: { global: EnvironmentData; nonGlobalEnvironments: FetchedData<EnvironmentMap> };
 };
 /* todo: rename both context and provider to something close to AllApiClientStores */
-export const ApiRecordsStoreContext = createContext<AllApiClientStores>(null);
+export const ApiRecordsStoreContext = createContext<AllApiClientStores | null>(null);
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
 
-  const [records, setRecords] = useState<FetchedStoreData["records"]>(null);
-  const [environments, setEnvironments] = useState<FetchedStoreData["environments"]>(null);
+  const [records, setRecords] = useState<FetchedStoreData["records"] | null>(null);
+  const [environments, setEnvironments] = useState<FetchedStoreData["environments"] | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -91,15 +93,19 @@ type RecordsProviderProps = {
 const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { environments, records } }) => {
   const environmentStore = createEnvironmentsStore({
     environments: environments.nonGlobalEnvironments.records,
-    erroredRecords: environments.nonGlobalEnvironments.erroredRecords,
+    global: environments.global, // note: expecting an update in the createEnvironmentsStore interface
   });
   const apiRecordsStore = createApiRecordsStore(records);
-
+  const errorStore = createErroredRecordsStore({
+    apiErroredRecords: records.erroredRecords,
+    environmentErroredRecords: environments.nonGlobalEnvironments.erroredRecords,
+  });
   return (
     <ApiRecordsStoreContext.Provider
       value={{
         records: apiRecordsStore,
         environments: environmentStore,
+        errorRecords: errorStore,
       }}
     >
       <Daemon />
@@ -109,37 +115,38 @@ const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { env
 };
 
 export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
-  const { records } = useContext(ApiRecordsStoreContext);
-  if (!records) {
+  const store = useContext(ApiRecordsStoreContext);
+  if (!store || !store.records) {
     throw new Error("records store not found!");
   }
 
-  return useStore(records, useShallow(selector));
+  return useStore(store.records, useShallow(selector));
 }
 
 export function useAPIRecordsStore() {
-  const { records } = useContext(ApiRecordsStoreContext);
-  if (!records) {
+  const store = useContext(ApiRecordsStoreContext);
+
+  if (!store || !store.records) {
     throw new Error("records store not found!");
   }
 
-  return records;
+  return store.records;
 }
 
 export function useAPIEnvironment<T>(selector: (state: EnvironmentsStore) => T) {
-  const { environments } = useContext(ApiRecordsStoreContext);
-  if (!environments) {
+  const store = useContext(ApiRecordsStoreContext);
+  if (!store || !store.environments) {
     throw new Error("environments store not found!");
   }
 
-  return useStore(environments, useShallow(selector));
+  return useStore(store.environments, useShallow(selector));
 }
 
 export function useAPIEnvironmentStore() {
-  const { environments } = useContext(ApiRecordsStoreContext);
-  if (!environments) {
+  const store = useContext(ApiRecordsStoreContext);
+  if (!store || !store.environments) {
     throw new Error("environments store not found!");
   }
 
-  return environments;
+  return store.environments;
 }
