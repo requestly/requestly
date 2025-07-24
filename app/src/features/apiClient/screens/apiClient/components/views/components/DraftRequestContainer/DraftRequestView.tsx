@@ -1,6 +1,6 @@
 import React from "react";
 import { RQAPI } from "features/apiClient/types";
-import { GenericApiClient } from "features/apiClient/screens/apiClient/GenericApiClient";
+import { GenericApiClient } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
 
 export const DraftRequestView: React.FC<{
   onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;

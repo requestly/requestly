@@ -5,7 +5,7 @@ import {
   Authorization,
   BasicAuthAuthorizationConfig,
   BearerTokenAuthorizationConfig,
-} from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+} from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 
 export enum RequestMethod {
@@ -109,7 +109,27 @@ export namespace RQAPI {
       [Authorization.Type.BASIC_AUTH]?: BasicAuthAuthorizationConfig["config"];
     };
   };
-  export interface Request {
+  // export interface Request {
+  //   url: string;
+  //   queryParams: KeyValuePair[];
+  //   method: RequestMethod;
+  //   headers: KeyValuePair[];
+  //   body?: RequestBody;
+  //   bodyContainer?: RequestBodyContainer;
+  //   contentType?: RequestContentType;
+  //   includeCredentials?: boolean;
+  // }
+
+  // export interface Response {
+  //   body: string;
+  //   headers: KeyValuePair[];
+  //   status: number;
+  //   statusText: string;
+  //   time: number;
+  //   redirectedUrl: string;
+  // }
+
+  export type HttpRequest = {
     url: string;
     queryParams: KeyValuePair[];
     method: RequestMethod;
@@ -118,27 +138,64 @@ export namespace RQAPI {
     bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
     includeCredentials?: boolean;
-  }
+  };
 
-  export interface Response {
+  export type HttpResponse = {
     body: string;
     headers: KeyValuePair[];
     status: number;
     statusText: string;
     time: number;
     redirectedUrl: string;
-  }
+  };
 
-  export interface Entry {
-    request: Request;
-    response?: Response;
+  export type HttpSpec = {
+    request: HttpRequest;
+    response: HttpResponse;
+  };
+
+  export type GraphQLRequest = {
+    url: string;
+    headers: KeyValuePair[];
+    operation: string;
+    variables: Record<string, unknown>;
+    operationName?: string;
+  };
+
+  export type GraphQLResponse = {
+    type: "http" | "ws";
+    body: string;
+    headers: KeyValuePair[];
+    status: number;
+    statusText: string;
+    time: number;
+  };
+
+  export type ApiEntryMetaData = {
     testResults?: TestResult[];
     scripts?: {
       preRequest: string;
       postResponse: string;
     };
     auth: Auth;
+  };
+
+  export enum ApiEntryType {
+    HTTP = "http",
+    GRAPHQL = "graphql",
   }
+
+  export type GraphQLApiEntry = {
+    request: GraphQLRequest;
+    response: GraphQLResponse;
+  } & ApiEntryMetaData & { type: ApiEntryType.GRAPHQL };
+
+  export type HttpApiEntry = {
+    request: HttpRequest;
+    response: HttpResponse;
+  } & ApiEntryMetaData & { type: ApiEntryType.HTTP };
+
+  export type ApiEntry = GraphQLApiEntry | HttpApiEntry;
 
   export enum ExecutionStatus {
     SUCCESS = "success",
@@ -161,12 +218,12 @@ export namespace RQAPI {
   export type ExecutionResult =
     | {
         status: ExecutionStatus.SUCCESS;
-        executedEntry: RQAPI.Entry;
+        executedEntry: ApiEntry;
         warning?: ExecutionWarning;
       }
     | {
         status: ExecutionStatus.ERROR;
-        executedEntry: RQAPI.Entry;
+        executedEntry: ApiEntry;
         error: ExecutionError;
       };
 
@@ -183,7 +240,7 @@ export namespace RQAPI {
       };
 
   export interface Collection {
-    children?: Record[];
+    children?: ApiClientRecord[];
     scripts?: {
       preRequest: string;
       postResponse: string;
@@ -208,7 +265,17 @@ export namespace RQAPI {
 
   export interface ApiRecord extends RecordMetadata {
     type: RecordType.API;
-    data: Entry;
+    data: ApiEntry;
+  }
+
+  export interface HttpApiRecord extends RecordMetadata {
+    type: RecordType.API;
+    data: HttpApiEntry;
+  }
+
+  export interface GraphQLApiRecord extends RecordMetadata {
+    type: RecordType.API;
+    data: GraphQLApiEntry;
   }
 
   export interface CollectionRecord extends RecordMetadata {
@@ -216,13 +283,13 @@ export namespace RQAPI {
     data: Collection;
   }
 
-  export type Record = ApiRecord | CollectionRecord;
+  export type ApiClientRecord = ApiRecord | CollectionRecord;
 
-  export type RecordPromise = Promise<{ success: boolean; data: Record; message?: string }>;
+  export type ApiClientRecordPromise = Promise<{ success: boolean; data: ApiClientRecord; message?: string }>;
 
   export type RecordsPromise = Promise<{
     success: boolean;
-    data: { records: Record[]; erroredRecords: ErroredRecord[] };
+    data: { records: ApiClientRecord[]; erroredRecords: ErroredRecord[] };
     message?: string;
   }>;
 

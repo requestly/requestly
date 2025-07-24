@@ -5,7 +5,7 @@ import { RQAPI } from "../types";
 
 export const QueryParamsStoreContext = createContext<StoreApi<QueryParamsStore>>(null);
 
-export const QueryParamsProvider = ({ children, entry }: { children: ReactNode; entry: RQAPI.Entry }) => {
+export const QueryParamsProvider = ({ children, entry }: { children: ReactNode; entry: RQAPI.HttpApiEntry }) => {
   const [store] = useState(() => createQueryParamsStore(entry));
   return <QueryParamsStoreContext.Provider value={store}>{children}</QueryParamsStoreContext.Provider>;
 };

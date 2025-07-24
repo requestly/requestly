@@ -3,7 +3,7 @@ import { RequestViewTabSource } from "../../RequestView/requestViewTabSource";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { GenericApiClient } from "features/apiClient/screens/apiClient/GenericApiClient";
+import { GenericApiClient } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
 
 export const HistoryView: React.FC = () => {
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);

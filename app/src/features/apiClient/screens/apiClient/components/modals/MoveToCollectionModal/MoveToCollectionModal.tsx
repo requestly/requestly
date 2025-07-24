@@ -9,7 +9,7 @@ import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/a
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
 import { head, isEmpty, omit } from "lodash";
-import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "../../views/components/request/components/AuthorizationView/types/AuthConfig";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
