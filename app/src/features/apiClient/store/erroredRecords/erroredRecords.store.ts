@@ -9,7 +9,7 @@ type ErroredRecords<T = ErroredRecord> = {
   setEnvironmentErroredRecords: (erroredRecord: T[]) => void;
 };
 
-type ErroredRecordsStore = ErroredRecords;
+export type ErroredRecordsStore = ErroredRecords;
 
 export const createErroredRecordsStore = ({ apiErroredRecords, environmentErroredRecords }: ErroredRecords) => {
   return create<ErroredRecordsStore>()((set, get) => ({
