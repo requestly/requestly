@@ -244,18 +244,25 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  export interface ApiRecord extends RecordMetadata {
+  // export interface HttpApiRecord extends BaseApiRecord {
+  //   entryType: ApiEntryType.HTTP;
+  //   data: HttpApiEntry;
+  // }
+
+  // export interface GraphQLApiRecord extends BaseApiRecord {
+  //   entryType: ApiEntryType.GRAPHQL;
+  //   data: GraphQLApiEntry;
+  // }
+
+  export interface BaseApiRecord extends RecordMetadata {
     type: RecordType.API;
-    data: ApiEntry;
   }
 
-  export interface HttpApiRecord extends RecordMetadata {
-    type: RecordType.API;
+  export interface HttpApiRecord extends BaseApiRecord {
     data: HttpApiEntry;
   }
 
-  export interface GraphQLApiRecord extends RecordMetadata {
-    type: RecordType.API;
+  export interface GraphQLApiRecord extends BaseApiRecord {
     data: GraphQLApiEntry;
   }
 
@@ -263,6 +270,8 @@ export namespace RQAPI {
     type: RecordType.COLLECTION;
     data: Collection;
   }
+
+  export type ApiRecord = HttpApiRecord | GraphQLApiRecord;
 
   export type ApiClientRecord = ApiRecord | CollectionRecord;
 
