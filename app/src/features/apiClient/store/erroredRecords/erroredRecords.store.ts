@@ -7,9 +7,6 @@ type ErroredRecords<T = ErroredRecord> = {
 
   setApiErroredRecords: (erroredRecord: T[]) => void;
   setEnvironmentErroredRecords: (erroredRecord: T[]) => void;
-
-  refreshApiClientRecords: () => void;
-  refreshEnvironments: () => void;
 };
 
 type ErroredRecordsStore = ErroredRecords;
@@ -25,15 +22,6 @@ export const createErroredRecordsStore = ({ apiErroredRecords, environmentErrore
 
     setEnvironmentErroredRecords(erroredRecords) {
       set({ environmentErroredRecords: erroredRecords });
-    },
-
-    refreshApiClientRecords() {
-      // should refetch entity, should be out, else it needs the repository and other store access to complete whole refresh flow
-      // eg: get the records from repo -> refresh the api records (records store) -> update the latest errorec records
-    },
-
-    refreshEnvironments() {
-      // should refetch entity, same as above
     },
   }));
 };
