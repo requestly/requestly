@@ -1,4 +1,5 @@
 import { EnvironmentVariableKey, EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
+import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
 
 export type VariablesStore = {
@@ -49,7 +50,7 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       const existingValue = data.get(key);
 
       if (!existingValue) {
-        return;
+        throw new NativeError("Variable does not exist!").addContext({ variableKey: key });
       }
 
       const updatedValue = { ...existingValue, ...updates };
