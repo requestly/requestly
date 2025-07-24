@@ -82,12 +82,12 @@ export const createEnvironmentsStore = ({
 
     update(id, updates) {
       const { environments } = get();
+      const existingValue = environments.get(id);
 
-      if (!environments.has(id)) {
+      if (!existingValue) {
         return;
       }
 
-      const existingValue = environments.get(id);
       const updatedValue = { ...existingValue, name: updates.name };
       environments.set(id, updatedValue);
 
@@ -97,11 +97,6 @@ export const createEnvironmentsStore = ({
 
     getEnvironment(id) {
       const { environments } = get();
-
-      if (!environments.has(id)) {
-        return;
-      }
-
       return environments.get(id);
     },
 

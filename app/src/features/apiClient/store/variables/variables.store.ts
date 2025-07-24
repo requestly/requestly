@@ -42,14 +42,13 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
 
     update(key, updates) {
       const { data } = get();
+      const existingValue = data.get(key);
 
-      if (!data.has(key)) {
+      if (!existingValue) {
         return;
       }
 
-      const existingValue = data.get(key);
       const updatedValue = { ...existingValue, ...updates };
-
       data.set(key, updatedValue);
       set({ data });
       get().incrementVersion();
