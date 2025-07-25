@@ -55,7 +55,6 @@ export const updateMockFromFirebase = async (
 
   const success = await updateDoc(docRef, {
     recordType: MockRecordType.MOCK,
-    ...mockData,
     lastUpdatedBy: updaterId,
     updatedTs: Timestamp.now().toMillis(),
   })
