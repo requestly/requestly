@@ -623,3 +623,37 @@ export const getRequestTypeForAnalyticEvent = (
 
   return "custom";
 };
+
+export const formatBytes = (bytes: number) => {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
+};
+
+export const truncateString = (str: string, maxLength: number) => {
+  if (str.length > maxLength) {
+    return str.slice(0, maxLength) + "...";
+  } else {
+    return str;
+  }
+};
+
+export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
+  const LARGE_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+
+  if (Array.isArray(body)) {
+    return body.some((item: any) => {
+      if (item.type === "file" && item.value && Array.isArray(item.value)) {
+        return item.value.some((file: any) => {
+          return file.size && file.size > LARGE_FILE_SIZE;
+        });
+      }
+      return false;
+    });
+  }
+
+  return false;
+};
