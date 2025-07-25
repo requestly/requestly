@@ -9,7 +9,7 @@ export const PricingModalFooterBanner = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href="https://calendly.com/requestly/sagar"
+          href="https://www.browserstack.com/contact?utm_source=Requestly&utm_medium=redirect&utm_platform=external"
           className="pricing-modal-footer-banner-link"
           onClick={() => {
             trackContactUsClicked("pricing_modal");

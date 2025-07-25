@@ -33,7 +33,7 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={"/assets/media/components/call.svg"} alt="call" />,
         title: "Schedule a demo",
-        href: "https://calendly.com/requestly/sagar",
+        href: "https://www.browserstack.com/contact?utm_source=Requestly&utm_medium=redirect&utm_platform=external",
       },
     ],
     []
