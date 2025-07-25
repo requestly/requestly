@@ -14,7 +14,10 @@ type RequestViewState =
       isCreateMode: true;
     };
 
-export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }) => {
+export const DraftRequestContainer: React.FC<{ draftId: string; apiEntryType: RQAPI.ApiEntryType }> = ({
+  draftId,
+  apiEntryType,
+}) => {
   const [requestViewState, setRequestViewState] = useState<RequestViewState>({
     isCreateMode: true,
   });
@@ -47,7 +50,7 @@ export const DraftRequestContainer: React.FC<{ draftId: string }> = ({ draftId }
   );
 
   if (requestViewState.isCreateMode === true) {
-    return <DraftRequestView onSaveCallback={onSaveCallback} />;
+    return <DraftRequestView onSaveCallback={onSaveCallback} apiEntryType={apiEntryType} />;
   } else {
     return <RequestView requestId={requestViewState.entryDetails.id} apiEntryDetails={requestViewState.entryDetails} />;
   }

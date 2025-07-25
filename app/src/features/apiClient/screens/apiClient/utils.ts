@@ -79,23 +79,65 @@ export const addUrlSchemeIfMissing = (url: string): string => {
   return url;
 };
 
-export const getEmptyAPIEntry = (request?: RQAPI.Request): RQAPI.Entry => {
+export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry => {
   return {
+    type: RQAPI.ApiEntryType.HTTP,
     request: {
       url: DEMO_API_URL,
-      queryParams: [],
       method: RequestMethod.GET,
       headers: [],
+      queryParams: [],
       body: null,
-      contentType: RequestContentType.RAW,
       ...(request || {}),
     },
-    auth: getDefaultAuth(false),
+    response: null,
     scripts: {
       preRequest: "",
       postResponse: "",
     },
+    auth: getDefaultAuth(false),
+  };
+};
+
+export const getEmptyGraphQLEntry = (request?: RQAPI.Request): RQAPI.GraphQLApiEntry => {
+  return {
+    type: RQAPI.ApiEntryType.GRAPHQL,
+    request: {
+      url: DEMO_API_URL,
+      headers: [],
+      operation: "",
+      variables: "",
+      operationName: "",
+      ...(request || {}),
+    },
     response: null,
+    scripts: {
+      preRequest: "",
+      postResponse: "",
+    },
+    auth: getDefaultAuth(false),
+  };
+};
+
+export const getEmptyAPIEntry = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request) => {
+  if (apiEntryType === RQAPI.ApiEntryType.HTTP) return getEmptyHttpEntry(request);
+  if (apiEntryType === RQAPI.ApiEntryType.GRAPHQL) return getEmptyGraphQLEntry(request);
+  return getEmptyHttpEntry(request);
+};
+
+export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request): RQAPI.ApiRecord => {
+  return {
+    data: getEmptyAPIEntry(apiEntryType),
+    type: RQAPI.RecordType.API,
+    id: "",
+    name: "Untitled request",
+    collectionId: "",
+    ownerId: "",
+    deleted: false,
+    createdBy: "",
+    updatedBy: "",
+    createdTs: Date.now(),
+    updatedTs: Date.now(),
   };
 };
 
@@ -292,14 +334,15 @@ export const getEmptyPair = (): KeyValuePair => ({ id: Math.random(), key: "", v
 export const createBlankApiRecord = (
   recordType: RQAPI.RecordType,
   collectionId: string,
-  apiClientRecordsRepository: ApiClientRecordsInterface<any>
+  apiClientRecordsRepository: ApiClientRecordsInterface<any>,
+  entryType?: RQAPI.ApiEntryType
 ) => {
-  const newRecord: Partial<RQAPI.Record> = {};
+  const newRecord: Partial<RQAPI.ApiClientRecord> = {};
 
   if (recordType === RQAPI.RecordType.API) {
     newRecord.name = "Untitled request";
     newRecord.type = RQAPI.RecordType.API;
-    newRecord.data = getEmptyAPIEntry();
+    newRecord.data = getEmptyAPIEntry(entryType);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }

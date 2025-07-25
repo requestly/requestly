@@ -23,7 +23,14 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
   }
 
   if (isGraphQLApiRecord(apiRecord)) {
-    return <GraphQLClientViewContainer />;
+    return (
+      <GraphQLClientViewContainer
+        selectedEntryDetails={apiRecord}
+        handleAppRequestFinished={handleRequestFinished}
+        onSaveCallback={onSaveCallback}
+        isCreateMode={isCreateMode}
+      />
+    );
   }
 
   return (

@@ -238,7 +238,7 @@ export namespace RQAPI {
     auth: Auth;
   }
 
-  interface RecordMetadata {
+  export interface RecordMetadata {
     id: string;
     name: string;
     description?: string;
