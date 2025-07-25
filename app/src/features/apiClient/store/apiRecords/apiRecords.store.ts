@@ -120,7 +120,7 @@ export const createRecordStore = (record: RQAPI.Record) => {
       record,
       updateRecordState: (patch : Partial<RQAPI.Record>) => {
         const record = get().record;
-        const updatedRecord = { ...record, ...patch } as RQAPI.ApiRecord;
++ const updatedRecord = { ...record, ...patch } as RQAPI.Record;
         set({
           record: updatedRecord,
           version: get().version + 1,
