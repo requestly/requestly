@@ -46,13 +46,13 @@ const APIClientSidebar: React.FC<Props> = () => {
   } = useApiClientContext();
 
   const handleNewRecordClick = useCallback(
-    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
       setRecordTypeToBeCreated(recordType);
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
           setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-          onNewClick(analyticEventSource, RQAPI.RecordType.API);
+          onNewClick(analyticEventSource, RQAPI.RecordType.API, "", entryType);
           return;
         }
 
@@ -141,7 +141,8 @@ const APIClientSidebar: React.FC<Props> = () => {
       setIsLoading(true);
 
       try {
-        const apiEntry = getEmptyAPIEntry(request);
+        // TODO: handle import for graphql requests
+        const apiEntry = getEmptyAPIEntry(RQAPI.ApiEntryType.HTTP, request);
 
         const record: Partial<RQAPI.ApiRecord> = {
           type: RQAPI.RecordType.API,
@@ -188,7 +189,9 @@ const APIClientSidebar: React.FC<Props> = () => {
             history={history}
             onClearHistory={clearHistory}
             onImportClick={onImportClick}
-            onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
+            onNewClick={(recordType, entryType) =>
+              handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
+            }
           />
 
           <Tabs
