@@ -5,16 +5,20 @@ import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesStore } from "../variables/variables.store";
 
 type BaseRecordState = {
+  type: RQAPI.RecordType;
   version: number;
+  record: RQAPI.ApiRecord | RQAPI.CollectionRecord;
   updateRecordState: (patch: Partial<RQAPI.Record>) => void;
   incrementVersion: () => void;
 };
 
 type ApiRecordState = BaseRecordState & {
+  type: RQAPI.RecordType.API;
   record: RQAPI.ApiRecord;
 };
 
 type CollectionRecordState = BaseRecordState & {
+  type: RQAPI.RecordType.COLLECTION;
   record: RQAPI.CollectionRecord;
   collectionVariables: StoreApi<VariablesStore>;
 };
@@ -108,57 +112,38 @@ function parseRecords(records: RQAPI.Record[]) {
   };
 }
 
-const createApiRecordStore = (record: RQAPI.ApiRecord) => {
-  return create<ApiRecordState>()((set, get) => ({
-    version: 0,
-    record,
-    updateRecordState: (patch) => {
-      const record = get().record;
-      const updatedRecord = { ...record, ...patch } as RQAPI.ApiRecord;
-      set({
-        record: updatedRecord,
-        version: get().version + 1,
-      });
-    },
+export const createRecordStore = (record: RQAPI.Record) => {
+  return create<CollectionRecordState | ApiRecordState>()((set, get) => {
+    const baseRecordState: BaseRecordState = {
+      type: record.type,
+      version: 0,
+      record,
+      updateRecordState: (patch : Partial<RQAPI.Record>) => {
+        const record = get().record;
+        const updatedRecord = { ...record, ...patch } as RQAPI.ApiRecord;
+        set({
+          record: updatedRecord,
+          version: get().version + 1,
+        });
+      },
+      incrementVersion: () => {
+        set({
+          version: get().version + 1,
+        });
+      },
+    }
 
-    incrementVersion: () => {
-      set({
-        version: get().version + 1,
-      });
-    },
-  }));
+    //The following are verified casts, done to prevent redundant code.
+    if (record.type === RQAPI.RecordType.API) {
+      return baseRecordState as ApiRecordState;
+    }
+    return {
+      ...baseRecordState,
+      collectionVariables: createVariablesStore({ variables: record.data.variables })
+    } as CollectionRecordState
+
+  });
 };
-
-const createCollectionRecordStore = (record: RQAPI.CollectionRecord) => {
-  return create<CollectionRecordState>()((set, get) => ({
-    version: 0,
-    record,
-    collectionVariables: createVariablesStore({ variables: record.data.variables }),
-
-    updateRecordState: (patch) => {
-      const record = get().record;
-      const updatedRecord = { ...record, ...patch } as RQAPI.CollectionRecord;
-      set({
-        record: updatedRecord,
-        version: get().version + 1,
-      });
-    },
-
-    incrementVersion: () => {
-      set({
-        version: get().version + 1,
-      });
-    },
-  }));
-};
-
-export function createRecordStore(record: RQAPI.Record) {
-  if (record.type === RQAPI.RecordType.API) {
-    return createApiRecordStore(record);
-  }
-
-  return createCollectionRecordStore(record);
-}
 
 function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<RecordState>>();
@@ -305,7 +290,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
     getRecordStore(id) {
       const { indexStore } = get();
       const recordStore = indexStore.get(id);
-      return recordStore!;
+      return recordStore;
     },
 
     getAllRecords() {
