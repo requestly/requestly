@@ -3,19 +3,19 @@ import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/
 import React, { useCallback, useEffect } from "react";
 import { useAPIRecords } from "../ApiRecordsContextProvider";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
-import { ApiRecordsState } from "../apiRecords.store";
-
-function getCollectionVariableStoreSelector(state: ApiRecordsState) {
-  return function (id: string) {
-    const recordState = state.indexStore.get(id)?.getState();
-    if (!recordState || recordState.type !== RQAPI.RecordType.COLLECTION) return null;
-    const collectionVariableStore = recordState.collectionVariables;
-    return collectionVariableStore;
-  };
-}
 
 const CollectionVariablesDaemon: React.FC = () => {
-  const getCollectionVariableStore = useAPIRecords(getCollectionVariableStoreSelector);
+  const indexStore = useAPIRecords((state) => state.indexStore);
+
+  const getCollectionVariableStore = useCallback(
+    (id: string) => {
+      const recordState = indexStore.get(id)?.getState();
+      if (!recordState || recordState.type !== RQAPI.RecordType.COLLECTION) return null;
+
+      return recordState.collectionVariables;
+    },
+    [indexStore]
+  );
 
   const updateCollections = useCallback(
     (newCollectionVariables: CollectionVariableMap) => {
