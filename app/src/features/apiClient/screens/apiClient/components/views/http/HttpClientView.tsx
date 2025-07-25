@@ -52,7 +52,6 @@ import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
-import { ApiClientUrl } from "../components/request/components/ApiClientUrl/ApiClientUrl";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../../constants";
@@ -65,6 +64,7 @@ import {
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
+import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -771,7 +771,7 @@ const HttpClientView: React.FC<Props> = ({
                 value={entry.request.method}
                 onChange={setMethod}
               />
-              <ApiClientUrl
+              <HttpApiClientUrl
                 url={entry.request.url}
                 onUrlChange={handleOnUrlChange}
                 onEnterPress={onUrlInputEnterPressed}
