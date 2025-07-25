@@ -11,7 +11,10 @@ export type ErroredRecordsState<T = ErroredRecord> = ErroredRecords<T> & {
   setEnvironmentErroredRecords: (erroredRecord: T[]) => void;
 };
 
-export const createErroredRecordsStore = <T = ErroredRecord>({ apiErroredRecords, environmentErroredRecords }: ErroredRecords<T>) => {
+export const createErroredRecordsStore = <T = ErroredRecord>({
+  apiErroredRecords,
+  environmentErroredRecords,
+}: ErroredRecords<T>) => {
   return create<ErroredRecordsState<T>>()((set, get) => ({
     apiErroredRecords,
     environmentErroredRecords,
