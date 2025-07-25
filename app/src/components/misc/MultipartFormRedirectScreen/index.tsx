@@ -2,6 +2,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import React from "react";
 import "./index.scss";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 
 const MultipartFormRedirectScreen: React.FC = () => {
   return (
@@ -53,7 +54,12 @@ const MultipartFormRedirectScreen: React.FC = () => {
           </p>
         </div>
 
-        <RQButton href="https://requestly.com/downloads/desktop/">Download Requestly</RQButton>
+        <RQButton
+          onClick={() => trackDesktopAppPromoClicked("multipart_forms_data", "web_app")}
+          href="https://requestly.com/downloads/desktop/"
+        >
+          Download Requestly
+        </RQButton>
       </div>
     </div>
   );
