@@ -15,7 +15,7 @@ type Environment = {
 
 type GlobalEnvironment = Environment;
 
-export type EnvironmentsStore = {
+export type EnvironmentsState = {
   // state
   version: number;
   activeEnvironment: Environment | null;
@@ -32,7 +32,7 @@ export type EnvironmentsStore = {
   incrementVersion: () => void;
 };
 
-const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsStore["environments"] => {
+const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsState["environments"] => {
   const environmentsWithVariableStore = Object.values(rawEnvironments).map((value) => {
     return [
       value.id,
@@ -56,7 +56,7 @@ export const createEnvironmentsStore = ({
 }) => {
   const environmentsWithVariableStore = parseEnvironments(environments);
 
-  return create<EnvironmentsStore>()((set, get) => ({
+  return create<EnvironmentsState>()((set, get) => ({
     version: 0,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
