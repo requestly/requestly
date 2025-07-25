@@ -2,7 +2,7 @@ import { trackEvent } from "modules/analytics";
 import { COMMAND_PALETTE } from "./constants";
 import { ParsedOS } from "utils/osUtils";
 
-export const trackCommandPaletteOpened = (os: ParsedOS) => {
+export const trackCommandPaletteOpened = (os: ParsedOS | null) => {
   const params = { os };
   trackEvent(COMMAND_PALETTE.COMMAND_PALETTE_OPENED, params);
 };
