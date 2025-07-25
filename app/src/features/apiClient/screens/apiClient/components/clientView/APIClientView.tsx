@@ -393,6 +393,7 @@ const APIClientView: React.FC<Props> = ({
       has_scripts: Boolean(entry?.scripts?.preRequest),
       auth_type: entry?.auth?.currentAuthType,
       request_type: getRequestTypeForAnalyticEvent(apiEntryDetails?.isExample, entry?.request?.url),
+      request_body_type: entry?.request?.contentType,
     });
 
     try {
