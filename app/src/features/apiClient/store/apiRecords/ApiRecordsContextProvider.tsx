@@ -9,14 +9,14 @@ import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
-import { createEnvironmentsStore, EnvironmentsStore } from "../environments/environments.store";
-import { Daemon } from "./Daemon";
-import { createErroredRecordsStore, ErroredRecordsStore } from "../erroredRecords/erroredRecords.store";
+import { createEnvironmentsStore, EnvironmentsState } from "../environments/environments.store";
+import Daemon from "./Daemon";
+import { createErroredRecordsStore, ErroredRecordsState } from "../erroredRecords/erroredRecords.store";
 
 type AllApiClientStores = {
   records: StoreApi<ApiRecordsState>;
-  environments: StoreApi<EnvironmentsStore>;
-  errorRecords: StoreApi<ErroredRecordsStore>;
+  environments: StoreApi<EnvironmentsState>;
+  errorRecords: StoreApi<ErroredRecordsState>;
 };
 
 type FetchedData<T> = { records: T; erroredRecords: ErroredRecord[] };
@@ -93,7 +93,7 @@ type RecordsProviderProps = {
 const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { environments, records } }) => {
   const environmentStore = createEnvironmentsStore({
     environments: environments.nonGlobalEnvironments.records,
-    global: environments.global, // note: expecting an update in the createEnvironmentsStore interface
+    globalEnvironment: environments.global,
   });
   const apiRecordsStore = createApiRecordsStore(records);
   const errorStore = createErroredRecordsStore({
@@ -133,7 +133,7 @@ export function useAPIRecordsStore() {
   return store.records;
 }
 
-export function useAPIEnvironment<T>(selector: (state: EnvironmentsStore) => T) {
+export function useAPIEnvironment<T>(selector: (state: EnvironmentsState) => T) {
   const store = useContext(ApiRecordsStoreContext);
   if (!store || !store.environments) {
     throw new Error("environments store not found!");
