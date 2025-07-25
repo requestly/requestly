@@ -74,6 +74,6 @@ export const DEFAULT_SCRIPT_VALUES = {
  */
 export const INVALID_KEY_CHARACTERS = /^(?!\{\{.*\}\}|^\{\{?$|^\}\}?$)[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
 
-export enum HeadersType {
+export enum Headers {
   CONTENT_TYPE = "Content-Type",
 }
