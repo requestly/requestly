@@ -15,6 +15,7 @@ import { trackCreateEnvironmentClicked } from "features/apiClient/screens/enviro
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
 import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
+import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useLocation } from "react-router-dom";
@@ -23,14 +24,15 @@ import { RoleBasedComponent } from "features/rbac";
 interface Props {
   activeTab: ApiClientSidebarTabKey;
   // TODO: FIX THIS
-  onNewClick: (recordType: RQAPI.RecordType) => void;
+  onNewClick: (recordType: RQAPI.RecordType, entryType?: RQAPI.ApiEntryType) => void;
   onImportClick: () => void;
-  history: RQAPI.Entry[];
+  history: RQAPI.ApiEntry[];
   onClearHistory: () => void;
 }
 
 enum DropdownOption {
-  REQUEST = "request",
+  HTTP = "http",
+  GRAPHQL = "graphql",
   COLLECTION = "collection",
   ENVIRONMENT = "environment",
 }
@@ -104,15 +106,27 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 
   const items: DropdownProps["menu"]["items"] = [
     {
-      key: DropdownOption.REQUEST,
+      key: DropdownOption.HTTP,
       label: (
         <div className="new-btn-option">
           <MdOutlineSyncAlt />
-          <span>Request</span>
+          <span>HTTP Request</span>
         </div>
       ),
       onClick: () => {
-        onNewClick(RQAPI.RecordType.API);
+        onNewClick(RQAPI.RecordType.API, RQAPI.ApiEntryType.HTTP);
+      },
+    },
+    {
+      key: DropdownOption.GRAPHQL,
+      label: (
+        <div className="new-btn-option">
+          <GrGraphQl />
+          <span>GraphQL Request</span>
+        </div>
+      ),
+      onClick: () => {
+        onNewClick(RQAPI.RecordType.API, RQAPI.ApiEntryType.GRAPHQL);
       },
     },
     {

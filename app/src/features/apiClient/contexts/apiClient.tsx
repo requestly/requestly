@@ -254,7 +254,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, repository).then((result) => {
+          return createBlankApiRecord(recordType, collectionId, repository, entryType).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data, "open");
           });
