@@ -7,7 +7,7 @@ import { createVariablesStore, VariablesStore } from "../variables/variables.sto
 type BaseRecordState = {
   type: RQAPI.RecordType;
   version: number;
-  record: RQAPI.ApiRecord | RQAPI.CollectionRecord;
++ record: RQAPI.Record
   updateRecordState: (patch: Partial<RQAPI.Record>) => void;
   incrementVersion: () => void;
 };
