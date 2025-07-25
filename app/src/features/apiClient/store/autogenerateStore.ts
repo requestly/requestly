@@ -21,7 +21,7 @@ Resolve the headers having prettyValue
 */
 const createHeaderEntryFrom = (value: string): HeaderEntry => {
   switch (value) {
-    case RequestContentType.MULTI_PART_FORM:
+    case RequestContentType.MULTIPARTFORM:
       return { value: value, placeHolder: PrettifiedHeaders.MULTI_PART_FORM };
 
     default:
