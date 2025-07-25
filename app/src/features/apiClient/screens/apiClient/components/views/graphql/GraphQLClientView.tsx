@@ -3,6 +3,8 @@ import { RQAPI } from "features/apiClient/types";
 import GraphQLClientUrl from "./components/GraphQLClientUrl/GraphQLClientUrl";
 import { useCallback, useMemo } from "react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { OperationEditor } from "./components/GraphQLEditor/components/OperationEditor/OperationEditor";
+import { VariablesEditor } from "./components/GraphQLEditor/components/VariablesEditor/VariablesEditor";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -36,8 +38,6 @@ export const GraphQLClientView = ({ notifyApiRequestFinished, onSaveCallback, is
     (evt.target as HTMLInputElement).blur();
   }, []);
 
-  console.log("GQL url", url);
-
   return (
     <div className="api-client-view">
       <GraphQLClientUrl
@@ -46,6 +46,8 @@ export const GraphQLClientView = ({ notifyApiRequestFinished, onSaveCallback, is
         onEnterPress={handleUrlInputEnterPressed}
         onUrlChange={handleUrlChange}
       />
+      <OperationEditor />
+      <VariablesEditor />
     </div>
   );
 };
