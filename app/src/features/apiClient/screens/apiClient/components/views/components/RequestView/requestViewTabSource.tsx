@@ -37,9 +37,9 @@ export class RequestViewTabSource extends BaseTabSource {
 
   private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
     switch (type) {
-      case RQAPI.ApiEntryType.GRAPHQL:
-        return <MdOutlineSyncAlt />;
       case RQAPI.ApiEntryType.HTTP:
+        return <MdOutlineSyncAlt />;
+      case RQAPI.ApiEntryType.GRAPHQL:
         return <GrGraphQl />;
       default:
         return <MdOutlineSyncAlt />;
