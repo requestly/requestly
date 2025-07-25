@@ -47,20 +47,29 @@ const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsState["
   return new Map(environmentsWithVariableStore);
 };
 
+const parseGlobalEnvironment = (globalEnv: EnvironmentMap[string]): GlobalEnvironment => {
+  return {
+    id: globalEnv.id,
+    name: globalEnv.name,
+    data: { variables: createVariablesStore({ variables: globalEnv.variables }) },
+  };
+};
+
 export const createEnvironmentsStore = ({
   environments,
   globalEnvironment,
 }: {
   environments: EnvironmentMap;
-  globalEnvironment: GlobalEnvironment;
+  globalEnvironment: EnvironmentMap[string];
 }) => {
   const environmentsWithVariableStore = parseEnvironments(environments);
+  const globalEnvWithVariableStore = parseGlobalEnvironment(globalEnvironment);
 
   return create<EnvironmentsState>()((set, get) => ({
     version: 0,
     activeEnvironment: null,
     environments: environmentsWithVariableStore,
-    globalEnvironment: globalEnvironment,
+    globalEnvironment: globalEnvWithVariableStore,
 
     delete(id) {
       const { environments } = get();
