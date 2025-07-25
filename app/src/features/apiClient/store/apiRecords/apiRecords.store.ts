@@ -7,7 +7,7 @@ import { createVariablesStore, VariablesStore } from "../variables/variables.sto
 type BaseRecordState = {
   type: RQAPI.RecordType;
   version: number;
-+ record: RQAPI.Record
+  record: RQAPI.Record;
   updateRecordState: (patch: Partial<RQAPI.Record>) => void;
   incrementVersion: () => void;
 };
@@ -118,20 +118,20 @@ export const createRecordStore = (record: RQAPI.Record) => {
       type: record.type,
       version: 0,
       record,
-      updateRecordState: (patch : Partial<RQAPI.Record>) => {
+      updateRecordState: (patch: Partial<RQAPI.Record>) => {
         const record = get().record;
-+ const updatedRecord = { ...record, ...patch } as RQAPI.Record;
+        const updatedRecord = { ...record, ...patch } as RQAPI.Record;
         set({
           record: updatedRecord,
           version: get().version + 1,
-        });
+        } as RecordState);
       },
       incrementVersion: () => {
         set({
           version: get().version + 1,
         });
       },
-    }
+    };
 
     //The following are verified casts, done to prevent redundant code.
     if (record.type === RQAPI.RecordType.API) {
@@ -139,9 +139,8 @@ export const createRecordStore = (record: RQAPI.Record) => {
     }
     return {
       ...baseRecordState,
-      collectionVariables: createVariablesStore({ variables: record.data.variables })
-    } as CollectionRecordState
-
+      collectionVariables: createVariablesStore({ variables: record.data.variables }),
+    } as CollectionRecordState;
   });
 };
 
