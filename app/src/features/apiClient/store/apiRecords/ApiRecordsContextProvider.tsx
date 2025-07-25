@@ -12,11 +12,11 @@ import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/compo
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
 
-export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState>>(null);
+export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState> | null>(null);
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<{ records: RQAPI.Record[]; erroredRecords: ErroredRecord[] } | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,7 +51,7 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   if (isLoading) return <ApiClientLoadingView />;
 
   return (
-    <RecordsProvider data={data} repository={apiClientRecordsRepository}>
+    <RecordsProvider data={data!} repository={apiClientRecordsRepository}>
       {children}
     </RecordsProvider>
   );
