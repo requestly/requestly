@@ -73,3 +73,7 @@ export const DEFAULT_SCRIPT_VALUES = {
  * Also checks the braces, cases where ex:{{RQ_CLIENT_ID}} environment variables are used, this should be not marked invalid other than this will be flagged
  */
 export const INVALID_KEY_CHARACTERS = /^(?!\{\{.*\}\}|^\{\{?$|^\}\}?$)[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
+
+export enum Headers {
+  CONTENT_TYPE = "Content-Type",
+}
