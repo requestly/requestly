@@ -805,14 +805,20 @@ const APIClientView: React.FC<Props> = ({
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
               type="primary"
               className="text-bold"
-              disabled={!entry.request.url}
+              disabled={
+                !entry.request.url ||
+                (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPARTFORM)
+              }
             >
               Send
             </RQButton>
 
             <Conditional condition={!openInModal}>
               <RBACButton
-                disabled={!hasUnsavedChanges}
+                disabled={
+                  !hasUnsavedChanges ||
+                  (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPARTFORM)
+                }
                 permission="create"
                 resource="api_client_request"
                 showHotKeyText
