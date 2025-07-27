@@ -1,30 +1,30 @@
 .key-value-table-file-dropdown {
   padding: 12px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: self-start !important;
-  gap: 8px !important;
-  border-radius: 6px !important;
-  border: 1px solid var(--requestly-color-white-t-20) !important;
+  display: flex;
+  flex-direction: column;
+  width: 368px;
+  border-radius: 6px;
+  border: 1px solid var(--requestly-color-white-t-20);
   background-color: var(--requestly-color-surface-0) !important;
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32) !important;
 
   .file-dropdown-item-container {
-    display: grid;
-    grid-template-columns: 20px 1fr auto auto;
-    padding: 8px 4px;
-    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    width: 300px;
     gap: 12px;
-    align-self: stretch;
-    border-radius: 4px;
 
     .file-info {
-      display: contents;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
 
       .file-icon,
       .invalid-icon {
-        grid-column: 1;
-        justify-self: center;
+        flex-shrink: 0;
+        color: inherit;
       }
 
       .invalid-icon {
@@ -32,41 +32,43 @@
       }
 
       .file-name {
-        grid-column: 2;
-        justify-self: start;
         overflow: hidden;
         text-overflow: ellipsis;
+        max-width: 180px;
         white-space: nowrap;
 
         &.file-invalid {
           color: var(--requestly-color-error-soft);
         }
       }
+    }
+
+    .file-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
 
       .file-size {
-        grid-column: 3;
-        justify-self: end;
-        font-size: 12px;
+        font-size: var(--requestly-font-size-sm);
         color: var(--requestly-color-text-subtle);
         white-space: nowrap;
       }
-    }
 
-    .file-dropdown-remove-button {
-      grid-column: 4;
-      justify-self: end;
+      .file-dropdown-remove-button {
+        margin-bottom: 4px;
+      }
     }
   }
 
   .add-more-file-container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-end;
+    flex-direction: row;
     gap: 8px;
     border-top: 1px solid var(--requestly-color-white-t-20);
-    padding-top: 20px;
-    padding-left: 300px;
+    padding-top: 12px;
+    padding-left: 200px;
   }
 }
 

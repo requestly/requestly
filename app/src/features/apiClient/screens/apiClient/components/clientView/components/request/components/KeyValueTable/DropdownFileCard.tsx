@@ -43,23 +43,25 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
             {file.isFileValid ? <FaRegFileLines className="file-icon" /> : <BiError className="invalid-icon" />}
 
             <span className={`file-name ${file.isFileValid ? "" : "file-invalid"}`} title={file.name}>
-              {file.name}
+              {truncateString(file.name, 150)}
             </span>
-            <span className="file-size">{formatBytes(file.size)}</span>
           </div>
-          <RQButton
-            className="file-dropdown-remove-button"
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              marginBottom: "4px",
-            }}
-            icon={<RiDeleteBinLine />}
-            size="small"
-            onClick={() => {
-              onDeleteFile(file.id);
-            }}
-          />
+          <div className="file-details">
+            <span className="file-size">{formatBytes(file.size)}</span>
+            <RQButton
+              className="file-dropdown-remove-button"
+              style={{
+                backgroundColor: "transparent",
+                border: "none",
+                marginBottom: "4px",
+              }}
+              icon={<RiDeleteBinLine />}
+              size="small"
+              onClick={() => {
+                onDeleteFile(file.id);
+              }}
+            />
+          </div>
         </div>
       ),
     }));
@@ -92,7 +94,7 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
           items: getDropDownItems(),
           className: "key-value-table-file-dropdown",
         }}
-        placement="bottomRight"
+        placement="bottomLeft"
         trigger={["click"]}
       >
         <RQButton className="key-value-table-file-button">
