@@ -2,7 +2,7 @@ import { NativeError } from "errors/NativeError";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
-import { createVariablesStore, VariablesStore } from "../variables/variables.store";
+import { createVariablesStore, VariablesState } from "../variables/variables.store";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -20,7 +20,7 @@ type ApiRecordState = BaseRecordState & {
 type CollectionRecordState = BaseRecordState & {
   type: RQAPI.RecordType.COLLECTION;
   record: RQAPI.CollectionRecord;
-  collectionVariables: StoreApi<VariablesStore>;
+  collectionVariables: StoreApi<VariablesState>;
 };
 
 export type RecordState = ApiRecordState | CollectionRecordState;
