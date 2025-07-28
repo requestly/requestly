@@ -13,7 +13,7 @@ import { createEnvironmentsStore, EnvironmentsState } from "../environments/envi
 import Daemon from "./Daemon";
 import { createErroredRecordsStore, ErroredRecordsState } from "../erroredRecords/erroredRecords.store";
 
-type AllApiClientStores = {
+export type AllApiClientStores = {
   records: StoreApi<ApiRecordsState>;
   environments: StoreApi<EnvironmentsState>;
   errorRecords: StoreApi<ErroredRecordsState>;
