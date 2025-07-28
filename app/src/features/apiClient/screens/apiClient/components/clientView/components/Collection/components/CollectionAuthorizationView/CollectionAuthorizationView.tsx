@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHasUnsavedChanges } from "hooks";
 import AuthorizationView from "../../../request/components/AuthorizationView";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
@@ -33,7 +33,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({
   const [isSaving, setIsSaving] = useState(false);
   const { setPreview, setUnsaved, getIsActive } = useGenericState();
 
-  const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const { getVariablesWithPrecedence } = useEnvironment();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);

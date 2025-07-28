@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useCallback, useRef } from "react";
-import { EnvironmentData, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
+import {
+  EnvironmentData,
+  EnvironmentVariables,
+  EnvironmentVariableType,
+  EnvironmentVariableValue,
+} from "../../../backend/environment/types";
 import { useSelector } from "react-redux";
 import {
   getAllEnvironmentData,
   getCollectionVariables,
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
-import { renderTemplate } from "../utils";
+import { renderTemplate } from "../../../backend/environment/utils";
 import Logger from "lib/logger";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -20,7 +25,7 @@ import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRe
 // higher precedence is given to environment variables
 const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
-const useEnvironmentManager = () => {
+export const useEnvironment = () => {
   const [getData, getRecordStore] = useAPIRecords((s) => [s.getData, s.getRecordStore]);
   const { onSaveRecord } = useApiClientContext();
   const [
@@ -396,5 +401,3 @@ const useEnvironmentManager = () => {
     forceRefreshEnvironments,
   };
 };
-
-export default useEnvironmentManager;

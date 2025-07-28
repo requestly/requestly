@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect } from "react";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { useApiClientContext } from "./contexts";
 import { reloadFsManager } from "services/fsManagerServiceAdapter";
 import { toast } from "utils/Toast";
 
 export const LocalSyncRefreshHandler: React.FC = () => {
   const { forceRefreshApiClientRecords, apiClientRecordsRepository } = useApiClientContext();
-  const { forceRefreshEnvironments } = useEnvironmentManager();
+  const { forceRefreshEnvironments } = useEnvironment();
 
   const handleRefresh = useCallback(async () => {
     await reloadFsManager(apiClientRecordsRepository.meta.rootPath);

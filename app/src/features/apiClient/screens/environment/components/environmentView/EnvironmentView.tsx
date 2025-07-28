@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
@@ -16,7 +16,7 @@ interface EnvironmentViewProps {
 }
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
-  const { getEnvironmentById, setVariables } = useEnvironmentManager();
+  const { getEnvironmentById, setVariables } = useEnvironment();
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 

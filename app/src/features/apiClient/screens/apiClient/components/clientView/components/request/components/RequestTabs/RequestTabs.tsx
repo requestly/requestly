@@ -5,7 +5,7 @@ import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import "./requestTabs.scss";
 import AuthorizationView from "../AuthorizationView";
 import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable";
@@ -53,7 +53,7 @@ const RequestTabs: React.FC<Props> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
-  const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const { getVariablesWithPrecedence } = useEnvironment();
   const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 

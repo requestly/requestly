@@ -5,7 +5,7 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ErrorFileViewerModal } from "../../../modals/ErrorFileViewerModal/ErrorFileViewerModal";
 import { useApiClientContext } from "features/apiClient/contexts";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { toast } from "utils/Toast";
 import { notification, Popconfirm, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
@@ -57,7 +57,7 @@ export const ErrorFilesList = () => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
   const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments } = useEnvironmentManager();
+  const { forceRefreshEnvironments } = useEnvironment();
 
   const [errorFiles, errorEnvFiles] = useErroredRecords((state) => [
     state.apiErroredRecords,

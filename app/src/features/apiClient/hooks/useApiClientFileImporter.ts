@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "./useEnvironment";
 import { useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -51,7 +51,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const [error, setError] = useState<string | null>(null);
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager();
+  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironment();
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;

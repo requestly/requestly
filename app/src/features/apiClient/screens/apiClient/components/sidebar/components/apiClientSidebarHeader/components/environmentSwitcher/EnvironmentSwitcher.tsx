@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Dropdown, Typography } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
@@ -16,7 +16,7 @@ import "./environmentSwitcher.scss";
 
 export const EnvironmentSwitcher = () => {
   const location = useLocation();
-  const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironmentManager();
+  const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironment();
   const { currentEnvironmentId, currentEnvironmentName } = getCurrentEnvironment();
   const environments = getAllEnvironments();
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
