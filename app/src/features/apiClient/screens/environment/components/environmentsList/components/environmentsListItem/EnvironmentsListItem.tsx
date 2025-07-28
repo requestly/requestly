@@ -3,7 +3,7 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { IoMdGlobe } from "@react-icons/all-files/io/IoMdGlobe";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -47,7 +47,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     deleteEnvironment,
     getAllEnvironments,
     setCurrentEnvironment,
-  } = useEnvironmentManager();
+  } = useEnvironment();
   const allEnvironments = getAllEnvironments();
   const { currentEnvironmentId } = getCurrentEnvironment();
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);

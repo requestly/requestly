@@ -8,7 +8,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import "./errorFileViewerModal.scss";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 
 interface ErrorFileViewerModalProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ interface ErrorFileViewerModalProps {
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
   const [fileContent, setFileContent] = useState(null);
   const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments } = useEnvironmentManager();
+  const { forceRefreshEnvironments } = useEnvironment();
 
   useEffect(() => {
     const fetchErrorFileData = async () => {

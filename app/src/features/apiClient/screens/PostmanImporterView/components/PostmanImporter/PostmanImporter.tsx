@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
 import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
@@ -44,7 +44,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     variables: {},
   });
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager();
+  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironment();
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const collectionsCount = useRef(0);

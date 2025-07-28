@@ -6,7 +6,7 @@ import {
 } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { getCollectionVariables } from "store/features/variables/selectors";
 import { useSelector } from "react-redux";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -20,7 +20,7 @@ interface CollectionsVariablesViewProps {
 }
 
 export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
-  const { setCollectionVariables } = useEnvironmentManager();
+  const { setCollectionVariables } = useEnvironment();
   const collectionVariables = useSelector(getCollectionVariables);
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);

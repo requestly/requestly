@@ -35,7 +35,7 @@ import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -116,7 +116,7 @@ const APIClientView: React.FC<Props> = ({
 
   const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
 
-  const environmentManager = useEnvironmentManager();
+  const environmentManager = useEnvironment();
   const {
     getVariablesWithPrecedence,
     setVariables,

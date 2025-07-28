@@ -1,5 +1,5 @@
 import { useCallback, useState, useMemo } from "react";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
@@ -19,12 +19,7 @@ import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabS
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
-  const {
-    getAllEnvironments,
-    addNewEnvironment,
-    setCurrentEnvironment,
-    getEnvironmentVariables,
-  } = useEnvironmentManager();
+  const { addNewEnvironment, getAllEnvironments, setCurrentEnvironment, getEnvironmentVariables } = useEnvironment();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);

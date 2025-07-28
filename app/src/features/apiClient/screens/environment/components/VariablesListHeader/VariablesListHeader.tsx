@@ -2,7 +2,7 @@ import React from "react";
 import { Input } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import PATHS from "config/constants/sub/paths";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
@@ -33,7 +33,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   onSave,
   exportActions,
 }) => {
-  const { renameEnvironment } = useEnvironmentManager();
+  const { renameEnvironment } = useEnvironment();
   const { setTitle, getIsActive, getIsNew } = useGenericState();
   const enableHotKey = getIsActive();
   const isNewEnvironment = getIsNew();

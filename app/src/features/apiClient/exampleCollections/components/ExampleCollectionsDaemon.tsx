@@ -7,7 +7,7 @@ import { useExampleCollections } from "../store";
 import { WorkspaceType } from "features/workspaces/types";
 import { StoreApi } from "zustand";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { getOwnerId, LOGGED_OUT_STATE_UID } from "backend/utils";
 
 export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsState> }> = ({ store }) => {
@@ -16,7 +16,7 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
   const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
   const syncRepository = useApiClientRepository();
   const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
-  const { forceRefreshEnvironments } = useEnvironmentManager();
+  const { forceRefreshEnvironments } = useEnvironment();
   const dispatch = useDispatch();
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -10,7 +10,7 @@ import "./emptyEnvironmentView.scss";
 
 export const EmptyEnvironmentView = () => {
   const navigate = useNavigate();
-  const { getAllEnvironments } = useEnvironmentManager();
+  const { getAllEnvironments } = useEnvironment();
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const environments = getAllEnvironments();
 

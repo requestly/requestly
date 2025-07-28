@@ -9,7 +9,7 @@ import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircl
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { notification, Row } from "antd";
 import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import "./brunoImporter.scss";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { useNavigate } from "react-router-dom";
@@ -44,7 +44,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   }>({ collections: [], apis: [], environments: [] });
 
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
-  const { addNewEnvironment, setVariables } = useEnvironmentManager();
+  const { addNewEnvironment, setVariables } = useEnvironment();
 
   const collectionsCount = useRef(0);
 
