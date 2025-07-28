@@ -19,7 +19,7 @@ interface ErrorFileViewerModalProps {
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
   const [fileContent, setFileContent] = useState(null);
   const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const { forceRefreshEnvironments } = useEnvironmentManager();
 
   useEffect(() => {
     const fetchErrorFileData = async () => {

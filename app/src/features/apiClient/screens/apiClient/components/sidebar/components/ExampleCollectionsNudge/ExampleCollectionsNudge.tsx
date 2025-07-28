@@ -24,7 +24,7 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
   const uid = user?.details?.profile?.uid;
 
   const syncRepository = useApiClientRepository();
-  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const { forceRefreshEnvironments } = useEnvironmentManager();
 
   const recordsStore = useAPIRecordsStore();
   const [

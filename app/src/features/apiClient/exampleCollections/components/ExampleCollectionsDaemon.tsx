@@ -16,7 +16,7 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
   const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
   const syncRepository = useApiClientRepository();
   const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
-  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const { forceRefreshEnvironments } = useEnvironmentManager();
   const dispatch = useDispatch();
 
   useEffect(() => {
