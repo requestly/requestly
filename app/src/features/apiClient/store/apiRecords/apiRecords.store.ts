@@ -1,6 +1,6 @@
 import { NativeError } from "errors/NativeError";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
-import { RQAPI } from "features/apiClient/types";
+import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesState } from "../variables/variables.store";
 
@@ -78,6 +78,12 @@ export type ApiRecordsState = {
   updateRecord: (record: RQAPI.Record) => void;
   updateRecords: (records: RQAPI.Record[]) => void;
   deleteRecords: (recordIds: string[]) => void;
+
+  /**
+   * finds the collection whose variables need to be updated
+   * calls mergeAndUpdate on the collectionVariables store of that collection
+   */
+  updateCollectionVariables: (variables: CollectionVariableMap) => void;
 };
 
 function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
@@ -282,6 +288,16 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
           if (patch.collectionId && record.collectionId !== patch.collectionId) {
             get().triggerUpdateForChildren(patch.id);
           }
+        }
+      }
+    },
+
+    updateCollectionVariables(variables) {
+      const { indexStore } = get();
+      for (const [recordId, newData] of Object.entries(variables)) {
+        const record = indexStore.get(recordId)?.getState();
+        if (record && record.type === RQAPI.RecordType.COLLECTION) {
+          record.collectionVariables.getState().mergeAndUpdate(newData.variables);
         }
       }
     },
