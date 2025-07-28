@@ -1,7 +1,5 @@
 import { EnvironmentVariableKey, EnvironmentVariableValue, VariableScope } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
-import { RecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
-import { Environment, GlobalEnvironment } from "features/apiClient/store/environments/environments.store";
 import { VariablesState } from "features/apiClient/store/variables/variables.store";
 import { RQAPI } from "features/apiClient/types";
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -157,7 +155,7 @@ export namespace VariableResolver {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const variableHolder = useMemo(() => new VariableHolder(), [parents]);
 
-    const scopes = useMemo(() => getScopes(parents, stores), [id, parents]);
+    const scopes = useMemo(() => getScopes(parents, stores), [parents, stores]);
 
     readScopes(
       {
