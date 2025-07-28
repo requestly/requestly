@@ -23,7 +23,7 @@ const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
 const useEnvironmentManager = () => {
   const dispatch = useDispatch();
-  const [getData] = useAPIRecords((state) => [state.getData]);
+  const [getData] = useAPIRecords((s) => [s.getData]);
   const { onSaveRecord } = useApiClientContext();
   const [setCurrentEnvironment, createNewEnvironment, activeEnvironment, getEnvironment] = useAPIEnvironment((s) => [
     s.setActive,
