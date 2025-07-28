@@ -27,7 +27,7 @@ import APP_CONSTANTS from "config/constants";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
 import { MutexTimeoutError } from "../fetch-lock";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 let unsubscribeListener: null | (() => void) = null;
 let unsubscribeCollectionListener: null | (() => void) = null;
@@ -46,7 +46,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const [isLoading, setIsLoading] = useState(false);
   const [getData] = useAPIRecords((state) => [state.getData]);
   const { onSaveRecord } = useApiClientContext();
-  // const s = useAPIEnvironment(s => );
+  const [setCurrentEnvironment] = useAPIEnvironment((s) => [s.setActive]);
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -76,13 +76,6 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   useEffect(() => {
     collectionVariablesRef.current = collectionVariables;
   }, [collectionVariables]);
-
-  const setCurrentEnvironment = useCallback(
-    (environmentId: string) => {
-      dispatch(variablesActions.setCurrentEnvironment({ environmentId }));
-    },
-    [dispatch]
-  );
 
   const addNewEnvironment = useCallback(
     async (newEnvironmentName: string) => {
