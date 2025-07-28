@@ -1,10 +1,10 @@
 import { EnvironmentMap } from "backend/environment/types";
 import { create, StoreApi } from "zustand";
-import { createVariablesStore, VariablesStore } from "../variables/variables.store";
+import { createVariablesStore, VariablesState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
 
 type EnvironmentData = {
-  variables: StoreApi<VariablesStore>;
+  variables: StoreApi<VariablesState>;
 };
 
 export type Environment = {
