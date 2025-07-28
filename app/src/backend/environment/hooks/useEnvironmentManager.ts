@@ -213,6 +213,14 @@ const useEnvironmentManager = () => {
   // TODO: move into actions
   const getEnvironmentById = useCallback(
     (environmentId: string): EnvironmentData => {
+      if (environmentId === globalEnvironment.id) {
+        return {
+          id: globalEnvironment.id,
+          name: globalEnvironment.name,
+          variables: Object.fromEntries(globalEnvironment.data.variables.getState().getAll()),
+        };
+      }
+
       const env = getEnvironment(environmentId);
 
       if (!env) {
@@ -221,7 +229,7 @@ const useEnvironmentManager = () => {
 
       return { id: env.id, name: env.name, variables: Object.fromEntries(env.data.variables.getState().getAll()) };
     },
-    [getEnvironment]
+    [globalEnvironment, getEnvironment]
   );
 
   // TODO: move into actions

@@ -146,7 +146,8 @@ export const createRecordStore = (record: RQAPI.Record) => {
     }
     return {
       ...baseRecordState,
-      collectionVariables: createVariablesStore({ variables: record.data.variables }),
+      // FIXME: temp fallback
+      collectionVariables: createVariablesStore({ variables: record.data?.variables ?? {} }),
     } as CollectionRecordState;
   });
 };
