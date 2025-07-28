@@ -37,14 +37,14 @@ const BATCH_SIZE = 25;
 export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
-  const [importError, setImportError] = useState(null);
+  const [importError, setImportError] = useState<string | null>(null);
   const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
     environments: [],
     apiRecords: [],
     variables: {},
   });
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
+  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager();
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const collectionsCount = useRef(0);

@@ -6,12 +6,11 @@ import PATHS from "config/constants/sub/paths";
 import { getCurrentEnvironmentId } from "store/features/variables/selectors";
 import { RQButton } from "lib/design-system-v2/components";
 import { redirectToNewEnvironment } from "utils/RedirectionUtils";
-import { Skeleton } from "antd";
 import "./emptyEnvironmentView.scss";
 
 export const EmptyEnvironmentView = () => {
   const navigate = useNavigate();
-  const { getAllEnvironments, isEnvironmentsLoading } = useEnvironmentManager();
+  const { getAllEnvironments } = useEnvironmentManager();
   const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
   const environments = getAllEnvironments();
 
@@ -31,20 +30,14 @@ export const EmptyEnvironmentView = () => {
 
   return (
     <div className="empty-environment-view">
-      {isEnvironmentsLoading ? (
-        <Skeleton active />
-      ) : (
-        <>
-          <div className="empty-environment-view-content">
-            <img src={"/assets/media/apiClient/emptyEnvironment.svg"} alt="empty environment" />
-            <div className="empty-environment-view-title">No environment created yet</div>
-            <p>You haven't set up an environment yet. Once you create one, it'll appear here.</p>
-            <RQButton type="primary" onClick={handleCreateNewEnvironment}>
-              Create new environment
-            </RQButton>
-          </div>
-        </>
-      )}
+      <div className="empty-environment-view-content">
+        <img src={"/assets/media/apiClient/emptyEnvironment.svg"} alt="empty environment" />
+        <div className="empty-environment-view-title">No environment created yet</div>
+        <p>You haven't set up an environment yet. Once you create one, it'll appear here.</p>
+        <RQButton type="primary" onClick={handleCreateNewEnvironment}>
+          Create new environment
+        </RQButton>
+      </div>
     </div>
   );
 };
