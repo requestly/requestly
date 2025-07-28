@@ -47,6 +47,7 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       );
 
       set({ data: parseVariables(mergedVariables) });
+      get().incrementVersion();
     },
 
     delete(key) {
