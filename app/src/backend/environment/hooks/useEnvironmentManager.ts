@@ -31,7 +31,15 @@ const useEnvironmentManager = () => {
     activeEnvironment,
     getEnvironment,
     globalEnvironment,
-  ] = useAPIEnvironment((s) => [s.setActive, s.create, s.activeEnvironment, s.getEnvironment, s.globalEnvironment]);
+    updateEnvironment,
+  ] = useAPIEnvironment((s) => [
+    s.setActive,
+    s.create,
+    s.activeEnvironment,
+    s.getEnvironment,
+    s.globalEnvironment,
+    s.update,
+  ]);
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -268,7 +276,7 @@ const useEnvironmentManager = () => {
     async (environmentId: string, newName: string) => {
       try {
         await syncRepository.environmentVariablesRepository.updateEnvironment(environmentId, { name: newName });
-        dispatch(variablesActions.updateEnvironmentName({ environmentId, newName, ownerId }));
+        updateEnvironment(environmentId, { name: newName });
       } catch (err) {
         notification.error({
           message: "Error while renaming environment",
@@ -278,7 +286,7 @@ const useEnvironmentManager = () => {
         console.error("Error while renaming environment", err);
       }
     },
-    [ownerId, dispatch, syncRepository]
+    [updateEnvironment, syncRepository]
   );
 
   const duplicateEnvironment = useCallback(
