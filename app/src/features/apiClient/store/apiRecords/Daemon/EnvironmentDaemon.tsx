@@ -4,40 +4,36 @@ import { VariableScope } from "backend/environment/types";
 import { useAPIEnvironment } from "../ApiRecordsContextProvider";
 
 const EnvironmentDaemon: React.FC = () => {
-  const { activeEnvironmentId, globalEnvironement, activeEnvVarStore, globalEnvVarStore } = useAPIEnvironment(
-    (state) => {
-      return {
-        activeEnvironmentId: state.activeEnvironment?.id,
-        globalEnvironement: state.globalEnvironment,
-        activeEnvVarStore: state.activeEnvironment?.data.variables,
-        globalEnvVarStore: state.globalEnvironment.data.variables,
-      };
-    }
-  );
+  const { globalEnvironement, activeEnvrionment } = useAPIEnvironment((state) => {
+    return {
+      activeEnvrionment: state.activeEnvironment,
+      globalEnvironement: state.globalEnvironment,
+    };
+  });
   const { environmentVariablesRepository } = useApiClientRepository();
 
   useEffect(() => {
-    if (!activeEnvironmentId) return;
+    if (!activeEnvrionment) return;
     const unsusbscribe = environmentVariablesRepository.attachListener({
       scope: VariableScope.ENVIRONMENT,
-      id: activeEnvironmentId,
+      id: activeEnvrionment.id,
       callback: (updatedEnvironmentData) => {
-        activeEnvVarStore?.getState().mergeAndUpdate(updatedEnvironmentData.variables);
+        activeEnvrionment.data.variables?.getState().mergeAndUpdate(updatedEnvironmentData.variables);
       },
     });
     return unsusbscribe;
-  }, [environmentVariablesRepository, activeEnvironmentId, activeEnvVarStore]);
+  }, [environmentVariablesRepository, activeEnvrionment]);
 
   useEffect(() => {
     const unsubscribe = environmentVariablesRepository.attachListener({
       scope: VariableScope.ENVIRONMENT,
       id: globalEnvironement.id,
       callback: (updatedEnvironmentData) => {
-        globalEnvVarStore.getState().mergeAndUpdate(updatedEnvironmentData.variables);
+        globalEnvironement.data.variables.getState().mergeAndUpdate(updatedEnvironmentData.variables);
       },
     });
     return unsubscribe;
-  }, [environmentVariablesRepository, globalEnvVarStore, globalEnvironement.id]);
+  }, [environmentVariablesRepository, globalEnvironement]);
   return null;
 };
 
