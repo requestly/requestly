@@ -46,7 +46,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const [isLoading, setIsLoading] = useState(false);
   const [getData] = useAPIRecords((state) => [state.getData]);
   const { onSaveRecord } = useApiClientContext();
-  const [setCurrentEnvironment] = useAPIEnvironment((s) => [s.setActive]);
+  const [setCurrentEnvironment, createNewEnvironment] = useAPIEnvironment((s) => [s.setActive, s.create]);
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -82,7 +82,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       return syncRepository.environmentVariablesRepository
         .createNonGlobalEnvironment(newEnvironmentName)
         .then(({ id, name }) => {
-          dispatch(variablesActions.addNewEnvironment({ id, name, ownerId }));
+          createNewEnvironment({ id, name });
           return {
             id,
             name,
@@ -97,7 +97,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           console.error("Error while setting environment in db", err);
         });
     },
-    [ownerId, dispatch, syncRepository]
+    [syncRepository, createNewEnvironment]
   );
 
   const attachEnvironmentListener = useCallback(
