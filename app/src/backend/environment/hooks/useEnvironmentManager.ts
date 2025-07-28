@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useCallback, useRef } from "react";
 import { EnvironmentData, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   getAllEnvironmentData,
   getCollectionVariables,
   getCurrentEnvironmentId,
 } from "store/features/variables/selectors";
-import { variablesActions } from "store/features/variables/slice";
 import { renderTemplate } from "../utils";
 import Logger from "lib/logger";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -22,8 +21,7 @@ import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRe
 const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
 
 const useEnvironmentManager = () => {
-  const dispatch = useDispatch();
-  const [getData] = useAPIRecords((s) => [s.getData]);
+  const [getData, getRecordStore] = useAPIRecords((s) => [s.getData, s.getRecordStore]);
   const { onSaveRecord } = useApiClientContext();
   const [
     setCurrentEnvironment,
@@ -355,7 +353,7 @@ const useEnvironmentManager = () => {
         .setCollectionVariables(record.id, record.data.variables)
         .then((result) => {
           onSaveRecord(result.data as RQAPI.Record, "open");
-          dispatch(variablesActions.updateCollectionVariables({ collectionId, variables }));
+          getRecordStore(collectionId)?.getState().collectionVariables.getState().mergeAndUpdate(variables);
         })
         .catch(() => {
           notification.error({
@@ -364,7 +362,7 @@ const useEnvironmentManager = () => {
           });
         });
     },
-    [onSaveRecord, dispatch, syncRepository.apiClientRecordsRepository, getData]
+    [onSaveRecord, getRecordStore, syncRepository.apiClientRecordsRepository, getData]
   );
 
   return {
