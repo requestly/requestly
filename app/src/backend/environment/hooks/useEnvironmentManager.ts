@@ -50,6 +50,7 @@ const useEnvironmentManager = () => {
 
   const syncRepository = useApiClientRepository();
 
+  // TODO: need to implement
   const activeOwnerEnvironments = useMemo(() => {
     return allEnvironmentData?.[ownerId] ?? {};
   }, [allEnvironmentData, ownerId]);
@@ -58,11 +59,6 @@ const useEnvironmentManager = () => {
   useEffect(() => {
     activeOwnerEnvironmentsRef.current = activeOwnerEnvironments;
   }, [activeOwnerEnvironments]);
-
-  const collectionVariablesRef = useRef(collectionVariables);
-  useEffect(() => {
-    collectionVariablesRef.current = collectionVariables;
-  }, [collectionVariables]);
 
   const addNewEnvironment = useCallback(
     async (newEnvironmentName: string) => {
