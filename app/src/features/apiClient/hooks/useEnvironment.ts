@@ -1,33 +1,19 @@
-import { useEffect, useMemo, useCallback, useRef } from "react";
+import { useCallback } from "react";
 import {
   EnvironmentData,
+  EnvironmentMap,
   EnvironmentVariables,
   EnvironmentVariableType,
   EnvironmentVariableValue,
 } from "../../../backend/environment/types";
-import { useSelector } from "react-redux";
-import {
-  getAllEnvironmentData,
-  getCollectionVariables,
-  getCurrentEnvironmentId,
-} from "store/features/variables/selectors";
 import { renderTemplate } from "../../../backend/environment/utils";
 import Logger from "lib/logger";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useApiClientContext } from "features/apiClient/contexts";
-import { RQAPI } from "features/apiClient/types";
-import { getOwnerId } from "backend/utils";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { notification } from "antd";
-import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-
-// higher precedence is given to environment variables
-const VARIABLES_PRECEDENCE_ORDER = ["ENVIRONMENT", "COLLECTION"];
+import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 
 export const useEnvironment = () => {
-  const [getData, getRecordStore] = useAPIRecords((s) => [s.getData, s.getRecordStore]);
-  const { onSaveRecord } = useApiClientContext();
+  const syncRepository = useApiClientRepository();
   const [
     setCurrentEnvironment,
     createNewEnvironment,
@@ -36,6 +22,7 @@ export const useEnvironment = () => {
     globalEnvironment,
     updateEnvironment,
     removeEnvironment,
+    getAll,
   ] = useAPIEnvironment((s) => [
     s.setActive,
     s.create,
@@ -44,57 +31,37 @@ export const useEnvironment = () => {
     s.globalEnvironment,
     s.update,
     s.delete,
+    s.getAll,
   ]);
-
-  const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
-  const currentEnvironmentId = useSelector(getCurrentEnvironmentId);
-  const allEnvironmentData = useSelector(getAllEnvironmentData);
-  const collectionVariables = useSelector(getCollectionVariables);
-  const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
-
-  const syncRepository = useApiClientRepository();
-
-  // TODO: need to implement
-  const activeOwnerEnvironments = useMemo(() => {
-    return allEnvironmentData?.[ownerId] ?? {};
-  }, [allEnvironmentData, ownerId]);
-
-  const activeOwnerEnvironmentsRef = useRef(activeOwnerEnvironments);
-  useEffect(() => {
-    activeOwnerEnvironmentsRef.current = activeOwnerEnvironments;
-  }, [activeOwnerEnvironments]);
 
   const addNewEnvironment = useCallback(
     async (newEnvironmentName: string) => {
-      return syncRepository.environmentVariablesRepository
-        .createNonGlobalEnvironment(newEnvironmentName)
-        .then(({ id, name }) => {
-          createNewEnvironment({ id, name });
-          return {
-            id,
-            name,
-          };
-        })
-        .catch((err) => {
-          notification.error({
-            message: "Error while creating a new environment",
-            description: err?.message,
-            placement: "bottomRight",
-          });
-          console.error("Error while setting environment in db", err);
+      try {
+        const newEnvironment = await syncRepository.environmentVariablesRepository.createNonGlobalEnvironment(
+          newEnvironmentName
+        );
+
+        createNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name });
+        return { id: newEnvironment.id, name: newEnvironment.name };
+      } catch (err) {
+        notification.error({
+          message: "Error while creating a new environment",
+          description: err?.message,
+          placement: "bottomRight",
         });
+      }
     },
     [syncRepository, createNewEnvironment]
   );
 
+  // TODO: TBD
   const fetchAndUpdateEnvironments = useCallback(async () => {}, []);
 
+  // TODO: TBD
   const forceRefreshEnvironments = useCallback(() => {
     fetchAndUpdateEnvironments();
   }, [fetchAndUpdateEnvironments]);
 
-  // TODO: can be moved into actions
   const getCurrentEnvironment = useCallback(() => {
     return {
       currentEnvironmentId: activeEnvironment?.id,
@@ -141,60 +108,17 @@ export const useEnvironment = () => {
     [syncRepository, getEnvironment]
   );
 
-  const getVariablesWithPrecedence = useCallback(
-    (currentCollectionId: string): Record<string, EnvironmentVariableValue> => {
-      const allVariables: Record<string, EnvironmentVariableValue> = {};
+  // resolver
+  // TODO: to be removed from this hook
+  const getVariablesWithPrecedence = useCallback((currentCollectionId: string): Record<
+    string,
+    EnvironmentVariableValue
+  > => {
+    const allVariables: Record<string, EnvironmentVariableValue> = {};
+    return allVariables;
+  }, []);
 
-      const currentEnvironmentVariables = activeOwnerEnvironments[currentEnvironmentId]?.variables;
-      Object.entries(currentEnvironmentVariables || {}).forEach(([key, value]) => {
-        // environment variables (highest precedence)
-        if (VARIABLES_PRECEDENCE_ORDER[0] === "ENVIRONMENT") {
-          allVariables[key] = value;
-        } else {
-          if (!(key in allVariables)) {
-            allVariables[key] = value;
-          }
-        }
-      });
-
-      // Function to get all parent collection variables recursively
-      const getParentVariables = (collectionId: string) => {
-        const collection = getData(collectionId);
-        if (!collection) {
-          return;
-        }
-        // Add current collection's variables
-        Object.entries(collectionVariables[collection.id]?.variables || {}).forEach(([key, value]) => {
-          // Only add if not already present (maintain precedence) with sub collections
-          if (!(key in allVariables)) {
-            allVariables[key] = value;
-          }
-        });
-
-        // Recursively get parent variables
-        if (collection.collectionId) {
-          getParentVariables(collection.collectionId);
-        }
-      };
-
-      // Get collection hierarchy variables
-      getParentVariables(currentCollectionId);
-      const globalEnvId = syncRepository.environmentVariablesRepository.getGlobalEnvironmentId();
-      const globalEnvironmentVariables = activeOwnerEnvironments[globalEnvId]?.variables || {};
-
-      Object.entries(globalEnvironmentVariables).forEach(([key, value]) => {
-        // global variables (lowest precedence)
-        if (!(key in allVariables)) {
-          allVariables[key] = value;
-        }
-      });
-
-      return allVariables;
-    },
-    [activeOwnerEnvironments, currentEnvironmentId, getData, collectionVariables, syncRepository]
-  );
-
-  // TODO: move it in utils
+  // TODO: to be removed from this hook
   const renderVariables = useCallback(
     <T extends string | Record<string, any>>(
       template: T,
@@ -211,7 +135,6 @@ export const useEnvironment = () => {
     [getVariablesWithPrecedence]
   );
 
-  // TODO: move into actions
   const getEnvironmentById = useCallback(
     (environmentId: string): EnvironmentData => {
       if (environmentId === globalEnvironment.id) {
@@ -233,59 +156,26 @@ export const useEnvironment = () => {
     [globalEnvironment, getEnvironment]
   );
 
-  // TODO: move into actions
-  const getEnvironmentVariables = useCallback(
-    (environmentId: string): EnvironmentVariables => {
-      const env = getEnvironment(environmentId);
-
-      if (!env) {
-        throw new Error("Environment not found! ");
-      }
-
-      // FIXME: update legacy types to match new store types
-      return Object.fromEntries(env.data.variables.getState().getAll());
-    },
-    [getEnvironment]
-  );
-
-  // TODO: move into actions
   const getCurrentEnvironmentVariables = useCallback((): EnvironmentVariables => {
     if (!activeEnvironment?.id) {
       throw new Error("No active environment!");
     }
 
-    return getEnvironmentVariables(activeEnvironment?.id);
-  }, [activeEnvironment?.id, getEnvironmentVariables]);
+    return getEnvironmentById(activeEnvironment?.id).variables;
+  }, [activeEnvironment?.id, getEnvironmentById]);
 
-  // TODO: move into actions
   const getGlobalVariables = useCallback((): EnvironmentVariables => {
     return Object.fromEntries(globalEnvironment.data.variables.getState().getAll());
   }, [globalEnvironment]);
 
-  // TODO: move into actions
-  const getCurrentCollectionVariables = useCallback(
-    (collectionId: string): EnvironmentVariables => {
-      const collectionStore = getRecordStore(collectionId);
-
-      if (!collectionStore) {
-        throw new Error("Collection not found!");
-      }
-
-      return Object.fromEntries(collectionStore.getState().collectionVariables.getState().getAll());
-    },
-    [getRecordStore]
-  );
-
-  // TODO: move into actions
   const getAllEnvironments = useCallback(() => {
-    const environments = activeOwnerEnvironments;
-    return Object.keys(environments).map((key) => {
+    return Object.entries(Object.fromEntries(getAll())).map(([key, value]) => {
       return {
         id: key,
-        name: environments[key].name,
+        name: value.name,
       };
     });
-  }, [activeOwnerEnvironments]);
+  }, [getAll]);
 
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
@@ -298,7 +188,6 @@ export const useEnvironment = () => {
           description: err?.message,
           placement: "bottomRight",
         });
-        console.error("Error while renaming environment", err);
       }
     },
     [updateEnvironment, syncRepository]
@@ -306,14 +195,28 @@ export const useEnvironment = () => {
 
   const duplicateEnvironment = useCallback(
     async (environmentId: string) => {
-      return syncRepository.environmentVariablesRepository
-        .duplicateEnvironment(environmentId, activeOwnerEnvironmentsRef.current)
-        .then((newEnvironment) => {
-          createNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name });
-          getEnvironment(newEnvironment.id)?.data.variables.getState().mergeAndUpdate(newEnvironment.variables);
+      try {
+        const envsMap: EnvironmentMap = {};
+        getAll().forEach((value) => {
+          envsMap[value.id] = getEnvironmentById(value.id);
         });
+
+        const newEnvironment = await syncRepository.environmentVariablesRepository.duplicateEnvironment(
+          environmentId,
+          envsMap
+        );
+
+        createNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name });
+        getEnvironment(newEnvironment.id)?.data.variables.getState().mergeAndUpdate(newEnvironment.variables);
+      } catch (err) {
+        notification.error({
+          message: "Error while duplicating environment",
+          description: err?.message,
+          placement: "bottomRight",
+        });
+      }
     },
-    [createNewEnvironment, getEnvironment, syncRepository]
+    [getAll, createNewEnvironment, getEnvironment, syncRepository, getEnvironmentById]
   );
 
   const deleteEnvironment = useCallback(
@@ -327,57 +230,9 @@ export const useEnvironment = () => {
           description: err?.message,
           placement: "bottomRight",
         });
-        console.error("Error while deleting environment", err);
       }
     },
     [removeEnvironment, syncRepository]
-  );
-
-  const setCollectionVariables = useCallback(
-    async (variables: EnvironmentVariables, collectionId: string) => {
-      let collection: RQAPI.CollectionRecord;
-      try {
-        const existingRecord = getData(collectionId);
-        if (!existingRecord) {
-          throw new Error("Collection not found");
-        }
-
-        if (existingRecord.type !== RQAPI.RecordType.COLLECTION) {
-          throw new Error("Record is not a collection");
-        }
-        collection = existingRecord as RQAPI.CollectionRecord;
-      } catch (error) {
-        throw new Error("Collection not found");
-      }
-
-      const updatedVariables = Object.fromEntries(
-        Object.entries(variables).map(([key, value]) => {
-          const typeToSave =
-            value.type === EnvironmentVariableType.Secret
-              ? EnvironmentVariableType.Secret
-              : (typeof value.syncValue as EnvironmentVariableType);
-          const { localValue, ...rest } = value;
-          return [key, { ...rest, type: typeToSave }];
-        })
-      );
-      const record: RQAPI.CollectionRecord = {
-        ...collection,
-        data: { ...collection?.data, variables: updatedVariables },
-      };
-      return syncRepository.apiClientRecordsRepository
-        .setCollectionVariables(record.id, record.data.variables)
-        .then((result) => {
-          onSaveRecord(result.data as RQAPI.Record, "open");
-          getRecordStore(collectionId)?.getState().collectionVariables.getState().mergeAndUpdate(variables);
-        })
-        .catch(() => {
-          notification.error({
-            message: "Error while updating collection variables",
-            placement: "bottomRight",
-          });
-        });
-    },
-    [onSaveRecord, getRecordStore, syncRepository.apiClientRecordsRepository, getData]
   );
 
   return {
@@ -385,19 +240,16 @@ export const useEnvironment = () => {
     addNewEnvironment,
     getCurrentEnvironment,
     setVariables,
-    renderVariables,
-    getEnvironmentVariables,
     getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentById,
     renameEnvironment,
     duplicateEnvironment,
     deleteEnvironment,
-    getVariablesWithPrecedence,
     getGlobalVariables,
-    setCollectionVariables,
-    getCollectionVariables: getCurrentCollectionVariables,
-    environmentSyncRepository: syncRepository.environmentVariablesRepository,
     forceRefreshEnvironments,
+
+    renderVariables,
+    getVariablesWithPrecedence,
   };
 };

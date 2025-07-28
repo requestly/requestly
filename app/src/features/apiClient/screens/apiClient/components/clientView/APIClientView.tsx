@@ -65,6 +65,8 @@ import {
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useCollection } from "features/apiClient/hooks/useCollection";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -114,20 +116,18 @@ const APIClientView: React.FC<Props> = ({
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
 
-  const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
+  const { onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
 
-  const environmentManager = useEnvironment();
   const {
     getVariablesWithPrecedence,
     setVariables,
-    setCollectionVariables,
     getCurrentEnvironment,
     getGlobalVariables,
-    getCollectionVariables,
     getCurrentEnvironmentVariables,
     renderVariables,
-    environmentSyncRepository,
-  } = environmentManager;
+  } = useEnvironment();
+  const { setCollectionVariables, getCollectionVariables } = useCollection();
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
     apiEntryDetails?.collectionId,
     getVariablesWithPrecedence,
@@ -269,7 +269,7 @@ const APIClientView: React.FC<Props> = ({
           }
         }
         if (key === "global") {
-          const globalEnvId = environmentSyncRepository.getGlobalEnvironmentId();
+          const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
           await setVariables(globalEnvId, state[key]);
         }
         if (key === "collectionVariables") {
@@ -282,7 +282,7 @@ const APIClientView: React.FC<Props> = ({
       setVariables,
       setCollectionVariables,
       apiEntryDetails?.collectionId,
-      environmentSyncRepository,
+      environmentVariablesRepository,
     ]
   );
 
