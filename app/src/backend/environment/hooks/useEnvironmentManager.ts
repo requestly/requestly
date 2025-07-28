@@ -256,9 +256,15 @@ const useEnvironmentManager = () => {
   // TODO: move into actions
   const getCurrentCollectionVariables = useCallback(
     (collectionId: string): EnvironmentVariables => {
-      return collectionVariables[collectionId]?.variables ?? {};
+      const collectionStore = getRecordStore(collectionId);
+
+      if (!collectionStore) {
+        throw new Error("Collection not found!");
+      }
+
+      return Object.fromEntries(collectionStore.getState().collectionVariables.getState().getAll());
     },
-    [collectionVariables]
+    [getRecordStore]
   );
 
   // TODO: move into actions
