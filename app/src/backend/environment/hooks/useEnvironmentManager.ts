@@ -32,6 +32,7 @@ const useEnvironmentManager = () => {
     getEnvironment,
     globalEnvironment,
     updateEnvironment,
+    removeEnvironment,
   ] = useAPIEnvironment((s) => [
     s.setActive,
     s.create,
@@ -39,6 +40,7 @@ const useEnvironmentManager = () => {
     s.getEnvironment,
     s.globalEnvironment,
     s.update,
+    s.delete,
   ]);
 
   const user = useSelector(getUserAuthDetails);
@@ -294,24 +296,18 @@ const useEnvironmentManager = () => {
       return syncRepository.environmentVariablesRepository
         .duplicateEnvironment(environmentId, activeOwnerEnvironmentsRef.current)
         .then((newEnvironment) => {
-          dispatch(variablesActions.addNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name, ownerId }));
-          dispatch(
-            variablesActions.updateEnvironmentData({
-              newVariables: newEnvironment.variables,
-              environmentId: newEnvironment.id,
-              ownerId,
-            })
-          );
+          createNewEnvironment({ id: newEnvironment.id, name: newEnvironment.name });
+          getEnvironment(newEnvironment.id)?.data.variables.getState().mergeAndUpdate(newEnvironment.variables);
         });
     },
-    [dispatch, ownerId, syncRepository]
+    [createNewEnvironment, getEnvironment, syncRepository]
   );
 
   const deleteEnvironment = useCallback(
     async (environmentId: string) => {
       try {
         await syncRepository.environmentVariablesRepository.deleteEnvironment(environmentId);
-        dispatch(variablesActions.removeEnvironment({ environmentId, ownerId }));
+        removeEnvironment(environmentId);
       } catch (err) {
         notification.error({
           message: "Error while deleting environment",
@@ -321,7 +317,7 @@ const useEnvironmentManager = () => {
         console.error("Error while deleting environment", err);
       }
     },
-    [ownerId, dispatch, syncRepository]
+    [removeEnvironment, syncRepository]
   );
 
   const setCollectionVariables = useCallback(
