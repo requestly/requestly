@@ -16,18 +16,19 @@ interface EnvironmentViewProps {
 }
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
-  const { getEnvironmentName, getEnvironmentVariables, setVariables } = useEnvironmentManager();
+  const { getEnvironmentById, setVariables } = useEnvironmentManager();
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const environmentName = getEnvironmentName(envId);
+  const environment = getEnvironmentById(envId);
+
   const variables = useMemo(() => {
     return pendingVariablesRef.current.length > 0
       ? pendingVariablesRef.current
-      : mapToEnvironmentArray(getEnvironmentVariables(envId));
-  }, [getEnvironmentVariables, envId]);
+      : mapToEnvironmentArray(environment.variables);
+  }, [environment.variables]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -36,6 +37,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
 
   const { setPreview, setUnsaved, setTitle } = useGenericState();
 
+  const environmentName = environment.name;
   useEffect(() => {
     // To sync title for tabs opened from deeplinks
     if (environmentName) {
