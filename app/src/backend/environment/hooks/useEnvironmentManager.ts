@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useCallback, useRef } from "react";
-import { EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
+import { EnvironmentData, EnvironmentVariables, EnvironmentVariableType, EnvironmentVariableValue } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllEnvironmentData,
@@ -203,6 +203,20 @@ const useEnvironmentManager = () => {
   );
 
   // TODO: move into actions
+  const getEnvironmentById = useCallback(
+    (environmentId: string): EnvironmentData => {
+      const env = getEnvironment(environmentId);
+
+      if (!env) {
+        throw new Error("Environment not found! ");
+      }
+
+      return { id: env.id, name: env.name, variables: Object.fromEntries(env.data.variables.getState().getAll()) };
+    },
+    [getEnvironment]
+  );
+
+  // TODO: move into actions
   const getEnvironmentVariables = useCallback(
     (environmentId: string): EnvironmentVariables => {
       const env = getEnvironment(environmentId);
@@ -249,14 +263,6 @@ const useEnvironmentManager = () => {
       };
     });
   }, [activeOwnerEnvironments]);
-
-  // TODO: move into actions
-  const getEnvironmentName = useCallback(
-    (environmentId: string) => {
-      return activeOwnerEnvironments[environmentId]?.name;
-    },
-    [activeOwnerEnvironments]
-  );
 
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
@@ -366,7 +372,7 @@ const useEnvironmentManager = () => {
     getEnvironmentVariables,
     getCurrentEnvironmentVariables,
     getAllEnvironments,
-    getEnvironmentName,
+    getEnvironmentById,
     renameEnvironment,
     duplicateEnvironment,
     deleteEnvironment,
