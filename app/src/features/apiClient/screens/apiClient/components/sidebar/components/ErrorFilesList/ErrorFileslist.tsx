@@ -12,7 +12,7 @@ import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
@@ -57,8 +57,12 @@ export const ErrorFilesList = () => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
   const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments, errorEnvFiles } = useEnvironmentManager();
-  const errorFiles = useAPIRecords((state) => state.erroredRecords);
+  const { forceRefreshEnvironments } = useEnvironmentManager();
+
+  const [errorFiles, errorEnvFiles] = useErroredRecords((state) => [
+    state.apiErroredRecords,
+    state.environmentErroredRecords,
+  ]);
 
   const files = useMemo(() => [...errorFiles, ...errorEnvFiles], [errorFiles, errorEnvFiles]);
 
@@ -104,7 +108,7 @@ export const ErrorFilesList = () => {
             setIsErrorFileViewerModalOpen(false);
             setErrorFileToView(null);
           }}
-          errorFile={errorFileToView}
+          errorFile={errorFileToView as ErroredRecord}
         />
       )}
 
