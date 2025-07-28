@@ -46,10 +46,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const [isLoading, setIsLoading] = useState(false);
   const [getData] = useAPIRecords((state) => [state.getData]);
   const { onSaveRecord } = useApiClientContext();
-  const [setCurrentEnvironment, createNewEnvironment, activeEnvironment] = useAPIEnvironment((s) => [
+  const [setCurrentEnvironment, createNewEnvironment, activeEnvironment, getEnvironment] = useAPIEnvironment((s) => [
     s.setActive,
     s.create,
     s.activeEnvironment,
+    s.getEnvironment,
   ]);
 
   const user = useSelector(getUserAuthDetails);
@@ -285,17 +286,19 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
           ];
         })
       );
+
       try {
         await syncRepository.environmentVariablesRepository.updateEnvironment(environmentId, {
           variables: newVariablesWithSyncvalues,
         });
-        dispatch(
-          variablesActions.updateEnvironmentData({
-            newVariables: newVariablesWithSyncvalues,
-            environmentId,
-            ownerId,
-          })
-        );
+
+        const env = getEnvironment(environmentId);
+
+        if (!env) {
+          throw new Error("Environment not found! ");
+        }
+
+        env.data.variables.getState().mergeAndUpdate(newVariablesWithSyncvalues);
       } catch (err) {
         notification.error({
           message: "Error while setting environment variables.",
@@ -305,7 +308,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
         Logger.error("Error while setting environment variables in db", err);
       }
     },
-    [ownerId, dispatch, syncRepository]
+    [syncRepository, getEnvironment]
   );
 
   const getVariablesWithPrecedence = useCallback(
@@ -361,6 +364,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     [activeOwnerEnvironments, currentEnvironmentId, getData, collectionVariables, syncRepository]
   );
 
+  // TODO: move it in utils
   const renderVariables = useCallback(
     <T extends string | Record<string, any>>(
       template: T,
@@ -379,9 +383,16 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
 
   const getEnvironmentVariables = useCallback(
     (environmentId: string): EnvironmentVariables => {
-      return activeOwnerEnvironments[environmentId]?.variables ?? {};
+      const env = getEnvironment(environmentId);
+
+      if (!env) {
+        throw new Error("Environment not found! ");
+      }
+
+      // FIXME: update legacy types to match new store types
+      return Object.fromEntries(env.data.variables.getState().getAll());
     },
-    [activeOwnerEnvironments]
+    [getEnvironment]
   );
 
   const getCurrentEnvironmentVariables = useCallback((): EnvironmentVariables => {
