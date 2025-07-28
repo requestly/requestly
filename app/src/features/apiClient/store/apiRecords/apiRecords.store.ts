@@ -70,7 +70,9 @@ export type ApiRecordsState = {
   setErroredRecords: (erroredRecords: ErroredRecord[]) => void; // TODO: remove this and use erroredRecordsStore
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
-  getRecordStore: (id: string) => StoreApi<RecordState> | undefined;
+  getRecordStore: (
+    id: string
+  ) => StoreApi<RecordState["type"] extends RQAPI.RecordType.API ? ApiRecordState : CollectionRecordState> | undefined;
   getAllRecords: () => RQAPI.Record[];
 
   addNewRecord: (record: RQAPI.Record) => void;
