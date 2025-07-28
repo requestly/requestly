@@ -2,7 +2,7 @@ import { EnvironmentVariableKey, EnvironmentVariables, EnvironmentVariableValue 
 import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
 
-export type VariablesStore = {
+export type VariablesState = {
   // state
   version: number;
   data: Map<EnvironmentVariableKey, EnvironmentVariableValue>;
@@ -17,12 +17,12 @@ export type VariablesStore = {
   incrementVersion: () => void;
 };
 
-const parseVariables = (rawVariables: EnvironmentVariables): VariablesStore["data"] => {
+const parseVariables = (rawVariables: EnvironmentVariables): VariablesState["data"] => {
   return new Map(Object.entries(rawVariables));
 };
 
 export const createVariablesStore = ({ variables }: { variables: EnvironmentVariables }) => {
-  return create<VariablesStore>()((set, get) => ({
+  return create<VariablesState>()((set, get) => ({
     version: 0,
     data: parseVariables(variables),
 
