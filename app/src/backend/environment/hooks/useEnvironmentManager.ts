@@ -25,12 +25,13 @@ const useEnvironmentManager = () => {
   const dispatch = useDispatch();
   const [getData] = useAPIRecords((s) => [s.getData]);
   const { onSaveRecord } = useApiClientContext();
-  const [setCurrentEnvironment, createNewEnvironment, activeEnvironment, getEnvironment] = useAPIEnvironment((s) => [
-    s.setActive,
-    s.create,
-    s.activeEnvironment,
-    s.getEnvironment,
-  ]);
+  const [
+    setCurrentEnvironment,
+    createNewEnvironment,
+    activeEnvironment,
+    getEnvironment,
+    globalEnvironment,
+  ] = useAPIEnvironment((s) => [s.setActive, s.create, s.activeEnvironment, s.getEnvironment, s.globalEnvironment]);
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -49,12 +50,6 @@ const useEnvironmentManager = () => {
   useEffect(() => {
     activeOwnerEnvironmentsRef.current = activeOwnerEnvironments;
   }, [activeOwnerEnvironments]);
-
-  const globalEnvironmentData = useMemo(() => {
-    const globalEnv = activeOwnerEnvironments[syncRepository.environmentVariablesRepository.getGlobalEnvironmentId()];
-
-    return globalEnv || null;
-  }, [activeOwnerEnvironments, syncRepository.environmentVariablesRepository]);
 
   const collectionVariablesRef = useRef(collectionVariables);
   useEffect(() => {
@@ -233,8 +228,8 @@ const useEnvironmentManager = () => {
 
   // TODO: move into actions
   const getGlobalVariables = useCallback((): EnvironmentVariables => {
-    return activeOwnerEnvironments[globalEnvironmentData?.id]?.variables ?? {};
-  }, [activeOwnerEnvironments, globalEnvironmentData?.id]);
+    return Object.fromEntries(globalEnvironment.data.variables.getState().getAll());
+  }, [globalEnvironment]);
 
   // TODO: move into actions
   const getCurrentCollectionVariables = useCallback(
