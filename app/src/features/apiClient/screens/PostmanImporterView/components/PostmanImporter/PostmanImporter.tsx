@@ -44,7 +44,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     variables: {},
   });
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironment();
+  const { addNewEnvironment, setVariables, getEnvironmentById } = useEnvironment();
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
 
   const collectionsCount = useRef(0);
@@ -153,7 +153,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
         if (env.isGlobal) {
-          const globalEnvVariables = getEnvironmentVariables("global");
+          const globalEnvVariables = getEnvironmentById("global").variables;
           await setVariables("global", { ...globalEnvVariables, ...env.variables });
           return true;
         } else {
@@ -172,7 +172,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [addNewEnvironment, setVariables, processedFileData.environments, getEnvironmentVariables]);
+  }, [addNewEnvironment, setVariables, processedFileData.environments, getEnvironmentById]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;

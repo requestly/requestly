@@ -51,7 +51,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const [error, setError] = useState<string | null>(null);
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironment();
+  const { addNewEnvironment, setVariables, getEnvironmentById } = useEnvironment();
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -139,7 +139,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     try {
       const importPromises = environments.map(async (env) => {
         if (env.isGlobal) {
-          const globalEnvVariables = getEnvironmentVariables("global");
+          const globalEnvVariables = getEnvironmentById("global").variables;
           await setVariables("global", { ...globalEnvVariables, ...env.variables });
           return true;
         } else {
@@ -158,7 +158,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       Logger.error("Data import failed:", error);
       throw error;
     }
-  }, [environments, getEnvironmentVariables, addNewEnvironment, setVariables]);
+  }, [environments, getEnvironmentById, addNewEnvironment, setVariables]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;

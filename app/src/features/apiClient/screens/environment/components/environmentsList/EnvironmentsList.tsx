@@ -19,7 +19,7 @@ import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabS
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
-  const { addNewEnvironment, getAllEnvironments, setCurrentEnvironment, getEnvironmentVariables } = useEnvironment();
+  const { addNewEnvironment, getAllEnvironments, setCurrentEnvironment, getEnvironmentById } = useEnvironment();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -75,12 +75,12 @@ export const EnvironmentsList = () => {
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
-      const variables = getEnvironmentVariables(environment.id);
+      const variables = getEnvironmentById(environment.id).variables;
       setEnvironmentsToExport([{ ...environment, variables }]);
 
       setIsExportModalOpen(true);
     },
-    [getEnvironmentVariables]
+    [getEnvironmentById]
   );
 
   return (

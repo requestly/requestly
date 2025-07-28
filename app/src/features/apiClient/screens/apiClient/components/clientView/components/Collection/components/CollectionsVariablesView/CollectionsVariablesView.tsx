@@ -4,9 +4,7 @@ import {
   EnvironmentVariableTableRow,
   VariablesList,
 } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
-import { getCollectionVariables } from "store/features/variables/selectors";
-import { useSelector } from "react-redux";
-import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
+import { useCollection } from "features/apiClient/hooks/useCollection";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -20,13 +18,12 @@ interface CollectionsVariablesViewProps {
 }
 
 export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
-  const { setCollectionVariables } = useEnvironment();
-  const collectionVariables = useSelector(getCollectionVariables);
+  const { getCollectionVariables, setCollectionVariables } = useCollection();
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [pendingVariables, setPendingVariables] = useState(
-    mapToEnvironmentArray(collectionVariables[collection.id]?.variables ?? collection.data?.variables) || []
+    mapToEnvironmentArray(getCollectionVariables(collection.id) ?? collection.data?.variables) || []
   );
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -47,10 +44,10 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
       handleSetPendingVariables(
         pendingVariablesRef.current.length > 0
           ? pendingVariablesRef.current
-          : mapToEnvironmentArray(collectionVariables[collection.id]?.variables ?? collection.data.variables)
+          : mapToEnvironmentArray(getCollectionVariables(collection.id) ?? collection.data.variables)
       );
     }
-  }, [collection.id, collection?.data?.variables, collectionVariables, isSaving]);
+  }, [collection.id, collection?.data?.variables, getCollectionVariables, isSaving]);
 
   const handleSetPendingVariables = (variables: EnvironmentVariableTableRow[]) => {
     setPendingVariables(variables);
