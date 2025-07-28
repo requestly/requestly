@@ -5,14 +5,14 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ErrorFileViewerModal } from "../../../modals/ErrorFileViewerModal/ErrorFileViewerModal";
 import { useApiClientContext } from "features/apiClient/contexts";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import { toast } from "utils/Toast";
 import { notification, Popconfirm, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
@@ -57,8 +57,12 @@ export const ErrorFilesList = () => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
   const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments, errorEnvFiles } = useEnvironmentManager();
-  const errorFiles = useAPIRecords((state) => state.erroredRecords);
+  const { forceRefreshEnvironments } = useEnvironment();
+
+  const [errorFiles, errorEnvFiles] = useErroredRecords((state) => [
+    state.apiErroredRecords,
+    state.environmentErroredRecords,
+  ]);
 
   const files = useMemo(() => [...errorFiles, ...errorEnvFiles], [errorFiles, errorEnvFiles]);
 
@@ -104,7 +108,7 @@ export const ErrorFilesList = () => {
             setIsErrorFileViewerModalOpen(false);
             setErrorFileToView(null);
           }}
-          errorFile={errorFileToView}
+          errorFile={errorFileToView as ErroredRecord}
         />
       )}
 

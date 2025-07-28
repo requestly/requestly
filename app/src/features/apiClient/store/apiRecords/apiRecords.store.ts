@@ -70,7 +70,9 @@ export type ApiRecordsState = {
   setErroredRecords: (erroredRecords: ErroredRecord[]) => void; // TODO: remove this and use erroredRecordsStore
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
-  getRecordStore: (id: string) => StoreApi<RecordState> | undefined;
+  getRecordStore: (
+    id: string
+  ) => StoreApi<RecordState["type"] extends RQAPI.RecordType.API ? ApiRecordState : CollectionRecordState> | undefined;
   getAllRecords: () => RQAPI.Record[];
 
   addNewRecord: (record: RQAPI.Record) => void;
@@ -144,7 +146,8 @@ export const createRecordStore = (record: RQAPI.Record) => {
     }
     return {
       ...baseRecordState,
-      collectionVariables: createVariablesStore({ variables: record.data.variables }),
+      // FIXME: temp fallback
+      collectionVariables: createVariablesStore({ variables: record.data?.variables ?? {} }),
     } as CollectionRecordState;
   });
 };

@@ -9,7 +9,7 @@ import {
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useEnvironment } from "../hooks/useEnvironment";
 import { createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
@@ -133,7 +133,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
-  const { addNewEnvironment } = useEnvironmentManager();
+  const { addNewEnvironment } = useEnvironment();
 
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
