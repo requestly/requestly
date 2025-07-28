@@ -46,7 +46,11 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
   const [isLoading, setIsLoading] = useState(false);
   const [getData] = useAPIRecords((state) => [state.getData]);
   const { onSaveRecord } = useApiClientContext();
-  const [setCurrentEnvironment, createNewEnvironment] = useAPIEnvironment((s) => [s.setActive, s.create]);
+  const [setCurrentEnvironment, createNewEnvironment, activeEnvironment] = useAPIEnvironment((s) => [
+    s.setActive,
+    s.create,
+    s.activeEnvironment,
+  ]);
 
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
@@ -259,12 +263,13 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
     };
   }, [ownerId, initFetchers, dispatch, syncRepository]);
 
+  // TODO: can be moved into actions
   const getCurrentEnvironment = useCallback(() => {
     return {
-      currentEnvironmentName: activeOwnerEnvironments[currentEnvironmentId]?.name,
-      currentEnvironmentId,
+      currentEnvironmentId: activeEnvironment?.id,
+      currentEnvironmentName: activeEnvironment?.name,
     };
-  }, [currentEnvironmentId, activeOwnerEnvironments]);
+  }, [activeEnvironment]);
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
