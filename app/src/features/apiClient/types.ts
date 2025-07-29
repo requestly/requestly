@@ -127,7 +127,7 @@ export namespace RQAPI {
     status: number;
     statusText: string;
     time: number;
-    redirectedUrl: string;
+    redirectedUrl?: string;
   };
 
   export type HttpSpec = {
