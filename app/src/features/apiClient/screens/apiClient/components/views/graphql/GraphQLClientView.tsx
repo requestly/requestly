@@ -110,11 +110,14 @@ export const GraphQLClientView = ({ notifyApiRequestFinished, onSaveCallback, is
   const handleSend = useCallback(async () => {
     const record = getRecord();
 
-    apiClientExecutor.updateEntryDetails({
+    const req = {
       entry: graphQLEntryToHttpEntryAdapter(record.data),
       recordId: record.id,
       collectionId: record.collectionId,
-    });
+    };
+
+    console.log("!!!debug", "req", req, record.data);
+    apiClientExecutor.updateEntryDetails(req);
     try {
       setIsSending(true);
       const apiClientExecutionResult = await apiClientExecutor.execute();

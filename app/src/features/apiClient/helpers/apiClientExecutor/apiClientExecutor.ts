@@ -28,11 +28,11 @@ type InternalFunctions = {
   getGlobalVariables(): EnvironmentVariables;
   postScriptExecutionCallback(state: any): Promise<void>;
   renderVariables(
-    request: RQAPI.Entry,
+    request: RQAPI.HttpApiEntry,
     collectionId: string
   ): {
     renderedVariables?: Record<string, unknown>;
-    result: RQAPI.Entry;
+    result: RQAPI.HttpApiEntry;
   };
 };
 
@@ -46,8 +46,8 @@ enum RequestErrorMessage {
 
 export class ApiClientExecutor {
   private abortController: AbortController;
-  private entryDetails: RQAPI.Entry;
-  private collectionId: RQAPI.Record["collectionId"];
+  private entryDetails: RQAPI.HttpApiEntry;
+  private collectionId: RQAPI.ApiClientRecord["collectionId"];
   private internalFunctions: InternalFunctions;
   private renderedVariables: Record<string, unknown> = {};
   constructor(
@@ -204,9 +204,9 @@ export class ApiClientExecutor {
   }
 
   updateEntryDetails(entryDetails: {
-    entry: RQAPI.Entry;
-    collectionId: RQAPI.Record["collectionId"];
-    recordId: RQAPI.Record["id"];
+    entry: RQAPI.HttpApiEntry;
+    collectionId: RQAPI.ApiClientRecord["collectionId"];
+    recordId: RQAPI.ApiClientRecord["id"];
   }) {
     this.entryDetails = entryDetails.entry;
     this.collectionId = entryDetails.collectionId;
