@@ -5,9 +5,11 @@ export const graphQLEntryToHttpEntryAdapter = (entry: RQAPI.GraphQLApiEntry): RQ
     query: entry.request.operation,
     variables: entry.request.variables,
   };
+
   if (entry.request.operationName) {
     requestBody.operationName = entry.request.operationName;
   }
+
   const headers: KeyValuePair[] = [
     ...entry.request.headers,
     // Temp: Adding content type header for testing execution
