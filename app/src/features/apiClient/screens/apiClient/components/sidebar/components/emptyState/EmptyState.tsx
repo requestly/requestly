@@ -26,7 +26,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   const handleOnClick = () => {
     setIsLoading(true);
-    onNewRecordClick()
+    onNewRecordClick?.()
       .then(() => {
         // DO NOTHING
       })

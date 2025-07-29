@@ -63,7 +63,7 @@ export const EnvironmentsList = () => {
     [addNewEnvironment, environments.length, setActiveEnvironment, openTab, setIsRecordBeingCreated]
   );
 
-  const handleAddEnvironmentClick = useCallback(() => {
+  const handleAddEnvironmentClick = useCallback(async () => {
     if (!isValidPermission) {
       toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, "environment"), 5);
       return;
