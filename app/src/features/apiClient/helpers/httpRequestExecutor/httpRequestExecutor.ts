@@ -14,7 +14,7 @@ import {
   trackScriptExecutionFailed,
   trackScriptExecutionStarted,
 } from "../modules/scriptsV2/analytics";
-import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./apiClientExecutorHelpers";
+import { isMethodSupported, isOnline, isUrlProtocolValid, isUrlValid } from "./httpRequestExecutorHelpers";
 import { isEmpty } from "lodash";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import { UserAbortError } from "features/apiClient/errors/UserAbortError/UserAbortError";
@@ -44,7 +44,7 @@ enum RequestErrorMessage {
   DNS_RESOLUTION_ERROR = "Could not connect. Please check if the server is up and the address can be resolved.",
 }
 
-export class ApiClientExecutor {
+export class HttpRequestExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.HttpApiEntry;
   private collectionId: RQAPI.ApiClientRecord["collectionId"];
