@@ -4,18 +4,17 @@ import {
   EnvironmentMap,
   EnvironmentVariables,
   EnvironmentVariableType,
-  EnvironmentVariableValue,
 } from "../../../backend/environment/types";
-import { renderTemplate } from "../../../backend/environment/utils";
 import Logger from "lib/logger";
 import { notification } from "antd";
 import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { Environment } from "../store/environments/environments.store";
 
 export const useEnvironment = () => {
   const syncRepository = useApiClientRepository();
   const [
-    setCurrentEnvironment,
+    setActive,
     createNewEnvironment,
     activeEnvironment,
     getEnvironment,
@@ -33,6 +32,38 @@ export const useEnvironment = () => {
     s.delete,
     s.getAll,
   ]);
+
+  const setActiveEnvironment = useCallback(
+    (id?: EnvironmentData["id"]) => {
+      setActive(id);
+    },
+    [setActive]
+  );
+
+  const getAllEnvironments = useCallback(() => {
+    return Object.entries(Object.fromEntries(getAll())).map(([key, value]) => {
+      return {
+        id: key,
+        name: value.name,
+      };
+    });
+  }, [getAll]);
+
+  const _environmentDataAdapter = useCallback((env: Environment): EnvironmentData => {
+    return {
+      id: env.id,
+      name: env.name,
+      variables: Object.fromEntries(env.data.variables.getState().getAll()),
+    };
+  }, []);
+
+  const getActiveEnvironment = useCallback(() => {
+    if (!activeEnvironment) {
+      return;
+    }
+
+    return _environmentDataAdapter(activeEnvironment);
+  }, [activeEnvironment, _environmentDataAdapter]);
 
   const addNewEnvironment = useCallback(
     async (newEnvironmentName: string) => {
@@ -53,21 +84,6 @@ export const useEnvironment = () => {
     },
     [syncRepository, createNewEnvironment]
   );
-
-  // TODO: TBD
-  const fetchAndUpdateEnvironments = useCallback(async () => {}, []);
-
-  // TODO: TBD
-  const forceRefreshEnvironments = useCallback(() => {
-    fetchAndUpdateEnvironments();
-  }, [fetchAndUpdateEnvironments]);
-
-  const getCurrentEnvironment = useCallback(() => {
-    return {
-      currentEnvironmentId: activeEnvironment?.id,
-      currentEnvironmentName: activeEnvironment?.name,
-    };
-  }, [activeEnvironment]);
 
   const setVariables = useCallback(
     async (environmentId: string, variables: EnvironmentVariables) => {
@@ -108,41 +124,10 @@ export const useEnvironment = () => {
     [syncRepository, getEnvironment]
   );
 
-  // resolver
-  // TODO: to be removed from this hook
-  const getVariablesWithPrecedence = useCallback((currentCollectionId: string): Record<
-    string,
-    EnvironmentVariableValue
-  > => {
-    const allVariables: Record<string, EnvironmentVariableValue> = {};
-    return allVariables;
-  }, []);
-
-  // TODO: to be removed from this hook
-  const renderVariables = useCallback(
-    <T extends string | Record<string, any>>(
-      template: T,
-      requestCollectionId: string = ""
-    ): {
-      renderedVariables?: Record<string, unknown>;
-      result: T;
-    } => {
-      const variablesWithPrecedence = getVariablesWithPrecedence(requestCollectionId);
-
-      const { renderedTemplate, renderedVariables } = renderTemplate(template, variablesWithPrecedence);
-      return { renderedVariables, result: renderedTemplate };
-    },
-    [getVariablesWithPrecedence]
-  );
-
   const getEnvironmentById = useCallback(
     (environmentId: string): EnvironmentData => {
       if (environmentId === globalEnvironment.id) {
-        return {
-          id: globalEnvironment.id,
-          name: globalEnvironment.name,
-          variables: Object.fromEntries(globalEnvironment.data.variables.getState().getAll()),
-        };
+        return _environmentDataAdapter(globalEnvironment);
       }
 
       const env = getEnvironment(environmentId);
@@ -151,31 +136,14 @@ export const useEnvironment = () => {
         throw new Error("Environment not found! ");
       }
 
-      return { id: env.id, name: env.name, variables: Object.fromEntries(env.data.variables.getState().getAll()) };
+      return _environmentDataAdapter(env);
     },
-    [globalEnvironment, getEnvironment]
+    [globalEnvironment, getEnvironment, _environmentDataAdapter]
   );
 
-  const getCurrentEnvironmentVariables = useCallback((): EnvironmentVariables => {
-    if (!activeEnvironment?.id) {
-      throw new Error("No active environment!");
-    }
-
-    return getEnvironmentById(activeEnvironment?.id).variables;
-  }, [activeEnvironment?.id, getEnvironmentById]);
-
-  const getGlobalVariables = useCallback((): EnvironmentVariables => {
-    return Object.fromEntries(globalEnvironment.data.variables.getState().getAll());
-  }, [globalEnvironment]);
-
-  const getAllEnvironments = useCallback(() => {
-    return Object.entries(Object.fromEntries(getAll())).map(([key, value]) => {
-      return {
-        id: key,
-        name: value.name,
-      };
-    });
-  }, [getAll]);
+  const getGlobalEnvironment = useCallback((): EnvironmentData => {
+    return _environmentDataAdapter(globalEnvironment);
+  }, [globalEnvironment, _environmentDataAdapter]);
 
   const renameEnvironment = useCallback(
     async (environmentId: string, newName: string) => {
@@ -236,20 +204,16 @@ export const useEnvironment = () => {
   );
 
   return {
-    setCurrentEnvironment,
-    addNewEnvironment,
-    getCurrentEnvironment,
-    setVariables,
-    getCurrentEnvironmentVariables,
     getAllEnvironments,
     getEnvironmentById,
+    getActiveEnvironment,
+    getGlobalEnvironment,
+
+    setVariables,
+    setActiveEnvironment,
+    addNewEnvironment,
     renameEnvironment,
     duplicateEnvironment,
     deleteEnvironment,
-    getGlobalVariables,
-    forceRefreshEnvironments,
-
-    renderVariables,
-    getVariablesWithPrecedence,
   };
 };

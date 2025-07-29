@@ -7,7 +7,7 @@ type EnvironmentData = {
   variables: StoreApi<VariablesState>;
 };
 
-type Environment = {
+export type Environment = {
   id: string;
   name: string;
   data: EnvironmentData;
