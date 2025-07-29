@@ -136,7 +136,7 @@ export const ImportMocksModal: React.FC<ImportMocksModalProps> = ({
       const mocksPromises: Promise<unknown>[] = [];
 
       dataToImport.mocks.forEach((mock) => {
-        const newCollectionId = oldToNewCollectionDetails[mock.collectionId]?.newId;
+        const newCollectionId = oldToNewCollectionDetails[mock.collectionId].newId;
         const updatedMock = { ...mock, collectionId: newCollectionId ?? "" };
 
         mocksPromises.push(createMock(uid, updatedMock, activeWorkspaceId, newCollectionId));
