@@ -4,7 +4,7 @@ import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSync
 import { AllApiClientStores, ApiRecordsStoreContext } from "../store/apiRecords/ApiRecordsContextProvider";
 
 export type ApiClientFeatureContext = {
-  stores: AllApiClientStores;
+  stores: AllApiClientStores | null;
   repositories: ApiClientRepositoryInterface;
 };
 export function useApiClientFeatureContext() {
