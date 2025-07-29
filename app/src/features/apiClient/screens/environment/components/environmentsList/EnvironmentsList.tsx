@@ -1,5 +1,4 @@
 import { useCallback, useState, useMemo } from "react";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
@@ -16,15 +15,11 @@ import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabSource";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
-  const {
-    getAllEnvironments,
-    addNewEnvironment,
-    setCurrentEnvironment,
-    getEnvironmentVariables,
-  } = useEnvironmentManager();
+  const { getAllEnvironments, addNewEnvironment, setActiveEnvironment, getEnvironmentById } = useEnvironment();
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -54,7 +49,7 @@ export const EnvironmentsList = () => {
         .then((newEnvironment) => {
           if (newEnvironment) {
             if (environments.length === 0) {
-              setCurrentEnvironment(newEnvironment.id);
+              setActiveEnvironment(newEnvironment.id);
             }
 
             openTab(new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name }));
@@ -65,7 +60,7 @@ export const EnvironmentsList = () => {
           setIsRecordBeingCreated(null);
         });
     },
-    [addNewEnvironment, environments.length, setCurrentEnvironment, openTab, setIsRecordBeingCreated]
+    [addNewEnvironment, environments.length, setActiveEnvironment, openTab, setIsRecordBeingCreated]
   );
 
   const handleAddEnvironmentClick = useCallback(() => {
@@ -80,12 +75,12 @@ export const EnvironmentsList = () => {
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
-      const variables = getEnvironmentVariables(environment.id);
+      const variables = getEnvironmentById(environment.id).variables;
       setEnvironmentsToExport([{ ...environment, variables }]);
 
       setIsExportModalOpen(true);
     },
-    [getEnvironmentVariables]
+    [getEnvironmentById]
   );
 
   return (
