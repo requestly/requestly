@@ -13,7 +13,7 @@ export type Environment = {
   data: EnvironmentData;
 };
 
-type GlobalEnvironment = Environment;
+export type GlobalEnvironment = Environment;
 
 export type EnvironmentsState = {
   // state

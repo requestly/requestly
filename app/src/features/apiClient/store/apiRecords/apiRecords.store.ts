@@ -232,7 +232,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
         const recordStore = indexStore.get(cid);
 
         if (!recordStore) {
-          new NativeError("Record store does not exist!").addContext({ id: cid });
+          throw new NativeError("Record store does not exist!").addContext({ id: cid });
         }
 
         recordStore.getState().incrementParentVersion();
@@ -256,7 +256,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
       const recordStore = get().getRecordStore(patch.id);
 
       if (!recordStore) {
-        new NativeError("Record store does not exist!").addContext({ id: patch.id });
+        throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
       }
 
       const { record, updateRecordState } = recordStore.getState();
@@ -280,7 +280,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
           const recordStore = get().getRecordStore(patch.id);
 
           if (!recordStore) {
-            new NativeError("Record store does not exist!").addContext({ id: patch.id });
+            throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
           }
 
           const { record, updateRecordState } = recordStore.getState();
