@@ -44,6 +44,7 @@ The following domains are eligible for the student programme:
     "fernuni-hagen.de",
     "univ-lorraine.fr",
     "univ-nantes.fr",
+    "etu.univ-amu.fr",
     "duke.edu",
     "fau.de",
     "sch.gr",

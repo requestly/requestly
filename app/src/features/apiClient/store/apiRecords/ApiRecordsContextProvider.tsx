@@ -16,7 +16,7 @@ import { createErroredRecordsStore, ErroredRecordsState } from "../erroredRecord
 type AllApiClientStores = {
   records: StoreApi<ApiRecordsState>;
   environments: StoreApi<EnvironmentsState>;
-  errorRecords: StoreApi<ErroredRecordsState>;
+  erroredRecords: StoreApi<ErroredRecordsState>;
 };
 
 type FetchedData<T> = { records: T; erroredRecords: ErroredRecord[] };
@@ -105,7 +105,7 @@ const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { env
       value={{
         records: apiRecordsStore,
         environments: environmentStore,
-        errorRecords: errorStore,
+        erroredRecords: errorStore,
       }}
     >
       <Daemon />
@@ -149,4 +149,13 @@ export function useAPIEnvironmentStore() {
   }
 
   return store.environments;
+}
+
+export function useErroredRecords<T>(selector: (state: ErroredRecordsState) => T) {
+  const store = useContext(ApiRecordsStoreContext);
+  if (!store || !store.erroredRecords) {
+    throw new Error("Errored records store not found!");
+  }
+
+  return useStore(store.erroredRecords, useShallow(selector));
 }
