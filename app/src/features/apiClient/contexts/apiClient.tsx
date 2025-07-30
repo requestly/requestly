@@ -49,7 +49,12 @@ interface ApiClientContextInterface {
   setCurrentHistoryIndex: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
+  onNewClick: (
+    analyticEventSource: RQAPI.AnalyticsEventSource,
+    recordType: RQAPI.RecordType,
+    collectionId?: string,
+    entryType?: RQAPI.ApiEntryType
+  ) => Promise<void>;
 
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
@@ -79,7 +84,12 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   setCurrentHistoryIndex: (index: number) => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
+  onNewClick: (
+    analyticEventSource: RQAPI.AnalyticsEventSource,
+    recordType: RQAPI.RecordType,
+    collectionId?: string,
+    entryType?: RQAPI.ApiEntryType
+  ) => Promise.resolve(),
 
   setIsImportModalOpen: () => {},
 
@@ -135,9 +145,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
 
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
-  const openDraftRequest = useCallback(() => {
-    openTab(new DraftRequestContainerTabSource());
-  }, [openTab]);
+  const openDraftRequest = useCallback(
+    (apiEntryType?: RQAPI.ApiEntryType) => {
+      openTab(new DraftRequestContainerTabSource(apiEntryType));
+    },
+    [openTab]
+  );
 
   // TODO: Create modal context
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -220,7 +233,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
   const onNewClick = useCallback(
-    async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
+    async (
+      analyticEventSource: RQAPI.AnalyticsEventSource,
+      recordType: RQAPI.RecordType,
+      collectionId = "",
+      entryType?: RQAPI.ApiEntryType
+    ) => {
       if (!isValidPermission) {
         toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
         return;
@@ -231,12 +249,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
           trackNewRequestClicked(analyticEventSource);
 
           if (["api_client_sidebar_header", "home_screen"].includes(analyticEventSource)) {
-            openDraftRequest();
+            openDraftRequest(entryType);
             return;
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, repository).then((result) => {
+          return createBlankApiRecord(recordType, collectionId, repository, entryType).then((result) => {
             setIsRecordBeingCreated(null);
             onSaveRecord(result.data, "open");
           });

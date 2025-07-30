@@ -22,7 +22,7 @@ export class RequestViewTabSource extends BaseTabSource {
       name: "request",
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
-    this.icon = this.getTabIcon(metadata.apiEntryDetails?.entryType);
+    this.icon = this.getTabIcon(metadata.apiEntryDetails.data.type);
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
@@ -37,9 +37,9 @@ export class RequestViewTabSource extends BaseTabSource {
 
   private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
     switch (type) {
-      case RQAPI.ApiEntryType.GRAPHQL:
-        return <MdOutlineSyncAlt />;
       case RQAPI.ApiEntryType.HTTP:
+        return <MdOutlineSyncAlt />;
+      case RQAPI.ApiEntryType.GRAPHQL:
         return <GrGraphQl />;
       default:
         return <MdOutlineSyncAlt />;
