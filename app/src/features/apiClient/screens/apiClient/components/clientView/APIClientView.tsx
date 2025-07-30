@@ -807,7 +807,7 @@ const APIClientView: React.FC<Props> = ({
               className="text-bold"
               disabled={
                 !entry.request.url ||
-                (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPARTFORM)
+                (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
               }
             >
               Send
@@ -817,7 +817,7 @@ const APIClientView: React.FC<Props> = ({
               <RBACButton
                 disabled={
                   !hasUnsavedChanges ||
-                  (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPARTFORM)
+                  (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
                 }
                 permission="create"
                 resource="api_client_request"

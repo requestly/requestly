@@ -9,7 +9,8 @@ import "./requestBody.scss";
 import { MultipartFormBodyRenderer } from "./renderers/multipart-form-body-renderer";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import MultipartFormRedirectScreen from "components/misc/MultipartFormRedirectScreen";
+import MultipartFormRedirectScreen from "../MultipartFormRedirectScreen";
+
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -20,9 +21,9 @@ function parseSingleModeBody(params: {
       return {
         form: body as RQAPI.RequestFormBody,
       };
-    case RequestContentType.MULTIPARTFORM:
+    case RequestContentType.MULTIPART_FORM:
       return {
-        multiPartForm: body as RQAPI.MultipartFormBody,
+        multipartForm: body as RQAPI.MultipartFormBody,
       };
     case RequestContentType.JSON:
       return {
@@ -80,7 +81,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         >
           <Radio value="text">Raw</Radio>
           <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
-          <Radio value={RequestContentType.MULTIPARTFORM}>multipart/form-data</Radio>
+          <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -119,7 +120,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       case RequestContentType.FORM:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
-      case RequestContentType.MULTIPARTFORM:
+      case RequestContentType.MULTIPART_FORM:
         return appMode === "DESKTOP" ? (
           <MultipartFormBodyRenderer environmentVariables={variables} setRequestEntry={setRequestEntry} />
         ) : (
@@ -137,7 +138,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPARTFORM
+      {contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM
         ? requestBodyOptions
         : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>

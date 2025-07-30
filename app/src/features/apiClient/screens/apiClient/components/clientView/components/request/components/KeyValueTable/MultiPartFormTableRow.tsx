@@ -8,7 +8,7 @@ import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFile
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { FormDropDownOptions, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
-import DropdownFile from "./DropdownFileCard";
+import FileDropdown from "./FileDropdown";
 import { EnvironmentVariables } from "backend/environment/types";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
@@ -49,7 +49,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
   checkInvalidCharacter,
   ...restProps
 }) => {
-  const { addFile, removeFile } = useApiClientFileStore((state) => state);
+  const [addFile, removeFile] = useApiClientFileStore((state) => [state.addFile, state.removeFile]);
   const form = useContext(EditableContext);
 
   const save = async () => {
@@ -63,6 +63,59 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
   if (!editable) {
     return <td {...restProps}>{children}</td>;
   }
+
+  const handleFileSelection = (files: { name: string; path: string; size: number }[], shouldAppend = false) => {
+    const selectedFiles = files.map(({ name, path, size }) => {
+      const fileId = name + "-" + Date.now();
+      addFile(fileId, {
+        name,
+        path,
+        size,
+        source: "desktop",
+        isFileValid: true,
+      });
+
+      return {
+        id: fileId,
+        name,
+        path,
+        size,
+        source: "desktop",
+      };
+    });
+
+    let updatedFiles;
+    if (shouldAppend) {
+      const existingFiles: any[] = Array.isArray(record.value) ? record.value : [];
+      updatedFiles = [...existingFiles, ...selectedFiles];
+    } else {
+      updatedFiles = selectedFiles;
+    }
+
+    form.setFieldsValue({ [dataIndex]: updatedFiles });
+    save();
+  };
+
+  const handleSelectFiles = () => {
+    displayMultiFileSelector((files: { name: string; path: string; size: number }[]) =>
+      handleFileSelection(files, false)
+    );
+  };
+
+  const handleAddMoreFiles = () => {
+    displayMultiFileSelector((files: { name: string; path: string; size: number }[]) =>
+      handleFileSelection(files, true)
+    );
+  };
+
+  const handleDeleteFile = (fileId: string) => {
+    removeFile(fileId);
+    const currentFiles: any[] = Array.isArray(record.value) ? record.value : [];
+    const remainingFiles = currentFiles.filter((file) => file.id !== fileId);
+
+    form.setFieldsValue({ [dataIndex]: remainingFiles });
+    save();
+  };
 
   return (
     <td {...restProps}>
@@ -143,77 +196,16 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
             </Conditional>
 
             {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length === 0 && (
-              <RQButton
-                className="key-value-table-file-button"
-                onClick={() => {
-                  displayMultiFileSelector((files: { name: string; path: string; size: number }[]) => {
-                    const selectedFiles = files.map(({ name, path, size }) => {
-                      const fileId = name + "-" + Date.now();
-
-                      addFile(fileId, {
-                        name,
-                        path,
-                        size,
-                        source: "desktop",
-                        isFileValid: true,
-                      });
-
-                      return {
-                        id: fileId,
-                        name,
-                        path,
-                        size,
-                        source: "desktop",
-                      };
-                    });
-                    form.setFieldsValue({ [dataIndex]: selectedFiles });
-                    save();
-                  });
-                }}
-              >
+              <RQButton className="key-value-table-file-button" onClick={handleSelectFiles}>
                 Select Files
               </RQButton>
             )}
 
             {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length > 0 && (
-              <DropdownFile
+              <FileDropdown
                 MultipartFormEntry={record}
-                onAddMoreFiles={() => {
-                  displayMultiFileSelector((files: { name: string; path: string; size: number }[]) => {
-                    const newSelectedFiles = files.map(({ name, path, size }) => {
-                      const fileId = name + "-" + Date.now();
-
-                      addFile(fileId, {
-                        name,
-                        path,
-                        size,
-                        source: "desktop",
-                        isFileValid: true,
-                      });
-
-                      return {
-                        id: fileId,
-                        name,
-                        path,
-                        size,
-                        source: "desktop",
-                      };
-                    });
-
-                    const existingFiles: any[] = Array.isArray(record.value) ? record.value : [];
-                    const updatedFiles = [...existingFiles, ...newSelectedFiles];
-                    form.setFieldsValue({ [dataIndex]: updatedFiles });
-                    save();
-                  });
-                }}
-                onDeleteFile={(fileId: string) => {
-                  removeFile(fileId);
-                  const currentFiles: any[] = Array.isArray(record.value) ? record.value : [];
-                  const remainingFiles = currentFiles.filter((file) => file.id !== fileId);
-
-                  form.setFieldsValue({ [dataIndex]: remainingFiles });
-                  save();
-                }}
+                onAddMoreFiles={handleAddMoreFiles}
+                onDeleteFile={handleDeleteFile}
               />
             )}
           </div>

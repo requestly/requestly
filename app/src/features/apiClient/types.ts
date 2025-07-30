@@ -27,7 +27,7 @@ export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
-  MULTIPARTFORM = "multipart/form-data",
+  MULTIPART_FORM = "multipart/form-data",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
@@ -119,7 +119,7 @@ export namespace RQAPI {
   export type RequestBodyContainer = {
     text?: string;
     form?: KeyValuePair[];
-    multiPartForm?: FormDataKeyValuePair[];
+    multipartForm?: FormDataKeyValuePair[];
   };
 
   export type Auth = {

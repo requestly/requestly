@@ -1,41 +1,42 @@
 import React from "react";
-import { DownOutlined } from "@ant-design/icons";
+import { FaAngleDown } from "@react-icons/all-files/fa/FaAngleDown";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { Dropdown } from "antd";
 import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFileStore.hook";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { FaRegFileLines } from "@react-icons/all-files/fa6/FaRegFileLines";
 import { BiError } from "@react-icons/all-files/bi/BiError";
-import "./DropdownFileCard.scss";
+import "./FileDropdown.scss";
 import { formatBytes, truncateString } from "features/apiClient/screens/apiClient/utils";
 import InfoIcon from "components/misc/InfoIcon";
 import { RQAPI } from "features/apiClient/types";
+import { HUNDERED_MB_IN_BYTE } from "features/apiClient/constants";
 
-interface DropdownFileProps {
+interface FileDropdownProps {
   MultipartFormEntry: RQAPI.FormDataKeyValuePair;
   onAddMoreFiles: () => void;
   onDeleteFile: (fileId: string) => void;
 }
 
-const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFile, MultipartFormEntry }) => {
-  const { getFilesByIds } = useApiClientFileStore((state) => state);
-  const MultipartFormFileIds = Array.isArray(MultipartFormEntry.value)
+const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFile, MultipartFormEntry }) => {
+  const getFilesByIds = useApiClientFileStore((state) => state.getFilesByIds);
+  const multipartFormFileIds = Array.isArray(MultipartFormEntry.value)
     ? MultipartFormEntry.value.map((file) => file.id)
     : [];
 
-  const filesFromStore = getFilesByIds(MultipartFormFileIds);
+  const filesFromStore = getFilesByIds(multipartFormFileIds);
 
   if (filesFromStore.length === 0) {
     return null;
   }
 
   //Filter the files that are larger than 100MB
-  const largeFiles = filesFromStore.filter((file) => file.size >= 104857600);
+  const largeFiles = filesFromStore.filter((file) => file.size >= HUNDERED_MB_IN_BYTE);
   const hasLargeFiles = largeFiles.length > 0;
   const hasMultipleLargeFiles = largeFiles.length > 1;
 
   const getDropDownItems = () => {
-    const FileSeperator = filesFromStore.map((file) => ({
+    const fileSeperator = filesFromStore.map((file) => ({
       key: file.id,
       label: (
         <div className="file-dropdown-item-container">
@@ -50,11 +51,6 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
             <span className="file-size">{formatBytes(file.size)}</span>
             <RQButton
               className="file-dropdown-remove-button"
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                marginBottom: "4px",
-              }}
               icon={<RiDeleteBinLine />}
               size="small"
               onClick={() => {
@@ -84,7 +80,7 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
         ),
       },
     ];
-    return [...FileSeperator, ...addMoreSeperator];
+    return [...fileSeperator, ...addMoreSeperator];
   };
 
   return (
@@ -118,7 +114,7 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
             {truncateString(filesFromStore[0].name, 15)}
           </span>
           <span className="file-counter">{filesFromStore.length > 1 && ` +${filesFromStore.length - 1}`}</span>
-          <DownOutlined className="down-outlined-icon" />
+          <FaAngleDown className="down-outlined-icon" />
         </RQButton>
       </Dropdown>
 
@@ -126,8 +122,8 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
         <InfoIcon
           text={
             hasMultipleLargeFiles
-              ? `Multiple files are larger than 100MB and may take longer to send request and get the response.`
-              : "This file size is over 100 MB and may take longer to send request and get the response."
+              ? `Multiple files are larger than 100 MB and may take longer to send request and get the response.`
+              : "This file size is over 100 MB and may take longer to send request and get the response."
           }
           showArrow={false}
           style={{
@@ -143,4 +139,4 @@ const DropdownFile: React.FC<DropdownFileProps> = ({ onAddMoreFiles, onDeleteFil
   );
 };
 
-export default DropdownFile;
+export default FileDropdown;

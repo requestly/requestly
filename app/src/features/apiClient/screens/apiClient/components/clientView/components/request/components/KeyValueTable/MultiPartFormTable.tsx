@@ -19,7 +19,7 @@ interface KeyValueTableProps {
   variables: EnvironmentVariables;
 }
 
-export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
+export const MultipartFormTable: React.FC<KeyValueTableProps> = ({
   data,
   onChange,
   variables,
@@ -37,30 +37,28 @@ export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
 
   const memoizedData = useMemo(() => (data.length ? data : [createEmptyPair()]), [createEmptyPair, data]);
 
-  const { removeFile } = useApiClientFileStore((state) => state);
+  const removeFile = useApiClientFileStore((state) => state.removeFile);
 
   const handleUpdateRequestPairs = useCallback(
     (pair: RQAPI.FormDataKeyValuePair, action: "add" | "remove" | "update") => {
-      let FormDataKeyValuePairs = [...memoizedData];
+      let existingPairs = [...memoizedData];
       if (pair) {
         switch (action) {
           case "add":
-            FormDataKeyValuePairs.push(pair);
+            existingPairs.push(pair);
             break;
           case "update": {
-            const index = FormDataKeyValuePairs.findIndex((item: RQAPI.FormDataKeyValuePair) => item.id === pair.id);
+            const index = existingPairs.findIndex((item: RQAPI.FormDataKeyValuePair) => item.id === pair.id);
             if (index !== -1) {
-              FormDataKeyValuePairs.splice(index, 1, {
-                ...FormDataKeyValuePairs[index],
+              existingPairs.splice(index, 1, {
+                ...existingPairs[index],
                 ...pair,
               });
             }
             break;
           }
           case "remove": {
-            FormDataKeyValuePairs = FormDataKeyValuePairs.filter(
-              (item: RQAPI.FormDataKeyValuePair) => item.id !== pair.id
-            );
+            existingPairs = existingPairs.filter((item: RQAPI.FormDataKeyValuePair) => item.id !== pair.id);
             break;
           }
           default:
@@ -68,7 +66,7 @@ export const MultiPartFormTable: React.FC<KeyValueTableProps> = ({
         }
       }
 
-      onChange(FormDataKeyValuePairs);
+      onChange(existingPairs);
     },
     [memoizedData, onChange]
   );

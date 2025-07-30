@@ -1,8 +1,8 @@
 import react, { useCallback, useContext } from "react";
 import { RequestBodyProps } from "../request-body-types";
 import { RQAPI } from "features/apiClient/types";
-import { RequestBodyContext, useMultiPartFormBody } from "../request-body-state-manager";
-import { MultiPartFormTable } from "../components/KeyValueTable/MultiPartFormTable";
+import { RequestBodyContext, useMultipartFormBody } from "../request-body-state-manager";
+import { MultipartFormTable } from "../components/KeyValueTable/MultiPartFormTable";
 import { EnvironmentVariables } from "backend/environment/types";
 
 export const MultipartFormBodyRenderer: react.FC<{
@@ -10,7 +10,7 @@ export const MultipartFormBodyRenderer: react.FC<{
   environmentVariables: EnvironmentVariables;
 }> = ({ setRequestEntry, environmentVariables }) => {
   const { requestBodyStateManager } = useContext(RequestBodyContext);
-  const { multiPartForm, setMultiPartForm } = useMultiPartFormBody(requestBodyStateManager);
+  const { multiPartForm, setMultiPartForm } = useMultipartFormBody(requestBodyStateManager);
 
   const handleMultiPartFormChange = useCallback(
     (updatedPairs: RQAPI.FormDataKeyValuePair[]) => {
@@ -30,6 +30,6 @@ export const MultipartFormBodyRenderer: react.FC<{
   );
 
   return (
-    <MultiPartFormTable data={multiPartForm} variables={environmentVariables} onChange={handleMultiPartFormChange} />
+    <MultipartFormTable data={multiPartForm} variables={environmentVariables} onChange={handleMultiPartFormChange} />
   );
 };
