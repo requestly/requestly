@@ -27,10 +27,10 @@ export const GraphQLClientView = ({ notifyApiRequestFinished, onSaveCallback, is
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(collectionId), [
-    collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(collectionId),
+    [collectionId, getVariablesWithPrecedence]
+  );
 
   const handleUrlChange = useCallback(
     (value: string) => {
