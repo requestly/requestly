@@ -4,15 +4,13 @@ import { sampleCmd1, sampleCmd2, sampleCmd3, sampleCmd4, sampleCmd5 } from "./sa
 import { bindCommands } from "./bindCommands";
 
 const commands = {
-  // just a sample
+  // strucutre for commands to be added
   env: {
-    something: {
-      cmd1: sampleCmd1,
-    },
+    cmd1: sampleCmd1,
     cmd2: sampleCmd2,
   },
-  cmd3: sampleCmd3,
   records: {
+    cmd3: sampleCmd3,
     cmd4: sampleCmd4,
     cmd5: sampleCmd5,
   },
