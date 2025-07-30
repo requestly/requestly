@@ -6,7 +6,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../..
 import RequestTabs from "../components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
-  getEmptyAPIEntry,
+  getEmptyApiEntry,
   getEmptyPair,
   getRequestTypeForAnalyticEvent,
   parseRequestEntry,
@@ -31,6 +31,7 @@ import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONTENT_TYPE_HEADER } from "../../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
+import "./httpClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
@@ -131,7 +132,9 @@ const HttpClientView: React.FC<Props> = ({
 
   const { version } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
+    apiEntryDetails?.data ?? getEmptyApiEntry(RQAPI.ApiEntryType.HTTP)
+  );
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -168,7 +171,7 @@ const HttpClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+    setEntry(apiEntryDetails?.data ?? getEmptyApiEntry(RQAPI.ApiEntryType.HTTP));
   }, [apiEntryDetails?.data]);
 
   useLayoutEffect(() => {
