@@ -7,10 +7,6 @@ export const renameEnvironment = async (
   const { repositories, stores } = ctx;
   const { environmentId, newName } = params;
 
-  try {
-    await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { name: newName });
-    stores.environments.getState().update(environmentId, { name: newName });
-  } catch (err) {
-    throw new Error(err);
-  }
+  await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { name: newName });
+  stores.environments.getState().update(environmentId, { name: newName });
 };
