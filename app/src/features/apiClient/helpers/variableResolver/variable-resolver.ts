@@ -20,8 +20,17 @@ type VariableSource = {
 export type ScopedVariable = [EnvironmentVariableValue, VariableSource];
 export type ScopedVariables = Map<EnvironmentVariableKey, ScopedVariable>;
 type Scope = [VariableSource, StoreApi<VariablesState>];
+
+/**
+ * This class is used to maintains and store variables, keeping in check that scopes that are higher in chain
+ * DO NO overwrite variables from scopes lower in chain.
+ *
+ * For example, if a collection has a variable 'baseUrl' and so does the active enviroment then this class will
+ * not allow the collection to overwrite and will make sure that there's only one instance of 'baseUrl' and that
+ * it is coming from the active environment.
+ */
 export class VariableHolder {
-  private data: ScopedVariables;
+  private data: ScopedVariables = new Map();
   private isDestroyed = false;
 
   add(params: { key: EnvironmentVariableKey; value: EnvironmentVariableValue; variableSource: VariableSource }) {
@@ -72,18 +81,7 @@ function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
     ]);
   }
 
-  //2. Global Environment
-  scopes.push([
-    {
-      scope: VariableScope.GLOBAL,
-      scopeId: globalEnvironment.id,
-      name: globalEnvironment.name,
-      level: currentScopeLevel++,
-    },
-    globalEnvironment.data.variables,
-  ]);
-
-  //3. Collection Variables
+  //2. Collection Variables
   for (const parent of parents) {
     const recordState = getRecordStore(parent)?.getState();
     if (!recordState) {
@@ -102,16 +100,27 @@ function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
     }
   }
 
+  //3. Global Environment
+  scopes.push([
+    {
+      scope: VariableScope.GLOBAL,
+      scopeId: globalEnvironment.id,
+      name: globalEnvironment.name,
+      level: currentScopeLevel++,
+    },
+    globalEnvironment.data.variables,
+  ]);
+
   return scopes;
 }
 
-function readScopes(
+function readScopesIntoVariableHolder(
   params: {
     parents: string[];
     scopes?: Scope[];
   },
   stores: AllApiClientStores,
-  variableHolder = new VariableHolder()
+  variableHolder: VariableHolder
 ) {
   const { parents } = params;
   const scopes = params.scopes || getScopes(parents, stores);
@@ -129,7 +138,7 @@ function readScopes(
 export namespace VariableResolver {
   export function getScopedVariables(parents: string[], stores: AllApiClientStores) {
     const variableHolder = new VariableHolder();
-    readScopes(
+    readScopesIntoVariableHolder(
       {
         parents,
       },
@@ -157,7 +166,7 @@ export namespace VariableResolver {
 
     const scopes = useMemo(() => getScopes(parents, stores), [parents, stores]);
 
-    readScopes(
+    readScopesIntoVariableHolder(
       {
         parents,
         scopes,
