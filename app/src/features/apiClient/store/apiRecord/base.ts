@@ -8,6 +8,7 @@ export type BaseApiRecordStoreState<T extends RQAPI.ApiRecord = RQAPI.ApiRecord,
   updateRecordResponse: (response: T["data"]["response"]) => void;
   updateRecordAuth: (auth: RQAPI.Auth) => void;
   updateRecordScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => void;
+  getRecord: () => T;
 } & TAdditionalData;
 
 // type setType<T extends RQAPI.ApiRecord> = ReturnType<typeof create<BaseApiRecordStoreState<T, {}>>> extends (
@@ -58,5 +59,6 @@ export const createBaseApiRecordState = <T extends RQAPI.ApiRecord>(
         record: { ...record, name },
       });
     },
+    getRecord: () => get().record,
   };
 };
