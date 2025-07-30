@@ -1,5 +1,6 @@
 import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
 import { ApiClientFeatureContext } from "./types";
+import { NativeError } from "errors/NativeError";
 
 export const setEnvironmentVariables = async (
   ctx: ApiClientFeatureContext,
@@ -11,7 +12,7 @@ export const setEnvironmentVariables = async (
   const env = stores.environments.getState().getEnvironment(environmentId);
 
   if (!env) {
-    throw new Error("Environment not found! ");
+    throw new NativeError("Environment not found!").addContext({ environmentId });
   }
 
   const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
