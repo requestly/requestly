@@ -31,8 +31,8 @@ interface Props {
 }
 
 enum DropdownOption {
-  HTTP = "http",
-  GRAPHQL = "graphql",
+  HTTP_REQUEST = "http_request",
+  GRAPHQL_REQUEST = "graphql_request",
   COLLECTION = "collection",
   ENVIRONMENT = "environment",
 }
@@ -106,7 +106,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
 
   const items: DropdownProps["menu"]["items"] = [
     {
-      key: DropdownOption.HTTP,
+      key: DropdownOption.HTTP_REQUEST,
       label: (
         <div className="new-btn-option">
           <MdOutlineSyncAlt />
@@ -118,7 +118,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
     },
     {
-      key: DropdownOption.GRAPHQL,
+      key: DropdownOption.GRAPHQL_REQUEST,
       label: (
         <div className="new-btn-option">
           <GrGraphQl />
