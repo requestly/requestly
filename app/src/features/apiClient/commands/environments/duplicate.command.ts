@@ -7,29 +7,22 @@ export const duplicateEnvironment = async (ctx: ApiClientFeatureContext, params:
   const { repositories, stores } = ctx;
   const { environmentId } = params;
 
-  try {
-    const envsMap: EnvironmentMap = {};
-    stores.environments
-      .getState()
-      .getAll()
-      .forEach((value) => {
-        envsMap[value.id] = _environmentDataAdapter(
-          stores.environments.getState().getEnvironment(value.id) as Environment
-        );
-      });
+  const envsMap: EnvironmentMap = {};
+  stores.environments
+    .getState()
+    .getAll()
+    .forEach((value) => {
+      envsMap[value.id] = _environmentDataAdapter(
+        stores.environments.getState().getEnvironment(value.id) as Environment
+      );
+    });
 
-    const newEnvironment = await repositories.environmentVariablesRepository.duplicateEnvironment(
-      environmentId,
-      envsMap
-    );
+  const newEnvironment = await repositories.environmentVariablesRepository.duplicateEnvironment(environmentId, envsMap);
 
-    stores.environments.getState().create({ id: newEnvironment.id, name: newEnvironment.name });
-    stores.environments
-      .getState()
-      .getEnvironment(newEnvironment.id)!
-      .data.variables.getState()
-      .mergeAndUpdate(newEnvironment.variables);
-  } catch (err) {
-    throw new Error(err);
-  }
+  stores.environments.getState().create({ id: newEnvironment.id, name: newEnvironment.name });
+  stores.environments
+    .getState()
+    .getEnvironment(newEnvironment.id)!
+    .data.variables.getState()
+    .mergeAndUpdate(newEnvironment.variables);
 };
