@@ -196,16 +196,18 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
               </div>
             </Conditional>
 
-            {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length === 0 && (
-              <RQButton
-                size="small"
-                type="secondary"
-                className="key-value-table-file-button"
-                onClick={handleSelectFiles}
-              >
-                Select Files
-              </RQButton>
-            )}
+            {dataIndex === "value" &&
+              record?.type === FormDropDownOptions.FILE &&
+              (!Array.isArray(record.value) || record.value.length === 0) && (
+                <RQButton
+                  size="small"
+                  type="secondary"
+                  className="key-value-table-file-button"
+                  onClick={handleSelectFiles}
+                >
+                  Select Files
+                </RQButton>
+              )}
 
             {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length > 0 && (
               <FileDropdown
