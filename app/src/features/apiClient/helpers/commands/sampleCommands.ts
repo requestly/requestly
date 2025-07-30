@@ -8,7 +8,6 @@ export const sampleCmd1 = (ctx: ApiClientFeatureContext, arg1: number) => {
 export const sampleCmd2 = (ctx: ApiClientFeatureContext, arg1: boolean, arg2: boolean) => {
   console.log("sampleCmd2 ctx", ctx);
   console.log("sampleCmd2 arg1", arg1);
-  console.log("sampleCmd2 arg2", arg2);
   return arg2;
 };
 
@@ -23,7 +22,5 @@ export const sampleCmd4 = (ctx: ApiClientFeatureContext, arg1: object) => {
 };
 
 export const sampleCmd5 = (ctx: ApiClientFeatureContext, arg1: any[], arg2: string) => {
-  console.log("sampleCmd5 ctx", ctx);
-  console.log("sampleCmd5 arg1", arg1);
-  console.log("sampleCmd5 arg2", arg2);
+  return { ctx, arg1, arg2 };
 };
