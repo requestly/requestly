@@ -21,6 +21,10 @@
       align-items: center;
       gap: 8px;
 
+      .file-icon {
+        font-size: 12px;
+      }
+
       .file-icon,
       .invalid-icon {
         flex-shrink: 0;
@@ -36,6 +40,7 @@
         text-overflow: ellipsis;
         max-width: 180px;
         white-space: nowrap;
+        font-size: 12px;
 
         &.file-invalid {
           color: var(--requestly-color-error-soft);
