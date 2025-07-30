@@ -128,10 +128,10 @@ const HttpClientView: React.FC<Props> = ({
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
+    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
+  );
 
   const { version } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
