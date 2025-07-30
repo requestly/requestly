@@ -21,23 +21,23 @@ import { debounce } from "lodash";
 import { variablesActions } from "store/features/variables/slice";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { DraftRequestContainerTabSource } from "../screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RequestViewTabSource } from "../screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
-import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
+import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
+import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
 
 interface ApiClientContextInterface {
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => void;
-  onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
-  recordsToBeDeleted: RQAPI.Record[];
-  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.Record[]) => void;
+  onSaveRecord: (apiClientRecord: RQAPI.ApiClientRecord, onSaveTabAction?: "open") => void;
+  onSaveBulkRecords: (apiClientRecords: RQAPI.ApiClientRecord[]) => void;
+  recordsToBeDeleted: RQAPI.ApiClientRecord[];
+  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.ApiClientRecord[]) => void;
   isDeleteModalOpen: boolean;
   setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteModalClose: () => void;
 
-  history: RQAPI.Entry[];
-  addToHistory: (apiEntry: RQAPI.Entry) => void;
+  history: RQAPI.ApiEntry[];
+  addToHistory: (apiEntry: RQAPI.ApiEntry) => void;
   clearHistory: () => void;
 
   isRecordBeingCreated: RQAPI.RecordType | null;
@@ -59,15 +59,15 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => {},
-  onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => {},
+  onSaveRecord: (apiClientRecord: RQAPI.ApiClientRecord, onSaveTabAction?: "open") => {},
+  onSaveBulkRecords: (apiClientRecords: RQAPI.ApiClientRecord[]) => {},
   recordsToBeDeleted: null,
-  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.Record[]) => {},
+  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.ApiClientRecord[]) => {},
   isDeleteModalOpen: false,
   setIsDeleteModalOpen: () => {},
   onDeleteModalClose: () => {},
   history: [],
-  addToHistory: (apiEntry: RQAPI.Entry) => {},
+  addToHistory: (apiEntry: RQAPI.ApiEntry) => {},
   clearHistory: () => {},
 
   isRecordBeingCreated: null,
@@ -94,7 +94,7 @@ interface ApiClientProviderProps {
   repository: ApiClientRecordsInterface<Record<any, any>>;
 }
 
-const trackUserProperties = (records: RQAPI.Record[]) => {
+const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
   const totalCollections = records.filter((record) => isApiCollection(record)).length;
   const totalRequests = records.length - totalCollections;
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
@@ -105,19 +105,26 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   const dispatch = useDispatch();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, addNewRecord, updateRecord, updateRecords, refreshRecords, setErroredRecords, getData] =
-    useAPIRecords((state) => [
-      state.apiClientRecords,
-      state.addNewRecord,
-      state.updateRecord,
-      state.updateRecords,
-      state.refresh,
-      state.setErroredRecords,
-      state.getData,
-    ]);
+  const [
+    apiClientRecords,
+    addNewRecord,
+    updateRecord,
+    updateRecords,
+    refreshRecords,
+    setErroredRecords,
+    getData,
+  ] = useAPIRecords((state) => [
+    state.apiClientRecords,
+    state.addNewRecord,
+    state.updateRecord,
+    state.updateRecords,
+    state.refresh,
+    state.setErroredRecords,
+    state.getData,
+  ]);
 
-  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
-  const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
+  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.ApiClientRecord[]>();
+  const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -140,7 +147,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   }, [apiClientRecords, debouncedTrackUserProperties]);
 
   const onSaveBulkRecords = useCallback(
-    (records: RQAPI.Record[]) => {
+    (records: RQAPI.ApiClientRecord[]) => {
       updateRecords(records);
     },
     [updateRecords]
@@ -181,7 +188,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     [getData, updateRecord, addNewRecord, openTab]
   );
 
-  const updateRecordsToBeDeleted = useCallback((record: RQAPI.Record[]) => {
+  const updateRecordsToBeDeleted = useCallback((record: RQAPI.ApiClientRecord[]) => {
     setRecordsToBeDeleted(record);
   }, []);
 
@@ -190,7 +197,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     setRecordsToBeDeleted(null);
   }, []);
 
-  const addToHistory = useCallback((apiEntry: RQAPI.Entry) => {
+  const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     setHistory((history) => [...history, apiEntry]);
     addToHistoryInStore(apiEntry);
   }, []);

@@ -1,4 +1,4 @@
-import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { RQAPI } from "./types";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";

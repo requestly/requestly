@@ -4,6 +4,8 @@ import { RequestView } from "./RequestView";
 import { RQAPI } from "features/apiClient/types";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
+import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
+import { ReactNode } from "react";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -20,7 +22,7 @@ export class RequestViewTabSource extends BaseTabSource {
       name: "request",
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
-    this.icon = <MdOutlineSyncAlt />;
+    this.icon = this.getTabIcon(metadata.apiEntryDetails?.entryType);
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
@@ -31,5 +33,16 @@ export class RequestViewTabSource extends BaseTabSource {
     }
 
     return new RequestViewTabSource({ id: requestId, title: "Request" });
+  }
+
+  private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
+    switch (type) {
+      case RQAPI.ApiEntryType.GRAPHQL:
+        return <MdOutlineSyncAlt />;
+      case RQAPI.ApiEntryType.HTTP:
+        return <GrGraphQl />;
+      default:
+        return <MdOutlineSyncAlt />;
+    }
   }
 }

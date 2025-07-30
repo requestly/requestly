@@ -20,7 +20,7 @@ import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
+import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
 import { useDrag, useDrop } from "react-dnd";
 import "./CollectionRow.scss";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
