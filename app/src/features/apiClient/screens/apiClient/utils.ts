@@ -2,7 +2,12 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { AbortReason, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
+import {
+  CONTENT_TYPE_HEADER,
+  DEMO_API_URL,
+  HUNDERED_MB_IN_BYTE,
+  SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
+} from "../../constants";
 import * as curlconverter from "curlconverter";
 import { forEach, omit, split } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
@@ -642,7 +647,7 @@ export const truncateString = (str: string, maxLength: number) => {
 };
 
 export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
-  const LARGE_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+  const LARGE_FILE_SIZE = HUNDERED_MB_IN_BYTE;
 
   if (Array.isArray(body)) {
     return body.some((item: any) => {

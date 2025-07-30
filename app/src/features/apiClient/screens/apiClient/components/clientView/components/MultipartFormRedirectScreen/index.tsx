@@ -1,7 +1,7 @@
 import { RQButton } from "lib/design-system-v2/components";
 import React from "react";
 import "./index.scss";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 
 const MultipartFormRedirectScreen: React.FC = () => {
@@ -9,7 +9,7 @@ const MultipartFormRedirectScreen: React.FC = () => {
     <div className="multipart-form-redirect-screen-container">
       <div className="multipart-form-redirect-screen-empty-state">
         <img
-          src="/assets/media/apiClient/Capa_1.svg"
+          src="/assets/media/apiClient/download-desktop.svg"
           alt="Not supported in web version"
           style={{
             width: "48px",
@@ -18,9 +18,9 @@ const MultipartFormRedirectScreen: React.FC = () => {
         />
         <div className="multipart-form-redirect-screen-content">
           <div className="multipart-form-redirect-info-container">
-            <InfoCircleOutlined
+            <MdOutlineInfo
               style={{
-                marginTop: "3px",
+                marginTop: "2px",
                 width: "16px",
                 height: "16px",
               }}
@@ -57,6 +57,7 @@ const MultipartFormRedirectScreen: React.FC = () => {
         <RQButton
           onClick={() => trackDesktopAppPromoClicked("multipart_forms_data", "web_app")}
           href="https://requestly.com/downloads/desktop/"
+          target="_blank"
         >
           Download Requestly
         </RQButton>

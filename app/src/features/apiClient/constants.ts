@@ -77,3 +77,5 @@ export const INVALID_KEY_CHARACTERS = /^(?!\{\{.*\}\}|^\{\{?$|^\}\}?$)[^!#$%&'*+
 export enum Headers {
   CONTENT_TYPE = "Content-Type",
 }
+
+export const HUNDERED_MB_IN_BYTE = 104857600;
