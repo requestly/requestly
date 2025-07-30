@@ -10,6 +10,8 @@ import { MultipartFormBodyRenderer } from "./renderers/multipart-form-body-rende
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import MultipartFormRedirectScreen from "../MultipartFormRedirectScreen";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 function parseSingleModeBody(params: {
   contentType: RequestContentType;

@@ -7,27 +7,29 @@
   border: 1px solid var(--requestly-color-white-t-20);
   background-color: var(--requestly-color-surface-0);
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden;
+
+  .file-list-scroll-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    padding-right: 4px;
+  }
 
   .file-dropdown-item-container {
     display: flex;
     justify-content: space-between;
-    flex-wrap: nowrap;
-    width: 300px;
     gap: 12px;
+    padding: 6px 0;
 
     .file-info {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       gap: 8px;
 
-      .file-icon,
-      .invalid-icon {
+      .file-icon .invalid-icon {
         flex-shrink: 0;
-        color: inherit;
+        width: 13px;
+        height: 13px;
       }
 
       .invalid-icon {
@@ -39,6 +41,7 @@
         text-overflow: ellipsis;
         max-width: 180px;
         white-space: nowrap;
+        font-size: var(--requestly-font-size-sm);
 
         &.file-invalid {
           color: var(--requestly-color-error-soft);
@@ -48,10 +51,8 @@
 
     .file-details {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       gap: 10px;
-      flex-shrink: 0;
 
       .file-size {
         font-size: var(--requestly-font-size-sm);
@@ -62,9 +63,15 @@
       .file-dropdown-remove-button {
         background-color: transparent;
         border: none;
-        margin-bottom: 4px;
       }
     }
+  }
+
+  .add-more-file-container {
+    border-top: 1px solid var(--requestly-color-white-t-20);
+    padding-top: 12px;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .add-more-file-container {

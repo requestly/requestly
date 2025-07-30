@@ -35,64 +35,40 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
   const hasLargeFiles = largeFiles.length > 0;
   const hasMultipleLargeFiles = largeFiles.length > 1;
 
-  const getDropDownItems = () => {
-    const fileSeperator = filesFromStore.map((file) => ({
-      key: file.id,
-      label: (
-        <div className="file-dropdown-item-container">
-          <div className="file-info">
-            {file.isFileValid ? <FaRegFileLines className="file-icon" /> : <BiError className="invalid-icon" />}
-
-            <span className={`file-name ${file.isFileValid ? "" : "file-invalid"}`} title={file.name}>
-              {truncateString(file.name, 150)}
-            </span>
+  const DropdownContent = () => (
+    <div className="key-value-table-file-dropdown">
+      <div className="file-list-scroll-container">
+        {filesFromStore.map((file) => (
+          <div className="file-dropdown-item-container" key={file.id}>
+            <div className="file-info">
+              {file.isFileValid ? <FaRegFileLines className="file-icon" /> : <BiError className="invalid-icon" />}
+              <span className={`file-name ${file.isFileValid ? "" : "file-invalid"}`} title={file.name}>
+                {truncateString(file.name, 150)}
+              </span>
+            </div>
+            <div className="file-details">
+              <span className="file-size">{formatBytes(file.size)}</span>
+              <RQButton
+                className="file-dropdown-remove-button"
+                icon={<RiDeleteBinLine />}
+                size="small"
+                onClick={() => onDeleteFile(file.id)}
+              />
+            </div>
           </div>
-          <div className="file-details">
-            <span className="file-size">{formatBytes(file.size)}</span>
-            <RQButton
-              className="file-dropdown-remove-button"
-              icon={<RiDeleteBinLine />}
-              size="small"
-              onClick={() => {
-                onDeleteFile(file.id);
-              }}
-            />
-          </div>
-        </div>
-      ),
-    }));
-
-    const addMoreSeperator = [
-      {
-        key: "add-more",
-        label: (
-          <div className="add-more-file-container">
-            <RQButton
-              className="file-dropdown-add-button"
-              size="small"
-              onClick={() => {
-                onAddMoreFiles();
-              }}
-            >
-              + Add more files
-            </RQButton>
-          </div>
-        ),
-      },
-    ];
-    return [...fileSeperator, ...addMoreSeperator];
-  };
+        ))}
+      </div>
+      <div className="add-more-file-container">
+        <RQButton className="file-dropdown-add-button" size="small" onClick={onAddMoreFiles}>
+          + Add more files
+        </RQButton>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      <Dropdown
-        menu={{
-          items: getDropDownItems(),
-          className: "key-value-table-file-dropdown",
-        }}
-        placement="bottomLeft"
-        trigger={["click"]}
-      >
+      <Dropdown dropdownRender={DropdownContent} placement="bottomLeft" trigger={["click"]}>
         <RQButton size="small" className="key-value-table-file-button">
           {filesFromStore[0].isFileValid ? (
             <FaRegFileLines className="bin-icon" />
