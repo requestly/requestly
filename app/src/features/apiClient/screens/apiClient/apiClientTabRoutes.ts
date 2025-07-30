@@ -1,10 +1,10 @@
 import PATHS from "config/constants/sub/paths";
 import { TabRoute } from "componentsV2/Tabs/types";
-import { DraftRequestContainerTabSource } from "./components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RequestViewTabSource } from "./components/clientView/components/RequestView/requestViewTabSource";
-import { CollectionViewTabSource } from "./components/clientView/components/Collection/collectionViewTabSource";
+import { DraftRequestContainerTabSource } from "./components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { RequestViewTabSource } from "./components/views/components/RequestView/requestViewTabSource";
+import { CollectionViewTabSource } from "./components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../environment/components/environmentView/EnvironmentViewTabSource";
-import { HistoryViewTabSource } from "./components/clientView/components/request/HistoryView/historyViewTabSource";
+import { HistoryViewTabSource } from "./components/views/components/request/HistoryView/historyViewTabSource";
 
 export const apiClientTabRoutes: TabRoute[] = [
   {
