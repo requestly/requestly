@@ -8,8 +8,8 @@ export type GraphQLRecordState = BaseApiRecordStoreState<RQAPI.GraphQLApiRecord>
 };
 
 export function createGraphQLRecordStore(record: RQAPI.GraphQLApiRecord) {
-  return create<GraphQLRecordState>()((set) => ({
+  return create<GraphQLRecordState>()((set, get) => ({
     schema: null,
-    ...createBaseApiRecordState(record, set),
+    ...createBaseApiRecordState(record, set, get),
   }));
 }
