@@ -6,7 +6,7 @@ import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../..
 import RequestTabs from "../components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
-  getEmptyAPIEntry,
+  getEmptyApiEntry,
   getEmptyPair,
   getRequestTypeForAnalyticEvent,
   parseRequestEntry,
@@ -52,7 +52,6 @@ import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
 import PATHS from "config/constants/sub/paths";
 import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
-import { ApiClientUrl } from "../components/request/components/ApiClientUrl/ApiClientUrl";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../../constants";
@@ -65,6 +64,7 @@ import {
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
+import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -128,14 +128,16 @@ const HttpClientView: React.FC<Props> = ({
     renderVariables,
     environmentSyncRepository,
   } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(apiEntryDetails?.collectionId),
+    [apiEntryDetails?.collectionId, getVariablesWithPrecedence]
+  );
 
   const { version } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
+    apiEntryDetails?.data ?? getEmptyApiEntry(RQAPI.ApiEntryType.HTTP)
+  );
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -173,7 +175,7 @@ const HttpClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+    setEntry(apiEntryDetails?.data ?? getEmptyApiEntry(RQAPI.ApiEntryType.HTTP));
   }, [apiEntryDetails?.data]);
 
   useLayoutEffect(() => {
@@ -771,7 +773,7 @@ const HttpClientView: React.FC<Props> = ({
                 value={entry.request.method}
                 onChange={setMethod}
               />
-              <ApiClientUrl
+              <HttpApiClientUrl
                 url={entry.request.url}
                 onUrlChange={handleOnUrlChange}
                 onEnterPress={onUrlInputEnterPressed}

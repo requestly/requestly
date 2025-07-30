@@ -6,7 +6,7 @@ import {
   filterHeadersToImport,
   generateKeyValuePairs,
   getContentTypeFromRequestHeaders,
-  getEmptyAPIEntry,
+  getEmptyApiEntry,
   parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
@@ -35,10 +35,10 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     }
 
     if (typeof request === "string") {
-      return getEmptyAPIEntry(parseCurlRequest(request));
+      return getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, parseCurlRequest(request));
     }
 
-    const entry: RQAPI.ApiEntry = getEmptyAPIEntry();
+    const entry: RQAPI.ApiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP);
     const urlObj = new URL(request.url);
     const searchParams = Object.fromEntries(new URLSearchParams(urlObj.search));
     urlObj.search = "";
