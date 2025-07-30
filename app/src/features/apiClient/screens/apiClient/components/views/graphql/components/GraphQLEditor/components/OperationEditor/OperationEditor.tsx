@@ -10,6 +10,7 @@ export const OperationEditor = () => {
   return (
     <GraphQLEditor
       type="operation"
+      className="operations-editor"
       // @ts-ignore
       schema={GQ_SCHEMA}
       initialDoc={operation}
