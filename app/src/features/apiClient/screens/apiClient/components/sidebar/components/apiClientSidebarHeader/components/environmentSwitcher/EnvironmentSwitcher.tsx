@@ -2,48 +2,62 @@ import { useMemo } from "react";
 import { Dropdown, Typography } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
 import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
-import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
+import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentSwitcher.scss";
+
+function SwitcherListItemLabel(props: { envId: string }) {
+  const environmentName = useEnvironment(props.envId, (s) => s.name);
+
+  return (
+    <Typography.Text
+      ellipsis={{
+        tooltip: {
+          title: environmentName,
+          placement: "right",
+        },
+      }}
+    >
+      {environmentName}
+    </Typography.Text>
+  );
+}
 
 export const EnvironmentSwitcher = () => {
   const location = useLocation();
-  const { getAllEnvironments, getCurrentEnvironment, setCurrentEnvironment } = useEnvironmentManager();
-  const { currentEnvironmentId, currentEnvironmentName } = getCurrentEnvironment();
-  const environments = getAllEnvironments();
+
+  const [environments, activeEnvironmentStore, setActiveEnvironment] = useAPIEnvironment((s) => [
+    s.environments,
+    s.activeEnvironment,
+    s.setActive,
+  ]);
+
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const dropdownItems = useMemo(() => {
     return environments
-      .filter((env) => !isGlobalEnvironment(env.id))
+      .map((e) => e.getState())
       .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
       .map((environment) => ({
         key: environment.id,
         label: (
-          <div className={`${environment.id === currentEnvironmentId ? "active-env-item" : ""} env-item`}>
-            <Typography.Text
-              ellipsis={{
-                tooltip: {
-                  title: environment.name,
-                  placement: "right",
-                },
-              }}
-            >
-              {environment.name}
-            </Typography.Text>{" "}
-            {environment.id === currentEnvironmentId ? <MdOutlineCheckCircleOutline /> : null}
+          <div
+            className={`${environment.id === activeEnvironmentStore.getState()?.id ? "active-env-item" : ""} env-item`}
+          >
+            <SwitcherListItemLabel envId={environment.id} />
+            {environment.id === activeEnvironmentStore.getState()?.id ? <MdOutlineCheckCircleOutline /> : null}
           </div>
         ),
         onClick: () => {
-          setCurrentEnvironment(environment.id);
+          setActiveEnvironment(environment.id);
           trackEnvironmentSwitched();
           if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
             openTab(
@@ -56,9 +70,9 @@ export const EnvironmentSwitcher = () => {
           toast.success(`Switched to ${environment.name} environment`);
         },
       }));
-  }, [environments, setCurrentEnvironment, currentEnvironmentId, location.pathname, openTab]);
+  }, [environments, activeEnvironmentStore, setActiveEnvironment, location.pathname, openTab]);
 
-  if (environments.length === 0 || (environments.length === 1 && isGlobalEnvironment(environments[0].id))) {
+  if (environments.length === 0) {
     return (
       <div className="no-environment-container">
         <MdHorizontalSplit /> No environment
@@ -69,16 +83,11 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
-        <Typography.Text
-          ellipsis={{
-            tooltip: {
-              title: currentEnvironmentName,
-              placement: "right",
-            },
-          }}
-        >
-          {currentEnvironmentName || "No environment"}
-        </Typography.Text>
+        {activeEnvironmentStore ? (
+          <SwitcherListItemLabel envId={activeEnvironmentStore.getState().id} />
+        ) : (
+          "No environment"
+        )}
         {<RiArrowDropDownLine />}
       </RQButton>
     </Dropdown>

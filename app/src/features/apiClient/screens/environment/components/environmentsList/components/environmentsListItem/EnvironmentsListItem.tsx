@@ -3,10 +3,9 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { IoMdGlobe } from "@react-icons/all-files/io/IoMdGlobe";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { Dropdown, Input, Tooltip, Typography } from "antd";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useCallback, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "utils/Toast";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import {
@@ -16,14 +15,13 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
+import { useCommand } from "features/apiClient/commands";
+import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
-  environment: {
-    id: string;
-    name: string;
-    isGlobal?: boolean;
-  };
+  environmentId: string;
   onExportClick?: (environment: { id: string; name: string }) => void;
 }
 
@@ -36,21 +34,18 @@ export enum EnvironmentMenuKey {
 
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
-  environment,
+  environmentId,
   onExportClick,
 }) => {
-  const { envId } = useParams();
   const {
-    getCurrentEnvironment,
-    renameEnvironment,
-    duplicateEnvironment,
-    deleteEnvironment,
-    getAllEnvironments,
-    setCurrentEnvironment,
-  } = useEnvironmentManager();
-  const allEnvironments = getAllEnvironments();
-  const { currentEnvironmentId } = getCurrentEnvironment();
+    env: { renameEnvironment, duplicateEnvironment, deleteEnvironment },
+  } = useCommand();
+
+  const [activeEnvironment] = useAPIEnvironment((s) => [s.activeEnvironment]);
+  const environment = useEnvironment(environmentId, (s) => s);
+
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
+  // TODO: can be cleaned up
   const [newEnvironmentName, setNewEnvironmentName] = useState(environment.name);
   const [isRenaming, setIsRenaming] = useState(false);
   const [openTab, closeTabBySource, activeTabSource] = useTabServiceWithSelector((state) => [
@@ -66,69 +61,51 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   }, [activeTabSource]);
 
   const handleEnvironmentRename = useCallback(async () => {
-    if (newEnvironmentName === environment.name) {
-      setIsRenameInputVisible(false);
-      return;
-    }
-    setIsRenaming(true);
-    renameEnvironment(environment.id, newEnvironmentName)
-      .then(() => {
-        trackEnvironmentRenamed();
-        openTab(new EnvironmentViewTabSource({ id: environment.id, title: newEnvironmentName }));
-        toast.success("Environment renamed successfully");
-      })
-      .catch(() => {
-        toast.error("Failed to rename environment");
-      })
-      .finally(() => {
-        setIsRenaming(false);
+    try {
+      if (newEnvironmentName === environment.name) {
         setIsRenameInputVisible(false);
-      });
+        return;
+      }
+
+      setIsRenaming(true);
+      await renameEnvironment({ environmentId: environment.id, newName: newEnvironmentName });
+
+      trackEnvironmentRenamed();
+      openTab(new EnvironmentViewTabSource({ id: environment.id, title: newEnvironmentName }));
+      toast.success("Environment renamed successfully");
+    } catch (error) {
+      toast.error("Failed to rename environment");
+    } finally {
+      setIsRenaming(false);
+      setIsRenameInputVisible(false);
+    }
   }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, openTab]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
-    toast.loading("Duplicating environment...");
-    duplicateEnvironment(environment.id)
-      .then(() => {
-        trackEnvironmentDuplicated();
-        toast.success("Environment duplicated successfully");
-      })
-      .catch(() => {
-        toast.error("Failed to duplicate environment");
-      });
+    try {
+      toast.loading("Duplicating environment...");
+      await duplicateEnvironment({ environmentId: environment.id });
+
+      trackEnvironmentDuplicated();
+      toast.success("Environment duplicated successfully");
+    } catch (error) {
+      toast.error("Failed to duplicate environment");
+    }
   }, [environment.id, duplicateEnvironment]);
 
-  const handleEnvironmentDelete = useCallback(() => {
-    toast.loading("Deleting environment...");
-    deleteEnvironment(environment.id)
-      .then(() => {
-        closeTabBySource(environment.id, "environments");
+  const handleEnvironmentDelete = useCallback(async () => {
+    try {
+      toast.loading("Deleting environment...");
+      await deleteEnvironment({ environmentId: environment.id });
 
-        trackEnvironmentDeleted();
-        toast.success("Environment deleted successfully");
-        const availableEnvironments = allEnvironments.filter((env) => env.id !== environment.id);
-        const isActiveEnvironmentBeingDeleted = environment.id === currentEnvironmentId;
-        if (availableEnvironments.length && (envId === environment.id || isActiveEnvironmentBeingDeleted)) {
-          if (isActiveEnvironmentBeingDeleted) {
-            if (availableEnvironments.length > 1) {
-              const nonGlobalEnvironments = availableEnvironments.filter((env) => !isGlobalEnvironment(env.id));
-              setCurrentEnvironment(nonGlobalEnvironments[0].id);
-            }
-          }
-        }
-      })
-      .catch(() => {
-        toast.error("Failed to delete environment");
-      });
-  }, [
-    environment.id,
-    deleteEnvironment,
-    allEnvironments,
-    envId,
-    currentEnvironmentId,
-    setCurrentEnvironment,
-    closeTabBySource,
-  ]);
+      closeTabBySource(environment.id, "environments");
+
+      trackEnvironmentDeleted();
+      toast.success("Environment deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete environment");
+    }
+  }, [environment.id, deleteEnvironment, closeTabBySource]);
 
   const menuItems = useMemo(() => {
     return [
@@ -207,7 +184,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           showArrow={false}
         >
           <span>
-            {environment.id === currentEnvironmentId && !isGlobalEnvironment(environment.id) ? (
+            {environment.id === activeEnvironment?.getState().id && !isGlobalEnvironment(environment.id) ? (
               <MdOutlineCheckCircle className="active-env-icon" />
             ) : (
               ""

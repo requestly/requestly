@@ -148,6 +148,7 @@ const createTabServiceStore = () => {
 
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
+            // FIXME: This can cause a rerender
             setActiveTab(existingTabId);
             return;
           }

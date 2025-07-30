@@ -1,6 +1,5 @@
 import { EnvironmentMap } from "backend/environment/types";
-import { _environmentDataAdapter } from "./utils";
-import { Environment } from "features/apiClient/store/environments/environments.store";
+import { parseEnvironmentState } from "./utils";
 import { ApiClientFeatureContext } from "./types";
 
 export const duplicateEnvironment = async (ctx: ApiClientFeatureContext, params: { environmentId: string }) => {
@@ -12,9 +11,7 @@ export const duplicateEnvironment = async (ctx: ApiClientFeatureContext, params:
     .getState()
     .getAll()
     .forEach((value) => {
-      envsMap[value.id] = _environmentDataAdapter(
-        stores.environments.getState().getEnvironment(value.id) as Environment
-      );
+      envsMap[value.id] = parseEnvironmentState(stores.environments.getState().getEnvironment(value.id));
     });
 
   const newEnvironment = await repositories.environmentVariablesRepository.duplicateEnvironment(environmentId, envsMap);

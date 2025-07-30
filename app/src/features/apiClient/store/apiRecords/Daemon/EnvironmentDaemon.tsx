@@ -16,9 +16,9 @@ const EnvironmentDaemon: React.FC = () => {
     if (!activeEnvrionment) return;
     const unsusbscribe = environmentVariablesRepository.attachListener({
       scope: VariableScope.ENVIRONMENT,
-      id: activeEnvrionment.id,
+      id: activeEnvrionment.getState().id,
       callback: (updatedEnvironmentData) => {
-        activeEnvrionment.data.variables?.getState().mergeAndUpdate(updatedEnvironmentData.variables);
+        activeEnvrionment.getState().data.variables?.getState().mergeAndUpdate(updatedEnvironmentData.variables);
       },
     });
     return unsusbscribe;
@@ -26,10 +26,10 @@ const EnvironmentDaemon: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = environmentVariablesRepository.attachListener({
-      scope: VariableScope.ENVIRONMENT,
-      id: globalEnvironement.id,
+      scope: VariableScope.GLOBAL,
+      id: globalEnvironement.getState().id,
       callback: (updatedEnvironmentData) => {
-        globalEnvironement.data.variables.getState().mergeAndUpdate(updatedEnvironmentData.variables);
+        globalEnvironement.getState().data.variables.getState().mergeAndUpdate(updatedEnvironmentData.variables);
       },
     });
     return unsubscribe;

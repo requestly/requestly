@@ -1,5 +1,4 @@
 import { useCallback, useState, useMemo } from "react";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { SidebarListHeader } from "../../../apiClient/components/sidebar/components/sidebarListHeader/SidebarListHeader";
 import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../analytics";
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
@@ -16,15 +15,26 @@ import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../environmentView/EnvironmentViewTabSource";
+import { useCommand } from "features/apiClient/commands";
+import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import {
+  parseEnvironmentsStore,
+  parseEnvironmentState,
+  parseEnvironmentStore,
+} from "features/apiClient/commands/environments/utils";
 import "./environmentsList.scss";
 
 export const EnvironmentsList = () => {
+  const [globalEnvironment, nonGlobalEnvironments, getEnvironment] = useAPIEnvironment((s) => [
+    s.globalEnvironment,
+    s.environments,
+    s.getEnvironment,
+  ]);
+
   const {
-    getAllEnvironments,
-    addNewEnvironment,
-    setCurrentEnvironment,
-    getEnvironmentVariables,
-  } = useEnvironmentManager();
+    env: { createEnvironment },
+  } = useCommand();
+
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -33,42 +43,39 @@ export const EnvironmentsList = () => {
   const { isValidPermission } = validatePermission("api_client_environment", "update");
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
-  const environments = useMemo(() => getAllEnvironments(), [getAllEnvironments]);
-  const filteredEnvironments = useMemo(
-    () =>
-      environments
+  const filteredEnvironments = useMemo(() => {
+    const globalEnv = parseEnvironmentStore(globalEnvironment);
+    const parsedEnvs = parseEnvironmentsStore(nonGlobalEnvironments);
+
+    return [
+      globalEnv,
+      ...parsedEnvs
         .filter((environment) => environment.name?.toLowerCase().includes(searchValue?.toLowerCase()))
         .sort((a, b) => {
-          if (isGlobalEnvironment(a.id)) return -1;
-          if (isGlobalEnvironment(b.id)) return 1;
           return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
         }),
-    [environments, searchValue]
-  );
+    ];
+  }, [globalEnvironment, nonGlobalEnvironments, searchValue]);
 
   const createNewEnvironment = useCallback(
     async (environmentName?: string) => {
       setIsRecordBeingCreated(RQAPI.RecordType.ENVIRONMENT);
 
-      return addNewEnvironment(environmentName || "New Environment")
-        .then((newEnvironment) => {
-          if (newEnvironment) {
-            if (environments.length === 0) {
-              setCurrentEnvironment(newEnvironment.id);
-            }
+      try {
+        const newEnvironment = await createEnvironment({ newEnvironmentName: environmentName || "New Environment" });
 
-            openTab(new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name }));
-            trackEnvironmentCreated(environments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
-          }
-        })
-        .finally(() => {
-          setIsRecordBeingCreated(null);
-        });
+        openTab(new EnvironmentViewTabSource({ id: newEnvironment.id, title: newEnvironment.name }));
+        trackEnvironmentCreated(filteredEnvironments.length, EnvironmentAnalyticsSource.ENVIRONMENTS_LIST);
+      } catch (error) {
+        toast.error("Failed to create environment. Please try again.");
+      } finally {
+        setIsRecordBeingCreated(null);
+      }
     },
-    [addNewEnvironment, environments.length, setCurrentEnvironment, openTab, setIsRecordBeingCreated]
+    [createEnvironment, filteredEnvironments.length, openTab, setIsRecordBeingCreated]
   );
 
-  const handleAddEnvironmentClick = useCallback(() => {
+  const handleAddEnvironmentClick = useCallback(async () => {
     if (!isValidPermission) {
       toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, "environment"), 5);
       return;
@@ -80,17 +87,18 @@ export const EnvironmentsList = () => {
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
-      const variables = getEnvironmentVariables(environment.id);
+      // FIXME: fix type "!"
+      const variables = parseEnvironmentState(getEnvironment(environment.id)!).variables;
       setEnvironmentsToExport([{ ...environment, variables }]);
 
       setIsExportModalOpen(true);
     },
-    [getEnvironmentVariables]
+    [getEnvironment]
   );
 
   return (
     <div style={{ height: "inherit" }}>
-      {environments?.length === 0 ? (
+      {filteredEnvironments?.length === 0 ? (
         <div className="environments-empty-state-wrapper">
           <EmptyState
             onNewRecordClick={handleAddEnvironmentClick}
@@ -111,10 +119,15 @@ export const EnvironmentsList = () => {
                 <>
                   {filteredEnvironments.map((environment) =>
                     isGlobalEnvironment(environment.id) ? (
-                      <EnvironmentsListItem environment={environment} isReadOnly={!isValidPermission} />
+                      <EnvironmentsListItem
+                        key={environment.id}
+                        environmentId={environment.id}
+                        isReadOnly={!isValidPermission}
+                      />
                     ) : (
                       <EnvironmentsListItem
-                        environment={environment}
+                        key={environment.id}
+                        environmentId={environment.id}
                         isReadOnly={!isValidPermission}
                         onExportClick={handleExportEnvironments}
                       />
