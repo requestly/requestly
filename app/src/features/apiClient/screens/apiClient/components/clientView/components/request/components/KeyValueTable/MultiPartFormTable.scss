@@ -20,6 +20,10 @@
     }
   }
 
+  tr:hover td.ant-table-cell:nth-last-child(2) {
+    border-right: none !important;
+  }
+
   td.ant-table-cell {
     padding: 4px 12px !important;
 
@@ -42,19 +46,26 @@
   .key-value-input-container {
     display: flex;
     flex-direction: row;
+    align-items: center;
+
     .key-value-table-file-text-select {
       position: relative;
       left: -4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      min-width: 82px;
+      min-width: 75px;
       width: auto;
-      height: 32px;
       padding: 0px 4px 0px 6px;
       border-radius: 4px;
 
       flex-shrink: 0;
+
+      .ant-select-selector {
+        align-items: center;
+        font-size: var(--requestly-font-size-sm);
+        height: 24px;
+      }
 
       .ant-select-arrow {
         svg {
@@ -70,7 +81,6 @@
     .ant-select-selector {
       background-color: var(--requestly-color-background) !important;
       font-size: var(--requestly-font-size-xs);
-      padding: 0 8px;
       white-space: nowrap;
     }
     .key-value-table-file-button {
@@ -82,7 +92,6 @@
       background-color: var(--requestly-color-white-t-10);
       border: 1px solid var(--requestly-color-white-t-10);
       font-size: var(--requestly-font-size-xs);
-      height: 32px;
     }
   }
   .key-value-table-input {
@@ -92,7 +101,6 @@
     height: 24px;
     font-size: var(--requestly-font-size-sm);
     width: 100%;
-    margin-top: 5px;
 
     &:hover {
       border: 1px solid transparent;

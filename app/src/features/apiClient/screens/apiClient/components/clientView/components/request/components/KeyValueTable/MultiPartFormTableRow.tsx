@@ -10,6 +10,7 @@ import { FormDropDownOptions, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import FileDropdown from "./FileDropdown";
 import { EnvironmentVariables } from "backend/environment/types";
+import * as Sentry from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -57,7 +58,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
       const values = await form.validateFields();
       handleUpdatePair({ ...record, ...values });
     } catch (error) {
-      console.error("Error saving key-value pair", error);
+      Sentry.captureMessage("Error saving key-value pair", error);
     }
   };
   if (!editable) {
@@ -196,7 +197,12 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
             </Conditional>
 
             {dataIndex === "value" && record?.type === FormDropDownOptions.FILE && record.value.length === 0 && (
-              <RQButton className="key-value-table-file-button" onClick={handleSelectFiles}>
+              <RQButton
+                size="small"
+                type="secondary"
+                className="key-value-table-file-button"
+                onClick={handleSelectFiles}
+              >
                 Select Files
               </RQButton>
             )}

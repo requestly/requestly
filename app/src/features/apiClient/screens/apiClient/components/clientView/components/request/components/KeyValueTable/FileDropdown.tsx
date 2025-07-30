@@ -19,6 +19,7 @@ interface FileDropdownProps {
 }
 
 const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFile, MultipartFormEntry }) => {
+  console.log("DEBUG", MultipartFormEntry);
   const getFilesByIds = useApiClientFileStore((state) => state.getFilesByIds);
   const multipartFormFileIds = Array.isArray(MultipartFormEntry.value)
     ? MultipartFormEntry.value.map((file) => file.id)
@@ -93,7 +94,7 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
         placement="bottomLeft"
         trigger={["click"]}
       >
-        <RQButton className="key-value-table-file-button">
+        <RQButton size="small" className="key-value-table-file-button">
           {filesFromStore[0].isFileValid ? (
             <FaRegFileLines className="bin-icon" />
           ) : (
@@ -111,7 +112,7 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
             </>
           )}
           <span className={`button-text ${filesFromStore[0].isFileValid ? "" : "file-invalid"}`}>
-            {truncateString(filesFromStore[0].name, 15)}
+            {truncateString(filesFromStore[0].name, 10)}
           </span>
           <span className="file-counter">{filesFromStore.length > 1 && ` +${filesFromStore.length - 1}`}</span>
           <FaAngleDown className="down-outlined-icon" />
@@ -129,7 +130,6 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
           style={{
             position: "relative",
             left: "8px",
-            top: "7px",
             width: "16px",
             height: "16px",
           }}
