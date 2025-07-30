@@ -19,7 +19,6 @@ interface FileDropdownProps {
 }
 
 const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFile, MultipartFormEntry }) => {
-  console.log("DEBUG", MultipartFormEntry);
   const getFilesByIds = useApiClientFileStore((state) => state.getFilesByIds);
   const multipartFormFileIds = Array.isArray(MultipartFormEntry.value)
     ? MultipartFormEntry.value.map((file) => file.id)
