@@ -1,10 +1,10 @@
 .api-key-value-table {
   &.rq-content-list-table {
-    border: none !important;
+    border: none;
   }
   tr {
     td.ant-table-cell:nth-last-child(2) {
-      border-right: none !important;
+      border-right: none;
     }
 
     &:hover {
@@ -55,6 +55,17 @@
       border-radius: 4px;
 
       flex-shrink: 0;
+
+      .ant-select-arrow {
+        svg {
+          position: relative;
+          top: 1px;
+          width: 10px;
+          height: 10px;
+          stroke: var(--requestly-color-white);
+          stroke-width: 40px;
+        }
+      }
     }
     .ant-select-selector {
       background-color: var(--requestly-color-background) !important;
