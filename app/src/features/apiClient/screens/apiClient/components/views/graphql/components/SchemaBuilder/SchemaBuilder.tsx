@@ -1,6 +1,6 @@
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
-import { buildClientSchema } from "graphql";
+import { buildClientSchema, IntrospectionQuery } from "graphql";
 import GQ_SCHEMA from "../GraphQLEditor/components/OperationEditor/GQ_SCHEMA.json";
 import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
@@ -25,7 +25,7 @@ export const SchemaBuilder = () => {
       <div className="schema-builder__content">
         <Explorer
           // TEMPORARY USAGE OF GQ_SCHEMA.json
-          schema={buildClientSchema(GQ_SCHEMA.data)}
+          schema={buildClientSchema((GQ_SCHEMA.data as unknown) as IntrospectionQuery)}
           query={query}
           explorerIsOpen={true}
           arrowClosed={<MdKeyboardArrowRight className="schema-builder__arrow" />}

@@ -31,6 +31,8 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(props.onChange);
   const initialDocRef = useRef(props.initialDoc);
+  const isUpdatingRef = useRef(false);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const myTheme = EditorView.theme({
     ".cm-activeLine": {
@@ -83,10 +85,43 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
   }, [props.initialDoc]);
 
   useEffect(() => {
+    if (viewRef.current && props.initialDoc !== undefined) {
+      // Clear any pending update
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+
+      // Debounce the update to avoid rapid successive updates
+      updateTimeoutRef.current = setTimeout(() => {
+        const currentDoc = viewRef.current?.state.doc.toString();
+        if (currentDoc !== props.initialDoc) {
+          // Only update if the content is actually different
+          isUpdatingRef.current = true;
+          const transaction = viewRef.current!.state.update({
+            changes: {
+              from: 0,
+              to: viewRef.current!.state.doc.length,
+              insert: props.initialDoc,
+            },
+          });
+          viewRef.current!.dispatch(transaction);
+          isUpdatingRef.current = false;
+        }
+      }, 50);
+    }
+
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, [props.initialDoc]);
+
+  useEffect(() => {
     if (!editorRef.current) return;
 
     const updateListener = EditorView.updateListener.of((update) => {
-      if (update.docChanged) {
+      if (update.docChanged && !isUpdatingRef.current) {
         const doc = update.state.doc.toString();
         onChangeRef.current?.(doc);
       }
