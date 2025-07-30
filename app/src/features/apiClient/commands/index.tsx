@@ -1,9 +1,10 @@
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { bindCommands } from "./bindCommands";
 import { useMemo } from "react";
+import * as envCommands from "./environments";
 
 const commands = {
-  /* todo: add commands and scope */
+  env: envCommands,
 };
 
 export function useCommand() {

@@ -9,5 +9,11 @@ export const createEnvironment = async (ctx: ApiClientFeatureContext, params: { 
   );
 
   stores.environments.getState().create({ id: newEnvironment.id, name: newEnvironment.name });
+
+  const environments = stores.environments.getState().environments;
+  if (environments.length === 1) {
+    stores.environments.getState().setActive(newEnvironment.id);
+  }
+
   return { id: newEnvironment.id, name: newEnvironment.name };
 };

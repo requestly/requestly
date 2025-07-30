@@ -9,7 +9,6 @@ import {
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
@@ -27,6 +26,7 @@ import { CollectionViewTabSource } from "../screens/apiClient/components/clientV
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
 import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { useCommand } from "../commands";
 
 interface ApiClientContextInterface {
   onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => void;
@@ -125,6 +125,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     state.getData,
   ]);
 
+  const {
+    env: { createEnvironment },
+  } = useCommand();
+
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -133,7 +137,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
-  const { addNewEnvironment } = useEnvironmentManager();
 
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
@@ -275,7 +278,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
           trackNewEnvironmentClicked();
-          return addNewEnvironment("New Environment")
+          return createEnvironment({ newEnvironmentName: "New Environment" })
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
               openTab(
@@ -301,10 +304,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       openDraftRequest,
       onSaveRecord,
       dispatch,
-      addNewEnvironment,
       openTab,
       getRBACValidationFailureErrorMessage,
       isValidPermission,
+      createEnvironment,
     ]
   );
 
