@@ -92,10 +92,12 @@
   .button-text.file-invalid {
     color: var(--requestly-color-error-soft);
   }
-  .rq-custom-btn.ant-btn.ant-btn-default .down-outlined-icon {
-    // need to fix the svg here
+  .rq-custom-btn.ant-btn.ant-btn-default svg,
+  .rq-custom-btn.ant-btn.ant-btn-default img .down-outlined-icon {
     svg {
-      stroke: var(--requestly-color-white-t-10);
+      width: 14px !important;
+      height: 14px !important;
+      stroke: var(--requestly-color-white-t-10) !important;
       stroke-width: 50px;
     }
   }
