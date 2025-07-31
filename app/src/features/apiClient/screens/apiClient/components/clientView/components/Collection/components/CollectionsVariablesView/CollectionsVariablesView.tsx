@@ -4,9 +4,6 @@ import {
   EnvironmentVariableTableRow,
   VariablesList,
 } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
-import { getCollectionVariables } from "store/features/variables/selectors";
-import { useSelector } from "react-redux";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -14,20 +11,27 @@ import { trackVariablesSaved } from "modules/analytics/events/features/apiClient
 import { useGenericState } from "hooks/useGenericState";
 import { convertEnvironmentToMap, mapToEnvironmentArray } from "features/apiClient/screens/environment/utils";
 import "./collectionsVariablesView.scss";
+import { useCommand } from "features/apiClient/commands";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
+import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
 }
 
 export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
-  const { setCollectionVariables } = useEnvironmentManager();
-  const collectionVariables = useSelector(getCollectionVariables);
+  const getRecord = useAPIRecords((s) => s.getRecordStore);
+  const collectionRecordState = getRecord(collection.id)!.getState() as CollectionRecordState;
+  const variablesMap = useVariableStore(collectionRecordState.collectionVariables);
+  const variables = Object.fromEntries(variablesMap.data);
 
+  const {
+    api: { patchCollectionVariables },
+  } = useCommand();
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
-  const [pendingVariables, setPendingVariables] = useState(
-    mapToEnvironmentArray(collectionVariables[collection.id]?.variables ?? collection.data?.variables) || []
-  );
+  const [pendingVariables, setPendingVariables] = useState(mapToEnvironmentArray(variables) || []);
   const [searchValue, setSearchValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -45,12 +49,10 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   useEffect(() => {
     if (!isSaving) {
       handleSetPendingVariables(
-        pendingVariablesRef.current.length > 0
-          ? pendingVariablesRef.current
-          : mapToEnvironmentArray(collectionVariables[collection.id]?.variables ?? collection.data.variables)
+        pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapToEnvironmentArray(variables)
       );
     }
-  }, [collection.id, collection?.data?.variables, collectionVariables, isSaving]);
+  }, [collection.id, collection?.data?.variables, variables, isSaving]);
 
   const handleSetPendingVariables = (variables: EnvironmentVariableTableRow[]) => {
     setPendingVariables(variables);
@@ -60,7 +62,10 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const handleSaveVariables = async () => {
     setIsSaving(true);
     const variablesToSave = convertEnvironmentToMap(pendingVariables);
-    return setCollectionVariables(variablesToSave, collection.id)
+    return patchCollectionVariables({
+      collectionId: collection.id,
+      patch: variablesToSave,
+    })
       .then(() => {
         toast.success("Variables updated successfully");
         trackVariablesSaved({

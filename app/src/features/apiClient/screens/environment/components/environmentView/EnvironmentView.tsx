@@ -9,9 +9,9 @@ import { ApiClientExportModal } from "features/apiClient/screens/apiClient/compo
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import { useGenericState } from "hooks/useGenericState";
 import { useCommand } from "features/apiClient/commands";
-import { parseEnvironmentState } from "features/apiClient/commands/environments/utils";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
+import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 
 interface EnvironmentViewProps {
   envId: string;
@@ -19,6 +19,8 @@ interface EnvironmentViewProps {
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const environment = useEnvironment(envId, (s) => s);
+  const variablesMap = useVariableStore(environment.data.variables);
+  const variablesData = Object.fromEntries(variablesMap.data);
   const {
     env: { patchEnvironmentVariables },
   } = useCommand();
@@ -28,15 +30,12 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const parsedEnvironment = parseEnvironmentState(environment);
   const environmentName = environment.name;
 
   // FIXME: Saves last input value even when cleared
   const variables = useMemo(() => {
-    return pendingVariablesRef.current.length > 0
-      ? pendingVariablesRef.current
-      : mapToEnvironmentArray(parsedEnvironment.variables);
-  }, [parsedEnvironment.variables]);
+    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapToEnvironmentArray(variablesData);
+  }, [variablesData]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
