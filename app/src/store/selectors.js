@@ -176,8 +176,16 @@ export const getDesktopSpecificDetails = (state) => {
   return getGlobalState(state)["desktopSpecificDetails"];
 };
 
+export const getDesktopSpecificAppDetails = (state, appId) => {
+  return getDesktopSpecificDetails(state)?.["appsList"]?.[appId];
+};
+
 export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
+};
+
+export const getAppLanguage = (state) => {
+  return getGlobalState(state)["appLanguage"];
 };
 
 export const getAuthInitialization = (state) => {
@@ -337,4 +345,20 @@ export const getBillingTeamNudgeLastSeenTs = (state) => {
 
 export const getIsSlackConnectButtonVisible = (state) => {
   return getGlobalState(state).misc.persist?.isSlackConnectButtonVisible;
+};
+
+export const getLastUsedFeaturePath = (state) => {
+  return getGlobalState(state)?.misc?.persist?.lastUsedFeaturePath || "/";
+};
+
+export const getIsNewUser = (state) => {
+  return getGlobalState(state).onboarding.isNewUser;
+};
+
+export const getIsOnboardingCompleted = (state) => {
+  return getGlobalState(state).onboarding.isOnboardingCompleted;
+};
+
+export const getIsAcquisitionAnnouncementModalVisible = (state) => {
+  return getGlobalState(state).onboarding.isAcquisitionAnnouncementModalVisible;
 };

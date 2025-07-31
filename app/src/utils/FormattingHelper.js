@@ -1,9 +1,7 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
-import { isDisposableEmail } from "./AuthUtils";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -30,6 +28,8 @@ export const getPrettyPlanName = (planName) => {
   if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
   if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
   if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
+  if (planName === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT) return "Professional (Student Program)";
+  if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) return "API Client Enterprise";
 
   return planName
     .toLowerCase()
@@ -71,36 +71,8 @@ export const getCompanyNameFromEmail = (email) => {
   return capitalize(getDomainFromEmail(email).split(".")[0]);
 };
 
-export const isCompanyEmail = (email) => {
-  const domain = getDomainFromEmail(email);
-  if (!domain) {
-    return false;
-  }
-
-  if (isDisposableEmail(email)) {
-    return false;
-  }
-
-  return !(
-    APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain) || APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)
-  );
-};
-
 export const getByteSize = (inputString) => {
   return new Blob([inputString]).size;
-};
-
-export const getEmailType = (email) => {
-  const domain = getDomainFromEmail(email);
-  if (!domain) {
-    return "UNDEFINED";
-  } else if (APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain)) {
-    return "PERSONAL";
-  } else if (isDisposableEmail(email)) {
-    return "DESTROYABLE";
-  } else if (isCompanyEmail(email)) {
-    return "BUSINESS";
-  } else return "UNDEFINED";
 };
 
 export const getGreeting = () => {
@@ -164,7 +136,7 @@ export const removeTrailingSlash = (url) => {
 };
 
 export const isEmailValid = (email) => {
-  return email && typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return email && typeof email === "string" && !/\s/.test(email) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
 // [[...],[...]] -> {id:[],id:[]}

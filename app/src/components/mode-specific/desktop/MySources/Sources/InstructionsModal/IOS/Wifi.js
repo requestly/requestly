@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import { Row, Col, Image, List } from "antd";
 import { getDesktopSpecificDetails } from "../../../../../../../store/selectors";
 import { IOS_DEVICES } from "./constants";
-import configureProxyGIF from "assets/img/screenshots/ios/configure-ios-proxy.gif";
 
 const WifiInstructions = ({ device_id }) => {
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
@@ -10,7 +9,7 @@ const WifiInstructions = ({ device_id }) => {
 
   const renderGif = () => {
     if (device_id === IOS_DEVICES.IPHONE13_PRO) {
-      return <Image src={configureProxyGIF} />;
+      return <Image src={"/assets/media/components/configure-ios-proxy.gif"} />;
     }
   };
 

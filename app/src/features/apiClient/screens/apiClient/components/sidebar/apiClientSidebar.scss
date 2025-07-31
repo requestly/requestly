@@ -4,11 +4,36 @@
   border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   overflow: hidden;
   border-right: 1px solid var(--border-dark);
   background-color: var(--requestly-color-background);
-  padding-bottom: 32px;
+
+  .storage-communication-note {
+    display: flex;
+    background: var(--requestly-color-primary-900);
+    padding: 4px 4px 8px 8px;
+    line-height: 17px;
+    font-size: var(--requestly-font-size-xs);
+    color: var(--requestly-color-primary-300);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    img {
+      margin-right: 6px;
+    }
+
+    p {
+      margin-top: 4px;
+      margin-bottom: 0;
+      margin-right: 4px;
+    }
+  }
 
   .api-client-sidebar-header {
     flex: 0 0 auto;
@@ -19,9 +44,15 @@
     border-bottom: 1px solid var(--border-dark);
   }
 
+  .api-client-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+    overflow-y: auto;
+  }
+
   .api-client-sidebar-tabs {
-    flex-shrink: 0;
-    height: 100%;
+    flex: 1;
     overflow: hidden;
     background-color: var(--requestly-color-background);
 
@@ -76,6 +107,7 @@
         margin: -8px 10px;
         border-radius: 4px;
 
+        &.active,
         &.clickable:hover {
           cursor: pointer;
           background-color: var(--gray-dark);
@@ -92,7 +124,7 @@
         }
 
         .api-history-url {
-          font-size: var(--requestly-font-size-xs, 11px);
+          font-size: 12px;
           width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -165,8 +197,9 @@
       height: 100%;
 
       .ant-tabs-tabpane {
-        padding: 0 8px;
+        padding: 0;
         height: 100%;
+        padding-bottom: 45px;
       }
     }
 
@@ -189,8 +222,13 @@
       color: var(--requestly-color-text-subtle);
     }
   }
+}
 
-  .ant-dropdown-menu-item.ant-dropdown-menu-item-disabled {
-    display: none;
+.api-client-sidebar-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+
+  & > * {
+    pointer-events: none;
   }
 }

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Space, Typography } from "antd";
-import { StorageService } from "../../../../init";
 import { getAppMode, getGroupwiseRulesToPopulate, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
@@ -15,8 +14,9 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
-import { unselectAllRecords } from "../actions";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
@@ -37,22 +37,19 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
     return new Promise((resolve) => {
       // Fetch all records to get rule data
       Logger.log("Reading storage in doMoveToUngrouped");
-      StorageService(appMode)
-        .getAllRecords()
-        .then((allRecords) => {
-          const updatedRules = groupRules.map((rule) => {
-            return {
-              ...allRecords[rule.id],
-              modificationDate: generateObjectCreationDate(),
-              groupId: UNGROUPED_GROUP_ID,
-            };
-          });
-
-          Logger.log("Writing storage in doMoveToUngrouped");
-          StorageService(appMode)
-            .saveMultipleRulesOrGroups(updatedRules)
-            .then(() => resolve());
+      // TODO-after-syncing: This should be fetched from redux not clientStorage.
+      clientRuleStorageService.getAllRulesAndGroups().then((allRecords) => {
+        const updatedRules = groupRules.map((rule) => {
+          return {
+            ...allRecords[rule.id],
+            modificationDate: generateObjectCreationDate(),
+            groupId: UNGROUPED_GROUP_ID,
+          };
         });
+
+        Logger.log("Writing storage in doMoveToUngrouped");
+        syncingHelper.saveMultipleRulesOrGroups(updatedRules).then(() => resolve());
+      });
     });
   };
 
@@ -71,7 +68,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
                 newValue: !isRulesListRefreshPending,
               })
             );
-            unselectAllRecords(dispatch);
+            dispatch(globalActions.clearSelectedRecords());
             // Notify user
             toast.success("Group deleted");
             toggle();

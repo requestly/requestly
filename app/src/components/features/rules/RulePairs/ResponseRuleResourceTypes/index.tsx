@@ -8,12 +8,12 @@ import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import DesktopIcon from "assets/icons/desktop.svg?react";
 import { omit, set } from "lodash";
-import { ResponseRuleResourceType } from "types/rules";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import "./ResponseRuleResourceTypes.css";
+import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const DownloadDesktopAppLink: React.FC = () => (
   <a
@@ -26,7 +26,10 @@ const DownloadDesktopAppLink: React.FC = () => (
   </a>
 );
 
-const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown> }> = ({ ruleDetails }) => {
+const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>; disabled: boolean }> = ({
+  disabled,
+  ruleDetails,
+}) => {
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -37,7 +40,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
   const requestPayloadFilter = currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
   const updateResourceType = useCallback(
-    (resourceType: ResponseRuleResourceType, clearGraphqlRequestPayload = false) => {
+    (resourceType: ResponseRule.ResourceType, clearGraphqlRequestPayload = false) => {
       const pairIndex = 0; // response rule will only have one pair
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
 
@@ -59,7 +62,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
 
       setCurrentlySelectedRule(dispatch, updatedRule, !isDefaultValue);
     },
-    [dispatch, currentlySelectedRuleData, ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]]
+    [currentlySelectedRuleData, ruleDetails, dispatch]
   );
 
   const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
@@ -68,46 +71,46 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
     if (isNewResponseRule) return;
 
     // legacy rules will have "unknown" resource type
-    updateResourceType(ResponseRuleResourceType.UNKNOWN);
+    updateResourceType(ResponseRule.ResourceType.UNKNOWN);
   }, [isNewResponseRule, requestPayloadFilter, updateResourceType]);
 
-  const handleResourceTypeChange = (type: ResponseRuleResourceType) => {
-    const clearGraphqlRequestPayload = type !== ResponseRuleResourceType.GRAPHQL_API;
+  const handleResourceTypeChange = (type: ResponseRule.ResourceType) => {
+    const clearGraphqlRequestPayload = type !== ResponseRule.ResourceType.GRAPHQL_API;
 
     updateResourceType(type, clearGraphqlRequestPayload);
   };
 
   const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.graphql_resource_type);
 
-  return isNewResponseRule && responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
+  return isNewResponseRule && responseRuleResourceType !== ResponseRule.ResourceType.UNKNOWN ? (
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group
-          disabled={isSampleRule}
+          disabled={isSampleRule || disabled}
           value={responseRuleResourceType}
           onChange={(e) => {
-            if (e.target.value !== ResponseRuleResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
+            if (e.target.value !== ResponseRule.ResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
           }}
         >
-          <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
+          <Radio value={ResponseRule.ResourceType.REST_API}>REST API</Radio>
           <PremiumFeature
             features={[FeatureLimitType.graphql_resource_type]}
             featureName="GraphQL API"
             popoverPlacement="top"
             onContinue={() => {
-              handleResourceTypeChange(ResponseRuleResourceType.GRAPHQL_API);
+              handleResourceTypeChange(ResponseRule.ResourceType.GRAPHQL_API);
             }}
             source="graphql_resource_type"
           >
-            <Radio value={ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
+            <Radio value={ResponseRule.ResourceType.GRAPHQL_API} className="graphql-radio-item">
               <Row align="middle">
                 GraphQL API {isPremiumFeature ? <PremiumIcon featureType="graphql_resource_type" /> : null}
               </Row>
             </Radio>
           </PremiumFeature>
           {isDesktop ? (
-            <Radio value={ResponseRuleResourceType.STATIC}>HTML / JS / CSS</Radio>
+            <Radio value={ResponseRule.ResourceType.STATIC}>HTML / JS / CSS</Radio>
           ) : (
             <Tooltip
               overlayClassName="response-rule-resource-type-tooltip"
@@ -118,7 +121,7 @@ const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown>
                 </span>
               }
             >
-              <Radio disabled={!isDesktop} value={ResponseRuleResourceType.STATIC}>
+              <Radio disabled={!isDesktop || disabled} value={ResponseRule.ResourceType.STATIC}>
                 HTML / JS / CSS
                 <QuestionCircleOutlined className="resource-disable-option-info-icon" />
               </Radio>

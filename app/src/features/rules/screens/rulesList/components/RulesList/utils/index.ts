@@ -1,5 +1,5 @@
 import { FilterType } from "componentsV2/ContentList";
-import { RecordStatus, Rule, StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 

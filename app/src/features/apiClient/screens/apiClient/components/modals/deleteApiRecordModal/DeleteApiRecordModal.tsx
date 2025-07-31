@@ -1,74 +1,127 @@
 import React, { useState } from "react";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
-import deleteIcon from "../../../../../assets/delete.svg";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection } from "../../../utils";
-import { deleteApiRecords } from "backend/apiClient";
+import { isApiCollection, isApiRequest } from "../../../utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
-import { useNavigate } from "react-router-dom";
-import { redirectToApiClient } from "utils/RedirectionUtils";
 import "./deleteApiRecordModal.scss";
+import { isEmpty, partition } from "lodash";
+import * as Sentry from "@sentry/react";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { notification } from "antd";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
-  record: RQAPI.Record;
+  records: RQAPI.Record[];
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, record, onClose, onSuccess }) => {
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
-  const { onDeleteRecords } = useApiClientContext();
-  const navigate = useNavigate();
-  const [isDeleting, setIsDeleting] = useState(false);
+export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
+  const { onDeleteRecords, apiClientRecordsRepository } = useApiClientContext();
+  const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
-  if (!record) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  if (isEmpty(records)) {
     return null;
   }
-  // TODO: handle single api request deletion - update the modal message too
-  let apiRequestCount = isApiCollection(record) ? record.data.children.length : 1;
 
-  const handleDeleteApiRecord = async () => {
-    setIsDeleting(true);
+  let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
-    const recordIds: string[] = [];
+  const getAllRecordsToDelete = () => {
+    const recordsToBeDeleted: RQAPI.Record[] = [];
+    const stack: RQAPI.Record[] = [...records];
 
-    recordIds.push(record.id);
-    if (isApiCollection(record)) {
-      record.data.children.forEach((request) => {
-        recordIds.push(request.id);
-      });
+    while (stack.length) {
+      const record = stack.pop()!;
+      recordsToBeDeleted.push(record);
+      if (isApiCollection(record) && record.data.children) {
+        stack.push(...record.data.children);
+      }
     }
 
-    const result = await deleteApiRecords(uid, recordIds, teamId);
-    onDeleteRecords(recordIds);
+    return recordsToBeDeleted;
+  };
 
-    if (result.success) {
+  const handleDeleteApiRecord = async () => {
+    const recordsToBeDeleted = getAllRecordsToDelete();
+    if (!recordsToBeDeleted.length) {
+      notification.error({
+        message: `Could not delete records.`,
+        placement: "bottomRight",
+      });
+      return;
+    }
+
+    setIsDeleting(true);
+    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
+    const apiRecordIds = apiRecords.map((record) => record.id);
+    const collectionRecordIds = collectionRecords.map((record) => record.id);
+
+    // First delete records
+    const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
+
+    // Then delete collections
+    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds);
+
+    // Check if both deletions were successful
+    if (recordDeletionResult.success && collectionsDeletionResult.success) {
+      onDeleteRecords([...apiRecordIds, ...collectionRecordIds]);
       trackCollectionDeleted();
-      toast.success(record.type === RQAPI.RecordType.API ? "API request deleted" : "Collection deleted");
+
+      apiRecordIds.forEach((recordId) => {
+        closeTabBySource(recordId, "request", true);
+      });
+
+      collectionRecordIds.forEach((recordId) => {
+        closeTabBySource(recordId, "collection", true);
+      });
+
+      toast.success(
+        records.length === 1
+          ? records[0].type === RQAPI.RecordType.API
+            ? "API request deleted"
+            : "Collection deleted"
+          : "Records Deleted"
+      );
       onClose();
       onSuccess?.();
-      redirectToApiClient(navigate);
+
       // TODO: add analytics
+    } else {
+      const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
+      notification.error({
+        message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
+        description: erroredResult?.message,
+        placement: "bottomRight",
+      });
+
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "api_client_record_deletion");
+        Sentry.captureException(
+          erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`
+        );
+      });
     }
 
     setIsDeleting(false);
   };
 
-  const header = record.type === RQAPI.RecordType.API ? "Delete API Request" : "Delete Collection";
+  const header =
+    records.length === 1
+      ? records[0].type === RQAPI.RecordType.API
+        ? "Delete API Request"
+        : "Delete Collection"
+      : "Delete Records";
+
   const description =
-    record.type === RQAPI.RecordType.API
-      ? `This action will permanently delete this API request. Are you sure you want to continue?`
-      : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`;
+    records.length === 1
+      ? records[0].type === RQAPI.RecordType.API
+        ? `This action will permanently delete this API request. Are you sure you want to continue?`
+        : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
+      : "This action will permanently delete the selected Collections, APIs, and their associated requests. Are you sure you want to proceed?";
 
   return (
     <RQModal
@@ -79,7 +132,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       destroyOnClose={true}
       className="delete-api-record-modal"
     >
-      <img width={32} height={32} src={deleteIcon} alt="Delete" className="icon" />
+      <img width={32} height={32} src={"/assets/media/common/delete.svg"} alt="Delete" className="icon" />
       <div className="header">{header}</div>
       <div className="description">{description}</div>
 
@@ -88,7 +141,11 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
           Cancel
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
-          {record.type === RQAPI.RecordType.API ? "Delete API" : "Delete collection"}
+          {records.length === 1
+            ? records[0].type === RQAPI.RecordType.API
+              ? "Delete API"
+              : "Delete collection"
+            : "Delete Records"}
         </RQButton>
       </div>
     </RQModal>

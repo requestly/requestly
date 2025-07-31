@@ -6,7 +6,7 @@ import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
 import { ResourceTable } from "@requestly-ui/resource-table";
 import networkEventTableColumns, { NETWORK_TABLE_COLUMN_IDS } from "./columns";
 import networkEventDetailsTabs from "./details-tabs";
-import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
+import { enrichNetworkEvent, getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
 import "./networkContainer.scss";
 import { getGraphQLDetails } from "./networkLogUtils";
 
@@ -27,6 +27,7 @@ const NetworkContainer: React.FC = () => {
 
   useEffect(() => {
     chrome.devtools.network.onRequestFinished.addListener((networkEvent: NetworkEvent) => {
+      enrichNetworkEvent(networkEvent);
       const rqNetworkEvent: RQNetworkEvent = {
         ...networkEvent,
         getContent: networkEvent.getContent,

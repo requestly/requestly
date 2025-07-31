@@ -2,7 +2,6 @@ import { RQButton } from "lib/design-system/components";
 import SlackIcon from "assets/icons/slack.svg?react";
 import sendSlackInvite from "components/misc/SupportPanel/sendSlackInvite";
 import { useCallback, useState } from "react";
-import starAnimation from "assets/images/gifs/Stars.gif";
 import { trackSlackConnectClicked } from "modules/analytics/events/misc/UnifiedSupport";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -33,7 +32,7 @@ const JoinSlackButton = () => {
         <span className="icon__wrapper">
           <SlackIcon />
         </span>
-        <img src={starAnimation} alt="Star Animation" className="star-animation" />
+        <img src={"/assets/media/Dashboard/Stars.gif"} alt="Star Animation" className="star-animation" />
         <span className="link-title">Join Slack</span>
       </RQButton>
     </>

@@ -1,11 +1,8 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { joinPaths } from "utils/PathUtils";
-import FilesLibraryIndexPage from "components/features/filesLibrary/FilesLibraryIndexPage";
-import MyFilesLibraryView from "components/features/filesLibrary/FilesLibraryTableContainer/MyFilesView";
 import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreateView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
-import FileViewerIndexPage from "components/features/filesLibrary/FileViewerIndexPage";
 import { MockType } from "components/features/mocksV2/types";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
 import MocksFeatureContainer from "./container";
@@ -15,64 +12,84 @@ export const mockServerRoutes: RouteObject[] = [
   {
     path: PATHS.MOCK_SERVER.INDEX,
     element: <MocksFeatureContainer />,
+    handle: {
+      breadcrumb: {
+        label: "File server",
+        navigateTo: PATHS.MOCK_SERVER.INDEX,
+      },
+    },
     children: [
-      /** @deprecated */
-      {
-        path: PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE,
-        element: <ProtectedRoute component={FilesLibraryIndexPage} />,
-      },
-      /** @deprecated */
-      {
-        path: PATHS.FILES.MY_FILES.ABSOLUTE,
-        element: <ProtectedRoute component={MyFilesLibraryView} />,
-      },
-      /** @deprecated */
-      {
-        path: PATHS.MOCK_SERVER.RELATIVE,
-        element: <Navigate to={PATHS.MOCK_SERVER.MY_MOCKS.ABSOLUTE} />,
-      },
-      /** @deprecated */
-      {
-        path: PATHS.FILES.RELATIVE,
-        element: <Navigate to={PATHS.FILES.MY_FILES.ABSOLUTE} />,
-      },
-      {
-        path: joinPaths(PATHS.FILES.VIEWER.RELATIVE, PATHS.ANY),
-        element: <ProtectedRoute component={FileViewerIndexPage} />,
-      },
-      {
-        path: joinPaths(PATHS.MOCK_SERVER.VIEWER.RELATIVE, PATHS.ANY),
-        element: <ProtectedRoute component={FileViewerIndexPage} />,
-      },
       //  MOCKS V2
       {
         index: true,
+        element: <Navigate to={PATHS.MOCK_SERVER_V2.RELATIVE} />,
+        handle: {
+          breadcrumb: {
+            label: "JSON file",
+            navigateTo: PATHS.MOCK_SERVER_V2.RELATIVE,
+          },
+        },
+      },
+      {
         path: PATHS.MOCK_SERVER_V2.RELATIVE,
         element: <MocksListScreen type={MockType.API} />,
+        handle: {
+          breadcrumb: {
+            label: "All",
+            navigateTo: PATHS.MOCK_SERVER_V2.RELATIVE,
+          },
+        },
       },
       {
         path: PATHS.MOCK_SERVER_V2.CREATE.RELATIVE,
-        // @ts-ignore
         element: <ProtectedRoute component={MockEditorIndex} isNew={true} mockType={MockType.API} />,
+        handle: {
+          breadcrumb: {
+            label: "JSON file",
+            navigateTo: PATHS.MOCK_SERVER_V2.CREATE.RELATIVE,
+          },
+        },
       },
       {
         path: PATHS.MOCK_SERVER_V2.EDIT.RELATIVE,
-        // @ts-ignore
         element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.API} />,
+        handle: {
+          breadcrumb: {
+            label: "JSON file",
+            navigateTo: PATHS.MOCK_SERVER_V2.EDIT.RELATIVE,
+          },
+        },
       },
       // FILES V2
       {
         path: PATHS.FILE_SERVER_V2.RELATIVE,
         element: <MocksListScreen type={MockType.FILE} />,
+        handle: {
+          breadcrumb: {
+            label: "All",
+            navigateTo: PATHS.FILE_SERVER_V2.RELATIVE,
+          },
+        },
       },
       {
         path: PATHS.FILE_SERVER_V2.CREATE.RELATIVE,
         element: <ProtectedRoute component={FileMockEditorCreateView} />,
+        handle: {
+          breadcrumb: {
+            label: "JS/CSS file",
+            navigateTo: PATHS.FILE_SERVER_V2.CREATE.RELATIVE,
+          },
+        },
       },
       {
         path: PATHS.FILE_SERVER_V2.EDIT.RELATIVE,
-        // @ts-ignore
         element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.FILE} />,
+        handle: {
+          breadcrumb: {
+            label: "JS/CSS file",
+            navigateTo: PATHS.FILE_SERVER_V2.EDIT.RELATIVE,
+          },
+        },
       },
     ],
   },

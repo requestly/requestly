@@ -1,6 +1,7 @@
 import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { RQAPI } from "features/apiClient/types";
+import { enforceLatestRecordSchema } from "./parser";
 
 export const getApiRecord = async (
   recordId: string
@@ -18,9 +19,11 @@ const getApiRecordFromFirebase = async (
   const snapshot = await getDoc(docRef);
 
   if (snapshot.exists()) {
-    const data = snapshot.data() as RQAPI.Record;
+    const data = snapshot.data();
+    const id = snapshot.id;
+    const processedData = enforceLatestRecordSchema(id, data);
 
-    return { success: true, data };
+    return { success: true, data: processedData };
   }
 
   return { success: false, data: null, message: "Not found!" };

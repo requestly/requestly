@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, DropdownProps } from "antd";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -6,26 +6,23 @@ import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
-import { RQAPI } from "features/apiClient/types";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
-import {
-  trackImportApiCollectionsClicked,
-  trackImportFromPostmanClicked,
-  trackNewCollectionClicked,
-  trackNewRequestClicked,
-} from "modules/analytics/events/features/apiClient";
+import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { ImportCollectionsModal } from "../../../modals/importCollectionsModal/ImportCollectionsModal";
+import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
+import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
+import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
+import { useLocation } from "react-router-dom";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -50,10 +47,11 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   onClearHistory,
 }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
+  const { state } = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const [isImportCollectionsModalOpen, setIsImportCollectionsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
+  const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -65,19 +63,34 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             cURL
           </div>
         ),
-        onClick: onImportClick,
-        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
+        onClick: () => {
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import a cURL request`,
+                },
+              })
+            );
+          } else {
+            onImportClick();
+          }
+        },
       },
       {
         key: "2",
         label: (
           <div className="new-btn-option">
             <BsCollection />
-            Requestly Collection
+            Requestly Collection and Environments
           </div>
         ),
-        disabled: location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.INDEX),
         onClick: () => {
+          trackImportStarted(ApiClientImporterType.REQUESTLY);
           if (!user.loggedIn) {
             dispatch(
               globalActions.toggleActiveModal({
@@ -91,8 +104,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
               })
             );
           } else {
-            trackImportApiCollectionsClicked();
-            setIsImportCollectionsModalOpen(true);
+            setIsImportModalOpen(true);
           }
         },
       },
@@ -100,16 +112,56 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         key: "3",
         label: (
           <div className="new-btn-option">
-            <SiPostman /> Postman
+            <SiPostman /> Postman Collections and Environments
           </div>
         ),
         onClick: () => {
-          trackImportFromPostmanClicked();
-          setIsPostmanImporterModalOpen(true);
+          trackImportStarted(ApiClientImporterType.POSTMAN);
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Postman collections`,
+                },
+              })
+            );
+          } else {
+            setIsPostmanImporterModalOpen(true);
+          }
+        },
+      },
+      {
+        key: "4",
+        label: (
+          <div className="new-btn-option">
+            <SiBruno /> Bruno Collections and Variables
+          </div>
+        ),
+        onClick: () => {
+          trackImportStarted(ApiClientImporterType.BRUNO);
+          if (!user.loggedIn) {
+            dispatch(
+              globalActions.toggleActiveModal({
+                modalName: "authModal",
+                newValue: true,
+                newProps: {
+                  eventSource: "api_client_sidebar",
+                  authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                  warningMessage: `Please log in to import Bruno exports`,
+                },
+              })
+            );
+          } else {
+            setIsBrunoImporterModalOpen(true);
+          }
         },
       },
     ],
-    [user.loggedIn, dispatch, location.pathname, onImportClick]
+    [user.loggedIn, dispatch, onImportClick]
   );
 
   const items: DropdownProps["menu"]["items"] = [
@@ -124,7 +176,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       onClick: () => {
         if (!user.loggedIn) {
           dispatch(
-            // @ts-ignore
             globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,
@@ -140,7 +191,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           return;
         }
 
-        trackNewRequestClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.API);
       },
     },
@@ -155,7 +205,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       onClick: () => {
         if (!user.loggedIn) {
           dispatch(
-            // @ts-ignore
             globalActions.toggleActiveModal({
               modalName: "authModal",
               newValue: true,
@@ -171,7 +220,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           return;
         }
 
-        trackNewCollectionClicked("api_client_sidebar_header");
         onNewClick(RQAPI.RecordType.COLLECTION);
       },
     },
@@ -206,32 +254,52 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     },
   ];
 
+  useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ApiClientImporterType.BRUNO:
+          setIsBrunoImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.POSTMAN:
+          setIsPostmanImporterModalOpen(true);
+          break;
+        case ApiClientImporterType.REQUESTLY:
+          setIsImportModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
+
   return (
     <>
       <div className="api-client-sidebar-header">
         {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          <div>
-            <Dropdown
-              menu={{ items }}
-              trigger={["click"]}
-              className="api-client-new-btn-dropdown"
-              overlayClassName="api-client-new-btn-dropdown-overlay"
-            >
-              <RQButton type="transparent" size="small" icon={<MdAdd />}>
-                New
-              </RQButton>
-            </Dropdown>
-            <Dropdown
-              menu={{ items: importItems }}
-              trigger={["click"]}
-              className="api-client-new-btn-dropdown"
-              overlayClassName="api-client-new-btn-dropdown-overlay"
-            >
-              <RQButton type="transparent" size="small" icon={<CodeOutlined />}>
-                Import
-              </RQButton>
-            </Dropdown>
-          </div>
+          <RoleBasedComponent resource="api_client_request" permission="create">
+            <div>
+              <Dropdown
+                menu={{ items }}
+                trigger={["click"]}
+                className="api-client-new-btn-dropdown"
+                overlayClassName="api-client-new-btn-dropdown-overlay"
+              >
+                <RQButton type="transparent" size="small" icon={<MdAdd />}>
+                  New
+                </RQButton>
+              </Dropdown>
+              <Dropdown
+                menu={{ items: importItems }}
+                trigger={["click"]}
+                className="api-client-new-btn-dropdown"
+                overlayClassName="api-client-new-btn-dropdown-overlay"
+              >
+                <RQButton type="transparent" size="small" icon={<CodeOutlined />}>
+                  Import
+                </RQButton>
+              </Dropdown>
+            </div>
+          </RoleBasedComponent>
         ) : activeTab === ApiClientSidebarTabKey.HISTORY ? (
           <RQButton
             disabled={!history?.length}
@@ -247,17 +315,17 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         {user.loggedIn && <EnvironmentSwitcher />}
       </div>
 
-      {isImportCollectionsModalOpen && (
-        <ImportCollectionsModal
-          isOpen={isImportCollectionsModalOpen}
-          onClose={() => setIsImportCollectionsModalOpen(false)}
-        />
+      {isImportModalOpen && (
+        <ApiClientImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
       )}
       {isPostmanImporterModalOpen && (
         <PostmanImporterModal
           isOpen={isPostmanImporterModalOpen}
           onClose={() => setIsPostmanImporterModalOpen(false)}
         />
+      )}
+      {isBrunoImporterModalOpen && (
+        <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
       )}
     </>
   );

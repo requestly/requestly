@@ -1,16 +1,15 @@
 import { autoBatchEnhancer, configureStore } from "@reduxjs/toolkit";
 
 //FEATURES
-import { incentivizationReducer } from "./features/incentivization/slice";
 import { sessionRecordingReducer } from "./features/session-recording/slice";
-import { teamsReducer } from "./features/teams/slice";
 
 import { ReducerKeys } from "./constants";
-import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
+import { desktopTrafficTableReducerWithLocalSync } from "./features/desktop-traffic-table/slice";
 import { recordsReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
-import { environmentVariablesReducer } from "./features/environment/slice";
+import { workspaceReducerWithLocal } from "./slices/workspaces/slice";
+import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
 
@@ -19,12 +18,11 @@ export const reduxStore = configureStore({
     [ReducerKeys.GLOBAL]: globalReducers,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
     [ReducerKeys.HAR_PREVIEW]: harPreviewReducer,
-    [ReducerKeys.TEAMS]: teamsReducer,
-    [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
+    [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducerWithLocalSync,
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
-    [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
-    [ReducerKeys.ENVIRONMENT]: environmentVariablesReducer,
+    [ReducerKeys.WORKSPACE]: workspaceReducerWithLocal,
+    [ReducerKeys.VARIABLES]: variablesReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

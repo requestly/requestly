@@ -26,7 +26,6 @@ import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
 import { deleteRecording } from "../api";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
@@ -38,6 +37,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -88,7 +88,7 @@ const SavedSessionViewer: React.FC = () => {
   const isMobileScreen = useMediaQuery({ query: "(max-width: 550px)" });
 
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const hasAuthInitialized = useSelector(getAuthInitialization);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
@@ -174,7 +174,7 @@ const SavedSessionViewer: React.FC = () => {
 
     setIsFetching(true);
 
-    getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
+    getRecording(id, user?.details?.profile?.uid, activeWorkspaceId, user?.details?.profile?.email)
       .then((res) => {
         setShowPermissionError(false);
         dispatch(sessionRecordingActions.setSessionRecordingMetadata({ id, ...res.payload }));
@@ -202,7 +202,7 @@ const SavedSessionViewer: React.FC = () => {
             setShowPermissionError(true);
         }
       });
-  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
+  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, activeWorkspaceId]);
 
   const hideOnboardingPrompt = () => {
     setShowOnboardingPrompt(false);
@@ -226,7 +226,7 @@ const SavedSessionViewer: React.FC = () => {
               <RQButton
                 iconOnly
                 type="default"
-                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
                 onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
                 className="back-button"
               />

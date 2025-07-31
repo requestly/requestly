@@ -35,58 +35,12 @@ const PricingFAQs = () => {
       ),
     },
     {
-      question: <React.Fragment>How is my payment information handled and secured?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Your transaction is processed securely through Stripe. All payments are encrypted, and your credentials and
-          payment method are isolated for security. We do not save any card info.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          No, developers working individually without a team are not required to pay for Requestly. The Free plan
-          provides liberal limits and includes many features you know and love, including capturing requests and
-          modifying requests, mocking APIs, SessionBook, and much more.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>How can I remove limits from the Free plan?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Requestly is an open-source platform. Downloading the source code from GitHub allows you to use the Free plan
-          without any limitations, but sharing and other collaboration features will be unavailable.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>When should I switch to the Pro plan?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Users should look forward to creating teams when there is a need for collaboration, as team workspaces provide
-          real-time modification of rules and synchronization within the team and thereby enhances the productivity of
-          teams.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <React.Fragment>Does unlimited really mean unlimited in the case of Pro plan?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Yes. Rarely some things might get restricted due to storage or performance reasons. Please contact us in case
-          that happens.
-        </React.Fragment>
-      ),
-    },
-    {
-      question: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
+      question: <>Is Requestly free for teams switching from ModHeader?</>,
       answer: (
         <>
-          We provide a custom plan for users seeking unlimited header modifications. Contact us to get this plan
-          activated for you.
+          Yes! ModHeader's primary offering is HTTP header modification, and Requestly's free plan includes unlimited
+          HTTP header modifications. This makes it simple for your team to migrate without any limitations or added
+          costs.
         </>
       ),
     },
@@ -96,6 +50,19 @@ const PricingFAQs = () => {
         <React.Fragment>
           We are using Stripe as our payment processor. Stripe supports the majority of credit and debit card networks,
           including Visa & Mastercard.
+        </React.Fragment>
+      ),
+    },
+    {
+      question: <React.Fragment>Do you offer student discounts?</React.Fragment>,
+      answer: (
+        <React.Fragment>
+          Requestly’s Professional Plan is completely free for students! Simply sign up with your school email address
+          to unlock premium features instantly. Read more details{" "}
+          <a target="_blank" href={LINKS.STUDENT_PROGRAM_DOC} rel="noreferrer">
+            here
+          </a>
+          .
         </React.Fragment>
       ),
     },

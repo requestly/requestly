@@ -1,0 +1,75 @@
+{
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDesc__",
+  "default_locale": "en",
+  "manifest_version": 3,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "extension@requestly.in",
+      "strict_min_version": "127.0",
+      "update_url": "https://app.requestly.io/firefox/updates.json"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*", "*://requestly.com/*"],
+      "js": ["app.cs.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["client.cs.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "scripts": ["serviceWorker.js"],
+    "type": "module"
+  },
+  "externally_connectable": {
+    "matches": ["https://*.bsstag.com/*", "https://*.browserstack.com/*"]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["libs/cacheJson.js", "resources/images/128x128.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "action": {
+    "default_icon": "resources/images/128x128.png",
+    "default_title": "__MSG_extIconTitle__",
+    "default_popup": "popup/popup.html"
+  },
+  "devtools_page": "devtools/devtools.html",
+  "icons": {
+    "16": "resources/images/16x16.png",
+    "48": "resources/images/48x48.png",
+    "128": "resources/images/128x128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; script-src-elem 'self'; object-src 'self'"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "delay_rules",
+        "enabled": true,
+        "path": "resources/static-rules/delayRules.json"
+      }
+    ]
+  },
+  "permissions": [
+    "contextMenus",
+    "declarativeNetRequest",
+    "proxy",
+    "scripting",
+    "storage",
+    "tabs",
+    "unlimitedStorage",
+    "webNavigation",
+    "webRequest"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "commands": {}
+}

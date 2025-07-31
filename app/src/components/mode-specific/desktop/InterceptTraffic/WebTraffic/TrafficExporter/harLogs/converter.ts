@@ -1,5 +1,5 @@
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
-import { HTTPSnippet } from "httpsnippet";
+import { HTTPSnippet } from "@readme/httpsnippet";
 import { v4 as uuidv4 } from "uuid";
 import { getGraphQLDetails } from "./utils";
 import { cloneDeep } from "lodash";
@@ -87,7 +87,7 @@ const generateCurlFromHarObject = (requestHarObject: HarRequest) => {
   try {
     const harObject = cloneDeep(requestHarObject);
 
-    requestCurl = new HTTPSnippet({
+    const snippetResult = new HTTPSnippet({
       ...harObject,
       postData: {
         ...harObject.postData,
@@ -95,7 +95,9 @@ const generateCurlFromHarObject = (requestHarObject: HarRequest) => {
       },
     }).convert("shell", "curl", {
       indent: " ",
-    }) as string;
+    });
+
+    requestCurl = Array.isArray(snippetResult) ? snippetResult[0]?.toString() ?? "" : "";
   } catch (err) {
     Logger.log(`LoggerMiddleware.generate_curl_from_har Error: ${err}`);
   }

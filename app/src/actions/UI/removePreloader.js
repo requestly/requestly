@@ -9,7 +9,11 @@ const removePreloader = () => {
       setTimeout(() => {
         // remove from DOM
         // ele.outerHTML = "";
-        document.body.removeChild(ele);
+        try {
+          document.body.removeChild(ele);
+        } catch (err) {
+          Logger.log("Error removing preloader", err);
+        }
       }, 500);
     }
     document.body.style.pointerEvents = "unset";

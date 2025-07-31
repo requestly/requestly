@@ -14,8 +14,9 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { RoleBasedComponent } from "features/rbac";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -23,7 +24,7 @@ interface Props {
 
 export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Props) => {
   const navigate = useNavigate();
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
   const handleOnURLCopy = useCallback((id: string) => {
@@ -95,20 +96,23 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 <RQButton icon={<MdOutlineFileCopy />} iconOnly />
               </Tooltip>
             </CopyToClipboard>
-            <Tooltip title="Delete">
-              <RQButton
-                icon={<RiDeleteBinLine />}
-                iconOnly
-                onClick={() => handleDeleteSharedListClick(record.shareId)}
-              />
-            </Tooltip>
+
+            <RoleBasedComponent resource="http_rule" permission="delete">
+              <Tooltip title="Delete">
+                <RQButton
+                  icon={<RiDeleteBinLine />}
+                  iconOnly
+                  onClick={() => handleDeleteSharedListClick(record.shareId)}
+                />
+              </Tooltip>
+            </RoleBasedComponent>
           </div>
         );
       },
     },
   ];
 
-  if (isWorkspaceMode) {
+  if (isSharedWorkspaceMode) {
     columns.splice(3, 0, {
       key: "createdBy",
       title: <div className="text-center">Created by</div>,
@@ -117,7 +121,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
       render: (_: any, record: SharedList) => {
         return (
           <div className="mock-table-user-icon">
-            <UserIcon uid={record.createdBy} />
+            <UserAvatar uid={record.createdBy} />
           </div>
         );
       },

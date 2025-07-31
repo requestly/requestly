@@ -52,7 +52,7 @@ const isFormRequest = (
 };
 
 /* CORE */
-export async function getAPIResponse(apiRequest: Request): Promise<Response> {
+export async function getAPIResponse(apiRequest: Request): Promise<Response | { error: string }> {
   const method = apiRequest.method || "GET";
   const headers = new Headers();
   const body = apiRequest.body;
@@ -127,6 +127,8 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response> {
       redirectedUrl: response.url !== url ? response.url : "",
     };
   } catch (e) {
-    return null;
+    return {
+      error: e.message,
+    };
   }
 }

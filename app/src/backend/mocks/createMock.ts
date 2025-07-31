@@ -64,14 +64,14 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   })
-    .then((docRef) => {
+    .then(async (docRef) => {
       Logger.log(`Mock document created ${docRef.id}`);
-      updateDoc(docRef, {
+      await updateDoc(docRef, {
         id: docRef.id,
       });
       return docRef.id;
     })
-    .catch((err) => {
+    .catch((err): null => {
       Logger.error("error while creating mock", err);
       return null;
     });
@@ -80,9 +80,8 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
 };
 
 const updateResponseFilePath = async (uid: string, mockData: RQMockSchema, teamId?: string) => {
-  mockData.responses.map((response) => {
+  mockData.responses.forEach((response) => {
     response.filePath = createResponseBodyFilepath(uid, mockData.id, response.id, teamId);
-    return null;
   });
 
   await updateMockFromFirebase(uid, mockData.id, mockData);

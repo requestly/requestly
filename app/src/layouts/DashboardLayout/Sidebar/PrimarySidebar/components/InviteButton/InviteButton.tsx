@@ -1,18 +1,17 @@
 import React, { useCallback } from "react";
-import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import InviteIcon from "assets/icons/invite.svg?react";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { RQButton } from "lib/design-system/components";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
-  const availableTeams = useSelector(getAvailableTeams);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const user = useSelector(getUserAuthDetails);
 
   const handleInviteClick = useCallback(() => {
@@ -28,7 +27,7 @@ const InviteButton: React.FC = () => {
       return;
     }
 
-    if (isWorkspaceMode) {
+    if (isSharedWorkspaceMode) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "inviteMembersModal",
@@ -36,7 +35,7 @@ const InviteButton: React.FC = () => {
           newProps: { source: SOURCE.SIDEBAR_INVITE_BUTTON },
         })
       );
-    } else if (availableTeams?.length === 0) {
+    } else if (availableWorkspaces?.length === 0) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "createWorkspaceModal",
@@ -47,7 +46,7 @@ const InviteButton: React.FC = () => {
     } else {
       dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }));
     }
-  }, [availableTeams?.length, dispatch, isWorkspaceMode, user?.loggedIn]);
+  }, [availableWorkspaces?.length, dispatch, isSharedWorkspaceMode, user?.loggedIn]);
 
   return (
     <>
@@ -55,11 +54,10 @@ const InviteButton: React.FC = () => {
         type="text"
         onClick={() => {
           handleInviteClick();
-          trackSidebarClicked("invite");
         }}
         className="primary-sidebar-link w-full"
       >
-        <span className="icon__wrapper">{<InviteIcon />}</span>
+        <InviteIcon />
         <span className="link-title">{"Invite"}</span>
       </RQButton>
     </>

@@ -1,16 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import isEmpty from "is-empty";
 import { Col, Row } from "antd";
-import { globalActions } from "store/slices/global/slice";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { StorageService } from "../../../../init";
 import {
   cleanup,
   getModeData,
@@ -20,22 +16,15 @@ import {
 } from "./actions";
 import {
   getAppMode,
-  getAllRules,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
-  getIsRuleEditorTourCompleted,
   getIsCurrentlySelectedRuleDetailsPanelShown,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
 import Logger from "lib/logger";
-import {
-  trackRuleEditorViewed,
-  trackDesktopRuleViewedOnExtension,
-  trackDocsSidebarViewed,
-} from "modules/analytics/events/common/rules";
+import { trackDesktopRuleViewedOnExtension, trackDocsSidebarViewed } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
@@ -43,6 +32,7 @@ import { RuleEditorMode } from "features/rules";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleBuilder.css";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -51,7 +41,6 @@ const RuleBuilder = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { state } = location;
   const ruleGroupId = searchParams.get("groupId") ?? undefined;
   const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(location, props.isSharedListViewRule);
 
@@ -61,23 +50,19 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const isDetailsPanelShown = useSelector(getIsCurrentlySelectedRuleDetailsPanelShown);
 
-  const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
+  const isReadOnly = currentlySelectedRuleData?.isReadOnly;
 
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
   }, [props.isSharedListViewRule]);
 
-  const isRuleEditorTourCompleted = useSelector(getIsRuleEditorTourCompleted);
-
   //References
   const isCleaningUpRef = useRef(false);
   //Component State
-  const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
-  const [startWalkthrough, setStartWalkthrough] = useState(false);
   const [showDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
@@ -126,19 +111,17 @@ const RuleBuilder = (props) => {
         stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE], navigate);
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
         Logger.log("Reading to storage in RuleBuilder");
-        StorageService(appMode)
-          .getRecord(RULE_TO_EDIT_ID)
-          .then((rule) => {
-            if (rule === undefined) {
-              RedirectionUtils.redirectTo404(navigate);
-            } else {
-              //Prevent updating state when component is about to unmount
-              if (!isCleaningUpRef.current) {
-                stableSetCurrentlySelectedRule(dispatch, rule);
-                stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
-              }
+        clientRuleStorageService.getRecordById(RULE_TO_EDIT_ID).then((rule) => {
+          if (rule === undefined) {
+            RedirectionUtils.redirectTo404(navigate);
+          } else {
+            //Prevent updating state when component is about to unmount
+            if (!isCleaningUpRef.current) {
+              stableSetCurrentlySelectedRule(dispatch, rule);
+              stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
             }
-          });
+          }
+        });
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW) {
         //View only
         if (props.rule) {
@@ -167,33 +150,6 @@ const RuleBuilder = (props) => {
     appMode,
     ruleGroupId,
   ]);
-
-  //If "all rules" are not already there in state, fetch them.
-  if (!fetchAllRulesComplete && isEmpty(allRules)) {
-    Logger.log("Reading to storage in RuleBuilder");
-    StorageService(appMode)
-      .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-      .then((rules) => {
-        //Set Flag to prevent loop
-        setFetchAllRulesComplete(true);
-        dispatch(globalActions.updateRulesAndGroups({ rules, groups: [] }));
-      });
-  }
-
-  useEffect(() => {
-    if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE && !isRuleEditorTourCompleted && !allRules.length) {
-      setStartWalkthrough(true);
-    }
-  }, [MODE, allRules.length, isRuleEditorTourCompleted]);
-
-  useEffect(() => {
-    const source = state?.source ?? null;
-    const ruleType = currentlySelectedRuleConfig.TYPE;
-
-    if (ruleType && source) {
-      trackRuleEditorViewed(source, ruleType);
-    }
-  }, [currentlySelectedRuleConfig.TYPE, state?.source]);
 
   useEffect(() => {
     if (
@@ -247,13 +203,6 @@ const RuleBuilder = (props) => {
 
   return (
     <m.div layout transition={{ type: "linear", duration: 0.2 }} style={{ height: "inherit" }}>
-      {/* <ProductWalkthrough
-        tourFor={RULE_TYPE_TO_CREATE}
-        startWalkthrough={startWalkthrough}
-        context={currentlySelectedRuleData}
-        onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
-      /> */}
-
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
@@ -264,7 +213,7 @@ const RuleBuilder = (props) => {
               source="new_rule_editor"
               handleSeeLiveRuleDemoClick={props.handleSeeLiveRuleDemoClick}
               ruleDetails={
-                isSampleRule
+                isSampleRule && isReadOnly
                   ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details
                   : RULE_DETAILS[currentlySelectedRuleData?.ruleType]
               }

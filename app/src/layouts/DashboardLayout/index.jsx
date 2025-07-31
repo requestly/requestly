@@ -6,10 +6,9 @@ import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "util
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
-import MenuHeader from "./MenuHeader";
-import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
+// import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { isAppOpenedInIframe, isDesktopMode } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { globalActions } from "store/slices/global/slice";
@@ -17,22 +16,34 @@ import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 import SupportPanel from "components/misc/SupportPanel";
 import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
-import "./DashboardLayout.css";
+import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
+import { getUserOS } from "utils/Misc";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import useRootPathRedirector from "hooks/useRootPathRedirector";
+import { ViewOnlyModeBanner } from "components/common/ViewOnlyModeBanner/ViewOnlyModeBanner";
+import { useCurrentWorkspaceUserRole } from "hooks";
+import { TeamRole } from "types";
+import { Conditional } from "components/common/Conditional";
+import { MenuHeader } from "./MenuHeader/MenuHeader";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
-  const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
+  // const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const { isDesktopAppConnected } = useDesktopAppConnection();
+  const { role } = useCurrentWorkspaceUserRole();
+  const isReadRole = role === TeamRole.read;
 
-  initializeOneTap();
+  useRootPathRedirector();
+  // initializeOneTap();
 
-  if (shouldShowOneTapPrompt()) {
-    promptOneTap();
-  }
+  // if (shouldShowOneTapPrompt()) {
+  //   promptOneTap();
+  // }
 
   const isSidebarVisible = useMemo(
     () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),
@@ -67,17 +78,25 @@ const DashboardLayout = () => {
     <>
       <AppNotificationBanner />
       <PlanExpiredBanner />
-      <div className="app-layout app-dashboard-layout">
-        <div className="app-header">
-          {" "}
-          <MenuHeader />
+
+      <div className={`app-layout app-dashboard-layout  ${isReadRole ? "read-role" : ""}`}>
+        <div
+          className={`app-header ${
+            isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
+              ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
+              : ""
+          }`}
+        >
+          {isPricingPage(pathname) ? null : <MenuHeader />}
+          <Conditional condition={isReadRole}>
+            <ViewOnlyModeBanner />
+          </Conditional>
         </div>
 
         {isDesktopAppConnected ? (
           <ConnectedToDesktopView />
         ) : (
           <>
-            {" "}
             <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
             <div className="app-main-content">
               <DashboardContent />

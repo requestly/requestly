@@ -3,8 +3,6 @@ import { useSelector } from "react-redux";
 import ProCard from "@ant-design/pro-card";
 import { Button, Col, Row } from "antd";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import img from "../../../../../assets/images/illustrations/modular-coding.svg";
-import imgDark from "../../../../../assets/images/illustrations/modular-coding-dark.svg";
 import { getAppTheme } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
 import { redirectToDownloadPage } from "utils/RedirectionUtils";
@@ -22,7 +20,11 @@ const ExtensionVersionError = () => {
               <Col>
                 <img
                   className="hp-position-relative hp-d-block hp-m-auto"
-                  src={appTheme === APP_CONSTANTS.THEMES.DARK ? imgDark : img}
+                  src={
+                    appTheme === APP_CONSTANTS.THEMES.DARK
+                      ? "/assets/media/views/modular-coding-dark.svg"
+                      : "/assets/media/views/modular-coding.svg"
+                  }
                   alt="403"
                   style={{ maxHeight: "30vh" }}
                 />

@@ -6,21 +6,21 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "../../../../utils/Toast";
 import { isEqual } from "lodash";
-import { getAppMode } from "store/selectors";
 import Logger from "lib/logger";
-import { StorageService } from "init";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./configurationPage.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -45,8 +45,7 @@ const ConfigurationPage = () => {
   const navigate = useNavigate();
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [customPageSources, setCustomPageSources] = useState([]);
   const [pageSourceType, setPageSourceType] = useState(PAGE_SOURCES_TYPE.ALL_PAGES);
   const inputRef = useRef(null);
@@ -55,19 +54,16 @@ const ConfigurationPage = () => {
     trackConfigurationOpened();
   }, []);
 
-  const handleSaveConfig = useCallback(
-    async (newConfig) => {
-      Logger.log("Writing storage in handleSaveConfig");
-      await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
-      setConfig(newConfig);
-      toast.success("Saved configuration successfully.");
-      trackConfigurationSaved({
-        pageSources: newConfig.pageSources.length,
-        maxDuration: newConfig.maxDuration,
-      });
-    },
-    [appMode]
-  );
+  const handleSaveConfig = useCallback(async (newConfig) => {
+    Logger.log("Writing storage in handleSaveConfig");
+    clientSessionRecordingStorageService.saveSessionRecordingConfig(newConfig);
+    setConfig(newConfig);
+    toast.success("Saved configuration successfully.");
+    trackConfigurationSaved({
+      pageSources: newConfig.pageSources.length,
+      maxDuration: newConfig.maxDuration,
+    });
+  }, []);
 
   useEffect(() => {
     if (inputRef.current?.input?.dataset.index === "0") {
@@ -77,16 +73,16 @@ const ConfigurationPage = () => {
 
   useEffect(() => {
     Logger.log("Reading storage in SessionsIndexPage");
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+    clientSessionRecordingStorageService
+      .getSessionRecordingConfig()
       .then((savedConfig) => setConfig(savedConfig || {}));
-  }, [appMode]);
+  }, []);
 
   useEffect(() => {
-    if (!isWorkspaceMode) {
+    if (!isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_ENABLED, config?.pageSources?.length > 0);
     }
-  }, [config?.pageSources?.length, isWorkspaceMode]);
+  }, [config?.pageSources?.length, isSharedWorkspaceMode]);
 
   useEffect(() => {
     const initialCustomPageSources = [{ ...emptyPageSourceData }];
@@ -150,6 +146,10 @@ const ConfigurationPage = () => {
   const addEmptyPageSource = () => {
     setCustomPageSources((prevPageSources) => [{ ...emptyPageSourceData }, ...prevPageSources]);
   };
+
+  if (isSafariBrowser()) {
+    return <SafariLimitedSupportView />;
+  }
 
   if (!isExtensionInstalled()) {
     return <InstallExtensionCTA eventPage="session_settings" />;
@@ -252,7 +252,7 @@ const ConfigurationPage = () => {
                 <RQButton
                   iconOnly
                   type="default"
-                  icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                  icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
                   onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
                 />
                 <span>SessionBook Settings</span>

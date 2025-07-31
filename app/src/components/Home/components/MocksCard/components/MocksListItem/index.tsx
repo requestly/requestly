@@ -7,9 +7,9 @@ import CopyButton from "components/misc/CopyButton";
 import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { trackHomeMockActionClicked } from "components/Home/analytics";
 import "./mocksListItem.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   mock: RQMockMetadataSchema;
@@ -19,18 +19,25 @@ interface Props {
 export const MocksListItem: React.FC<Props> = ({ mock, collectionData }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const { url } = useMemo(
     () =>
       generateFinalUrlParts({
         endpoint: mock.endpoint,
         uid: user?.details?.profile?.uid,
         username: user?.details?.username,
-        teamId: workspace?.id,
+        teamId: activeWorkspaceId,
         password: mock.password,
         collectionPath: collectionData?.path ?? "",
       }),
-    [mock.endpoint, user?.details?.profile?.uid, user?.details?.username, workspace?.id, mock.password]
+    [
+      mock.endpoint,
+      mock.password,
+      user?.details?.profile?.uid,
+      user?.details?.username,
+      activeWorkspaceId,
+      collectionData?.path,
+    ]
   );
 
   return (

@@ -1,66 +1,72 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const LINKS = {
   /** DOCS */
 
   // Download
-  REQUESTLY_DOWNLOAD_PAGE: "https://requestly.com/downloads",
-  REQUESTLY_DOCS: "https://developers.requestly.io/",
+  REQUESTLY_DOWNLOAD_PAGE: getLinkWithMetadata("https://requestly.com/downloads"),
+  REQUESTLY_DOCS: "https://docs.requestly.com/",
   //Docs - Using Rules
-  REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.io/using-rules/",
+  REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.com/general/http-rules/overview/",
   //Docs -Sharing Rules
-  REQUESTLY_DOCS_SHARING_RULES: "https://docs.requestly.io/managing-rules/sharing",
+  REQUESTLY_DOCS_SHARING_RULES: "https://docs.requestly.com/general/http-rules/sharing",
   //Docs - File Service
-  REQUESTLY_DOCS_FILES_SERVICE: "https://docs.requestly.io/library/introduction-to-library",
+  REQUESTLY_DOCS_FILES_SERVICE: "https://docs.requestly.com/general/mock-server/overview",
 
   // Docs - Premium Subscription
-  REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION: "https://docs.requestly.io/premium-subscription",
+  REQUESTLY_DOCS_PREMIUM_SUBSCRIPTION: "https://docs.requestly.com/general/team/team-collaboration",
 
   // Docs - Premium Subscription
-  REQUESTLY_DOCS_TEAM_SUBSCRIPTION: "https://docs.requestly.io/premium-subscription#for-teams",
+  REQUESTLY_DOCS_TEAM_SUBSCRIPTION: "https://docs.requestly.com/general/team/team-collaboration",
 
   // Docs - Mock Server
-  REQUESTLY_DOCS_MOCK_SERVER: "https://docs.requestly.io/using-rules/mock-server",
+  REQUESTLY_DOCS_MOCK_SERVER: "https://docs.requestly.com/general/mock-server/overview",
 
   // Docs - Backup Data
-  REQUESTLY_DOCS_BACKUP_DATA: "https://docs.requestly.io/managing-rules/backup-and-restore",
+  REQUESTLY_DOCS_BACKUP_DATA: "https://docs.requestly.com/general/http-rules/sharing/download-rules",
 
   // Docs - Extension Troubleshooting
-  REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.io/troubleshooting",
+  REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.com/guides/troubleshooting/rules-not-working",
 
-  REQUESTLY_EXTENSION_RULES_NOT_WORKING:
-    "https://docs.requestly.io/browser-extension/chrome/troubleshooting/rules-not-working",
+  REQUESTLY_EXTENSION_RULES_NOT_WORKING: "https://docs.requestly.com/guides/troubleshooting/rules-not-working",
 
   // Docs - Mock GraphQL API response
-  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://developers.requestly.io/http-rules/graphql-support",
+  REQUESTLY_DOCS_MOCK_GRAPHQL:
+    "https://docs.requestly.com/general/http-rules/advanced-usage/graphql-modify-request-response",
 
   // Docs - HTTP modifications
-  REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
+  REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.com/general/http-rules/overview",
 
   // Docs - Source Filters
   REQUESTLY_DOCS_SOURCE_FILTERS: "https://docs.requestly.com/general/http-rules/advanced-usage/advance-targeting",
 
   // Docs - Import rules from charles proxy
-  REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES: "https://developers.requestly.com/http-rules/import-from-charles/",
+  REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES: "https://docs.requestly.com/general/imports/charles-proxy",
+
+  // Docs - Import Rules from resource override
+  REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_RESOURCE_OVERRIDE: "https://docs.requestly.com/general/imports/resource-override",
 
   // Docs - Test URL condition
   REQUESTLY_DOCS_TEST_URL_CONDITION:
     "https://docs.requestly.com/general/http-rules/others/http-rules-testing/test-url-condition",
 
-  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
+  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://docs.requestly.com/security-privacy/sessions/",
 
-  REQUESTLY_API_DOCS: "https://developers.requestly.io/api/overview/",
+  REQUESTLY_DOCS_TEST_RULES: "https://docs.requestly.com/general/http-rules/advanced-usage/test-rules",
 
-  REQUESTLY_REDIRECT_RULE_DOCS: "https://developers.requestly.com/http-rules/map-local-url-redirect",
-  REQUESTLY_CANCEL_RULE_DOCS: "https://developers.requestly.com/http-rules/cancel-rule/",
-  REQUESTLY_DELAY_RULE_DOCS: "https://developers.requestly.com/http-rules/delay-request/",
-  REQUESTLY_HEADERS_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-headers/",
-  REQUESTLY_QUERYPARAM_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-query-params/",
-  REQUESTLY_REPLACE_RULE_DOCS: "https://developers.requestly.com/http-rules/replace-strings/",
-  REQUESTLY_REQUEST_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-request-body/",
-  REQUESTLY_RESPONSE_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-response-body/",
-  REQUESTLY_SCRIPT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-dom-inject-scripts/",
-  REQUESTLY_USERAGENT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-user-agents/",
+  REQUESTLY_API_DOCS: "https://docs.requestly.com/public-apis/overview/",
+
+  REQUESTLY_REDIRECT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/redirect-rule",
+  REQUESTLY_CANCEL_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/cancel-rule",
+  REQUESTLY_DELAY_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/delay-network-requests",
+  REQUESTLY_HEADERS_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-headers/",
+  REQUESTLY_QUERYPARAM_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-query-params",
+  REQUESTLY_REPLACE_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/replace-strings",
+  REQUESTLY_REQUEST_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-request-body",
+  REQUESTLY_RESPONSE_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-request-body",
+  REQUESTLY_SCRIPT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/insert-scripts",
+  REQUESTLY_USERAGENT_RULE_DOCS: "https://docs.requestly.com/general/http-rules/rule-types/modify-user-agents",
 
   REQUESTLY_HEADERS_RULE_FAQ_LINK:
     "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
@@ -68,22 +74,27 @@ const LINKS = {
   REQUESTLY_NETWORK_INSPECTOR_DOCS:
     "https://docs.requestly.com/guides/inspect-traffic-and-apply-modifications-from-chrome-devtools-using-requestly",
 
+  /** API Client docs */
+  REQUESTLY_API_CLIENT_DOCS: "https://docs.requestly.com/general/api-client/overview",
+
   /** LANDING PAGES **/
 
   // Home
-  REQUESTLY_LANDING_HOME: "https://requestly.com/",
+  REQUESTLY_LANDING_HOME: getLinkWithMetadata("https://requestly.com/"),
   //Blog
-  REQUESTLY_BLOG: "https://requestly.com/blog/",
+  REQUESTLY_BLOG: getLinkWithMetadata("https://requestly.com/blog/"),
   //Desktop App
-  REQUESTLY_DESKTOP_APP: "https://requestly.com/desktop",
+  REQUESTLY_DESKTOP_APP: getLinkWithMetadata("https://requestly.com/desktop"),
   //Privacy Policy
-  REQUESTLY_PRIVACY_POLICY: "https://requestly.com/privacy",
+  REQUESTLY_PRIVACY_POLICY: getLinkWithMetadata("https://requestly.com/privacy"),
   // Terms and Conditions
-  REQUESTLY_TERMS_AND_CONDITIONS: "https://requestly.com/terms/",
+  REQUESTLY_TERMS_AND_CONDITIONS: getLinkWithMetadata("https://requestly.com/terms/"),
+  //Privacy Statement
+  REQUESTLY_PRIVACY_STATEMENT: getLinkWithMetadata("https://requestly.com/privacy/"),
   //Contact Us
   CONTACT_US: "mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL,
   // Contact Us Page
-  CONTACT_US_PAGE: "https://requestly.com/contact-us/",
+  CONTACT_US_PAGE: getLinkWithMetadata("https://requestly.com/contact-us/"),
   // Book A Demo
   BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
 
@@ -115,14 +126,14 @@ const LINKS = {
   },
 
   /** TUTORIALS */
-  YOUTUBE_TUTORIALS: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+  YOUTUBE_TUTORIALS: "https://rqst.ly/http-rules-yt-tutorials",
 
   TUTORIALS: {
-    REDIRECT_RULE: "https://youtu.be/lOt1kGKTq-w",
+    REDIRECT_RULE: "https://rqst.ly/redirect-rule-yt",
   },
 
   DEMO_VIDEOS: {
-    TEAM_WORKSPACES: "https://www.youtube.com/watch?v=xF5M_z4O5zg",
+    TEAM_WORKSPACES: "https://rqst.ly/team-collaboration-yt-tutorial",
   },
 
   DOWNLOAD_DESKTOP_APP: {
@@ -136,6 +147,16 @@ const LINKS = {
   CALENDLY_LINK: "https://calendly.com/requestly/sagar",
 
   ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
+
+  STUDENT_PROGRAM_DOC: "https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131",
+
+  API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT: "https://github.com/requestly/requestly/issues/2629",
+
+  REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
+
+  OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
+
+  ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
 };
 
 export default LINKS;

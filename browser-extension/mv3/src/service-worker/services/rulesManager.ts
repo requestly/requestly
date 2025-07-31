@@ -4,11 +4,27 @@ import { onVariableChange, Variable } from "../variable";
 import { debounce, getBlockedDomains, isExtensionEnabled, onBlockListChange } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
-import { sendMessageToApp } from "./messageHandler";
 import { EXTENSION_MESSAGES } from "common/constants";
 import { UpdateDynamicRuleOptions } from "common/types";
+import { sendMessageToApp } from "./messageHandler/sender";
 
-const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
+// Object.values(chrome.declarativeNetRequest.ResourceType) cannot be used because in some browsers like safari and firefox
+// chrome.declarativeNetRequest.ResourceType is not defined.
+const ALL_RESOURCE_TYPES: chrome.declarativeNetRequest.ResourceType[] = [
+  "main_frame" as chrome.declarativeNetRequest.ResourceType.MAIN_FRAME,
+  "sub_frame" as chrome.declarativeNetRequest.ResourceType.SUB_FRAME,
+  "stylesheet" as chrome.declarativeNetRequest.ResourceType.STYLESHEET,
+  "script" as chrome.declarativeNetRequest.ResourceType.SCRIPT,
+  "image" as chrome.declarativeNetRequest.ResourceType.IMAGE,
+  "font" as chrome.declarativeNetRequest.ResourceType.FONT,
+  "object" as chrome.declarativeNetRequest.ResourceType.OBJECT,
+  "xmlhttprequest" as chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST,
+  "ping" as chrome.declarativeNetRequest.ResourceType.PING,
+  "csp_report" as chrome.declarativeNetRequest.ResourceType.CSP_REPORT,
+  "media" as chrome.declarativeNetRequest.ResourceType.MEDIA,
+  "websocket" as chrome.declarativeNetRequest.ResourceType.WEBSOCKET,
+  "other" as chrome.declarativeNetRequest.ResourceType.OTHER,
+];
 
 const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<void> => {
   const badRQRuleIds = new Set<string>();
@@ -125,7 +141,11 @@ const applyExtensionRules = async (): Promise<void> => {
 
 export const initRulesManager = async (): Promise<void> => {
   onRuleOrGroupChange(debounce(applyExtensionRules, 500));
-  onVariableChange(Variable.IS_EXTENSION_ENABLED, () => {
+  onVariableChange(Variable.IS_EXTENSION_ENABLED, (newValue, oldValue) => {
+    console.log(`[initRulesManager.onVariableChange] IS_EXTENSION_ENABLED changed`, {
+      newValue,
+      oldValue,
+    });
     applyExtensionRules();
     deleteAllSessionRules();
   });

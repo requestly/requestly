@@ -6,14 +6,15 @@ import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { getDomainFromEmail, getEmailType, isEmailValid } from "utils/FormattingHelper";
+import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackLoginAttemptedEvent, trackLoginFailedEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
-import "./index.scss";
 import { getSSOProviderId } from "backend/auth/sso";
 import { loginWithSSO } from "actions/FirebaseActions";
-import { isDisposableEmail } from "utils/AuthUtils";
+import { EmailType } from "@requestly/shared/types/common";
+import { getEmailType } from "utils/mailCheckerUtils";
+import "./index.scss";
 
 interface Props {
   email: string;
@@ -27,7 +28,6 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
 
   const domain = useMemo(() => getDomainFromEmail(email), [email]);
-  const emailType = useMemo(() => getEmailType(email), [email]);
 
   const handleLoginWithSSO = useCallback(async () => {
     if (!email) {
@@ -40,7 +40,8 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       return;
     }
 
-    if (isDisposableEmail(email)) {
+    const emailType = await getEmailType(email);
+    if (emailType === EmailType.DESTROYABLE) {
       toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
       return;
     }
@@ -72,7 +73,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       });
       const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
 
-      captureSSOInterest({ email, isCompanyEmail: emailType === "BUSINESS" })
+      captureSSOInterest({ email, isCompanyEmail: emailType === EmailType.BUSINESS })
         .then(() => {
           Logger.log("SSO interest captured successfully");
         })
@@ -81,7 +82,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
         });
     }
     setIsLoading(false);
-  }, [domain, email, emailType, source]);
+  }, [domain, email, source]);
 
   return (
     <>
@@ -121,6 +122,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
           placeholder="E.g., you@company.com"
           label="Your work email"
           onPressEnter={handleLoginWithSSO}
+          type="email"
         />
       </div>
       <RQButton

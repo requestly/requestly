@@ -42,7 +42,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
   const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
 
   useEffect(() => {
-    if (!pair.modifications.Request?.length && pair.modifications.Response?.length) {
+    if (!pair.modifications?.Request?.length && pair.modifications?.Response?.length) {
       setActiveTab("Response");
     }
   }, [pair.modifications]);
@@ -65,7 +65,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                 <span>
                   {`${modificationType} Headers`}
                   <Badge
-                    count={pair.modifications[modificationType]?.length}
+                    count={pair.modifications?.[modificationType]?.length}
                     size="small"
                     style={{ margin: "0 5px" }}
                   />
@@ -74,7 +74,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
               key={modificationType}
             >
               <Card bordered={false} className="headers-rule-pair-card">
-                {pair.modifications[modificationType]?.map((modification, modificationIndex) => (
+                {pair.modifications?.[modificationType]?.map((modification, modificationIndex) => (
                   <HeadersPairModificationRowV2
                     modification={modification}
                     modificationIndex={modificationIndex}
@@ -85,7 +85,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                   />
                 ))}
                 <Row span={24} align="middle">
-                  {pair.modifications[modificationType]?.length ? (
+                  {pair.modifications?.[modificationType]?.length ? (
                     <Col
                       lg={{
                         offset: 3,

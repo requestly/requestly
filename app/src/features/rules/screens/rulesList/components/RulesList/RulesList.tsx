@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import RulesTable from "./components/RulesTable/RulesTable";
 import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
-import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -11,7 +11,7 @@ import { GettingStarted } from "./components";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
@@ -19,13 +19,15 @@ import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
 import { useSearchParams } from "react-router-dom";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
+import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
 import "./rulesList.scss";
 
 interface Props {}
 
 const RulesList: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
-  const isRuleListLoading = useSelector(getIsRulesListLoading);
+  // const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
@@ -48,7 +50,9 @@ const RulesList: React.FC<Props> = () => {
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      if (!isExtensionInstalled()) {
+      if (isSafariBrowser()) {
+        return <SafariLimitedSupportView />;
+      } else if (!isExtensionInstalled()) {
         return (
           <InstallExtensionCTA
             heading="Install Browser extension to start modifying network requests"
@@ -62,7 +66,7 @@ const RulesList: React.FC<Props> = () => {
     }
     return (
       <>
-        {isLoading || isRuleListLoading ? (
+        {isLoading ? (
           <>
             <MonitorMountedTime transactionName="new-rules-list-loading" />
             <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
@@ -84,14 +88,25 @@ const RulesList: React.FC<Props> = () => {
                 <RulesTable
                   allRecordsMap={allRecordsMap}
                   records={filteredRecords}
-                  loading={isLoading || isRuleListLoading}
+                  loading={isLoading}
                   searchValue={searchValue}
                 />
               </div>
             </div>
           </>
         ) : (
-          <GettingStarted />
+          <RoleBasedComponent
+            resource="http_rule"
+            permission="create"
+            fallback={
+              <RBACEmptyState
+                title="No rules created yet."
+                description="As a viewer, you will be able to view and test rules once someone from your team creates them. You can contact your workspace admin to update your role."
+              />
+            }
+          >
+            <GettingStarted />
+          </RoleBasedComponent>
         )}
       </>
     );

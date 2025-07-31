@@ -6,16 +6,15 @@ import { getAllGroups, getAppMode, getCurrentlySelectedRuleData, getIsRefreshRul
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createNewGroup, updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { globalActions } from "store/slices/global/slice";
-import { StorageService } from "init";
 import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
-import { Group } from "types/rules";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
 import "./EditorGroupDropdown.css";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { Group } from "@requestly/shared/types/entities/rules";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
@@ -41,8 +40,8 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
 
   useEffect(() => {
     Logger.log("Reading storage in EditorGroupDropdown");
-    StorageService(appMode)
-      .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
+    clientRuleStorageService
+      .getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
       .then((groups) => dispatch(globalActions.updateGroups(groups)));
   }, [appMode, dispatch]);
 
@@ -68,8 +67,8 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         handleGroupChange(groupId);
         trackGroupCreatedEvent("rule_editor");
         Logger.log("Reading storage in EditorGroupDropdown handleAddNewGroup");
-        StorageService(appMode)
-          .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
+        clientRuleStorageService
+          .getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
           .then((groups) => dispatch(globalActions.updateGroups(groups)));
       },
       user
@@ -212,7 +211,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
               width={10}
               height={6}
               alt="down arrow"
-              src="/assets/icons/downArrow.svg" // TODO: Use react-icons
+              src="/assets/media/common/down-arrow.svg" // TODO: Use react-icons
             />
           </span>
         </RQButton>

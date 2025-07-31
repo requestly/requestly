@@ -5,12 +5,13 @@ import { RQButton } from "lib/design-system/components";
 import { TeamsListItem } from "./components/TeamsListItem";
 import { m, AnimatePresence } from "framer-motion";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
-import { Invite, Team } from "types";
+import { Invite } from "types";
 import { globalActions } from "store/slices/global/slice";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./teamsListView.scss";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   pendingInvites?: Invite[];
@@ -20,10 +21,10 @@ interface Props {
 
 export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subheading }) => {
   const dispatch = useDispatch();
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const sortedAvailableTeams = useMemo(
-    () => [...(availableTeams ?? [])]?.sort((a: Team, b: Team) => b?.accessCount - a?.accessCount),
-    [availableTeams]
+    () => [...(availableWorkspaces ?? [])]?.sort((a: Workspace, b: Workspace) => b?.accessCount - a?.accessCount),
+    [availableWorkspaces]
   );
 
   return (
@@ -48,15 +49,20 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
                     <TeamsListItem
                       key={index}
                       inviteId={invite.id}
-                      teamId={invite.metadata.teamId as string}
-                      teamName={invite.metadata.teamName as string}
+                      workspace={
+                        {
+                          id: invite.metadata.teamId,
+                          name: invite.metadata.teamName,
+                          workspaceType: WorkspaceType.SHARED,
+                        } as Workspace
+                      }
                     />
                   ))}
                 </>
               ) : (
                 <>
-                  {sortedAvailableTeams.map((team: Team, index: number) => (
-                    <TeamsListItem key={index} teamId={team.id} teamName={team.name} />
+                  {sortedAvailableTeams.map((workspace: Workspace, index: number) => (
+                    <TeamsListItem key={index} workspace={workspace} />
                   ))}
                 </>
               )}

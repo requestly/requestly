@@ -1,13 +1,14 @@
 import React from "react";
 import { Col, Select, Input } from "antd";
 import { capitalize } from "lodash";
-import { RulePairSource, SourceKey, SourceOperator } from "types/rules";
 import { SessionRecordingPageSource } from "types";
 import "./index.scss";
+import { RulePairSource, RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 type Source = RulePairSource | SessionRecordingPageSource;
 
 interface SourceProps {
+  disabled?: boolean;
   source: Source;
   autoFocus?: boolean;
   additionalActions?: React.ReactNode;
@@ -17,6 +18,7 @@ interface SourceProps {
 export const SourceConditionInput: React.FC<SourceProps> = ({
   source,
   autoFocus = false,
+  disabled = false,
   additionalActions = <></>,
   onSourceChange,
 }) => {
@@ -24,16 +26,17 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
     <div className="source-condition-input-wrapper mt-8">
       <Col className="shrink-0 source-condition-input-select">
         <Select
+          disabled={disabled}
           value={source.key}
           className="source-condition-selector cursor-pointer uppercase"
           onChange={(value) => {
             onSourceChange({ ...source, key: value });
           }}
         >
-          {Object.entries(SourceKey).map(([key, value]) =>
-            value === SourceKey.PATH ? null : (
-              <Select.Option key={value} value={value}>
-                {capitalize(value)}
+          {Object.entries(RuleSourceKey).map(([key, value]) =>
+            value === RuleSourceKey.PATH ? null : (
+              <Select.Option key={String(value)} value={value}>
+                {capitalize(String(value))}
               </Select.Option>
             )
           )}
@@ -41,24 +44,26 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
       </Col>
       <Col className="shrink-0 source-condition-input-select">
         <Select
+          disabled={disabled}
           value={source.operator}
           className="source-condition-selector cursor-pointer"
           onChange={(value) => {
             onSourceChange({ ...source, operator: value });
           }}
         >
-          {Object.entries(SourceOperator).map(([key, value]) => (
+          {Object.entries(RuleSourceOperator).map(([key, value]) => (
             <Select.Option key={key} value={value}>
-              {value === SourceOperator.WILDCARD_MATCHES
+              {value === RuleSourceOperator.WILDCARD_MATCHES
                 ? "Wildcard"
-                : value === SourceOperator.MATCHES
+                : value === RuleSourceOperator.MATCHES
                 ? "RegEx"
-                : value}
+                : String(value)}
             </Select.Option>
           ))}
         </Select>
       </Col>
       <Input
+        disabled={disabled}
         autoFocus={autoFocus}
         className="source-url-input"
         placeholder="Enter source URL"

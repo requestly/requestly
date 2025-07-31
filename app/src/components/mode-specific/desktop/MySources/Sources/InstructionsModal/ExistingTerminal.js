@@ -52,7 +52,7 @@ const ExistingTerminalInstructionModal = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/terminal.png"}
+        icon={window.location.origin + "/assets/media/components/terminal.png"}
         heading="Terminal proxy setup"
         description="Note: Follow the below mentioned steps to complete the setup."
         setShowInstructions={setShowInstructions}

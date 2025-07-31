@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import isEmpty from "is-empty";
+import { isEmpty } from "lodash";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
@@ -16,7 +16,6 @@ import AppModeInitializer from "hooks/AppModeInitializer";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 // import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
-import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/notices/ExtensionContextInvalidationNotice";
 import AutomationNotAllowedNotice from "components/misc/notices/AutomationNotAllowedNotice";
@@ -26,11 +25,13 @@ import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsLi
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
-import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
 import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
+import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
+import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
+import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
+import { GrrWarningHoc } from "features/grr";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -41,15 +42,19 @@ const App: React.FC = () => {
   }, []);
 
   usePreLoadRemover();
+  useClientStorageService();
   useGeoLocation();
+
   useIsExtensionEnabled();
   useBillingTeamsListener();
-  useEnvironmentManager(true);
+  useAppLanguageObserver();
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
   useAppUpdateChecker();
-  useFetchIncentivizationDetails();
+
+  // FIXME-syncing: Move to AppModeProvider after refractoring. Everything triggered by appMode should be there
+  useWorkspaceManager();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
@@ -74,17 +79,15 @@ const App: React.FC = () => {
     <>
       <ExtensionContextInvalidationNotice />
       <AutomationNotAllowedNotice />
-      <AuthHandler />
       <AppModeInitializer />
-      <DBListeners />
-      {/* <RuleExecutionsSyncer /> */}
-      {/* @ts-ignore */}
-      <ActiveWorkspace />
-      {/* @ts-ignore */}
-      <ThirdPartyIntegrationsHandler />
-      <ThemeProvider>
-        <ConfigProvider locale={enUS}>
-          <GrowthBookProvider growthbook={growthbook}>
+      <AuthHandler />
+      <GrowthBookProvider growthbook={growthbook}>
+        <DBListeners />
+        {/* <RuleExecutionsSyncer /> */}
+        {/* @ts-ignore */}
+        <ThirdPartyIntegrationsHandler />
+        <ThemeProvider>
+          <ConfigProvider locale={enUS}>
             {/* @ts-ignore */}
             <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
@@ -95,12 +98,14 @@ const App: React.FC = () => {
                 <CommandBar />
                 <UpdateDialog />
                 <GlobalModals />
-                <Outlet />
+                <GrrWarningHoc>
+                  <Outlet />
+                </GrrWarningHoc>
               </div>
             </LazyMotion>
-          </GrowthBookProvider>
-        </ConfigProvider>
-      </ThemeProvider>
+          </ConfigProvider>
+        </ThemeProvider>
+      </GrowthBookProvider>
     </>
   );
 };

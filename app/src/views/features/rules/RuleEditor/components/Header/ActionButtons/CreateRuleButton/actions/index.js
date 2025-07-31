@@ -5,7 +5,6 @@ import { isValidUrl } from "../../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
@@ -13,6 +12,7 @@ import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 import { RE2JS } from "re2js";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import { EditorLanguage } from "componentsV2/CodeEditor";
+import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 /**
  * In case of a few rules, input from the rule editor does not directly map to rule schema.
@@ -227,6 +227,15 @@ export const validateRule = (rule, dispatch, appMode) => {
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
     if (rule.version > 1) {
       rule.pairs.every((pair, index) => {
+        if (!pair.modifications) {
+          output = {
+            result: false,
+            message: `Please add atleast one header modification to the rule.`,
+            error: "missing modifications key in pair",
+          };
+          return false;
+        }
+
         if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
           output = {
             result: false,
@@ -426,7 +435,7 @@ export const validateRule = (rule, dispatch, appMode) => {
       }
       // graphql operation data shouldn't be empty
       else if (
-        pair.response?.resourceType === ResponseRuleResourceType.GRAPHQL_API &&
+        pair.response?.resourceType === ResponseRule.ResourceType.GRAPHQL_API &&
         !isEmpty(pair.source?.filters?.[0]?.requestPayload) &&
         (!pair.source.filters[0].requestPayload.key || !pair.source.filters[0].requestPayload.value)
       ) {
@@ -451,15 +460,16 @@ export const validateRule = (rule, dispatch, appMode) => {
             ? EditorLanguage.JAVASCRIPT
             : EditorLanguage.JSON;
 
-        const result = prettifyCode(pair.response.value, language);
-
-        if (!result.success) {
-          output = {
-            result: false,
-            message: "Response body contains invalid syntax!",
-            error: "invalid syntax",
-          };
-        }
+        //const result = prettifyCode(pair.response.value, language);
+        prettifyCode(pair.response.value, language).then((result) => {
+          if (!result.success) {
+            output = {
+              result: false,
+              message: "Response body contains invalid syntax!",
+              error: "invalid syntax",
+            };
+          }
+        });
       }
     });
   }
@@ -491,15 +501,16 @@ export const validateRule = (rule, dispatch, appMode) => {
             ? EditorLanguage.JAVASCRIPT
             : EditorLanguage.JSON;
 
-        const result = prettifyCode(pair.request.value, language);
-
-        if (!result.success) {
-          output = {
-            result: false,
-            message: "Request body contains invalid syntax!",
-            error: "invalid syntax",
-          };
-        }
+        //const result = prettifyCode(pair.request.value, language);
+        prettifyCode(pair.request.value, language).then((result) => {
+          if (!result.success) {
+            output = {
+              result: false,
+              message: "Request body contains invalid syntax!",
+              error: "invalid syntax",
+            };
+          }
+        });
       }
     });
   }

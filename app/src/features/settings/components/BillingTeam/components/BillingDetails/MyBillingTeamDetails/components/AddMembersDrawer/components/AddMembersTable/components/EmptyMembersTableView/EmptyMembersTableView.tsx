@@ -1,6 +1,5 @@
 import React from "react";
 import { RQButton } from "lib/design-system/components";
-import EmptyIcon from "./assets/empty.svg";
 import { trackBillingTeamInviteMemberClicked } from "features/settings/analytics";
 import "./emptyMembersTableView.scss";
 
@@ -15,7 +14,7 @@ export const EmptyMembersTableView: React.FC<EmptyMembersTableViewProps> = ({
 }) => {
   return (
     <div className="empty-members-table-view">
-      <img src={EmptyIcon} alt="empty list" />
+      <img src={"/assets/media/settings/empty.svg"} alt="empty list" />
       <div className="empty-members-table-title">
         {searchValue.length
           ? `No user found with email “${searchValue}” in your billing team`

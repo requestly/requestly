@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row, Switch, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
-import { SessionRecordingPageSource, SourceKey, SourceOperator } from "types";
+import { SessionRecordingPageSource } from "types";
 import { toast } from "utils/Toast";
 import { SourceConditionInput } from "components/common/SourceUrl";
 import "./pageSourceRow.css";
+import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
 
 interface Props {
   disabled: boolean;
@@ -31,8 +32,8 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     const [pageSourceDetails, setPageSourceDetails] = useState<SessionRecordingPageSource>({
       value: "",
       isActive: true,
-      key: SourceKey.URL,
-      operator: SourceOperator.CONTAINS,
+      key: RuleSourceKey.URL,
+      operator: RuleSourceOperator.CONTAINS,
     });
 
     useEffect(() => {
@@ -91,6 +92,7 @@ export const PageSourceRow: React.FC<Props> = React.memo(
     ) : (
       <>
         <SourceConditionInput
+          disabled={disabled}
           autoFocus={true}
           source={pageSourceDetails}
           onSourceChange={(updatedSource) => handlePageSourceDetailsChange(updatedSource as SessionRecordingPageSource)}

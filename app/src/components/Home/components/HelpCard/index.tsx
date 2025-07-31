@@ -1,40 +1,37 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Col } from "antd";
-import callIcon from "../../assets/call.svg";
-import infoIcon from "../../assets/info.svg";
-import communityIcon from "../../assets/community.svg";
-import bookIcon from "../../assets/book.svg";
 import { AiOutlineYoutube } from "@react-icons/all-files/ai/AiOutlineYoutube";
 import { trackHomeHelpClicked } from "components/Home/analytics";
 import "./helpCard.scss";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 export const HelpCard: React.FC = () => {
   const helperLinks = useMemo(
     () => [
       // TODO: Add links to the hrefs
       {
-        icon: <img src={infoIcon} alt="info" />,
+        icon: <img src={"/assets/media/components/info.svg"} alt="info" />,
         title: "What is Requestly?",
-        href: "https://requestly.com/blog/what-is-requestly/",
+        href: getLinkWithMetadata("https://requestly.com/blog/what-is-requestly/"),
       },
       {
-        icon: <img src={bookIcon} alt="community" />,
+        icon: <img src={"/assets/media/components/book.svg"} alt="community" />,
         title: "Read official documentation",
-        href: "https://developers.requestly.io",
+        href: "https://docs.requestly.com/",
       },
       {
         icon: <AiOutlineYoutube className="help-card-react-icon" />,
         title: "See video tutorials",
-        href: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
+        href: "https://rqst.ly/http-rules-yt-tutorials",
       },
       {
-        icon: <img src={communityIcon} alt="community" />,
+        icon: <img src={"/assets/media/components/community.svg"} alt="community" />,
         title: "Community",
         href: "https://requestlycommunity.slack.com/ssb/redirect",
       },
       {
-        icon: <img src={callIcon} alt="call" />,
+        icon: <img src={"/assets/media/components/call.svg"} alt="call" />,
         title: "Schedule a demo",
         href: "https://calendly.com/requestly/sagar",
       },

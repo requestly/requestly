@@ -6,13 +6,14 @@ import { Button, Progress, Tooltip, TooltipProps, Typography } from "antd";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RuleSelectionListDrawer } from "../../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import PATHS from "config/constants/sub/paths";
-import { RecordStatus } from "features/rules/types/rules";
+import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { useTheme } from "styled-components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackSampleRuleEditorViewed } from "features/rules/analytics";
+import { RoleBasedComponent } from "features/rbac";
 
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
@@ -122,23 +123,25 @@ const RuleNameColumn: React.FC<{
           </Tooltip>
         ) : null}
 
-        <RuleSelectionListDrawer
-          groupId={group.id}
-          open={isRulesListDrawerOpen}
-          onClose={onRulesListDrawerClose}
-          source={SOURCE.RULE_GROUP}
-        >
-          <Button
-            className="add-rule-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsRulesListDrawerOpen(true);
-              trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
-            }}
+        <RoleBasedComponent resource="http_rule" permission="create">
+          <RuleSelectionListDrawer
+            groupId={group.id}
+            open={isRulesListDrawerOpen}
+            onClose={onRulesListDrawerClose}
+            source={SOURCE.RULE_GROUP}
           >
-            <span>+</span> <span>Add rule</span>
-          </Button>
-        </RuleSelectionListDrawer>
+            <Button
+              className="add-rule-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRulesListDrawerOpen(true);
+                trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
+              }}
+            >
+              <span>+</span> <span>Add rule</span>
+            </Button>
+          </RuleSelectionListDrawer>
+        </RoleBasedComponent>
       </div>
     );
   }

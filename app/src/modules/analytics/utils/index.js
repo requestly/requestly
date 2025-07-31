@@ -1,4 +1,5 @@
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
+import { EmailType } from "@requestly/shared/types/common";
 
 export function buildBasicUserProperties(user) {
   if (user && user.uid && user.providerData && user.providerData.length > 0) {
@@ -6,9 +7,11 @@ export function buildBasicUserProperties(user) {
     const email = profile["email"];
     let isBusinessAccount = false;
     let company = null;
-    if (email && isCompanyEmail(email)) {
+    const emailType = user.emailType;
+
+    if (email && emailType === EmailType.BUSINESS) {
       isBusinessAccount = true;
-      company = getDomainFromEmail(email);
+      company = email.split("@")[1];
     }
 
     return {
@@ -17,7 +20,10 @@ export function buildBasicUserProperties(user) {
       uid: user.uid,
       isBusinessAccount,
       company,
-      workspaceId: window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null,
+      workspaceId: getActiveWorkspaceId(window.activeWorkspaceIds)
+        ? getActiveWorkspaceId(window.activeWorkspaceIds)
+        : null,
+      browserstackId: user.browserstackId,
     };
   }
 }

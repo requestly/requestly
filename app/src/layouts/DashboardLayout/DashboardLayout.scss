@@ -1,0 +1,104 @@
+.app-layout {
+  --app-header-height: 48px;
+  --app-footer-height: 24px;
+  --app-sidebar-width: 80px;
+
+  width: 100vw;
+  height: clamp(calc(100vh - 48px), 100vh, 100vh);
+  display: grid;
+  background-color: var(--body-background);
+}
+
+.app-layout.app-dashboard-layout {
+  grid-template-columns: fit-content(var(--app-sidebar-width)) 1fr;
+  grid-template-rows: fit-content(var(--app-header-height)) 1fr fit-content(var(--app-footer-height));
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+}
+
+.app-layout.app-dashboard-layout {
+  &.read-role {
+    --view-only-banner-height: 32px;
+
+    .app-header {
+      max-height: calc(var(--app-header-height) + var(--view-only-banner-height));
+    }
+  }
+}
+
+.app-header {
+  grid-area: header;
+  height: 100%;
+  max-height: var(--app-header-height);
+  background-color: var(--requestly-color-surface-0);
+
+  &.app-mode-desktop {
+    -webkit-app-region: drag;
+
+    &.app-mode-desktop-macOS {
+      padding-left: 65px;
+    }
+
+    &.app-mode-desktop-Windows {
+      // TODO: TO be added when we add frameless option in Windows
+      // padding-right: 65px;
+    }
+
+    &.app-mode-desktop-Linux {
+      // TODO: TO be added when we add frameless option in Linux
+      // padding-right: 65px;
+    }
+  }
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.app-sidebar {
+  grid-area: sidebar;
+  width: 100%;
+  max-width: var(--app-sidebar-width);
+  background-color: var(--requestly-color-surface-0);
+}
+
+.app-main-content {
+  grid-area: main;
+  overflow: auto !important;
+  background-color: var(--requestly-color-surface-1);
+  border: 1px solid var(--border-dark);
+  border-radius: 10px 0px 0px 10px;
+}
+
+.app-footer {
+  grid-area: footer;
+  height: 100%;
+  max-height: var(--app-footer-height);
+}
+
+.app-main-content,
+#dashboardMainContent {
+  height: 100%;
+}
+
+#dashboardMainContent {
+  overflow: hidden;
+}
+
+.app-layout .ant-layout-footer {
+  height: 1.5rem;
+  font-size: var(--requestly-font-size-xs, 11px);
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--body-background);
+}
+
+@media screen and (max-width: 768px) {
+  #requestly-dashboard-layout .hidden-on-small-screen {
+    display: none;
+  }
+}

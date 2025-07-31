@@ -6,10 +6,10 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { RuleTableRecord } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/types";
 import { useSharedListViewerColumns } from "./hooks/useSharedListViewerColumns";
 import { SharedListViewerModal } from "../../modals/SharedListRuleViewerModal";
-import { Group, Rule } from "types";
 import { enhanceRecords } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
 import { recordsToContentTableDataAdapter } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils";
 import "./sharedListViewerList.scss";
+import { Group, Rule } from "@requestly/shared/types/entities/rules";
 
 interface Props {
   records: Array<Rule | Group>;

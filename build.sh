@@ -27,6 +27,11 @@ cd ../..
 echo -e "\n***** Generating requestly-core Dist Files *****"
 npm run build
 
+echo -e "\n***** Building @requestly/shared *****"
+cd shared
+npm run build
+cd ..
+
 echo -e "\n***** Building New React App *****"
 cd app
 bash build.sh ${env}

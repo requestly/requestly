@@ -1,22 +1,20 @@
 enum Feature {
   RULES = "RULES",
   API_CLIENT = "API_CLIENT",
+  FILE_SERVER = "FILE_SERVER",
 }
 
 export const KEY_ICONS: Record<string, string> = {
   meta: "⌘",
+  enter: "⏎",
 };
 
-export const KEYBOARD_SHORTCUTS: Record<
-  Feature,
-  Record<
-    string,
-    {
-      hotKey: string;
-      description: string;
-    }
-  >
-> = {
+export type KEYBOARD_SHORTCUT = {
+  hotKey: string;
+  description: string;
+};
+
+export const KEYBOARD_SHORTCUTS: Record<Feature, Record<string, KEYBOARD_SHORTCUT>> = {
   [Feature.RULES]: {
     EDITOR_BACK: {
       hotKey: "esc",
@@ -27,6 +25,12 @@ export const KEYBOARD_SHORTCUTS: Record<
       description: "Save rule",
     },
   },
+  [Feature.FILE_SERVER]: {
+    SAVE_FILE: {
+      hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
+      description: "Save file",
+    },
+  },
   [Feature.API_CLIENT]: {
     SEND_REQUEST: {
       hotKey: navigator.platform.match("Mac") ? "meta+enter" : "ctrl+enter",
@@ -35,6 +39,10 @@ export const KEYBOARD_SHORTCUTS: Record<
     SAVE_REQUEST: {
       hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
       description: "Save request",
+    },
+    SAVE_ENVIRONMENT: {
+      hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
+      description: "Save environment",
     },
   },
 };

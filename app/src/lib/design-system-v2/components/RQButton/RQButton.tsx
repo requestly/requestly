@@ -4,6 +4,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { capitalize } from "lodash";
 import { KEY_ICONS } from "../../../../constants";
 import "./RQButton.scss";
+import { useSelector } from "react-redux";
+import { getAppLanguage } from "store/selectors";
 
 type RQButtonSize = "small" | "default" | "large";
 
@@ -12,6 +14,7 @@ type RQButtonType = "primary" | "secondary" | "transparent" | "danger" | "warnin
 export interface RQButtonProps extends Omit<AntDButtonProps, "size" | "type"> {
   hotKey?: string;
   hotKeyText?: string;
+  enableHotKey?: boolean;
   showHotKeyText?: boolean;
   size?: RQButtonSize;
   type?: RQButtonType;
@@ -37,7 +40,7 @@ const RQ_TO_ANTD_PROPS: {
 };
 
 const BaseButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function BaseButton({ ...props }, ref) {
-  const { hotKey, showHotKeyText, ...restProps } = props; // Remove unrecognised props
+  const { hotKey, showHotKeyText, enableHotKey, ...restProps } = props; // Remove unrecognised props
 
   const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
 
@@ -63,6 +66,7 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(func
     {
       preventDefault: true,
       enableOnFormTags: ["input", "INPUT"],
+      enabled: props.enableHotKey ?? true,
     }
   );
 
@@ -76,8 +80,9 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(func
         <span className="rq-custom-btn-hotkey-text">
           {keys.map((key, index) => (
             <>
-              <span className="key">{capitalize(key)}</span>
-              {/* {index === keys.length - 1 ? null : <span>+</span>} */}
+              <span key={key} className="key">
+                {capitalize(key)}
+              </span>
             </>
           ))}
         </span>
@@ -92,7 +97,10 @@ interface RQCustomButton
   extends React.ForwardRefExoticComponent<RQButtonProps & React.RefAttributes<HTMLButtonElement>> {}
 
 export const RQButton: RQCustomButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function Button(props, ref) {
-  if (props.hotKey) {
+  const appLanguage = useSelector(getAppLanguage);
+
+  // Only showing hotkey for english language as hotkeys behave differently in other languages and keyboard layouts
+  if (props.hotKey && appLanguage === "en") {
     return <ButtonWithHotkey ref={ref} {...props} />;
   }
 

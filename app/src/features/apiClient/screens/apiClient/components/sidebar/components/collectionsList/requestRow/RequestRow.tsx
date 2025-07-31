@@ -1,38 +1,63 @@
-import React, { useCallback, useState } from "react";
-import { Typography, Dropdown, MenuProps } from "antd";
-import PATHS from "config/constants/sub/paths";
-import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
-import { RQAPI } from "features/apiClient/types";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useCallback, useMemo, useState } from "react";
+import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
+import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
+import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
-import { upsertApiRecord } from "backend/apiClient";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import {
   trackDuplicateRequestClicked,
   trackDuplicateRequestFailed,
-  trackDuplicateRequestSuccessful,
   trackMoveRequestToCollectionClicked,
+  trackRequestDuplicated,
 } from "modules/analytics/events/features/apiClient";
-import { redirectToRequest } from "utils/RedirectionUtils";
+import { LocalWorkspaceTooltip } from "../../../../clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import "./RequestRow.scss";
+import { MdOutlineBorderColor } from "@react-icons/all-files/md/MdOutlineBorderColor";
+import { MdContentCopy } from "@react-icons/all-files/md/MdContentCopy";
+import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
+import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
+import { Conditional } from "components/common/Conditional";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../../../../clientView/components/RequestView/requestViewTabSource";
 
 interface Props {
   record: RQAPI.ApiRecord;
+  isReadOnly: boolean;
+  bulkActionOptions: {
+    showSelection: boolean;
+    selectedRecords: Set<RQAPI.Record["id"]>;
+    recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+    setShowSelection: (arg: boolean) => void;
+  };
 }
 
-export const RequestRow: React.FC<Props> = ({ record }) => {
+export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions }) => {
+  const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const { updateRecordToBeDeleted, setIsDeleteModalOpen, onSaveRecord } = useApiClientContext();
-  const user = useSelector(getUserAuthDetails);
-  const team = useSelector(getCurrentlyActiveWorkspace);
-  const navigate = useNavigate();
+  const {
+    updateRecordsToBeDeleted,
+    setIsDeleteModalOpen,
+    onSaveRecord,
+    apiClientRecordsRepository,
+  } = useApiClientContext();
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
+
+  const activeTabSourceId = useMemo(() => {
+    if (activeTabSource) {
+      return activeTabSource.getSourceId();
+    }
+  }, [activeTabSource]);
+
+  const handleDropdownVisibleChange = (isOpen: boolean) => {
+    setIsDropdownVisible(isOpen);
+  };
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
@@ -41,71 +66,101 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
         name: `(Copy) ${record.name || record.data.request.url}`,
       };
       delete newRecord.id;
-      return upsertApiRecord(user?.details?.profile?.uid, newRecord, team?.id)
+      return apiClientRecordsRepository
+        .createRecord(newRecord)
         .then((result) => {
           if (!result.success) {
             throw new Error("Failed to duplicate request");
           }
-          onSaveRecord(result.data);
-          redirectToRequest(navigate, result.data.id);
+          onSaveRecord(result.data, "open");
           toast.success("Request duplicated successfully");
-          trackDuplicateRequestSuccessful();
+          trackRequestDuplicated();
         })
         .catch((error) => {
           console.error("Error duplicating request:", error);
-          toast.error(error.message || "Unexpected error. Please contact support.");
+          notification.error({
+            message: "Error duplicating request",
+            description: error?.message || "Unexpected error. Please contact support.",
+            placement: "bottomRight",
+          });
           trackDuplicateRequestFailed();
         });
     },
-    [team?.id, user?.details?.profile?.uid, onSaveRecord, navigate]
+    [onSaveRecord, apiClientRecordsRepository]
   );
 
-  const getRequestOptions = useCallback((): MenuProps["items"] => {
+  const requestOptions = useMemo((): MenuProps["items"] => {
     return [
       {
         key: "0",
-        label: <div>Rename</div>,
+        label: (
+          <div>
+            <MdOutlineBorderColor style={{ marginRight: 8 }} />
+            Rename
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setIsEditMode(true);
+          handleDropdownVisibleChange(false);
         },
       },
       {
         key: "1",
-        label: <div>Duplicate</div>,
+        label: (
+          <LocalWorkspaceTooltip featureName="Request duplication" placement="bottomRight">
+            <div>
+              <MdContentCopy style={{ marginRight: 8 }} />
+              Duplicate
+            </div>
+          </LocalWorkspaceTooltip>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           handleDuplicateRequest(record);
           trackDuplicateRequestClicked();
+          handleDropdownVisibleChange(false);
         },
       },
       {
         key: "2",
-        label: <div>Move to Collection</div>,
+        label: (
+          <div>
+            <MdMoveDown style={{ marginRight: 8 }} />
+            Move to Collection
+          </div>
+        ),
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
           setRecordToMove(record);
           trackMoveRequestToCollectionClicked();
+          handleDropdownVisibleChange(false);
         },
       },
       {
         key: "3",
-        label: <div>Delete</div>,
+        label: (
+          <div>
+            <MdOutlineDelete style={{ marginRight: 8 }} />
+            Delete
+          </div>
+        ),
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
-          updateRecordToBeDeleted(record);
+          updateRecordsToBeDeleted([record]);
           setIsDeleteModalOpen(true);
+          handleDropdownVisibleChange(false);
         },
       },
     ];
-  }, [record, updateRecordToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
+  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
 
   return (
     <>
       {recordToMove && (
         <MoveToCollectionModal
-          recordToMove={recordToMove}
+          recordsToMove={[recordToMove]}
           isOpen={recordToMove}
           onClose={() => {
             setRecordToMove(null);
@@ -122,33 +177,75 @@ export const RequestRow: React.FC<Props> = ({ record }) => {
           }}
         />
       ) : (
-        <NavLink
-          title={record.name || record.data.request.url}
-          to={`${PATHS.API_CLIENT.ABSOLUTE}/request/${record.id}`}
-          className={({ isActive }) => `collections-list-item api  ${isActive ? "active" : ""}`}
-        >
-          <Typography.Text
-            strong
-            className="request-method"
-            style={{ color: REQUEST_METHOD_COLORS[record.data.request.method] }}
+        <div className={`request-row`}>
+          <div
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
+            onClick={() => {
+              openTab(
+                new RequestViewTabSource({
+                  id: record.id,
+                  apiEntryDetails: record,
+                  title: record.name || record.data.request?.url,
+                }),
+                { preview: true }
+              );
+            }}
           >
-            {record.data.request.method}
-          </Typography.Text>
-          <div className="request-url">{record.name || record.data.request.url}</div>
-
-          <div className="request-options">
-            <Dropdown trigger={["click"]} menu={{ items: getRequestOptions() }} placement="bottomRight">
-              <RQButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                size="small"
-                type="transparent"
-                icon={<MdOutlineMoreHoriz />}
+            {showSelection && (
+              <Checkbox
+                onChange={recordsSelectionHandler.bind(this, record)}
+                checked={selectedRecords.has(record.id)}
               />
-            </Dropdown>
+            )}
+            <Typography.Text
+              strong
+              className="request-method"
+              style={{
+                color: REQUEST_METHOD_COLORS[record.data.request?.method],
+                backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[record.data.request?.method],
+              }}
+            >
+              {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(record.data.request?.method)
+                ? record.data.request?.method.slice(0, 3)
+                : record.data.request?.method}
+            </Typography.Text>
+            <Typography.Text
+              ellipsis={{
+                tooltip: {
+                  title: record.name || record.data.request?.url,
+                  placement: "right",
+                  color: "#000",
+                  mouseEnterDelay: 0.5,
+                },
+              }}
+              className="request-url"
+            >
+              {record.name || record.data.request?.url}
+            </Typography.Text>
+
+            <Conditional condition={!isReadOnly}>
+              <div className={`request-options ${isDropdownVisible ? "active" : ""}`}>
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{ items: requestOptions }}
+                  placement="bottomRight"
+                  open={isDropdownVisible}
+                  onOpenChange={handleDropdownVisibleChange}
+                >
+                  <RQButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSelection(false);
+                    }}
+                    size="small"
+                    type="transparent"
+                    icon={<MdOutlineMoreHoriz />}
+                  />
+                </Dropdown>
+              </div>
+            </Conditional>
           </div>
-        </NavLink>
+        </div>
       )}
     </>
   );

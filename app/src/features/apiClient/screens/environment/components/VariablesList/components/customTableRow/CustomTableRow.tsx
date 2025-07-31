@@ -1,11 +1,9 @@
-import { Form, FormInstance, Input, InputNumber, Select } from "antd";
-import React, { useCallback, useContext, useMemo, useRef, useEffect } from "react";
+import { Form, FormInstance, Input, InputNumber, Select, Tooltip } from "antd";
+import React, { useCallback, useContext, useRef, useEffect } from "react";
 import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
-import debounce from "lodash/debounce";
 import Logger from "lib/logger";
-import { useLocation } from "react-router-dom";
-import PATHS from "config/constants/sub/paths";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -20,9 +18,11 @@ interface EditableCellProps {
   children: React.ReactNode;
   dataIndex: keyof EnvironmentVariableTableRow;
   record: EnvironmentVariableTableRow;
-  handleSaveVariable: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
+  handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
   isSecret?: boolean;
   options?: string[];
+  duplicateKeyIndices?: Set<number>;
+  isReadOnly: boolean;
 }
 
 export const EditableRow = ({ index, ...props }: { index: number }) => {
@@ -42,80 +42,68 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   children,
   dataIndex,
   record,
-  handleSaveVariable,
+  handleVariableChange,
   options,
   isSecret,
+  duplicateKeyIndices,
+  isReadOnly,
   ...restProps
 }) => {
-  const location = useLocation();
   const form = useContext(EditableContext)!;
   const inputRef = useRef(null);
 
-  const convertValueByType = useCallback((value: any, type: EnvironmentVariableType) => {
-    if (value === undefined) {
-      return "";
-    }
-    switch (type) {
-      case EnvironmentVariableType.Number:
-        return Number(value);
-      case EnvironmentVariableType.Boolean:
-        return Boolean(value);
-      case EnvironmentVariableType.String:
-      default:
-        return String(value);
-    }
-  }, []);
+  const handleTypeChange = useCallback(
+    (value: EnvironmentVariableType) => {
+      const defaultValues = {
+        syncValue: record.syncValue,
+        localValue: record.localValue,
+      };
 
-  const handleSaveCellValue = useCallback(async () => {
+      switch (value) {
+        case EnvironmentVariableType.Boolean:
+          defaultValues.syncValue = Boolean(defaultValues.syncValue ?? true);
+          defaultValues.localValue = Boolean(defaultValues.localValue ?? true);
+          break;
+        case EnvironmentVariableType.Number:
+          defaultValues.syncValue = isNaN(defaultValues.syncValue as number) ? 0 : Number(defaultValues.syncValue);
+          defaultValues.localValue = isNaN(defaultValues.localValue as number) ? 0 : Number(defaultValues.localValue);
+
+          break;
+        case EnvironmentVariableType.String:
+          defaultValues.syncValue = String(defaultValues.syncValue ?? "");
+          defaultValues.localValue = String(defaultValues.localValue ?? "");
+
+          break;
+        default:
+          break;
+      }
+
+      handleVariableChange({ ...record, type: value, ...defaultValues }, "type");
+    },
+    [record, handleVariableChange]
+  );
+
+  const handleValueChange = useCallback(async () => {
     try {
       const values = await form.validateFields();
       const updatedRecord = { ...record, ...values };
 
-      updatedRecord.syncValue = convertValueByType(updatedRecord.syncValue, updatedRecord.type);
-      updatedRecord.localValue = convertValueByType(updatedRecord.localValue, updatedRecord.type);
-
-      handleSaveVariable(updatedRecord, dataIndex);
+      handleVariableChange(updatedRecord, dataIndex);
     } catch (errInfo) {
       Logger.log("Save failed:", errInfo);
     }
-  }, [form, record, handleSaveVariable, convertValueByType, dataIndex]);
-
-  const debouncedSave = useMemo(() => debounce(handleSaveCellValue, 1000), [handleSaveCellValue]);
+  }, [dataIndex, handleVariableChange, record, form]);
 
   const handleChange = useCallback(
-    (value: string | number | boolean) => {
+    (value: string | number | boolean | EnvironmentVariableType) => {
       if (dataIndex === "type") {
-        const defaultValues = {
-          syncValue: record.syncValue,
-          localValue: record.localValue,
-        };
-        if (value === EnvironmentVariableType.Boolean) {
-          defaultValues.syncValue = true;
-          defaultValues.localValue = true;
-        } else if (value === EnvironmentVariableType.Number) {
-          defaultValues.syncValue = 0;
-          defaultValues.localValue = 0;
-        }
-        handleSaveVariable({ ...record, [dataIndex]: value, ...defaultValues }, dataIndex);
+        handleTypeChange(value as EnvironmentVariableType);
       } else {
-        debouncedSave();
+        handleValueChange();
       }
     },
-    [form, dataIndex, debouncedSave, handleSaveVariable, record]
+    [dataIndex, handleTypeChange, handleValueChange]
   );
-
-  useEffect(() => {
-    // automatically focus on the "key" input for newest row
-    // don't focus on key input for table in /new route
-    if (
-      dataIndex === "key" &&
-      record?.key === "" &&
-      inputRef.current &&
-      !location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.NEW.RELATIVE)
-    ) {
-      inputRef.current.focus();
-    }
-  }, [dataIndex, record?.key, location.pathname]);
 
   const getPlaceholderText = useCallback((dataIndex: string) => {
     if (dataIndex === "key") {
@@ -125,11 +113,14 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }, []);
 
   const renderValueInputByType = useCallback(() => {
+    const disabled = isReadOnly;
+
     switch (record.type) {
       case EnvironmentVariableType.String:
         return (
           <Input
             ref={inputRef}
+            disabled={disabled}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
           />
@@ -140,6 +131,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           <Input
             type={isSecret ? "password" : "text"}
             ref={inputRef}
+            disabled={disabled}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
           />
@@ -149,6 +141,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         return (
           <InputNumber
             type="number"
+            disabled={disabled}
             controls={false}
             ref={inputRef}
             onChange={(value) => handleChange(value)}
@@ -157,13 +150,18 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         );
       case EnvironmentVariableType.Boolean:
         return (
-          <Select onChange={handleChange} value={record[dataIndex]} placeholder="Select value">
+          <Select
+            disabled={disabled}
+            onChange={(value) => handleChange(value)}
+            value={record[dataIndex]}
+            placeholder="Select value"
+          >
             <Select.Option value={true}>True</Select.Option>
             <Select.Option value={false}>False</Select.Option>
           </Select>
         );
     }
-  }, [record, handleChange, dataIndex, getPlaceholderText, isSecret]);
+  }, [isReadOnly, record, handleChange, dataIndex, getPlaceholderText, isSecret]);
 
   useEffect(() => {
     // Update form fields when record changes non-user actions like syncing variables from listener
@@ -177,10 +175,11 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   }
 
   return (
-    <td {...restProps}>
+    <td {...restProps} style={{ position: "relative" }}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         {dataIndex === "type" ? (
           <Select
+            disabled={isReadOnly}
             className="w-full"
             onChange={(value) => handleChange(value as EnvironmentVariableType)}
             value={record.type}
@@ -193,9 +192,19 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </Select>
         ) : dataIndex === "key" ? (
           <Input
+            disabled={isReadOnly}
             ref={inputRef}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={getPlaceholderText(dataIndex)}
+            suffix={
+              duplicateKeyIndices?.has(record.id) ? (
+                <Tooltip title="This variable has been overwritten by a duplicate key." color="#000">
+                  <MdOutlineWarningAmber className="warning" />
+                </Tooltip>
+              ) : (
+                <></>
+              )
+            }
           />
         ) : (
           renderValueInputByType()

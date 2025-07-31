@@ -1,0 +1,112 @@
+.product-switcher {
+  border-radius: 72px;
+  padding: 8px;
+  border: 1px solid var(--requestly-color-neutral-700);
+  display: flex;
+  gap: 16px;
+  max-width: 624px;
+  margin: auto;
+  margin-top: 32px;
+
+  &.in-modal {
+    margin-top: 16px;
+    max-width: 450px;
+    padding: 4px;
+    gap: 6.5px;
+    background: rgba(255, 255, 255, 0.06);
+    align-items: center;
+    margin-bottom: 18px;
+    flex-basis: auto;
+
+    .product-details {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      flex-grow: 1;
+      padding: 8px 11px;
+      flex-basis: 48%;
+
+      .product-text {
+        padding: 0;
+
+        p {
+          margin-bottom: 0;
+        }
+      }
+
+      img {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .product-details {
+    padding: 8px 12px;
+    flex-grow: 1;
+    flex-basis: 50%;
+    border-radius: 48px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    transition: all 0.5s;
+    cursor: pointer;
+
+    .product-text {
+      padding-left: 12px;
+      p {
+        line-height: 20px;
+        font-weight: var(--requestly-font-weight-bold);
+        margin-bottom: 2px;
+      }
+      span {
+        font-size: var(--requestly-font-size-xs);
+        line-height: 17px;
+        display: block;
+        color: var(--requestly-color-neutral-300);
+      }
+    }
+
+    &.active {
+      background: var(--requestly-color-neutral-700);
+      cursor: default;
+
+      .product-text {
+        span {
+          color: var(--requestly-color-text-default);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .product-switcher {
+    position: sticky;
+    top: 10px;
+    z-index: 1;
+    background: var(--black);
+
+    img {
+      display: none;
+    }
+
+    .product-details {
+      justify-content: center;
+
+      .product-text {
+        text-align: center;
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: var(--requestly-font-weight-medium);
+        line-height: 18px; /* 150% */
+        padding-left: 0;
+
+        .description {
+          display: none;
+        }
+      }
+    }
+  }
+}

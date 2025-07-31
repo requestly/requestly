@@ -1,5 +1,5 @@
 .enterprise-plan-card {
-  background: var(--requestly-color-surface-0);
+  background: var(--requestly-color-background);
   border-radius: 8px;
   border: 1px solid var(--requestly-color-white-t-20);
   margin-top: 32px;
@@ -7,14 +7,17 @@
 
 .enterprise-plan-name {
   color: var(--requestly-color-text-default);
-  font-size: var(--requestly-font-size-xl);
+  font-size: var(--requestly-font-size-base);
   font-weight: 500;
+  line-height: 22px;
 }
 
 .enterprise-plan-description {
-  color: var(--requestly-color-text-subtle);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm);
   margin-top: 8px;
+  font-weight: 500;
+  line-height: 18px;
 }
 
 .enterprise-plan-details-container {
@@ -24,19 +27,21 @@
 
 .enterprise-plan-card-body {
   display: flex;
-  padding: 30px 32px;
+  padding: 24px 32px;
 }
 
 .enterprise-plan-features-list-container {
   display: flex;
   gap: 60px;
-  margin-top: 1rem;
+  margin-top: 24px;
 
   .enterprise-plan-feature {
     color: var(--requestly-color-text-subtle);
+    line-height: 18px;
+    font-size: 12px;
 
     img {
-      width: 14px;
+      width: 12px;
       margin-right: 8px;
     }
 
@@ -49,6 +54,10 @@
 .enterprise-contact-us-container {
   padding: 64px 0;
   padding-left: 48px;
+
+  button {
+    font-weight: 500;
+  }
 
   .enterprise-plan-price {
     color: var(--requestly-color-text-default);

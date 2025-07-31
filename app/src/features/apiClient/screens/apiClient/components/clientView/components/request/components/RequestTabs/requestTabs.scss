@@ -25,36 +25,6 @@
     height: 100%;
   }
 
-  .api-request-body {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    .api-request-body-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .beautify-code {
-        height: 22px;
-        padding: 0;
-      }
-    }
-
-    .react-resizable {
-      min-height: 0 !important;
-      margin-bottom: 0 !important;
-      height: 100% !important;
-    }
-
-    .api-request-body-raw {
-      height: 100%;
-      width: 100%;
-      resize: none;
-    }
-  }
-
   .rq-content-list-table-container {
     padding: 0 0 1rem 0;
     max-width: unset;
@@ -69,7 +39,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--requestly-color-primary);
+      background: var(--requestly-color-success);
     }
   }
 }

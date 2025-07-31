@@ -1,7 +1,5 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Tooltip } from "antd";
-import { RQButton } from "lib/design-system-v2/components";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 import {
@@ -11,7 +9,7 @@ import {
   getUserAttributes,
 } from "../../../../../../../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 import { saveRule, validateSyntaxInRule } from "../actions";
 import {
   getModeData,
@@ -27,28 +25,19 @@ import {
   trackErrorInRuleCreation,
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
-  trackRuleResourceTypeSelected,
-  trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
-import { ResponseRuleResourceType } from "types/rules";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { globalActions } from "store/slices/global/slice";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { RuleType } from "features/rules";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import Logger from "../../../../../../../../../../common/logger";
-import { IncentivizationModal } from "store/features/incentivization/types";
-import { useIncentiveActions } from "features/incentivization/hooks";
-import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
-import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../constants/keyboardShortcuts";
+import { RBACButton } from "features/rbac";
 import "../RuleEditorActionButtons.css";
+import * as Sentry from "@sentry/react";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -60,6 +49,7 @@ const getEventParams = (rule) => {
       }, rule.pairs[0].scripts[0]?.value?.length);
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+      eventParams.resource_type = rule.pairs[0].response?.resourceType;
       eventParams.num_characters = rule.pairs[0].response?.value?.length;
       break;
     case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
@@ -120,8 +110,6 @@ const CreateRuleButton = ({
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
 
-  const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUserForIncentivization = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
 
   const premiumRuleLimitType = useMemo(() => {
@@ -136,12 +124,6 @@ const CreateRuleButton = ({
         return null;
     }
   }, [currentlySelectedRuleData.ruleType]);
-
-  const tooltipText = isDisabled
-    ? "Only available in desktop app."
-    : navigator.platform.match("Mac")
-    ? "⌘+S"
-    : "Ctrl+S";
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
@@ -159,82 +141,7 @@ const CreateRuleButton = ({
     }
   }, [isDisabled, MODE, premiumRuleLimitType, user.details?.isPremium]);
 
-  const handleOtherRuleEvents = useCallback(async () => {
-    const otherRules = [RuleType.RESPONSE, RuleType.REDIRECT];
-
-    if (otherRules.includes(currentlySelectedRuleData.ruleType)) {
-      const incentiveEvent =
-        currentlySelectedRuleData.ruleType === RuleType.RESPONSE
-          ? IncentivizeEvent.RESPONSE_RULE_CREATED
-          : IncentivizeEvent.REDIRECT_RULE_CREATED;
-
-      claimIncentiveRewards({
-        type: incentiveEvent,
-        metadata: { rule_type: currentlySelectedRuleData.ruleType },
-      })?.then((response) => {
-        if (response.data?.success) {
-          dispatch(
-            incentivizationActions.setUserMilestoneAndRewardDetails({
-              userMilestoneAndRewardDetails: response.data?.data,
-            })
-          );
-
-          dispatch(
-            incentivizationActions.toggleActiveModal({
-              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-              newValue: true,
-              newProps: {
-                event: incentiveEvent,
-                metadata: { rule_type: currentlySelectedRuleData.ruleType },
-              },
-            })
-          );
-        }
-      });
-    }
-  }, [dispatch, currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
-
-  const handleFirstRuleCreationEvent = useCallback(async () => {
-    claimIncentiveRewards({
-      type: IncentivizeEvent.RULE_CREATED,
-      metadata: { num_rules: 1, rule_type: currentlySelectedRuleData.ruleType },
-    })?.then((response) => {
-      if (response.data?.success) {
-        dispatch(
-          incentivizationActions.setUserMilestoneAndRewardDetails({
-            userMilestoneAndRewardDetails: response.data?.data,
-          })
-        );
-
-        dispatch(
-          incentivizationActions.toggleActiveModal({
-            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-            newValue: true,
-            newProps: {
-              event: IncentivizeEvent.RULE_CREATED,
-              metadata: { rule_type: currentlySelectedRuleData.ruleType },
-            },
-          })
-        );
-      }
-    });
-  }, [dispatch, currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
-
-  const claimRuleCreationRewards = async () => {
-    if (isNewUserForIncentivization) {
-      handleOtherRuleEvents();
-      return;
-    } else if (userAttributes?.num_rules === 0) {
-      return handleFirstRuleCreationEvent().catch((err) => {
-        Logger.log("Error in claiming rule creation rewards", err);
-      });
-    } else {
-      handleOtherRuleEvents();
-    }
-  };
-
   const handleBtnOnClick = async (saveType = "button_click") => {
-    trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
@@ -263,10 +170,6 @@ const CreateRuleButton = ({
       })
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
         .then(() => {
-          if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-            claimRuleCreationRewards();
-          }
-
           if (isRuleEditorModal) {
             ruleCreatedFromEditorModalCallback(finalRuleData.id);
           } else {
@@ -281,6 +184,7 @@ const CreateRuleButton = ({
             rule_type = finalRuleData.ruleType;
           }
           if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
+            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, (userAttributes?.num_rules ?? 0) + 1);
             trackRuleCreatedEvent({
               rule_type,
               description: finalRuleData.description,
@@ -311,14 +215,6 @@ const CreateRuleButton = ({
           }
           ruleModifiedAnalytics(user);
           trackRQLastActivity("rule_saved");
-
-          if (finalRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
-            const resourceType = finalRuleData?.pairs?.[0]?.response?.resourceType;
-
-            if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
-              trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
-            }
-          }
         })
         .then(() => {
           if (!isRuleEditorModal && MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
@@ -326,7 +222,8 @@ const CreateRuleButton = ({
             redirectToRuleEditor(navigate, finalRuleData.id, MODE, false, true);
           }
         })
-        .catch(() => {
+        .catch((e) => {
+          Sentry.captureException(e.message);
           toast.error("Error in saving rule. Please contact support.");
         });
     } else {
@@ -343,20 +240,21 @@ const CreateRuleButton = ({
       source={SOURCE.CREATE_NEW_RULE}
       placement="bottomLeft"
     >
-      <Tooltip title={tooltipText} placement="bottom">
-        <RQButton
-          showHotKeyText
-          hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
-          data-tour-id="rule-editor-create-btn"
-          id="rule-editor-save-btn"
-          type="primary"
-          className="text-bold"
-          disabled={isDisabled}
-        >
-          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-          {`Save rule`}
-        </RQButton>
-      </Tooltip>
+      <RBACButton
+        permission="update"
+        resource="http_rule"
+        showHotKeyText
+        hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
+        data-tour-id="rule-editor-create-btn"
+        id="rule-editor-save-btn"
+        type="primary"
+        className="text-bold"
+        disabled={isDisabled}
+        tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
+      >
+        {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+        {`Save rule`}
+      </RBACButton>
     </AuthConfirmationPopover>
   ) : (
     <>
@@ -368,20 +266,21 @@ const CreateRuleButton = ({
         disabled={checkIsUpgradePopoverDisabled()}
         source={currentlySelectedRuleData.ruleType}
       >
-        <Tooltip title={tooltipText} placement="bottom">
-          <RQButton
-            showHotKeyText
-            hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
-            data-tour-id="rule-editor-create-btn"
-            id="rule-editor-save-btn"
-            type="primary"
-            className="text-bold"
-            disabled={isDisabled}
-          >
-            {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-            {`Save rule`}
-          </RQButton>
-        </Tooltip>
+        <RBACButton
+          permission="update"
+          resource="http_rule"
+          showHotKeyText
+          hotKey={KEYBOARD_SHORTCUTS.RULES.SAVE_RULE.hotKey}
+          data-tour-id="rule-editor-create-btn"
+          id="rule-editor-save-btn"
+          type="primary"
+          className="text-bold"
+          disabled={isDisabled}
+          tooltipTitle="Saving is not allowed in view-only mode. You can test rules but cannot save them."
+        >
+          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+          {`Save rule`}
+        </RBACButton>
       </PremiumFeature>
     </>
   );

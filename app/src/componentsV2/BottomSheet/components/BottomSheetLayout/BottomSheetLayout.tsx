@@ -13,10 +13,11 @@ type BottomSheetLayoutProps = {
 type SplitLayoutProps = BottomSheetLayoutProps & {
   layout: SheetLayout.SPLIT;
   minSize?: number;
+  initialSizes?: Array<number>;
 };
 
 type DrawerLayoutProps = BottomSheetLayoutProps & {
-  layout: SheetLayout.DRAWER;
+  layout?: SheetLayout.DRAWER;
   initialOffset?: number;
 };
 
@@ -45,6 +46,7 @@ export const BottomSheetLayout: React.FC<Props> = (props) => {
         bottomSheet={bottomSheet}
         children={children}
         minSize={(props as SplitLayoutProps).minSize ?? 100}
+        initialSizes={(props as SplitLayoutProps).initialSizes ?? [40, 60]}
       />
     );
   }

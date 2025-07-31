@@ -7,25 +7,17 @@
     min-height: 33px;
 
     .active-inline-input.ant-input {
-      padding: 0;
-      border-bottom: 1px solid transparent;
       color: var(--requestly-color-text-default);
-      font-size: var(--requestly-font-size-sm);
+      font-size: var(--requestly-font-size-default);
       font-weight: 500;
-      border-radius: 0;
-      padding: 0;
-
-      &:focus,
-      &:active {
-        border-bottom: 1px solid var(--requestly-color-primary);
-      }
+      padding: 2px 4px;
     }
 
     .inactive-inline-input {
       display: flex;
       gap: 4px;
       width: 400px;
-      font-size: var(--requestly-font-size-sm);
+      font-size: var(--requestly-font-size-default);
       font-weight: 500;
 
       span {

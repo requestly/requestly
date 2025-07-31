@@ -9,19 +9,17 @@ import { CloseOutlined } from "@ant-design/icons";
 import "./card.scss";
 import { getMV3MigrationData, saveMV3MigrationData } from "modules/extension/utils";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { isEmpty } from "lodash";
 import {
   trackMigrationNotificationClicked,
   trackMigrationNotificationClosed,
   trackMigrationNotificationShown,
 } from "features/rules/analytics";
-import { StorageService } from "init";
-import { getAppMode } from "store/selectors";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export function NotificationCard() {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const appMode = useSelector(getAppMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const [isVisible, setIsVisible] = useState(false);
   const [doesAnyRuleExist, setDoesAnyRuleExist] = useState(false);
@@ -33,35 +31,35 @@ export function NotificationCard() {
       const migrationData = getMV3MigrationData();
       saveMV3MigrationData({
         ...migrationData,
-        [currentlyActiveWorkspace?.id ?? "private"]: {
-          ...migrationData[currentlyActiveWorkspace?.id ?? "private"],
+        [activeWorkspaceId ?? "private"]: {
+          ...migrationData[activeWorkspaceId ?? "private"],
           migrationModalViewed: true,
         },
       });
       setIsVisible(false);
     },
-    [currentlyActiveWorkspace?.id]
+    [activeWorkspaceId]
   );
 
   const migratedRulesLogs = useMemo(() => {
     const migrationData = getMV3MigrationData();
 
-    const migratedRulesLogs = migrationData?.[currentlyActiveWorkspace?.id ?? "private"]?.rulesMigrationLogs;
+    const migratedRulesLogs = migrationData?.[activeWorkspaceId ?? "private"]?.rulesMigrationLogs;
 
     if (isEmpty(migratedRulesLogs)) return {};
 
     return migratedRulesLogs;
-  }, [currentlyActiveWorkspace]);
+  }, [activeWorkspaceId]);
 
   const isShowNotification = useMemo(() => {
     const migrationData = getMV3MigrationData();
 
     return (
       Object.keys(migratedRulesLogs).length > 0 &&
-      !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalViewed &&
+      !migrationData[activeWorkspaceId ?? "private"]?.migrationModalViewed &&
       doesAnyRuleExist
     );
-  }, [currentlyActiveWorkspace?.id, doesAnyRuleExist, migratedRulesLogs]);
+  }, [activeWorkspaceId, doesAnyRuleExist, migratedRulesLogs]);
 
   useEffect(() => {
     if (isShowNotification) {
@@ -74,13 +72,11 @@ export function NotificationCard() {
 
   useEffect(() => {
     Object.keys(migratedRulesLogs).forEach((ruleId) => {
-      StorageService(appMode)
-        .getRecord(ruleId)
-        .then((rule) => {
-          if (rule) {
-            setDoesAnyRuleExist(true);
-          }
-        });
+      clientRuleStorageService.getRecordById(ruleId).then((rule) => {
+        if (rule) {
+          setDoesAnyRuleExist(true);
+        }
+      });
     });
   });
 

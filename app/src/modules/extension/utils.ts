@@ -1,15 +1,17 @@
-import { Rule, RulePairSource, RuleType, SourceFilter, SourceKey, SourceOperator } from "types";
 import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
-import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  trackMv3MigrationCompleted,
-  trackMv3MigrationRulesMigrated,
-  trackMv3MigrationStarted,
-} from "modules/analytics/events/migrations";
 import Logger from "lib/logger";
 import * as semver from "semver";
+import {
+  Rule,
+  RulePairSource,
+  RuleSourceFilter,
+  RuleSourceKey,
+  RuleSourceOperator,
+  RuleType,
+} from "@requestly/shared/types/entities/rules";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
@@ -42,7 +44,7 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
     isFirstSyncComplete: window.isFirstSyncComplete,
     currentWorkspaceId,
   });
-  trackMv3MigrationStarted(rules.length);
+
   const rulesMigrationLogs: Record<string, any> = {};
   const migratedRules: Rule[] = [];
 
@@ -84,10 +86,9 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
     const migrationPromises = [];
     for (let i = 0; i < migratedRules.length; i += MIGRATION_BATCH) {
       migrationPromises.push(
-        StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION).saveMultipleRulesOrGroups(
-          migratedRules.slice(i, i + MIGRATION_BATCH),
-          { workspaceId: workspaceId }
-        )
+        syncingHelper.saveMultipleRulesOrGroups(migratedRules.slice(i, i + MIGRATION_BATCH), {
+          workspaceId: workspaceId,
+        })
       );
     }
 
@@ -99,17 +100,9 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
         },
       });
       Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migrated Successfully", { migratedRules, results });
-      trackMv3MigrationRulesMigrated(
-        rules.length,
-        migratedRules.length,
-        rulesMigrationLogs ? Object.keys(rulesMigrationLogs).length : 0,
-        pathImpactedRulesCount,
-        pageUrlImpactedRulesCount
-      );
     });
   }
 
-  trackMv3MigrationCompleted(rules.length, migratedRules.length);
   Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migration ended", {
     currentWorkspaceMigrationData,
     rulesMigrationLogs,
@@ -203,9 +196,9 @@ const migratePathOperator = (
   type: RuleMigrationChange;
   oldSource: RulePairSource;
 } => {
-  if (source.key === SourceKey.PATH) {
-    source.operator = SourceOperator.CONTAINS;
-    source.key = SourceKey.URL;
+  if (source.key === RuleSourceKey.PATH) {
+    source.operator = RuleSourceOperator.CONTAINS;
+    source.key = RuleSourceKey.URL;
 
     return {
       type: RuleMigrationChange.SOURCE_PATH_MIGRATED,
@@ -224,8 +217,7 @@ const migratePageURLtoPageDomain = (
 } => {
   if (source.filters) {
     const sourceFilters =
-      //@ts-ignore
-      Array.isArray(source.filters) && source.filters.length ? source.filters[0] : (source.filters as SourceFilter);
+      Array.isArray(source.filters) && source.filters.length ? source.filters[0] : (source.filters as RuleSourceFilter);
 
     let migrationLog = null;
     let pageDomains: string[];
@@ -252,9 +244,10 @@ const migratePageURLtoPageDomain = (
 
     //For backward compatibility until MV3 is release
     if (!isExtensionManifestVersion3() && sourceFilters?.pageDomains?.length > 0) {
-      sourceFilters.pageUrl = {};
-      sourceFilters.pageUrl.value = sourceFilters.pageDomains[0];
-      sourceFilters.pageUrl.operator = SourceOperator.CONTAINS;
+      sourceFilters.pageUrl = {
+        value: sourceFilters.pageDomains[0],
+        operator: RuleSourceOperator.CONTAINS,
+      };
     }
 
     return migrationLog;

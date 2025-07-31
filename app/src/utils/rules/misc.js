@@ -1,12 +1,11 @@
-//UTILS
-import { StorageService } from "../../init";
 //CONSTANTS
 import APP_CONSTANTS from "../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { isRule } from "features/rules";
+import { clientStorageService } from "services/clientStorageService";
+import { RedirectRule } from "@requestly/shared/types/entities/rules";
 
 const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -41,10 +40,10 @@ export const getRuleConfigInEditMode = (rule) => {
 /**
  *
  * @param {string} appMode
- * @param {import("features/rules/types/rules").Rule["id"][]} selectedRuleIds
+ * @param {import("@requestly/shared/types/entities/rules").Rule["id"][]} selectedRuleIds
  * @returns {Promise<{
- *  rules: import("features/rules/types/rules").Rule[],
- *  groups: import("features/rules/types/rules").Group[]
+ *  rules: import("@requestly/shared/types/entities/rules").Rule[],
+ *  groups: import("@requestly/shared/types/entities/rules").Group[]
  * }>}
  */
 export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds) => {
@@ -53,70 +52,66 @@ export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds) => {
     const isGroupIdAlreadyAdded = {};
 
     Logger.log("Reading storage in getRulesAndGroupsFromRuleIds");
-    StorageService(appMode)
-      .getAllRecords()
-      .then((allRecords) => {
-        //Fetch Required Rules
-        const rules = selectedRuleIds.map((ruleId) =>
-          processRules(allRecords[ruleId], groupIdsArr, isGroupIdAlreadyAdded, true)
-        );
+    clientStorageService.getStorageSuperObject().then((allRecords) => {
+      //Fetch Required Rules
+      const rules = selectedRuleIds.map((ruleId) =>
+        processRules(allRecords[ruleId], groupIdsArr, isGroupIdAlreadyAdded, true)
+      );
 
-        const groups = [];
-        //Fetch Required Groups
-        groupIdsArr.forEach((groupId) => {
-          groups.push(allRecords?.[groupId]);
-        });
-
-        resolve({
-          rules,
-          groups,
-        });
+      const groups = [];
+      //Fetch Required Groups
+      groupIdsArr.forEach((groupId) => {
+        groups.push(allRecords?.[groupId]);
       });
+
+      resolve({
+        rules,
+        groups,
+      });
+    });
   });
 };
 
 export const getAllRulesAndGroups = (appMode, _sanitizeRules = true) => {
   return new Promise((resolve) => {
     Logger.log("Reading storage in getAllRulesAndGroups");
-    StorageService(appMode)
-      .getAllRecords()
-      .then((allRecords) => {
-        const groupIdsArr = [];
-        const isGroupIdAlreadyAdded = {};
-        let allRules = [],
-          allGroups = {};
-        for (let recordId in allRecords) {
-          if (allRecords[recordId] && allRecords[recordId].objectType) {
-            switch (allRecords[recordId].objectType) {
-              case GLOBAL_CONSTANTS.OBJECT_TYPES.RULE:
-                allRules.push(allRecords[recordId]);
-                break;
+    clientStorageService.getStorageSuperObject().then((allRecords) => {
+      const groupIdsArr = [];
+      const isGroupIdAlreadyAdded = {};
+      let allRules = [],
+        allGroups = {};
+      for (let recordId in allRecords) {
+        if (allRecords[recordId] && allRecords[recordId].objectType) {
+          switch (allRecords[recordId].objectType) {
+            case GLOBAL_CONSTANTS.OBJECT_TYPES.RULE:
+              allRules.push(allRecords[recordId]);
+              break;
 
-              case GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP:
-                allGroups[recordId] = allRecords[recordId];
-                break;
+            case GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP:
+              allGroups[recordId] = allRecords[recordId];
+              break;
 
-              default:
-                break;
-            }
+            default:
+              break;
           }
         }
+      }
 
-        const rules = allRules.map((rule) => {
-          return processRules(rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules);
-        });
-
-        const groups = [];
-        //Fetch Required Groups
-        groupIdsArr.forEach((groupId) => {
-          groups.push(allGroups[groupId]);
-        });
-
-        resolve({
-          rules,
-          groups,
-        });
+      const rules = allRules.map((rule) => {
+        return processRules(rule, groupIdsArr, isGroupIdAlreadyAdded, _sanitizeRules);
       });
+
+      const groups = [];
+      //Fetch Required Groups
+      groupIdsArr.forEach((groupId) => {
+        groups.push(allGroups[groupId]);
+      });
+
+      resolve({
+        rules,
+        groups,
+      });
+    });
   });
 };
 
@@ -171,7 +166,7 @@ export const isDesktopOnlyRule = (rule) => {
     const pairs = rule?.pairs;
     return pairs.some(
       ({ destinationType, destination }) =>
-        destinationType === RedirectDestinationType.MAP_LOCAL || destination?.startsWith("file://")
+        destinationType === RedirectRule.DestinationType.MAP_LOCAL || destination?.startsWith("file://")
     );
   }
 };
@@ -270,8 +265,8 @@ export const getAllRulesOfGroup = (appMode, groupId) => {
   if (!groupId) return Promise.resolve([]);
 
   return new Promise((resolve) => {
-    StorageService(appMode)
-      .getAllRecords()
+    clientStorageService
+      .getStorageSuperObject()
       .then((allRecords) => {
         const groupRules = Object.values(allRecords).filter((record) => isRule(record) && record?.groupId === groupId);
         resolve(groupRules);

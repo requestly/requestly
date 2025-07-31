@@ -1,10 +1,27 @@
 .collections-list-container {
   width: 100%;
-  height: 100%;
-  overflow: auto;
-  overflow-x: hidden;
-  padding: 8px 8px 8px 0;
+  height: inherit;
+  padding: 0px 0px 8px 0;
   flex: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &.selection-enabled {
+    padding-bottom: 50px;
+  }
+
+  .collection-panel.active {
+    & > .ant-collapse-header {
+      background: var(--requestly-color-white-t-20);
+      box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
+      transition: unset;
+
+      &:hover {
+        background: var(--requestly-color-white-t-20) !important;
+      }
+    }
+  }
 
   .collections-list-header {
     display: flex;
@@ -17,50 +34,132 @@
   }
 
   .collections-list-content {
-    .collections-list-item + .collections-list-item {
-      margin-top: 4px;
+    overflow: auto;
+    padding: 0 8px;
+
+    .collections-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ant-collapse-expand-icon {
+      display: flex;
+      align-items: center;
+      .ant-checkbox-wrapper {
+        margin-right: 4px;
+      }
+    }
+
+    .ant-checkbox-wrapper {
+      margin-right: 2px;
+
+      .ant-checkbox-input {
+        width: 13px;
+        height: 13px;
+      }
+
+      .ant-checkbox-inner {
+        width: 13px;
+        height: 13px;
+        border: 1px solid var(--requestly-color-white-t-20);
+
+        &::after {
+          width: 4px;
+          height: 7px;
+        }
+      }
+    }
+
+    .request-row {
+      display: flex;
+      align-items: center;
+
+      a {
+        width: 100%;
+      }
+    }
+
+    .collection-row {
+      display: flex;
+      align-items: start;
+    }
+
+    .empty-state-wrapper {
+      margin: 2px 0;
     }
 
     .collections-list-item {
+      width: 100%;
       display: flex;
       align-items: center;
       gap: 8px;
-
       cursor: pointer;
       padding: 2px 6px;
       border-radius: 4px;
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-sm, 13px);
+      min-height: 26px;
+      margin-top: 2px;
 
       &.api {
+        height: 26px;
+        padding: var(--space-2, 4px);
+
+        .ant-checkbox-wrapper {
+          margin-left: 2px;
+        }
+
         .request-method {
           flex-shrink: 0;
-          font-size: var(--requestly-font-size-2xs);
+          font-size: 8px;
+          font-weight: var(--requestly-font-weight-medium);
+          line-height: 13px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          display: flex;
+          width: 32px;
+          justify-content: center;
+          align-items: center;
+          border-radius: 2px;
         }
 
         .request-url {
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
-          font-size: var(--requestly-font-size-xs);
+          font-size: 12px;
           color: var(--requestly-color-text-default);
         }
         .request-options {
           margin-left: auto;
-          visibility: hidden;
-          opacity: 0;
-          transition: opacity 0.3s;
+          display: none;
         }
 
         &:hover .request-options {
-          visibility: visible;
-          opacity: 1;
+          display: block;
         }
 
         &:hover,
         &.active {
           background: var(--requestly-color-surface-1);
         }
+
+        &:hover {
+          background: var(--requestly-color-white-t-10);
+        }
+
+        &.active {
+          background: var(--requestly-color-white-t-20);
+          box-shadow: inset 2px 0px 0px 0px var(--requestly-color-primary);
+        }
+      }
+
+      .collection-checkbox-container {
+        margin-left: 6px;
+      }
+
+      .ant-checkbox {
+        top: 2px;
       }
 
       &.collection.ant-collapse {
@@ -73,6 +172,11 @@
 
       .ant-collapse-item {
         width: 100%;
+
+        .ant-collapse-header {
+          height: 26px;
+          color: var(--requestly-color-text-default);
+        }
 
         &.ant-collapse-item-active {
           .ant-collapse-header {
@@ -94,16 +198,30 @@
           }
 
           &:hover {
-            background: var(--requestly-color-surface-1);
+            background: var(--requestly-color-white-t-10);
           }
 
           .ant-collapse-expand-icon {
+            cursor: pointer;
+
             svg {
-              width: 12px;
-              height: 12px;
+              width: 18px;
+              height: 18px;
+              padding: 3px;
               color: inherit;
               margin: 0;
             }
+
+            .collection-expand-icon {
+              &:hover {
+                background: var(--requestly-color-white-t-20);
+                border-radius: 4px;
+              }
+            }
+          }
+
+          .ant-collapse-header-text {
+            flex: auto;
           }
 
           .collection-name-container {
@@ -113,12 +231,11 @@
           }
 
           .collection-name {
-            max-width: 140px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             font-style: normal;
-            font-size: var(--requestly-font-size-xs);
+            font-size: 12px;
             font-weight: var(--requestly-font-weight-medium);
             font-weight: var(--requestly-font-weight-normal);
             line-height: var(--line-height-xs, 15px);
@@ -126,15 +243,18 @@
 
           .collection-options {
             flex-shrink: 0;
-            visibility: hidden;
             margin-left: auto;
-            display: flex;
             align-items: center;
             gap: var(--space-1, 2px);
-            visibility: hidden;
+            display: none;
 
             svg {
               color: var(--requestly-color-text-subtle);
+            }
+
+            &:hover,
+            &.active {
+              display: flex;
             }
           }
         }
@@ -142,7 +262,11 @@
         .ant-collapse-content-box {
           margin-left: 6px;
           padding: 2px 0px 0px 6px;
-          border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+
+          &:hover {
+            border-left: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
         }
       }
     }

@@ -1,4 +1,5 @@
 import { PricingPlansType } from "../types";
+import { PRICING } from "./pricing";
 
 export const PricingPlans: PricingPlansType = {
   free: {
@@ -19,7 +20,7 @@ export const PricingPlans: PricingPlansType = {
     plans: {
       monthly: {
         usd: {
-          price: 9,
+          price: 8,
         },
       },
       annually: {
@@ -85,4 +86,24 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
+  [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
+    plans: {
+      monthly: {
+        usd: {
+          price: 10,
+        },
+      },
+      annually: {
+        usd: {
+          price: 100,
+        },
+      },
+    },
+  },
+};
+
+export const RQBrowserstackPlanIdMap: Record<string, string> = {
+  [PRICING.PLAN_NAMES.LITE]: "lite",
+  [PRICING.PLAN_NAMES.BASIC]: "basic",
+  [PRICING.PLAN_NAMES.PROFESSIONAL]: "professional",
 };

@@ -1,8 +1,13 @@
 import { escapeRegExp } from "lodash";
-import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 import Logger from "../../../../../common/logger";
+import {
+  RulePairSource,
+  RuleSourceFilter,
+  RuleSourceKey,
+  RuleSourceOperator,
+} from "@requestly/shared/types/entities/rules";
 
 export const escapeForwardSlashes = (value: string): string => {
   return value.replace(/\//g, "\\/");
@@ -64,9 +69,9 @@ export const parseUrlParametersFromSourceV2 = (
     };
   }
 
-  if (source.key === SourceKey.URL) {
+  if (source.key === RuleSourceKey.URL) {
     switch (source.operator) {
-      case SourceOperator.EQUALS:
+      case RuleSourceOperator.EQUALS:
         if (useRegexOnlyFilter) {
           return {
             regexFilter: `^${escapeRegExp(source.value)}$`,
@@ -79,7 +84,7 @@ export const parseUrlParametersFromSourceV2 = (
           isUrlFilterCaseSensitive: true,
         };
 
-      case SourceOperator.CONTAINS:
+      case RuleSourceOperator.CONTAINS:
         if (useRegexOnlyFilter) {
           return {
             regexFilter: `.*${escapeRegExp(source.value)}.*`,
@@ -92,7 +97,7 @@ export const parseUrlParametersFromSourceV2 = (
           isUrlFilterCaseSensitive: true,
         };
 
-      case SourceOperator.MATCHES: {
+      case RuleSourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
 
         if (!pattern) {
@@ -109,7 +114,7 @@ export const parseUrlParametersFromSourceV2 = (
         };
       }
 
-      case SourceOperator.WILDCARD_MATCHES: {
+      case RuleSourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(
           createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
         );
@@ -127,21 +132,21 @@ export const parseUrlParametersFromSourceV2 = (
     }
   }
 
-  if (source.key === SourceKey.HOST) {
+  if (source.key === RuleSourceKey.HOST) {
     switch (source.operator) {
-      case SourceOperator.EQUALS:
+      case RuleSourceOperator.EQUALS:
         return {
           regexFilter: `^https?://${escapeRegExp(source.value)}(?:[/?#].*)?$`,
           isUrlFilterCaseSensitive: true,
         };
 
-      case SourceOperator.CONTAINS:
+      case RuleSourceOperator.CONTAINS:
         return {
           regexFilter: `^https?://[a-z0-9:.-]*${escapeRegExp(source.value)}[a-z0-9:.-]*(?:[/?#].*)?$`,
           isUrlFilterCaseSensitive: true,
         };
 
-      case SourceOperator.MATCHES: {
+      case RuleSourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
 
         if (!pattern) {
@@ -157,7 +162,7 @@ export const parseUrlParametersFromSourceV2 = (
         };
       }
 
-      case SourceOperator.WILDCARD_MATCHES: {
+      case RuleSourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(
           createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
         );
@@ -185,8 +190,7 @@ export const parseUrlParametersFromSourceV2 = (
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
   const filters =
-    //@ts-ignore
-    Array.isArray(source.filters) && source.filters.length ? source.filters : [source.filters as SourceFilter];
+    Array.isArray(source.filters) && source.filters.length ? source.filters : [source.filters as RuleSourceFilter];
 
   const requestMethods = new Set<ExtensionRequestMethod>();
   const resourceTypes = new Set<ExtensionResourceType>();
@@ -197,7 +201,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
       requestMethods.add(method.toLowerCase() as ExtensionRequestMethod);
     });
     filter?.resourceType?.forEach((resourceType) => {
-      resourceTypes.add(resourceType as ExtensionResourceType);
+      resourceTypes.add((resourceType as unknown) as ExtensionResourceType);
     });
     if (filter?.pageDomains?.length) {
       pageDomains = filter?.pageDomains;

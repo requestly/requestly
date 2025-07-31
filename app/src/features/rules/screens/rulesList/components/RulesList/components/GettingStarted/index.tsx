@@ -1,19 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
+import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
 import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import PersonaRecommendation from "./PersonaRecommendation";
-import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
 import {
   trackGettingStartedVideoPlayed,
   trackNewRuleButtonClicked,
@@ -23,25 +21,28 @@ import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
   trackCharlesSettingsImportStarted,
+  trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
-import emptyInbox from "./empty-inbox.svg";
 import { MdOutlineAddCircleOutline } from "@react-icons/all-files/md/MdOutlineAddCircleOutline";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { HiOutlineTemplate } from "@react-icons/all-files/hi/HiOutlineTemplate";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { trackAskAIClicked } from "features/requestBot";
 import { RQButton } from "lib/design-system/components";
 import BotIcon from "assets/icons/bot.svg?react";
 import { globalActions } from "store/slices/global/slice";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
+import { RuleType } from "@requestly/shared/types/entities/rules";
+import { ImportFromResourceOverrideModal } from "../ImporterComponents/ResourceOverrideImporter";
+import { ImporterType } from "components/Home/types";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -50,14 +51,13 @@ export const GettingStarted: React.FC = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
+  const [isImportResourceOverrideRulesModalActive, setIsImportResourceOverrideRulesModalActive] = useState(false);
   const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
   const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
@@ -67,11 +67,6 @@ export const GettingStarted: React.FC = () => {
 
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
-  const isRecommendationScreenVisible = useMemo(
-    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
-    [appMode, state?.src, userPersona]
-  );
-
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
   };
@@ -80,6 +75,9 @@ export const GettingStarted: React.FC = () => {
   };
   const toggleImportModheaderRulesModal = () => {
     setIsImportModheaderRulesModalActive((prev) => !prev);
+  };
+  const toggleImportResourceOverrideRulesModal = () => {
+    setIsImportResourceOverrideRulesModalActive((prev) => !prev);
   };
 
   const handleNewRuleClick = (source: string) => {
@@ -94,16 +92,33 @@ export const GettingStarted: React.FC = () => {
   };
 
   useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ImporterType.CHARLES:
+          toggleImportCharlesRulesModal();
+          break;
+        case ImporterType.MOD_HEADER:
+          toggleImportModheaderRulesModal();
+          break;
+        case ImporterType.RESOURCE_OVERRIDE:
+          toggleImportResourceOverrideRulesModal();
+          break;
+        case ImporterType.REQUESTLY:
+          handleUploadRulesClick();
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
+
+  useEffect(() => {
     if (gettingStartedVideo.current) {
       gettingStartedVideo.current.addEventListener("play", () => {
         trackGettingStartedVideoPlayed();
       });
     }
   }, []);
-
-  if (isRecommendationScreenVisible) {
-    return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
-  }
 
   const suggestedRules = [
     {
@@ -133,7 +148,7 @@ export const GettingStarted: React.FC = () => {
     <>
       <div className="v2 getting-started-container">
         <div className="getting-started-content">
-          {isWorkspaceMode ? (
+          {isSharedWorkspaceMode ? (
             <div className="workspace-title-container">
               <div className="workspace-title">
                 <MdInfoOutline />
@@ -142,11 +157,11 @@ export const GettingStarted: React.FC = () => {
               <div className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates{" "}
                 <a
-                  href="https://requestly.com/"
+                  href={getLinkWithMetadata("https://requestly.com/")}
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    redirectToTeam(navigate, currentlyActiveWorkspace.id);
+                    redirectToTeam(navigate, activeWorkspaceId);
                   }}
                 >
                   click here
@@ -161,7 +176,13 @@ export const GettingStarted: React.FC = () => {
             <div className="create-new-rule-content">
               <div className="no-rules">
                 <div className="empty-rules-image-container">
-                  <img width={72} height={72} src={emptyInbox} alt="empty-rules" className="empty-rules" />
+                  <img
+                    width={72}
+                    height={72}
+                    src={"/assets/media/rules/empty-inbox.svg"}
+                    alt="empty-rules"
+                    className="empty-rules"
+                  />
                   <div className="caption">No rules created yet</div>
                 </div>
 
@@ -248,9 +269,21 @@ export const GettingStarted: React.FC = () => {
               </Button>
             </AuthConfirmationPopover>
 
+            <Button
+              type="link"
+              className="link-btn"
+              icon={<HiOutlineTemplate className="anticon" />}
+              onClick={() => {
+                trackRulesEmptyStateClicked("templates");
+                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
+              }}
+            >
+              Start with templates
+            </Button>
+
             {/* TODO: make desktop only */}
             {isCharlesImportFeatureFlagOn ? (
-              <>
+              <div className="third-party-imports">
                 <Button
                   type="link"
                   className="link-btn"
@@ -276,20 +309,28 @@ export const GettingStarted: React.FC = () => {
                 >
                   Import from ModHeader
                 </Button>
-              </>
+                <Button
+                  type="link"
+                  className="link-btn"
+                  icon={
+                    <img
+                      src={ResourceOverrideIcon}
+                      width={11}
+                      height={10}
+                      alt="Resource override icon"
+                      className="anticon"
+                    />
+                  }
+                  onClick={() => {
+                    toggleImportResourceOverrideRulesModal();
+                    trackRulesEmptyStateClicked("import_resource_override");
+                    trackResourceOverrideSettingsImportStarted(SOURCE.GETTING_STARTED);
+                  }}
+                >
+                  Import from Resource Override
+                </Button>
+              </div>
             ) : null}
-
-            <Button
-              type="link"
-              className="link-btn templates-btn"
-              icon={<HiOutlineTemplate className="anticon" />}
-              onClick={() => {
-                trackRulesEmptyStateClicked("templates");
-                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
-              }}
-            >
-              Start with templates
-            </Button>
           </div>
 
           <div className="ask-ai-container">
@@ -326,6 +367,13 @@ export const GettingStarted: React.FC = () => {
         <ImportFromModheaderModal
           isOpen={isImportModheaderRulesModalActive}
           toggle={toggleImportModheaderRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+      {isImportResourceOverrideRulesModalActive ? (
+        <ImportFromResourceOverrideModal
+          isOpen={isImportResourceOverrideRulesModalActive}
+          toggle={toggleImportResourceOverrideRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}

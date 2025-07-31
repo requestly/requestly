@@ -3,13 +3,13 @@ import { SessionsList } from "./components/SessionsList/SessionsList";
 import { isExtensionInstalled, isExtensionVersionCompatible } from "actions/ExtensionActions";
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { ContentListScreen } from "componentsV2/ContentList";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 export const SessionsListScreen = () => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const isSessionsCompatible = isExtensionVersionCompatible(APP_CONSTANTS.SESSION_RECORDING_COMPATIBILITY_VERSION);
-  if (isExtensionInstalled() && !isSessionsCompatible && !isWorkspaceMode) {
+  if (isExtensionInstalled() && !isSessionsCompatible && !isSharedWorkspaceMode) {
     return <ExtensionVersionError />;
   }
 

@@ -8,7 +8,6 @@ import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types"
 import { RQNetworkTable, RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import RuleEditorModal from "components/common/RuleEditorModal";
-import { RuleType } from "types";
 import { copyToClipBoard } from "utils/Misc";
 import { snakeCase } from "lodash";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
@@ -17,6 +16,8 @@ import {
   trackSessionRecordingNetworkLogContextMenuOpen,
   trackSessionRecordingNetworkLogContextMenuOptionClicked,
 } from "modules/analytics/events/features/sessionRecording";
+import { RuleType } from "@requestly/shared/types/entities/rules";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 interface Props {
   startTime: number;
@@ -30,6 +31,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
   const { ruleEditorModal } = useSelector(getActiveModals);
   const [isApiClientModalOpen, setIsApiClientModalOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState<APIClientRequest>(null);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   const includeNetworkLogs = useSelector(getIncludeNetworkLogs);
 
@@ -82,6 +84,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
         {
           key: "replay_request",
           label: "Replay Request",
+          disabled: isLocalSyncEnabled,
           onSelect: (key, log) => {
             const { url, method, headers, postData } = log.entry.request ?? {};
 
@@ -102,56 +105,66 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
         {
           key: RuleType.REDIRECT,
           label: "Redirect URL (Map local/Remote)",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.RESPONSE,
           label: "Modify Response Body",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.REQUEST,
           label: "Modify Request Body",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.HEADERS,
           label: "Modify Headers",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.REPLACE,
           label: "Replace part of URL",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
 
         {
           key: RuleType.CANCEL,
           label: "Cancel Request",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.SCRIPT,
           label: "Insert Custom Script",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.DELAY,
           label: "Delay Request",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.QUERYPARAM,
           label: "Modify Query Params",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
         {
           key: RuleType.USERAGENT,
           label: "Modify User Agent",
+          disabled: isLocalSyncEnabled,
           onSelect: handleContextMenuRuleOptionSelect,
         },
       ] as RQNetworkTableProps["contextMenuOptions"],
-    [handleContextMenuRuleOptionSelect]
+    [handleContextMenuRuleOptionSelect, isLocalSyncEnabled]
   );
 
   const handleCloseApiClientModal = useCallback(() => {

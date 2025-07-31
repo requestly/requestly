@@ -8,6 +8,7 @@ import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
+import ResourceOverrideIcon from "assets/icons/resourceOverrideIcon.webp";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAllRules } from "store/features/rules/selectors";
@@ -24,16 +25,21 @@ import {
   trackRulesImportFailed,
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
+  trackResourceOverrideSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
 import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/CharlesImporter";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ImportFromModheader } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ModheaderImporter";
+import { ImportFromResourceOverride } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ResourceOverrideImporter";
+import { useLocation } from "react-router-dom";
+import { ImporterType } from "components/Home/types";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
   const dispatch = useDispatch();
+  const { state } = useLocation();
   const appMode = useSelector(getAppMode);
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
@@ -49,6 +55,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [conflictingRecords, setConflictingRecords] = useState([]);
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
   const [isImportFromModheaderModalOpen, setIsImportFromModheaderModalOpen] = useState(false);
+  const [isImportFromResourceOverrideModalOpen, setIsImportFromResourceOverrideModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
@@ -292,6 +299,24 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
     }
   }, [allRules, dataToImport]);
 
+  useEffect(() => {
+    if (state?.modal) {
+      switch (state?.modal) {
+        case ImporterType.CHARLES:
+          setIsImportFromCharlesModalOpen(true);
+          break;
+        case ImporterType.MOD_HEADER:
+          setIsImportFromModheaderModalOpen(true);
+          break;
+        case ImporterType.RESOURCE_OVERRIDE:
+          setIsImportFromResourceOverrideModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [state?.modal]);
+
   return (
     <>
       <Modal open={isOpen} onCancel={toggleModal} width={550} className="custom-rq-modal" footer={null}>
@@ -305,6 +330,12 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
           <ImportFromModheader
             isBackButtonVisible={true}
             onBackButtonClick={() => setIsImportFromModheaderModalOpen(false)}
+            callback={toggleModal}
+          />
+        ) : isImportFromResourceOverrideModalOpen ? (
+          <ImportFromResourceOverride
+            isBackButtonVisible={true}
+            onBackButtonClick={() => setIsImportFromResourceOverrideModalOpen(false)}
             callback={toggleModal}
           />
         ) : (
@@ -338,6 +369,17 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                   >
                     <ModheaderIcon />
                     &nbsp; Import from ModHeader
+                  </RQButton>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromResourceOverrideModalOpen(true);
+                      trackResourceOverrideSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
+                    <img src={ResourceOverrideIcon} width={11} height={10} alt="Resource override icon" />
+                    &nbsp; Import from Resource Override
                   </RQButton>
                 </div>
               ) : null}

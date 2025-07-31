@@ -1,5 +1,4 @@
-import { Rule } from "types";
-import { Group } from "types";
+import { Group, Rule } from "@requestly/shared/types/entities/rules";
 
 export const getFilterSharedListRecords = (records: Array<Group | Rule>, searchValue: string) => {
   return records.filter((record) => {

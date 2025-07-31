@@ -4,10 +4,12 @@ import { Avatar, Dropdown, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import "./index.scss";
+import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
+import { isPersonalWorkspace } from "features/workspaces/utils";
 
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
@@ -16,22 +18,23 @@ const getWorkspaceIcon = (workspaceName: string) => {
 
 const WorkspaceDropdown: React.FC<{
   isAppSumo?: boolean;
-  workspaceToUpgrade: { name: string; id: string; accessCount: number };
+  workspaceToUpgrade: { name: string; id: string; accessCount?: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
   className?: string;
   disabled?: boolean;
 }> = ({ isAppSumo = false, workspaceToUpgrade, setWorkspaceToUpgrade, className, disabled = false }) => {
   const user = useSelector(getUserAuthDetails);
-  const availableTeams = useSelector(getAvailableTeams);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
-      availableTeams?.filter(
-        (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
+      availableWorkspaces?.filter(
+        (team: Workspace) =>
+          !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === WorkspaceMemberRole.admin
       ) ?? []
     );
-  }, [availableTeams, user?.details?.profile?.uid]);
+  }, [availableWorkspaces, user?.details?.profile?.uid]);
 
   const populateWorkspaceDetails = useCallback(
     (workspaceId: string) => {
@@ -41,40 +44,17 @@ const WorkspaceDropdown: React.FC<{
   );
 
   useEffect(() => {
-    if (currentlyActiveWorkspace?.id) {
-      setWorkspaceToUpgrade(populateWorkspaceDetails(currentlyActiveWorkspace?.id));
+    if (activeWorkspaceId) {
+      setWorkspaceToUpgrade(populateWorkspaceDetails(activeWorkspaceId));
     }
-  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade]);
+  }, [activeWorkspaceId, populateWorkspaceDetails, setWorkspaceToUpgrade]);
 
   const workspaceMenuItems = {
     items: [
-      {
-        key: "private_workspace",
-        label: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-        icon: (
-          <Avatar
-            size={18}
-            shape="square"
-            icon={getWorkspaceIcon(APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)}
-            className="workspace-avatar"
-            style={{ backgroundColor: "#1E69FF" }}
-          />
-        ),
-      },
-      ...filteredAvailableTeams.map((team: any) => ({
+      ...filteredAvailableTeams.map((team) => ({
         label: team.name,
         key: team.id,
-        icon: (
-          <Avatar
-            size={18}
-            shape="square"
-            icon={getWorkspaceIcon(team.name)}
-            className="workspace-avatar"
-            style={{
-              backgroundColor: getUniqueColorForWorkspace(team?.id, team.name),
-            }}
-          />
-        ),
+        icon: <WorkspaceAvatar workspace={team} size={18} />,
       })),
     ].filter((items) => (isAppSumo ? items.key !== "private_workspace" : true)),
     onClick: ({ key: teamId }: { key: string }) => {
@@ -123,22 +103,14 @@ const WorkspaceDropdown: React.FC<{
         >
           <RQButton className="workspace-selector-dropdown-btn">
             <div className="cursor-pointer items-center">
-              <Avatar
-                size={18}
-                shape="square"
-                icon={getWorkspaceIcon(
-                  workspaceToUpgrade?.name ?? APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                )}
-                className="workspace-avatar"
-                style={{
-                  backgroundColor:
-                    !workspaceToUpgrade ||
-                    workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                      ? "#1E69FF"
-                      : workspaceToUpgrade?.id === APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.id
-                      ? APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.color
-                      : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
+              <WorkspaceAvatar
+                workspace={{
+                  ...workspaceToUpgrade,
+                  workspaceType: isPersonalWorkspace(workspaceToUpgrade)
+                    ? WorkspaceType.PERSONAL
+                    : WorkspaceType.SHARED,
                 }}
+                size={18}
               />
               <span>{workspaceToUpgrade?.name}</span>
               <DownOutlined className="workspace-selector-dropdown-icon" />

@@ -1,30 +1,45 @@
-import React, { useCallback } from "react";
-import placeholderImage from "../../../../../../../../assets/images/illustrations/empty-sheets-dark.svg";
+import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Timeline, Typography } from "antd";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants";
 import { trackRequestSelectedFromHistory } from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
+import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { HistoryViewTabSource } from "../../../clientView/components/request/HistoryView/historyViewTabSource";
 
 interface Props {
   history: RQAPI.Entry[];
+  selectedHistoryIndex: number;
   onSelectionFromHistory: (index: number) => void;
 }
 
-export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory }) => {
+export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, onSelectionFromHistory }) => {
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const [dismissNote, setDismissNote] = useState(false);
+
   const onHistoryLinkClick = useCallback(
     (index: number) => {
       onSelectionFromHistory(index);
+
+      openTab(new HistoryViewTabSource());
       trackRequestSelectedFromHistory();
       trackRQLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
       trackRQDesktopLastActivity(API_CLIENT.REQUEST_SELECTED_FROM_HISTORY);
     },
-    [onSelectionFromHistory]
+    [onSelectionFromHistory, openTab]
   );
 
   return history?.length ? (
     <>
+      {!dismissNote && (
+        <div className="storage-communication-note">
+          <img src={"/assets/media/apiClient/shield-icon.svg"} alt="secured" />
+          <p> Your history is stored in your device's local storage for better privacy & control.</p>
+          <TfiClose onClick={() => setDismissNote(true)} />
+        </div>
+      )}
       <Timeline reverse className="api-history-list-container" mode="left">
         <Timeline.Item key="end" color="gray">
           <div className="api-history-row">
@@ -35,7 +50,11 @@ export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory }
         </Timeline.Item>
         {history.map((entry, index) => (
           <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
-            <div className={`api-history-row ${entry.request.url ? "clickable" : ""}`}>
+            <div
+              className={`api-history-row ${entry.request.url ? "clickable" : ""} ${
+                selectedHistoryIndex === index ? "active" : ""
+              }`}
+            >
               <Typography.Text
                 strong
                 className="api-method"
@@ -58,7 +77,7 @@ export const HistoryList: React.FC<Props> = ({ history, onSelectionFromHistory }
     </>
   ) : (
     <div className="api-client-sidebar-placeholder">
-      <img src={placeholderImage} alt="empty" />
+      <img src={"/assets/media/apiClient/empty-sheets-dark.svg"} alt="empty" />
       <Typography.Text type="secondary">API requests you send will appear here.</Typography.Text>
     </div>
   );

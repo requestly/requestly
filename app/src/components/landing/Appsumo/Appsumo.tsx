@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
@@ -18,10 +17,12 @@ import { useDebounce } from "hooks/useDebounce";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
+import { WorkspaceType } from "types";
 
 interface AppSumoCode {
   error: string;
@@ -38,16 +39,16 @@ const DEFAULT_APPSUMO_INPUT: AppSumoCode = {
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState<Workspace>(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
   const [showMaxCodesExeceededError, setShowMaxCodesExeceededError] = useState(false);
 
+  const { switchWorkspace } = useWorkspaceHelpers();
   const db = getFirestore(firebaseApp);
 
   const addAppSumoCodeInput = () => {
@@ -131,28 +132,15 @@ const AppSumoModal: React.FC = () => {
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
     try {
       const response: any = await createTeam({ teamName: newTeamName });
-      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
-      switchWorkspace(
-        {
-          teamId: response?.data?.teamId,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        {
-          isWorkspaceMode: false,
-          isSyncEnabled: true,
-        },
-        appMode,
-        null,
-        "appsumo"
-      );
+      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo", WorkspaceType.SHARED);
+      switchWorkspace(response?.data?.teamId, "appsumo");
 
       setIsLoading(false);
       return response?.data?.teamId;
     } catch (error) {
       // do nothing
     }
-  }, [appMode, dispatch]);
+  }, [switchWorkspace]);
 
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || emailValidationError) {
@@ -232,11 +220,11 @@ const AppSumoModal: React.FC = () => {
   };
 
   useEffect(() => {
-    const appsumoWorkspace = availableTeams?.find((team: any) => team?.appsumo);
+    const appsumoWorkspace = availableWorkspaces?.find((team: Workspace) => team?.appsumo);
     if (appsumoWorkspace) {
-      setWorkspaceToUpgrade(appsumoWorkspace);
+      setWorkspaceToUpgrade(appsumoWorkspace as any);
     }
-  }, [availableTeams]);
+  }, [availableWorkspaces]);
 
   useEffect(() => {
     dispatch(globalActions.updateIsWorkspaceOnboardingCompleted());
@@ -256,7 +244,7 @@ const AppSumoModal: React.FC = () => {
       <>
         <div className="rq-modal-content appsumo-modal">
           <div>
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/assets/media/common/smiles.svg" />
           </div>
           <div className="header mt-16">Please enter your AppSumo code</div>
           <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>

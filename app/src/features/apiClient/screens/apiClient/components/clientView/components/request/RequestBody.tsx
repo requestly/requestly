@@ -1,74 +1,127 @@
-import React, { useCallback, useMemo } from "react";
-import { Input, Radio } from "antd";
-import { KeyValueFormType, KeyValuePair, RQAPI, RequestContentType } from "../../../../../../types";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
-import { KeyValueTable } from "./components/KeyValueTable/KeyValueTable";
-
-interface Props {
-  body: RQAPI.RequestBody;
+import { Radio, Select } from "antd";
+import React, { useMemo } from "react";
+import { RQAPI, RequestContentType } from "../../../../../../types";
+import { FormBody } from "./renderers/form-body-renderer";
+import { RawBody } from "./renderers/raw-body-renderer";
+import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
+import { RequestBodyProps } from "./request-body-types";
+import "./requestBody.scss";
+function parseSingleModeBody(params: {
   contentType: RequestContentType;
-  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
-  setContentType: (contentType: RequestContentType) => void;
+  body: RQAPI.RequestBody;
+}): RQAPI.RequestBodyContainer {
+  const { contentType, body } = params;
+  switch (contentType) {
+    case RequestContentType.FORM:
+      return {
+        form: body as RQAPI.RequestFormBody,
+      };
+    case RequestContentType.JSON:
+      return {
+        text: body as RQAPI.RequestJsonBody,
+      };
+    case RequestContentType.RAW:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
+    case RequestContentType.HTML:
+      return {
+        text: body as RQAPI.RequestHtmlBody,
+      };
+    case RequestContentType.JAVASCRIPT:
+      return {
+        text: body as RQAPI.RequestJavascriptBody,
+      };
+    case RequestContentType.XML:
+      return {
+        text: body as RQAPI.RequestXmlBody,
+      };
+    default:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
+  }
 }
 
-const RequestBody: React.FC<Props> = ({ body, contentType, setRequestEntry, setContentType }) => {
-  const handleBodyChange = useCallback(
-    (body: string) => {
-      setRequestEntry((prev) => ({ ...prev, request: { ...prev.request, body } }));
-    },
-    [setRequestEntry]
+const RequestBody: React.FC<RequestBodyProps> = (props) => {
+  const { contentType, variables, setRequestEntry, setContentType } = props;
+
+  const requestBodyStateManager = useMemo(
+    () =>
+      new RequestBodyStateManager(
+        props.mode === "multiple"
+          ? props.bodyContainer
+          : parseSingleModeBody({
+              contentType,
+              body: props.body,
+            })
+      ),
+    [contentType, props]
   );
+
+  const requestBodyOptions = useMemo(() => {
+    return (
+      <div className="api-request-body-options">
+        <Radio.Group
+          onChange={(e) => setContentType(e.target.value === "text" ? RequestContentType.RAW : e.target.value)}
+          defaultValue={RequestContentType.RAW}
+          value={
+            contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? "text" : contentType
+          }
+        >
+          <Radio value="text">Raw</Radio>
+          <Radio value={RequestContentType.FORM}>Form</Radio>
+        </Radio.Group>
+
+        {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
+          <Select
+            popupClassName="api-request-body-options-list"
+            className="api-request-body-options-select"
+            value={contentType}
+            options={[
+              { value: RequestContentType.RAW, label: "Text" },
+              { value: RequestContentType.JSON, label: "JSON" },
+            ]}
+            onChange={(value) => setContentType(value)}
+            size="small"
+          />
+        ) : null}
+      </div>
+    );
+  }, [contentType, setContentType]);
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
+      case RequestContentType.RAW:
       case RequestContentType.JSON:
+      case RequestContentType.HTML:
+      case RequestContentType.JAVASCRIPT:
+      case RequestContentType.XML:
         return (
-          // @ts-ignore
-          <CodeEditor
-            language={EditorLanguage.JSON}
-            value={body as string}
-            handleChange={handleBodyChange}
-            isResizable={false}
-            hideCharacterCount
-            analyticEventProperties={{ source: "api_client" }}
+          <RawBody
+            contentType={contentType}
+            environmentVariables={variables}
+            setRequestEntry={setRequestEntry}
+            editorOptions={requestBodyOptions}
           />
         );
 
       case RequestContentType.FORM:
-        return (
-          <KeyValueTable
-            pairType={KeyValueFormType.FORM}
-            data={body as KeyValuePair[]}
-            setKeyValuePairs={setRequestEntry}
-          />
-        );
+        return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
       default:
-        return (
-          <Input.TextArea
-            className="api-request-body-raw"
-            placeholder="Enter text here..."
-            value={body as string}
-            onChange={(e) => handleBodyChange(e.target.value)}
-          />
-        );
+        return null;
     }
-  }, [body, contentType, setRequestEntry, handleBodyChange]);
+  }, [contentType, variables, setRequestEntry, requestBodyOptions]);
 
+  /*
+  In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
+  we are considering RAW & Json as 'Text'
+  */
   return (
     <div className="api-request-body">
-      <div className="api-request-body-options">
-        <Radio.Group
-          onChange={(e) => setContentType(e.target.value)}
-          defaultValue={RequestContentType.RAW}
-          value={contentType}
-        >
-          <Radio value={RequestContentType.RAW}>Raw</Radio>
-          <Radio value={RequestContentType.JSON}>JSON</Radio>
-          <Radio value={RequestContentType.FORM}>Form</Radio>
-        </Radio.Group>
-      </div>
-      {bodyEditor}
+      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
+      <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );
 };

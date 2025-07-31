@@ -3,10 +3,6 @@
   position: relative;
 
   .api-response-body-editor-container {
-    border-radius: 8px;
-    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-    background: #282828;
-    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.16);
     height: 100%;
 
     .react-resizable {
@@ -54,7 +50,7 @@
   }
 
   .api-response-body-content {
-    height: calc(100% - 35px); //deduct footer height
+    height: 100%;
 
     pre {
       overflow: hidden;

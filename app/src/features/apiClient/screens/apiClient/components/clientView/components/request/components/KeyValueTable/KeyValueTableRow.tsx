@@ -1,10 +1,8 @@
 import React, { useContext } from "react";
 import { Checkbox, Form, FormInstance } from "antd";
-import { KeyValueFormType, KeyValuePair } from "features/apiClient/types";
-import { trackEnableKeyValueToggled } from "modules/analytics/events/features/apiClient";
-import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQSingleLineEditor } from "features/apiClient/screens/environment/components/SingleLineEditor/SingleLineEditor";
+import { KeyValuePair } from "features/apiClient/types";
+import { EnvironmentVariables } from "backend/environment/types";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -28,7 +26,7 @@ interface EditableCellProps {
   editable: boolean;
   dataIndex: keyof KeyValuePair;
   record: KeyValuePair;
-  pairtype: KeyValueFormType;
+  variables: EnvironmentVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
 }
 
@@ -38,20 +36,18 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   children,
   dataIndex,
   record,
-  pairtype,
+  variables,
   handleUpdatePair,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
-  const { getCurrentEnvironmentVariables } = useEnvironmentManager();
-  const currentEnvironmentVariables = getCurrentEnvironmentVariables();
 
   const save = async () => {
     try {
       const values = await form.validateFields();
       handleUpdatePair({ ...record, ...values });
-    } catch (errInfo) {
-      Logger.log(pairtype, " KeyValueTable: Save failed:", errInfo);
+    } catch (error) {
+      console.error("Error saving key-value pair", error);
     }
   };
 
@@ -65,23 +61,22 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
         {dataIndex === "isEnabled" ? (
           <Checkbox
             className="key-value-table-checkbox"
-            checked={record?.isEnabled}
+            checked={record?.isEnabled ?? true}
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.checked });
               save();
-              trackEnableKeyValueToggled(e.target.checked, pairtype);
             }}
           />
         ) : (
-          <RQSingleLineEditor
-            className={`key-value-table-input ${!record.isEnabled ? "key-value-table-input-disabled" : ""}`}
+          <SingleLineEditor
+            className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
             placeholder={dataIndex === "key" ? "Key" : "Value"}
             defaultValue={record?.[dataIndex] as string}
             onChange={(value) => {
               form.setFieldsValue({ [dataIndex]: value });
               save();
             }}
-            variables={currentEnvironmentVariables}
+            variables={variables}
           />
         )}
       </Form.Item>

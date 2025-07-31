@@ -18,11 +18,14 @@ import { Row, notification } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
 import { useSelector } from "react-redux";
-import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
+import { clientStorageService } from "services/clientStorageService";
+import { LocalFirstComingSoon } from "componentsV2/Nudge/views/LocalFirstComingSoon/LocalFirstComingSoon";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 
 const RulesFeatureContainer = () => {
   const appMode = useSelector(getAppMode);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
@@ -42,7 +45,7 @@ const RulesFeatureContainer = () => {
                 /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
               ) ? (
                 <span>
-                  We are facing some limitations due to chrome API changes. Please try the solution mentioned{" "}
+                  Due to Chrome API(MV3) limitations, rules can't be greater than 2KB. Please try a solution mentioned{" "}
                   <a href="https://github.com/requestly/requestly/issues/1797" target="_blank" rel="noreferrer">
                     here.
                   </a>
@@ -57,23 +60,26 @@ const RulesFeatureContainer = () => {
         duration: 0,
       });
       console.log(`[Requestly]: Error saving rule - ${message.error}`);
-      StorageService(appMode)
-        .getRecord(message.rqRuleId)
-        .then((ruleDetails) => {
-          const sourceCondition = ruleDetails?.pairs?.[0]?.source;
-          trackErrorInSavingDNR({
-            rule_type: message.rqRuleId.split("_")[0],
-            rule_id: message.rqRuleId,
-            error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
-            is_migration_triggered: window.location.search.includes("updatedToMv3"),
-            source_key: sourceCondition?.key,
-            source_operator: sourceCondition?.operator,
-            source_value: sourceCondition?.value,
-            page_path: window.location.pathname + window.location.search,
-          });
+
+      clientStorageService.getStorageObject(message.rqRuleId).then((ruleDetails) => {
+        const sourceCondition = ruleDetails?.pairs?.[0]?.source;
+        trackErrorInSavingDNR({
+          rule_type: message.rqRuleId.split("_")[0],
+          rule_id: message.rqRuleId,
+          error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
+          is_migration_triggered: window.location.search.includes("updatedToMv3"),
+          source_key: sourceCondition?.key,
+          source_operator: sourceCondition?.operator,
+          source_value: sourceCondition?.value,
+          page_path: window.location.pathname + window.location.search,
         });
+      });
     });
   }, [appMode]);
+
+  if (isLocalSyncEnabled) {
+    return <LocalFirstComingSoon featureName="HTTP Rules" />;
+  }
 
   return (
     <SecondarySidebarLayout secondarySidebar={<RulesSidebar />}>

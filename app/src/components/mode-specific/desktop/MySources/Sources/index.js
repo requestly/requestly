@@ -10,7 +10,7 @@ import { RQButton, RQModal } from "lib/design-system/components";
 // CONSTANTS
 import { globalActions } from "store/slices/global/slice";
 // UTILS
-import { getDesktopSpecificDetails } from "../../../../../store/selectors";
+import { getDesktopSpecificAppDetails, getDesktopSpecificDetails } from "../../../../../store/selectors";
 import SetupInstructions from "./InstructionsModal";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -22,6 +22,7 @@ import {
   trackAppSetupInstructionsViewed,
   trackConnectAppsModalClosed,
   trackConnectAppsViewed,
+  trackFailedToConnectToSimulator,
 } from "modules/analytics/events/desktopApp/apps";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
@@ -31,8 +32,9 @@ import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
-import { getAndroidDevices } from "./utils";
+import { getAndroidDevices, getIosSimulators } from "./deviceFetchers";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
+import IosBtn from "./iosBtn";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   // Global State
   const dispatch = useDispatch();
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
+  const iosAppDetails = useSelector((state) => getDesktopSpecificAppDetails(state, "ios-simulator"));
 
   // Component State
   const [processingApps, setProcessingApps] = useState({});
@@ -50,6 +53,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const [activeSourceTab, setActiveSourceTab] = useState("browser");
   const [currentApp, setCurrentApp] = useState(props.appId ?? null);
   const [fetchingDevices, setFetchingDevices] = useState(false);
+  const [fetchedDevicesOnce, setFetchedDevicesOnce] = useState(false);
 
   const { appsList } = desktopSpecificDetails;
   const systemWideSource = appsList["system-wide"];
@@ -69,7 +73,6 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   }, [appsList]);
 
   const fetchAndUpdateAndroidDevices = useCallback(() => {
-    setFetchingDevices(true);
     getAndroidDevices().then((devices) => {
       if (devices) {
         console.log("Devices", devices, desktopSpecificDetails.appsList);
@@ -82,7 +85,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               type: "mobile",
               name: device.id,
               description: device?.product,
-              icon: "android.png",
+              icon: "/assets/media/components/android.png",
               isActive: false,
               isScanned: true,
               comingSoon: false,
@@ -96,11 +99,8 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       }
       setFetchingDevices(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]); // Don't add appsList as dependency
-
-  useEffect(() => {
-    fetchAndUpdateAndroidDevices();
-  }, [fetchAndUpdateAndroidDevices]);
 
   const toggleCloseConfirmModal = () => {
     if (isCloseConfirmModalActive) {
@@ -155,6 +155,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   value: true,
                 })
               );
+            } else if (appId === "ios-simulator") {
+              toast.success(`iOS simulator(s) connected successfully`);
+              dispatch(
+                globalActions.updateDesktopSpecificAppProperty({
+                  appId: appId,
+                  property: "isActive",
+                  value: true,
+                })
+              );
             } else {
               toast.success(`Connected ${getAppName(appId)}`);
               dispatch(
@@ -189,7 +198,13 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             }
           }
         })
-        .catch(Logger.log);
+        .catch((err) => {
+          if (appId === "ios-simulator") {
+            trackFailedToConnectToSimulator();
+            toast.error(`Error connecting to simulators. Please re-scan list of devices and try again.`);
+          }
+          Logger.log(err);
+        });
     },
     [dispatch, getAppCount, navigate, processingApps, renderInstructionsModal, toggle]
   );
@@ -249,6 +264,75 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     [dispatch, processingApps]
   );
 
+  const fetchAndUpdateIosDevices = useCallback(
+    async (shouldShowPopup) => {
+      if (!isFeatureCompatible(FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT)) return;
+      let deviceCount = 0;
+      let newIosDetails = { ...iosAppDetails };
+      getIosSimulators()
+        .then((simulators) => {
+          const simulatorsFound =
+            simulators && simulators?.activeDevices && Object.keys(simulators.activeDevices).length > 0;
+          if (simulatorsFound) {
+            deviceCount += Object.keys(simulators.activeDevices).length;
+            newIosDetails = {
+              ...newIosDetails,
+              metadata: {
+                devices: simulators.activeDevices ?? {},
+              },
+              type: "mobile", // "hack to make it visible"
+            };
+          } else {
+            if (newIosDetails.isActive) {
+              handleDisconnectAppOnClick("ios-simulator");
+            }
+            newIosDetails = {
+              ...newIosDetails,
+              metadata: {
+                devices: {},
+              },
+              isActive: false,
+              type: "hack to not show the option in the app manager",
+            };
+          }
+        })
+        .finally(() => {
+          dispatch(
+            globalActions.updateDesktopSpecificAppDetails({ appId: "ios-simulator", appDetails: newIosDetails })
+          );
+          setFetchingDevices(false);
+          if (shouldShowPopup) {
+            if (deviceCount === 0) {
+              toast.warn("No simulators found. Please boot an ios simulator and scan again.");
+            } else {
+              if (deviceCount === 1) {
+                toast.info(`Found 1 simulator`);
+              } else {
+                toast.info(`${deviceCount} simulators found`);
+              }
+            }
+          }
+        });
+    },
+    [iosAppDetails, handleDisconnectAppOnClick, dispatch]
+  );
+
+  const fetchAndUpdateDevices = useCallback(
+    async (showPopup = true) => {
+      setFetchingDevices(true);
+      fetchAndUpdateAndroidDevices(showPopup);
+      fetchAndUpdateIosDevices(showPopup);
+    },
+    [fetchAndUpdateAndroidDevices, fetchAndUpdateIosDevices]
+  );
+
+  useEffect(() => {
+    if (!fetchedDevicesOnce) {
+      fetchAndUpdateDevices(false);
+      setFetchedDevicesOnce(true);
+    }
+  }, [fetchAndUpdateDevices, fetchedDevicesOnce]);
+
   const renderChangeAppStatusBtn = useCallback(
     (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs, options = {}) => {
       if (!isAvailable && !isActive) {
@@ -290,6 +374,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         );
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [processingApps, handleActivateAppOnClick, handleDisconnectAppOnClick]
   );
 
@@ -305,8 +390,10 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             {app.description}
           </Col>
           <>
-            {app.type !== "browser" && app.id !== "android-adb" ? (
-              <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
+            {app.id === "ios-simulator" ? (
+              <IosBtn handleActivate={handleActivateAppOnClick} handleDeactivate={handleDisconnectAppOnClick} />
+            ) : app.type !== "browser" && app.id !== "android-adb" ? (
+              <RQButton type="default" onClick={() => renderInstructionsModal(app.id)} className="mobile-connect-btn">
                 Setup Instructions
               </RQButton>
             ) : (
@@ -325,7 +412,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         </Row>
       );
     },
-    [renderChangeAppStatusBtn, renderInstructionsModal]
+    [handleActivateAppOnClick, handleDisconnectAppOnClick, renderChangeAppStatusBtn, renderInstructionsModal]
   );
 
   const renderSources = useCallback(
@@ -352,14 +439,14 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                         type="link"
                         onClick={() => {
                           window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-                            link: "https://developers.requestly.com/android-emulators/",
+                            link: "https://docs.requestly.com/general/http-interceptor/android-simulator-interception",
                           });
                         }}
                         icon={<InfoCircleFilled />}
                       >
                         Need Help
                       </Button>
-                      <Button icon={<IoMdRefresh />} disabled={fetchingDevices} onClick={fetchAndUpdateAndroidDevices}>
+                      <Button icon={<IoMdRefresh />} disabled={fetchingDevices} onClick={fetchAndUpdateDevices}>
                         &nbsp;Refresh Devices
                       </Button>
                       {/* <Button danger>Disconnect All</Button> */}
@@ -380,7 +467,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         </>
       );
     },
-    [appsListArray, renderSourceCard]
+    [appsListArray, renderSourceCard, fetchAndUpdateDevices, fetchingDevices]
   );
 
   const sourceTabs = useMemo(

@@ -1,31 +1,25 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import { Button, Col, Form, Input, Row, Typography } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useNavigate } from "react-router-dom";
+import * as Sentry from "@sentry/react";
+
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useDispatch } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { WorkspaceType } from "types";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   // Component State
   const [isSubmitProcess, setIsSubmitProcess] = useState(false);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const onFinish = (filledData) => {
     const newTeamName = filledData.workspaceName;
@@ -38,33 +32,26 @@ const CreateWorkspace = () => {
       teamName: newTeamName,
     })
       .then((response) => {
-        trackNewTeamCreateSuccess(response.data.teamId, newTeamName);
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "teams_screen", WorkspaceType.SHARED);
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
-        switchWorkspace(
-          {
-            teamId,
-            teamName: newTeamName,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isSyncEnabled: user?.details?.isSyncEnabled,
-            isWorkspaceMode,
-          },
-          appMode
-        );
+        switchWorkspace(teamId);
         redirectToTeam(navigate, teamId, {
           state: {
             isNewTeam: true,
           },
         });
-        trackNewTeamCreateSuccess(teamId, newTeamName);
+        trackNewTeamCreateSuccess(teamId, newTeamName, "teams_screen", WorkspaceType.SHARED);
       })
       .catch((err) => {
         toast.error("Unable to Create Team");
-        trackNewTeamCreateFailure(newTeamName);
+        Sentry.captureException("Create Team Failure", {
+          extra: {
+            message: err.message,
+          },
+        });
+        trackNewTeamCreateFailure(newTeamName, WorkspaceType.SHARED);
         setIsSubmitProcess(false);
       });
   };

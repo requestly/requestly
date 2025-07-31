@@ -30,6 +30,7 @@ import {
 } from "modules/analytics/events/features/rules";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { copyToClipBoard } from "utils/Misc";
+import { RBACEmptyState, RoleBasedComponent } from "features/rbac";
 import "../importer-components.css";
 
 const validExportSteps = [
@@ -99,7 +100,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({
       centered
       onCancel={toggle}
       footer={null}
-      className="import-from-charles-modal custom-rq-modal"
+      className="importer-modal custom-rq-modal"
       width={550}
     >
       <ImportFromCharles
@@ -118,9 +119,20 @@ export const ImportFromCharlesWrapperView: React.FC = () => {
   }, []);
 
   return (
-    <div className="importer-wrapper">
-      <ImportFromCharles />
-    </div>
+    <RoleBasedComponent
+      resource="http_rule"
+      permission="create"
+      fallback={
+        <RBACEmptyState
+          title="You cannot import as a viewer"
+          description="As a viewer, you will be able to view and test rules once someone from your team import them. You can contact your workspace admin to update your role."
+        />
+      }
+    >
+      <div className="importer-wrapper">
+        <ImportFromCharles />
+      </div>
+    </RoleBasedComponent>
   );
 };
 
@@ -209,7 +221,6 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
     Promise.all(rulesImportPromises)
       .then(() => {
         dispatch(
-          //@ts-ignore
           globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,

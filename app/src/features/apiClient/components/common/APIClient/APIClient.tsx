@@ -2,17 +2,24 @@ import { Modal } from "antd";
 import React, { useMemo } from "react";
 import { APIClientRequest } from "./types";
 import BetaBadge from "components/misc/BetaBadge";
-import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { QueryParamSyncType, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
   filterHeadersToImport,
   generateKeyValuePairsFromJson,
   getContentTypeFromRequestHeaders,
   getEmptyAPIEntry,
   parseCurlRequest,
+  syncQueryParams,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
+import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import ApiClientLoggedOutView from "../LoggedOutView/LoggedOutView";
 import "./apiClient.scss";
+import { isEmpty } from "lodash";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { useSelector } from "react-redux";
+import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -23,6 +30,7 @@ interface Props {
 }
 
 const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModalClose, modalTitle }) => {
+  const user = useSelector(getUserAuthDetails);
   const apiEntry = useMemo<RQAPI.Entry>(() => {
     if (!request) {
       return null;
@@ -68,6 +76,15 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       }
     }
 
+    entry.request = {
+      ...entry.request,
+      ...syncQueryParams(
+        entry.request.queryParams,
+        entry.request.url,
+        isEmpty(entry.request.queryParams) ? QueryParamSyncType.TABLE : QueryParamSyncType.SYNC
+      ),
+    };
+
     return entry;
   }, [request]);
 
@@ -86,10 +103,20 @@ const APIClient: React.FC<Props> = ({ request, openInModal, isModalOpen, onModal
       width="70%"
       destroyOnClose
     >
-      <APIClientView apiEntry={apiEntry} openInModal={openInModal} />
+      <WindowsAndLinuxGatedHoc featureName="API client">
+        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+          {user.loggedIn ? (
+            <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal={openInModal} />
+          ) : (
+            <ApiClientLoggedOutView />
+          )}
+        </BottomSheetProvider>
+      </WindowsAndLinuxGatedHoc>
     </Modal>
   ) : (
-    <APIClientView apiEntry={apiEntry} />
+    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+      <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} />
+    </BottomSheetProvider>
   );
 };
 

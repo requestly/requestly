@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-//@ts-ignore : needed because rq-core type declaration is not present
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { CheckCircleOutlined, CloseOutlined, DownOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Alert, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
@@ -23,8 +22,8 @@ import {
 import { useSelector } from "react-redux";
 import { getSessionId, getSessionName } from "store/features/network-sessions/selectors";
 import { getAppMode } from "store/selectors";
-import { StorageService } from "init";
 import Logger from "lib/logger";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const DEFAULT_PAIR_VALUE: GraphQLFilterPair = {
   key: "",
@@ -128,7 +127,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
       });
     });
 
-    return StorageService(appMode)
+    return syncingHelper
       .saveMultipleRulesOrGroups(newRules)
       .then(() => {
         setIsRulesCreated(true);

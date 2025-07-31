@@ -7,11 +7,16 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
 import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
+import LINKS from "config/constants/sub/links";
+import "./implicitRuleTesting.scss";
 
 export const ImplicitRuleTesting = () => {
   const appMode = useSelector(getAppMode);
   const [isImplicitRuleTestingEnabled, setIsImplicitRuleTestingEnabled] = useState(false);
   const [enabledRuleTypes, setEnabledRuleTypes] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [widgetVisibility, setWidgetVisibility] = useState(
     GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL
   );
@@ -20,6 +25,7 @@ export const ImplicitRuleTesting = () => {
 
   const handleImplicitRuleTestingToggleChange = useCallback(
     (status: boolean) => {
+      trackSettingsToggled("implicit_rule_applied_widget", status);
       setIsImplicitRuleTestingEnabled(status);
 
       updateImplictRuleTestingWidgetConfig(appMode, {
@@ -33,31 +39,90 @@ export const ImplicitRuleTesting = () => {
 
   useEffect(() => {
     getImplicitRuleTestingWidgetConfig(appMode).then((data) => {
+      if (!data) return;
+
       setEnabledRuleTypes(data.ruleTypes);
       setWidgetVisibility(data.visibility);
       if (data?.enabled) {
         setIsImplicitRuleTestingEnabled(true);
-      } else setIsImplicitRuleTestingEnabled(false);
+      } else {
+        setIsImplicitRuleTestingEnabled(false);
+      }
     });
   }, [appMode]);
 
-  return (
-    isCompatible && (
-      <SettingsItem
-        isActive={isImplicitRuleTestingEnabled}
-        onChange={handleImplicitRuleTestingToggleChange}
-        title="Show widget when rule is applied"
-        caption="Enabling this option will display the widget on websites where any rules are enabled."
-        settingsBody={
-          <RuleTypesOptions
-            enabledRuleTypes={enabledRuleTypes}
-            setEnabledRuleTypes={setEnabledRuleTypes}
-            isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
-            widgetVisibility={widgetVisibility}
-            setWidgetVisibility={setWidgetVisibility}
-          />
-        }
-      />
-    )
+  const onConfirm = () => {
+    handleImplicitRuleTestingToggleChange(false);
+    setShowConfirmation(false);
+  };
+
+  const onCancel = () => {
+    setShowConfirmation(false);
+  };
+
+  const onChange = (status: boolean) => {
+    if (status) {
+      handleImplicitRuleTestingToggleChange(true);
+    } else {
+      setShowConfirmation(true);
+    }
+  };
+
+  const confirmationTitle = (
+    <>
+      <div className="title-container">
+        <MdInfoOutline className="icon" />
+        <span className="title">Hide Requestly widget</span>
+      </div>
+      <div className="description">
+        This widget shows rule executions. Some changes, such as response body and header modifications, are not visible
+        in DevTools due to technical limitations. Do you still want to hide the widget?
+      </div>
+    </>
   );
+
+  return isCompatible ? (
+    <SettingsItem
+      isActive={isImplicitRuleTestingEnabled}
+      onChange={onChange}
+      title="Show widget when rule is applied"
+      caption={
+        <>
+          Enabling this option will display the widget on websites where any rules are enabled.{" "}
+          <a target="_blank" rel="noreferrer" href={LINKS.REQUESTLY_DOCS_TEST_RULES}>
+            Read more
+          </a>
+        </>
+      }
+      confirmation={{
+        icon: null,
+        open: showConfirmation,
+        title: confirmationTitle,
+        placement: "bottomRight",
+        onConfirm,
+        okText: "Hide widget",
+        okButtonProps: {
+          size: "small",
+          className: "rq-custom-btn",
+        },
+        showCancel: true,
+        onCancel,
+        cancelText: "Cancel",
+        cancelButtonProps: {
+          size: "small",
+          className: "rq-custom-btn",
+        },
+        overlayClassName: "implicit-rule-switch-confirmation",
+      }}
+      settingsBody={
+        <RuleTypesOptions
+          enabledRuleTypes={enabledRuleTypes}
+          setEnabledRuleTypes={setEnabledRuleTypes}
+          isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
+          widgetVisibility={widgetVisibility}
+          setWidgetVisibility={setWidgetVisibility}
+        />
+      }
+    />
+  ) : null;
 };

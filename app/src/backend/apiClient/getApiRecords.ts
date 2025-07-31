@@ -1,20 +1,37 @@
 import firebaseApp from "../../firebase";
 import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
-import { getOwnerId } from "backend/utils";
 import { RQAPI } from "features/apiClient/types";
 import Logger from "lib/logger";
+import { patchMissingIdInVariables } from "./utils";
+import { enforceLatestRecordSchema } from "./parser";
 
-export const getApiRecords = async (
-  uid: string,
-  teamId?: string
-): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
-  if (!uid) {
+function patchCollectionVariablesMissingId(params: { success: boolean; data: RQAPI.Record[] }) {
+  if (!params.success) {
+    return params;
+  }
+
+  params.data
+    .filter((p) => p.type === RQAPI.RecordType.COLLECTION)
+    .forEach((collection) => {
+      let variables = collection.data.variables;
+      if (variables) {
+        const doesIdExist = typeof Object.values(variables)[0]?.id !== "undefined";
+
+        if (!doesIdExist) {
+          variables = patchMissingIdInVariables(variables);
+        }
+      }
+    });
+  return params;
+}
+
+export const getApiRecords = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
+  if (!ownerId) {
     return { success: false, data: [] };
   }
 
-  const ownerId = getOwnerId(uid, teamId);
   const result = await getApiRecordsFromFirebase(ownerId);
-  return result;
+  return patchCollectionVariablesMissingId(result);
 };
 
 const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
@@ -24,7 +41,7 @@ const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: bo
   try {
     const q = query(rootApiRecordsRef, where("ownerId", "==", ownerId), where("deleted", "in", [false]));
 
-    const result: any = [];
+    const result: RQAPI.Record[] = [];
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
@@ -32,7 +49,10 @@ const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: bo
     }
 
     snapshot.forEach((doc) => {
-      result.push({ ...doc.data(), id: doc.id });
+      const data = doc.data();
+      const id = doc.id;
+      const processedData = enforceLatestRecordSchema(id, data);
+      result.push(processedData);
     });
 
     return { success: true, data: result };

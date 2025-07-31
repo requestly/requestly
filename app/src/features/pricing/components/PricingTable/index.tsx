@@ -6,6 +6,8 @@ import { PRICING } from "../../constants/pricing";
 import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { PlanColumn } from "./components/PlanColumn";
 import "./index.scss";
+import { kebabCase } from "lodash";
+import { isSafariBrowser } from "actions/ExtensionActions";
 
 interface PricingTableProps {
   product?: string;
@@ -26,13 +28,28 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
   return (
     <>
-      <Row wrap={false} className="pricing-table" ref={tableRef}>
+      <Row wrap={false} className={`pricing-table ${kebabCase(product)}`} ref={tableRef}>
         {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
           const planPrice = PricingPlans[planName]?.plans[duration]?.usd?.price;
 
-          if (isOpenedFromModal && planName === PRICING.PLAN_NAMES.FREE) return null;
+          if (isOpenedFromModal && planName === PRICING.PLAN_NAMES.FREE && product !== PRICING.PRODUCTS.API_CLIENT)
+            return null;
 
-          if (!isOpenedFromModal && planName === PRICING.PLAN_NAMES.ENTERPRISE) return null;
+          if (
+            !isOpenedFromModal &&
+            product !== PRICING.PRODUCTS.API_CLIENT &&
+            planName === PRICING.PLAN_NAMES.ENTERPRISE
+          ) {
+            return null;
+          }
+
+          if (
+            isSafariBrowser() &&
+            product === PRICING.PRODUCTS.API_CLIENT &&
+            planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE
+          ) {
+            return null;
+          }
 
           return (
             <PlanColumn
@@ -52,8 +69,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       <ContactUsModal
         isOpen={isContactUsModalOpen}
         onCancel={() => setIsContactUsModalOpen(false)}
-        heading="Get In Touch"
-        subHeading="Learn about the benefits & pricing of team plan"
         source="pricing_table"
       />
     </>

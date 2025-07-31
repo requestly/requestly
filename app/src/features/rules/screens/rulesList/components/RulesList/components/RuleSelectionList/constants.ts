@@ -1,6 +1,6 @@
 import React from "react";
-import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 enum RuleCategories {
   URL_REWRITES = "urlRewrites",
@@ -27,7 +27,7 @@ type RuleDetails = {
 export const RULE_DETAILS: RuleDetails = {
   categories: [
     {
-      title: "URL Rewrites",
+      title: "URL rewrites",
       type: RuleCategories.URL_REWRITES,
       rules: [
         {
@@ -51,7 +51,7 @@ export const RULE_DETAILS: RuleDetails = {
       ],
     },
     {
-      title: "APIs",
+      title: "API mocking",
       type: RuleCategories.APIS,
       rules: [
         {

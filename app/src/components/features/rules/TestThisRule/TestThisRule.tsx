@@ -11,7 +11,6 @@ import { TestReport } from "./types";
 import { getTestReportById, getTestReportsByRuleId, saveTestReport, deleteTestReport } from "./utils/testReports";
 import { generateDraftSessionTitle } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {
   compressEvents,
   getRecordingOptionsToSave,
@@ -28,11 +27,12 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackTestRuleReportDeleted, trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
 import { TestRuleHeader } from "./components/TestRuleHeader";
 import "./TestThisRule.scss";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export const TestThisRule = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const [testReports, setTestReports] = useState<TestReport[]>(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
@@ -77,7 +77,7 @@ export const TestThisRule = () => {
 
           saveRecording(
             user.details?.profile?.uid,
-            workspace?.id,
+            activeWorkspaceId,
             sessionMetadata,
             compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
             recordingOptionsToSave,
@@ -105,7 +105,13 @@ export const TestThisRule = () => {
           toast.error("Error saving test session");
         });
     },
-    [appMode, user.details?.profile?.uid, workspace?.id, fetchAndUpdateTestReports, currentlySelectedRuleData?.ruleType]
+    [
+      appMode,
+      user.details?.profile?.uid,
+      activeWorkspaceId,
+      fetchAndUpdateTestReports,
+      currentlySelectedRuleData?.ruleType,
+    ]
   );
 
   const handleTestReportDelete = useCallback(
@@ -130,7 +136,7 @@ export const TestThisRule = () => {
         fetchAndUpdateTestReports(message?.record ? message.testReportId : null);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
         if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-          toggleBottomSheet(true);
+          toggleBottomSheet({ isOpen: true, isTrack: false, action: "test_rule_bottom_sheet" });
         }
         if (message.record && user.loggedIn) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId, message.appliedStatus);

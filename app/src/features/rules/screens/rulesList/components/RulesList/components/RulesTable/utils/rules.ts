@@ -1,13 +1,14 @@
 import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
-import { Rule, StorageRecord, RecordStatus, Group, RecordType } from "features/rules";
 import Logger from "lib/logger";
 import { getTemplates } from "backend/rules";
-import { User } from "types";
 import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
 import { AppMode } from "utils/syncing/SyncUtils";
 import { localSampleRules, sampleRuleDetails } from "../../../constants";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { Group, RecordStatus, RecordType, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
+import { RuleTemplate } from "features/rules/types/rules";
+import { UserAuth } from "store/slices/global/user/types";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -104,25 +105,22 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
   } else return false;
 };
 
-export const getSampleRules = async (fromDb: boolean = true) => {
+export const getSampleRules = async (fromDb: boolean = false) => {
   try {
     const sampleRuleIds = Object.keys(sampleRuleDetails);
 
-    let templates;
+    let templates: RuleTemplate[];
     if (!fromDb) {
       templates = localSampleRules;
     } else {
       templates = await getTemplates(sampleRuleIds);
     }
 
-    const sampleRules = templates.map((template) => ({
+    const sampleRules: RuleTemplate["data"]["ruleData"][] = templates.map((template) => ({
       ...template.data.ruleData,
       sampleId: template.id,
       isReadOnly: true,
       isSample: true,
-      lastModifiedBy: null,
-      createdBy: null,
-      currentOwner: null,
       creationDate: generateObjectCreationDate(),
       modificationDate: generateObjectCreationDate(),
     }));
@@ -134,7 +132,7 @@ export const getSampleRules = async (fromDb: boolean = true) => {
   }
 };
 
-export const importSampleRules = async (user: User, appMode: AppMode) => {
+export const importSampleRules = async (user: UserAuth, appMode: AppMode) => {
   const sampleRules = await getSampleRules();
 
   return processDataToImport(sampleRules, user)

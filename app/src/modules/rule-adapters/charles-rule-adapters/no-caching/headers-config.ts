@@ -1,26 +1,26 @@
-import { HeaderRuleActionType } from "types";
+import { HeaderRule } from "@requestly/shared/types/entities/rules";
 import { Header, HeaderValue } from "../types";
 
 export const headersConfig = {
   requestHeaders: [
     {
       header: Header.PRAGMA,
-      type: HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
       value: HeaderValue.NO_CACHE,
     },
     {
       header: Header.CACHE_CONTROL,
-      type: HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
       value: HeaderValue.NO_CACHE,
     },
     {
       header: Header.IF_MODIFIED_SINCE,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
     {
       header: Header.IF_NONE_MATCH,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
   ],
@@ -29,21 +29,21 @@ export const headersConfig = {
     {
       header: Header.CACHE_CONTROL,
       value: HeaderValue.NO_CACHE,
-      type: HeaderRuleActionType.ADD,
+      type: HeaderRule.ModificationType.ADD,
     },
     {
       header: Header.EXPIRES,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
     {
       header: Header.LAST_MODIFIED,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
     {
       header: Header.ETAG,
-      type: HeaderRuleActionType.REMOVE,
+      type: HeaderRule.ModificationType.REMOVE,
       value: HeaderValue.UNKNOWN,
     },
   ],

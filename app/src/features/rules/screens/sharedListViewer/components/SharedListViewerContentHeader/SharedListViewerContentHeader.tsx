@@ -20,12 +20,13 @@ import {
 } from "../../analytics";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { Group, Rule } from "types";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
 import APP_CONSTANTS from "config/constants";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
+import { Group, Rule } from "@requestly/shared/types/entities/rules";
+import { useRBAC } from "features/rbac";
 
 interface ContentHeaderProps {
   searchValue: string;
@@ -49,6 +50,8 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { getFeatureLimitValue } = useFeatureLimiter();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const [areRulesImporting, setAreRulesImporting] = useState(false);
   const isImportLimitReached = useMemo(
@@ -151,7 +154,12 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
         searchValue={searchValue}
         setSearchValue={handleSearchValueUpdate}
         actions={[
-          <RQButton type="primary" loading={areRulesImporting} onClick={handleImportListOnClick}>
+          <RQButton
+            type="primary"
+            disabled={!isValidPermission}
+            loading={areRulesImporting}
+            onClick={handleImportListOnClick}
+          >
             Import to my rules
           </RQButton>,
         ]}

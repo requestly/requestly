@@ -1,69 +1,48 @@
-import { Avatar, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniqueColorForWorkspace } from "utils/teams";
 import { toast } from "utils/Toast";
 import "./index.css";
 import { redirectToTeam } from "utils/RedirectionUtils";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { acceptTeamInvite } from "backend/workspace";
 import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
 import InviteAcceptAnimation from "../LottieAnimation/InviteAcceptAnimation";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { Workspace } from "features/workspaces/types";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 interface Props {
   inviteId: string;
   ownerName: string;
-  workspaceId: string;
-  workspaceName: string;
+  workspace: Workspace;
   invitedEmail?: string;
 }
 
-const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props) => {
+const AcceptInvite = ({ inviteId, ownerName, workspace }: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const [inProgress, setInProgress] = useState(false);
 
   const handleAcceptInvitation = () => {
     setInProgress(true);
     acceptTeamInvite(inviteId)
-      .then((res: any) => {
-        if (res?.data?.success) {
+      .then((res) => {
+        if (res?.success) {
           toast.success("Successfully accepted invite");
           trackWorkspaceInviteAccepted(
-            res?.data?.data?.invite?.metadata?.teamId,
-            res?.data?.data?.invite?.metadata?.teamName,
+            res?.data?.invite?.metadata?.teamId,
+            res?.data?.invite?.metadata?.teamName,
             inviteId,
             "invite_screen",
-            res?.data?.data?.invite?.usage,
-            res?.data?.data?.invite?.metadata?.teamAccessCount
+            res?.data?.invite?.usage,
+            res?.data?.invite?.metadata?.teamAccessCount
           );
 
-          if (res?.data?.data?.invite.type === "teams") {
-            switchWorkspace(
-              {
-                teamId: res?.data?.data?.invite?.metadata?.teamId,
-                teamName: res?.data?.data?.invite?.metadata?.teamName,
-                teamMembersCount: 1,
-              },
-              dispatch,
-              {
-                isSyncEnabled: user?.details?.isSyncEnabled,
-                isWorkspaceMode,
-              },
-              appMode,
-              null,
-              "invite_screen"
-            );
-            redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
+          if (res?.data?.invite.type === "teams") {
+            switchWorkspace(res?.data?.invite?.metadata?.teamId as string, "invite_screen");
+            redirectToTeam(navigate, res?.data?.invite?.metadata?.teamId, {
               state: {
                 isNewTeam: false,
               },
@@ -86,17 +65,10 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
             No, I'll skip
           </RQButton>
           <div className="workspace-image invite-accept-avatar-image">
-            <Avatar
-              size={56}
-              shape="square"
-              icon={workspaceName ? workspaceName?.[0]?.toUpperCase() : "P"}
-              style={{
-                backgroundColor: `${getUniqueColorForWorkspace(workspaceId ?? "", workspaceName)}`,
-              }}
-            />
+            <WorkspaceAvatar workspace={workspace} size={56} />
           </div>
           <div className="header invite-header">
-            {ownerName} has invited you to join workspace {workspaceName}
+            {ownerName} has invited you to join workspace {workspace?.name}
           </div>
           <p className="text-gray invite-subheader">Accept to start collaborating together</p>
 

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { createMock } from "backend/mocks/createMock";
 import APP_CONSTANTS from "config/constants";
 import { isEnvBeta, isEnvDevWithBeta, isEnvEmulator } from "utils/EnvUtils";
@@ -12,6 +11,7 @@ import {
 
 import { MockEditorDataSchema } from "../MockEditorIndex/types";
 import { RQMockSchema, FileType } from "../types";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
 
 export const fileTypeColorMap = {
   [FileType.JS]: "#FFCA5F",
@@ -165,6 +165,12 @@ export const generateFinalUrl = ({
   password?: string;
   collectionPath?: string;
 }) => {
+  // For Backward Comptibility
+  // FIXME-syncing: Migrate these
+  if (isPersonalWorkspaceId(teamId)) {
+    teamId = null;
+  }
+
   return generateFinalUrlParts({ endpoint, uid, username, teamId, password, collectionPath }).url;
 };
 

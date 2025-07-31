@@ -1,15 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getAppOnboardingDetails } from "store/selectors";
+import { getAppOnboardingDetails } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { DefaultTeamView } from "./components/defaultTeamView";
 import { JoinTeamView } from "./components/joinTeamsView";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
 import { OnboardingLoader } from "../loader";
@@ -17,6 +12,11 @@ import { isNull } from "lodash";
 import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
+import { Invite } from "types";
+import { isCompanyEmail } from "utils/mailCheckerUtils";
 
 interface WorkspaceOnboardingViewProps {
   isOpen: boolean;
@@ -24,80 +24,37 @@ interface WorkspaceOnboardingViewProps {
 
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const navigate = useNavigate();
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const availableTeams = useSelector(getAvailableTeams);
-  const isTeamExist = useMemo(() => {
-    const ownedTeams = availableTeams?.filter((team: { owner: string }) => team?.owner === user?.details?.profile?.uid);
-    return !!ownedTeams?.length;
-  }, [availableTeams, user?.details?.profile?.uid]);
-
-  const createTeam = useMemo(
-    () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
-    []
-  );
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleSwitchWorkspace = useCallback(
     (teamId: string, newTeamName: string) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        { isWorkspaceMode, isSyncEnabled: true },
-        appMode,
-        null,
-        "app_onboarding"
-      );
+      switchWorkspace(teamId, "app_onboarding");
     },
-    [dispatch, isWorkspaceMode, appMode]
+    [switchWorkspace]
   );
 
   const handlePendingInvites = useCallback(
-    (res: any) => {
+    (res: { pendingInvites: Invite[]; success: boolean }) => {
       setPendingInvites(res?.pendingInvites ?? []);
       if (res?.pendingInvites?.length > 0) setIsLoading(false);
       else {
-        if (!appOnboardingDetails.createdWorkspace) {
-          if (isTeamExist) {
-            dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
-            setIsLoading(false);
-            return;
-          }
-
-          const newTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
-            getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
-          })`;
-
-          createTeam({ teamName: newTeamName, generatePublicLink: false })
-            .then((response: any) => {
-              trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "app_onboarding", false);
-              handleSwitchWorkspace(response?.data?.teamId, newTeamName);
-              dispatch(globalActions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
-              setIsLoading(false);
-            })
-            .catch((e) => {
-              Logger.error(e);
-              setIsLoading(false);
-            });
-        } else setIsLoading(false);
+        setIsLoading(false);
+        redirectToWebAppHomePage(navigate);
+        dispatch(globalActions.updateAppOnboardingCompleted());
+        dispatch(
+          globalActions.toggleActiveModal({
+            modalName: "appOnboardingModal",
+            newValue: false,
+          })
+        );
       }
     },
-    [
-      appOnboardingDetails.createdWorkspace,
-      createTeam,
-      dispatch,
-      handleSwitchWorkspace,
-      isTeamExist,
-      user.details?.profile?.displayName,
-      user.details?.profile?.email,
-    ]
+    [dispatch, navigate]
   );
 
   useEffect(() => {
@@ -106,9 +63,16 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       return;
     }
 
-    if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
+    if (isCompanyEmail(user.details?.emailType) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
-      dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+      redirectToWebAppHomePage(navigate);
+      dispatch(globalActions.updateAppOnboardingCompleted());
+      dispatch(
+        globalActions.toggleActiveModal({
+          modalName: "appOnboardingModal",
+          newValue: false,
+        })
+      );
       return;
     }
 
@@ -120,17 +84,19 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         setPendingInvites([]);
       });
   }, [
-    user?.details?.profile?.email,
-    user?.details?.profile?.isEmailVerified,
+    user.details?.profile?.email,
+    user.details?.profile?.isEmailVerified,
     user.loggedIn,
     dispatch,
     handleSwitchWorkspace,
     handlePendingInvites,
+    user.details?.emailType,
+    navigate,
   ]);
 
   useEffect(() => {
     if (!isNull(pendingInvites)) {
-      if (!isCompanyEmail(user?.details?.profile?.email)) {
+      if (!isCompanyEmail(user.details?.emailType)) {
         trackAppOnboardingTeamsViewed("no_workspaces");
         return;
       }
@@ -143,7 +109,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         return;
       }
     }
-  }, [pendingInvites, user?.details?.profile?.email, appOnboardingDetails.createdWorkspace]);
+  }, [pendingInvites, user.details?.profile?.email, appOnboardingDetails.createdWorkspace, user.details?.emailType]);
 
   useEffect(() => {
     if (isOpen) {

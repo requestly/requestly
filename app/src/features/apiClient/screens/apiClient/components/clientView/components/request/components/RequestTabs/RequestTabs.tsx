@@ -1,14 +1,19 @@
 import { Tabs, TabsProps, Tag } from "antd";
-import React, { memo, useEffect, useMemo, useState } from "react";
-import { KeyValueFormType, RQAPI, RequestContentType } from "../../../../../../../../types";
+import React, { memo, useEffect, useMemo } from "react";
+import { RQAPI, RequestContentType } from "../../../../../../../../types";
 import RequestBody from "../../RequestBody";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "../../../../../../utils";
-import { KeyValueTable } from "../KeyValueTable/KeyValueTable";
 import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./requestTabs.scss";
+import AuthorizationView from "../AuthorizationView";
+import { QueryParamsTable } from "./components/QueryParamsTable/QueryParamsTable";
+import { HeadersTable } from "./components/HeadersTable/HeadersTable";
+import { useDeepLinkState } from "hooks";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
-enum Tab {
+export enum RequestTab {
   QUERY_PARAMS = "query_params",
   BODY = "body",
   HEADERS = "headers",
@@ -16,7 +21,7 @@ enum Tab {
   SCRIPTS = "scripts",
 }
 
-const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean }> = ({ label, count, showDot }) => {
+const LabelWithCount: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({ label, count, showDot }) => {
   return (
     <div className="request-tab-label">
       <span>{label}</span>
@@ -27,19 +32,36 @@ const LabelWithCount: React.FC<{ label: string; count: number; showDot?: boolean
 
 interface Props {
   requestEntry: RQAPI.Entry;
+  requestId: RQAPI.ApiRecord["id"];
+  collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
+  handleAuthChange: (newAuth: RQAPI.Auth) => void;
 }
 
-const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setContentType }) => {
-  const [selectedTab, setSelectedTab] = useState(Tab.QUERY_PARAMS);
+const RequestTabs: React.FC<Props> = ({
+  requestEntry,
+  requestId,
+  collectionId,
+  setRequestEntry,
+  setContentType,
+  handleAuthChange,
+}) => {
+  const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
+  const { getVariablesWithPrecedence } = useEnvironmentManager();
+  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
+
+  // TODO: remove tabs state
+  const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
 
   useEffect(() => {
-    if (selectedTab === Tab.BODY && !supportsRequestBody(requestEntry.request.method)) {
-      setSelectedTab(Tab.QUERY_PARAMS);
+    if (requestId && activeTabSource?.getSourceId() === requestId) {
+      if (selectedTab.tab === RequestTab.BODY && !supportsRequestBody(requestEntry.request.method)) {
+        setSelectedTab({ tab: RequestTab.QUERY_PARAMS });
+      }
     }
-  }, [requestEntry.request.method, selectedTab]);
+  }, [activeTabSource, requestEntry.request.method, requestId, selectedTab.tab, setSelectedTab]);
 
   const tabItems: TabsProps["items"] = useMemo(() => {
     const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
@@ -47,54 +69,68 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
 
     const items = [
       {
-        key: Tab.QUERY_PARAMS,
+        key: RequestTab.QUERY_PARAMS,
         label: (
           <LabelWithCount label="Query Params" count={sanitizeKeyValuePairs(requestEntry.request.queryParams).length} />
         ),
         children: (
-          <KeyValueTable
-            data={requestEntry.request.queryParams}
-            setKeyValuePairs={setRequestEntry}
-            pairType={KeyValueFormType.QUERY_PARAMS}
-          />
+          <QueryParamsTable requestEntry={requestEntry} setRequestEntry={setRequestEntry} variables={variables} />
         ),
       },
       {
-        key: Tab.BODY,
+        key: RequestTab.BODY,
         label: (
           <LabelWithCount label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
         ),
-        children: (
+        children: requestEntry.request.bodyContainer ? (
           <RequestBody
+            mode="multiple"
+            bodyContainer={requestEntry.request.bodyContainer}
+            contentType={requestEntry.request.contentType}
+            setRequestEntry={setRequestEntry}
+            setContentType={setContentType}
+            variables={variables}
+          />
+        ) : (
+          <RequestBody
+            mode="single"
             body={requestEntry.request.body}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
+            variables={variables}
           />
         ),
         disabled: !isRequestBodySupported,
       },
       {
-        key: Tab.HEADERS,
+        key: RequestTab.HEADERS,
         label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
-          <KeyValueTable
-            data={requestEntry.request.headers}
-            setKeyValuePairs={setRequestEntry}
-            pairType={KeyValueFormType.HEADERS}
+          <HeadersTable
+            headers={requestEntry.request.headers}
+            variables={variables}
+            setRequestEntry={setRequestEntry}
           />
         ),
       },
-      // {
-      //   key: Tab.AUTHORIZATION,
-      //   label: "Authorization",
-      //   children: <div></div>,
-      // },
+      {
+        key: RequestTab.AUTHORIZATION,
+        label: <LabelWithCount label="Authorization" />,
+        children: (
+          <AuthorizationView
+            defaults={requestEntry.auth}
+            onAuthUpdate={handleAuthChange}
+            isRootLevelRecord={!collectionId}
+            variables={variables}
+          />
+        ),
+      },
     ];
 
     if (isScriptsSupported) {
       items.push({
-        key: Tab.SCRIPTS,
+        key: RequestTab.SCRIPTS,
         label: (
           <LabelWithCount
             label="Scripts"
@@ -107,15 +143,18 @@ const RequestTabs: React.FC<Props> = ({ requestEntry, setRequestEntry, setConten
     }
 
     return items;
-  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts]);
+  }, [requestEntry, setRequestEntry, setContentType, isApiClientScripts, variables, handleAuthChange, collectionId]);
 
   return (
     <Tabs
       className="api-request-tabs"
-      activeKey={selectedTab}
-      onChange={(tab: Tab) => setSelectedTab(tab)}
+      activeKey={selectedTab.tab}
+      onChange={(tab: RequestTab) => {
+        setSelectedTab({ tab: tab });
+      }}
       items={tabItems}
       size="small"
+      moreIcon={null}
     />
   );
 };

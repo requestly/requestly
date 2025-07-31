@@ -1,27 +1,30 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Row, Col, Avatar, Tabs, Alert } from "antd";
-import { getAvailableTeams } from "store/features/teams/selectors";
+import { Row, Col, Tabs, Alert } from "antd";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
 import BillingDetails from "./BillingDetails";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
 import "./TeamViewer.css";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getWorkspaceById } from "store/slices/workspaces/selectors";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
+import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
+import { WorkspaceType } from "features/workspaces/types";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
-  const availableTeams = useSelector(getAvailableTeams);
   const user = useSelector(getUserAuthDetails);
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
+  const teamDetails = useSelector(getWorkspaceById(teamId));
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
@@ -29,15 +32,25 @@ const TeamViewer = () => {
 
   const manageWorkspaceItems = useMemo(
     () => [
-      {
-        key: "Members",
-        label: "Members",
-        children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
-      },
+      teamDetails?.workspaceType === WorkspaceType.PERSONAL
+        ? {}
+        : {
+            key: "Members",
+            label: "Members",
+            children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
+          },
       {
         key: "Workspace settings",
         label: "Workspace settings",
-        children: (
+        children: isPersonalWorkspaceId(teamId) ? (
+          <PersonalWorkspaceSettings
+            key={teamId}
+            teamId={teamId}
+            teamOwnerId={teamOwnerId}
+            isTeamAdmin={isTeamAdmin}
+            isTeamArchived={isTeamArchived}
+          />
+        ) : (
           <TeamSettings
             key={teamId}
             teamId={teamId}
@@ -87,14 +100,7 @@ const TeamViewer = () => {
         <Row align="middle" justify="space-between" className="manage-workspace-header-container">
           <Col>
             <Row wrap={false} align="middle" className="manage-workspace-header">
-              <Avatar
-                size={28}
-                shape="square"
-                icon={name ? name?.[0]?.toUpperCase() : "P"}
-                style={{
-                  backgroundColor: `${getUniqueColorForWorkspace(teamId, name)}`,
-                }}
-              />{" "}
+              <WorkspaceAvatar workspace={teamDetails} size={28} />{" "}
               <span className="header">Manage {name ?? "private"} workspace</span>
             </Row>
           </Col>

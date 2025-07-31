@@ -95,12 +95,6 @@ export const redirectToMocks = (navigate) => {
 };
 
 /* FEATURE - FILES LIBRARY */
-
-/* FEATURE - FILES LIBRARY - List of All Files */
-export const redirectToFiles = (navigate) => {
-  navigate(PATHS.FILES.MY_FILES.ABSOLUTE);
-};
-
 /* FEATURE - FILES LIBRARY - View a File */
 export const redirectToFileViewer = (navigate, fileId, url = null) => {
   navigate({
@@ -185,6 +179,10 @@ export const redirectToRequest = (navigate, requestId = "new") => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
 };
 
+export const redirectToCollection = (navigate, collectionId) => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
+};
+
 export const redirectToApiClientCollection = (navigate, collectionId = "new") => {
   navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
 };
@@ -212,6 +210,10 @@ export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
 
 export const redirectToBillingTeamSettings = (navigate, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.BILLING.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToMyPlan = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.MY_PLAN.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
 export const redirectToProfileSettings = (navigate, redirectUrl, source) => {
@@ -456,6 +458,14 @@ export const redirectToWebAppHomePage = (navigate) => {
   navigate(PATHS.HOME.ABSOLUTE);
 };
 
+export function redirectToHome(appMode, navigate) {
+  if (appMode === "desktop") {
+    redirectToDesktopHomepage(navigate);
+  } else {
+    redirectToWebAppHomePage(navigate);
+  }
+}
+
 // route should be choosen from APP_CONSTANTS.PATH.<your-route>.ABSOLUTE
 export const redirectToDesktopApp = (route) => {
   let redirectedRoute = "requestly://open-url";
@@ -555,7 +565,7 @@ export const redirectToUrl = (url, newTab = false) => {
     return window.open(url, "_blank");
   }
 
-  return window.open(url);
+  return window.open(url, "_self");
 };
 
 export const navigateBack = (navigate, location, fallback) => {
@@ -565,4 +575,12 @@ export const navigateBack = (navigate, location, fallback) => {
   } else {
     fallback();
   }
+};
+
+export const redirectToProductSpecificPricing = (navigate, product) => {
+  navigate(`${PATHS.PRICING.RELATIVE}?product=${product}`);
+};
+
+export const redirectToOAuthUrl = (navigate) => {
+  redirectToUrl(LINKS.OAUTH_REDIRECT_URL);
 };

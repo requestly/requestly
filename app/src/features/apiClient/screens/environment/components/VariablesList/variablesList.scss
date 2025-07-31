@@ -1,6 +1,10 @@
 .variables-list-table {
   margin-top: 8px;
 
+  &.rq-content-list-table {
+    border: none !important;
+  }
+
   .ant-table {
     background: transparent;
   }
@@ -23,6 +27,29 @@
     padding: var(--space-3, 6px) var(--space-5, 8px);
     border-color: var(--requestly-color-white-t-10) !important;
 
+    .ant-input-affix-wrapper {
+      background: none;
+      box-shadow: none;
+      border-color: transparent;
+      padding: 2px 4px;
+      height: 26px;
+
+      &-focused {
+        border-color: var(--requestly-color-primary-500);
+      }
+
+      .ant-input {
+        border: none;
+        padding: 0;
+        height: 21px;
+
+        &:focus {
+          box-shadow: none;
+          border: none;
+        }
+      }
+    }
+
     .ant-input,
     .ant-input-number,
     .ant-input-number-input {
@@ -37,6 +64,10 @@
       &:focus {
         box-shadow: none;
         border: 1px solid var(--requestly-color-primary-500);
+      }
+
+      &:disabled {
+        color: var(--requestly-color-text-placeholder);
       }
     }
 
@@ -61,6 +92,10 @@
   .ant-table-footer {
     padding: var(--space-5, 12px) var(--space-4, 8px);
     background: transparent;
+  }
+
+  .ant-select:not(.ant-select-customize-input).ant-select-disabled .ant-select-selector {
+    color: var(--requestly-color-text-placeholder);
   }
 
   .ant-select:not(.ant-select-customize-input) .ant-select-selector {

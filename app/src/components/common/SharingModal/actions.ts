@@ -1,11 +1,12 @@
 import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
-import { Group as NewGroup, Rule as NewRule } from "features/rules/types/rules";
-import { StorageService } from "init";
+import { Rule as NewRule, Group as NewGroup } from "@requestly/shared/types/entities/rules";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
-import { StorageRecord } from "features/rules/types/rules";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 export const createSharedList = async (
   appMode: string,
@@ -15,11 +16,11 @@ export const createSharedList = async (
   sharedListRecipients: unknown
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
-  const currentWorkspaceId = window.currentlyActiveWorkspaceTeamId;
+  const currentWorkspaceId = getActiveWorkspaceId(window.activeWorkspaceIds);
 
   const updatedGroups: NewGroup[] = groups.map((group) => ({
     ...group,
-    children: [],
+    children: [] as NewGroup[],
   }));
 
   const sharedListData: SharedListData = {
@@ -53,7 +54,7 @@ export const prepareContentToExport = (appMode: string, selectedRuleIds: string[
     getRulesAndGroupsFromRuleIds(appMode, selectedRuleIds).then(({ rules, groups }) => {
       const updatedGroups: NewGroup[] = groups.map((group) => ({
         ...group,
-        children: [],
+        children: [] as NewGroup[],
       }));
       resolve({
         fileContent: JSON.stringify((rules as StorageRecord[]).concat(updatedGroups), null, 2),
@@ -99,5 +100,5 @@ export const duplicateRulesToTargetWorkspace = async (
     return formatRule(rule, newGroupId);
   });
 
-  return StorageService(appMode).saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
+  return syncingHelper.saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
 };

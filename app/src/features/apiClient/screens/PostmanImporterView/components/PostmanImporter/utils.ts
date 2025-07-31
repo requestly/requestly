@@ -1,6 +1,13 @@
-import { EnvironmentVariableValue } from "backend/environment/types";
-import { RequestMethod, RQAPI } from "features/apiClient/types";
-import { generateDocumentId } from "backend/utils";
+import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
+import { KeyValuePair, PostmanBodyMode, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
+import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { isEmpty } from "lodash";
+import {
+  getDefaultAuth,
+  getDefaultAuthType,
+} from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
+import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 interface PostmanCollectionExport {
   info: {
@@ -22,32 +29,49 @@ interface PostmanEnvironmentExport {
   _postman_variable_scope: string;
 }
 
+interface RequestBodyProcessingResult {
+  requestBody: string | KeyValuePair[] | null;
+  contentType: RequestContentType;
+  headers: KeyValuePair[];
+}
+
 export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport | PostmanEnvironmentExport) => {
   if ("info" in fileContent && fileContent.info?.schema) {
     return "collection";
   }
-  if ("_postman_variable_scope" in fileContent && fileContent._postman_variable_scope) {
+  if ("values" in fileContent) {
     return "environment";
   }
   return null;
 };
 
 export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExport) => {
-  if (!fileContent.values.length) {
-    throw new Error("No variables found in the environment file");
-  }
+  const isGlobalEnvironment = fileContent?._postman_variable_scope === "globals";
 
-  const variables = fileContent.values.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
-    acc[variable.key] = {
-      syncValue: variable.value,
-      type: variable.type === "secret" ? "secret" : "string",
-    };
-    return acc;
-  }, {});
+  const variables = fileContent.values.reduce(
+    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+      // dont add variables with empty key
+      if (!variable.key) {
+        return acc;
+      }
+
+      acc[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+      return acc;
+    },
+    {}
+  );
 
   return {
     name: fileContent.name,
     variables,
+    isGlobal: isGlobalEnvironment,
   };
 };
 
@@ -58,6 +82,9 @@ const processScripts = (item: any) => {
   };
 
   const migratePostmanScripts = (postmanScript: string) => {
+    if (!postmanScript) {
+      return "";
+    }
     return postmanScript.replace(/pm\./g, "rq."); // Replace all occurrences of 'pm.' with 'rq.'
   };
 
@@ -67,16 +94,193 @@ const processScripts = (item: any) => {
 
   item.event.forEach((event: any) => {
     if (event.listen === "prerequest") {
-      scripts.preRequest = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.preRequest = event.script ? migratePostmanScripts(event.script.exec.join("\n")) : "";
     } else if (event.listen === "test") {
-      scripts.postResponse = migratePostmanScripts(event.script.exec.join("\n"));
+      scripts.postResponse = event.script ? migratePostmanScripts(event.script.exec.join("\n")) : "";
     }
   });
 
   return scripts;
 };
 
-const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.ApiRecord> => {
+const processAuthorizationOptions = (item: PostmanAuth.Item | undefined, parentCollectionId?: string): RQAPI.Auth => {
+  if (isEmpty(item)) return getDefaultAuth(parentCollectionId === null);
+
+  const currentAuthType = POSTMAN_AUTH_TYPES_MAPPING[item.type] ?? getDefaultAuthType(parentCollectionId === null);
+
+  const auth: RQAPI.Auth = { currentAuthType, authConfigStore: {} };
+
+  if (item.type === PostmanAuth.AuthType.BEARER_TOKEN) {
+    const authOptions = item[item.type];
+    const token = authOptions[0];
+    auth.authConfigStore[Authorization.Type.BEARER_TOKEN] = {
+      bearer: token.value,
+    };
+  } else if (item.type === PostmanAuth.AuthType.BASIC_AUTH) {
+    const basicAuthOptions = item[item.type];
+    let username: PostmanAuth.KV<"username">, password: PostmanAuth.KV<"password">;
+
+    basicAuthOptions.forEach((option) => {
+      if (option.key === "username") {
+        username = option;
+      } else if (option.key === "password") {
+        password = option;
+      }
+    });
+
+    auth.authConfigStore[Authorization.Type.BASIC_AUTH] = {
+      username: username.value,
+      password: password.value,
+    };
+  } else if (item.type === PostmanAuth.AuthType.API_KEY) {
+    const apiKeyOptions = item[item.type];
+    let keyLabel: PostmanAuth.KV<"key">;
+    let apiKey: PostmanAuth.KV<"value">;
+    let addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER";
+
+    apiKeyOptions.forEach((option) => {
+      if (option.key === "key") {
+        keyLabel = option;
+      } else if (option.key === "value") {
+        apiKey = option;
+      } else if (option.key === "in") {
+        addTo = option.value === "header" ? "HEADER" : "QUERY";
+      }
+    });
+
+    auth.authConfigStore[Authorization.Type.API_KEY] = {
+      key: keyLabel.value,
+      value: apiKey.value,
+      addTo,
+    };
+  }
+  return auth;
+};
+
+const getContentTypeForRawBody = (bodyType: string) => {
+  switch (bodyType) {
+    case "json":
+      return RequestContentType.JSON;
+    case "text":
+      return RequestContentType.RAW;
+    case "html":
+      return RequestContentType.HTML;
+    case "javascript":
+      return RequestContentType.JAVASCRIPT;
+    case "xml":
+      return RequestContentType.XML;
+    default:
+      return RequestContentType.RAW;
+  }
+};
+
+const addImplicitContentTypeHeader = (headers: KeyValuePair[], contentType: RequestContentType): KeyValuePair[] => {
+  const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
+  if (!isContentTypeHeaderSet) {
+    return [
+      ...headers,
+      {
+        id: headers.length,
+        key: "Content-Type",
+        value: contentType,
+        isEnabled: true,
+      },
+    ];
+  }
+  return headers;
+};
+
+const processRawRequestBody = (raw: string, options: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+  const contentType = getContentTypeForRawBody(options?.raw.language);
+  const updatedHeaders = raw.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
+
+  return {
+    requestBody: raw,
+    contentType,
+    headers: updatedHeaders,
+  };
+};
+
+const processFormDataBody = (formdata: any[]): Omit<RequestBodyProcessingResult, "headers"> => {
+  return {
+    requestBody:
+      formdata?.map((formData: { key: string; value: string }) => ({
+        id: Date.now(),
+        key: formData.key,
+        value: formData.value,
+        isEnabled: true,
+      })) || [],
+    contentType: RequestContentType.FORM,
+  };
+};
+
+const processUrlEncodedBody = (urlencoded: any[], headers: KeyValuePair[]): RequestBodyProcessingResult => {
+  const contentType = RequestContentType.FORM;
+  const updatedHeaders = urlencoded.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
+
+  return {
+    requestBody: urlencoded.map((data: { key: string; value: string }) => ({
+      id: Date.now() + Math.random(),
+      key: data?.key || "",
+      value: data?.value || "",
+      isEnabled: true,
+    })),
+    contentType,
+    headers: updatedHeaders,
+  };
+};
+
+const processRequestBody = (request: any): RequestBodyProcessingResult => {
+  if (!request.body) {
+    return {
+      requestBody: null,
+      contentType: RequestContentType.RAW,
+      headers: request.header || [],
+    };
+  }
+
+  const processGraphqlBody = (graphql: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+    const contentType = RequestContentType.JSON;
+    const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
+    return {
+      requestBody: "",
+      contentType,
+      headers: updatedHeaders,
+    };
+  };
+
+  const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
+  const headers =
+    request.header?.map((header: KeyValuePair, index: number) => ({
+      id: index,
+      key: header.key,
+      value: header.value,
+      isEnabled: true,
+    })) ?? [];
+
+  switch (mode) {
+    case PostmanBodyMode.RAW:
+      return processRawRequestBody(raw, options, headers);
+    case PostmanBodyMode.FORMDATA:
+      return { ...processFormDataBody(formdata), headers };
+    case PostmanBodyMode.URL_ENCODED:
+      return processUrlEncodedBody(urlencoded, headers);
+    case PostmanBodyMode.GRAPHQL:
+      return processGraphqlBody(graphql, headers);
+    default:
+      return {
+        requestBody: null,
+        contentType: RequestContentType.RAW,
+        headers,
+      };
+  }
+};
+
+const createApiRecord = (
+  item: any,
+  parentCollectionId: string,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
+): Partial<RQAPI.ApiRecord> => {
   const { request } = item;
   if (!request) throw new Error(`Invalid API item: ${item.name}`);
 
@@ -88,16 +292,10 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
       isEnabled: true,
     })) ?? [];
 
-  const headers =
-    request.header?.map((header: any, index: number) => ({
-      id: index,
-      key: header.key,
-      value: header.value,
-      isEnabled: true,
-    })) ?? [];
+  const { requestBody, contentType, headers } = processRequestBody(request);
 
   return {
-    id: generateDocumentId("apis"),
+    id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
     collectionId: parentCollectionId,
     name: item.name,
     type: RQAPI.RecordType.API,
@@ -108,23 +306,53 @@ const createApiRecord = (item: any, parentCollectionId: string): Partial<RQAPI.A
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
-        body: request.body?.raw ?? null,
+        body: requestBody,
+        contentType,
       },
+      auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
   };
 };
 
-const createCollectionRecord = (name: string, id = generateDocumentId("apis")): Partial<RQAPI.CollectionRecord> => ({
-  id,
-  name,
-  deleted: false,
-  data: {},
-  type: RQAPI.RecordType.COLLECTION,
-});
+const createCollectionRecord = (
+  name: string,
+  description: string,
+  id: string,
+  variables?: any[],
+  auth?: any,
+  parentCollectionId?: string
+): Partial<RQAPI.CollectionRecord> => {
+  const collectionVariables: Record<string, EnvironmentVariableValue> = {};
+  if (variables) {
+    variables.forEach((variable: any, index: number) => {
+      collectionVariables[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+    });
+  }
+
+  return {
+    id,
+    name,
+    description,
+    deleted: false,
+    data: {
+      variables: collectionVariables,
+      auth: processAuthorizationOptions(auth, parentCollectionId),
+    },
+    type: RQAPI.RecordType.COLLECTION,
+  };
+};
 
 export const processPostmanCollectionData = (
-  fileContent: any
+  fileContent: any,
+  apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): { collections: Partial<RQAPI.CollectionRecord>[]; apis: Partial<RQAPI.ApiRecord>[] } => {
   if (!fileContent.info?.name) {
     throw new Error("Invalid collection file: missing name");
@@ -139,7 +367,14 @@ export const processPostmanCollectionData = (
     items.forEach((item) => {
       if (item.item?.length) {
         // This is a sub-collection
-        const subCollection = createCollectionRecord(item.name, generateDocumentId("apis"));
+        const subCollection = createCollectionRecord(
+          item.name,
+          item.description || "",
+          apiClientRecordsRepository.generateCollectionId(item.name, parentCollectionId),
+          [],
+          item.auth,
+          parentCollectionId
+        );
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
@@ -148,15 +383,21 @@ export const processPostmanCollectionData = (
         result.apis.push(...subItems.apis);
       } else if (item.request) {
         // This is an API endpoint
-        result.apis.push(createApiRecord(item, parentCollectionId));
+        result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
       }
     });
 
     return result;
   };
 
-  const rootCollectionId = generateDocumentId("apis");
-  const rootCollection = createCollectionRecord(fileContent.info.name, rootCollectionId);
+  const rootCollectionId = apiClientRecordsRepository.generateCollectionId(fileContent.info.name);
+  const rootCollection = createCollectionRecord(
+    fileContent.info.name,
+    fileContent.info?.description || "",
+    rootCollectionId,
+    fileContent.variable,
+    fileContent.auth
+  );
   rootCollection.collectionId = "";
   const processedItems = processItems(fileContent.item, rootCollectionId);
 
@@ -173,13 +414,20 @@ export const processPostmanVariablesData = (
     return null;
   }
 
-  const variables = fileContent.variable.reduce((acc: Record<string, EnvironmentVariableValue>, variable: any) => {
-    acc[variable.key] = {
-      syncValue: variable.value,
-      type: variable.type === "secret" ? "secret" : "string",
-    };
-    return acc;
-  }, {});
+  const variables = fileContent.variable.reduce(
+    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+      acc[variable.key] = {
+        id: index,
+        syncValue: variable.value,
+        type:
+          variable.type === EnvironmentVariableType.Secret
+            ? EnvironmentVariableType.Secret
+            : EnvironmentVariableType.String,
+      };
+      return acc;
+    },
+    {}
+  );
 
   return variables;
 };

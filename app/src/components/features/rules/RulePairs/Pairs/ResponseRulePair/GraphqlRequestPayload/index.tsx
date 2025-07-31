@@ -8,7 +8,6 @@ import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "../../../Filters/actions/deleteObjectAtPath";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import { debounce, snakeCase } from "lodash";
-import { ResponseRuleResourceType } from "types/rules";
 import {
   trackRequestPayloadKeyFilterModifiedEvent,
   trackRequestPayloadOperatorFilterModifiedEvent,
@@ -17,6 +16,7 @@ import {
 import "./GraphqlRequestPayload.css";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { ResponseRule } from "@requestly/shared/types/entities/rules";
 
 const {
   SOURCE_REQUEST_PAYLOAD,
@@ -90,7 +90,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setGqlOperationFilter((prev) => ({ ...prev, key: newPayloadKey }));
     debouncedTrackPayloadKeyModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRuleResourceType.GRAPHQL_API)
+      snakeCase(ResponseRule.ResourceType.GRAPHQL_API)
     );
   };
 
@@ -105,7 +105,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setGqlOperationFilter((prev) => ({ ...prev, operator }));
     trackRequestPayloadOperatorFilterModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRuleResourceType.GRAPHQL_API)
+      snakeCase(ResponseRule.ResourceType.GRAPHQL_API)
     );
   };
 
@@ -122,7 +122,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     setGqlOperationFilter((prev) => ({ ...prev, value: newPayloadValue }));
     debouncedTrackPayloadValueModifiedEvent(
       currentlySelectedRuleData.ruleType,
-      snakeCase(ResponseRuleResourceType.GRAPHQL_API)
+      snakeCase(ResponseRule.ResourceType.GRAPHQL_API)
     );
   };
 

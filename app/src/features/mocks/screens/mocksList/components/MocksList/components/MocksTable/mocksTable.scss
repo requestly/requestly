@@ -296,3 +296,23 @@
     }
   }
 }
+
+.rq-mocks-list-table.rq-content-list-table.read-only {
+  & .mock-row,
+  & .collection-row {
+    .ant-table-cell:first-child {
+      padding-left: 2px;
+    }
+  }
+
+  & .collection-row {
+    .ant-table-cell:first-child {
+      padding-left: 6px;
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: flex-end;
+      height: 57px; // parent row height
+    }
+  }
+}

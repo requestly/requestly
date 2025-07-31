@@ -1,42 +1,70 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
-import { toast } from "utils/Toast";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
-import { trackAddVariableClicked, trackVariableValueUpdated } from "../../analytics";
+import { trackAddVariableClicked } from "../../analytics";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
 
 interface VariablesListProps {
-  searchValue: string;
-  currentEnvironmentId: string;
+  variables: EnvironmentVariableTableRow[];
+  searchValue?: string;
+  onVariablesChange: (variables: EnvironmentVariableTableRow[]) => void;
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string; id: number };
+export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, currentEnvironmentId }) => {
+export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const { getEnvironmentVariables, setVariables, removeVariable } = useEnvironmentManager();
   const [dataSource, setDataSource] = useState([]);
-  const variables = getEnvironmentVariables(currentEnvironmentId);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_environment", "create");
 
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
     [dataSource, searchValue]
   );
 
-  const handleSaveVariable = useCallback(
-    async (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+  const duplicateKeyIndices = useMemo(() => {
+    const keyIndices = new Map<string, number[]>();
+
+    // Collecting all indices for each key
+    dataSource.forEach((row, index) => {
+      if (row.key) {
+        const lowercaseKey = row.key.toLowerCase();
+        const indices = keyIndices.get(lowercaseKey) || [];
+        indices.push(index);
+        keyIndices.set(lowercaseKey, indices);
+      }
+    });
+
+    // Create a set of indices (all except the last occurrence)
+    const overridenIndices = new Set<number>();
+
+    keyIndices.forEach((indices) => {
+      if (indices.length > 1) {
+        // Add all indices except the last one to the set
+        indices.slice(0, -1).forEach((index) => {
+          overridenIndices.add(dataSource[index].id);
+        });
+      }
+    });
+
+    return overridenIndices;
+  }, [dataSource]);
+
+  const handleVariableChange = useCallback(
+    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
       if (!user.loggedIn) {
         return;
       }
@@ -45,52 +73,20 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if ((row.key && row.syncValue) || fieldChanged === "type" || fieldChanged === "key") {
-        // Check if the new key already exists (excluding the current row)
-        const isDuplicate = variableRows.some(
-          (variable, idx) => idx !== index && variable.key.toLowerCase() === row.key.toLowerCase()
-        );
-
-        if (isDuplicate && row.key) {
-          toast.error(`Variable with name "${row.key}" already exists`);
-          console.error(`Variable with name "${row.key}" already exists`);
-          return;
-        }
+      if (row.key) {
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
+        setDataSource(variableRows);
 
-        if (fieldChanged === "type" || fieldChanged === "key") {
-          // updating the dataSource state only when variable type or key is changed because state update makes the table inputs lose focus
-          setDataSource(variableRows);
-        }
-
-        if (row.key && row.syncValue) {
-          const variablesToSave = variableRows.reduce((acc, variable) => {
-            if (variable.key) {
-              acc[variable.key] = {
-                type: variable.type,
-                syncValue: variable.syncValue,
-                localValue: variable.localValue,
-              };
-            }
-            return acc;
-          }, {});
-
-          setVariables(currentEnvironmentId, variablesToSave).then(() => {
-            setDataSource(variableRows);
-            if (fieldChanged === "syncValue" || fieldChanged === "localValue") {
-              trackVariableValueUpdated(fieldChanged, EnvironmentAnalyticsContext.API_CLIENT, variableRows.length);
-            }
-          });
-        }
+        onVariablesChange(variableRows);
       }
     },
-    [dataSource, setVariables, currentEnvironmentId, user.loggedIn]
+    [dataSource, onVariablesChange, user.loggedIn]
   );
 
   const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
     const newData = {
-      id: dataSource.length + 1,
+      id: dataSource.length,
       key: "",
       type: EnvironmentVariableType.String,
       localValue: "",
@@ -100,20 +96,21 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   }, []);
 
   const handleDeleteVariable = useCallback(
-    async (key: string) => {
-      const newData = key ? dataSource.filter((item) => item.key !== key) : dataSource.slice(0, -1);
-
-      if (key) {
-        await removeVariable(currentEnvironmentId, key);
+    async (id: number) => {
+      if (isNaN(id)) {
+        return;
       }
+      const newData = dataSource.filter((item) => item.id !== id).map((record, index) => ({ ...record, id: index }));
 
       setDataSource(newData);
+
+      onVariablesChange(newData);
 
       if (newData.length === 0) {
         handleAddNewRow([]);
       }
     },
-    [dataSource, removeVariable, handleAddNewRow, currentEnvironmentId]
+    [dataSource, handleAddNewRow, onVariablesChange]
   );
 
   const handleUpdateVisibleSecretsRowIds = useCallback(
@@ -128,24 +125,20 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
   );
 
   const columns = useVariablesListColumns({
-    handleSaveVariable,
+    handleVariableChange,
     handleDeleteVariable,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
     recordsCount: dataSource.length,
+    duplicateKeyIndices,
   });
 
   useEffect(() => {
     if (variables) {
-      const formattedDataSource: EnvironmentVariableTableRow[] = Object.entries(variables).map(
-        ([key, value], index) => ({
-          id: index,
-          key,
-          type: value.type,
-          localValue: value.localValue,
-          syncValue: value.syncValue,
-        })
-      );
+      const formattedDataSource = [...variables].sort((a, b) => {
+        return a.id - b.id; // Sort by id if both ids are defined
+      });
+
       if (formattedDataSource.length === 0) {
         formattedDataSource.push({
           id: 0,
@@ -193,14 +186,18 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue, curre
           cell: EditableCell,
         },
       }}
-      scroll={{ y: "calc(100vh - 240px)" }}
-      footer={() => (
-        <div className="variables-list-footer">
-          <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
-            Add More
-          </RQButton>
-        </div>
-      )}
+      scroll={{ y: "calc(100vh - 280px)" }}
+      footer={
+        !isValidPermission
+          ? null
+          : () => (
+              <div className="variables-list-footer">
+                <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
+                  Add More
+                </RQButton>
+              </div>
+            )
+      }
     />
   );
 };

@@ -21,6 +21,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   tourId = "",
   disableDocking,
   utilities,
+  ...props
 }) => {
   const { isBottomSheetOpen, sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
@@ -37,7 +38,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             icon={isBottomSheetOpen ? <MdExpandMore /> : <MdExpandLess />}
             onClick={() => {
               if (isSheetPlacedAtBottom) {
-                toggleBottomSheet();
+                toggleBottomSheet({ isOpen: false, isTrack: true, action: "bottom_sheet_utility_toggle" });
               }
             }}
           />
@@ -54,10 +55,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       </div>
 
       <Tabs
+        moreIcon={null}
         data-tour-id={tourId}
         defaultActiveKey={defaultActiveKey}
         items={items}
-        onTabClick={() => toggleBottomSheet(true)}
+        onTabClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
+        {...props}
       />
     </>
   );

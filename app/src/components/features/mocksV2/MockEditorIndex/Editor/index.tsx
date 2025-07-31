@@ -8,7 +8,7 @@ import { MockEditorHeader } from "./Header";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType, RQMockCollection } from "../../types";
@@ -16,20 +16,22 @@ import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
-import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
+import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateHeaders, validateStatusCode } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { APIClient, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
-import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { ExportMocksModalWrapper } from "features/mocks/modals";
+import { globalActions } from "store/slices/global/slice";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import Editor from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
@@ -56,11 +58,11 @@ const MockEditor: React.FC<Props> = ({
   onClose = () => {},
   mockType,
 }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const username = user?.details?.username;
 
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const areLogsVisible = useFeatureValue("mock_logs", false);
 
@@ -82,6 +84,7 @@ const MockEditor: React.FC<Props> = ({
     name: null,
     statusCode: null,
     endpoint: null,
+    headers: null,
   });
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
@@ -89,8 +92,16 @@ const MockEditor: React.FC<Props> = ({
   const collectionPath = mockCollectionData?.path ?? "";
 
   const finalUrl = useMemo(
-    () => generateFinalUrl({ endpoint, uid: user?.details?.profile?.uid, username, teamId, password, collectionPath }),
-    [endpoint, teamId, user?.details?.profile?.uid, username, password, collectionPath]
+    () =>
+      generateFinalUrl({
+        endpoint,
+        uid: user?.details?.profile?.uid,
+        username,
+        teamId: activeWorkspaceId,
+        password,
+        collectionPath,
+      }),
+    [endpoint, activeWorkspaceId, user?.details?.profile?.uid, username, password, collectionPath]
   );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
@@ -115,14 +126,16 @@ const MockEditor: React.FC<Props> = ({
     setLatency(0);
   };
 
-  const createMockEditorData = () => {
+  const createMockEditorData = useCallback(() => {
     let headersDict: { [key: string]: string } = {};
     try {
       headersDict = JSON.parse(headersString);
     } catch (err) {
       // TODO: Improve this toast message
       toast.error("Error while parsing headers. Creating with empty headers");
+      setErrors((prev) => ({ ...prev, headers: "Error while parsing headers" }));
       headersDict = {};
+      return;
     }
 
     const cleanedEndpoint = cleanupEndpoint(endpoint);
@@ -146,48 +159,82 @@ const MockEditor: React.FC<Props> = ({
     };
 
     return tempMockData;
-  };
+  }, [
+    id,
+    type,
+    fileType,
+    name,
+    desc,
+    method,
+    latency,
+    endpoint,
+    statusCode,
+    contentType,
+    headersString,
+    body,
+    mockData.responseId,
+    password,
+  ]);
 
-  const validateMockEditorData = (data: MockEditorDataSchema): boolean => {
-    const updatedErrors: ValidationErrors = {};
-    let focusedInvalidFieldRef = null;
+  const validateMockEditorData = useCallback(
+    (data: MockEditorDataSchema): boolean => {
+      if (!data) return false;
+      const updatedErrors: ValidationErrors = {};
+      let focusedInvalidFieldRef = null;
 
-    if (!data.name) {
-      updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
-    }
-    const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
-    if (statusCodeValidationError) {
-      updatedErrors.statusCode = statusCodeValidationError;
-      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
-    }
+      if (!data.name) {
+        updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
+      }
+      const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
+      if (statusCodeValidationError) {
+        updatedErrors.statusCode = statusCodeValidationError;
+        if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
+      }
 
-    // TODO: Add more validations here for special characters, //, etc.
-    const endpointValidationError = validateEndpoint(data.endpoint);
-    if (endpointValidationError) {
-      updatedErrors.endpoint = endpointValidationError;
-      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
-    }
+      const headersValidationError = validateHeaders(data.headers);
+      if (headersValidationError) {
+        updatedErrors.headers = headersValidationError;
+      }
 
-    // No errors found.
-    if (Object.keys(updatedErrors).length === 0) {
-      setErrors(updatedErrors);
-      return true;
-    }
-    focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
-    setErrors(updatedErrors);
-    return false;
-  };
+      // TODO: Add more validations here for special characters, //, etc.
+      const endpointValidationError = validateEndpoint(data.endpoint);
+      if (endpointValidationError) {
+        updatedErrors.endpoint = endpointValidationError;
+        if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
+      }
 
-  const handleOnSave = () => {
+      // No errors found.
+      if (Object.keys(updatedErrors).length === 0) {
+        setErrors((prev) => ({ ...prev, ...updatedErrors }));
+        return true;
+      }
+      focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
+      setErrors((prev) => ({ ...prev, ...updatedErrors }));
+      return false;
+    },
+    [mockType]
+  );
+
+  const handleOnSave = useCallback(() => {
     const finalMockData = createMockEditorData();
     const success = validateMockEditorData(finalMockData);
 
     if (success) {
       onSave(finalMockData);
     } else {
-      toast.error("Please fix the highlighted fields");
+      if (errors.headers) {
+        dispatch(
+          globalActions.triggerToastForEditor({
+            id: `headers-${id}`,
+            message: errors.headers,
+            type: "error",
+          })
+        );
+      } else {
+        toast.error("Please fix the highlighted fields");
+      }
     }
-  };
+  }, [onSave, errors, createMockEditorData, validateMockEditorData, id, dispatch]);
 
   const handleTest = useCallback(() => {
     setIsTestModalOpen(true);
@@ -210,6 +257,7 @@ const MockEditor: React.FC<Props> = ({
           Method
         </label>
         <Select
+          disabled={isEditorReadOnly}
           id="method"
           size="large"
           options={requestMethodDropdownOptions}
@@ -228,6 +276,7 @@ const MockEditor: React.FC<Props> = ({
           Latency
         </label>
         <InputNumber
+          disabled={isEditorReadOnly}
           id="latency"
           size="large"
           type="text"
@@ -237,7 +286,6 @@ const MockEditor: React.FC<Props> = ({
           value={latency}
           name="latency"
           onChange={handleMockLatencyChange}
-          // @ts-ignore: TS2322
           addonAfter="ms"
         />
       </Col>
@@ -251,6 +299,7 @@ const MockEditor: React.FC<Props> = ({
           Status code
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           ref={statusCodeRef}
           id="status-code"
           size="large"
@@ -277,14 +326,12 @@ const MockEditor: React.FC<Props> = ({
           Content type
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           id="content-type"
           size="large"
-          // @ts-ignore
-          type="text"
           placeholder="content"
           value={contentType}
           options={APP_CONSTANTS.CONTENT_TYPE}
-          name="type"
           onChange={(e) => setContentType(e)}
         />
       </Col>
@@ -295,6 +342,7 @@ const MockEditor: React.FC<Props> = ({
     return (
       <MockEditorEndpoint
         isNew={isNew}
+        disabled={isEditorReadOnly}
         errors={errors}
         collectionPath={collectionPath}
         endpoint={endpoint}
@@ -331,32 +379,33 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
+          <Editor
+            scriptId={`headers-${id}`} // used to show error toasts created because header invalidation
             isResizable
             height={220}
             value={headersString}
-            defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
             analyticEventProperties={{ source: "mocks", mock_type: type }}
+            isReadOnly={isEditorReadOnly}
           />
         </Col>
       </Row>
     );
-  }, [headersString, type]);
+  }, [headersString, type, id, isEditorReadOnly]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
       <Row className="editor-row">
         <Col span={24}>
-          <CodeEditor
+          <Editor
             isResizable
             height={220}
             value={body}
-            defaultValue={body}
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
+            prettifyOnInit={true}
             analyticEventProperties={{ source: "mocks", mock_type: mockType }}
             toolbarOptions={{
               title: mockType === MockType.FILE ? "File content" : "",
@@ -412,6 +461,7 @@ const MockEditor: React.FC<Props> = ({
               handleTest={handleTest}
               setPassword={setPassword}
               password={password}
+              isEditorReadOnly={isEditorReadOnly}
             />
             <BottomSheetLayout
               layout={SheetLayout.SPLIT}
@@ -424,7 +474,7 @@ const MockEditor: React.FC<Props> = ({
                   name={name}
                   mode={isNew ? "create" : "edit"}
                   description={desc}
-                  namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+                  namePlaceholder="File name"
                   descriptionPlaceholder="Add your description here."
                   nameChangeCallback={onNameChange}
                   descriptionChangeCallback={onDescriptionChange}
@@ -463,13 +513,15 @@ const MockEditor: React.FC<Props> = ({
             handleTest={handleTest}
             setPassword={setPassword}
             password={password}
+            isEditorReadOnly={isEditorReadOnly}
           />
           <Col className="mock-editor-title-container">
             <RQEditorTitle
+              disabled={isEditorReadOnly}
               name={name}
               mode={isNew ? "create" : "edit"}
               description={desc}
-              namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+              namePlaceholder="File name"
               descriptionPlaceholder="Add your description here."
               nameChangeCallback={onNameChange}
               descriptionChangeCallback={onDescriptionChange}

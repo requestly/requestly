@@ -1,5 +1,4 @@
 import { getValueAsPromise, updateValueAsPromise } from "../../actions/FirebaseActions";
-import { StorageService } from "../../init";
 import { trackSyncCompleted, trackSyncTriggered } from "modules/analytics/events/features/syncing";
 import { getAllRulesAndGroups, getAllRulesAndGroupsIds } from "../rules/misc";
 import { SYNC_CONSTANTS } from "./syncConstants";
@@ -78,7 +77,7 @@ export const getSyncRuleStatus = () => {
 const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
   const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
-  if (typeof localRecords?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
+  if (typeof latestRules?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
     //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated. // @nsr: not hanlded, but is an enhancement, no breaking logic I guess
     const teamUserRuleConfigPath = getTeamUserRuleConfigPath(objectId);
     if (!teamUserRuleConfigPath) return;
@@ -298,7 +297,7 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
 export const saveRecords = (records, appMode) => {
   // not being used anywhere
   Logger.log("Writing storage in saveRecords");
-  return StorageService(appMode).saveMultipleRulesOrGroups(records);
+  // return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };
 
 export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) => {
@@ -311,7 +310,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter((x) => !recordIdsOnFirebase.includes(x));
   if (!isEmpty(recordsThatShouldBeDeletedFromLocal)) {
     Logger.log("Removing storage in syncToLocalFromFirebase");
-    await StorageService(appMode).removeRecordsWithoutSyncing(recordsThatShouldBeDeletedFromLocal);
+    // await StorageService(appMode).removeRecordsWithoutSyncing(recordsThatShouldBeDeletedFromLocal);
   }
 
   // END - Handles the case where a rule/group is delete from the cloud but still might exist locally
@@ -348,23 +347,23 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
   Logger.log("Writing storage in syncToLocalFromFirebase");
-  await StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
+  // await StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
   return updateLastSyncedTS(appMode);
 };
 
 const updateLastSyncedTS = async (appMode) => {
-  return StorageService(appMode).saveRecord({
-    [APP_CONSTANTS.LAST_SYNCED_TS]: Date.now(),
-  });
+  // return StorageService(appMode).saveRecord({
+  //   [APP_CONSTANTS.LAST_SYNCED_TS]: Date.now(),
+  // });
 };
 
 // Checks if last-synced-ts is later than last-updated-ts - the ideal case
 // last updated-ts will be ahead only if updates are performed directly by extension popup
 export const checkIfNoUpdateHasBeenPerformedSinceLastSync = async (appMode) => {
-  const lastSyncedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNCED_TS);
-  const lastUpdatedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_UPDATED_TS);
-  if (!lastSyncedTS || !lastUpdatedTS) return true; // assumption
-  return lastSyncedTS > lastUpdatedTS;
+  // const lastSyncedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNCED_TS);
+  // const lastUpdatedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_UPDATED_TS);
+  // if (!lastSyncedTS || !lastUpdatedTS) return true; // assumption
+  // return lastSyncedTS > lastUpdatedTS;
 };
 
 // Merge them both
@@ -413,7 +412,7 @@ export const handleLocalConflicts = (firebaseRecords, localRecords) => {
 
 export const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
   Logger.log("Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync");
-  await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
+  // await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
 };
 
 export const getSyncedSessionRecordingPageConfig = (uid) => {
@@ -427,12 +426,12 @@ export const getSyncedSessionRecordingPageConfig = (uid) => {
 };
 
 export const getLocalSessionRecordingPageConfig = (appMode) => {
-  Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
-  return new Promise((resolve) => {
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
-      .then((savedConfig) => resolve(savedConfig || {}));
-  });
+  // Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
+  // return new Promise((resolve) => {
+  //   StorageService(appMode)
+  //     .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+  //     .then((savedConfig) => resolve(savedConfig || {}));
+  // });
 };
 
 export const syncSessionRecordingPageConfigToFirebase = async (uid, appMode) => {

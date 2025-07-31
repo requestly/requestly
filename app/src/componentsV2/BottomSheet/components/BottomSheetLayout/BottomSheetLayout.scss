@@ -1,6 +1,10 @@
 .bottomsheet-layout-container {
-  height: inherit;
+  height: calc(100% - 56px);
   position: relative;
+
+  .ant-tabs {
+    height: 100%;
+  }
 
   &.drawer-layout {
     .bottom-sheet-container {
@@ -23,6 +27,10 @@
     .gutter {
       border-top: 1px solid var(--requestly-color-surface-1);
       cursor: ns-resize;
+    }
+    & .ant-tabs-content-holder {
+      padding: 8px;
+      overflow: hidden;
     }
   }
 

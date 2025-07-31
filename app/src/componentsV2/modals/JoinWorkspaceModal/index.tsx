@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getIsJoinWorkspaceCardVisible } from "store/selectors";
+import { getIsJoinWorkspaceCardVisible } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { Avatar, Button, Col, Row } from "antd";
+import { Button, Col, Row } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RQModal } from "lib/design-system/components";
-import { getUniqueColorForWorkspace, getUniqueTeamsFromInvites } from "utils/teams";
+import { getUniqueTeamsFromInvites } from "utils/teams";
 import { globalActions } from "store/slices/global/slice";
 import { getPendingInvites, acceptTeamInvite } from "backend/workspace";
 import { LearnMoreLink } from "components/common/LearnMoreLink";
@@ -17,6 +15,9 @@ import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/tea
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
@@ -33,35 +34,21 @@ interface InviteRowProps {
 
 const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isJoining, setIsJoining] = useState<boolean>(false);
+
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleJoinClick = (team: TeamInviteMetadata) => {
     trackWorkspaceJoinClicked(team?.teamId, modalSrc);
     setIsJoining(true);
 
     acceptTeamInvite(team?.inviteId)
-      .then((res: any) => {
-        if (res?.data?.success) {
+      .then((res) => {
+        if (res?.success) {
           toast.success("Successfully joined workspace");
-          if (res?.data?.data?.invite.type === "teams") {
-            switchWorkspace(
-              {
-                teamId: team?.teamId,
-                teamName: team?.teamName,
-                teamMembersCount: team?.teamAccessCount,
-              },
-              dispatch,
-              {
-                isWorkspaceMode,
-                isSyncEnabled: true,
-              },
-              appMode,
-              null,
-              "join_workspace_modal"
-            );
+          if (res?.data?.invite.type === "teams") {
+            switchWorkspace(team?.teamId, "join_workspace_modal");
           }
         }
         if (isJoinWorkspaceCardVisible) dispatch(globalActions.updateJoinWorkspaceCardVisible(false));
@@ -69,7 +56,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
         setIsJoining(false);
         dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
       })
-      .catch((err) => {
+      .catch(() => {
         toast.error("Error while accepting invitation. Please contact workspace admin");
         setIsJoining(false);
         dispatch(globalActions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: false }));
@@ -80,14 +67,9 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
     <li key={team.inviteId}>
       <div className="w-full team-invite-row">
         <Col>
-          <Avatar
+          <WorkspaceAvatar
+            workspace={{ id: team.teamId, name: team.teamName, workspaceType: WorkspaceType.SHARED }}
             size={28}
-            shape="square"
-            className="workspace-avatar"
-            icon={team.teamName?.[0]?.toUpperCase() ?? "W"}
-            style={{
-              backgroundColor: `${getUniqueColorForWorkspace(team.teamId, team.teamName)}`,
-            }}
           />
           <div>{team.teamName}</div>
         </Col>
@@ -108,7 +90,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   useEffect(() => {
     if (user.loggedIn) {
       getPendingInvites({ email: true, domain: true })
-        .then((res: any) => {
+        .then((res) => {
           const pendingInvites = res?.pendingInvites ?? [];
           const sortedInvites = pendingInvites
             ? pendingInvites.sort(
@@ -173,7 +155,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
           </ul>
         ) : (
           <div className="title teams-invite-empty-message">
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+            <img alt="smile" width="48px" height="44px" src="/assets/media/common/smiles.svg" />
             <div>You don't have any workspace invites!</div>
           </div>
         )}

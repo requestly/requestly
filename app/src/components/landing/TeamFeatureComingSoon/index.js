@@ -1,13 +1,10 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Row, Col } from "antd";
-import { getAppMode } from "store/selectors";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import "./TeamFeatureComingSoon.css";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 const TeamFeatureComingSoon = ({ title = "" }) => {
-  const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
+  const { switchToPersonalWorkspace } = useWorkspaceHelpers();
 
   return (
     <Row className="team-feature-coming-soon-container">
@@ -25,14 +22,14 @@ const TeamFeatureComingSoon = ({ title = "" }) => {
         </p>
 
         <div className="team-feature-banner">
-          <img alt="file" className="file-icon" src="/assets/img/workspaces/file.svg" />
+          <img alt="file" className="file-icon" src="/assets/media/common/file.svg" />
           <div className="header">Coming soon!</div>
           <p className="text-dark-gray">
             Meanwhile you can{" "}
             <span
               title="Switch to personal workspace"
               className="text-underline cursor-pointer"
-              onClick={() => clearCurrentlyActiveWorkspace(dispatch, appMode)}
+              onClick={() => switchToPersonalWorkspace()}
             >
               switch to personal workspace
             </span>{" "}

@@ -1,8 +1,8 @@
-import { QueryParamRule, QueryParamModificationType, QueryParamRuleModification } from "../../../types/rules";
+import { QueryParamRule } from "@requestly/shared/types/entities/rules";
 import { ExtensionRule, ExtensionRuleAction, QueryParamRuleTransform, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryParamRuleTransform => {
+const parseQueryParams = (modifications: QueryParamRule.Modification[]): QueryParamRuleTransform => {
   const transform: QueryParamRuleTransform = {
     queryTransform: {
       addOrReplaceParams: [],
@@ -11,12 +11,12 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
   };
 
   for (const modification of modifications) {
-    if (modification.type === QueryParamModificationType.ADD) {
+    if (modification.type === QueryParamRule.ModificationType.ADD) {
       transform.queryTransform.addOrReplaceParams.push({
         key: modification.param,
         value: modification.value,
       });
-    } else if (modification.type === QueryParamModificationType.REMOVE) {
+    } else if (modification.type === QueryParamRule.ModificationType.REMOVE) {
       transform.queryTransform.removeParams.push(modification.param);
     } else {
       // case remove all
@@ -30,7 +30,7 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
   return transform;
 };
 
-const parseQueryParamRule = (rule: QueryParamRule): ExtensionRule[] => {
+const parseQueryParamRule = (rule: QueryParamRule.Record): ExtensionRule[] => {
   return rule.pairs.map(
     (rulePair): ExtensionRule => {
       const condition = parseConditionFromSource(rulePair.source);

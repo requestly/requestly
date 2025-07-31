@@ -1,4 +1,4 @@
-.rq-breadcrumb {
+ol.rq-breadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
@@ -7,7 +7,17 @@
   margin: 8px 16px;
   max-height: 24px;
 
-  .rq-breadcrumb-item,
+  .ant-skeleton {
+    opacity: 0.6;
+    max-width: 250px;
+
+    .ant-skeleton-input {
+      height: 16px;
+      border-radius: 4px;
+    }
+  }
+
+  a.rq-breadcrumb-item,
   .rq-breadcrumb-separator {
     flex-shrink: 0;
     cursor: pointer;
@@ -15,13 +25,16 @@
     color: var(--requestly-color-text-subtle);
     line-height: var(--requestly-font-line-height-xs, 15px);
     font-size: var(--requestly-font-size-xs, 11px);
+    padding: 0;
+    height: auto;
   }
 
-  .rq-breadcrumb-item:hover {
+  a.rq-breadcrumb-item:hover {
+    background-color: transparent !important;
     text-decoration: underline;
   }
 
-  .rq-breadcrumb-item:last-child {
+  a.rq-breadcrumb-item:last-child {
     color: var(--requestly-color-text-default);
   }
 

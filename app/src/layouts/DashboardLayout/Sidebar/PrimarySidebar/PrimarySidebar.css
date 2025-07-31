@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   max-width: 5rem;
+  padding: var(--space-2, 4px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -29,6 +30,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  margin: 8px 0;
 }
 
 .primary-sidebar-container li .primary-sidebar-link {
@@ -36,41 +38,45 @@
 }
 
 .primary-sidebar-container .primary-sidebar-link {
-  padding: 8px 4px;
-  min-height: 4.5rem;
-  margin-bottom: 2px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  row-gap: 8px;
-  color: var(--text-dark-gray);
+  align-items: center;
+  padding: 6px;
+  gap: var(--space-4, 8px);
+  color: var(--requestly-color-text-placeholder);
+  border-radius: 4px;
   border: none;
-  border-radius: 0;
 }
 
-.primary-sidebar-container .primary-sidebar-link:hover,
-.primary-sidebar-container .primary-sidebar-link:active,
-.primary-sidebar-container .primary-sidebar-link:focus,
-.primary-sidebar-container .primary-sidebar-active-link {
+.primary-sidebar-container .primary-sidebar-link:hover {
   cursor: pointer;
   color: var(--white);
-  background-color: var(--gray-dark);
-  border: none !important;
+  background-color: var(--requestly-color-white-t-10);
+}
+
+.primary-sidebar-container .primary-sidebar-link:active,
+.primary-sidebar-container .primary-sidebar-active-link,
+.primary-sidebar-container .primary-sidebar-active-link:hover {
+  color: var(--requestly-color-text-default);
+  background-color: var(--requestly-color-white-t-20);
 }
 
 .primary-sidebar-container .primary-sidebar-active-link {
   border-left-color: var(--primary);
 }
 
-.primary-sidebar-link .icon__wrapper svg {
-  width: 1rem;
-  height: 1rem;
+.primary-sidebar-link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .primary-sidebar-link .link-title {
   font-size: var(--requestly-font-size-2xs);
-  font-weight: var(--requestly-font-weight-medium);
   line-height: 15.92px;
   text-align: center;
 }
@@ -83,10 +89,17 @@
   position: absolute;
   top: -7px;
   right: -30px;
-  font-size: 8px;
+  font-size: 9px;
   padding: 1px 2px;
+  z-index: 1;
+  background: var(--requestly-color-neutral-700);
+  border: 1px solid var(--requestly-color-surface-3);
 }
-
+.primary-sidebar-link .icon-with-badge .rq-badge span {
+  color: var(--requestly-color-neutral-300);
+  background: none;
+  -webkit-text-fill-color: var(--requestly-color-neutral-300);
+}
 .primary-sidebar-bottom-btns {
   display: flex;
   flex-direction: column;

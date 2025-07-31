@@ -1,4 +1,4 @@
-import { ScriptRule } from "../../../types/rules";
+import { ScriptRule } from "@requestly/shared/types/entities/rules";
 import {
   ExtensionResourceType,
   ExtensionRule,
@@ -11,7 +11,7 @@ import { parseConditionFromSource } from "./utils";
 const CSP_HEADER = "Content-Security-Policy";
 
 // Only need to add headers rule to remove the CSP header
-const parseScriptRule = (rule: ScriptRule): ExtensionRule[] => {
+const parseScriptRule = (rule: ScriptRule.Record): ExtensionRule[] => {
   if (rule.removeCSPHeader === false) {
     return [];
   }

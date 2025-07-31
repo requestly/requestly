@@ -8,9 +8,10 @@ interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
   minSize?: number;
+  initialSizes?: Array<number>;
 }
 
-export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100 }) => {
+export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100, initialSizes = [40, 60] }) => {
   const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
   const splitPane = useRef(null);
@@ -20,19 +21,19 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   useEffect(() => {
     if (isSheetPlacedAtBottom && splitPane.current) {
       if (isBottomSheetOpen) {
-        splitPane.current.split.setSizes([40, 60]);
+        splitPane.current.split.setSizes(initialSizes);
       } else {
         splitPane.current.split.setSizes([100, 0]);
       }
     }
-  }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
+  }, [isBottomSheetOpen, isSheetPlacedAtBottom, initialSizes]);
 
   return (
     <Split
       ref={splitPane}
       direction={splitDirection}
-      sizes={isSheetPlacedAtBottom ? [100, 0] : [58, 42]}
-      minSize={isSheetPlacedAtBottom ? minSize : 350}
+      sizes={isSheetPlacedAtBottom ? [100, 0] : initialSizes}
+      minSize={minSize || 350}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
       }`}

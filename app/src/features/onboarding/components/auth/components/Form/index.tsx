@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Divider, Row, Col, Tooltip, Button } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { AuthFormInput } from "./components/AuthFormInput";
-import googleLogo from "assets/icons/google.svg";
 // import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
-import { handleEmailSignIn, handleEmailSignUp, handleGoogleSignIn } from "./actions";
+import { handleAppleSignIn, handleEmailSignIn, handleEmailSignUp, handleGoogleSignIn } from "./actions";
 import { globalActions } from "store/slices/global/slice";
 import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
@@ -26,10 +25,14 @@ import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
 import { AuthWarningBanner } from "./components/AuthWarningBanner";
-import { isDisposableEmail } from "utils/AuthUtils";
+import { getEmailType } from "utils/mailCheckerUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getAppFlavour } from "utils/AppUtils";
+import LINKS from "config/constants/sub/links";
 import "./index.scss";
+import { isSafariBrowser } from "actions/ExtensionActions";
+import { EmailType } from "@requestly/shared/types/common";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 interface AuthFormProps {
   authMode: string;
@@ -62,6 +65,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const appMode = useSelector(getAppMode);
   const [password, setPassword] = useState("");
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
+  const [isAppleSignInLoading, setIsAppleSignInLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
   const [isAuthWarningBannerVisible, setIsAuthWarningBannerVisible] = useState(!!warningMessage?.length);
@@ -114,7 +118,45 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       });
   }, [authMode, source, appMode, isOnboarding, callback, postAuthGreeting]);
 
-  const handleMagicLinkAuthClick = useCallback(() => {
+  const handleAppleSignInButtonClick = useCallback(() => {
+    setIsAppleSignInLoading(true);
+    handleAppleSignIn(source)
+      .then((result) => {
+        if (result.uid) {
+          setIsNewUser(result?.isNewUser || false);
+        }
+        const greatingName = result.displayName?.split(" ")?.[0];
+        !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
+
+        callback?.();
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsAppleSignInLoading(false);
+      });
+  }, [callback, isOnboarding, postAuthGreeting, source]);
+
+  const renderSignInWithApple = useCallback(() => {
+    if (isSafariBrowser()) {
+      return (
+        <RQButton
+          type="default"
+          className="onboarding-google-auth-button"
+          onClick={handleAppleSignInButtonClick}
+          loading={isAppleSignInLoading}
+          disabled={isLoading}
+        >
+          <img src={"/assets/media/common/apple-white.svg"} alt="apple" height={24} width={24} />
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Apple" : "Sign in with Apple"}
+        </RQButton>
+      );
+    }
+    return null;
+  }, [authMode, handleAppleSignInButtonClick, isAppleSignInLoading, isLoading]);
+
+  const handleMagicLinkAuthClick = useCallback(async () => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       if (!email) {
         toast.error("Please enter your email address");
@@ -126,7 +168,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         return;
       }
 
-      if (isDisposableEmail(email)) {
+      const isDisposable = await getEmailType(email);
+      if (isDisposable === EmailType.DESTROYABLE) {
         setIsInputEmailDisposable(true);
         return;
       }
@@ -235,11 +278,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           loading={isGoogleSignInLoading}
           disabled={isLoading}
         >
-          <img src={googleLogo} alt="google" />
+          <img src={"/assets/media/common/google.svg"} alt="google" />
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
         </RQButton>
+        {renderSignInWithApple()}
         <Divider plain className="onboarding-auth-form-divider">
-          Or
+          or
         </Divider>
 
         <AuthFormInput
@@ -342,6 +386,22 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
         </span>
       </Row>
+      <div className="auth-form-footer">
+        By clicking {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"},
+        {isSafariBrowser()
+          ? authMode === AUTH.ACTION_LABELS.SIGN_UP
+            ? " Sign up with Apple"
+            : " Sign in with Apple"
+          : ""}
+        , Continue with Single Sign-on (SSO) or Continue you agree to our{" "}
+        <a href={LINKS.REQUESTLY_TERMS_AND_CONDITIONS} target="_blank" rel="noreferrer">
+          Terms and Conditions
+        </a>{" "}
+        and{" "}
+        <a href={LINKS.REQUESTLY_PRIVACY_STATEMENT} target="_blank" rel="noreferrer">
+          Privacy Statement
+        </a>
+      </div>
     </>
   ) : (
     <div className="w-full">
@@ -366,11 +426,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         loading={isGoogleSignInLoading}
         disabled={isLoading}
       >
-        <img src={googleLogo} alt="google" />
+        <img src={"/assets/media/common/google.svg"} alt="google" />
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
+      {renderSignInWithApple()}
       <Divider plain className="onboarding-auth-form-divider">
-        Or
+        or
       </Divider>
 
       <AuthFormInput
@@ -467,11 +528,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <div className="onboarding-terms-text">
           I agree to the{" "}
-          <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
+          <a href={getLinkWithMetadata("https://requestly.com/terms/")} target="_blank" rel="noreferrer">
             terms
           </a>
           . Learn about how we use and protect your data in our{" "}
-          <a href="https://requestly.com/privacy/">privacy policy</a>.
+          <a href={getLinkWithMetadata("https://requestly.com/privacy/")} target="_blank" rel="noreferrer">
+            privacy policy
+          </a>
+          .
         </div>
       )}
     </div>

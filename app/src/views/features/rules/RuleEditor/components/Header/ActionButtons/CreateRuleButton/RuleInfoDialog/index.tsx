@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { Col, notification, Row, Space } from "antd";
-//@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import QuestionMarkIcon from "assets/icons/question-mark.svg?react";
 import { RQButton } from "lib/design-system/components";
@@ -18,14 +17,14 @@ const ruleInfoDialogContent: Record<string, RuleInfoDialogContent> = {
     title: "Modified response body and status will not be visible in browser network dev tools.",
     description:
       "The rule will be executed correctly but cannot be monitored in dev tools due to technical limitions of the browser.",
-    readMoreLink: "https://docs.requestly.io/browser-extension/chrome/http-modifications/response-rule",
+    readMoreLink: "https://docs.requestly.com/general/http-rules/rule-types/modify-response-body",
     appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
   },
   [GLOBAL_CONSTANTS.RULE_TYPES.REQUEST]: {
     title: "Modified request body will not be visible in browser network dev tools.",
     description:
       "The rule will be executed correctly but cannot be monitored in dev tools due to technical limitions of the browser.",
-    readMoreLink: "https://docs.requestly.io/desktop-app/mac/http-modifications/request-body-rule",
+    readMoreLink: "https://docs.requestly.com/general/http-rules/rule-types/modify-request-body",
     appMode: [GLOBAL_CONSTANTS.APP_MODES.DESKTOP],
   },
 };

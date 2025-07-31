@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--requestly-color-background);
+  background: var(--black);
   width: 100%;
   overflow: hidden;
 
@@ -22,16 +22,15 @@
   align-items: center;
 
   .pricing-navbar {
-    position: fixed;
+    position: relative;
     top: 0;
-    left: 0;
-    right: 0;
     display: flex;
     align-items: center;
+    width: 100%;
+
     padding: 8px 1rem;
-    background: var(--requestly-color-background);
+    background: var(--black);
     border-bottom: 1px solid var(--requestly-color-surface-1);
-    z-index: 5;
 
     &-content {
       display: flex;
@@ -43,6 +42,12 @@
     .logo {
       width: 100px;
       cursor: pointer;
+    }
+
+    .auth-button-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   }
 
@@ -74,32 +79,37 @@
 .page-yellow-text {
   margin-top: 24px;
   text-align: center;
-  color: var(--requestly-color-warning);
+  color: var(--requestly-color-warning-soft);
   font-size: var(--requestly-font-size-sm);
 }
 
 .pricing-page-title {
   color: var(--requestly-color-text-default);
-  font-size: 24px;
-  font-weight: 500;
-  margin-top: 20px;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  margin-top: 16px;
   text-align: center;
+  font-family: var(--requestly-font-family-default);
 }
 
 .pricing-page-description {
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-sm);
-  margin-top: 8px;
+  margin-top: 12px;
   text-align: center;
 }
 
 .pricing-page-duartion-label {
   color: var(--requestly-color-text-default);
   margin-left: 8px;
+
+  .success {
+    color: var(--green-green-300);
+  }
 }
 
 .pricing-page-table-wrapper {
-  margin-top: 32px;
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -108,11 +118,25 @@
     flex-wrap: wrap;
     gap: 1rem;
     padding: 0 4px;
+    margin-top: 16px;
 
     .plan-card {
       flex: 1;
       min-width: 300px;
+      button {
+        font-weight: 500;
+      }
+
+      .annual-bill {
+        span {
+          font-size: 11px;
+          line-height: 17px;
+        }
+      }
     }
+  }
+  &.api-client {
+    justify-content: center;
   }
 }
 
@@ -121,4 +145,37 @@
   grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
   gap: 16px;
   margin-top: 56px;
+}
+
+.pricing-page-error-message-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #a41f1f;
+  width: 100%;
+  height: 56px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--requestly-color-text-default);
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  span {
+    font-size: var(--requestly-font-size-sm);
+  }
+
+  &-close-icon {
+    cursor: pointer;
+    position: absolute;
+    align-self: center;
+    top: 20px;
+    right: 16px;
+  }
 }

@@ -1,4 +1,17 @@
-import { RecordStatus, RecordType, RuleType } from "features/rules/types/rules";
+import {
+  HeaderRule,
+  QueryParamRule,
+  RecordStatus,
+  RecordType,
+  RedirectRule,
+  ResponseRule,
+  RuleSourceKey,
+  RuleSourceOperator,
+  RuleType,
+  ScriptRule,
+} from "@requestly/shared/types/entities/rules";
+import { ResourceType } from "@requestly/shared/types/common/network";
+
 import { TemplateRecord } from "../types";
 
 const templateRecords: TemplateRecord[] = [
@@ -25,11 +38,11 @@ const templateRecords: TemplateRecord[] = [
         pairs: [
           {
             destination: "http://localhost:8000/scripts/main.js",
-            destinationType: "url",
+            destinationType: RedirectRule.DestinationType.URL,
             id: "9h8ir",
             source: {
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "https://www.example.com/scripts/main.js",
             },
           },
@@ -65,17 +78,17 @@ const templateRecords: TemplateRecord[] = [
             id: "gjjnt",
             scripts: [
               {
-                codeType: "js",
+                codeType: ScriptRule.ScriptType.JS,
                 fileName: "",
                 id: "fnujk",
-                loadTime: "afterPageLoad",
-                type: "url",
+                loadTime: ScriptRule.ScriptLoadTime.AFTER_PAGE_LOAD,
+                type: ScriptRule.ScriptValueType.URL,
                 value: "https://www.yourserver.com/yourscript.js",
               },
             ],
             source: {
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "https://www.customersite.com",
             },
           },
@@ -111,30 +124,30 @@ const templateRecords: TemplateRecord[] = [
               Response: [
                 {
                   header: "Access-Control-Allow-Origin",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "rq_request_initiator_origin()",
                 },
                 {
                   header: "Access-Control-Allow-Methods",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "*",
                 },
                 {
                   header: "Access-Control-Allow-Headers",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "*",
                 },
                 {
                   header: "Access-Control-Allow-Credentials",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "true",
                 },
               ],
             },
             source: {
               filters: null,
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "<yourdomain.com>",
             },
           },
@@ -177,14 +190,14 @@ const templateRecords: TemplateRecord[] = [
                 {
                   header: "Authorization",
                   id: "5jipq",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "Bearer your_custom_token",
                 },
               ],
             },
             source: {
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "localhost",
             },
           },
@@ -219,15 +232,15 @@ const templateRecords: TemplateRecord[] = [
           {
             id: "qvgs0",
             response: {
-              resourceType: "restApi",
+              resourceType: ResponseRule.ResourceType.REST_API,
               statusCode: "",
-              type: "static",
+              type: ResponseRule.BodyType.STATIC,
               value: '{"userId":2,"status":"response modified!"}',
             },
             source: {
               filters: [],
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "https://testheaders.com/exampleAPI",
             },
           },
@@ -265,15 +278,15 @@ const templateRecords: TemplateRecord[] = [
               Response: [
                 {
                   header: "content-security-policy",
-                  type: "Remove",
+                  type: HeaderRule.ModificationType.REMOVE,
                   value: "",
                 },
               ],
             },
             source: {
               filters: null,
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "",
             },
           },
@@ -311,15 +324,15 @@ const templateRecords: TemplateRecord[] = [
           {
             id: "qoa22",
             response: {
-              resourceType: "restApi",
+              resourceType: ResponseRule.ResourceType.REST_API,
               statusCode: "404",
               statusText: "Not Found",
-              type: "static",
+              type: ResponseRule.BodyType.STATIC,
               value: "{}",
             },
             source: {
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "https://testheaders.com/exampleAPI",
             },
           },
@@ -353,14 +366,14 @@ const templateRecords: TemplateRecord[] = [
           {
             id: "hwm11",
             response: {
-              resourceType: "restApi",
+              resourceType: ResponseRule.ResourceType.REST_API,
               statusCode: "",
-              type: "static",
+              type: ResponseRule.BodyType.STATIC,
               value: '{"featureFlag1":true,"featureFlag2":false,"featureFlag3":true}',
             },
             source: {
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "https://api.example.com/features",
             },
           },
@@ -398,20 +411,20 @@ const templateRecords: TemplateRecord[] = [
                 {
                   header: "X-Forwarded-For",
                   id: "abijp",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "203.0.113.195",
                 },
                 {
                   header: "CF-IPCountry",
                   id: "3qfpw",
-                  type: "Add",
+                  type: HeaderRule.ModificationType.ADD,
                   value: "US",
                 },
               ],
             },
             source: {
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "https://www.specificsite.com",
             },
           },
@@ -444,8 +457,8 @@ const templateRecords: TemplateRecord[] = [
             destination: "$1://duckduckgo.com/?q=$3&$4",
             source: {
               filters: null,
-              key: "Url",
-              operator: "Wildcard_Matches",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.WILDCARD_MATCHES,
               value: "*://www.google.*/search?q=*&*",
             },
             id: "soktt",
@@ -494,19 +507,18 @@ const templateRecords: TemplateRecord[] = [
         objectType: RecordType.RULE,
         pairs: [
           {
-            libraries: [],
             source: {
               filters: null,
-              key: "Url",
-              operator: "Contains",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "",
             },
             scripts: [
               {
-                codeType: "js",
+                codeType: ScriptRule.ScriptType.JS,
                 fileName: "",
-                loadTime: "afterPageLoad",
-                type: "code",
+                loadTime: ScriptRule.ScriptLoadTime.AFTER_PAGE_LOAD,
+                type: ScriptRule.ScriptValueType.CODE,
                 value:
                   "if(document.querySelector('#tvcap'))document.querySelector('#tvcap').style.background='#f8fcae'",
                 id: "nu40j",
@@ -547,17 +559,19 @@ const templateRecords: TemplateRecord[] = [
               {
                 actionWhenParamExists: "Overwrite",
                 param: "share",
-                type: "Add",
+                type: QueryParamRule.ModificationType.ADD,
                 value: "1",
                 id: "mlcns",
               },
             ],
             source: {
-              filters: {
-                resourceType: ["main_frame"],
-              },
-              key: "Url",
-              operator: "Contains",
+              filters: [
+                {
+                  resourceType: [ResourceType.MainDocument],
+                },
+              ],
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "quora.com",
             },
             id: "irgm4",
@@ -593,6 +607,7 @@ const templateRecords: TemplateRecord[] = [
         pairs: [
           {
             id: "ak6l0",
+            // @ts-ignore
             modifications: [
               {
                 actionWhenParamExists: "Overwrite",
@@ -624,11 +639,13 @@ const templateRecords: TemplateRecord[] = [
               },
             ],
             source: {
-              filters: {
-                resourceType: ["main_frame"],
-              },
-              key: "Url",
-              operator: "Contains",
+              filters: [
+                {
+                  resourceType: [ResourceType.MainDocument],
+                },
+              ],
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.CONTAINS,
               value: "",
             },
           },
@@ -663,8 +680,8 @@ const templateRecords: TemplateRecord[] = [
             destination: "$1://bing.com/?q=$3&$4",
             source: {
               filters: null,
-              key: "Url",
-              operator: "Wildcard_Matches",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.WILDCARD_MATCHES,
               value: "*://www.google.*/search?q=*&*",
             },
             id: "yi3r8",
@@ -704,8 +721,8 @@ const templateRecords: TemplateRecord[] = [
             destination: "https://www.merriam-webster.com/dictionary/$1",
             source: {
               filters: null,
-              key: "Url",
-              operator: "Wildcard_Matches",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.WILDCARD_MATCHES,
               value: "https://www.dictionary.com/browse/*",
             },
             id: "azvg0",
@@ -744,8 +761,8 @@ const templateRecords: TemplateRecord[] = [
             id: "w679g",
             source: {
               filters: null,
-              key: "Url",
-              operator: "Wildcard_Matches",
+              key: RuleSourceKey.URL,
+              operator: RuleSourceOperator.WILDCARD_MATCHES,
               value: "https://www.dictionary.com/browse/*",
             },
           },

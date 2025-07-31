@@ -1,4 +1,4 @@
-import { RuleType } from "types";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const getEventObject = (name: string, value: string) => ({
   target: { name, value },

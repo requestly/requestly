@@ -2,7 +2,6 @@
 
 This sub-project consists of following components:
 
-- [Extension on Manifest V2](./mv2/README.md)
 - [Extension on Manifest V3](./mv3/README.md)
 - [Common code between above two versions](./common/README.md)
 - [Configurations - browser, environment](./config/README.md)

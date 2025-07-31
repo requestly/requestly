@@ -2,7 +2,7 @@ import config from "../config";
 import { Rule } from "../types";
 import { ResourceTypeFilterValue } from "./components/ResourceTypeFilter";
 import { EVENT, sendEvent } from "./events";
-import { RuleEditorUrlFragment, ColorScheme, NetworkResourceType } from "./types";
+import { RuleEditorUrlFragment, ColorScheme, NetworkResourceType, NetworkEvent } from "./types";
 
 interface PostMessageData {
   author: string;
@@ -36,7 +36,7 @@ export const createRule = <T extends Rule>(
             inputSelectorToFocus,
           },
         },
-        "*"
+        config.WEB_URL
       );
       window.removeEventListener("message", onMessageReceived);
     }
@@ -110,6 +110,24 @@ export const matchResourceTypeFilter = (
     case ResourceTypeFilterValue.OTHER:
       return true;
   }
+};
+
+export const getNetworkResourceType = (networkEvent: NetworkEvent) => {
+  const mimeType = networkEvent?.response?.content?.mimeType;
+  if (!mimeType) return NetworkResourceType.OTHER;
+  if (mimeType.startsWith("text/html")) return NetworkResourceType.DOC;
+  if (mimeType.startsWith("text/css")) return NetworkResourceType.CSS;
+  if (mimeType.startsWith("image/")) return NetworkResourceType.IMG;
+  if (mimeType.startsWith("text/")) return NetworkResourceType.JS;
+  if (mimeType.includes("font")) return NetworkResourceType.FONT;
+  if (mimeType.includes("script")) return NetworkResourceType.JS;
+  if (mimeType.includes("octet")) return NetworkResourceType.OTHER;
+  if (mimeType.includes("application")) return NetworkResourceType.JS;
+  return NetworkResourceType.OTHER;
+};
+
+export const enrichNetworkEvent = (networkEvent: NetworkEvent) => {
+  networkEvent._resourceType ??= getNetworkResourceType(networkEvent);
 };
 
 export const isRequestBodyParseable = (mimeType: string): boolean => {

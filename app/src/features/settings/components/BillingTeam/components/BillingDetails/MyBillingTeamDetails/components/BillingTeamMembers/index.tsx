@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
@@ -12,6 +13,7 @@ import { ActionLoadingModal } from "componentsV2/modals/ActionLoadingModal";
 import { toast } from "utils/Toast";
 import type { MenuProps } from "antd";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
+import { HiOutlineUsers } from "@react-icons/all-files/hi/HiOutlineUsers";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDotsHorizontal";
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
@@ -24,10 +26,12 @@ import {
   trackBillingTeamActionClicked,
   trackBillingTeamMemberRemoved,
   trackBillingTeamRoleChanged,
+  trackBillingTeamManageLicenseClicked,
 } from "features/settings/analytics";
 import { UserOutlined } from "@ant-design/icons";
 import { BsPersonFillExclamation } from "@react-icons/all-files/bs/BsPersonFillExclamation";
 import "./index.scss";
+import { redirectToUrl } from "utils/RedirectionUtils";
 
 interface Props {
   openDrawer: () => void;
@@ -35,6 +39,7 @@ interface Props {
 
 export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const { billingId } = useParams();
+  const isDomainWithCustomInfo = useFeatureValue("domain_with_custom_admin_info", false);
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
@@ -181,7 +186,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const getMemberRoleTag = useCallback(
     (role: BillingTeamRoles) => {
       if (
-        (billingTeamDetails?.isAcceleratorTeam && role === BillingTeamRoles.Manager) ||
+        ((billingTeamDetails?.isAcceleratorTeam || isDomainWithCustomInfo) && role === BillingTeamRoles.Manager) ||
         role === BillingTeamRoles.Admin
       ) {
         return (
@@ -200,7 +205,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       }
       return null;
     },
-    [billingTeamDetails?.isAcceleratorTeam]
+    [billingTeamDetails?.isAcceleratorTeam, isDomainWithCustomInfo]
   );
 
   const columns = useMemo(
@@ -272,7 +277,12 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         title: "",
         key: "action",
         render: (_: any, record: any) => {
-          if (!isUserAdmin || record.id === user?.details?.profile?.uid || record.role === BillingTeamRoles.Manager) {
+          if (
+            !isUserAdmin ||
+            record.id === user?.details?.profile?.uid ||
+            record.role === BillingTeamRoles.Manager ||
+            billingTeamDetails.browserstackGroupId
+          ) {
             return null;
           }
           return (
@@ -332,6 +342,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       handleRoleChange,
       checkIsPendingMember,
       getMemberRoleTag,
+      billingTeamDetails.browserstackGroupId,
     ]
   );
 
@@ -341,15 +352,30 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         <Row className="billing-team-members-section-header w-full" justify="space-between" align="middle">
           <Col className="billing-team-members-section-header-title">Licensed members</Col>
           <Col>
-            <RQButton
-              type="default"
-              icon={<IoMdAdd />}
-              className="billing-team-members-section-header-btn"
-              onClick={openDrawer}
-              disabled={!isUserAdmin}
-            >
-              Assign license
-            </RQButton>
+            {billingTeamDetails.browserstackGroupId ? (
+              <RQButton
+                type="default"
+                icon={<HiOutlineUsers />}
+                className="billing-team-members-section-header-btn"
+                onClick={() => {
+                  trackBillingTeamManageLicenseClicked();
+                  redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/manage-users/users`, true);
+                }}
+                disabled={!isUserAdmin}
+              >
+                Manage Licenses
+              </RQButton>
+            ) : (
+              <RQButton
+                type="default"
+                icon={<IoMdAdd />}
+                className="billing-team-members-section-header-btn"
+                onClick={openDrawer}
+                disabled={!isUserAdmin}
+              >
+                Assign license
+              </RQButton>
+            )}
           </Col>
         </Row>
         <Table

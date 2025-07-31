@@ -1,0 +1,32 @@
+.view-only-mode-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4, 8px);
+  padding: var(--space-2, 3px) var(--space-6, 16px);
+
+  background: var(--requestly-color-neutral-900);
+
+  .content {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--font-size-sm, 12px);
+    line-height: 22px;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      color: var(--requestly-color-warning-soft, #f2aa09);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+  }
+
+  .highlight {
+    color: var(--requestly-color-warning-soft, #f2aa09);
+  }
+}

@@ -1,14 +1,18 @@
 import React, { useMemo } from "react";
 import { Button, Col, Image, List, Row, Steps } from "antd";
 import InstructionsHeader from "./InstructionsHeader";
-import existingBrowserConnection from "assets/img/screenshots/existing_browser_connection.png";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const ExistingBrowserInstructionModal: React.FC<{
   setShowInstructions: () => void;
   handleActivateAppOnClick: (appId: string) => void;
   appId: string;
 }> = ({ setShowInstructions, handleActivateAppOnClick, appId }) => {
-  const instructionSteps = useMemo(() => {
+  const instructionSteps: {
+    title: string;
+    status: "process" | "finish" | "wait" | "error";
+    description: React.ReactNode;
+  }[] = useMemo(() => {
     return [
       {
         title: "Install Requestly Extension in your browser profile",
@@ -21,7 +25,10 @@ const ExistingBrowserInstructionModal: React.FC<{
                   <List.Item.Meta
                     title={
                       <>
-                        a. Install Requestly Extension from <a href="https://requestly.com">requestly.com</a>
+                        a. Install Requestly Extension from{" "}
+                        <a href={getLinkWithMetadata("https://requestly.com")} target="__blank">
+                          requestly.com
+                        </a>
                       </>
                     }
                   />
@@ -47,7 +54,7 @@ const ExistingBrowserInstructionModal: React.FC<{
               </List.Item>
             </List>
             <Row>
-              <Image src={existingBrowserConnection} />
+              <Image src={"/assets/media/components/existing_browser_connection.png"} />
             </Row>
           </>
         ),
@@ -73,7 +80,7 @@ const ExistingBrowserInstructionModal: React.FC<{
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/chrome.png"}
+        icon={window.location.origin + "/assets/media/components/chrome.png"}
         heading="Connect Existing Browser Profile"
         description={
           <Col>

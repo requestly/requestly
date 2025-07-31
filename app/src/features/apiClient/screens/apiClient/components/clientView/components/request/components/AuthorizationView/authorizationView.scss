@@ -1,0 +1,235 @@
+.authorization-view {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  height: 100%;
+  overflow: scroll;
+
+  &.collection-auth {
+    border-bottom: 0;
+  }
+
+  .form-and-description {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    height: calc(100% - 45px);
+
+    &.no-auth {
+      .form-view {
+        display: none;
+      }
+    }
+
+    .form-view {
+      max-width: 680px;
+      flex: 1;
+
+      .info-text {
+        color: #8f8f8f;
+        line-height: 15px;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        span {
+          margin-left: 4px;
+        }
+      }
+
+      .form {
+        .field-group {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 16px;
+          align-items: center;
+
+          label {
+            width: 120px;
+          }
+
+          .field {
+            width: 448px;
+          }
+
+          .ant-select-selector {
+            width: 448px;
+            background: none;
+          }
+
+          .ant-input {
+            height: 32px;
+            background: none;
+            font-size: 13px;
+            line-height: 20px;
+            padding: 4px 6px;
+          }
+
+          label,
+          .ant-input,
+          .ant-select-selector {
+            color: #fff;
+          }
+        }
+      }
+    }
+
+    .auth-description {
+      padding: 16px;
+      max-width: 320px;
+      margin-left: auto;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+
+      &.no-auth {
+        border: none;
+        margin: 0 auto;
+        text-align: center;
+        max-width: 100%;
+
+        img {
+          margin-top: 72px;
+          margin-bottom: 16px;
+          width: 80px;
+          height: 80px;
+        }
+
+        h1 {
+          line-height: 20px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #fff;
+          margin-bottom: 4px;
+        }
+
+        h2 {
+          line-height: 15px;
+          font-size: 11px;
+        }
+      }
+
+      h1 {
+        line-height: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #bbbbbb;
+      }
+
+      h2,
+      li {
+        font-size: 11px;
+        line-height: 17px;
+        color: #bbbbbb;
+      }
+
+      ul {
+        margin-left: -20px;
+        li {
+          display: list-item;
+          list-style-type: disc;
+        }
+      }
+
+      .step {
+        p {
+          color: blue;
+        }
+        .step {
+          p {
+            color: pink;
+          }
+        }
+      }
+
+      .note {
+        line-height: 17px;
+        font-size: 11px;
+        color: #bbbbbb;
+        margin-bottom: 8px;
+      }
+    }
+
+    .auth-help-panel {
+      margin: auto;
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      padding: var(--space-5, 12px);
+      gap: var(--space-4, 8px);
+      align-self: stretch;
+      border-radius: 8px;
+      border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+      background: var(--requestly-color-surface-0, #212121);
+
+      .sub-heading {
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-size: var(--requestly-font-size-xs, 11px);
+        line-height: var(--requestly-font-line-height-sm);
+      }
+
+      .info-icon {
+        margin-top: 2px;
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        color: var(--requestly-color-text-subtle, #bbb);
+      }
+
+      .link-text {
+        display: inline-block;
+        margin-left: 4px;
+        text-decoration: underline;
+        color: var(--requestly-color-primary-text, #639ff9);
+      }
+    }
+  }
+
+  &.read-only {
+    .form-and-description {
+      height: calc(100% - 45px - 48px); // 48px = read only alert height
+    }
+  }
+
+  .type-of-authorization {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    .form-selector {
+      display: flex;
+      align-items: center;
+
+      .authorization-save-btn {
+        margin-left: auto;
+      }
+
+      .clear-icon {
+        cursor: pointer;
+        margin-left: 16px;
+        display: flex;
+        align-items: center;
+
+        span {
+          color: #bbb;
+          font-size: 12px;
+          line-height: 15px;
+          margin-left: 7px;
+        }
+      }
+
+      label {
+        font-size: 11px;
+        line-height: 15px;
+        color: #bbbbbb;
+        margin-right: 12px;
+        font-weight: 500;
+      }
+
+      .ant-select-selector {
+        color: #fff;
+      }
+
+      .form-selector-dropdown {
+        width: 200px;
+      }
+    }
+  }
+}

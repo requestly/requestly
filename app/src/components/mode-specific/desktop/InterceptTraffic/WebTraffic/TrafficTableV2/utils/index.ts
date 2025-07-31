@@ -2,9 +2,10 @@ import { getNewGroup, getNewRule } from "components/features/rules/RuleBuilder/a
 import parser from "ua-parser-js";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { StorageService } from "init";
 import { cloneDeep } from "lodash";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 export const getRequestDomain = (log: any) => {
   const domain = log?.request?.host;
@@ -76,14 +77,14 @@ export const getOrCreateSessionGroup = async (
     throw new Error("Session ID is required to create a session group");
   }
 
-  const allGroups = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
+  const allGroups = await clientRuleStorageService.getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
 
   let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
 
   if (!sessionGroup) {
     const groupName = `[Mocks] ${sessionDetails.networkSessionName}`;
     sessionGroup = getNewGroup(groupName);
-    await StorageService(appMode).saveRuleOrGroup({
+    await syncingHelper.saveRuleOrGroup({
       ...sessionGroup,
       sessionId: sessionDetails.networkSessionId,
       createdFromSession: true,

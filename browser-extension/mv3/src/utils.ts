@@ -1,7 +1,7 @@
 import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
-import { Variable, getVariable } from "./service-worker/variable";
+import { getVariable, Variable } from "./service-worker/variable";
 import { ChangeType, getRecord, onRecordChange } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
 
@@ -25,8 +25,26 @@ export const getAllSupportedWebURLs = () => {
   return [...webURLsSet];
 };
 
+export const getAllSupportedAppOrigins = () => {
+  const supportedOriginsSet = new Set([]);
+
+  getAllSupportedWebURLs().forEach((url) => {
+    const origin = new URL(url).origin;
+    supportedOriginsSet.add(origin);
+  });
+  return [...supportedOriginsSet];
+};
+
 export const isAppURL = (url: string) => {
-  return !!url && getAllSupportedWebURLs().some((webURL) => url.includes(webURL));
+  let origin = null;
+  try {
+    const urlObject = new URL(url);
+    origin = urlObject.origin;
+  } catch (err) {
+    return false;
+  }
+
+  return !!url && getAllSupportedAppOrigins().includes(origin);
 };
 
 export const isBlacklistedURL = (url: string): boolean => {
