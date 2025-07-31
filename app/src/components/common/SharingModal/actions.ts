@@ -2,10 +2,11 @@ import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
 import { Rule as NewRule, Group as NewGroup } from "@requestly/shared/types/entities/rules";
-import { StorageService } from "init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 export const createSharedList = async ({
   appMode,
@@ -23,7 +24,7 @@ export const createSharedList = async ({
   notifyOnImport: boolean;
 }) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
-  const currentWorkspaceId = window.currentlyActiveWorkspaceTeamId;
+  const currentWorkspaceId = getActiveWorkspaceId(window.activeWorkspaceIds);
 
   const updatedGroups: NewGroup[] = groups.map((group) => ({
     ...group,
@@ -109,7 +110,7 @@ export const duplicateRulesToTargetWorkspace = async (
     return formatRule(rule, newGroupId);
   });
 
-  return StorageService(appMode).saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
+  return syncingHelper.saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
 };
 
 export const updateSharedListNotificationStatus = async ({

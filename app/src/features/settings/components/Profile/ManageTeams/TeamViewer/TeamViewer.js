@@ -10,23 +10,22 @@ import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/te
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getWorkspaceById } from "store/slices/workspaces/selectors";
+import { isPersonalWorkspaceId } from "features/workspaces/utils";
+import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
+import { WorkspaceType } from "features/workspaces/types";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
-import { WorkspaceType } from "features/workspaces/types";
 import { LocalWorkspaceSettings } from "./LocalWorkspaceSettings/LocalWorkspaceSettings";
 import "./TeamViewer.css";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
-  const availableWorkspaces = useSelector(getAllWorkspaces);
   const user = useSelector(getUserAuthDetails);
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
-  const teamDetails = useMemo(() => availableWorkspaces?.find((team) => team.id === teamId), [
-    availableWorkspaces,
-    teamId,
-  ]);
+  const teamDetails = useSelector(getWorkspaceById(teamId));
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
@@ -35,15 +34,25 @@ const TeamViewer = () => {
 
   const manageWorkspaceItems = useMemo(
     () => [
-      {
-        key: "Members",
-        label: "Members",
-        children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
-      },
+      teamDetails?.workspaceType === WorkspaceType.PERSONAL
+        ? {}
+        : {
+            key: "Members",
+            label: "Members",
+            children: <MembersDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
+          },
       {
         key: "Workspace settings",
         label: "Workspace settings",
-        children: (
+        children: isPersonalWorkspaceId(teamId) ? (
+          <PersonalWorkspaceSettings
+            key={teamId}
+            teamId={teamId}
+            teamOwnerId={teamOwnerId}
+            isTeamAdmin={isTeamAdmin}
+            isTeamArchived={isTeamArchived}
+          />
+        ) : (
           <TeamSettings
             key={teamId}
             teamId={teamId}

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
+import { checkUserBackupState, getAuthData } from "actions/FirebaseActions";
 import firebaseApp from "firebase.js";
 import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { globalActions } from "store/slices/global/slice";
@@ -18,8 +18,8 @@ import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { StorageService } from "init";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { clientStorageService } from "services/clientStorageService";
 import { getEmailType } from "utils/mailCheckerUtils";
 import { EmailType } from "@requestly/shared/types/common";
 
@@ -110,9 +110,8 @@ const AuthHandler: React.FC<{}> = () => {
 
       try {
         // FIXME: getOrUpdateUserSyncState, checkUserBackupState taking too long for large workspace, can this be improved or moved to non-blocking operations?
-        const [firestorePlanDetails, isSyncEnabled, isBackupEnabled, mailType] = await Promise.all([
+        const [firestorePlanDetails, isBackupEnabled, mailType] = await Promise.all([
           getUserSubscription(user.uid),
-          getOrUpdateUserSyncState(user.uid, appMode),
           checkUserBackupState(user.uid),
           getEmailType(user.email),
         ]);
@@ -122,8 +121,6 @@ const AuthHandler: React.FC<{}> = () => {
         // phase-1 migration: Adaptor to convert firestore schema into old schema
         const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
         const isUserPremium = isPremiumUser(planDetails);
-
-        window.isSyncEnabled = isSyncEnabled;
         window.keySetDoneisSyncEnabled = true;
 
         dispatch(
@@ -137,7 +134,6 @@ const AuthHandler: React.FC<{}> = () => {
                 planName: getPlanName(planDetails),
               },
               isBackupEnabled,
-              isSyncEnabled,
               isPremium: isUserPremium,
               emailType: mailType,
             },
@@ -196,7 +192,7 @@ const AuthHandler: React.FC<{}> = () => {
         return false;
       }
     },
-    [appMode, dispatch, onboardingDetails.fullName]
+    [dispatch, onboardingDetails.fullName]
   );
 
   useEffect(() => {
@@ -242,7 +238,7 @@ const AuthHandler: React.FC<{}> = () => {
 
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
-        StorageService(appMode).saveRecord({
+        clientStorageService.saveStorageObject({
           [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: user.refreshToken,
         });
 
@@ -260,9 +256,8 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
+        clientStorageService.removeStorageObjects([GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]);
         // set amplitude anon id to local storage:
-
         dispatch(
           // @ts-ignore
           globalActions.updateUserInfo({ loggedIn: false, details: null })

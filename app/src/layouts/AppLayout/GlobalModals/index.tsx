@@ -1,4 +1,6 @@
 import { getActiveModals } from "store/slices/global/modals/selectors";
+import WorkspaceLoadingModal from "features/workspaces/modals/WorkspaceLoadingModal";
+import SwitchWorkspaceModal from "features/workspaces/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { AuthModal } from "features/onboarding/screens/auth/modals/AuthModal/AuthModal";
 import RQAuthModal from "components/authentication/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +36,22 @@ export const GlobalModals = () => {
             />
           )}
         </>
+      ) : null}
+      {activeModals.workspaceLoadingModal.isActive ? (
+        <WorkspaceLoadingModal
+          isOpen={activeModals.workspaceLoadingModal.isActive}
+          close={() =>
+            dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }))
+          }
+          {...activeModals.workspaceLoadingModal.props}
+        />
+      ) : null}
+      {activeModals.switchWorkspaceModal.isActive ? (
+        <SwitchWorkspaceModal
+          isOpen={activeModals.switchWorkspaceModal.isActive}
+          toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "switchWorkspaceModal" }))}
+          {...activeModals.switchWorkspaceModal.props}
+        />
       ) : null}
     </>
   );

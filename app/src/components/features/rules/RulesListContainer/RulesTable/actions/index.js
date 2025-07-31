@@ -1,11 +1,11 @@
 import isEmpty from "is-empty";
-import { StorageService } from "../../../../../../init";
 import Logger from "lib/logger";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 export const deleteGroup = (appMode, groupId, groupwiseRulesToPopulate, forceDelete = false) => {
   if (forceDelete) {
     Logger.log("Removing from storage in deleteGroup");
-    return StorageService(appMode).removeRecord(groupId);
+    return syncingHelper.removeRecord(groupId);
   }
 
   if (!groupwiseRulesToPopulate[groupId]) {
@@ -13,7 +13,7 @@ export const deleteGroup = (appMode, groupId, groupwiseRulesToPopulate, forceDel
   }
   if (isEmpty(groupwiseRulesToPopulate[groupId]["group_rules"])) {
     Logger.log("Removing from storage in deleteGroup");
-    return StorageService(appMode).removeRecord(groupId);
+    return syncingHelper.removeRecord(groupId);
   } else {
     return Promise.resolve({ err: "ungroup-rules-first" });
   }
