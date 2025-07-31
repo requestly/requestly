@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { useHasChanged } from "hooks";
-import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode, getIsRulesListLoading } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -13,6 +12,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { useFetchMockRecords } from "features/mocks/screens/mocksList/components/MocksList/hooks/useFetchMockRecords";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import * as Sentry from "@sentry/react";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 interface HomeScreenContextInterface {
   // rules
@@ -51,8 +51,8 @@ export const HomeScreenProvider: React.FC<HomeScreenProviderProps> = ({ children
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesListLoading) {
-      StorageService(appMode)
-        .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
+      clientRuleStorageService
+        .getRecordsByObjectType(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
         .then((rules) => {
           setRules(rules);
         })

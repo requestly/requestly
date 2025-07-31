@@ -17,7 +17,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   isExtensionEnabled: true,
 
   /* App Mode */
-  appMode: GLOBAL_CONSTANTS.APP_MODES.EXTENSION,
+  appMode: "",
 
   /* App Theme */
   appTheme: APP_CONSTANTS.THEMES.DARK,
@@ -136,6 +136,10 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       props: {},
     },
     pricingModal: {
+      isActive: false,
+      props: {},
+    },
+    workspaceLoadingModal: {
       isActive: false,
       props: {},
     },

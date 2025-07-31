@@ -105,16 +105,23 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
   const dispatch = useDispatch();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, addNewRecord, updateRecord, updateRecords, refreshRecords, setErroredRecords, getData] =
-    useAPIRecords((state) => [
-      state.apiClientRecords,
-      state.addNewRecord,
-      state.updateRecord,
-      state.updateRecords,
-      state.refresh,
-      state.setErroredRecords,
-      state.getData,
-    ]);
+  const [
+    apiClientRecords,
+    addNewRecord,
+    updateRecord,
+    updateRecords,
+    refreshRecords,
+    setErroredRecords,
+    getData,
+  ] = useAPIRecords((state) => [
+    state.apiClientRecords,
+    state.addNewRecord,
+    state.updateRecord,
+    state.updateRecords,
+    state.refresh,
+    state.setErroredRecords,
+    state.getData,
+  ]);
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
   const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
