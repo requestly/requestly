@@ -15,6 +15,7 @@ import { useCommand } from "features/apiClient/commands";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
+import { NativeError } from "errors/NativeError";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -22,7 +23,11 @@ interface CollectionsVariablesViewProps {
 
 export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> = ({ collection }) => {
   const getRecord = useAPIRecords((s) => s.getRecordStore);
-  const collectionRecordState = getRecord(collection.id)!.getState() as CollectionRecordState;
+
+  const collectionRecord = getRecord(collection.id);
+  if (!collectionRecord) throw new NativeError(`Collection Record ${collection.id} not found`);
+  const collectionRecordState = collectionRecord.getState() as CollectionRecordState;
+
   const variablesMap = useVariableStore(collectionRecordState.collectionVariables);
   const variables = Object.fromEntries(variablesMap.data);
 
