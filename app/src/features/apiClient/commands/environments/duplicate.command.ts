@@ -11,7 +11,11 @@ export const duplicateEnvironment = async (ctx: ApiClientFeatureContext, params:
     .getState()
     .getAll()
     .forEach((value) => {
-      envsMap[value.id] = parseEnvironmentState(stores.environments.getState().getEnvironment(value.id));
+      const environmentState = stores.environments.getState().getEnvironment(value.id);
+      if (!environmentState) {
+        return;
+      }
+      envsMap[value.id] = parseEnvironmentState(environmentState);
     });
 
   const newEnvironment = await repositories.environmentVariablesRepository.duplicateEnvironment(environmentId, envsMap);

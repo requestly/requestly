@@ -77,7 +77,7 @@ export const createEnvironmentsStore = ({
 
   const persistedActiveEnvId = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY);
   const activeEnvironment = persistedActiveEnvId
-    ? environmentsWithVariableStore.find((env) => env.getState().id === persistedActiveEnvId)
+    ? environmentsWithVariableStore.find((env) => env.getState().id === persistedActiveEnvId) || null
     : null;
 
   return create<EnvironmentsState>()((set, get) => ({
@@ -134,13 +134,13 @@ export const createEnvironmentsStore = ({
     },
 
     setActive(id) {
-      localStorage.setItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY, id);
-
       if (!id) {
+        localStorage.removeItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY);
         set({ activeEnvironment: null });
         return;
       }
 
+      localStorage.setItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY, id);
       const { environments } = get();
       const environment = environments.find((e) => e.getState().id === id);
       if (!environment) {

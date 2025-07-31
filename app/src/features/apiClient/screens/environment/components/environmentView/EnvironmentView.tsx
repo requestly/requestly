@@ -29,14 +29,14 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const parsedEnvironment = parseEnvironmentState(environment);
-  const environmentName = environment?.name;
+  const environmentName = environment.name;
 
   // FIXME: Saves last input value even when cleared
   const variables = useMemo(() => {
     return pendingVariablesRef.current.length > 0
       ? pendingVariablesRef.current
-      : mapToEnvironmentArray(parsedEnvironment?.variables);
-  }, [parsedEnvironment?.variables]);
+      : mapToEnvironmentArray(parsedEnvironment.variables);
+  }, [parsedEnvironment.variables]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);

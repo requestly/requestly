@@ -9,9 +9,13 @@ export function useEnvironment<T>(id: string, selector: (state: EnvironmentState
     stores: { environments },
   } = useApiClientFeatureContext();
 
+  const envState = environments.getState();
+  const globalEnv = envState.globalEnvironment;
+  const globalEnvState = globalEnv.getState();
+
   const environmentStore =
-    environments.getState().globalEnvironment.getState().id === id
-      ? environments.getState().globalEnvironment
+    globalEnvState.id === id
+      ? globalEnv
       : environments
           .getState()
           .getAllEnvironmentStores()

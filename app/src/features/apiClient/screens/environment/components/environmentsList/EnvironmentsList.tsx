@@ -87,8 +87,11 @@ export const EnvironmentsList = () => {
 
   const handleExportEnvironments = useCallback(
     (environment: { id: string; name: string }) => {
-      // FIXME: fix type "!"
-      const variables = parseEnvironmentState(getEnvironment(environment.id)!).variables;
+      const environmentState = getEnvironment(environment.id);
+      if (!environmentState) {
+        throw new Error("Environment not found!");
+      }
+      const variables = parseEnvironmentState(environmentState).variables;
       setEnvironmentsToExport([{ ...environment, variables }]);
 
       setIsExportModalOpen(true);

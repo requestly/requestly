@@ -50,10 +50,10 @@ export const EnvironmentSwitcher = () => {
         key: environment.id,
         label: (
           <div
-            className={`${environment.id === activeEnvironmentStore.getState()?.id ? "active-env-item" : ""} env-item`}
+            className={`${environment.id === activeEnvironmentStore?.getState()?.id ? "active-env-item" : ""} env-item`}
           >
             <SwitcherListItemLabel envId={environment.id} />
-            {environment.id === activeEnvironmentStore.getState()?.id ? <MdOutlineCheckCircleOutline /> : null}
+            {environment.id === activeEnvironmentStore?.getState()?.id ? <MdOutlineCheckCircleOutline /> : null}
           </div>
         ),
         onClick: () => {

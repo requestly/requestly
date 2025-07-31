@@ -14,7 +14,7 @@ export const deleteEnvironment = async (ctx: ApiClientFeatureContext, params: { 
   } = getApiClientEnvironmentsStore(ctx).getState();
 
   const newActiveEnv = (() => {
-    if (activeEnvironment.getState().id !== environmentId) {
+    if (activeEnvironment?.getState().id !== environmentId) {
       return activeEnvironment;
     }
 
@@ -30,5 +30,5 @@ export const deleteEnvironment = async (ctx: ApiClientFeatureContext, params: { 
   })();
 
   deleteEnvironmentFromStore(environmentId);
-  setActive(newActiveEnv.getState()?.id);
+  setActive(newActiveEnv?.getState()?.id);
 };

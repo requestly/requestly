@@ -18,12 +18,12 @@ export function getApiClientRecordStore(ctx: ApiClientFeatureContext, id: string
 }
 
 export function getApiClientEnvironmentVariablesStore(ctx: ApiClientFeatureContext, id: string) {
-  return getApiClientEnvironmentsStore(ctx).getState().getEnvironment(id).data.variables;
+  return getApiClientEnvironmentsStore(ctx).getState().getEnvironment(id)?.data.variables;
 }
 
 export function getApiClientCollectionVariablesStore(ctx: ApiClientFeatureContext, id: string) {
-  const recordState = getApiClientRecordsStore(ctx).getState().getRecordStore(id).getState();
-  if (recordState.type !== RQAPI.RecordType.COLLECTION) {
+  const recordState = getApiClientRecordStore(ctx, id)?.getState();
+  if (!recordState || recordState.type !== RQAPI.RecordType.COLLECTION) {
     return;
   }
   return recordState.collectionVariables;
