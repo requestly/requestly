@@ -24,7 +24,7 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
       return;
     }
 
-    if (activeWorkspace.workspaceType !== WorkspaceType.PERSONAL) {
+    if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
       return;
     }
 
@@ -38,7 +38,7 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
     });
   }, [
     uid,
-    activeWorkspace.workspaceType,
+    activeWorkspace?.workspaceType,
     syncRepository,
     importExampleCollections,
     store,
