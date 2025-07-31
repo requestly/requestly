@@ -3,7 +3,7 @@ import { EmptyState, EmptyStateProps } from "../../emptyState/EmptyState";
 import { RQAPI } from "features/apiClient/types";
 
 interface Props extends EmptyStateProps {
-  record?: RQAPI.Record;
+  record?: RQAPI.ApiClientRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
 }
 
