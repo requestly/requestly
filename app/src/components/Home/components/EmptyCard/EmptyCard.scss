@@ -13,7 +13,7 @@
     margin-bottom: 4px;
 
     span {
-      font-size: 9px;
+      font-size: var(--requestly-font-size-2xs, 9px);
       font-family: var(--requestly-font-family-default);
       font-weight: 600;
       text-align: center;

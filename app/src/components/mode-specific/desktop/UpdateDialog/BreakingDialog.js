@@ -4,6 +4,7 @@ import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { Text, Title } = Typography;
 
+/* NOT BEING USED */
 const BreakingDialog = () => {
   const handleUpdateClick = () => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {

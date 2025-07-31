@@ -49,6 +49,7 @@ import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { RQTooltip } from "lib/design-system-v2/components/RQTooltip/RQTooltip";
+import * as Sentry from "@sentry/react";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -68,8 +69,6 @@ const CurrentTrafficTable = ({
   disableFilters = false,
   persistLogsFilters = false,
 }) => {
-  const GUTTER_SIZE = 20;
-  const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
@@ -491,7 +490,6 @@ const CurrentTrafficTable = ({
   const getLogAvatar = useCallback(
     (key, logName = "", avatarUrl) => {
       const isSelected = trafficTableFilters[key].includes(logName);
-
       return (
         <RQTooltip mouseEnterDelay={0.3} placement="right" title={logName.length >= 20 ? logName : ""}>
           <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
@@ -515,8 +513,14 @@ const CurrentTrafficTable = ({
 
   const getApplogAvatar = useCallback(
     (key, logName) => {
-      const logNameURI = decodeURIComponent(logName.trim());
-      const avatarDomain = APPNAMES[logNameURI.split(" ")[0].toLowerCase()];
+      let logNameURI;
+      try {
+        logNameURI = decodeURIComponent(logName.trim());
+      } catch (e) {
+        Logger.log("faulty logname: ", logName);
+        Sentry.captureMessage(e);
+      }
+      const avatarDomain = logNameURI ? APPNAMES[logNameURI.split(" ")[0].toLowerCase()] : "randooooom.com"; // random domain to show the 404-like icon
       const avatarUrl = `https://www.google.com/s2/favicons?domain=${avatarDomain}`;
       return getLogAvatar(key, logNameURI, avatarUrl);
     },
@@ -792,11 +796,11 @@ const CurrentTrafficTable = ({
           </div>
 
           <div className={!isPreviewOpen ? "hide-traffic-table-split-gutter" : ""}>
+            {/* TODO: use <SplitPaneLayout/> component */}
             <Split
               sizes={rulePaneSizes}
               minSize={[75, 0]}
-              gutterSize={gutterSize}
-              dragInterval={20}
+              gutterSize={4}
               direction="vertical"
               cursor="row-resize"
               className="traffic-table-split-container"

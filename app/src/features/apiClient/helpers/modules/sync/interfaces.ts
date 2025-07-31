@@ -8,8 +8,15 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
     success: boolean;
     data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
   }>;
+  getEnvironmentById(
+    envId: string
+  ): Promise<{
+    success: boolean;
+    data: EnvironmentData | null;
+  }>;
   createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData>;
   createGlobalEnvironment(): Promise<EnvironmentData>;
+  createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]>;
   deleteEnvironment(envId: string): Promise<{ success: boolean; message?: string }>;
   updateEnvironment(
     environmentId: string,
@@ -46,9 +53,6 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
-
-  generateApiRecordId(parentId?: string): string;
-  generateCollectionId(name: string, parentId?: string): string;
   writeToRawFile(
     id: string,
     record: any,
@@ -68,6 +72,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   ): Promise<{ success: boolean; message?: string }>;
   duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
   moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
+  batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise;
 }
 
 export interface ApiClientRepositoryInterface {
@@ -82,6 +87,10 @@ export type ApiClientCloudMeta = {
 
 export type ApiClientLocalMeta = {
   rootPath: string;
+};
+
+export type ApiClientLocalStoreMeta = {
+  version: number;
 };
 
 export type EnvironmentListenerParams =

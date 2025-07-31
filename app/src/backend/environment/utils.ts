@@ -112,10 +112,20 @@ const collectAndEscapeVariablesFromTemplate = (
     const varName = firstMatchedGroup.trim();
     const isMatchEmpty = varName === ""; // {{}}
     const matchStartsWithKnownHelper = varName in variables;
-    usedVariables[varName] = variables[varName];
+
+    if (matchStartsWithKnownHelper) {
+      usedVariables[varName] = variables[varName];
+    }
 
     if (isMatchEmpty || !matchStartsWithKnownHelper) {
       return escapeMatchFromHandlebars(completeMatch);
+    }
+
+    // If variable name contains dots, wrap it in square brackets for Handlebars
+    // otherwise a.b gets parsed as nested object path
+    // https://handlebarsjs.com/guide/expressions.html#literal-segments
+    if (varName.includes(".")) {
+      return `{{[${varName}]}}`;
     }
 
     return completeMatch;
@@ -138,10 +148,14 @@ export const mergeLocalAndSyncVariables = (
         type: value.type,
       };
 
-      // Remove localValue if it doesn't exist
-      if (!updatedValue.localValue) {
-        delete updatedValue.localValue;
-      }
+      /*
+      Commented the code belowe as this merge logic removes the localValue if it doesn't exist which leads to tabs showing unsaved changes because of the localValue missing from variable object
+       */
+
+      // // Remove localValue if it doesn't exist
+      // if (!updatedValue.localValue) {
+      //   delete updatedValue.localValue;
+      // }
 
       return [key, updatedValue];
     })

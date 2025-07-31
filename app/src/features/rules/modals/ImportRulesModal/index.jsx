@@ -26,6 +26,7 @@ import {
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
   trackResourceOverrideSettingsImportStarted,
+  trackHeaderEditorSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
@@ -35,6 +36,7 @@ import { ImportFromModheader } from "features/rules/screens/rulesList/components
 import { ImportFromResourceOverride } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ResourceOverrideImporter";
 import { useLocation } from "react-router-dom";
 import { ImporterType } from "components/Home/types";
+import { HeaderEditorImporter } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/HeaderEditorImporter/HeaderEditorImporterComponent";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -56,6 +58,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
   const [isImportFromModheaderModalOpen, setIsImportFromModheaderModalOpen] = useState(false);
   const [isImportFromResourceOverrideModalOpen, setIsImportFromResourceOverrideModalOpen] = useState(false);
+  const [isImportFromHeaderEditorModalOpen, setIsImportFromHeaderEditorModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
@@ -311,6 +314,9 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         case ImporterType.RESOURCE_OVERRIDE:
           setIsImportFromResourceOverrideModalOpen(true);
           break;
+        case ImporterType.HEADER_EDITOR:
+          setIsImportFromHeaderEditorModalOpen(true);
+          break;
         default:
           break;
       }
@@ -338,6 +344,8 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
             onBackButtonClick={() => setIsImportFromResourceOverrideModalOpen(false)}
             callback={toggleModal}
           />
+        ) : isImportFromHeaderEditorModalOpen ? (
+          <HeaderEditorImporter />
         ) : (
           <>
             <div className="rule-importer-content">
@@ -380,6 +388,22 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                   >
                     <img src={ResourceOverrideIcon} width={11} height={10} alt="Resource override icon" />
                     &nbsp; Import from Resource Override
+                  </RQButton>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromHeaderEditorModalOpen(true);
+                      trackHeaderEditorSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
+                    <img
+                      src="/assets/img/brandLogos/header-editor-custom-icon.png"
+                      width={11}
+                      height={10}
+                      alt="Header Editor icon"
+                    />
+                    &nbsp; Import from Header Editor
                   </RQButton>
                 </div>
               ) : null}

@@ -146,13 +146,14 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
 
   return (
     <div className="api-client-sheet-panel-container">
-      {response && error && !isRequestCancelled && <ApiClientErrorPanel error={error} />}
+      {response && error?.type === RQAPI.ApiClientErrorType.SCRIPT && !isRequestCancelled && (
+        <ApiClientErrorPanel error={error} />
+      )}
       {!error && warning && !isRequestCancelled && <ApiClientWarningPanel warning={warning} />}
       <div className="api-client-sheet-panel">
         <BottomSheet
           items={bottomSheetTabItems}
-          disableDocking
-          tabBarExtraContent={<StatusLine response={response} />}
+          tabBarExtraContent={!isLoading && <StatusLine response={response} />}
         />
       </div>
     </div>

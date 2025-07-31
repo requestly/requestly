@@ -15,6 +15,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import "./EditorGroupDropdown.css";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { Group } from "@requestly/shared/types/entities/rules";
+import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
@@ -202,18 +203,10 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
         className={`editor-group-dropdown-trigger ${showDropdown ? "editor-group-dropdown-active" : ""}`}
       >
         <RQButton>
-          <span>
-            {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
-              ? "Add to group"
-              : "Edit group"}
-            <img
-              style={{ width: "10px", height: "6px" }}
-              width={10}
-              height={6}
-              alt="down arrow"
-              src="/assets/media/common/down-arrow.svg" // TODO: Use react-icons
-            />
-          </span>
+          {currentGroupId === APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID
+            ? "Add to group"
+            : "Edit group"}
+          <MdOutlineKeyboardArrowDown />
         </RQButton>
       </Dropdown>
     </div>

@@ -20,6 +20,10 @@ const addNewEnvironment = (
     ownerId: string;
   }>
 ) => {
+  if (!state.environments[action.payload.ownerId]) {
+    return;
+  }
+
   state.environments[action.payload.ownerId][action.payload.id] = {
     id: action.payload.id,
     variables: {},
@@ -58,6 +62,13 @@ const updateEnvironmentData = (
     environmentName?: string;
   }>
 ) => {
+  if (
+    !state.environments[action.payload.ownerId] ||
+    !state.environments[action.payload.ownerId]?.[action.payload.environmentId]
+  ) {
+    return;
+  }
+
   state.environments[action.payload.ownerId][action.payload.environmentId].variables = action.payload.newVariables;
   if (action.payload.environmentName) {
     state.environments[action.payload.ownerId][action.payload.environmentId].name = action.payload.environmentName;

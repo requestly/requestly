@@ -8,6 +8,7 @@ import "./MemberRoleDropdown.css";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface MemberRoleDropdownProps extends DropDownProps {
+  source?: "membersTable" | "inviteModal";
   memberRole?: TeamRole;
   loggedInUserTeamRole?: TeamRole;
   isAdmin: boolean;
@@ -34,6 +35,7 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
   memberRole,
   isLoggedInUserAdmin = false,
   handleMemberRoleChange,
+  source,
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -111,31 +113,33 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
     [memberId, currentRole, hasWriteAccess, loggedInUserTeamRole, handleMemberRoleChange]
   );
 
+  const disableForMembersTable =
+    source === "membersTable" && ((memberId !== loggedInUserId && !isLoggedInUserAdmin) || memberId === loggedInUserId);
+  const disableForInviteModal =
+    source === "inviteModal" &&
+    (!activeWorkspaceId || (memberId !== loggedInUserId && !hasWriteAccess) || memberId === loggedInUserId);
+
   return (
     <Dropdown
       overlay={items}
       trigger={["click"]}
       {...props}
-      disabled={
-        isLoading ||
-        !activeWorkspaceId ||
-        (memberId !== loggedInUserId && !hasWriteAccess) ||
-        memberId === loggedInUserId
-      }
+      disabled={isLoading || disableForMembersTable || disableForInviteModal}
     >
       <div className={`dropdown-trigger ${isHoverEffect ? "member-role-dropdown-trigger" : ""}`}>
         <Typography.Text className={!props.disabled && "cursor-pointer"}>
           {getDisplayTextForRole(currentRole)}
 
-          {hasWriteAccess && memberId !== loggedInUserId && activeWorkspaceId && (
-            <img
-              width="10px"
-              height="6px"
-              alt="downoutlined"
-              src="/assets/media/settings/downoutlined.svg"
-              className="dropdown-down-arrow-icon"
-            />
-          )}
+          {memberId !== loggedInUserId &&
+            ((source === "membersTable" && isLoggedInUserAdmin) || (source === "inviteModal" && hasWriteAccess)) && (
+              <img
+                width="10px"
+                height="6px"
+                alt="downoutlined"
+                src="/assets/media/settings/downoutlined.svg"
+                className="dropdown-down-arrow-icon"
+              />
+            )}
         </Typography.Text>
 
         {showLoader && isLoading ? <Spin className="role-change-spinner" indicator={<LoadingOutlined />} /> : null}

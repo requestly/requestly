@@ -118,7 +118,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       };
     }
     const parsedRecords = this.parseAPIEntities(result.content.records);
-    console.log("local fs parsing", parsedRecords);
     return {
       success: true,
       data: {
@@ -512,5 +511,14 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       }
     }
     return result;
+  }
+
+  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+    if (records.length === 0) {
+      return {
+        success: true,
+        data: { records: [], erroredRecords: [] },
+      };
+    }
   }
 }

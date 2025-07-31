@@ -4,13 +4,21 @@
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-xs, 11px);
   max-width: 120px;
+  background-color: var(--requestly-color-background);
+  border: none;
+  padding: 0px 4px 0px 6px;
 
   & > span {
+    position: relative;
+    left: 4px;
     display: unset;
-    flex-shrink: unset;
   }
 
   svg {
+    position: relative;
+    right: 2px;
+    height: 18px;
+    width: 18px;
     color: var(--requestly-color-text-default);
   }
 }
@@ -39,7 +47,7 @@
         padding: var(--space-3, 6px) var(--space-5, 12px);
         color: var(--requestly-color-text-default);
         border-radius: 4px;
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         max-height: 26px;
 
         svg {
@@ -68,6 +76,6 @@
   padding: 0 4px;
 
   svg {
-    font-size: 14px;
+    font-size: var(--requestly-font-size-md, 14px);
   }
 }

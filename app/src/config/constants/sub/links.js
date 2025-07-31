@@ -110,8 +110,8 @@ const LINKS = {
   CHROME_EXTENSION:
     "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa",
 
-  CHROME_STORE_REVIEWS:
-    "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa/reviews",
+  CHROME_STORE_REVIEWS: "https://rqst.ly/chrome-review",
+  CHROME_STORE_REVIEW_FORM: "https://app.formbricks.com/s/cmd2qhh4vnxezyq01ailfaszm",
   //Firefox
   FIREFOX_EXTENSION: "https://app.requestly.in/firefox/builds/requestly-latest.xpi",
   //Edge
@@ -157,6 +157,14 @@ const LINKS = {
   OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
 
   ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
+
+  API_KEY_FORM: "https://app.formbricks.com/s/clryn62s316gjdeho9j03t7oa",
+
+  AUTOMATION_DOC: "https://rqst.ly/automation",
+
+  DOWNLOAD_CRX: "https://requestly.com/downloads/crx/",
+
+  DOWNLOAD_CHROME_EXTENSION_ZIP: "https://rqst.ly/chrome/zip",
 };
 
 export default LINKS;

@@ -23,7 +23,6 @@ import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
 import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
-import { RQBadge } from "lib/design-system/components/RQBadge";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import "./PrimarySidebar.css";
 import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
@@ -86,12 +85,7 @@ export const PrimarySidebar: React.FC = () => {
         id: 4,
         title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
-        icon: (
-          <span className="icon-with-badge">
-            <ApiOutlined />
-            <RQBadge badgeText="BETA" />
-          </span>
-        ),
+        icon: <ApiOutlined />,
         display: true,
       },
       {

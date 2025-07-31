@@ -63,6 +63,18 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     }
   }
 
+  async getEnvironmentById(
+    envId: string
+  ): Promise<{
+    success: boolean;
+    data: EnvironmentData | null;
+  }> {
+    return {
+      success: true,
+      data: null,
+    };
+  }
+
   async createNonGlobalEnvironment(environmentName: string): Promise<EnvironmentData> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment(environmentName, false);
@@ -82,6 +94,17 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     }
     // TODO: FIX THIS
     return null;
+  }
+
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    const promises = environments.map(async (env) => {
+      return this.createNonGlobalEnvironment(env.name).then((envData) => {
+        this.updateEnvironment(envData.id, { variables: env.variables });
+        return envData;
+      });
+    });
+
+    return Promise.all(promises);
   }
 
   async deleteEnvironment(envId: string) {

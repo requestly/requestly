@@ -8,13 +8,21 @@ import { StorageRecord } from "@requestly/shared/types/entities/rules";
 import syncingHelper from "lib/syncing/helpers/syncingHelper";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 
-export const createSharedList = async (
-  appMode: string,
-  rulesIdsToShare: string[],
-  sharedListName: string,
-  sharedListVisibility: SharedLinkVisibility,
-  sharedListRecipients: unknown
-) => {
+export const createSharedList = async ({
+  appMode,
+  rulesIdsToShare,
+  sharedListName,
+  sharedListVisibility,
+  sharedListRecipients,
+  notifyOnImport,
+}: {
+  appMode: string;
+  rulesIdsToShare: string[];
+  sharedListName: string;
+  sharedListVisibility: SharedLinkVisibility;
+  sharedListRecipients: unknown;
+  notifyOnImport: boolean;
+}) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
   const currentWorkspaceId = getActiveWorkspaceId(window.activeWorkspaceIds);
 
@@ -30,11 +38,13 @@ export const createSharedList = async (
     sharedListVisibility,
     sharedListRecipients,
     teamId: currentWorkspaceId,
+    notifyOnImport,
   };
 
   const sharedList = (await generateSharedList(sharedListData)) as any;
 
   return {
+    notifyOnImport,
     sharedListId: sharedList.sharedListId,
     sharedListName: sharedList.sharedListName,
     sharedListData: sharedList.sharedListData,
@@ -101,4 +111,34 @@ export const duplicateRulesToTargetWorkspace = async (
   });
 
   return syncingHelper.saveMultipleRulesOrGroups([...formattedRules, ...formattedGroups], { workspaceId });
+};
+
+export const updateSharedListNotificationStatus = async ({
+  id,
+  teamId,
+  notifyOnImport,
+}: {
+  teamId: string;
+  id: string;
+  notifyOnImport: boolean;
+}) => {
+  const functions = getFunctions();
+  const updateStatus = httpsCallable<
+    {
+      teamId: string;
+      sharedListId: string;
+      notifyOnImport: boolean;
+    },
+    | {
+        success: true;
+        data: { notifyOnImport: boolean };
+      }
+    | {
+        success: false;
+        message: string;
+      }
+  >(functions, "sharedLists-updateNotificationStatus");
+
+  const result = await updateStatus({ teamId, sharedListId: id, notifyOnImport });
+  return result;
 };

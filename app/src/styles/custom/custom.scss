@@ -36,7 +36,7 @@ button.ant-btn {
 }
 
 button.ant-btn-lg {
-  font-size: 16px;
+  font-size: var(--requestly-font-size-lg, 16px);
 }
 
 button.ant-input-search-button {
@@ -434,22 +434,6 @@ input[id^="react-select-"] {
   width: 80% !important;
 }
 
-.gutter {
-  background-repeat: no-repeat;
-  background-position: 50%;
-  transition: 0.3s all;
-}
-
-/* Gutter on rule editor splitter pane - execution logs */
-.gutter:hover {
-  opacity: 0.8;
-}
-
-.gutter.gutter-vertical {
-  background-color: #1c1d21;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
-}
-
 /* header */
 .alert .ant-alert-message {
   overflow: hidden;
@@ -542,7 +526,7 @@ div.react-multi-email.focused {
 }
 
 div.react-multi-email .multi-email-tag {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 400;
   padding: 4px 8px;
   color: var(--white);
@@ -624,5 +608,5 @@ div.react-multi-email .multi-email-tag {
 // All tooltips to have sm font size
 .ant-tooltip-inner {
   // Our new -sm token has 13px value while DS has 12px
-  font-size: var(--font-size-sm, 12px);
+  font-size: var(--requestly-font-size-sm, 12px);
 }

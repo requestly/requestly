@@ -1,0 +1,63 @@
+.local-workspace-details-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+
+  .local-workspace-location-details-title {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-default);
+    font-weight: var(--requestly-font-weight-medium);
+    margin-bottom: 8px;
+  }
+
+  .local-workspace-details-card {
+    background: var(--requestly-color-white-t-10);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .local-workspace-path-details-card {
+    &-title {
+      font-size: var(--requestly-font-size-2xs);
+      color: var(--requestly-color-text-subtle);
+      letter-spacing: 1px;
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    &-path {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-text-default);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    &-info {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+  }
+
+  .local-workspace-git-card {
+    width: 264px;
+
+    &-title {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-text-default);
+    }
+
+    &-description {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-text-subtle);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+  }
+}

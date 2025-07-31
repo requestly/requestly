@@ -83,3 +83,32 @@
     }
   }
 }
+
+.file-delete-confirmation-container {
+  .file-delete-confirmation-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--requestly-font-size-sm);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-default);
+
+    svg {
+      color: var(--requestly-color-error);
+      width: 16px;
+      flex-shrink: 0;
+    }
+  }
+
+  .file-delete-confirmation-description {
+    font-size: var(--requestly-font-size-xs);
+    color: var(--requestly-color-text-subtle);
+    margin-top: 8px;
+    width: 248px;
+  }
+}
+
+.file-delete-confirmation-btn.ant-btn {
+  font-size: var(--requestly-font-size-xs);
+  font-weight: var(--requestly-font-weight-medium);
+}

@@ -125,6 +125,8 @@ export const AuthScreen = () => {
         if (metadata.providers.length === 1 && metadata.providers[0] === AuthProvider.PASSWORD && !isDesktopSignIn) {
           handleSendEmailLink();
         } else {
+          // Give google and password as default providers if no providers are found for existing user
+          if (metadata.providers.length === 0) setAuthProviders([AuthProvider.GOOGLE, AuthProvider.PASSWORD]);
           setShowRQAuthForm(true);
         }
       }

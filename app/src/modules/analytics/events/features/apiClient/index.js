@@ -1,6 +1,41 @@
 import { trackEvent } from "modules/analytics";
 import { API_CLIENT } from "../constants";
 
+// Example collections
+// TODO: To be removed once analysis done
+export const trackExampleCollectionsImported = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_IMPORTED, params);
+};
+
+export const trackExampleCollectionsImportFailed = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_IMPORT_FAILED, params);
+};
+
+export const trackExampleCollectionsNudgeShown = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_NUDGE_SHOWN, params);
+};
+
+export const trackExampleCollectionsNudgeCloseClicked = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_NUDGE_CLOSE_CLICKED, params);
+};
+
+export const trackExampleCollectionsNudgeImportClicked = (params = {}) => {
+  trackEvent(API_CLIENT.EXAMPLE_COLLECTIONS_NUDGE_IMPORT_CLICKED, params);
+};
+
+// Local store sync
+export const trackLocalStorageSyncStarted = (params = {}) => {
+  trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_STARTED, params);
+};
+
+export const trackLocalStorageSyncFailed = (params = {}) => {
+  trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_FAILED, params);
+};
+
+export const trackLocalStorageSyncCompleted = (params = {}) => {
+  trackEvent(API_CLIENT.LOCAL_STORAGE_SYNC_COMPLETED, params);
+};
+
 // Request
 export const trackAPIRequestSent = (params = {}) => {
   trackEvent(API_CLIENT.REQUEST_SENT, params);
@@ -68,8 +103,8 @@ export const trackCollectionRenamed = () => {
   trackEvent(API_CLIENT.COLLECTION_RENAMED);
 };
 
-export const trackCollectionDeleted = () => {
-  trackEvent(API_CLIENT.COLLECTION_DELETED);
+export const trackCollectionDeleted = (type) => {
+  trackEvent(API_CLIENT.COLLECTION_DELETED, { type });
 };
 
 export const trackExportCollectionsClicked = () => {

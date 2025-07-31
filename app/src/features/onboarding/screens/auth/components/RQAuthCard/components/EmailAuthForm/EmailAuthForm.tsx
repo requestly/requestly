@@ -12,6 +12,8 @@ import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./emailAuthForm.scss";
 import { trackLoginWithPasswordClicked } from "modules/analytics/events/common/auth/signup";
+import Logger from "../../../../../../../../../../common/logger";
+import * as Sentry from "@sentry/react";
 
 interface EmailAuthFormProps {
   isLoading: boolean;
@@ -36,8 +38,16 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ isLoading, onSendE
         const greatingName = result.user.displayName?.split(" ")?.[0];
         toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome back!");
         toggleAuthModal(false);
+        Logger.log("[Auth-EmailAuthForm-handleSignInWithEmailAndPassword] Successfully logged in");
       }
     } catch (error) {
+      Logger.log("[Auth-EmailAuthForm-handleSignInWithEmailAndPassword] catch", { error });
+      Sentry.captureMessage("[Auth] Error logging in with email and password", {
+        tags: {
+          flow: "auth",
+        },
+        extra: { email, error, source: "EmailAuthForm-handleSignInWithEmailAndPassword" },
+      });
       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, error.errorCode));
     } finally {
       setIsSignInInProgress(false);
