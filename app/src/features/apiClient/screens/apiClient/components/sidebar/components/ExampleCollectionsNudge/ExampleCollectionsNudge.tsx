@@ -4,7 +4,6 @@ import { ExampleCollectionsImportStatus, useExampleCollections } from "features/
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { toast } from "utils/Toast";
 import "./exampleCollectionsNudge.scss";
@@ -13,6 +12,7 @@ import {
   trackExampleCollectionsNudgeImportClicked,
   trackExampleCollectionsNudgeShown,
 } from "modules/analytics/events/features/apiClient";
+import { useCommand } from "features/apiClient/commands";
 
 interface ExampleCollectionsNudgeProps {
   fallback?: React.ReactNode;
@@ -24,7 +24,9 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
   const uid = user?.details?.profile?.uid;
 
   const syncRepository = useApiClientRepository();
-  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const {
+    env: { createEnvironments },
+  } = useCommand();
 
   const recordsStore = useAPIRecordsStore();
   const [
@@ -51,7 +53,7 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
         ownerId: uid,
         respository: syncRepository,
         recordsStore: recordsStore,
-        envsStore: { forceRefreshEnvironments },
+        envsStore: { createEnvironments },
         dispatch,
       });
 

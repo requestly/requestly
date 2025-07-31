@@ -2,7 +2,6 @@ import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types"
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
-import { RQAPI } from "features/apiClient/types";
 
 type EnvironmentData = {
   variables: StoreApi<VariablesState>;
@@ -30,7 +29,10 @@ export type EnvironmentsState = {
 
   // actions
   delete: (id: string) => void;
-  create: (params: Pick<EnvironmentState, "id" | "name"> & { variables?: EnvironmentVariables }) => void;
+  create: (params: Pick<EnvironmentState, "id" | "name"> & { variables?: EnvironmentVariables }) => EnvironmentState;
+  createEnvironments: (
+    params: (Pick<EnvironmentState, "id" | "name"> & { variables?: EnvironmentVariables })[]
+  ) => EnvironmentState[];
   updateEnvironment: (id: string, updates: Pick<EnvironmentState, "name">) => void;
   getEnvironment: (id: string) => EnvironmentState | undefined;
   getAll: () => EnvironmentState[];
@@ -106,9 +108,17 @@ export const createEnvironmentsStore = ({
         return env;
       }
 
+      const newEvn = createEnvironmentStore(id, name, variables || {});
       set({
-        environments: [...environments, createEnvironmentStore(id, name, variables || {})],
+        environments: [...environments, newEvn],
       });
+
+      return newEvn.getState();
+    },
+
+    createEnvironments(environmentsToCreate) {
+      const { create } = get();
+      return environmentsToCreate.map((env) => create(env));
     },
 
     updateEnvironment(id, updates) {
