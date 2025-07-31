@@ -107,26 +107,17 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const { apiClientRecordsRepository: recordsRepository } = useApiClientRepository();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [
-    apiClientRecords,
-    addNewRecord,
-    updateRecord,
-    updateRecords,
-    refreshRecords,
-    setErroredRecords,
-    getData,
-  ] = useAPIRecords((state) => [
+  const [apiClientRecords, addNewRecord, updateRecord, updateRecords, getData] = useAPIRecords((state) => [
     state.apiClientRecords,
     state.addNewRecord,
     state.updateRecord,
     state.updateRecords,
-    state.refresh,
-    state.setErroredRecords,
     state.getData,
   ]);
 
   const {
     env: { createEnvironment },
+    api: { forceRefreshRecords },
   } = useCommand();
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
@@ -311,16 +302,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     ]
   );
 
-  const forceRefreshApiClientRecords = useCallback(async () => {
-    const recordsToRefresh = await recordsRepository.getRecordsForForceRefresh();
-    if (!recordsToRefresh || !recordsToRefresh.success) {
-      return false;
-    }
-    refreshRecords(recordsToRefresh.data.records);
-    setErroredRecords(recordsToRefresh.data.erroredRecords);
-    return true;
-  }, [recordsRepository, refreshRecords, setErroredRecords]);
-
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
   const value = {
@@ -348,7 +329,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onNewClick,
     apiClientWorkloadManager: workloadManager,
     apiClientRecordsRepository: recordsRepository,
-    forceRefreshApiClientRecords,
+    forceRefreshApiClientRecords: forceRefreshRecords,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
