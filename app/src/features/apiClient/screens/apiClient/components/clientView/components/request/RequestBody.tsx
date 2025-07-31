@@ -83,7 +83,9 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         >
           <Radio value="text">Raw</Radio>
           <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
-          <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
+          {isFeatureCompatible(FEATURES.API_CLIENT_MULTIPART_FORM) && (
+            <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
+          )}
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
