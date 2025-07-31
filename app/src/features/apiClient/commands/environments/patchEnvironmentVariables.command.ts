@@ -1,5 +1,5 @@
 import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
-import { ApiClientFeatureContext } from "./types";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { NativeError } from "errors/NativeError";
 
 export const patchEnvironmentVariables = async (

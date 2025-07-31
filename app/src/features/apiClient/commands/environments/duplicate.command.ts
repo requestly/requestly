@@ -1,6 +1,6 @@
 import { EnvironmentMap } from "backend/environment/types";
 import { parseEnvironmentState } from "./utils";
-import { ApiClientFeatureContext } from "./types";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 export const duplicateEnvironment = async (ctx: ApiClientFeatureContext, params: { environmentId: string }) => {
   const { repositories, stores } = ctx;
