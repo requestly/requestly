@@ -14,9 +14,10 @@ import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecord
 import "./environmentSwitcher.scss";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { EnvironmentState } from "features/apiClient/store/environments/environments.store";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 
-function SwitcherListItemLabel(props: { environmentState: EnvironmentState }) {
-  const environmentName = props.environmentState.name;
+function SwitcherListItemLabel(props: { environmentId: EnvironmentState["id"] }) {
+  const environmentName = useEnvironment(props.environmentId, (s) => s.name);
 
   return (
     <Typography.Text
@@ -49,7 +50,7 @@ export const EnvironmentSwitcher = () => {
         key: environment.id,
         label: (
           <div className={`${environment.id === activeEnvironment?.id ? "active-env-item" : ""} env-item`}>
-            <SwitcherListItemLabel environmentState={environment} />
+            <SwitcherListItemLabel environmentId={environment.id} />
             {environment.id === activeEnvironment?.id ? <MdOutlineCheckCircleOutline /> : null}
           </div>
         ),
@@ -80,7 +81,7 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
-        {activeEnvironment ? <SwitcherListItemLabel environmentState={activeEnvironment} /> : "No environment"}
+        {activeEnvironment ? <SwitcherListItemLabel environmentId={activeEnvironment.id} /> : "No environment"}
         {<RiArrowDropDownLine />}
       </RQButton>
     </Dropdown>
