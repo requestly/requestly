@@ -7,6 +7,8 @@ export type VariablesState = {
   version: number;
   data: Map<EnvironmentVariableKey, EnvironmentVariableValue>;
 
+  reset: (data: Map<EnvironmentVariableKey, EnvironmentVariableValue>) => void;
+
   // actions
   delete: (key: EnvironmentVariableKey) => void;
   add: (key: EnvironmentVariableKey, variable: EnvironmentVariableValue) => void;
@@ -26,6 +28,12 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
   return create<VariablesState>()((set, get) => ({
     version: 0,
     data: parseVariables(variables),
+
+    reset(data) {
+      set({
+        data,
+      });
+    },
 
     mergeAndUpdate: (newVariables) => {
       const { data: currentVariables } = get();
