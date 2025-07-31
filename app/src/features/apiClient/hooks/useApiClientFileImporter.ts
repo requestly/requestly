@@ -15,6 +15,7 @@ import { processRqImportData } from "features/apiClient/screens/apiClient/compon
 import { EnvironmentVariableValue } from "backend/environment/types";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "../commands";
+import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 
 const BATCH_SIZE = 25;
 
@@ -55,7 +56,8 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
 
-  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
+  const { onSaveRecord } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
@@ -143,7 +145,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       const importPromises = environments.map(async (env) => {
         if (env.isGlobal) {
           await patchEnvironmentVariables({
-            environmentId: "global",
+            environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
             patch: env.variables,
           });
           return true;
