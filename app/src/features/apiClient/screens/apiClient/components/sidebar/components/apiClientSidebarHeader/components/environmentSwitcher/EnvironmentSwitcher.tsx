@@ -11,11 +11,12 @@ import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiC
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentSwitcher.scss";
+import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
+import { EnvironmentState } from "features/apiClient/store/environments/environments.store";
 
-function SwitcherListItemLabel(props: { envId: string }) {
-  const environmentName = useEnvironment(props.envId, (s) => s.name);
+function SwitcherListItemLabel(props: { environmentState: EnvironmentState }) {
+  const environmentName = props.environmentState.name;
 
   return (
     <Typography.Text
@@ -34,11 +35,9 @@ function SwitcherListItemLabel(props: { envId: string }) {
 export const EnvironmentSwitcher = () => {
   const location = useLocation();
 
-  const [environments, activeEnvironmentStore, setActiveEnvironment] = useAPIEnvironment((s) => [
-    s.environments,
-    s.activeEnvironment,
-    s.setActive,
-  ]);
+  const [environments, setActiveEnvironment] = useAPIEnvironment((s) => [s.environments, s.setActive]);
+
+  const activeEnvironment = useActiveEnvironment();
 
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
@@ -49,11 +48,9 @@ export const EnvironmentSwitcher = () => {
       .map((environment) => ({
         key: environment.id,
         label: (
-          <div
-            className={`${environment.id === activeEnvironmentStore?.getState()?.id ? "active-env-item" : ""} env-item`}
-          >
-            <SwitcherListItemLabel envId={environment.id} />
-            {environment.id === activeEnvironmentStore?.getState()?.id ? <MdOutlineCheckCircleOutline /> : null}
+          <div className={`${environment.id === activeEnvironment?.id ? "active-env-item" : ""} env-item`}>
+            <SwitcherListItemLabel environmentState={environment} />
+            {environment.id === activeEnvironment?.id ? <MdOutlineCheckCircleOutline /> : null}
           </div>
         ),
         onClick: () => {
@@ -70,7 +67,7 @@ export const EnvironmentSwitcher = () => {
           toast.success(`Switched to ${environment.name} environment`);
         },
       }));
-  }, [environments, activeEnvironmentStore, setActiveEnvironment, location.pathname, openTab]);
+  }, [environments, activeEnvironment, setActiveEnvironment, location.pathname, openTab]);
 
   if (environments.length === 0) {
     return (
@@ -83,11 +80,7 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
-        {activeEnvironmentStore ? (
-          <SwitcherListItemLabel envId={activeEnvironmentStore.getState().id} />
-        ) : (
-          "No environment"
-        )}
+        {activeEnvironment ? <SwitcherListItemLabel environmentState={activeEnvironment} /> : "No environment"}
         {<RiArrowDropDownLine />}
       </RQButton>
     </Dropdown>
