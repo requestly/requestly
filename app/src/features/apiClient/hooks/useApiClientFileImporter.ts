@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useSelector } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -15,8 +14,6 @@ import {
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import * as Sentry from "@sentry/react";
-import { useAPIEnvironment } from "../store/apiRecords/ApiRecordsContextProvider";
-import { useEnvironment } from "./useEnvironment.hook";
 import { useCommand } from "../commands";
 
 const BATCH_SIZE = 25;
@@ -54,12 +51,9 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const [error, setError] = useState<string | null>(null);
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
-  // const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-
   const {
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
-  const getEnvironment = useAPIEnvironment((s) => s.getEnvironment);
 
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
