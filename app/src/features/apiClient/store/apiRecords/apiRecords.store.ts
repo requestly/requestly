@@ -32,11 +32,6 @@ export type ApiRecordsState = {
   apiClientRecords: RQAPI.Record[];
 
   /**
-   * This is the list of records that have errors.
-   */
-  erroredRecords: ErroredRecord[]; // TODO: remove this and use erroredRecordsStore
-
-  /**
    * This maintains a map of child <-> parent. This field is mostly for internal use,
    * since it will get updated when any relationship changes. So try not to use this
    * unless you want to listen to all changes.
@@ -67,7 +62,6 @@ export type ApiRecordsState = {
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.Record[]) => void;
-  setErroredRecords: (erroredRecords: ErroredRecord[]) => void; // TODO: remove this and use erroredRecordsStore
   getData: (id: string) => RQAPI.Record;
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState> | undefined;
@@ -190,12 +184,6 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
         childParentMap,
         index,
         indexStore,
-      });
-    },
-
-    setErroredRecords(erroredRecords) {
-      set({
-        erroredRecords,
       });
     },
 
