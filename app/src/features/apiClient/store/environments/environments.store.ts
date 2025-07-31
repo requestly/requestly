@@ -2,6 +2,7 @@ import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types"
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
+import { RQAPI } from "features/apiClient/types";
 
 type EnvironmentData = {
   variables: StoreApi<VariablesState>;
@@ -29,12 +30,13 @@ export type EnvironmentsState = {
 
   // actions
   delete: (id: string) => void;
-  create: (params: Pick<EnvironmentState, "id" | "name">) => void;
+  create: (params: Pick<EnvironmentState, "id" | "name"> & { variables?: EnvironmentVariables }) => void;
   updateEnvironment: (id: string, updates: Pick<EnvironmentState, "name">) => void;
   getEnvironment: (id: string) => EnvironmentState | undefined;
   getAll: () => EnvironmentState[];
   getAllEnvironmentStores: () => EnvironmentStore[];
   setActive: (id?: string) => void;
+  refresh: (params: { globalEnvironment: EnvironmentMap[string]; environments: EnvironmentMap }) => void;
 };
 
 export function createEnvironmentStore(id: string, name: string, variables: EnvironmentVariables) {
@@ -96,7 +98,7 @@ export const createEnvironmentsStore = ({
       set({ environments: environments.filter((env) => env.getState().id !== id) });
     },
 
-    create({ id, name }) {
+    create({ id, name, variables }) {
       const { environments } = get();
 
       const env = get().getEnvironment(id);
@@ -105,7 +107,7 @@ export const createEnvironmentsStore = ({
       }
 
       set({
-        environments: [...environments, createEnvironmentStore(id, name, {})],
+        environments: [...environments, createEnvironmentStore(id, name, variables || {})],
       });
     },
 
@@ -148,6 +150,38 @@ export const createEnvironmentsStore = ({
       }
 
       set({ activeEnvironment: environment });
+    },
+
+    refresh(params) {
+      const { create, delete: deleteEnvironment, getEnvironment, environments } = get();
+
+      for (const environmentId in params.environments) {
+        const environment = params.environments[environmentId];
+        const existingEnvironment = getEnvironment(environmentId);
+        if (!existingEnvironment) {
+          create({
+            id: environment.id,
+            name: environment.name,
+            variables: environment.variables,
+          });
+        } else {
+          existingEnvironment.update({
+            name: environment.name,
+          });
+          existingEnvironment.data.variables.getState().reset(new Map(Object.entries(environment.variables)));
+        }
+      }
+
+      for (const environmentStore of environments) {
+        const environmentState = environmentStore.getState();
+        if (!params.environments[environmentState.id]) {
+          deleteEnvironment(environmentState.id);
+        }
+      }
+
+      set({
+        globalEnvironment: parseGlobalEnvironment(params.globalEnvironment),
+      });
     },
   }));
 };
