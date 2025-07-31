@@ -16,20 +16,20 @@ import { getDefaultAuthType } from "./defaults";
 import "./authorizationView.scss";
 
 interface Props {
+  recordId: string;
   wrapperClass?: string;
   defaults?: RQAPI.Auth;
   onAuthUpdate: (newAuth: RQAPI.Auth) => void;
   isRootLevelRecord: boolean;
-  variables: EnvironmentVariables;
   authorizationViewActions?: React.ReactElement;
 }
 
 const AuthorizationView: React.FC<Props> = ({
+  recordId,
   defaults,
   onAuthUpdate,
   isRootLevelRecord,
   wrapperClass = "",
-  variables,
   authorizationViewActions,
 }) => {
   const defaultsRef = useRef(defaults);
@@ -106,7 +106,7 @@ const AuthorizationView: React.FC<Props> = ({
               formData={FORM_TEMPLATE_STATIC_DATA[selectedAuthType].formData}
               formType={selectedAuthType}
               onChangeHandler={onFormConfigChange}
-              variables={variables}
+              recordId={recordId}
             />
           </div>
         )}
