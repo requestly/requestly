@@ -330,7 +330,6 @@ export const CollectionRow: React.FC<Props> = ({
                       className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}
                     >
                       <NewApiRecordDropdown
-                        dropdownType="wrapper"
                         onSelect={(params) => {
                           setActiveKey(record.id);
                           setCreateNewField(params.recordType);
