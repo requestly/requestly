@@ -7,11 +7,12 @@ export const graphQLEntryToHttpEntryAdapter = (entry: RQAPI.GraphQLApiEntry): RQ
   }
 
   const httpRequest = graphQLRequestToHttpRequestAdapter(entry.request);
+  const httpResponse = graphQLResponseToHttpResponseAdapter(entry.response);
 
   return {
     ...entry,
     request: httpRequest,
-    response: null,
+    response: httpResponse,
     type: RQAPI.ApiEntryType.HTTP,
   };
 };
@@ -22,11 +23,12 @@ export const httpEntryToGraphQLEntryAdapter = (entry: RQAPI.HttpApiEntry): RQAPI
   }
 
   const graphQLRequest = httpRequestToGraphQLRequestAdapter(entry.request);
+  const graphQLResponse = httpResponseToGraphQLResponseAdapter(entry.response);
 
   return {
     ...entry,
     request: graphQLRequest,
-    response: null,
+    response: graphQLResponse,
     type: RQAPI.ApiEntryType.GRAPHQL,
   };
 };
@@ -36,10 +38,15 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
     throw new Error("GraphQL request cannot be empty");
   }
 
-  const requestBody: RQAPI.RequestJsonBody = JSON.stringify({
+  const requestBody: Record<string, any> = {
     query: request.operation,
-    variables: request.variables,
-  });
+  };
+
+  if (request.variables) {
+    requestBody.variables = request.variables;
+  }
+
+  const stringifiedRequestBody: RQAPI.RequestJsonBody = JSON.stringify(requestBody);
 
   const httpRequest: RQAPI.HttpRequest = {
     url: request.url,
@@ -55,7 +62,7 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
       },
     ],
     queryParams: [],
-    body: requestBody,
+    body: stringifiedRequestBody,
     contentType: RequestContentType.JSON,
   };
 
@@ -86,4 +93,34 @@ export const httpRequestToGraphQLRequestAdapter = (request: RQAPI.HttpRequest): 
   }
 
   return graphQLRequest;
+};
+
+export const httpResponseToGraphQLResponseAdapter = (response: RQAPI.HttpResponse): RQAPI.GraphQLResponse => {
+  if (isEmpty(response)) {
+    return null as RQAPI.GraphQLResponse;
+  }
+
+  return {
+    type: "http",
+    body: response.body,
+    headers: response.headers,
+    status: response.status,
+    statusText: response.statusText,
+    time: response.time,
+  };
+};
+
+export const graphQLResponseToHttpResponseAdapter = (response: RQAPI.GraphQLResponse): RQAPI.HttpResponse => {
+  if (isEmpty(response)) {
+    return null as RQAPI.HttpResponse;
+  }
+
+  return {
+    body: response.body,
+    headers: response.headers,
+    status: response.status,
+    statusText: response.statusText,
+    time: response.time,
+    redirectedUrl: "", // GraphQL responses do not have a redirected URL
+  };
 };
