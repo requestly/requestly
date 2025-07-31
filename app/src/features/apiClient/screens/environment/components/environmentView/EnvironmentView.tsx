@@ -20,7 +20,7 @@ interface EnvironmentViewProps {
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const environment = useEnvironment(envId, (s) => s);
   const {
-    env: { setEnvironmentVariables },
+    env: { patchEnvironmentVariables },
   } = useCommand();
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
@@ -76,7 +76,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
       setIsSaving(true);
 
       const variablesToSave = convertEnvironmentToMap(pendingVariables);
-      await setEnvironmentVariables({ environmentId: envId, variables: variablesToSave });
+      await patchEnvironmentVariables({ environmentId: envId, patch: variablesToSave });
 
       toast.success("Variables updated successfully");
       trackVariablesSaved({
