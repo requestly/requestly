@@ -10,8 +10,8 @@ type OnSelectParams =
   | { recordType: RQAPI.RecordType.COLLECTION | RQAPI.RecordType.ENVIRONMENT; entryType?: never };
 
 type DropdownProps =
-  | { onSelect: (params: OnSelectParams) => void; dropdownType: "button"; buttonProps?: ButtonProps }
-  | { onSelect: (params: OnSelectParams) => void; dropdownType: "wrapper"; children: React.ReactNode };
+  | { onSelect: (params: OnSelectParams) => void; buttonProps?: ButtonProps; children?: never }
+  | { onSelect: (params: OnSelectParams) => void; buttonProps?: never; children: React.ReactNode };
 
 enum DropdownItemType {
   HTTP = "http",
@@ -20,7 +20,7 @@ enum DropdownItemType {
 }
 
 export const NewApiRecordDropdown: React.FC<DropdownProps> = (props) => {
-  const { onSelect, dropdownType } = props;
+  const { onSelect, buttonProps, children } = props;
 
   const dropdownItems: DropDownProps["menu"]["items"] = useMemo(() => {
     return [
@@ -51,24 +51,24 @@ export const NewApiRecordDropdown: React.FC<DropdownProps> = (props) => {
     ];
   }, [onSelect]);
 
-  if (dropdownType === "button") {
+  if (children) {
     return (
-      <Dropdown.Button
-        {...props.buttonProps}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.HTTP });
-        }}
-        menu={{ items: dropdownItems }}
-      >
-        New Request
-      </Dropdown.Button>
+      <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
+        {children}
+      </Dropdown>
     );
   }
 
   return (
-    <Dropdown menu={{ items: dropdownItems }} trigger={["click"]}>
-      {props.children}
-    </Dropdown>
+    <Dropdown.Button
+      {...buttonProps}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.HTTP });
+      }}
+      menu={{ items: dropdownItems }}
+    >
+      New Request
+    </Dropdown.Button>
   );
 };

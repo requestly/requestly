@@ -23,9 +23,9 @@
   }
 
   .collection-options {
-    .ant-btn:hover {
+    .ant-btn.ant-btn-sm.rq-custom-btn.icon-only-btn:hover {
       svg {
-        color: white !important;
+        color: white;
       }
     }
   }
