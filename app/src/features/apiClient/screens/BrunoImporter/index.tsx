@@ -44,7 +44,6 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   }>({ collections: [], apis: [], environments: [] });
 
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
-  // const { addNewEnvironment, setVariables } = useEnvironmentManager();
   const {
     env: { createEnvironment },
   } = useCommand();
