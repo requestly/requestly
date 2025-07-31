@@ -1,10 +1,23 @@
 import { EnvironmentData } from "backend/environment/types";
-import { Environment } from "features/apiClient/store/environments/environments.store";
+import {
+  EnvironmentState,
+  EnvironmentStore,
+  EnvironmentsState,
+} from "features/apiClient/store/environments/environments.store";
 
-export const _environmentDataAdapter = (env: Environment): EnvironmentData => {
+export const parseEnvironmentState = (env: EnvironmentState): EnvironmentData => {
+  const { id, name, data } = env;
   return {
-    id: env.id,
-    name: env.name,
-    variables: Object.fromEntries(env.data.variables.getState().getAll()),
+    id,
+    name,
+    variables: Object.fromEntries(data.variables.getState().getAll()),
   };
+};
+
+export const parseEnvironmentStore = (env: EnvironmentStore): EnvironmentData => {
+  return parseEnvironmentState(env.getState());
+};
+
+export const parseEnvironmentsStore = (envs: EnvironmentsState["environments"]): EnvironmentData[] => {
+  return envs.map(parseEnvironmentStore);
 };

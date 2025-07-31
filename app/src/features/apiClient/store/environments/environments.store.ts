@@ -1,58 +1,70 @@
-import { EnvironmentMap } from "backend/environment/types";
+import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
+import { RQAPI } from "features/apiClient/types";
 
 type EnvironmentData = {
   variables: StoreApi<VariablesState>;
 };
 
-export type Environment = {
+export const LOCAL_STORAGE_ACTIVE_ENV_ID_KEY = "__rq_api_client_active_environment_id";
+
+export type EnvironmentState = {
   id: string;
   name: string;
   data: EnvironmentData;
+
+  update: (patch: Pick<EnvironmentState, "name">) => void;
 };
 
-export type GlobalEnvironment = Environment;
+export type EnvironmentStore = StoreApi<EnvironmentState>;
+
+export type GlobalEnvironmentStore = EnvironmentStore;
 
 export type EnvironmentsState = {
   // state
-  version: number;
-  activeEnvironment: Environment | null;
-  globalEnvironment: GlobalEnvironment;
-  environments: Map<Environment["id"], Environment>;
+  activeEnvironment: EnvironmentStore | null;
+  globalEnvironment: GlobalEnvironmentStore;
+  environments: EnvironmentStore[];
 
   // actions
   delete: (id: string) => void;
-  create: (params: Omit<Environment, "data">) => void;
-  update: (id: string, updates: Pick<Environment, "name">) => void;
-  getEnvironment: (id: string) => Environment | undefined;
-  getAll: () => Map<Environment["id"], Environment>;
+  create: (params: Pick<EnvironmentState, "id" | "name"> & { variables?: EnvironmentVariables }) => void;
+  updateEnvironment: (id: string, updates: Pick<EnvironmentState, "name">) => void;
+  getEnvironment: (id: string) => EnvironmentState | undefined;
+  getAll: () => EnvironmentState[];
+  getAllEnvironmentStores: () => EnvironmentStore[];
   setActive: (id?: string) => void;
-  incrementVersion: () => void;
+  refresh: (params: { globalEnvironment: EnvironmentMap[string]; environments: EnvironmentMap }) => void;
 };
+
+export function createEnvironmentStore(id: string, name: string, variables: EnvironmentVariables) {
+  return create<EnvironmentState>((set, get) => ({
+    id,
+    name,
+    data: {
+      variables: createVariablesStore({
+        variables,
+      }),
+    },
+
+    update(patch) {
+      set(patch);
+    },
+  }));
+}
 
 const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsState["environments"] => {
   const environmentsWithVariableStore = Object.values(rawEnvironments).map((value) => {
-    return [
-      value.id,
-      {
-        id: value.id,
-        name: value.name,
-        data: { variables: createVariablesStore({ variables: value.variables }) },
-      },
-    ] as [Environment["id"], Environment];
+    return createEnvironmentStore(value.id, value.name, value.variables);
   });
 
-  return new Map(environmentsWithVariableStore);
+  return environmentsWithVariableStore;
 };
 
-const parseGlobalEnvironment = (globalEnv: EnvironmentMap[string]): GlobalEnvironment => {
-  return {
-    id: globalEnv.id,
-    name: globalEnv.name,
-    data: { variables: createVariablesStore({ variables: globalEnv.variables }) },
-  };
+const parseGlobalEnvironment = (globalEnv: EnvironmentMap[string]): GlobalEnvironmentStore => {
+  return createEnvironmentStore(globalEnv.id, globalEnv.name, globalEnv.variables);
 };
 
 export const createEnvironmentsStore = ({
@@ -65,69 +77,110 @@ export const createEnvironmentsStore = ({
   const environmentsWithVariableStore = parseEnvironments(environments);
   const globalEnvWithVariableStore = parseGlobalEnvironment(globalEnvironment);
 
+  const persistedActiveEnvId = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY);
+  const activeEnvironment = persistedActiveEnvId
+    ? environmentsWithVariableStore.find((env) => env.getState().id === persistedActiveEnvId) || null
+    : null;
+
   return create<EnvironmentsState>()((set, get) => ({
-    version: 0,
-    activeEnvironment: null,
+    activeEnvironment,
     environments: environmentsWithVariableStore,
     globalEnvironment: globalEnvWithVariableStore,
 
     delete(id) {
       const { environments } = get();
 
-      if (!environments.has(id)) {
+      const isExist = get().getEnvironment(id);
+      if (!isExist) {
         return;
       }
 
-      environments.delete(id);
-      set({ environments });
-      get().incrementVersion();
+      set({ environments: environments.filter((env) => env.getState().id !== id) });
     },
 
-    create({ id, name }) {
+    create({ id, name, variables }) {
       const { environments } = get();
-      environments.set(id, { id, name, data: { variables: createVariablesStore({ variables: {} }) } });
-      set({ environments });
-      get().incrementVersion();
+
+      const env = get().getEnvironment(id);
+      if (env) {
+        return env;
+      }
+
+      set({
+        environments: [...environments, createEnvironmentStore(id, name, variables || {})],
+      });
     },
 
-    update(id, updates) {
+    updateEnvironment(id, updates) {
       const { environments } = get();
-      const existingValue = environments.get(id);
+      const existingValue = environments.find((e) => e.getState().id === id);
 
       if (!existingValue) {
         throw new NativeError("Environment does not exist!").addContext({ environmentId: id });
       }
 
-      const updatedValue = { ...existingValue, name: updates.name };
-      environments.set(id, updatedValue);
-
-      set({ environments });
-      get().incrementVersion();
+      existingValue.setState(updates);
     },
 
     getEnvironment(id) {
       const { environments } = get();
-      return environments.get(id);
+      return environments.find((env) => env.getState().id === id)?.getState();
     },
 
     getAll() {
+      return get().environments.map((s) => s.getState());
+    },
+
+    getAllEnvironmentStores() {
       return get().environments;
     },
 
     setActive(id) {
       if (!id) {
+        localStorage.removeItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY);
         set({ activeEnvironment: null });
-        get().incrementVersion();
         return;
       }
 
-      set({ activeEnvironment: get().getEnvironment(id) });
-      get().incrementVersion();
+      localStorage.setItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY, id);
+      const { environments } = get();
+      const environment = environments.find((e) => e.getState().id === id);
+      if (!environment) {
+        throw new NativeError("Environment does not exist!").addContext({ environmentId: id });
+      }
+
+      set({ activeEnvironment: environment });
     },
 
-    incrementVersion() {
+    refresh(params) {
+      const { create, delete: deleteEnvironment, getEnvironment, environments } = get();
+
+      for (const environmentId in params.environments) {
+        const environment = params.environments[environmentId];
+        const existingEnvironment = getEnvironment(environmentId);
+        if (!existingEnvironment) {
+          create({
+            id: environment.id,
+            name: environment.name,
+            variables: environment.variables,
+          });
+        } else {
+          existingEnvironment.update({
+            name: environment.name,
+          });
+          existingEnvironment.data.variables.getState().reset(new Map(Object.entries(environment.variables)));
+        }
+      }
+
+      for (const environmentStore of environments) {
+        const environmentState = environmentStore.getState();
+        if (!params.environments[environmentState.id]) {
+          deleteEnvironment(environmentState.id);
+        }
+      }
+
       set({
-        version: get().version + 1,
+        globalEnvironment: parseGlobalEnvironment(params.globalEnvironment),
       });
     },
   }));
