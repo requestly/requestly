@@ -1,4 +1,4 @@
-import { ApiClientFeatureContext } from "./types";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 export const renameEnvironment = async (
   ctx: ApiClientFeatureContext,

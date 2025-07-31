@@ -1,5 +1,5 @@
 import { getApiClientEnvironmentsStore } from "../store.utils";
-import { ApiClientFeatureContext } from "./types";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 export const deleteEnvironment = async (ctx: ApiClientFeatureContext, params: { environmentId: string }) => {
   const { repositories } = ctx;
