@@ -1,4 +1,5 @@
 export { createEnvironment } from "./create.command";
+export { createEnvironments } from "./createEnvironments.command";
 export { deleteEnvironment } from "./delete.command";
 export { duplicateEnvironment } from "./duplicate.command";
 export { renameEnvironment } from "./rename.command";
