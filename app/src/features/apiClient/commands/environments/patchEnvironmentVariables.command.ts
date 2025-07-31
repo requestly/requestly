@@ -1,6 +1,7 @@
-import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
+import { EnvironmentVariables } from "backend/environment/types";
 import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { NativeError } from "errors/NativeError";
+import { sanitizePatch } from "../utils";
 
 export const patchEnvironmentVariables = async (
   ctx: ApiClientFeatureContext,
@@ -8,25 +9,16 @@ export const patchEnvironmentVariables = async (
 ) => {
   const { repositories, stores } = ctx;
   const { environmentId, patch } = params;
+  const environmentStore = stores.environments.getState();
+  const globalEnv = environmentStore.globalEnvironment.getState();
 
-  const env = stores.environments.getState().getEnvironment(environmentId);
+  const env = globalEnv.id === environmentId ? globalEnv : stores.environments.getState().getEnvironment(environmentId);
 
   if (!env) {
     throw new NativeError("Environment not found!").addContext({ environmentId });
   }
 
-  const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
-    Object.entries(patch).map(([key, value], index) => {
-      const typeToSaveInDB =
-        value.type === EnvironmentVariableType.Secret
-          ? EnvironmentVariableType.Secret
-          : (typeof value.syncValue as EnvironmentVariableType);
-      return [
-        key.trim(),
-        { localValue: value.localValue, syncValue: value.syncValue, type: typeToSaveInDB, id: index },
-      ];
-    })
-  );
+  const newVariablesWithSyncvalues: EnvironmentVariables = sanitizePatch(patch);
 
   await repositories.environmentVariablesRepository.updateEnvironment(environmentId, {
     variables: newVariablesWithSyncvalues,
