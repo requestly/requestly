@@ -9,7 +9,6 @@ import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircl
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { notification, Row } from "antd";
 import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import "./brunoImporter.scss";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +21,7 @@ import {
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
+import { useCommand } from "features/apiClient/commands";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -44,7 +44,10 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
   }>({ collections: [], apis: [], environments: [] });
 
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
-  const { addNewEnvironment, setVariables } = useEnvironmentManager();
+  // const { addNewEnvironment, setVariables } = useEnvironmentManager();
+  const {
+    env: { createEnvironment },
+  } = useCommand();
 
   const collectionsCount = useRef(0);
 
@@ -200,11 +203,10 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
-        const newEnvironment = await addNewEnvironment(env.name);
-        if (newEnvironment) {
-          await setVariables(newEnvironment.id, env.variables);
-          importedEnvCount++;
-        }
+        return createEnvironment({
+          newEnvironmentName: env.name,
+          variables: env.variables,
+        });
       });
 
       await Promise.all(importPromises);
@@ -213,7 +215,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       Logger.error("Environment import failed:", error);
       return importedEnvCount;
     }
-  }, [processedFileData.environments, addNewEnvironment, setVariables]);
+  }, [createEnvironment, processedFileData.environments]);
 
   const handleImportBrunoData = useCallback(() => {
     setIsImporting(true);
