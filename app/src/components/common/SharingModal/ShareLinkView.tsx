@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
-import { Radio, Space, Tooltip } from "antd";
+import { Radio, RadioChangeEvent, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
 import { getSharedListIdFromImportURL } from "features/rules/screens/sharedLists";
@@ -22,8 +22,9 @@ import { trackSharedListUrlCopied } from "features/rules/screens/sharedLists";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import "./index.css";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import { NotifyOnImport } from "./components/NotifyOnImport/NotifyOnImport";
+import "./index.css";
 
 interface ShareLinkProps {
   selectedRules: StorageRecord["id"][];
@@ -42,6 +43,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
   const [shareableLinkData, setShareableLinkData] = useState(null);
+  const [sharedListId, setSharedListId] = useState<string>("");
   const [isLinkGenerating, setIsLinkGenerating] = useState(false);
   const [isMailSent, setIsMailSent] = useState(false);
   const [error, setError] = useState(null);
@@ -56,39 +58,41 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
     return selectedRules && selectedRules?.length === 1
       ? records.find((record) => record.id === selectedRules[0])
       : null;
+
+    //eslint-disable-next-line
   }, [records, selectedRules, isRuleEditor, currentlySelectedRuleData?.name]);
 
   const visibilityOptions = useMemo(
     () => [
       {
         label: (
-          <span>
-            Public shared list{" "}
+          <>
+            <span>Public shared list</span>{" "}
             <Tooltip
               showArrow={false}
               placement="bottom"
               overlayClassName="share-link-radio-btn-label-tooltip"
               title="Anyone with the link can access the rule."
             >
-              <AiOutlineInfoCircle className="text-gray" />
+              <AiOutlineInfoCircle />
             </Tooltip>
-          </span>
+          </>
         ),
         value: SharedLinkVisibility.PUBLIC,
       },
       {
         label: (
-          <span>
-            Private shared list{" "}
+          <>
+            <span>Private shared list</span>{" "}
             <Tooltip
               showArrow={false}
               placement="bottom"
               overlayClassName="share-link-radio-btn-label-tooltip"
               title="Only accessible by accounts you specify."
             >
-              <AiOutlineInfoCircle className="text-gray" />
+              <AiOutlineInfoCircle />
             </Tooltip>
-          </span>
+          </>
         ),
         value: SharedLinkVisibility.PRIVATE,
       },
@@ -149,51 +153,57 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
 
     try {
       setIsLinkGenerating(true);
-      createSharedList(appMode, selectedRules, sharedListName, sharedLinkVisibility, sharedListRecipients).then(
-        ({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
-          trackRQLastActivity("sharedList_created");
-          onSharedLinkCreated();
-          if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
-            sendSharedListShareEmail({
-              sharedListData: sharedListData,
-              recipientEmails: sharedListRecipients,
+      createSharedList({
+        appMode,
+        rulesIdsToShare: selectedRules,
+        sharedListName,
+        sharedListVisibility: sharedLinkVisibility,
+        sharedListRecipients,
+        notifyOnImport: false,
+      }).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
+        trackRQLastActivity("sharedList_created");
+        onSharedLinkCreated();
+        setSharedListId(sharedListId);
+        if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
+          sendSharedListShareEmail({
+            sharedListData: sharedListData,
+            recipientEmails: sharedListRecipients,
+          })
+            .then((res: any) => {
+              if (res.data.success) setIsMailSent(true);
             })
-              .then((res: any) => {
-                if (res.data.success) setIsMailSent(true);
-              })
-              .catch((err) => {
-                Logger.log("send shared list email failed : ", err);
-                toast.error("Opps! Couldn't send the notification");
-              });
-          }
-
-          const shareableLinkData = {
-            link: getSharedListURL(sharedListId, sharedListName),
-            visibility: sharedLinkVisibility,
-          };
-
-          setShareableLinkData(shareableLinkData);
-
-          navigator.clipboard.writeText(shareableLinkData.link).catch((e) => {
-            // NOOP
-          });
-
-          const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
-          const recipientsCount =
-            sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? sharedListRecipients.length : null;
-
-          trackSharedListCreatedEvent(
-            sharedListId,
-            sharedListName,
-            selectedRules.length,
-            source,
-            sharedLinkVisibility,
-            nonRQEmailsCount,
-            recipientsCount
-          );
-          setIsLinkGenerating(false);
+            .catch((err) => {
+              Logger.log("send shared list email failed : ", err);
+              toast.error("Opps! Couldn't send the notification");
+            });
         }
-      );
+
+        const shareableLinkData = {
+          link: getSharedListURL(sharedListId, sharedListName),
+          visibility: sharedLinkVisibility,
+        };
+
+        setShareableLinkData(shareableLinkData);
+
+        navigator.clipboard.writeText(shareableLinkData.link).catch((e) => {
+          // NOOP
+        });
+
+        const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
+        const recipientsCount =
+          sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? sharedListRecipients.length : null;
+
+        trackSharedListCreatedEvent(
+          sharedListId,
+          sharedListName,
+          selectedRules.length,
+          source,
+          sharedLinkVisibility,
+          nonRQEmailsCount,
+          recipientsCount
+        );
+        setIsLinkGenerating(false);
+      });
     } catch (e) {
       setIsLinkGenerating(false);
     }
@@ -225,87 +235,106 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
     }
   }, [shareableLinkData?.visibility, sharedLinkVisibility, handleSharedListCreation]);
 
+  const handleSharedListVisibilityChange = (e: RadioChangeEvent) => {
+    const value = e.target.value as SharedLinkVisibility;
+    setSharedLinkVisibility(value);
+
+    if (value === SharedLinkVisibility.PRIVATE) {
+      // reset
+      setShareableLinkData(null);
+      setSharedListRecipients([]);
+    }
+  };
+
   return (
     <div className="sharing-modal-body">
-      <Space direction="vertical" size={12} className="w-full">
-        {visibilityOptions.map((option, index) => (
-          <div className="w-full" key={index}>
-            <Radio
-              value={option.value}
-              checked={sharedLinkVisibility === option.value}
-              onChange={() => setSharedLinkVisibility(option.value)}
-              className="w-full"
-            >
-              <div className="text-white text-bold share-link-radio-btn-label">{option.label}</div>
-            </Radio>
-            {option.value === sharedLinkVisibility && (
-              <>
-                {shareableLinkData && shareableLinkData.visibility === sharedLinkVisibility ? (
-                  <>
-                    {shareableLinkData.visibility === SharedLinkVisibility.PRIVATE ? (
-                      <>
-                        {isMailSent && (
-                          <div className="mt-8 text-gray success-message">
-                            <AiFillCheckCircle className="success" /> Invites sent!
-                          </div>
-                        )}
-                      </>
-                    ) : null}
-                    <CopyValue
-                      title="Copy link"
-                      value={shareableLinkData.link}
-                      trackCopiedEvent={() =>
-                        trackSharedListUrlCopied(
-                          source,
-                          getSharedListIdFromImportURL(shareableLinkData.link),
-                          sharedLinkVisibility
-                        )
-                      }
-                    />
-                    {option.value === SharedLinkVisibility.PRIVATE && (
-                      <div className="mt-8 text-gray caption">
-                        You can also share above link for quick access, they’ll need to sign in using the email address
-                        you specified.
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {option.value === SharedLinkVisibility.PUBLIC && isLinkGenerating ? (
-                      <div className="link-generation-loader">
-                        <FaSpinner className="icon-spin" /> <span>Generating a sharing link...</span>
-                      </div>
-                    ) : null}
+      <div className="shared-list-container">
+        <div className="shared-list-visibility-options">
+          {visibilityOptions.map((option) => {
+            return (
+              <Radio
+                value={option.value}
+                checked={sharedLinkVisibility === option.value}
+                onChange={handleSharedListVisibilityChange}
+                className="text-white text-bold share-link-radio-btn-label"
+              >
+                {option.label}
+              </Radio>
+            );
+          })}
+        </div>
 
-                    {option.value === SharedLinkVisibility.PRIVATE && (
-                      <>
-                        {sharedListNameField}
+        <>
+          {shareableLinkData && shareableLinkData.visibility === sharedLinkVisibility ? (
+            <>
+              {shareableLinkData.visibility === SharedLinkVisibility.PRIVATE ? (
+                <>
+                  {isMailSent && (
+                    <div className="mt-8 text-gray success-message">
+                      <AiFillCheckCircle className="success" /> <span>Invites sent!</span>
+                    </div>
+                  )}
+                </>
+              ) : null}
+              <CopyValue
+                title="Copy link"
+                value={shareableLinkData.link}
+                trackCopiedEvent={() =>
+                  trackSharedListUrlCopied(
+                    source,
+                    getSharedListIdFromImportURL(shareableLinkData.link),
+                    sharedLinkVisibility
+                  )
+                }
+              />
+              {sharedLinkVisibility === SharedLinkVisibility.PRIVATE && (
+                <div className="mt-8 text-gray caption">
+                  You can also share above link for quick access, they’ll need to sign in using the email address you
+                  specified.
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {sharedLinkVisibility === SharedLinkVisibility.PUBLIC && isLinkGenerating ? (
+                <div className="link-generation-loader">
+                  <FaSpinner className="icon-spin" /> <span>Generating a sharing link...</span>
+                </div>
+              ) : null}
 
-                        <div className="mt-8 sharing-modal-email-input-wrapper">
-                          <label htmlFor="user_emails" className="text-gray caption">
-                            Email addresses
-                          </label>
-                          <EmailInputWithDomainBasedSuggestions onChange={handleAddRecipient} />
-                        </div>
+              {sharedLinkVisibility === SharedLinkVisibility.PRIVATE && (
+                <>
+                  {sharedListNameField}
 
-                        <RQButton
-                          type="primary"
-                          className="mt-8"
-                          onClick={handleSharedListCreation}
-                          disabled={!sharedListRecipients.length}
-                          loading={isLinkGenerating}
-                        >
-                          Create list
-                        </RQButton>
-                      </>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-      </Space>
+                  <div className="mt-8 sharing-modal-email-input-wrapper">
+                    <label htmlFor="user_emails" className="text-gray caption">
+                      Email addresses
+                    </label>
+                    <EmailInputWithDomainBasedSuggestions onChange={handleAddRecipient} />
+                  </div>
+
+                  <RQButton
+                    type="primary"
+                    className="mt-8"
+                    onClick={handleSharedListCreation}
+                    disabled={!sharedListRecipients.length}
+                    loading={isLinkGenerating}
+                  >
+                    Create list
+                  </RQButton>
+                </>
+              )}
+            </>
+          )}
+        </>
+
+        <NotifyOnImport
+          key={sharedListId}
+          sharedListId={sharedListId}
+          disabled={isLinkGenerating || !shareableLinkData}
+          label="Enable email notification for shared list import"
+        />
+      </div>
     </div>
   );
 };

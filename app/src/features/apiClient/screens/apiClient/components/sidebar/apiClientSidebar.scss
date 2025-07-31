@@ -124,7 +124,7 @@
         }
 
         .api-history-url {
-          font-size: 12px;
+          font-size: var(--requestly-font-size-sm, 12px);
           width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -221,14 +221,5 @@
       height: 16px;
       color: var(--requestly-color-text-subtle);
     }
-  }
-}
-
-.api-client-sidebar-disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-
-  & > * {
-    pointer-events: none;
   }
 }

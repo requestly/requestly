@@ -42,7 +42,7 @@
   > .ant-menu-item:first-child
   .clear-all-filter-option
   .anticon {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item.ant-menu-item-selected {
@@ -111,16 +111,23 @@
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .traffic-table-content {
   padding-top: 24px;
 }
 
-.hide-traffic-table-split-gutter .traffic-table-split-container .gutter.gutter-vertical {
-  height: 0 !important;
+.traffic-table-split-container .gutter.gutter-vertical {
   transition: none;
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: row-resize;
+  transition: 0.3s all;
+}
+
+.traffic-table-split-container .gutter.gutter-vertical:hover {
+  border: 2px solid var(--requestly-color-primary, #004eeb);
 }
 
 .traffic-table-split-container {
@@ -130,6 +137,7 @@
 .traffic-table-split-container .ant-row.request-log-pane-container {
   overflow: hidden;
   height: 100%;
+  border-top: 1px solid var(--requestly-color-white-t-10);
 }
 
 /* table */

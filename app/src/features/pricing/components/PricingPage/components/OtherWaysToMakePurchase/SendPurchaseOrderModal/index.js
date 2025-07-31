@@ -1,6 +1,6 @@
 import React from "react";
-import { Modal, Typography } from "antd";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { Typography } from "antd";
+import { RQModal } from "lib/design-system/components";
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -16,11 +16,11 @@ const SendPurchaseOrderModal = ({ isOpen, handleToggleModal }) => {
       <div className="rq-modal-content">
         <Title level={4}>Please address the Purchase Order to:</Title>
         <Paragraph>
-          RQ Labs, Inc.
+          BrowserStack, Inc.
           <br />
-          355 Bryant St Unit 403
+          4512 Legacy Drive Suite 100
           <br />
-          San Francisco, CA 94107
+          Plano, Texas 75024
         </Paragraph>
 
         <Title level={4}>Include information about your company:</Title>
@@ -52,8 +52,8 @@ const SendPurchaseOrderModal = ({ isOpen, handleToggleModal }) => {
 
         <Title level={4}>Submission Instructions:</Title>
         <Paragraph>
-          Please send the Purchase Order to <Text style={styles.email}>sales@requestly.io</Text> and we'll process it
-          within 1 business day.
+          Please send the Purchase Order to <Text style={styles.email}>support@requestly.io</Text> and we'll process it
+          within 12 hours.
         </Paragraph>
       </div>
     </RQModal>

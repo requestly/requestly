@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Col } from "antd";
+import { Alert, Col } from "antd";
 import { TeamPlanDetails } from "./components/TeamPlanDetails";
 import { BillingTeamMembers } from "./components/BillingTeamMembers";
 import { BillingInvoiceCard } from "./components/BillingInvoiceCard";
@@ -24,11 +24,14 @@ export const MyBillingTeamDetails: React.FC = () => {
         [PlanType.STUDENT, PlanType.SIGNUP_TRIAL].includes(
           billingTeamDetails?.subscriptionDetails?.rqSubscriptionType
         ) || billingTeamDetails?.subscriptionDetails?.plan === "lite"
-      ) || billingTeamDetails.browserstackGroupId,
+      ) ||
+      billingTeamDetails.browserstackGroupId ||
+      Object.keys(billingTeamDetails.members || {}).length > 1,
     [
-      billingTeamDetails?.subscriptionDetails?.plan,
       billingTeamDetails?.subscriptionDetails?.rqSubscriptionType,
-      billingTeamDetails.browserstackGroupId,
+      billingTeamDetails?.subscriptionDetails?.plan,
+      billingTeamDetails?.browserstackGroupId,
+      billingTeamDetails?.members,
     ]
   );
 
@@ -37,6 +40,18 @@ export const MyBillingTeamDetails: React.FC = () => {
   return (
     <div className="display-row-center w-full">
       <div className="w-full" style={{ maxWidth: "1000px" }}>
+        {billingTeamDetails?.migratedToBrowserstack && (
+          <Alert
+            type="warning"
+            description={
+              <>
+                Subscription renewal for this billing team is under process right now. If you want to make any
+                modifications, please reach out to us at <b>support@requestly.io</b>
+              </>
+            }
+            style={{ marginBottom: "12px" }}
+          />
+        )}
         <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
         <Col className="mt-8">
           <TeamPlanDetails billingTeamDetails={billingTeamDetails} />

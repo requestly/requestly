@@ -20,6 +20,7 @@
     "service_worker": "serviceWorker.js"
   },
   "externally_connectable": {
+    "ids": ["khkpfminnhkjeabcnhpjcfhegbbodpjk"],
     "matches": ["https://*.bsstag.com/*", "https://*.browserstack.com/*"]
   },
   "web_accessible_resources": [
@@ -48,6 +49,11 @@
         "id": "delay_rules",
         "enabled": true,
         "path": "resources/static-rules/delayRules.json"
+      },
+      {
+        "id": "header_rules",
+        "enabled": true,
+        "path": "resources/static-rules/headerRules.json"
       }
     ]
   },

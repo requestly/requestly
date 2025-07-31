@@ -19,7 +19,7 @@
     .title {
       overflow: hidden;
       color: var(--requestly-color-text-default, #fff);
-      font-size: var(--font-size-md, 14px);
+      font-size: var(--requestly-font-size-md, 14px);
       font-weight: var(--requestly-font-weight-medium);
       line-height: 20px; /* 142.857% */
     }
@@ -27,7 +27,7 @@
     .description {
       color: var(--requestly-color-text-subtle, #bbb);
       text-align: center;
-      font-size: var(--font-size-sm, 12px);
+      font-size: var(--requestly-font-size-sm, 12px);
       line-height: 18px; /* 150% */
     }
   }

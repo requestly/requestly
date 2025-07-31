@@ -7,6 +7,7 @@ import {
   deleteEnvironmentFromDB,
   duplicateEnvironmentInDB,
   fetchAllEnvironmentDetails,
+  getEnvironment,
   updateEnvironmentInDB,
 } from "backend/environment";
 import { getOwnerId } from "backend/utils";
@@ -34,6 +35,14 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     };
   }
 
+  async getEnvironmentById(envId: string) {
+    const result = await getEnvironment(envId, this.getPrimaryId());
+    return {
+      success: true,
+      data: result,
+    };
+  }
+
   async deleteEnvironment(envId: string) {
     try {
       await deleteEnvironmentFromDB(this.getPrimaryId(), envId);
@@ -47,6 +56,21 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
   }
   async createGlobalEnvironment(): Promise<EnvironmentData> {
     return createNonGlobalEnvironmentInDB(this.getPrimaryId(), "Global Environment");
+  }
+
+  async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
+    if (environments.length === 0) {
+      return [];
+    }
+
+    const promises = environments.map(async (env) => {
+      return this.createNonGlobalEnvironment(env.name).then((envData) => {
+        this.updateEnvironment(envData.id, { variables: env.variables });
+        return envData;
+      });
+    });
+
+    return Promise.all(promises);
   }
 
   async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {

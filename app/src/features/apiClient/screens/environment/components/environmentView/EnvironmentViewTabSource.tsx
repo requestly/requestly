@@ -13,10 +13,8 @@ export class EnvironmentViewTabSource extends BaseTabSource {
     super();
     this.component = <EnvironmentView key={metadata.id} envId={metadata.id} />;
     this.metadata = {
-      id: metadata.id,
+      ...metadata,
       name: "environments", // FIXME: Its legacy, should be "environment"
-      title: metadata.title,
-      isNewTab: metadata.focusBreadcrumb,
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
     this.icon = <MdHorizontalSplit />;

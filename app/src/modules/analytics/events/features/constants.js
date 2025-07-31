@@ -115,6 +115,15 @@ export const RULES = {
     IMPORT_COMPLETE: "resource_override_settings_import_completed",
     DOCS_CLICKED: "resource_override_settings_import_docs_clicked",
   },
+
+  HEADER_EDITOR_SETTINGS: {
+    VIEWED: "header_editor_settings_import_viewed",
+    IMPORT_STARTED: "header_editor_settings_import_started",
+    PARSED: "header_editor_settings_parsed",
+    IMPORT_FAILED: "header_editor_settings_import_failed",
+    IMPORT_COMPLETE: "header_editor_settings_import_completed",
+    DOCS_CLICKED: "header_editor_settings_import_docs_clicked",
+  },
 };
 
 // TODO: cleanup
@@ -209,6 +218,18 @@ export const API_CLIENT = {
   IMPORT_CURL_CLICKED: "api_client_import_curl_clicked",
   CURL_IMPORTED: "api_client_curl_imported",
   CURL_IMPORT_FAILED: "api_client_curl_import_failed",
+
+  // Example collection
+  EXAMPLE_COLLECTIONS_IMPORTED: "api_client_example_collections_imported",
+  EXAMPLE_COLLECTIONS_IMPORT_FAILED: "api_client_example_collections_import_failed",
+  EXAMPLE_COLLECTIONS_NUDGE_SHOWN: "api_client_example_collections_nudge_shown",
+  EXAMPLE_COLLECTIONS_NUDGE_CLOSE_CLICKED: "api_client_example_collections_nudge_close_clicked",
+  EXAMPLE_COLLECTIONS_NUDGE_IMPORT_CLICKED: "api_client_example_collections_nudge_import_clicked",
+
+  // Local store sync
+  LOCAL_STORAGE_SYNC_STARTED: "local_storage_sync_started",
+  LOCAL_STORAGE_SYNC_FAILED: "local_storage_sync_failed",
+  LOCAL_STORAGE_SYNC_COMPLETED: "local_storage_sync_completed",
 
   // Request
   REQUEST_SENT: "api_client_request_sent",

@@ -30,20 +30,20 @@ const createAuthConfig = (
   }
 };
 
-export const getDefaultFormState = (defaultAuth?: RQAPI.Auth): Record<string, string> => {
+const getDefaultFormState = (
+  formType: AuthConfigMeta.AuthWithConfig,
+  defaultAuth?: RQAPI.Auth
+): Record<string, string> => {
   if (!defaultAuth || !defaultAuth.currentAuthType) {
     // no default config passed
     return {};
   }
-  if (Authorization.hasNoConfig(defaultAuth.currentAuthType)) {
-    return {};
-  }
 
-  if (!defaultAuth.authConfigStore || !defaultAuth.authConfigStore[defaultAuth.currentAuthType]) {
+  if (!defaultAuth.authConfigStore || !defaultAuth.authConfigStore[formType]) {
     // happens when auth type has changed but there is no existing config values to prefill the form with
     return {};
   }
-  switch (defaultAuth.currentAuthType) {
+  switch (formType) {
     case Authorization.Type.BASIC_AUTH: {
       const { username, password } = defaultAuth.authConfigStore[Authorization.Type.BASIC_AUTH];
       return { username, password };
@@ -66,7 +66,7 @@ export const useAuthFormState = (
   onChangeHandler: (config: AuthConfig<typeof formType> | null) => void,
   defaultAuth?: RQAPI.Auth
 ) => {
-  const defaults = getDefaultFormState(defaultAuth);
+  const defaults = getDefaultFormState(formType, defaultAuth);
   const [formState, setFormState] = useState<Record<string, string>>(defaults ?? {});
 
   // Use ref to avoid closure issues with onChangeHandler
@@ -79,6 +79,18 @@ export const useAuthFormState = (
     const newConfig = createAuthConfig(formState, formType);
     onChangeHandlerRef.current(newConfig?.validate() ? newConfig : null);
   }, [formState, formType]);
+
+  // fix-me: Ideally the formType callback and the formstate update should be in the same place,
+  // using something like zustand or contexts. Side Effect changes like these have been known to be hard to debug.
+  useEffect(() => {
+    const newDefaults = getDefaultFormState(formType, defaultAuth);
+    setFormState((prev) => {
+      return {
+        ...newDefaults,
+        ...prev, // Preserve any existing values in the form state
+      };
+    });
+  }, [formType, defaultAuth]);
 
   const handleFormChange = useCallback(
     (value: string, id: string) => {

@@ -1,3 +1,7 @@
+.environments-empty-state-wrapper {
+  margin: 8px;
+}
+
 .environments-list-container {
   height: inherit;
   display: flex;
@@ -97,6 +101,6 @@
   text-overflow: ellipsis;
 
   span {
-    font-size: 12px;
+    font-size: var(--requestly-font-size-sm, 12px);
   }
 }

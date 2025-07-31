@@ -200,6 +200,9 @@ const AppModeInitializer = () => {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
       });
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("initiate-app-close", () => {
+        navigate(PATHS.DESKTOP.QUIT.ABSOLUTE);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

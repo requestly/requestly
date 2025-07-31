@@ -27,7 +27,7 @@
       .info-text {
         color: #8f8f8f;
         line-height: 15px;
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         display: flex;
         align-items: center;
         margin-bottom: 16px;
@@ -49,6 +49,36 @@
 
           .field {
             width: 448px;
+
+            .input-container.error-state {
+              position: relative;
+              display: flex;
+              align-items: center;
+              height: 32px;
+              padding: 8px 8px;
+              gap: 6px;
+              border: 1px solid var(--requestly-color-error);
+              border-radius: 4px;
+
+              .error-icon {
+                position: inherit;
+                margin-bottom: 12px;
+                padding: 2px;
+                align-items: center;
+                margin-left: auto;
+                svg {
+                  width: 17px;
+                  height: 17px;
+                }
+              }
+            }
+            .input-container.error-state > .editor-popup-container {
+              width: 100%;
+              height: 100%;
+              border: none;
+              padding: 0;
+              margin-bottom: 8px;
+            }
           }
 
           .ant-select-selector {
@@ -101,84 +131,20 @@
         }
 
         h2 {
-          line-height: 15px;
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
+          line-height: 17px;
+          color: var(--requestly-color-text-subtle);
         }
-      }
 
-      h1 {
-        line-height: 20px;
-        font-size: 13px;
-        font-weight: 500;
-        margin-bottom: 8px;
-        color: #bbbbbb;
-      }
-
-      h2,
-      li {
-        font-size: 11px;
-        line-height: 17px;
-        color: #bbbbbb;
-      }
-
-      ul {
-        margin-left: -20px;
-        li {
-          display: list-item;
-          list-style-type: disc;
+        .link-text {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          text-decoration: underline;
+          font-size: var(--requestly-font-size-sm);
+          color: var(--requestly-color-primary-text, #639ff9);
         }
-      }
-
-      .step {
-        p {
-          color: blue;
-        }
-        .step {
-          p {
-            color: pink;
-          }
-        }
-      }
-
-      .note {
-        line-height: 17px;
-        font-size: 11px;
-        color: #bbbbbb;
-        margin-bottom: 8px;
-      }
-    }
-
-    .auth-help-panel {
-      margin: auto;
-      max-width: 500px;
-      width: 100%;
-      display: flex;
-      padding: var(--space-5, 12px);
-      gap: var(--space-4, 8px);
-      align-self: stretch;
-      border-radius: 8px;
-      border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-      background: var(--requestly-color-surface-0, #212121);
-
-      .sub-heading {
-        color: var(--requestly-color-text-subtle, #bbb);
-        font-size: var(--requestly-font-size-xs, 11px);
-        line-height: var(--requestly-font-line-height-sm);
-      }
-
-      .info-icon {
-        margin-top: 2px;
-        width: 14px;
-        height: 14px;
-        flex-shrink: 0;
-        color: var(--requestly-color-text-subtle, #bbb);
-      }
-
-      .link-text {
-        display: inline-block;
-        margin-left: 4px;
-        text-decoration: underline;
-        color: var(--requestly-color-primary-text, #639ff9);
       }
     }
   }
@@ -209,14 +175,14 @@
 
         span {
           color: #bbb;
-          font-size: 12px;
+          font-size: var(--requestly-font-size-sm, 12px);
           line-height: 15px;
           margin-left: 7px;
         }
       }
 
       label {
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         line-height: 15px;
         color: #bbbbbb;
         margin-right: 12px;

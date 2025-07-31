@@ -12,6 +12,9 @@ import { trackLoginWithSSOClicked } from "modules/analytics/events/common/auth/s
 import "./rqAuthCard.scss";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
+import { getSSOProviderId } from "backend/auth/sso";
+import Logger from "../../../../../../../../common/logger";
+import * as Sentry from "@sentry/react";
 
 interface RQAuthCardProps {
   onBackClick: () => void;
@@ -26,7 +29,7 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
   successfulLoginCallback,
   failedLoginCallback,
 }) => {
-  const { email, authProviders, ssoProviderId, isSendEmailInProgress, eventSource } = useAuthScreenContext();
+  const { email, authProviders, isSendEmailInProgress, eventSource } = useAuthScreenContext();
   const [isSSOLoginInProgress, setIsSSOLoginInProgress] = useState(false);
 
   const isPasswordProviderUsed = useMemo(() => {
@@ -43,15 +46,24 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
     });
     setIsSSOLoginInProgress(true);
     try {
+      const ssoProviderId = await getSSOProviderId(email);
       await loginWithSSO(ssoProviderId, email);
       setIsSSOLoginInProgress(false);
       successfulLoginCallback(AUTH_PROVIDERS.SSO);
+      Logger.log("[Auth-handleSSOLogin] Successfully logged in with SSO");
     } catch (err) {
+      Logger.log("[Auth-handleSSOLogin] Error logging in with SSO", { err });
+      Sentry.captureMessage("[Auth] Error logging in with SSO", {
+        tags: {
+          flow: "auth",
+        },
+        extra: { email, err, source: "RQAuthCard-handleSSOLogin" },
+      });
       failedLoginCallback(AuthErrorCode.UNKNOWN, AUTH_PROVIDERS.SSO);
       toast.error("Something went wrong, Could not sign in with SSO");
       setIsSSOLoginInProgress(false);
     }
-  }, [email, eventSource, ssoProviderId, successfulLoginCallback, failedLoginCallback]);
+  }, [email, eventSource, successfulLoginCallback, failedLoginCallback]);
 
   const renderAuthProvider = (provider: AuthProvider) => {
     switch (provider.toLowerCase()) {
@@ -77,8 +89,6 @@ export const RQAuthCard: React.FC<RQAuthCardProps> = ({
             Sign in with SSO
           </RQButton>
         );
-      default:
-        return null;
     }
   };
 

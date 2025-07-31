@@ -1,4 +1,10 @@
-import { deleteApiRecords, getApiRecord, getApiRecords, upsertApiRecord } from "backend/apiClient";
+import {
+  deleteApiRecords,
+  getApiRecord,
+  getApiRecords,
+  upsertApiRecord,
+  batchCreateApiRecordsWithExistingId,
+} from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
@@ -51,7 +57,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   }
 
   async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
-    return this.updateRecord({ id, name: newName }, id);
+    return this.updateRecord({ id, name: newName }, id, RQAPI.RecordType.COLLECTION);
   }
 
   async createRecord(record: Partial<RQAPI.Record>) {
@@ -66,9 +72,12 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
-  async updateRecord(record: Partial<RQAPI.Record>, id: string) {
+  async updateRecord(record: Partial<RQAPI.Record>, id: string, type?: RQAPI.Record["type"]) {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
     sanitizedRecord.id = id;
+    if (type) {
+      sanitizedRecord.type = type;
+    }
     return updateApiRecord(this.meta.uid, sanitizedRecord, this.meta.teamId);
   }
 
@@ -164,5 +173,16 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         : { ...record, collectionId: newParentId }
     );
     return await firebaseBatchWrite("apis", updatedRequests);
+  }
+
+  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+    if (records.length === 0) {
+      return {
+        success: true,
+        data: { records: [], erroredRecords: [] },
+      };
+    }
+
+    return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
   }
 }

@@ -53,6 +53,7 @@ FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT = "desktop-ios-simulator-support";
 FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
 FEATURES.FRAMELESS_DESKTOP_APP = "frameless-desktop-app";
 FEATURES.EXTENSION_STATUS_NOTIFICATION = "extension-status-notification";
+FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD = "request-rule-graphql-payload";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";
@@ -75,6 +76,7 @@ FEATURES.PERSONA_SURVEY = "persona-survey";
 FEATURES.NETWORK_SESSIONS = "network-sessions"; // todo: replace redundancy
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
+FEATURES.API_CLIENT_INCLUDE_CREDENTIALS = "api-client-include-credentials";
 
 // session recording
 FEATURES.SESSION_ONBOARDING = "session_onboarding";
@@ -92,5 +94,8 @@ FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
 FEATURES.CONNECT_EXTENSION = "connect_extension";
 FEATURES.EDIT_LOCAL_FILE_PATH = "edit_local_file_path";
 FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
+
+FEATURES.COMPATIBLE_DESKTOP_APP = "compatible_desktop_app";
+FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
 
 export default FEATURES;

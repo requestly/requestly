@@ -9,7 +9,6 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { trackWorkspaceSettingToggled } from "modules/analytics/events/common/teams";
 import SwitchWorkspaceButton from "./SwitchWorkspaceButton";
 import { useIsTeamAdmin } from "./hooks/useIsTeamAdmin";
-import "./TeamViewer.css";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getWorkspaceById } from "store/slices/workspaces/selectors";
 import { isPersonalWorkspaceId } from "features/workspaces/utils";
@@ -17,6 +16,8 @@ import PersonalWorkspaceSettings from "./PersonalWorkspaceSettings";
 import { WorkspaceType } from "features/workspaces/types";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { LocalWorkspaceSettings } from "./LocalWorkspaceSettings/LocalWorkspaceSettings";
+import "./TeamViewer.css";
 
 const TeamViewer = () => {
   const { teamId } = useParams();
@@ -29,6 +30,7 @@ const TeamViewer = () => {
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
   const teamMembersCount = teamDetails?.accessCount;
+  const isLocalWorkspace = teamDetails?.workspaceType === WorkspaceType.LOCAL;
 
   const manageWorkspaceItems = useMemo(
     () => [
@@ -116,14 +118,18 @@ const TeamViewer = () => {
           </Col>
         </Row>
 
-        <Tabs
-          defaultActiveKey="0"
-          items={manageWorkspaceItems}
-          className="manage-workspace-tabs"
-          onChange={(activeTab) => {
-            trackWorkspaceSettingToggled(activeTab);
-          }}
-        />
+        {isLocalWorkspace ? (
+          <LocalWorkspaceSettings workspacePath={teamDetails?.rootPath} />
+        ) : (
+          <Tabs
+            defaultActiveKey="0"
+            items={manageWorkspaceItems}
+            className="manage-workspace-tabs"
+            onChange={(activeTab) => {
+              trackWorkspaceSettingToggled(activeTab);
+            }}
+          />
+        )}
       </Col>
     </Row>
   );

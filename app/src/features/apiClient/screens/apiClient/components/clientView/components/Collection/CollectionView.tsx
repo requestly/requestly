@@ -1,4 +1,4 @@
-import { notification, Result, Skeleton, Tabs } from "antd";
+import { notification, Result, Tabs } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -11,6 +11,8 @@ import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "./collectionViewTabSource";
+import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
+import { isEmpty } from "lodash";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -23,26 +25,18 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const {
-    apiClientRecords,
-    onSaveRecord,
-    isLoadingApiClientRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
   const { setTitle, getIsNew } = useGenericState();
   const isNewCollection = getIsNew();
 
-  const collection = useMemo(() => {
-    return apiClientRecords.find((record) => record.id === collectionId) as RQAPI.CollectionRecord;
-  }, [apiClientRecords, collectionId]);
+  const collection = useApiRecord(collectionId) as RQAPI.CollectionRecord;
 
   useEffect(() => {
     // To sync title for tabs opened from deeplinks
-    if (collection) {
+    if (!isEmpty(collection)) {
       setTitle(collection.name);
     }
   }, [collection, setTitle]);
@@ -60,7 +54,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         .updateCollectionAuthData(record)
         .then((result) => {
           if (result.success) {
-            onSaveRecord(result.data, "open");
+            onSaveRecord(result.data);
           } else {
             notification.error({
               message: `Could not update collection authorization changes!`,
@@ -77,7 +71,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           });
         });
     },
-    [collection, onSaveRecord, apiClientRecordsRepository]
+    [collection, apiClientRecordsRepository, onSaveRecord]
   );
 
   const tabItems = useMemo(() => {
@@ -120,7 +114,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           return;
         }
 
-        onSaveRecord(result.data, "open");
+        onSaveRecord(result.data);
         const wasForceRefreshed = await forceRefreshApiClientRecords();
         if (wasForceRefreshed) {
           closeTab(
@@ -136,19 +130,11 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
     [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
 
-  if (isLoadingApiClientRecords) {
-    return (
-      <div className="collection-view-container__loading">
-        <Skeleton />
-      </div>
-    );
-  }
-
   const collectionName = collection?.name || "New Collection";
 
   return (
     <div className="collection-view-container">
-      {!collection && collectionId !== "new" ? (
+      {isEmpty(collection) && collectionId !== "new" ? (
         <Result
           status="error"
           title="Collection not found"

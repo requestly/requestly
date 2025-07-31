@@ -3,7 +3,9 @@ import firebaseApp from "../firebase";
 import { isPersonalWorkspaceId } from "features/workspaces/utils";
 import { updateRecordMetaData } from "./apiClient/utils";
 
-export const getOwnerId = (uid: string, teamId?: string) => {
+export const LOGGED_OUT_STATE_UID = "local";
+
+export const getOwnerId = (uid: string | undefined, teamId?: string) => {
   if (teamId) {
     // For backward compatibility, we are using teamId as ownerId for team workspaces only
     // FIXME-syncing: Find a longterm fix for this. What should be the owner id of personal workspace?
@@ -13,6 +15,11 @@ export const getOwnerId = (uid: string, teamId?: string) => {
 
     return `team-${teamId}`;
   }
+
+  if (!uid) {
+    return LOGGED_OUT_STATE_UID;
+  }
+
   return uid;
 };
 

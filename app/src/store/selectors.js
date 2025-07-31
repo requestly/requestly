@@ -98,6 +98,11 @@ export const getResponseRuleResourceType = (state) => {
   return rule?.pairs?.[0]?.response?.resourceType ?? "";
 };
 
+export const getRequestRuleResourceType = (state) => {
+  const rule = getCurrentlySelectedRuleData(state);
+  return rule?.pairs?.[0]?.request?.resourceType ?? "";
+};
+
 export const getLastBackupTimeStamp = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["lastBackupTimeStamp"];

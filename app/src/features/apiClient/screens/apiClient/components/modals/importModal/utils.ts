@@ -3,7 +3,7 @@ import { isApiCollection, isApiRequest } from "../../../utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
-interface ImportData {
+export interface RQImportData {
   records: (RQAPI.ApiRecord | RQAPI.CollectionRecord)[];
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
 }
@@ -14,7 +14,7 @@ interface UpdatedApiRecordsToImport {
 }
 
 export const processRqImportData = (
-  fileContent: ImportData,
+  fileContent: RQImportData,
   uid: string | null,
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ): {
@@ -50,19 +50,21 @@ export const processRqImportData = (
   collections.forEach((collection: RQAPI.CollectionRecord) => {
     const oldId = collection.id;
     delete collection.id;
-    const newId = apiClientRecordsRepository.generateCollectionId(collection.name, "");
+    const newId = apiClientRecordsRepository.generateCollectionId(
+      collection.name,
+      oldToNewIdMap[collection.collectionId]
+    );
     collection.id = newId;
     oldToNewIdMap[oldId] = newId;
   });
 
   collections.forEach((collection: RQAPI.CollectionRecord) => {
-    const collectionToImport = { ...collection, name: `(Imported) ${collection.name}` };
-    if (collectionToImport.collectionId) {
-      const oldCollectionId = collectionToImport.collectionId;
-      delete collectionToImport.collectionId;
-      collectionToImport.collectionId = oldToNewIdMap[oldCollectionId] ?? "";
+    if (collection.collectionId) {
+      const oldCollectionId = collection.collectionId;
+      delete collection.collectionId;
+      collection.collectionId = oldToNewIdMap[oldCollectionId] ?? "";
     }
-    updatedApiRecordsToImport.collections.push(collectionToImport);
+    updatedApiRecordsToImport.collections.push(collection);
   });
 
   apis.forEach((api: RQAPI.ApiRecord) => {

@@ -117,6 +117,7 @@ export namespace RQAPI {
     body?: RequestBody;
     bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
+    includeCredentials?: boolean;
   }
 
   export interface Response {
@@ -196,6 +197,7 @@ export namespace RQAPI {
     name: string;
     description?: string;
     collectionId: string | null;
+    isExample?: boolean;
     ownerId: string;
     deleted: boolean;
     createdBy: string;
@@ -242,3 +244,5 @@ export enum PostmanBodyMode {
 export enum AbortReason {
   USER_CANCELLED = "user_cancelled",
 }
+
+export type UnwrappedPromise<T> = T extends Promise<infer R> ? R : T;
