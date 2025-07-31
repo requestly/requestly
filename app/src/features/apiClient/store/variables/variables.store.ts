@@ -15,7 +15,7 @@ export type VariablesState = {
   getAll: () => Map<EnvironmentVariableKey, EnvironmentVariableValue>;
   search: (value: string) => Map<EnvironmentVariableKey, EnvironmentVariableValue>;
   incrementVersion: () => void;
-  mergeAndUpdate: (newVariables: EnvironmentVariables) => void;
+  mergeAndUpdate: (newVariables: EnvironmentVariables) => EnvironmentVariables;
 };
 
 const parseVariables = (rawVariables: EnvironmentVariables): VariablesState["data"] => {
@@ -47,6 +47,7 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       );
 
       set({ data: parseVariables(mergedVariables) });
+      return mergedVariables;
     },
 
     delete(key) {

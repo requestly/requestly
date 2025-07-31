@@ -15,6 +15,9 @@ import {
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import * as Sentry from "@sentry/react";
+import { useAPIEnvironment } from "../store/apiRecords/ApiRecordsContextProvider";
+import { useEnvironment } from "./useEnvironment.hook";
+import { useCommand } from "../commands";
 
 const BATCH_SIZE = 25;
 
@@ -51,7 +54,13 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const [error, setError] = useState<string | null>(null);
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
+  // const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
+
+  const {
+    env: { createEnvironment, patchEnvironmentVariables },
+  } = useCommand();
+  const getEnvironment = useAPIEnvironment((s) => s.getEnvironment);
+
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -139,15 +148,16 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     try {
       const importPromises = environments.map(async (env) => {
         if (env.isGlobal) {
-          const globalEnvVariables = getEnvironmentVariables("global");
-          await setVariables("global", { ...globalEnvVariables, ...env.variables });
+          await patchEnvironmentVariables({
+            environmentId: "global",
+            patch: env.variables,
+          });
           return true;
         } else {
-          const newEnvironment = await addNewEnvironment(env.name);
-          if (newEnvironment) {
-            await setVariables(newEnvironment.id, env.variables);
-            return true;
-          }
+          await createEnvironment({
+            newEnvironmentName: env.name,
+            variables: env.variables,
+          });
         }
         return false;
       });
@@ -158,7 +168,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       Logger.error("Data import failed:", error);
       throw error;
     }
-  }, [environments, getEnvironmentVariables, addNewEnvironment, setVariables]);
+  }, [createEnvironment, environments, patchEnvironmentVariables]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
