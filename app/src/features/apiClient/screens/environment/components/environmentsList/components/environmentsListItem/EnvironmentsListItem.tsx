@@ -16,8 +16,8 @@ import {
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
 import { useCommand } from "features/apiClient/commands";
-import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
+import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
@@ -41,7 +41,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     env: { renameEnvironment, duplicateEnvironment, deleteEnvironment },
   } = useCommand();
 
-  const [activeEnvironment] = useAPIEnvironment((s) => [s.activeEnvironment]);
+  const activeEnvironment = useActiveEnvironment();
   const environment = useEnvironment(environmentId, (s) => s);
 
   const [isRenameInputVisible, setIsRenameInputVisible] = useState(false);
@@ -184,7 +184,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           showArrow={false}
         >
           <span>
-            {environment.id === activeEnvironment?.getState().id && !isGlobalEnvironment(environment.id) ? (
+            {environment.id === activeEnvironment?.id && !isGlobalEnvironment(environment.id) ? (
               <MdOutlineCheckCircle className="active-env-icon" />
             ) : (
               ""
