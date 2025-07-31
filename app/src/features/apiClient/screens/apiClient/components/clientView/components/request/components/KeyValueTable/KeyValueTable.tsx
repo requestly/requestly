@@ -6,15 +6,15 @@ import { RQButton } from "lib/design-system-v2/components";
 import { EditableRow, EditableCell } from "./KeyValueTableRow";
 import { KeyValuePair } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
-import { EnvironmentVariables } from "backend/environment/types";
 import "./keyValueTable.scss";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
 interface KeyValueTableProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
-  variables: EnvironmentVariables;
+  variables: ScopedVariables;
   checkInvalidCharacter?: boolean;
 }
 

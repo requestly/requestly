@@ -7,6 +7,7 @@ import {
 } from "@codemirror/autocomplete";
 import { EditorView } from "@codemirror/view";
 import { EnvironmentVariables } from "backend/environment/types";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 /**
  * Creates a custom completion source that returns a set of suggestions
@@ -36,15 +37,18 @@ export function generateCompletionSource(
 }
 
 // VARIABLE COMPLETIONS
-function varCompletionSource(envVariables: EnvironmentVariables): CompletionSource {
-  const varCompletions = Object.keys(envVariables).map((key) => {
+function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
+  if (!(envVariables instanceof Map)) {
+    return;
+  }
+  const varCompletions = Array.from(envVariables.entries()).map(([envId, [variable, source]]) => {
     return {
-      label: key,
+      label: envId,
       detail:
-        envVariables[key].type === "secret"
-          ? "•".repeat(String(envVariables[key].localValue ?? envVariables[key].syncValue).length)
-          : ((envVariables[key].localValue ?? envVariables[key].syncValue) as string),
-      type: envVariables[key].localValue ? "local variable" : "sync variable",
+        variable.type === "secret"
+          ? "•".repeat(String(variable.localValue ?? variable.syncValue).length)
+          : ((variable.localValue ?? variable.syncValue) as string),
+      type: variable.localValue ? "local variable" : "sync variable",
       apply: (view: EditorView, completion: Completion, from: number, to: number): void => {
         // Look ahead up to 10 characters, skip spaces, then check for and add closing braces
         const LOOK_AHEAD_BUFFER = 10;
@@ -60,7 +64,7 @@ function varCompletionSource(envVariables: EnvironmentVariables): CompletionSour
 }
 
 /* CORE PLUGIN */
-export default function generateCompletionsForVariables(envVariables?: EnvironmentVariables) {
+export default function generateCompletionsForVariables(envVariables?: ScopedVariables) {
   const customCompletions = [];
   if (envVariables) {
     customCompletions.push(varCompletionSource(envVariables));

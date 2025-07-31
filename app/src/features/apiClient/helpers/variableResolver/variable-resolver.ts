@@ -2,13 +2,13 @@ import { EnvironmentVariableKey, EnvironmentVariableValue, VariableScope } from 
 import { NativeError } from "errors/NativeError";
 import { VariablesState } from "features/apiClient/store/variables/variables.store";
 import { RQAPI } from "features/apiClient/types";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { StoreApi } from "zustand";
-import * as fp from "lodash/fp";
 import {
   AllApiClientStores,
   ApiRecordsStoreContext,
 } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 
 type VariableSource = {
   scope: VariableScope;
@@ -30,31 +30,44 @@ type Scope = [VariableSource, StoreApi<VariablesState>];
  * it is coming from the active environment.
  */
 export class VariableHolder {
-  private data: ScopedVariables = new Map();
+  private data = new Map<number, ScopedVariables>();
   private isDestroyed = false;
 
-  add(params: { key: EnvironmentVariableKey; value: EnvironmentVariableValue; variableSource: VariableSource }) {
+  private parseVariableState(state: VariablesState["data"], variableSource: VariableSource) {
+    const result: ScopedVariables = new Map();
+    for (const [key, value] of state) {
+      result.set(key, [value, variableSource]);
+    }
+
+    return result;
+  }
+
+  refresh(params: { variableSource: VariableSource; variableState: VariablesState }) {
     if (this.isDestroyed) {
       return false;
     }
-    const { key, value, variableSource } = params;
-    const existingEntry = this.data.get(key);
-    if (!existingEntry) {
-      this.data.set(key, [value, variableSource]);
-      return true;
-    }
-
-    const [, existingVariableSource] = existingEntry;
-    if (variableSource.level > existingVariableSource.level) {
-      return false;
-    }
-
-    this.data.set(key, [value, variableSource]);
+    const { variableState, variableSource } = params;
+    this.data.set(variableSource.level, this.parseVariableState(variableState.data, variableSource));
     return true;
   }
 
-  getAll() {
-    return this.data;
+  getAll(): ScopedVariables {
+    const result: ScopedVariables = new Map();
+    const sortedLevels = Array.from(this.data.keys()).sort();
+
+    for (const level of sortedLevels) {
+      const scopedVariable = this.data.get(level);
+      if (!scopedVariable) {
+        throw new Error("Scoped variable not found for level!");
+      }
+      for (const [key, value] of scopedVariable) {
+        if (!result.has(key)) {
+          result.set(key, value);
+        }
+      }
+    }
+
+    return result;
   }
 
   destroy() {
@@ -65,7 +78,14 @@ export class VariableHolder {
 function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
   const scopes: [VariableSource, StoreApi<VariablesState>][] = [];
   let currentScopeLevel = 0;
-  const { activeEnvironment, globalEnvironment } = stores.environments.getState();
+  const {
+    activeEnvironment: activeEnvironmentStore,
+    globalEnvironment: globalEnvironmentStore,
+  } = stores.environments.getState();
+
+  const activeEnvironment = activeEnvironmentStore?.getState();
+  const globalEnvironment = globalEnvironmentStore.getState();
+
   const { getRecordStore } = stores.records.getState();
 
   //1. Active Envrionment
@@ -116,89 +136,120 @@ function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
 
 function readScopesIntoVariableHolder(
   params: {
-    parents: string[];
-    scopes?: Scope[];
+    scopes: Scope[];
   },
-  stores: AllApiClientStores,
   variableHolder: VariableHolder
 ) {
-  const { parents } = params;
-  const scopes = params.scopes || getScopes(parents, stores);
-  for (const [variableSource, variableState] of scopes) {
-    for (const [key, value] of variableState.getState().getAll()) {
-      variableHolder.add({
-        key,
-        value,
+  const scopes = params.scopes;
+  for (const [variableSource, variableStore] of scopes) {
+    variableHolder.refresh({
+      variableSource,
+      variableState: variableStore.getState(),
+    });
+  }
+}
+
+export function getScopedVariables(parents: string[], stores: AllApiClientStores) {
+  const variableHolder = new VariableHolder();
+  readScopesIntoVariableHolder(
+    {
+      scopes: getScopes(parents, stores),
+    },
+    variableHolder
+  );
+
+  return variableHolder.getAll();
+}
+
+export function resolveVariable(key: string, parents: string[], stores: AllApiClientStores) {
+  return getScopedVariables(parents, stores).get(key);
+}
+
+class VariableEventsManager {
+  private variableHolder: VariableHolder = new VariableHolder();
+  private map = new Map<
+    VariableSource["scopeId"],
+    {
+      unsubscriber: (...args: any[]) => any[] | void;
+    }
+  >();
+  constructor(private readonly setScopedVariables: (variable: ScopedVariables) => void, scopes: Scope[]) {
+    scopes.forEach((scope) => this.addScope(scope));
+  }
+
+  private addScope(scope: Scope) {
+    const [variableSource, variableState] = scope;
+    const unsubscriber = variableState.subscribe((variableState) => {
+      this.variableHolder.refresh({
         variableSource,
+        variableState,
       });
+      this.setScopedVariables(this.variableHolder.getAll());
+    });
+    this.map.set(variableSource.scopeId, {
+      unsubscriber,
+    });
+  }
+
+  private deleteScope(scopeId: VariableSource["scopeId"]) {
+    const data = this.map.get(scopeId);
+    if (!data) {
+      return false;
+    }
+    data.unsubscriber();
+    this.map.delete(scopeId);
+    return true;
+  }
+
+  refresh(scopes: Scope[]) {
+    this.variableHolder = new VariableHolder();
+    readScopesIntoVariableHolder(
+      {
+        scopes,
+      },
+      this.variableHolder
+    );
+    const newScopeIds = new Set(scopes.map((s) => s[0].scopeId));
+    for (const scope of scopes) {
+      if (!this.map.has(scope[0].scopeId)) {
+        this.addScope(scope);
+      }
+    }
+
+    for (const [scopeId] of this.map) {
+      if (!newScopeIds.has(scopeId)) {
+        this.deleteScope(scopeId);
+      }
     }
   }
 }
 
-export namespace VariableResolver {
-  export function getScopedVariables(parents: string[], stores: AllApiClientStores) {
-    const variableHolder = new VariableHolder();
-    readScopesIntoVariableHolder(
-      {
-        parents,
-      },
-      stores,
-      variableHolder
-    );
-
-    return variableHolder.getAll();
+export function useScopedVariables(id: string, parentVersion: number) {
+  const stores = useContext(ApiRecordsStoreContext);
+  if (!stores) {
+    throw new Error("Unable to locate stores!");
   }
+  const { getParentChain } = stores.records.getState();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const parents = useMemo(() => getParentChain(id), [id, parentVersion]);
 
-  export function resolveVariable(key: string, parents: string[], stores: AllApiClientStores) {
-    return getScopedVariables(parents, stores).get(key);
-  }
+  const activeEnvironment = useActiveEnvironment();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const scopes = useMemo(() => getScopes(parents, stores), [activeEnvironment, parents, stores]);
 
-  export function useScopedVariables(id: string, parentVersion: number) {
-    const stores = useContext(ApiRecordsStoreContext);
-    if (!stores) {
-      throw new Error("Unable to locate stores!");
-    }
-    const { getParentChain } = stores.records.getState();
+  const [scopedVariables, setScopedVariables] = useState(getScopedVariables(parents, stores));
+
+  const variableEventsManagerRef = useRef<VariableEventsManager>();
+
+  useEffect(() => {
+    variableEventsManagerRef.current = new VariableEventsManager(setScopedVariables, scopes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const parents = useMemo(() => getParentChain(id), [id, parentVersion]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const variableHolder = useMemo(() => new VariableHolder(), [parents]);
+  }, []);
 
-    const scopes = useMemo(() => getScopes(parents, stores), [parents, stores]);
+  useEffect(() => {
+    variableEventsManagerRef.current?.refresh(scopes);
+    setScopedVariables(getScopedVariables(parents, stores));
+  }, [parents, scopes, stores]);
 
-    readScopesIntoVariableHolder(
-      {
-        parents,
-        scopes,
-      },
-      stores,
-      variableHolder
-    );
-
-    const [scopedVariables, setScopedVariables] = useState(variableHolder.getAll());
-
-    useEffect(() => {
-      const unsubscribers: ((...args: any[]) => any[] | void)[] = [];
-      scopes.forEach(([variableSource, variableState], index) => {
-        const unsubscriber = variableState.subscribe((state) => {
-          for (const [key, value] of state.data) {
-            variableHolder.add({
-              key,
-              value,
-              variableSource,
-            });
-          }
-          setScopedVariables(variableHolder.getAll());
-        });
-        unsubscribers.push(unsubscriber);
-      });
-
-      return () => {
-        fp.flow(unsubscribers);
-        variableHolder.destroy();
-      };
-    }, [scopes, variableHolder]);
-
-    return scopedVariables;
-  }
+  return scopedVariables;
 }
