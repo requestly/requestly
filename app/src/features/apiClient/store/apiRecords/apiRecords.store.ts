@@ -12,12 +12,12 @@ type BaseRecordState = {
   incrementParentVersion: () => void;
 };
 
-type ApiRecordState = BaseRecordState & {
+export type ApiRecordState = BaseRecordState & {
   type: RQAPI.RecordType.API;
   record: RQAPI.ApiRecord;
 };
 
-type CollectionRecordState = BaseRecordState & {
+export type CollectionRecordState = BaseRecordState & {
   type: RQAPI.RecordType.COLLECTION;
   record: RQAPI.CollectionRecord;
   collectionVariables: StoreApi<VariablesState>;
