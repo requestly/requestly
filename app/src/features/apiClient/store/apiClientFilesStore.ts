@@ -30,7 +30,6 @@ export const createApiClientFilesStore = (appMode: "desktop", initialFiles: Reco
         isFilePresentLocally: async (fileId: FileId) => {
           const { files } = get();
           const file = files[fileId];
-          console.log("!!!debug", "file present locally", file);
           const doesFileExist = await window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInMain?.(
             "does-file-exist",
             file.path
