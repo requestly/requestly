@@ -6,10 +6,10 @@ import { createVariablesStore, VariablesState } from "../variables/variables.sto
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
-  parentVersion: number;
+  version: number;
   record: RQAPI.Record;
   updateRecordState: (patch: Partial<RQAPI.Record>) => void;
-  incrementParentVersion: () => void;
+  incrementVersion: () => void;
 };
 
 export type ApiRecordState = BaseRecordState & {
@@ -116,7 +116,7 @@ export const createRecordStore = (record: RQAPI.Record) => {
   return create<CollectionRecordState | ApiRecordState>()((set, get) => {
     const baseRecordState: BaseRecordState = {
       type: record.type,
-      parentVersion: 0,
+      version: 0,
       record,
       updateRecordState: (patch: Partial<RQAPI.Record>) => {
         const record = get().record;
@@ -124,10 +124,11 @@ export const createRecordStore = (record: RQAPI.Record) => {
         set({
           record: updatedRecord,
         } as RecordState);
+        get().incrementVersion();
       },
-      incrementParentVersion: () => {
+      incrementVersion: () => {
         set({
-          parentVersion: get().parentVersion + 1,
+          version: get().version + 1,
         });
       },
     };
@@ -214,6 +215,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
     triggerUpdateForChildren(id) {
       const { childParentMap, indexStore } = get();
+
       const allChildren = getAllChildren(id, childParentMap);
 
       allChildren.forEach((cid) => {
@@ -223,7 +225,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
           throw new NativeError("Record store does not exist!").addContext({ id: cid });
         }
 
-        recordStore.getState().incrementParentVersion();
+        recordStore.getState().incrementVersion();
       });
     },
 
@@ -247,11 +249,9 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
         throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
       }
 
-      const { record, updateRecordState } = recordStore.getState();
+      const { updateRecordState } = recordStore.getState();
       updateRecordState(patch);
-      if (patch.collectionId && record.collectionId !== patch.collectionId) {
-        get().triggerUpdateForChildren(patch.id);
-      }
+      get().triggerUpdateForChildren(patch.id);
     },
 
     updateRecords(patches) {
@@ -271,11 +271,9 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
             throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
           }
 
-          const { record, updateRecordState } = recordStore.getState();
+          const { updateRecordState } = recordStore.getState();
           updateRecordState(patch);
-          if (patch.collectionId && record.collectionId !== patch.collectionId) {
-            get().triggerUpdateForChildren(patch.id);
-          }
+          get().triggerUpdateForChildren(patch.id);
         }
       }
     },
