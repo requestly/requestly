@@ -1,13 +1,13 @@
 import { EnvironmentVariables, EnvironmentVariableType } from "backend/environment/types";
-import { ApiClientFeatureContext } from "./types";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { NativeError } from "errors/NativeError";
 
-export const setEnvironmentVariables = async (
+export const patchEnvironmentVariables = async (
   ctx: ApiClientFeatureContext,
-  params: { environmentId: string; variables: EnvironmentVariables }
+  params: { environmentId: string; patch: EnvironmentVariables }
 ) => {
   const { repositories, stores } = ctx;
-  const { environmentId, variables } = params;
+  const { environmentId, patch } = params;
 
   const env = stores.environments.getState().getEnvironment(environmentId);
 
@@ -16,7 +16,7 @@ export const setEnvironmentVariables = async (
   }
 
   const newVariablesWithSyncvalues: EnvironmentVariables = Object.fromEntries(
-    Object.entries(variables).map(([key, value], index) => {
+    Object.entries(patch).map(([key, value], index) => {
       const typeToSaveInDB =
         value.type === EnvironmentVariableType.Secret
           ? EnvironmentVariableType.Secret

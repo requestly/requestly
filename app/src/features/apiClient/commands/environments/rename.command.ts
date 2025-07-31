@@ -1,4 +1,4 @@
-import { ApiClientFeatureContext } from "./types";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 export const renameEnvironment = async (
   ctx: ApiClientFeatureContext,
@@ -8,5 +8,5 @@ export const renameEnvironment = async (
   const { environmentId, newName } = params;
 
   await repositories.environmentVariablesRepository.updateEnvironment(environmentId, { name: newName });
-  stores.environments.getState().update(environmentId, { name: newName });
+  stores.environments.getState().updateEnvironment(environmentId, { name: newName });
 };

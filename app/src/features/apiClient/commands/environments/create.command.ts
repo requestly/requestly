@@ -1,6 +1,11 @@
-import { ApiClientFeatureContext } from "./types";
+import { EnvironmentVariables } from "backend/environment/types";
+import { patchEnvironmentVariables } from "./patchEnvironmentVariables.command";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
-export const createEnvironment = async (ctx: ApiClientFeatureContext, params: { newEnvironmentName: string }) => {
+export const createEnvironment = async (
+  ctx: ApiClientFeatureContext,
+  params: { newEnvironmentName: string; variables?: EnvironmentVariables }
+) => {
   const { repositories, stores } = ctx;
   const { newEnvironmentName } = params;
 
@@ -9,5 +14,18 @@ export const createEnvironment = async (ctx: ApiClientFeatureContext, params: { 
   );
 
   stores.environments.getState().create({ id: newEnvironment.id, name: newEnvironment.name });
+
+  const environments = stores.environments.getState().environments;
+  if (environments.length === 1) {
+    stores.environments.getState().setActive(newEnvironment.id);
+  }
+
+  if (params.variables) {
+    await patchEnvironmentVariables(ctx, {
+      environmentId: newEnvironment.id,
+      patch: params.variables,
+    });
+  }
+
   return { id: newEnvironment.id, name: newEnvironment.name };
 };
