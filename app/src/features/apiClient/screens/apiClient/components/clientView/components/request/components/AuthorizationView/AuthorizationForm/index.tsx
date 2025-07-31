@@ -1,6 +1,5 @@
 import { Select } from "antd";
 import React from "react";
-import { EnvironmentVariables } from "backend/environment/types";
 import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
 import { useAuthFormState } from "./hooks/useAuthFormState";
@@ -9,13 +8,15 @@ import SingleLineEditor from "features/apiClient/screens/environment/components/
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
+import { ScopedVariables, useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
+  recordId: string;
   defaultAuthValues?: RQAPI.Auth;
   formData: AuthForm.FormField[];
   formType: AuthType;
   onChangeHandler: (config: AuthConfig<AuthType> | null) => void;
-  variables: EnvironmentVariables;
 }
 
 const addToOptions = {
@@ -24,13 +25,16 @@ const addToOptions = {
 };
 
 const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
+  recordId,
   defaultAuthValues,
   formData,
   formType,
   onChangeHandler,
-  variables,
 }: AuthorizationFormProps<AuthType>) => {
   const { formState, handleFormChange } = useAuthFormState(formType, onChangeHandler, defaultAuthValues);
+
+  const { version } = useApiRecordState(recordId);
+  const scopedVariables = useScopedVariables(recordId, version);
 
   return (
     <div className="form">
@@ -38,7 +42,7 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
         <div className="field-group" key={formField.id || index}>
           <label>{formField.label}</label>
           <div className="field">
-            {generateFields(formField, index, variables, formType, handleFormChange, formState)}
+            {generateFields(formField, index, scopedVariables, formType, handleFormChange, formState)}
           </div>
         </div>
       ))}
@@ -49,7 +53,7 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
 function generateFields(
   field: AuthForm.FormField,
   index: number,
-  currentEnvironmentVariables: EnvironmentVariables,
+  variables: ScopedVariables,
   formType: Authorization.Type,
   onChangeHandler: (value: string, id: string) => void,
   formState: Record<string, string>
@@ -76,7 +80,7 @@ function generateFields(
             placeholder={field.placeholder}
             defaultValue={formState[field.id]}
             onChange={(value) => onChangeHandler(value, field.id)}
-            variables={currentEnvironmentVariables}
+            variables={variables}
           />
           <Conditional
             condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}

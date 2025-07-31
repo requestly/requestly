@@ -6,17 +6,22 @@ import { RequestBodyContext, useTextBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
 import Editor from "componentsV2/CodeEditor";
 import { RequestContentType } from "features/apiClient/types";
+import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
+import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 export function RawBody(props: {
   contentType: RequestContentType;
-  environmentVariables: EnvironmentVariables;
+  recordId: string;
   setRequestEntry: RequestBodyProps["setRequestEntry"];
   editorOptions: React.ReactNode;
 }) {
-  const { environmentVariables, setRequestEntry, editorOptions, contentType } = props;
+  const { recordId, setRequestEntry, editorOptions, contentType } = props;
 
   const { requestBodyStateManager } = useContext(RequestBodyContext);
   const { text, setText } = useTextBody(requestBodyStateManager);
+
+  const { version } = useApiRecordState(recordId);
+  const scopedVariables = useScopedVariables(recordId, version);
 
   const handleTextChange = useDebounce(
     useCallback(
@@ -44,7 +49,7 @@ export function RawBody(props: {
         prettifyOnInit={false}
         isResizable={false}
         hideCharacterCount
-        envVariables={environmentVariables}
+        envVariables={scopedVariables}
         toolbarOptions={{ title: "", options: [editorOptions] }}
         analyticEventProperties={{ source: "api_client" }}
         showOptions={{
