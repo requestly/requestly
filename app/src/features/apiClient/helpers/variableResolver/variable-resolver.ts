@@ -166,14 +166,26 @@ export function resolveVariable(key: string, parents: string[], stores: AllApiCl
 }
 
 class VariableEventsManager {
-  private variableHolder: VariableHolder = new VariableHolder();
+  private variableHolder: VariableHolder;
   private map = new Map<
     VariableSource["scopeId"],
     {
       unsubscriber: (...args: any[]) => any[] | void;
     }
   >();
+
+  private resetVariableHolder(scopes: Scope[]) {
+    this.variableHolder = new VariableHolder();
+    readScopesIntoVariableHolder(
+      {
+        scopes,
+      },
+      this.variableHolder
+    );
+  }
+
   constructor(private readonly setScopedVariables: (variable: ScopedVariables) => void, scopes: Scope[]) {
+    this.resetVariableHolder(scopes);
     scopes.forEach((scope) => this.addScope(scope));
   }
 
@@ -202,13 +214,7 @@ class VariableEventsManager {
   }
 
   refresh(scopes: Scope[]) {
-    this.variableHolder = new VariableHolder();
-    readScopesIntoVariableHolder(
-      {
-        scopes,
-      },
-      this.variableHolder
-    );
+    this.resetVariableHolder(scopes);
     const newScopeIds = new Set(scopes.map((s) => s[0].scopeId));
     for (const scope of scopes) {
       if (!this.map.has(scope[0].scopeId)) {
