@@ -8,7 +8,6 @@ export const useGraphQLIntrospection = () => {
   const [url, setIntrospectionData] = useGraphQLRecordStore((state) => [
     state.record.data.request.url,
     state.setIntrospectionData,
-    state.introspectionData,
   ]);
   const appMode = useSelector(getAppMode);
 
@@ -28,6 +27,7 @@ export const useGraphQLIntrospection = () => {
       console.log("!!! Introspection Data:", introspectionData);
     } catch (error) {
       console.log("!!! Error fetching introspection data:", error);
+      setIntrospectionData(null);
       setIsIntrospectionDataFetchingFailed(true);
     } finally {
       setFetchingIntrospectionData(false);

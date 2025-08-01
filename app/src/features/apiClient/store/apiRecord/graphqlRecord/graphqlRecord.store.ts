@@ -1,11 +1,11 @@
 import { RQAPI } from "features/apiClient/types";
-import { GraphQLSchema } from "graphql";
 import { create } from "zustand";
 import { BaseApiRecordStoreState, createBaseApiRecordState } from "../base";
+import { IntrospectionData } from "features/apiClient/helpers/introspectionQuery";
 
 export type GraphQLRecordState = BaseApiRecordStoreState<RQAPI.GraphQLApiRecord> & {
-  introspectionData: any;
-  setIntrospectionData: (data: any) => void;
+  introspectionData: IntrospectionData | null;
+  setIntrospectionData: (data: IntrospectionData) => void;
 };
 
 export function createGraphQLRecordStore(record: RQAPI.GraphQLApiRecord) {

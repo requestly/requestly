@@ -19,8 +19,9 @@ const createGraphQLIntrospectionRequest = (url: string): RQAPI.GraphQLRequest =>
   };
 };
 
-// TODO return introspection data type
-export const fetchGraphQLIntrospectionData = async (url: string, appMode: string): Promise<any> => {
+export type IntrospectionData = Record<string, any>;
+
+export const fetchGraphQLIntrospectionData = async (url: string, appMode: string): Promise<IntrospectionData> => {
   const request = createGraphQLIntrospectionRequest(url);
   const httpRequest = graphQLRequestToHttpRequestAdapter(request);
   const response = await makeRequest(appMode, httpRequest);
