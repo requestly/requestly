@@ -12,6 +12,8 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
 import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/graphQLRequestexecutor";
+import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import { useDebounce } from "hooks/useDebounce";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -68,6 +70,20 @@ export const GraphQLClientView = ({ notifyApiRequestFinished, onSaveCallback, is
     },
     [updateRecordRequest]
   );
+
+  const {
+    introspectAndSaveSchema,
+    isIntrospectionDataFetchingFailed,
+    fetchingIntrospectionData,
+  } = useGraphQLIntrospection();
+
+  const debouncedIntrospection = useDebounce(introspectAndSaveSchema, 500);
+
+  useEffect(() => {
+    if (url) {
+      debouncedIntrospection();
+    }
+  }, [url, debouncedIntrospection]);
 
   // TEMP IMPLEMENTATION
   const handleSave = useCallback(async () => {
@@ -184,6 +200,8 @@ export const GraphQLClientView = ({ notifyApiRequestFinished, onSaveCallback, is
         currentEnvironmentVariables={currentEnvironmentVariables}
         onEnterPress={handleUrlInputEnterPressed}
         onUrlChange={handleUrlChange}
+        fetchingIntrospectionData={fetchingIntrospectionData}
+        isIntrospectionDataFetchingFailed={isIntrospectionDataFetchingFailed}
       />
       <OperationEditor />
       <VariablesEditor />
