@@ -9,6 +9,7 @@ import {
   ApiRecordsStoreContext,
 } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
+import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 
 type VariableSource = {
   scope: VariableScope;
@@ -29,6 +30,7 @@ type Scope = [VariableSource, StoreApi<VariablesState>];
  * not allow the collection to overwrite and will make sure that there's only one instance of 'baseUrl' and that
  * it is coming from the active environment.
  */
+
 export class VariableHolder {
   private data = new Map<number, ScopedVariables>();
   private isDestroyed = false;
@@ -230,14 +232,17 @@ class VariableEventsManager {
   }
 }
 
-export function useScopedVariables(id: string, parentVersion: number) {
+export function useScopedVariables(id: string) {
   const stores = useContext(ApiRecordsStoreContext);
   if (!stores) {
     throw new Error("Unable to locate stores!");
   }
+
+  const { version } = useApiRecordState(id);
+
   const { getParentChain } = stores.records.getState();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const parents = useMemo(() => getParentChain(id), [id, parentVersion]);
+  const parents = useMemo(() => getParentChain(id), [id, version]);
 
   const activeEnvironment = useActiveEnvironment();
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -9,7 +9,6 @@ import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables, useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 
 interface AuthorizationFormProps<AuthType extends AuthConfigMeta.AuthWithConfig> {
   recordId: string;
@@ -33,8 +32,7 @@ const AuthorizationForm = <AuthType extends AuthConfigMeta.AuthWithConfig>({
 }: AuthorizationFormProps<AuthType>) => {
   const { formState, handleFormChange } = useAuthFormState(formType, onChangeHandler, defaultAuthValues);
 
-  const { version } = useApiRecordState(recordId);
-  const scopedVariables = useScopedVariables(recordId, version);
+  const scopedVariables = useScopedVariables(recordId);
 
   return (
     <div className="form">

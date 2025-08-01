@@ -3,7 +3,6 @@ import { useCallback, useContext } from "react";
 import { RequestBodyContext, useFormBody } from "../request-body-state-manager";
 import { RequestBodyProps } from "../request-body-types";
 import { KeyValueTable } from "../components/KeyValueTable/KeyValueTable";
-import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 export function FormBody(props: { recordId: string; setRequestEntry: RequestBodyProps["setRequestEntry"] }) {
@@ -12,8 +11,7 @@ export function FormBody(props: { recordId: string; setRequestEntry: RequestBody
   const { requestBodyStateManager } = useContext(RequestBodyContext);
   const { formBody, setFormBody } = useFormBody(requestBodyStateManager);
 
-  const { version } = useApiRecordState(recordId);
-  const scopedVariables = useScopedVariables(recordId, version);
+  const scopedVariables = useScopedVariables(recordId);
 
   const handleFormChange = useCallback(
     (updatedPairs: KeyValuePair[]) => {
