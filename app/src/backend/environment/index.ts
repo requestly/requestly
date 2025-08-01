@@ -177,8 +177,11 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
     }
 
     return environmentDetails;
-  } catch (e) {
-    console.log("aaa", e);
+  } catch (error) {
+    if (error.code === "permission-denied") {
+      return {};
+    }
+    throw error;
   } finally {
     releaseLock();
   }
