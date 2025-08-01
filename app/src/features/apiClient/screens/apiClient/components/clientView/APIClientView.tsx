@@ -56,7 +56,7 @@ import { ApiClientUrl } from "./components/request/components/ApiClientUrl/ApiCl
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "./components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../constants";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
 import {
@@ -65,6 +65,12 @@ import {
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
+import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
+import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { useCommand } from "features/apiClient/commands";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { renderVariables } from "backend/environment/utils";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -116,24 +122,20 @@ const APIClientView: React.FC<Props> = ({
 
   const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
 
-  const environmentManager = useEnvironmentManager();
-  const {
-    getVariablesWithPrecedence,
-    setVariables,
-    setCollectionVariables,
-    getCurrentEnvironment,
-    getGlobalVariables,
-    getCollectionVariables,
-    getCurrentEnvironmentVariables,
-    renderVariables,
-    environmentSyncRepository,
-  } = environmentManager;
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(apiEntryDetails?.collectionId), [
-    apiEntryDetails?.collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const ctx = useApiClientFeatureContext();
 
-  const { version } = useParentApiRecord(apiEntryDetails?.id);
+  const [getActiveEnvironment] = useAPIEnvironment((s) => [s.getActiveEnvironment]);
+
+  const {
+    env: { patchEnvironmentVariables },
+    api: { patchCollectionVariables },
+  } = useCommand();
+
+  const { environmentVariablesRepository } = useApiClientRepository();
+
+  const scopedVariables = useScopedVariables(apiEntryDetails!.id!);
+
+  const { version: parentVersion } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.Entry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
   const [isFailed, setIsFailed] = useState(false);
@@ -260,37 +262,37 @@ const APIClientView: React.FC<Props> = ({
     async (state: any) => {
       for (const key in state) {
         if (key === "environment") {
-          const currentEnvironment = getCurrentEnvironment() as {
-            currentEnvironmentName?: string;
-            currentEnvironmentId?: string;
-          };
-          if (currentEnvironment.currentEnvironmentId) {
-            await setVariables(currentEnvironment.currentEnvironmentId, state[key]);
+          const activeEnvironment = getActiveEnvironment();
+          if (activeEnvironment) {
+            await patchEnvironmentVariables({ environmentId: activeEnvironment.id, patch: state[key] });
           }
         }
         if (key === "global") {
-          const globalEnvId = environmentSyncRepository.getGlobalEnvironmentId();
-          await setVariables(globalEnvId, state[key]);
+          const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
+          await patchEnvironmentVariables({ environmentId: globalEnvId, patch: state[key] });
         }
         if (key === "collectionVariables") {
-          await setCollectionVariables(state[key], apiEntryDetails?.collectionId);
+          await patchCollectionVariables({
+            collectionId: apiEntryDetails?.collectionId,
+            patch: state[key],
+          });
         }
       }
     },
     [
-      getCurrentEnvironment,
-      setVariables,
-      setCollectionVariables,
+      getActiveEnvironment,
+      patchEnvironmentVariables,
+      environmentVariablesRepository,
+      patchCollectionVariables,
       apiEntryDetails?.collectionId,
-      environmentSyncRepository,
     ]
   );
 
   const resolver = useCallback(
     <T extends Record<string, any>>(template: T) => {
-      return renderVariables(template, apiEntryDetails?.collectionId).result;
+      return renderVariables(template, apiEntryDetails.id, ctx).result;
     },
-    [renderVariables, apiEntryDetails?.collectionId]
+    [apiEntryDetails.id, ctx]
   );
 
   useEffect(() => {
@@ -327,7 +329,7 @@ const APIClientView: React.FC<Props> = ({
       queryParamsContent.push({ key, value });
     });
     purgeAndAdd(AutogeneratedFieldsNamespace.AUTH, headersContent, queryParamsContent);
-  }, [apiEntryDetails, getData, getParentChain, purgeAndAdd, resolver, version]);
+  }, [apiEntryDetails, getData, getParentChain, purgeAndAdd, resolver, parentVersion]);
 
   const onSendButtonClick = useCallback(async () => {
     // updateTab(apiEntryDetails?.id, { isPreview: false });
@@ -672,28 +674,19 @@ const APIClientView: React.FC<Props> = ({
 
   useEffect(() => {
     if (!apiClientExecutor) {
-      setApiClientExecutor(new ApiClientExecutor(appMode, apiClientWorkloadManager, autoGeneratedStore));
+      setApiClientExecutor(
+        new ApiClientExecutor(apiEntryDetails.id, ctx, appMode, apiClientWorkloadManager, autoGeneratedStore)
+      );
     }
-  }, [apiClientWorkloadManager, appMode, apiClientExecutor, autoGeneratedStore]);
+  }, [apiClientWorkloadManager, appMode, apiClientExecutor, autoGeneratedStore, apiEntryDetails.id, ctx]);
 
   useEffect(() => {
     if (apiClientExecutor) {
       apiClientExecutor.updateInternalFunctions({
-        getCollectionVariables,
-        getEnvironmentVariables: getCurrentEnvironmentVariables,
-        getGlobalVariables,
         postScriptExecutionCallback: handleUpdatesFromExecutionWorker,
-        renderVariables,
       });
     }
-  }, [
-    getCurrentEnvironmentVariables,
-    getCollectionVariables,
-    getGlobalVariables,
-    handleUpdatesFromExecutionWorker,
-    apiClientExecutor,
-    renderVariables,
-  ]);
+  }, [handleUpdatesFromExecutionWorker, apiClientExecutor]);
 
   const handleRevertChanges = () => {
     setEntry(apiEntryDetails?.data);
@@ -775,7 +768,7 @@ const APIClientView: React.FC<Props> = ({
                 url={entry.request.url}
                 onUrlChange={handleOnUrlChange}
                 onEnterPress={onUrlInputEnterPressed}
-                currentEnvironmentVariables={currentEnvironmentVariables}
+                currentEnvironmentVariables={scopedVariables}
               />
             </Space.Compact>
             <RQButton

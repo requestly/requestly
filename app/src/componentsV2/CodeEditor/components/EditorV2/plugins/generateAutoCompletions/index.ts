@@ -38,9 +38,6 @@ export function generateCompletionSource(
 
 // VARIABLE COMPLETIONS
 function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
-  if (!(envVariables instanceof Map)) {
-    return;
-  }
   const varCompletions = Array.from(envVariables.entries()).map(([envId, [variable, source]]) => {
     return {
       label: envId,
