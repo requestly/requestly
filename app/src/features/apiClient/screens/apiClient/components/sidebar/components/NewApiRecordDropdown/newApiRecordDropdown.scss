@@ -1,0 +1,39 @@
+.new-api-record-dropdown {
+  .ant-btn.ant-btn-default {
+    padding: var(--space-0, 0px) var(--space-5, 12px);
+    font-size: var(--requestly-font-size-xs);
+    line-height: var(--requestly-font-line-height-sm, 20px);
+    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+    &:hover {
+      background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+
+      svg,
+      img {
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    &:active {
+      border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    }
+
+    svg,
+    img {
+      flex-shrink: 0;
+      color: inherit;
+      width: 16px;
+      height: 16px;
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+}
+
+.new-api-record-dropdown-overlay {
+  li.ant-dropdown-menu-item {
+    svg.ant-dropdown-menu-item-icon {
+      width: 12px !important;
+    }
+  }
+}

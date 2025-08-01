@@ -1,29 +1,44 @@
 import React from "react";
-import { Input, Dropdown, Tooltip } from "antd";
-import type { MenuProps } from "antd";
-import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
+import { Input, Tooltip } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system-v2/components";
 import { BiSelectMultiple } from "@react-icons/all-files/bi/BiSelectMultiple";
+import { MdAddCircleOutline } from "@react-icons/all-files/md/MdAddCircleOutline";
+import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../NewApiRecordDropdown/NewApiRecordDropdown";
+import { RQAPI } from "features/apiClient/types";
 import "./sidebarListHeader.scss";
 
 interface ListHeaderProps {
   onSearch: (value: string) => void;
-  menuItems?: MenuProps["items"];
+  newRecordActionOptions: {
+    showNewRecordAction: boolean;
+    onNewRecordClick: (
+      src: RQAPI.AnalyticsEventSource,
+      recordType: RQAPI.RecordType,
+      collectionId?: string,
+      entryType?: RQAPI.ApiEntryType
+    ) => Promise<void>;
+  };
   multiSelectOptions?: {
     showMultiSelect: boolean;
     toggleMultiSelect: () => void;
   };
 }
 
-export const SidebarListHeader: React.FC<ListHeaderProps> = ({ onSearch, menuItems, multiSelectOptions }) => {
+export const SidebarListHeader: React.FC<ListHeaderProps> = ({
+  onSearch,
+  multiSelectOptions,
+  newRecordActionOptions,
+}) => {
   const { showMultiSelect = false, toggleMultiSelect } = multiSelectOptions || {};
+  const { showNewRecordAction, onNewRecordClick } = newRecordActionOptions || {};
 
   return (
     <div className="sidebar-list-header">
       {showMultiSelect && (
         <div className="multi-select-option">
           <Tooltip title={"Select items"}>
-            <BiSelectMultiple size={"18px"} onClick={toggleMultiSelect} />
+            <RQButton size="small" type="transparent" icon={<BiSelectMultiple />} onClick={toggleMultiSelect} />
           </Tooltip>
         </div>
       )}
@@ -34,11 +49,20 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({ onSearch, menuIte
         onChange={(e) => onSearch(e.target.value)}
         className="sidebar-list-header-search"
       />
-
-      {menuItems && (
-        <Dropdown menu={{ items: menuItems }} trigger={["click"]} placement="bottomRight">
-          <RQButton size="small" type="transparent" icon={<MoreOutlined />} className="sidebar-list-header-button" />
-        </Dropdown>
+      {showNewRecordAction && (
+        <NewApiRecordDropdown
+          invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+          onSelect={(params) => {
+            onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
+          }}
+        >
+          <RQButton
+            size="small"
+            type="transparent"
+            icon={<MdAddCircleOutline />}
+            className="sidebar-list-header-button"
+          />
+        </NewApiRecordDropdown>
       )}
     </div>
   );

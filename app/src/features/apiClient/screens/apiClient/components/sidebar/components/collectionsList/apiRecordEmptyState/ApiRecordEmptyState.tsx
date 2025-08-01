@@ -4,17 +4,15 @@ import { RQAPI } from "features/apiClient/types";
 
 interface Props extends EmptyStateProps {
   record?: RQAPI.ApiClientRecord;
-  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
+  onNewClick: (
+    src: RQAPI.AnalyticsEventSource,
+    recordType: RQAPI.RecordType,
+    collectionId?: string,
+    entryType?: RQAPI.ApiEntryType
+  ) => Promise<void>;
 }
 
-export const ApiRecordEmptyState: React.FC<Props> = ({
-  record,
-  disabled,
-  message,
-  newRecordBtnText,
-  analyticEventSource,
-  onNewClick,
-}) => {
+export const ApiRecordEmptyState: React.FC<Props> = ({ record, disabled, message, newRecordBtnText, onNewClick }) => {
   return (
     <div className="api-record-empty-state-container">
       <div className="empty-state-wrapper">
@@ -22,9 +20,9 @@ export const ApiRecordEmptyState: React.FC<Props> = ({
           disabled={disabled}
           message={message}
           newRecordBtnText={newRecordBtnText}
-          onNewRecordClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.COLLECTION, record?.id)}
-          onNewRequestClick={() => onNewClick("collection_list_empty_state", RQAPI.RecordType.API, record?.id)}
-          analyticEventSource={analyticEventSource}
+          onNewRecordClick={(recordType, entryType) =>
+            onNewClick("collection_list_empty_state", recordType, record?.id, entryType)
+          }
         />
       </div>
     </div>

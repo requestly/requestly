@@ -24,7 +24,7 @@ import { CollectionViewTabSource } from "../../../../views/components/Collection
 import { useDrag, useDrop } from "react-dnd";
 import "./CollectionRow.scss";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { NewApiRecordDropdown } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
+import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -330,6 +330,7 @@ export const CollectionRow: React.FC<Props> = ({
                       className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}
                     >
                       <NewApiRecordDropdown
+                        invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
                         onSelect={(params) => {
                           setActiveKey(record.id);
                           setCreateNewField(params.recordType);
@@ -378,7 +379,6 @@ export const CollectionRow: React.FC<Props> = ({
                     <ApiRecordEmptyState
                       record={record}
                       disabled={isReadOnly}
-                      analyticEventSource="collection_row"
                       message="No requests created yet"
                       newRecordBtnText="New collection"
                       onNewClick={onNewClick}
