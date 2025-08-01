@@ -4,12 +4,14 @@ import { create } from "zustand";
 import { BaseApiRecordStoreState, createBaseApiRecordState } from "../base";
 
 export type GraphQLRecordState = BaseApiRecordStoreState<RQAPI.GraphQLApiRecord> & {
-  schema: GraphQLSchema;
+  introspectionData: any;
+  setIntrospectionData: (data: any) => void;
 };
 
 export function createGraphQLRecordStore(record: RQAPI.GraphQLApiRecord) {
   return create<GraphQLRecordState>()((set, get) => ({
-    schema: null,
+    introspectionData: null,
+    setIntrospectionData: (data: any) => set({ introspectionData: data }),
     ...createBaseApiRecordState(record, set, get),
   }));
 }
