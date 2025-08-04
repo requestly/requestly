@@ -5,7 +5,7 @@ import * as Sentry from "@sentry/react";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../../types";
 import {
   getContentTypeFromResponseHeaders,
-  getEmptyAPIEntry,
+  getEmptyApiEntry,
   getEmptyPair,
   getRequestTypeForAnalyticEvent,
   parseRequestEntry,
@@ -131,7 +131,9 @@ const HttpClientView: React.FC<Props> = ({
 
   const { version } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
+    apiEntryDetails?.data ?? getEmptyApiEntry(RQAPI.ApiEntryType.HTTP)
+  );
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -168,7 +170,7 @@ const HttpClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+    setEntry(apiEntryDetails?.data ?? getEmptyApiEntry(RQAPI.ApiEntryType.HTTP));
   }, [apiEntryDetails?.data]);
 
   useLayoutEffect(() => {
