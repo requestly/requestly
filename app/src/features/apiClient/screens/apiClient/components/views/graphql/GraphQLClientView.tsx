@@ -11,7 +11,7 @@ import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
-import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/graphQLRequestexecutor";
+import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
