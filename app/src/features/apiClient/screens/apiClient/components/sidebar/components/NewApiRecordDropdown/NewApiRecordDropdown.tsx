@@ -20,27 +20,24 @@ export enum NewRecordDropdownItemType {
   ENVIRONMENT = "environment",
 }
 
-type DropdownProps =
+type NewRecordDropdownProps = {
+  onSelect: (params: OnSelectParams) => void;
+  disabled?: boolean;
+  className?: string;
+  overlayClassName?: string;
+  invalidActions?: NewRecordDropdownItemType[];
+} & (
   | {
-      onSelect: (params: OnSelectParams) => void;
       buttonProps?: DropdownButtonProps;
       children?: never;
-      disabled?: boolean;
-      className?: string;
-      overlayClassName?: string;
-      invalidActions?: NewRecordDropdownItemType[];
     }
   | {
-      onSelect: (params: OnSelectParams) => void;
       buttonProps?: never;
       children: React.ReactNode;
-      disabled?: boolean;
-      className?: string;
-      overlayClassName?: string;
-      invalidActions?: NewRecordDropdownItemType[];
-    };
+    }
+);
 
-export const NewApiRecordDropdown: React.FC<DropdownProps> = (props) => {
+export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) => {
   const { onSelect, buttonProps, children, disabled, invalidActions } = props;
 
   const allDropdownItems: DropDownProps["menu"]["items"] = useMemo(() => {
