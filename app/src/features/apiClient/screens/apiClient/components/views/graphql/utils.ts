@@ -54,12 +54,12 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
     headers: [
       ...request.headers,
       // Temp: Adding content type header for testing execution
-      {
-        id: 0,
-        isEnabled: true,
-        key: "Content-Type",
-        value: "application/json",
-      },
+      // {
+      //   id: 0,
+      //   isEnabled: true,
+      //   key: "Content-Type",
+      //   value: "application/json",
+      // },
     ],
     queryParams: [],
     body: stringifiedRequestBody,
