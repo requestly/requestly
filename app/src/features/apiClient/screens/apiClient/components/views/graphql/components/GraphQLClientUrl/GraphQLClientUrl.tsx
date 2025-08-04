@@ -3,8 +3,11 @@ import { EnvironmentVariableValue } from "backend/environment/types";
 
 import { ApiClientUrl } from "features/apiClient/screens/apiClient/components/views/components/request/components/ApiClientUrl/ApiClientUrl";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
-import { ImSpinner2 } from "@react-icons/all-files/im/ImSpinner2";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import { Spin, Tooltip } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
+import "./graphqlClientUrl.scss";
 
 interface GraphQLClientUrlProps {
   url: string;
@@ -23,25 +26,37 @@ const GraphQLClientUrl = ({
   fetchingIntrospectionData,
   isIntrospectionDataFetchingFailed,
 }: GraphQLClientUrlProps) => {
+  const [introspectionData] = useGraphQLRecordStore((state) => [state.introspectionData]);
+
   return (
-    <>
+    <div className="gql-url-container">
       <ApiClientUrl
         url={url}
         currentEnvironmentVariables={currentEnvironmentVariables}
         onEnterPress={onEnterPress}
         onUrlChange={onUrlChange}
       />
-      {fetchingIntrospectionData ? (
-        <>
-          <ImSpinner2 className="loading-spinner" />
-          <span>Fetching schema</span>
-        </>
-      ) : isIntrospectionDataFetchingFailed ? (
-        <MdOutlineWarningAmber />
-      ) : (
-        <MdOutlineCheckCircle style={{ color: "var(--requestly-color-success)" }} />
-      )}
-    </>
+      <div className="gql-url__fetch-status">
+        {fetchingIntrospectionData ? (
+          <div className="gql-url-container__loading">
+            <Spin indicator={<LoadingOutlined spin />} size="small" />
+            <span>Fetching schema</span>
+          </div>
+        ) : isIntrospectionDataFetchingFailed ? (
+          <Tooltip
+            color="#000"
+            title="Error while fetching the schema. The endpoint may not exist or misconfigured."
+            placement="top"
+          >
+            <MdOutlineWarningAmber className="gql-url__fetch-status-icon schema-failed" />
+          </Tooltip>
+        ) : introspectionData !== null ? (
+          <Tooltip title="Schema fetched successfully" placement="top" color="#000">
+            <MdOutlineCheckCircle className=" gql-url__fetch-status-icon schema-success" />
+          </Tooltip>
+        ) : null}
+      </div>
+    </div>
   );
 };
 
