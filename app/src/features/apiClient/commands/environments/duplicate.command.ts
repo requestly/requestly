@@ -20,10 +20,7 @@ export const duplicateEnvironment = async (ctx: ApiClientFeatureContext, params:
 
   const newEnvironment = await repositories.environmentVariablesRepository.duplicateEnvironment(environmentId, envsMap);
 
-  stores.environments.getState().create({ id: newEnvironment.id, name: newEnvironment.name });
   stores.environments
     .getState()
-    .getEnvironment(newEnvironment.id)!
-    .data.variables.getState()
-    .mergeAndUpdate(newEnvironment.variables);
+    .create({ id: newEnvironment.id, name: newEnvironment.name, variables: newEnvironment.variables });
 };

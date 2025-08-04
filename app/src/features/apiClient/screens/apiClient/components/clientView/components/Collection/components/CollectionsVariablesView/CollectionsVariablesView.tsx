@@ -32,7 +32,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const variables = Object.fromEntries(variablesMap.data);
 
   const {
-    api: { patchCollectionVariables },
+    api: { setCollectionVariables },
   } = useCommand();
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
@@ -66,10 +66,11 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
 
   const handleSaveVariables = async () => {
     setIsSaving(true);
+
     const variablesToSave = convertEnvironmentToMap(pendingVariables);
-    return patchCollectionVariables({
+    return setCollectionVariables({
       collectionId: collection.id,
-      patch: variablesToSave,
+      variables: variablesToSave,
     })
       .then(() => {
         toast.success("Variables updated successfully");

@@ -94,14 +94,23 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     variables: EnvironmentVariables
   ): Promise<{ success: boolean; data: unknown; message?: string }> {
     const record = await this.getCollection(id);
+
+    const variablesToSet = Object.fromEntries(
+      Object.entries(variables).map(([key, value]) => [
+        key,
+        { syncValue: value.syncValue, type: value.type, id: value.id },
+      ])
+    );
+
     const updatedRecord: RQAPI.CollectionRecord = {
       ...record.data,
       type: RQAPI.RecordType.COLLECTION,
       data: {
         ...record.data.data,
-        variables,
+        variables: variablesToSet,
       },
     };
+
     return this.updateRecord(updatedRecord, updatedRecord.id);
   }
 

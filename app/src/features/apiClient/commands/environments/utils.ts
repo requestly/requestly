@@ -1,4 +1,4 @@
-import { EnvironmentData } from "backend/environment/types";
+import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
 import {
   EnvironmentState,
   EnvironmentStore,
@@ -21,3 +21,22 @@ export const parseEnvironmentStore = (env: EnvironmentStore): EnvironmentData =>
 export const parseEnvironmentsStore = (envs: EnvironmentsState["environments"]): EnvironmentData[] => {
   return envs.map(parseEnvironmentStore);
 };
+
+/* id in the variable map represents order */
+export function createOrderedVariableMap(variableMap: EnvironmentVariables): EnvironmentVariables {
+  const result = Object.fromEntries(
+    Array.from(Object.entries(variableMap))
+      .sort(([_aIdx, aVal], [_bIdx, bVal]) => {
+        return aVal.id - bVal.id;
+      })
+      .map(([key, value], index) => {
+        const newValue = {
+          ...value,
+          id: index,
+        };
+
+        return [key, newValue];
+      })
+  );
+  return result;
+}

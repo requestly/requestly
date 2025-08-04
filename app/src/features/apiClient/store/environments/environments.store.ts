@@ -134,12 +134,18 @@ export const createEnvironmentsStore = ({
     },
 
     getEnvironment(id) {
-      const { environments } = get();
-      return environments.find((env) => env.getState().id === id)?.getState();
+      const { environments, globalEnvironment } = get();
+
+      const globalEnvState = globalEnvironment.getState();
+
+      const environmentState =
+        globalEnvState.id === id ? globalEnvState : environments.find((e) => e.getState().id === id)?.getState();
+
+      return environmentState;
     },
 
     getActiveEnvironment() {
-      return get().activeEnvironment?.getState();
+      return get().activeEnvironment?.getState() ?? null;
     },
 
     getAll() {

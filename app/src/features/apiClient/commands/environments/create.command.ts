@@ -1,6 +1,6 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { patchEnvironmentVariables } from "./patchEnvironmentVariables.command";
 import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { patchEnvironmentVariables } from "./patchEnvironmentVariables.command";
 
 export const createEnvironment = async (
   ctx: ApiClientFeatureContext,
@@ -23,7 +23,7 @@ export const createEnvironment = async (
   if (params.variables) {
     await patchEnvironmentVariables(ctx, {
       environmentId: newEnvironment.id,
-      patch: params.variables,
+      variables: params.variables,
     });
   }
 

@@ -22,7 +22,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const variablesMap = useVariableStore(environment.data.variables);
   const variablesData = Object.fromEntries(variablesMap.data);
   const {
-    env: { patchEnvironmentVariables },
+    env: { setEnvironmentVariables },
   } = useCommand();
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
@@ -75,7 +75,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
       setIsSaving(true);
 
       const variablesToSave = convertEnvironmentToMap(pendingVariables);
-      await patchEnvironmentVariables({ environmentId: envId, patch: variablesToSave });
+      await setEnvironmentVariables({ environmentId: envId, variables: variablesToSave });
 
       toast.success("Variables updated successfully");
       trackVariablesSaved({
@@ -85,6 +85,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
 
       resetChanges();
     } catch (error) {
+      console.error("Failed to update variables", error);
       toast.error("Failed to update variables");
     } finally {
       setIsSaving(false);

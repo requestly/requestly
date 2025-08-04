@@ -157,13 +157,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
         if (env.isGlobal) {
-          patchEnvironmentVariables({
+          await patchEnvironmentVariables({
             environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-            patch: env.variables,
+            variables: env.variables,
           });
           return true;
         } else {
-          createEnvironment({
+          await createEnvironment({
             newEnvironmentName: env.name,
             variables: env.variables,
           });

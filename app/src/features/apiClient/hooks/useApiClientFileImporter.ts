@@ -140,13 +140,14 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     [processors, importer, uid, apiClientRecordsRepository]
   );
 
+  const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
     try {
       const importPromises = environments.map(async (env) => {
         if (env.isGlobal) {
           await patchEnvironmentVariables({
-            environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
-            patch: env.variables,
+            environmentId: globalEnvId,
+            variables: env.variables,
           });
           return true;
         } else {
@@ -164,7 +165,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       Logger.error("Data import failed:", error);
       throw error;
     }
-  }, [createEnvironment, environments, patchEnvironmentVariables]);
+  }, [createEnvironment, environments, patchEnvironmentVariables, globalEnvId]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
