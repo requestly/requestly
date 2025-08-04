@@ -227,7 +227,8 @@ const APIClientView: React.FC<Props> = ({
           ...entry,
           request: {
             ...entry.request,
-            body: contentType === RequestContentType.FORM ? [] : "",
+            body:
+              contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM ? [] : "",
             contentType,
           },
         };
@@ -249,7 +250,7 @@ const APIClientView: React.FC<Props> = ({
 
         if (contentType === RequestContentType.JSON) {
           newEntry.request.body = "{}";
-        } else if (contentType === RequestContentType.FORM) {
+        } else if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
           newEntry.request.body = [];
         } else {
           newEntry.request.body = "";
