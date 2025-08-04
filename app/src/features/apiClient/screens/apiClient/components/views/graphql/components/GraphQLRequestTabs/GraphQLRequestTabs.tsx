@@ -2,6 +2,7 @@ import { RQAPI } from "features/apiClient/types";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import React, { useMemo } from "react";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
+import { QueryView } from "../QueryView/QueryView";
 
 enum GraphQLRequestTab {
   QUERY = "query",
@@ -20,7 +21,7 @@ export const GraphQLRequestTabs: React.FC<Props> = ({ requestId }) => {
       {
         key: GraphQLRequestTab.QUERY,
         label: <RequestTabLabel label="Query" />,
-        children: <div>Query</div>,
+        children: <QueryView />,
       },
       {
         key: GraphQLRequestTab.HEADERS,

@@ -9,6 +9,7 @@ export const VariablesEditor = () => {
   return (
     <GraphQLEditor
       type="variables"
+      className="variables-editor"
       initialDoc={variables}
       onChange={(value) => {
         updateRecordRequest({

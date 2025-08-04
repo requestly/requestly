@@ -20,8 +20,8 @@ import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClient
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useGenericState } from "hooks/useGenericState";
-import { BottomSheetLayout } from "componentsV2/BottomSheet";
 import "./gqClientView.scss";
+import { BottomSheetLayout } from "componentsV2/BottomSheet";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
 
