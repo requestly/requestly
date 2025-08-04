@@ -39,8 +39,8 @@ const MultipartFormRedirectScreen: React.FC = () => {
             </text>
           </div>
 
+          {/* FIXME: Replace inline styles */}
           <p
-            //FIXME: remove inline style
             style={{
               color: "var(--requestly-color-text-subtle)",
               textAlign: "center",
