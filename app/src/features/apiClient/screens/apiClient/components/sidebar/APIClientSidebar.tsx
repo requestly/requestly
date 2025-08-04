@@ -11,7 +11,7 @@ import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiC
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../modals";
-import { getEmptyAPIEntry } from "../../utils";
+import { getEmptyApiEntry } from "../../utils";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
 
@@ -142,7 +142,7 @@ const APIClientSidebar: React.FC<Props> = () => {
 
       try {
         // TODO: handle import for graphql requests
-        const apiEntry = getEmptyAPIEntry(RQAPI.ApiEntryType.HTTP, request);
+        const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, request);
 
         const record: Partial<RQAPI.ApiRecord> = {
           type: RQAPI.RecordType.API,
