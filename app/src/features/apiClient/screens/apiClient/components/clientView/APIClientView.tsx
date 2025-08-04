@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useContext } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState, useContext } from "react";
 import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
@@ -35,7 +35,6 @@ import "./apiClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -65,7 +64,6 @@ import {
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
-import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
@@ -275,17 +273,21 @@ const APIClientView: React.FC<Props> = ({
         if (key === "environment") {
           const activeEnvironment = getActiveEnvironment();
           if (activeEnvironment) {
-            await patchEnvironmentVariables({ environmentId: activeEnvironment.id, patch: state[key] });
+            await patchEnvironmentVariables({ environmentId: activeEnvironment.id, variables: state[key] });
           }
         }
         if (key === "global") {
           const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
-          await patchEnvironmentVariables({ environmentId: globalEnvId, patch: state[key] });
+          await patchEnvironmentVariables({ environmentId: globalEnvId, variables: state[key] });
         }
         if (key === "collectionVariables") {
+          if (!apiEntryDetails?.collectionId) {
+            return;
+          }
+
           await patchCollectionVariables({
             collectionId: apiEntryDetails?.collectionId,
-            patch: state[key],
+            variables: state[key],
           });
         }
       }

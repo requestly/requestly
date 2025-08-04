@@ -1,28 +1,39 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { NativeError } from "errors/NativeError";
-import { sanitizePatch } from "../utils";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { parseVariables } from "features/apiClient/store/variables/variables.store";
 
-export const patchEnvironmentVariables = async (
+export async function patchEnvironmentVariables(
   ctx: ApiClientFeatureContext,
-  params: { environmentId: string; patch: EnvironmentVariables }
-) => {
-  const { repositories, stores } = ctx;
-  const { environmentId, patch } = params;
-  const environmentStore = stores.environments.getState();
-  const globalEnv = environmentStore.globalEnvironment.getState();
+  params: { environmentId: string; variables: EnvironmentVariables }
+) {
+  const {
+    repositories: { environmentVariablesRepository },
+    stores: { environments },
+  } = ctx;
+  const environmentStore = environments.getState().getEnvironment(params.environmentId);
 
-  const env = globalEnv.id === environmentId ? globalEnv : stores.environments.getState().getEnvironment(environmentId);
+  if (!environmentStore) throw new NativeError("set only allowed on existing variable stores");
 
-  if (!env) {
-    throw new NativeError("Environment not found!").addContext({ environmentId });
-  }
+  const varStore = environmentStore.data.variables;
 
-  const newVariablesWithSyncvalues: EnvironmentVariables = sanitizePatch(patch);
+  const currentVariables = Object.fromEntries(varStore.getState().data.entries());
+  const rawNewVariables = params.variables;
 
-  await repositories.environmentVariablesRepository.updateEnvironment(environmentId, {
-    variables: newVariablesWithSyncvalues,
+  const finalVariables = { ...currentVariables };
+
+  let counter = Object.keys(currentVariables).length;
+  Object.keys(rawNewVariables).forEach((key) => {
+    // merge keys
+    if (finalVariables[key]) {
+      finalVariables[key] = { ...finalVariables[key], ...rawNewVariables[key], id: currentVariables[key].id };
+    } else {
+      // create new ids
+      finalVariables[key] = { ...rawNewVariables[key], id: counter };
+      counter++;
+    }
   });
 
-  env.data.variables.getState().mergeAndUpdate(newVariablesWithSyncvalues);
-};
+  await environmentVariablesRepository.updateEnvironment(params.environmentId, { variables: finalVariables });
+  varStore.getState().reset(parseVariables(finalVariables));
+}
