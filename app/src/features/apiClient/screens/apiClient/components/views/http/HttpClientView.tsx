@@ -3,7 +3,6 @@ import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../../types";
-import RequestTabs from "../components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
   getEmptyAPIEntry,
@@ -31,26 +30,21 @@ import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONTENT_TYPE_HEADER } from "../../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
-import "./httpClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
-import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
-import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { ApiClientSnippetModal } from "../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
-import PATHS from "config/constants/sub/paths";
-import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { INVALID_KEY_CHARACTERS } from "../../../../../constants";
@@ -65,6 +59,10 @@ import {
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
+import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
+import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
+import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
+import "./httpClientView.scss";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -106,11 +104,9 @@ const HttpClientView: React.FC<Props> = ({
   apiEntryDetails,
 }) => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
-  const isHistoryPath = location.pathname.includes("history");
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
 
@@ -158,7 +154,6 @@ const HttpClientView: React.FC<Props> = ({
     sanitizeEntry({ ...entryWithoutResponse, response: null })
   );
 
-  const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
   const [purgeAndAdd, purgeAndAddHeaders] = useAutogenerateStore((state) => [
     state.purgeAndAdd,
     state.purgeAndAddHeaders,
@@ -720,7 +715,7 @@ const HttpClientView: React.FC<Props> = ({
   const enableHotkey = getIsActive();
 
   return isExtensionEnabled ? (
-    <div className="api-client-view">
+    <div className="api-client-view http-client-view">
       <div className="api-client-header-container">
         <RoleBasedComponent
           permission="create"
@@ -736,43 +731,16 @@ const HttpClientView: React.FC<Props> = ({
         />
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
-            <Conditional condition={!openInModal}>
-              <RQBreadcrumb
-                placeholder="Untitled request"
-                recordName={apiEntryDetails?.name}
-                onRecordNameUpdate={setRequestName}
-                onBlur={handleRecordNameUpdate}
-                autoFocus={location.pathname.includes("new")}
-                defaultBreadcrumbs={[
-                  { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-                  {
-                    isEditable: !isHistoryPath,
-                    pathname: window.location.pathname,
-                    label: isHistoryPath ? "History" : apiEntryDetails?.name || "Untitled request",
-                  },
-                ]}
-              />
-            </Conditional>
-
-            <RQButton
-              type="transparent"
-              icon={<IoMdCode />}
-              size="small"
-              className="api-client-view_get-code-btn"
-              onClick={() => {
-                apiClientExecutor.updateEntryDetails({
-                  entry: sanitizeEntry(entry),
-                  recordId: apiEntryDetails?.id,
-                  collectionId: apiEntryDetails?.collectionId,
-                });
-                setIsSnippetModalVisible(true);
-              }}
-            >
-              Get client code
-            </RQButton>
+            <ApiClientBreadCrumb
+              openInModal={openInModal}
+              name={apiEntryDetails?.name}
+              OnRecordNameUpdate={setRequestName}
+              onBlur={handleRecordNameUpdate}
+            />
+            <ClientCodeButton apiClientExecutor={apiClientExecutor} />
           </div>
 
-          <div className="api-client-header">
+          <div className="api-client-header__url">
             <Space.Compact className="api-client-url-container">
               <Select
                 popupClassName="api-request-method-selector"
@@ -839,24 +807,16 @@ const HttpClientView: React.FC<Props> = ({
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">
-          <RequestTabs
-            key={apiEntryDetails?.id}
+          <HttpRequestTabs
+            requestEntry={entry}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
-            requestEntry={entry}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
             handleAuthChange={handleAuthChange}
           />
         </div>
       </BottomSheetLayout>
-      {isSnippetModalVisible ? (
-        <ApiClientSnippetModal
-          apiRequest={apiClientExecutor.prepareRequest()}
-          open={isSnippetModalVisible}
-          onClose={() => setIsSnippetModalVisible(false)}
-        />
-      ) : null}
     </div>
   ) : (
     <div className="w-full">

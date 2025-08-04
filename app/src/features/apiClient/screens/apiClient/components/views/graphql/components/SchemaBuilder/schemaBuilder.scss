@@ -1,0 +1,125 @@
+.schema-builder {
+  height: 100%;
+  overflow: hidden;
+
+  &__header {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-2xs, 9px);
+    font-weight: var(--requestly-font-weight-medium);
+    line-height: 13px;
+    letter-spacing: 1px;
+    padding: var(--space-3, 6px) var(--space-4, 8px);
+  }
+
+  &__content {
+    height: calc(100% - 25px);
+    overflow: hidden;
+    padding: var(--space-3, 6px) var(--space-5, 12px);
+
+    .schema-builder__arrow {
+      color: var(--requestly-color-text-subtle);
+      transform: scale(1.4);
+      position: relative;
+      top: 3px;
+    }
+
+    .schema-builder__checkbox {
+      .ant-checkbox-inner {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .docExplorerWrap {
+    width: 100% !important;
+    height: inherit !important;
+    overflow: auto !important;
+
+    .doc-explorer-title-bar {
+      display: none;
+    }
+
+    .doc-explorer-contents {
+      height: 100%;
+      font-size: var(--requestly-font-size-sm);
+
+      .graphiql-operation-title-bar {
+        span {
+          input {
+            width: 150px !important;
+            height: 24px !important;
+            border-radius: 4px;
+            border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+            padding: var(--space-3, 6px) var(--space-4, 8px);
+          }
+        }
+      }
+
+      .toolbar-button {
+        display: none !important;
+      }
+
+      .graphiql-explorer-node {
+        margin-top: 6px;
+
+        input[type="text"] {
+          width: 150px !important;
+          height: 24px !important;
+          border-radius: 4px;
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+          padding: var(--space-3, 6px) var(--space-4, 8px);
+        }
+
+        span {
+          gap: 8px;
+        }
+        .graphiql-explorer-graphql-arguments {
+          margin-top: 6px;
+          .ant-checkbox-wrapper {
+            margin-right: 8px;
+          }
+          input[type="text"] {
+            margin-left: 8px;
+          }
+
+          svg {
+            top: unset;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styling to make field types more visible
+.graphiql-explorer-root {
+  .graphiql-explorer-node {
+    span[data-field-type] {
+      position: relative;
+
+      &::after {
+        content: " " attr(data-field-type) "";
+        font-family: "Roboto Mono", monospace;
+        color: var(--requestly-color-text-placeholder);
+        font-size: var(--requestly-font-size-xs, 11px);
+        margin-left: 4px;
+        letter-spacing: 0.25px;
+      }
+    }
+  }
+
+  .graphiql-explorer-graphql-arguments {
+    div[data-arg-type] {
+      &::after {
+        content: " " attr(data-arg-type) "";
+        font-family: "Roboto Mono", monospace;
+        color: var(--requestly-color-text-placeholder);
+        font-size: var(--requestly-font-size-xs, 11px);
+        margin-left: 4px;
+        letter-spacing: 0.25px;
+      }
+    }
+  }
+}
