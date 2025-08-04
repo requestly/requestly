@@ -1,4 +1,4 @@
-import { ButtonProps, Dropdown, DropDownProps } from "antd";
+import { Dropdown, DropDownProps } from "antd";
 import React, { useMemo } from "react";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
@@ -7,6 +7,7 @@ import { RQAPI } from "features/apiClient/types";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import "./newApiRecordDropdown.scss";
+import { DropdownButtonProps } from "antd/lib/dropdown";
 
 type OnSelectParams =
   | { recordType: RQAPI.RecordType.API; entryType: RQAPI.ApiEntryType }
@@ -22,7 +23,7 @@ export enum NewRecordDropdownItemType {
 type DropdownProps =
   | {
       onSelect: (params: OnSelectParams) => void;
-      buttonProps?: ButtonProps;
+      buttonProps?: DropdownButtonProps;
       children?: never;
       disabled?: boolean;
       className?: string;
@@ -113,7 +114,7 @@ export const NewApiRecordDropdown: React.FC<DropdownProps> = (props) => {
       }}
       menu={{ items: dropdownItems }}
     >
-      New Request
+      {buttonProps?.children || "New Request"}
     </Dropdown.Button>
   );
 };
