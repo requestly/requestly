@@ -6,6 +6,7 @@ import SingleLineEditor from "features/apiClient/screens/environment/components/
 import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -29,7 +30,7 @@ interface EditableCellProps {
   editable: boolean;
   dataIndex: keyof KeyValuePair;
   record: KeyValuePair;
-  variables: EnvironmentVariables;
+  variables: ScopedVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
   checkInvalidCharacter: boolean;
 }
@@ -74,7 +75,7 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
           />
         ) : (
           <div
-            className={`key-value-input-container 
+            className={`key-value-input-container
           ${
             INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
               ? "error-state"

@@ -53,8 +53,6 @@ const RequestTabs: React.FC<Props> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
   const isApiClientScripts = useFeatureIsOn("api-client-scripts");
-  const { getVariablesWithPrecedence } = useEnvironmentManager();
-  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
@@ -78,7 +76,7 @@ const RequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.QUERY_PARAMS,
         label: <LabelWithCount label="Query Params" count={queryParams.length} />,
-        children: <QueryParamsTable variables={variables} setRequestEntry={setRequestEntry} />,
+        children: <QueryParamsTable recordId={requestId} setRequestEntry={setRequestEntry} />,
       },
       {
         key: RequestTab.BODY,
@@ -88,20 +86,20 @@ const RequestTabs: React.FC<Props> = ({
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
             mode="multiple"
+            recordId={requestId}
             bodyContainer={requestEntry.request.bodyContainer}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
-            variables={variables}
           />
         ) : (
           <RequestBody
             mode="single"
+            recordId={requestId}
             body={requestEntry.request.body}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
-            variables={variables}
           />
         ),
         disabled: !isRequestBodySupported,
@@ -110,11 +108,7 @@ const RequestTabs: React.FC<Props> = ({
         key: RequestTab.HEADERS,
         label: <LabelWithCount label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
-          <HeadersTable
-            headers={requestEntry.request.headers}
-            variables={variables}
-            setRequestEntry={setRequestEntry}
-          />
+          <HeadersTable recordId={requestId} headers={requestEntry.request.headers} setRequestEntry={setRequestEntry} />
         ),
       },
       {
@@ -122,10 +116,10 @@ const RequestTabs: React.FC<Props> = ({
         label: <LabelWithCount label="Authorization" />,
         children: (
           <AuthorizationView
+            recordId={requestId}
             defaults={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
             isRootLevelRecord={!collectionId}
-            variables={variables}
           />
         ),
       },
@@ -147,14 +141,20 @@ const RequestTabs: React.FC<Props> = ({
 
     return items;
   }, [
-    requestEntry,
+    requestEntry.request.method,
+    requestEntry.request.body,
+    requestEntry.request.bodyContainer,
+    requestEntry.request.contentType,
+    requestEntry.request.headers,
+    requestEntry.auth,
+    requestEntry.scripts,
+    isApiClientScripts,
+    queryParams.length,
+    requestId,
     setRequestEntry,
     setContentType,
-    isApiClientScripts,
-    variables,
     handleAuthChange,
     collectionId,
-    queryParams.length,
   ]);
 
   return (

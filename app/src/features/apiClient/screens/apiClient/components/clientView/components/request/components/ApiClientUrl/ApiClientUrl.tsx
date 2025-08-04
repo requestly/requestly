@@ -1,4 +1,4 @@
-import { EnvironmentVariableValue } from "backend/environment/types";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { extractQueryParams, queryParamsToURLString } from "features/apiClient/screens/apiClient/utils";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
@@ -7,7 +7,7 @@ import { useCallback } from "react";
 
 interface ApiClientUrlProps {
   url: string;
-  currentEnvironmentVariables: Record<string, EnvironmentVariableValue>;
+  currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
 }

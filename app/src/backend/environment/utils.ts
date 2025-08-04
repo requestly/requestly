@@ -2,11 +2,33 @@ import { compile } from "handlebars";
 import { EnvironmentVariables, EnvironmentVariableValue } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
+import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { getScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
   renderedTemplate: T;
   usedVariables: Record<string, unknown>;
+}
+
+export function renderVariables<T extends string | Record<string, any>>(
+  template: T,
+  recordId: string,
+  ctx: ApiClientFeatureContext
+): {
+  renderedVariables?: Record<string, unknown>;
+  result: T;
+} {
+  const parents = getApiClientRecordsStore(ctx).getState().getParentChain(recordId);
+  const variables = Object.fromEntries(
+    Array.from(getScopedVariables(parents, ctx.stores)).map(([key, [variable, _]]) => {
+      return [key, variable];
+    })
+  );
+
+  const { renderedTemplate, renderedVariables } = renderTemplate(template, variables);
+  return { renderedVariables, result: renderedTemplate };
 }
 
 export const renderTemplate = <T extends string | Record<string, T>>(
