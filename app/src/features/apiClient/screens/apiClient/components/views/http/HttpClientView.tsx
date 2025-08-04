@@ -45,7 +45,6 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useLocation } from "react-router-dom";
 import { useHasUnsavedChanges } from "hooks";
-import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/HttpRequestExecutor";
 import { ApiClientSnippetModal } from "../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
@@ -65,6 +64,7 @@ import {
 } from "features/apiClient/store/autogenerateStore";
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
+import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -135,7 +135,9 @@ const HttpClientView: React.FC<Props> = ({
 
   const { version } = useParentApiRecord(apiEntryDetails?.id);
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
-  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(apiEntryDetails?.data ?? getEmptyAPIEntry());
+  const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
+    apiEntryDetails?.data ?? (getEmptyAPIEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry)
+  );
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -152,7 +154,9 @@ const HttpClientView: React.FC<Props> = ({
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
-  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(sanitizeEntry(entryWithoutResponse));
+  const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(
+    sanitizeEntry({ ...entryWithoutResponse, response: null })
+  );
 
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
   const [purgeAndAdd, purgeAndAddHeaders] = useAutogenerateStore((state) => [
@@ -173,7 +177,7 @@ const HttpClientView: React.FC<Props> = ({
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
-    setEntry(apiEntryDetails?.data ?? getEmptyAPIEntry());
+    setEntry(apiEntryDetails?.data ?? (getEmptyAPIEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry));
   }, [apiEntryDetails?.data]);
 
   useLayoutEffect(() => {
@@ -384,8 +388,8 @@ const HttpClientView: React.FC<Props> = ({
     try {
       const apiClientExecutionResult = await apiClientExecutor.execute();
 
-      const { executedEntry } = apiClientExecutionResult;
-      const entryWithResponse: RQAPI.Entry = {
+      const executedEntry = apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry;
+      const entryWithResponse: RQAPI.HttpApiEntry = {
         ...entry,
         response: executedEntry.response,
         testResults: executedEntry.testResults,
@@ -491,7 +495,7 @@ const HttpClientView: React.FC<Props> = ({
       return;
     }
 
-    const record: Partial<RQAPI.ApiRecord> = {
+    const record: Partial<RQAPI.HttpApiRecord> = {
       type: RQAPI.RecordType.API,
       data: { ...entry },
     };
@@ -511,7 +515,11 @@ const HttpClientView: React.FC<Props> = ({
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       setTitle(requestName);
-      const savedRecord = { ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } };
+      const savedRecord: RQAPI.HttpApiRecord = {
+        ...(apiEntryDetails ?? {}),
+        ...result.data,
+        data: { ...result.data.data, ...record.data },
+      };
       onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
       setRequestName("");
@@ -578,18 +586,20 @@ const HttpClientView: React.FC<Props> = ({
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
+      const httpApiEntry = result.data as RQAPI.HttpApiRecord;
+
       onSaveRecord({ ...(apiEntryDetails ?? {}), ...result.data, data: { ...result.data.data, ...record.data } });
 
-      setEntry({ ...result.data.data, response: entry.response, testResults: entry.testResults });
+      setEntry({ ...httpApiEntry.data, response: entry.response, testResults: entry.testResults });
       const { response, testResults, ...resultWithoutResponse } = result.data.data;
-      resetChanges(resultWithoutResponse);
+      resetChanges({ ...(resultWithoutResponse as RQAPI.HttpApiEntry), response: null });
       trackRequestSaved({
         src: "api_client_view",
         has_scripts: Boolean(entry.scripts?.preRequest),
         auth_type: entry?.auth?.currentAuthType,
       });
       if (isCreateMode) {
-        onSaveCallback(result.data);
+        onSaveCallback(httpApiEntry);
       }
       toast.success("Request saved!");
     } else {
