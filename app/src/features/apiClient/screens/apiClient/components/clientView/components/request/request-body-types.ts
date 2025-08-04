@@ -1,9 +1,8 @@
-import { EnvironmentVariables } from "backend/environment/types";
 import { RQAPI, RequestContentType } from "../../../../../../types";
 
 export type RequestBodyProps = {
   contentType: RequestContentType;
-  variables: EnvironmentVariables;
+  recordId: string;
   setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
   setContentType: (contentType: RequestContentType) => void;
 } & /**

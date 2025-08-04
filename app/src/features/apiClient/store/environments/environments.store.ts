@@ -35,6 +35,7 @@ export type EnvironmentsState = {
   ) => EnvironmentState[];
   updateEnvironment: (id: string, updates: Pick<EnvironmentState, "name">) => void;
   getEnvironment: (id: string) => EnvironmentState | undefined;
+  getActiveEnvironment: () => EnvironmentState | null;
   getAll: () => EnvironmentState[];
   getAllEnvironmentStores: () => EnvironmentStore[];
   setActive: (id?: string) => void;
@@ -135,6 +136,10 @@ export const createEnvironmentsStore = ({
     getEnvironment(id) {
       const { environments } = get();
       return environments.find((env) => env.getState().id === id)?.getState();
+    },
+
+    getActiveEnvironment() {
+      return get().activeEnvironment?.getState();
     },
 
     getAll() {

@@ -44,7 +44,7 @@ function parseSingleModeBody(params: {
 }
 
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
-  const { contentType, variables, setRequestEntry, setContentType } = props;
+  const { contentType, recordId, setRequestEntry, setContentType } = props;
 
   const requestBodyStateManager = useMemo(
     () =>
@@ -100,19 +100,19 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         return (
           <RawBody
             contentType={contentType}
-            environmentVariables={variables}
+            recordId={recordId}
             setRequestEntry={setRequestEntry}
             editorOptions={requestBodyOptions}
           />
         );
 
       case RequestContentType.FORM:
-        return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
+        return <FormBody recordId={recordId} setRequestEntry={setRequestEntry} />;
 
       default:
         return null;
     }
-  }, [contentType, variables, setRequestEntry, requestBodyOptions]);
+  }, [contentType, recordId, setRequestEntry, requestBodyOptions]);
 
   /*
   In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,

@@ -20,7 +20,6 @@ import { toast } from "utils/Toast";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
-import { EnvironmentVariables } from "backend/environment/types";
 import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
 import { VariablePopover } from "./components/VariablePopOver";
 import "./editor.scss";
@@ -28,6 +27,7 @@ import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -39,7 +39,7 @@ interface EditorProps {
   hideCharacterCount?: boolean;
   handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
-  envVariables?: EnvironmentVariables;
+  envVariables?: ScopedVariables;
   analyticEventProperties?: AnalyticEventProperties;
   showOptions?: {
     enablePrettify?: boolean;

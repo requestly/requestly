@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHasUnsavedChanges } from "hooks";
 import AuthorizationView from "../../../request/components/AuthorizationView";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
@@ -32,10 +31,6 @@ const CollectionAuthorizationView: React.FC<Props> = ({
   const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
   const [isSaving, setIsSaving] = useState(false);
   const { setPreview, setUnsaved, getIsActive } = useGenericState();
-
-  const { getVariablesWithPrecedence } = useEnvironmentManager();
-  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
-
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);
 
   const isActiveTab = getIsActive();
@@ -84,7 +79,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({
       defaults={authOptionsState}
       onAuthUpdate={setAuthOptionsState}
       isRootLevelRecord={rootLevelRecord}
-      variables={variables}
+      recordId={collectionId}
       authorizationViewActions={<AuthorizationViewActions />}
     />
   );
