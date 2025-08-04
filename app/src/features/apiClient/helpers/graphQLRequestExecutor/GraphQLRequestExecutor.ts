@@ -1,4 +1,4 @@
-import { HttpRequestExecutor } from "../httpRequestExecutor/HttpRequestExecutor";
+import { HttpRequestExecutor } from "../httpRequestExecutor/httpRequestExecutor";
 import { RQAPI } from "../../types";
 import {
   graphQLEntryToHttpEntryAdapter,
