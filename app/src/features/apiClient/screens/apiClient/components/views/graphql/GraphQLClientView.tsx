@@ -11,7 +11,7 @@ import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
-import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/graphQLRequestexecutor";
+import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 import { useDebounce } from "hooks/useDebounce";
 
