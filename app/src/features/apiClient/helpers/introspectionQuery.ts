@@ -7,12 +7,12 @@ const createGraphQLIntrospectionRequest = (url: string): RQAPI.GraphQLRequest =>
   return {
     url,
     headers: [
-      // {
-      //   id: 0,
-      //   isEnabled: true,
-      //   key: "Content-Type",
-      //   value: "application/json",
-      // },
+      {
+        id: 0,
+        isEnabled: true,
+        key: "Content-Type",
+        value: "application/json",
+      },
     ],
     operation: getIntrospectionQuery(),
     variables: "",
