@@ -1,7 +1,7 @@
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { RQAPI } from "features/apiClient/types";
 import GraphQLClientUrl from "./components/GraphQLClientUrl/GraphQLClientUrl";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQButton } from "lib/design-system-v2/components";
 import { useApiClientContext } from "features/apiClient/contexts";
@@ -20,10 +20,11 @@ import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClient
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useGenericState } from "hooks/useGenericState";
-import "./gqClientView.scss";
-import { BottomSheetLayout } from "componentsV2/BottomSheet";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
+import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
+import "./gqClientView.scss";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -39,20 +40,26 @@ export const GraphQLClientView: React.FC<Props> = ({
   openInModal = false,
 }) => {
   const [
+    recordId,
     url,
     collectionId,
+    response,
     updateRecordRequest,
     updateRecord,
     getRecord,
     getRecordName,
   ] = useGraphQLRecordStore((state) => [
+    state.record.id,
     state.record.data.request.url,
     state.record.collectionId,
+    state.record.data.response,
     state.updateRecordRequest,
     state.updateRecord,
     state.getRecord,
     state.getRecordName,
   ]);
+
+  const { sheetPlacement, toggleSheetPlacement } = useBottomSheetContext();
 
   const { getVariablesWithPrecedence } = useEnvironmentManager();
 
@@ -69,6 +76,9 @@ export const GraphQLClientView: React.FC<Props> = ({
   // const [isSending, setIsSending] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [apiClientExecutor] = useState<ApiClientExecutor | null>(null);
+  // const [isRequestCancelled, setIsRequestCancelled] = useState(false);
+  const [error] = useState<RQAPI.ExecutionError | undefined>(undefined);
+  const [warning] = useState<RQAPI.ExecutionWarning | undefined>(undefined);
 
   const originalRecord = useRef(getRecord().data);
 
@@ -204,6 +214,17 @@ export const GraphQLClientView: React.FC<Props> = ({
     updateRecord(originalRecord.current);
   };
 
+  const isDefaultPlacementRef = useRef(false);
+  useLayoutEffect(() => {
+    if (isDefaultPlacementRef.current) {
+      return;
+    }
+
+    isDefaultPlacementRef.current = true;
+    const bottomSheetPlacement = window.innerWidth < 1600 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+    toggleSheetPlacement(bottomSheetPlacement);
+  }, [toggleSheetPlacement]);
+
   return (
     <div className="api-client-view gql-client-view">
       <div className="api-client-header-container">
@@ -269,9 +290,30 @@ export const GraphQLClientView: React.FC<Props> = ({
           </div>
         </div>
       </div>
-      <BottomSheetLayout layout={SheetLayout.SPLIT} bottomSheet={<div>Bottom Sheet</div>}>
+      {/* TODO: update props when integrating execution adapter */}
+      <BottomSheetLayout
+        layout={SheetLayout.SPLIT}
+        bottomSheet={
+          <ApiClientBottomSheet
+            key={recordId}
+            response={response}
+            testResults={[]}
+            isLoading={false}
+            isFailed={false}
+            isRequestCancelled={false}
+            onCancelRequest={() => {}}
+            handleTestResultRefresh={() => Promise.resolve()}
+            error={error}
+            onDismissError={() => {}}
+            warning={warning}
+            executeRequest={() => Promise.resolve()}
+          />
+        }
+        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
+        initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [60, 40]}
+      >
         <div className="api-client-body">
-          <GraphQLRequestTabs requestId={getRecord().id} />
+          <GraphQLRequestTabs requestId={recordId} variables={currentEnvironmentVariables} />
         </div>
       </BottomSheetLayout>
     </div>
