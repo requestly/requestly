@@ -3,7 +3,6 @@ import { notification, Select, Space } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../../types";
-import RequestTabs from "../components/request/components/RequestTabs/RequestTabs";
 import {
   getContentTypeFromResponseHeaders,
   getEmptyApiEntry,
@@ -31,7 +30,6 @@ import { getAppMode, getIsExtensionEnabled } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { CONTENT_TYPE_HEADER } from "../../../../../constants";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
-import "./httpClientView.scss";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { isDesktopMode } from "utils/AppUtils";
@@ -63,6 +61,7 @@ import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
+import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
@@ -800,11 +799,10 @@ const HttpClientView: React.FC<Props> = ({
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">
-          <RequestTabs
-            key={apiEntryDetails?.id}
+          <HttpRequestTabs
+            requestEntry={entry}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
-            requestEntry={entry}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
             handleAuthChange={handleAuthChange}

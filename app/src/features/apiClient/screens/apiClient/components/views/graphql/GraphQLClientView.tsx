@@ -20,7 +20,10 @@ import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClient
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useGenericState } from "hooks/useGenericState";
+import { BottomSheetLayout } from "componentsV2/BottomSheet";
 import "./gqClientView.scss";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -266,6 +269,11 @@ export const GraphQLClientView: React.FC<Props> = ({
           </div>
         </div>
       </div>
+      <BottomSheetLayout layout={SheetLayout.SPLIT} bottomSheet={<div>Bottom Sheet</div>}>
+        <div className="api-client-body">
+          <GraphQLRequestTabs requestId={getRecord().id} />
+        </div>
+      </BottomSheetLayout>
     </div>
   );
 };
