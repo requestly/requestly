@@ -7,7 +7,7 @@ import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { FaRegFileLines } from "@react-icons/all-files/fa6/FaRegFileLines";
 import { BiError } from "@react-icons/all-files/bi/BiError";
 import "./FileDropdown.scss";
-import { formatBytes, truncateString } from "features/apiClient/screens/apiClient/utils";
+import { formatBytes, getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import InfoIcon from "components/misc/InfoIcon";
 import { RQAPI } from "features/apiClient/types";
 import { HUNDERED_MB_IN_BYTE } from "features/apiClient/constants";
@@ -42,8 +42,8 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
           <div className="file-dropdown-item-container" key={file.id}>
             <div className="file-info">
               {file.isFileValid ? <FaRegFileLines className="file-icon" /> : <BiError className="invalid-icon" />}
-              <span className={`file-name ${file.isFileValid ? "" : "file-invalid"}`} title={file.name}>
-                {truncateString(file.name, 150)}
+              <span className={`file-name ${file.isFileValid ? "" : "file-invalid"}`}>
+                {truncateString(file.name, 20)} <span className="file-extension">{getFileExtension(file.name)}</span>
               </span>
             </div>
             <div className="file-details">

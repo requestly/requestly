@@ -43,6 +43,11 @@
         white-space: nowrap;
         font-size: var(--requestly-font-size-sm);
 
+        .file-extension {
+          position: relative;
+          left: -2px;
+        }
+
         &.file-invalid {
           color: var(--requestly-color-error-soft);
         }
@@ -52,7 +57,7 @@
     .file-details {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 24px;
 
       .file-size {
         font-size: var(--requestly-font-size-sm);

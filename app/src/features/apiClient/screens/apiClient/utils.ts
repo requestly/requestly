@@ -629,6 +629,10 @@ export const getRequestTypeForAnalyticEvent = (
   return "custom";
 };
 
+export const getFileExtension = (fileName: string) => {
+  const extension = fileName.includes(".") ? fileName.slice(fileName.lastIndexOf(".")) : "";
+  return extension;
+};
 export const formatBytes = (bytes: number) => {
   if (bytes === 0) return "0 B";
   const k = 1024;
@@ -639,10 +643,11 @@ export const formatBytes = (bytes: number) => {
 };
 
 export const truncateString = (str: string, maxLength: number) => {
-  if (str.length > maxLength) {
-    return str.slice(0, maxLength) + "...";
+  const nameWithoutExtension = str.includes(".") ? str.slice(0, str.lastIndexOf(".")) : str;
+  if (nameWithoutExtension.length > maxLength) {
+    return nameWithoutExtension.slice(0, maxLength) + "...";
   } else {
-    return str;
+    return nameWithoutExtension;
   }
 };
 
