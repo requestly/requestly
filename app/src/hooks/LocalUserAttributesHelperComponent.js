@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import { getUserAttributes } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import useGrowthBookIntegration, { GrowthbookExperimentHelperComponent } from "./useGrowthbookIntegration";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
 
 const LocalUserAttributesHelperComponent = () => {
   const dispatch = useDispatch();
@@ -17,6 +19,8 @@ const LocalUserAttributesHelperComponent = () => {
     if (!userAttributes?.deviceId) {
       const deviceId = uuidv4();
       stableDispatch(globalActions.updateUserAttributes({ deviceId }));
+    } else {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.CUSTOM_DEVICE_ID, userAttributes?.deviceId);
     }
   }, [userAttributes?.deviceId, stableDispatch]);
 
