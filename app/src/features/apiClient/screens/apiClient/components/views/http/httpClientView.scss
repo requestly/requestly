@@ -38,67 +38,15 @@
   }
 }
 
-.api-client-view {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  background-color: var(--requestly-color-background);
-
-  .api-client-header-container {
-    position: sticky;
-    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-
-    &__header {
-      padding: var(--space-5, 12px) var(--space-6, 16px);
-    }
-
-    .api-client-breadcrumb-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: var(--space-5, 12px);
-
-      .rq-breadcrumb {
-        margin: 0;
-      }
-
-      .api-client-view_get-code-btn {
-        color: var(--requestly-color-text-subtle);
-
-        &:hover {
-          color: var(--requestly-color-text-default);
-        }
-      }
-    }
-  }
-
-  .api-client-body {
-    position: sticky;
-    overflow: hidden;
-
-    .ant-tabs {
-      .ant-tabs-nav-wrap {
-        padding: 0 16px;
-        .ant-tabs-tab {
-          padding: 6px 4px;
-        }
-      }
-    }
-  }
-
-  .api-client-header {
-    flex: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
+.http-client-view {
+  // HEADER URL AND METHOD SELECTOR
+  .api-client-header__url {
     .api-client-url-container {
-      display: flex;
-      flex: auto;
-      height: 32px;
-      width: calc(100% - 205px);
-      font-size: var(--requestly-font-size-sm, 12px);
+      .api-request-url {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+      }
 
       .api-request-method-selector {
         width: 100px;
@@ -115,183 +63,16 @@
         }
       }
 
-      .api-request-url {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        padding: 4px 8px;
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-left: none;
-        font-size: var(--requestly-font-size-sm);
-
-        &:focus-within {
-          border: 1px solid var(--requestly-color-primary);
-        }
-
-        .cm-editor {
-          margin-top: -2px;
-        }
-      }
-
       .ant-select-selector {
         @include request-method-colors("ant-select-selection-item");
       }
     }
   }
 
-  .api-client-body {
-    flex: auto;
-    height: 100%;
-    min-height: 0;
-
-    .gutter:hover {
-      background-color: #1e69ff;
-    }
-  }
-
-  .api-request-tabs {
-    height: calc(100% - 20px);
-    overflow: hidden;
-    margin-top: 2px;
-
+  //TABS
+  .api-request-tabs.ant-tabs.ant-tabs-small {
     .ant-tabs-content-holder {
-      height: inherit;
-      padding: 0 16px 12px;
-
-      .ant-tabs-content-top {
-        height: 100%;
-      }
+      padding: 12px 16px;
     }
-  }
-
-  .api-response-view {
-    height: 100%;
-    padding: 0 10px;
-
-    .api-response-empty-placeholder {
-      height: 100%;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-  }
-
-  /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
-  .ant-tabs-ink-bar {
-    display: none;
-  }
-
-  .ant-tabs-tab {
-    border-bottom: 2px solid transparent;
-
-    + .ant-tabs-tab {
-      margin-left: 20px;
-    }
-
-    &.ant-tabs-tab-active {
-      border-bottom-color: #1e69ff;
-    }
-
-    .ant-tabs-tab-btn {
-      display: flex;
-      align-items: center;
-      padding: 0 5px;
-
-      .dot {
-        margin-left: 2px;
-        margin-top: 5px;
-      }
-
-      .count {
-        font-size: 10px;
-        padding: 0 4px;
-        line-height: 14px;
-        margin-left: 5px;
-        margin-right: 0;
-      }
-    }
-  }
-
-  .bottom-sheet-container.ant-col {
-    .ant-tabs {
-      /*
-      HACKY HEIGHT OVERFLOW FIX: CODEMIRROR EDITOR OVERFLOWING ON SMALL HEIGHTS
-      TODO: Fix this properly
-      */
-      // height: calc(100% - px) !important;
-      height: 100%;
-
-      .ant-tabs-content-holder {
-        // FIXED HEIGHT FIXES HEIGHT CHANGE OF SPILT PANEL HEIGHT CHANGE ON CODE MIRROR MOUNT
-        // TODO: FIX THIS
-        height: 35px;
-      }
-    }
-  }
-
-  .empty-api-response-view-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .api-response-status-line {
-    font-size: var(--requestly-font-size-xs);
-
-    &.ant-space.ant-space-horizontal {
-      gap: 0px;
-    }
-
-    .ant-space-item {
-      display: flex;
-      align-items: center;
-
-      .ant-btn {
-        padding: 0;
-        color: var(--requestly-color-text-subtle, #bbb);
-
-        &:hover {
-          background-color: transparent;
-        }
-      }
-    }
-
-    .ant-space-item::after {
-      content: "";
-      margin: 0 8px;
-      display: block;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background-color: var(--requestly-color-text-subtle, #bbb);
-    }
-
-    .ant-space-item:last-child::after {
-      display: none;
-    }
-  }
-
-  .api-client-response__loading-overlay {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--requestly-color-background);
-    z-index: 2;
-  }
-
-  .api-client-code-editor-container {
-    border-radius: 8px;
-    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-    background: #282828;
-    box-shadow: 0px 2px 3px 1px rgba(0, 0, 0, 0.16);
   }
 }

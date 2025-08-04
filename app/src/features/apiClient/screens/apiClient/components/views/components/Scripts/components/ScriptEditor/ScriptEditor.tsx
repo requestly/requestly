@@ -9,11 +9,11 @@ import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 
 interface ScriptEditorProps {
-  scripts: RQAPI.Entry["scripts"];
-  setScripts: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  scripts: RQAPI.ApiEntry["scripts"];
+  onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
 }
 // FIX: Editor does not re-render when scripts are undefined
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts }) => {
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsChange }) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -53,9 +53,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, setScripts 
       <Editor
         key={scriptType}
         value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
-        handleChange={(value: string) =>
-          setScripts((prev) => ({ ...prev, scripts: { ...prev.scripts, [scriptType]: value } }))
-        }
+        handleChange={(value: string) => onScriptsChange({ ...scripts, [scriptType]: value })}
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{
           title: "",

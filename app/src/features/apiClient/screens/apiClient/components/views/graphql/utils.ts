@@ -53,13 +53,14 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
     method: RequestMethod.POST,
     headers: [
       ...request.headers,
+      // @todo @nafees87n: to be removed with headers implementation
       // Temp: Adding content type header for testing execution
-      // {
-      //   id: 0,
-      //   isEnabled: true,
-      //   key: "Content-Type",
-      //   value: "application/json",
-      // },
+      {
+        id: 0,
+        isEnabled: true,
+        key: "Content-Type",
+        value: "application/json",
+      },
     ],
     queryParams: [],
     body: stringifiedRequestBody,
