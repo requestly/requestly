@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
-import { getEmptyAPIEntry } from "features/apiClient/screens/apiClient/utils";
+import { getEmptyApiEntry } from "features/apiClient/screens/apiClient/utils";
 import "./newRecordNameInput.scss";
 import {
   trackCollectionSaved,
@@ -59,7 +59,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
 
     if (recordType === RQAPI.RecordType.API) {
       record.type = RQAPI.RecordType.API;
-      record.data = getEmptyAPIEntry();
+      record.data = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP);
     } else {
       record.type = RQAPI.RecordType.COLLECTION;
 
