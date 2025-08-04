@@ -39,6 +39,7 @@
 }
 
 .http-client-view {
+  // HEADER URL AND METHOD SELECTOR
   .api-client-header__url {
     .api-client-url-container {
       .api-request-url {
@@ -65,6 +66,13 @@
       .ant-select-selector {
         @include request-method-colors("ant-select-selection-item");
       }
+    }
+  }
+
+  //TABS
+  .api-request-tabs.ant-tabs.ant-tabs-small {
+    .ant-tabs-content-holder {
+      padding: 12px 16px;
     }
   }
 }
