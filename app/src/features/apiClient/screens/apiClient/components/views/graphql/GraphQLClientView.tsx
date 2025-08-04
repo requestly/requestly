@@ -26,6 +26,7 @@ import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLReque
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import "./gqClientView.scss";
+import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -34,7 +35,7 @@ interface Props {
   openInModal?: boolean;
 }
 
-export const GraphQLClientView: React.FC<Props> = ({
+const GraphQLClientView: React.FC<Props> = ({
   notifyApiRequestFinished,
   onSaveCallback,
   isCreateMode,
@@ -339,3 +340,15 @@ export const GraphQLClientView: React.FC<Props> = ({
     </div>
   );
 };
+
+const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
+  return (props: any) => {
+    return (
+      <GraphQLRecordProvider record={props.selectedEntryDetails}>
+        <Component {...props} />
+      </GraphQLRecordProvider>
+    );
+  };
+};
+
+export default WithGraphQLRecordProvider(GraphQLClientView);
