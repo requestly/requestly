@@ -10,7 +10,7 @@ import "./FileDropdown.scss";
 import { formatBytes, getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import InfoIcon from "components/misc/InfoIcon";
 import { RQAPI } from "features/apiClient/types";
-import { HUNDERED_MB_IN_BYTE } from "features/apiClient/constants";
+import { LARGE_FILE_SIZE } from "features/apiClient/constants";
 
 interface FileDropdownProps {
   MultipartFormEntry: RQAPI.FormDataKeyValuePair;
@@ -31,7 +31,7 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
   }
 
   //Filter the files that are larger than 100MB
-  const largeFiles = filesFromStore.filter((file) => file.size >= HUNDERED_MB_IN_BYTE);
+  const largeFiles = filesFromStore.filter((file) => file.size >= LARGE_FILE_SIZE);
   const hasLargeFiles = largeFiles.length > 0;
   const hasMultipleLargeFiles = largeFiles.length > 1;
 
