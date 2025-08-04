@@ -104,9 +104,16 @@
     background-color: var(--requestly-color-white-t-10);
   }
 
-  .button-text.file-invalid {
-    color: var(--requestly-color-error-soft);
+  .button-text {
+    .file-extension {
+      position: relative;
+      left: -5px;
+    }
+    .file-invalid {
+      color: var(--requestly-color-error-soft);
+    }
   }
+
   &.down-outlined-icon {
     svg {
       width: 14px;

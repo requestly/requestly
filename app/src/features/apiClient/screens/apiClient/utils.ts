@@ -126,13 +126,24 @@ export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => 
         entry.request.body as RQAPI.RequestFormBody,
         removeDisabledKeys
       );
+    } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(
+        entry.request.body as RQAPI.MultipartFormBody,
+        removeDisabledKeys
+      );
     }
   }
 
   return sanitizedEntry;
 };
 
-export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
+/**
+ * generic sanitization fx for keyValuePairs (form & multipartform)
+ */
+export const sanitizeKeyValuePairs = <T extends { key: string; isEnabled: boolean }>(
+  keyValuePairs: T[],
+  removeDisabledKeys = true
+): T[] => {
   return keyValuePairs
     .map((pair) => ({
       ...pair,

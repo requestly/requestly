@@ -87,7 +87,8 @@ const FileDropdown: React.FC<FileDropdownProps> = ({ onAddMoreFiles, onDeleteFil
             </>
           )}
           <span className={`button-text ${filesFromStore[0].isFileValid ? "" : "file-invalid"}`}>
-            {truncateString(filesFromStore[0].name, 10)}
+            {truncateString(filesFromStore[0].name, 10)}{" "}
+            <span className="file-extension">{getFileExtension(filesFromStore[0].name)}</span>
           </span>
           <span className="file-counter">{filesFromStore.length > 1 && ` +${filesFromStore.length - 1}`}</span>
           <FaAngleDown className="down-outlined-icon" />
