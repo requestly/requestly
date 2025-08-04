@@ -119,15 +119,20 @@ export const getEmptyGraphQLEntry = (request?: RQAPI.Request): RQAPI.GraphQLApiE
   };
 };
 
-export const getEmptyAPIEntry = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request) => {
-  if (apiEntryType === RQAPI.ApiEntryType.HTTP) return getEmptyHttpEntry(request);
-  if (apiEntryType === RQAPI.ApiEntryType.GRAPHQL) return getEmptyGraphQLEntry(request);
-  return getEmptyHttpEntry(request);
+export const getEmptyApiEntry = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request) => {
+  switch (apiEntryType) {
+    case RQAPI.ApiEntryType.HTTP:
+      return getEmptyHttpEntry(request);
+    case RQAPI.ApiEntryType.GRAPHQL:
+      return getEmptyGraphQLEntry(request);
+    default:
+      return getEmptyHttpEntry(request);
+  }
 };
 
 export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request?: RQAPI.Request): RQAPI.ApiRecord => {
   return {
-    data: getEmptyAPIEntry(apiEntryType),
+    data: getEmptyApiEntry(apiEntryType),
     type: RQAPI.RecordType.API,
     id: "",
     name: "Untitled request",
@@ -342,7 +347,7 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.API) {
     newRecord.name = "Untitled request";
     newRecord.type = RQAPI.RecordType.API;
-    newRecord.data = getEmptyAPIEntry(entryType);
+    newRecord.data = getEmptyApiEntry(entryType);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }
