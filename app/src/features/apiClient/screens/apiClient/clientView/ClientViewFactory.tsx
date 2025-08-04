@@ -1,7 +1,7 @@
 import { RQAPI } from "features/apiClient/types";
-import { HttpClientViewContainer } from "../components/views/http/HttpClientViewContainer";
-import { GraphQLClientViewContainer } from "../components/views/graphql/GraphQLClientViewContainer";
 import { isGraphQLApiRecord, isHttpApiRecord } from "../utils";
+import GraphQLClientView from "../components/views/graphql/GraphQLClientView";
+import HttpClientView from "../components/views/http/HttpClientView";
 
 interface Props {
   apiRecord: RQAPI.ApiRecord;
@@ -13,7 +13,7 @@ interface Props {
 export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCallback, isCreateMode }: Props) => {
   if (isHttpApiRecord(apiRecord)) {
     return (
-      <HttpClientViewContainer
+      <HttpClientView
         selectedEntryDetails={apiRecord}
         handleAppRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}
@@ -24,7 +24,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
 
   if (isGraphQLApiRecord(apiRecord)) {
     return (
-      <GraphQLClientViewContainer
+      <GraphQLClientView
         selectedEntryDetails={apiRecord}
         handleAppRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}
@@ -34,7 +34,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
   }
 
   return (
-    <HttpClientViewContainer
+    <HttpClientView
       selectedEntryDetails={apiRecord as RQAPI.HttpApiRecord}
       handleAppRequestFinished={handleRequestFinished}
       onSaveCallback={onSaveCallback}

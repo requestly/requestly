@@ -63,6 +63,7 @@ import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClient
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
+import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -825,4 +826,14 @@ const HttpClientView: React.FC<Props> = ({
   );
 };
 
-export default React.memo(HttpClientView);
+const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
+  return (props: any) => {
+    return (
+      <QueryParamsProvider entry={props.apiEntryDetails?.data}>
+        <Component {...props} />
+      </QueryParamsProvider>
+    );
+  };
+};
+
+export default React.memo(WithQueryParamsProvider(HttpClientView));
