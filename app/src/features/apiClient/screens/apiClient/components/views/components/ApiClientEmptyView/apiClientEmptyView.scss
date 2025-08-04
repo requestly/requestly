@@ -22,5 +22,15 @@
     justify-content: center;
     gap: 8px;
     margin-top: 20px;
+
+    .new-api-record-dropdown {
+      width: unset;
+
+      .ant-btn {
+        height: 32px;
+        color: var(--requestly-color-text-default);
+        font-weight: var(--requestly-font-weight-medium);
+      }
+    }
   }
 }

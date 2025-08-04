@@ -5,9 +5,10 @@ import { RQAPI } from "features/apiClient/types";
 import { useState } from "react";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
-import { RBACButton } from "features/rbac";
+import { RBACButton, useRBAC } from "features/rbac";
 import { notification } from "antd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { NewApiRecordDropdown } from "../../../sidebar/components/NewApiRecordDropdown/NewApiRecordDropdown";
 import "./apiClientEmptyView.scss";
 
 export const ApiClientEmptyView = () => {
@@ -15,18 +16,20 @@ export const ApiClientEmptyView = () => {
 
   const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
   const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("api_client_request", "create");
 
   const [isRecordCreating, setIsRecordCreating] = useState(null);
 
   const isEmpty = apiClientRecords.length === 0;
 
-  const handleNewRecordClick = (recordType: RQAPI.RecordType) => {
+  const handleNewRecordClick = (recordType: RQAPI.RecordType, entryType?: RQAPI.ApiEntryType) => {
     recordType === RQAPI.RecordType.API
       ? trackNewRequestClicked("api_client_home")
       : trackNewCollectionClicked("api_client_home");
 
     setIsRecordCreating(recordType);
-    createBlankApiRecord(recordType, "", apiClientRecordsRepository)
+    createBlankApiRecord(recordType, "", apiClientRecordsRepository, entryType)
       .then((result) => {
         if (result.success) {
           onSaveRecord(result.data, "open");
@@ -65,15 +68,15 @@ export const ApiClientEmptyView = () => {
             : "View saved collections and requests, continue from where you left off, or start something new."}
         </div>
         <div className="api-client-empty-view-actions">
-          <RBACButton
-            permission="create"
-            resource="api_client_request"
-            tooltipTitle="Creating a new request is not allowed in view-only mode."
-            loading={isRecordCreating === RQAPI.RecordType.API}
-            onClick={() => handleNewRecordClick(RQAPI.RecordType.API)}
-          >
-            Create a new API request
-          </RBACButton>
+          <NewApiRecordDropdown
+            disabled={!isValidPermission}
+            onSelect={(params) => handleNewRecordClick(params.recordType, params?.entryType)}
+            buttonProps={{
+              disabled: !isValidPermission,
+              loading: isRecordCreating === RQAPI.RecordType.API,
+              children: "Create a new request",
+            }}
+          />
           <RBACButton
             permission="create"
             resource="api_client_collection"
