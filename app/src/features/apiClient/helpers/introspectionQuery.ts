@@ -1,4 +1,4 @@
-import { getIntrospectionQuery } from "graphql";
+import { getIntrospectionQuery, IntrospectionQuery } from "graphql";
 import { RQAPI } from "../types";
 import { makeRequest } from "../screens/apiClient/utils";
 import { graphQLRequestToHttpRequestAdapter } from "../screens/apiClient/components/views/graphql/utils";
@@ -7,19 +7,19 @@ const createGraphQLIntrospectionRequest = (url: string): RQAPI.GraphQLRequest =>
   return {
     url,
     headers: [
-      {
-        id: 0,
-        isEnabled: true,
-        key: "Content-Type",
-        value: "application/json",
-      },
+      // {
+      //   id: 0,
+      //   isEnabled: true,
+      //   key: "Content-Type",
+      //   value: "application/json",
+      // },
     ],
     operation: getIntrospectionQuery(),
     variables: "",
   };
 };
 
-export type IntrospectionData = Record<string, any>;
+export type IntrospectionData = IntrospectionQuery;
 
 export const fetchGraphQLIntrospectionData = async (url: string, appMode: string): Promise<IntrospectionData> => {
   const request = createGraphQLIntrospectionRequest(url);

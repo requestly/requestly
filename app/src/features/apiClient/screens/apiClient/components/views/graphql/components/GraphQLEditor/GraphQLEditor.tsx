@@ -3,9 +3,10 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, basicSetup } from "codemirror";
 import { json } from "@codemirror/lang-json";
 import { graphql } from "cm6-graphql";
-import { buildClientSchema, GraphQLSchema } from "graphql";
+import { buildClientSchema } from "graphql";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./graphQLEditor.css";
+import { IntrospectionData } from "features/apiClient/helpers/introspectionQuery";
 
 interface BaseEditorProps {
   initialDoc?: string;
@@ -15,7 +16,7 @@ interface BaseEditorProps {
 
 interface OperationEditorProps extends BaseEditorProps {
   type: "operation";
-  schema: GraphQLSchema;
+  introspectionData: IntrospectionData;
 }
 
 interface VariablesEditorProps extends BaseEditorProps {
@@ -130,10 +131,11 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
     let extensions = [...basicExtensions, updateListener, myTheme];
 
     if (props.type === "operation") {
-      const schema = (props as OperationEditorProps).schema;
-      // @ts-ignore
-      const clientSchema = buildClientSchema(schema.data);
-      extensions.push(graphql(clientSchema));
+      const introspectionData = (props as OperationEditorProps).introspectionData;
+      if (introspectionData) {
+        const clientSchema = buildClientSchema(introspectionData);
+        extensions.push(graphql(clientSchema));
+      }
     } else if (props.type === "variables") {
       extensions.push(json());
     }
@@ -152,7 +154,7 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
       viewRef.current?.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.type, props.type === "operation" ? props.schema : null]); // Only recreate when type or schema changes
+  }, [props.type, props.type === "operation" ? props.introspectionData : null]); // Only recreate when type or schema changes
 
   return <div ref={editorRef} className={`gql-editor ${props?.className || ""}`} />;
 };
