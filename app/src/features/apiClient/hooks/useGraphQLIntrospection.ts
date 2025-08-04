@@ -23,10 +23,7 @@ export const useGraphQLIntrospection = () => {
         throw new Error("No introspection data received");
       }
       setIntrospectionData(introspectionData);
-      // Here you would typically save the introspection data to your store or state
-      console.log("!!! Introspection Data:", introspectionData);
     } catch (error) {
-      console.log("!!! Error fetching introspection data:", error);
       setIntrospectionData(null);
       setIsIntrospectionDataFetchingFailed(true);
     } finally {

@@ -1,0 +1,43 @@
+.gql-url-container {
+  display: flex;
+  flex: 1;
+  position: relative;
+  .api-request-url {
+    flex: 1;
+  }
+
+  .gql-url__fetch-status {
+    position: absolute;
+    right: 10px;
+    top: 8px;
+
+    .gql-url-container__loading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--requestly-color-text-subtle);
+      height: 15px;
+
+      span {
+        font-size: var(--requestly-font-size-2xs);
+      }
+
+      .ant-spin {
+        color: unset;
+        line-height: 0;
+      }
+    }
+
+    .gql-url__fetch-status-icon {
+      font-size: var(--requestly-font-size-sm);
+
+      &.schema-failed {
+        color: var(--requestly-color-error-soft);
+      }
+
+      &.schema-success {
+        color: var(--requestly-color-success);
+      }
+    }
+  }
+}

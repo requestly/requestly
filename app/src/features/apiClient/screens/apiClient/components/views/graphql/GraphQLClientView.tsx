@@ -24,6 +24,7 @@ import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomShe
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
+import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import "./gqClientView.scss";
 
 interface Props {
@@ -266,7 +267,7 @@ export const GraphQLClientView: React.FC<Props> = ({
               onBlur={() => {}}
             />
 
-            {/* <ClientCodeButton apiClientExecutor={apiClientExecutor} /> */}
+            <ClientCodeButton apiClientExecutor={graphQLRequestExecutor} />
           </div>
 
           <div className="api-client-header__url">
