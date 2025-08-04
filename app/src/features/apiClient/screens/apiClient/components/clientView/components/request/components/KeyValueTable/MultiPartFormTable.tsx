@@ -5,7 +5,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { TableProps } from "antd";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
-import { MultiEditableCell, MultiEditableRow } from "./MultiPartFormTableRow";
+import { MultiEditableCell, MultiEditableRow } from "./MultipartFormTableRow";
 import "./MultiPartFormTable.scss";
 import { EnvironmentVariables } from "backend/environment/types";
 import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFileStore.hook";

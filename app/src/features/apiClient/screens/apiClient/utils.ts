@@ -5,7 +5,7 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import {
   CONTENT_TYPE_HEADER,
   DEMO_API_URL,
-  HUNDERED_MB_IN_BYTE,
+  LARGE_FILE_SIZE,
   SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
 } from "../../constants";
 import * as curlconverter from "curlconverter";
@@ -652,8 +652,6 @@ export const truncateString = (str: string, maxLength: number) => {
 };
 
 export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
-  const LARGE_FILE_SIZE = HUNDERED_MB_IN_BYTE;
-
   if (Array.isArray(body)) {
     return body.some((item: any) => {
       if (item.type === "file" && item.value && Array.isArray(item.value)) {
