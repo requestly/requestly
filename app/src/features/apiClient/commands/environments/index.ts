@@ -5,3 +5,4 @@ export { duplicateEnvironment } from "./duplicate.command";
 export { renameEnvironment } from "./rename.command";
 export { forceRefreshEnvironments } from "./force-refresh.command";
 export { patchEnvironmentVariables } from "./patchEnvironmentVariables.command";
+export { setEnvironmentVariables } from "./setEnvironmentVariables.command";
