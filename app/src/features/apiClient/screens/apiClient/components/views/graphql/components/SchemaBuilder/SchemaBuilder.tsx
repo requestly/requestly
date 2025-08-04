@@ -5,7 +5,10 @@ import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowR
 import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
 import "@graphiql/plugin-explorer/style.css";
 import { Checkbox } from "antd";
+import { RQButton } from "lib/design-system-v2/components";
+import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import "./schemaBuilder.scss";
+import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 
 export const SchemaBuilder = () => {
   const [introspectionData, query, updateRecordRequest] = useGraphQLRecordStore((state) => [
@@ -13,6 +16,8 @@ export const SchemaBuilder = () => {
     state.record.data.request.operation,
     state.updateRecordRequest,
   ]);
+
+  const { introspectAndSaveSchema } = useGraphQLIntrospection();
 
   const handleEdit = (query: string) => {
     updateRecordRequest({ operation: query });
@@ -22,7 +27,12 @@ export const SchemaBuilder = () => {
     <>
       {introspectionData ? (
         <div className="schema-builder">
-          <div className="schema-builder__header">SCHEMA</div>
+          <div className="schema-builder__header-container">
+            <div className="schema-builder__header-container__title">SCHEMA</div>
+            <div className="schema-builder__header-container__actions">
+              <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
+            </div>
+          </div>
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}

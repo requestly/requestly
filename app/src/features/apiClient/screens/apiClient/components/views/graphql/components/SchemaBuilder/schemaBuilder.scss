@@ -2,13 +2,30 @@
   height: 100%;
   overflow: hidden;
 
-  &__header {
-    color: var(--requestly-color-text-subtle);
-    font-size: var(--requestly-font-size-2xs, 9px);
-    font-weight: var(--requestly-font-weight-medium);
-    line-height: 13px;
-    letter-spacing: 1px;
-    padding: var(--space-3, 6px) var(--space-4, 8px);
+  &__header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3, 4px);
+
+    &__title {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-2xs, 9px);
+      font-weight: var(--requestly-font-weight-medium);
+      line-height: 13px;
+      letter-spacing: 1px;
+      padding: var(--space-3, 6px) var(--space-4, 8px);
+    }
+
+    &__actions {
+      .ant-btn.ant-btn-sm svg {
+        color: var(--requestly-color-text-subtle);
+      }
+
+      .ant-btn.ant-btn-sm:hover svg {
+        color: var(--requestly-color-text-default);
+      }
+    }
   }
 
   &__content {

@@ -121,7 +121,6 @@ export const GraphQLClientView: React.FC<Props> = ({
     }
   }, [url, debouncedIntrospection]);
 
-  // TEMP IMPLEMENTATION
   const handleUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
   }, []);
