@@ -102,7 +102,7 @@
       &::after {
         content: " " attr(data-field-type) "";
         font-family: "Roboto Mono", monospace;
-        color: var(--requestly-color-text-placeholder);
+        color: #4880b0;
         font-size: var(--requestly-font-size-xs, 11px);
         margin-left: 4px;
         letter-spacing: 0.25px;
@@ -115,7 +115,7 @@
       &::after {
         content: " " attr(data-arg-type) "";
         font-family: "Roboto Mono", monospace;
-        color: var(--requestly-color-text-placeholder);
+        color: #4880b0;
         font-size: var(--requestly-font-size-xs, 11px);
         margin-left: 4px;
         letter-spacing: 0.25px;

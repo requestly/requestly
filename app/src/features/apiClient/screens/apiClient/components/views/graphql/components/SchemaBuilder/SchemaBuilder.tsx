@@ -34,10 +34,10 @@ export const SchemaBuilder = () => {
           checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
           onEdit={(query: string) => handleEdit(query)}
           colors={{
-            keyword: "var(--requestly-color-text-default)",
+            keyword: "#E29C6D",
             property: "var(--requestly-color-text-default)",
             def: "var(--requestly-color-text-default)",
-            attribute: "var(--requestly-color-text-default)",
+            attribute: "#FF8080",
           }}
           hideActions
         />
