@@ -2,6 +2,7 @@ import { EnvironmentVariableValue } from "backend/environment/types";
 import { DEMO_API_URL } from "features/apiClient/constants";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { useCallback } from "react";
+import "./apiClientUrl.css";
 
 interface ApiClientUrlProps {
   url: string;

@@ -186,6 +186,8 @@ export namespace RQAPI {
 
   export type Request = GraphQLRequest | HttpRequest;
 
+  export type Response = GraphQLResponse | HttpResponse;
+
   export enum ExecutionStatus {
     SUCCESS = "success",
     ERROR = "error",
