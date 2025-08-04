@@ -1,6 +1,10 @@
-.api-request-tabs {
+.api-request-tabs.ant-tabs {
   display: flex;
   flex-direction: column;
+
+  .ant-tabs-nav {
+    margin: 0;
+  }
 
   .ant-tabs-tab {
     span:first-child {
