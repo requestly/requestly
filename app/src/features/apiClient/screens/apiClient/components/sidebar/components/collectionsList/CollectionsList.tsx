@@ -35,7 +35,7 @@ import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleColle
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
-  recordTypeToBeCreated: RQAPI.RecordType;
+  recordTypeToBeCreated: RQAPI.RecordType | null;
 }
 
 export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCreated }) => {
@@ -182,7 +182,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
 
             toast.success("Records Duplicated successfully");
-            result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
+            result.length === 1 ? onSaveRecord(head(result)!, "open") : onSaveBulkRecords(result);
           } catch (error) {
             console.error("Error Duplicating records: ", error);
             notification.error({
@@ -390,7 +390,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
               newRecordBtnText="Create a collection"
               message={searchValue ? "No collection or request found" : "No content available yet"}
               onNewClick={onNewClick}
-              analyticEventSource="collection_list_empty_state"
             />
           )}
         </div>
