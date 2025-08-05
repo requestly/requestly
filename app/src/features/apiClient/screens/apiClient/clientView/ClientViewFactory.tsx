@@ -35,7 +35,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
 
   return (
     <HttpClientView
-      selectedEntryDetails={apiRecord as RQAPI.HttpApiRecord}
+      apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
       handleAppRequestFinished={handleRequestFinished}
       onSaveCallback={onSaveCallback}
       isCreateMode={isCreateMode}
