@@ -28,6 +28,8 @@ import "./gqClientView.scss";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { isNull } from "lodash";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -88,6 +90,8 @@ const GraphQLClientView: React.FC<Props> = ({
     environmentSyncRepository,
   } = useEnvironmentManager();
 
+  const location = useLocation();
+
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
@@ -103,6 +107,9 @@ const GraphQLClientView: React.FC<Props> = ({
   const [warning] = useState<RQAPI.ExecutionWarning | undefined>(undefined);
 
   const originalRecord = useRef(getRecord().data);
+  console.log("LOCATION", location, PATHS.API_CLIENT.HISTORY.RELATIVE);
+  const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
+  console.log("IS HISTORY VIEW", isHistoryView);
 
   const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(collectionId), [
     collectionId,
@@ -221,9 +228,13 @@ const GraphQLClientView: React.FC<Props> = ({
   }, [setIcon]);
 
   useEffect(() => {
-    setTitle(getRecordName());
+    if (isHistoryView) {
+      setTitle("History");
+    } else {
+      setTitle(getRecordName() || "Untitled request");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setTitle, isHistoryView]);
 
   useEffect(() => {
     if (graphQLRequestExecutor) {

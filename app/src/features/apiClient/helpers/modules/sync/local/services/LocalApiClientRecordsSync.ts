@@ -1,7 +1,7 @@
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { API, APIEntity, FileSystemResult, FileType } from "./types";
+import { API, APIEntity, ApiRequestDetails, FileSystemResult, FileType } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -30,6 +30,29 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   private appendPath(basePath: string, resourcePath: string) {
     const separator = basePath.endsWith("/") ? "" : "/";
     return `${basePath}${separator}${resourcePath}`;
+  }
+
+  private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
+    switch (requestDetails.type) {
+      case "http":
+        return {
+          url: requestDetails.url,
+          queryParams: requestDetails.queryParams,
+          method: requestDetails.method as RQAPI.HttpRequest["method"],
+          headers: requestDetails.headers,
+          body: requestDetails.body,
+          bodyContainer: requestDetails.bodyContainer,
+          contentType: requestDetails.contentType,
+        };
+      case "graphql":
+        return {
+          operation: requestDetails.operation,
+          variables: requestDetails.variables,
+          operationName: requestDetails.operationName,
+          headers: requestDetails.headers,
+          url: requestDetails.url,
+        };
+    }
   }
 
   private parseAPIEntities(entities: APIEntity[]): RQAPI.ApiClientRecord[] {
@@ -62,7 +85,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           id: parseFsId(e.id),
           collectionId: e.collectionId,
           name: e.request.name,
-
           ownerId: this.meta.rootPath,
           deleted: false,
           createdBy: "local",
@@ -72,26 +94,51 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
           type: RQAPI.RecordType.API,
           data: {
-            request: {
-              url: e.request.url,
-              queryParams: e.request.queryParams,
-              method: e.request.method as RQAPI.Request["method"],
-              headers: e.request.headers,
-              body: e.request?.body,
-              bodyContainer: e.request?.bodyContainer,
-              contentType: e.request?.contentType,
-            },
+            request: this.parseApiRequestDetails(e.request),
             scripts: e.request.scripts,
             auth: e.request.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
-          },
+            response: null,
+            testResults: [],
+          } as RQAPI.ApiEntry,
         };
 
         return api;
       }
     });
+  }
+
+  private parseApiRecordRequest(record: Partial<RQAPI.ApiRecord>): API["request"] {
+    switch (record.data.type) {
+      case RQAPI.ApiEntryType.HTTP:
+        return {
+          type: record.data.type,
+          name: record.name || "Untitled Request",
+          url: record.data.request.url,
+          scripts: record.data.scripts,
+          method: record.data.request.method,
+          queryParams: record.data.request.queryParams,
+          headers: record.data.request.headers,
+          body: record.data.request?.body,
+          bodyContainer: record.data.request?.bodyContainer,
+          contentType: record.data.request?.contentType,
+          auth: record.data.auth,
+        };
+      case RQAPI.ApiEntryType.GRAPHQL:
+        return {
+          type: record.data.type,
+          name: record.name || "Untitled Request",
+          url: record.data.request.url,
+          scripts: record.data.scripts,
+          operation: record.data.request.operation,
+          variables: record.data.request.variables,
+          operationName: record.data.request.operationName,
+          headers: record.data.request.headers,
+          auth: record.data.auth,
+        };
+    }
   }
 
   generateApiRecordId(parentId?: string) {
@@ -153,15 +200,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     const service = await this.getAdapter();
     const result = await service.createRecord(
       {
-        name: record.name || "Untitled Request",
-        url: record.data.request.url,
-        method: record.data.request.method,
-        queryParams: record.data.request.queryParams,
-        headers: record.data.request.headers,
-        body: record.data.request?.body,
-        bodyContainer: record.data.request?.bodyContainer,
-        contentType: record.data.request?.contentType,
-        scripts: record.data.scripts,
+        ...this.parseApiRecordRequest(record),
       },
       record.collectionId
     );
@@ -209,16 +248,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     const service = await this.getAdapter();
     const result = await service.createRecordWithId(
       {
-        name: record.name || "Untitled Request",
-        url: record.data.request.url,
-        method: record.data.request.method,
-        queryParams: record.data.request.queryParams,
-        headers: record.data.request.headers,
-        body: record.data.request?.body,
-        bodyContainer: record.data.request?.bodyContainer,
-        contentType: record.data.request?.contentType,
-        scripts: record.data.scripts,
-        auth: record.data.auth,
+        ...this.parseApiRecordRequest(record),
       },
       id
     );
@@ -242,16 +272,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     const service = await this.getAdapter();
     const result = await service.updateRecord(
       {
+        ...this.parseApiRecordRequest(patch),
         name: patch.name,
-        url: patch.data.request.url,
-        method: patch.data.request.method,
-        queryParams: patch.data.request.queryParams,
-        headers: patch.data.request.headers,
-        body: patch.data.request?.body,
-        bodyContainer: patch.data.request?.bodyContainer,
-        contentType: patch.data.request?.contentType,
-        scripts: patch.data.scripts,
-        auth: patch.data.auth,
       },
       id
     );
