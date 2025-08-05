@@ -96,7 +96,7 @@ const LINKS = {
   // Contact Us Page
   CONTACT_US_PAGE: getLinkWithMetadata("https://requestly.com/contact-us/"),
   // Book A Demo
-  BOOK_A_DEMO: "https://www.browserstack.com/?utm_source=Requestly&utm_medium=redirect&utm_platform=external",
+  BOOK_A_DEMO: "https://www.browserstack.com/contact?utm_source=Requestly&utm_medium=redirect&utm_platform=external",
 
   /** SUPPORT */
 
