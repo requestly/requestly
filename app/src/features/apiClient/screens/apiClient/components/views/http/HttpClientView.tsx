@@ -64,6 +64,7 @@ import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButto
 import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
+import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -146,7 +147,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
-  const { setPreview, setUnsaved, setTitle, getIsActive } = useGenericState();
+  const { setPreview, setUnsaved, setTitle, getIsActive, setIcon } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -292,6 +293,15 @@ const HttpClientView: React.FC<Props> = ({
     },
     [renderVariables, apiEntryDetails?.collectionId]
   );
+
+  useEffect(() => {
+    setIcon(<MdOutlineSyncAlt />);
+  }, [setIcon]);
+
+  useEffect(() => {
+    setTitle(apiEntryDetails?.name || "Untitled request");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setTitle]);
 
   useEffect(() => {
     //on mount run this

@@ -102,7 +102,7 @@ export const TabsContainer: React.FC = () => {
             }}
           >
             <div className="tab-title">
-              {<div className="icon">{tabState.source.getIcon()}</div>}
+              {<div className="icon">{tabState.icon}</div>}
               <Typography.Text
                 ellipsis={{
                   tooltip: {
