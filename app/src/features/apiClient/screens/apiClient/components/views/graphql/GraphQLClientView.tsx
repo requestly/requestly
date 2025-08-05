@@ -94,10 +94,10 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const originalRecord = useRef(getRecord().data);
 
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(collectionId), [
-    collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(collectionId),
+    [collectionId, getVariablesWithPrecedence]
+  );
 
   const handleUrlChange = useCallback(
     (value: string) => {
@@ -108,11 +108,8 @@ const GraphQLClientView: React.FC<Props> = ({
     [updateRecordRequest]
   );
 
-  const {
-    introspectAndSaveSchema,
-    isIntrospectionDataFetchingFailed,
-    fetchingIntrospectionData,
-  } = useGraphQLIntrospection();
+  const { introspectAndSaveSchema, isIntrospectionDataFetchingFailed, fetchingIntrospectionData } =
+    useGraphQLIntrospection();
 
   const debouncedIntrospection = useDebounce(introspectAndSaveSchema, 500);
 
