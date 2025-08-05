@@ -1,5 +1,6 @@
 import { trackContactUsClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import "./index.scss";
+import LINKS from "config/constants/sub/links";
 
 export const PricingModalFooterBanner = () => {
   return (
@@ -9,7 +10,7 @@ export const PricingModalFooterBanner = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href="https://www.browserstack.com/contact?utm_source=Requestly&utm_medium=redirect&utm_platform=external"
+          href={LINKS.CONTACT_US}
           className="pricing-modal-footer-banner-link"
           onClick={() => {
             trackContactUsClicked("pricing_modal");
