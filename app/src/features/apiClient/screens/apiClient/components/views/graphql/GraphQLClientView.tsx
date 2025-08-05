@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { AutogenerateStoreContext } from "features/apiClient/store/autogenerateContextProvider";
 import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
+import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import { useDebounce } from "hooks/useDebounce";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -22,7 +24,9 @@ import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomShe
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { GraphQLRequestTabs } from "./components/GraphQLRequestTabs/GraphQLRequestTabs";
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
+import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import "./gqClientView.scss";
+import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -31,7 +35,7 @@ interface Props {
   openInModal?: boolean;
 }
 
-export const GraphQLClientView: React.FC<Props> = ({
+const GraphQLClientView: React.FC<Props> = ({
   notifyApiRequestFinished,
   onSaveCallback,
   isCreateMode,
@@ -90,10 +94,10 @@ export const GraphQLClientView: React.FC<Props> = ({
 
   const originalRecord = useRef(getRecord().data);
 
-  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(collectionId), [
-    collectionId,
-    getVariablesWithPrecedence,
-  ]);
+  const currentEnvironmentVariables = useMemo(
+    () => getVariablesWithPrecedence(collectionId),
+    [collectionId, getVariablesWithPrecedence]
+  );
 
   const handleUrlChange = useCallback(
     (value: string) => {
@@ -103,6 +107,17 @@ export const GraphQLClientView: React.FC<Props> = ({
     },
     [updateRecordRequest]
   );
+
+  const { introspectAndSaveSchema, isIntrospectionDataFetchingFailed, fetchingIntrospectionData } =
+    useGraphQLIntrospection();
+
+  const debouncedIntrospection = useDebounce(introspectAndSaveSchema, 500);
+
+  useEffect(() => {
+    if (url) {
+      debouncedIntrospection();
+    }
+  }, [url, debouncedIntrospection]);
 
   const handleUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
@@ -249,7 +264,7 @@ export const GraphQLClientView: React.FC<Props> = ({
               onBlur={() => {}}
             />
 
-            {/* <ClientCodeButton apiClientExecutor={apiClientExecutor} /> */}
+            <ClientCodeButton apiClientExecutor={graphQLRequestExecutor} />
           </div>
 
           <div className="api-client-header__url">
@@ -259,6 +274,8 @@ export const GraphQLClientView: React.FC<Props> = ({
                 currentEnvironmentVariables={currentEnvironmentVariables}
                 onEnterPress={handleUrlInputEnterPressed}
                 onUrlChange={handleUrlChange}
+                fetchingIntrospectionData={fetchingIntrospectionData}
+                isIntrospectionDataFetchingFailed={isIntrospectionDataFetchingFailed}
               />
             </Space.Compact>
             <RQButton
@@ -320,3 +337,15 @@ export const GraphQLClientView: React.FC<Props> = ({
     </div>
   );
 };
+
+const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
+  return (props: any) => {
+    return (
+      <GraphQLRecordProvider record={props.selectedEntryDetails}>
+        <Component {...props} />
+      </GraphQLRecordProvider>
+    );
+  };
+};
+
+export default WithGraphQLRecordProvider(GraphQLClientView);

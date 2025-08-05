@@ -1,47 +1,65 @@
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
-import { buildClientSchema, IntrospectionQuery } from "graphql";
-import GQ_SCHEMA from "../GraphQLEditor/components/OperationEditor/GQ_SCHEMA.json";
+import { buildClientSchema } from "graphql";
 import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
 import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
 import "@graphiql/plugin-explorer/style.css";
 import { Checkbox } from "antd";
+import { RQButton } from "lib/design-system-v2/components";
+import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
+import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 import "./schemaBuilder.scss";
 
 export const SchemaBuilder = () => {
-  const [schema, query, updateRecordRequest] = useGraphQLRecordStore((state) => [
-    state.schema,
+  const [introspectionData, query, updateRecordRequest] = useGraphQLRecordStore((state) => [
+    state.introspectionData,
     state.record.data.request.operation,
     state.updateRecordRequest,
   ]);
+
+  const { introspectAndSaveSchema } = useGraphQLIntrospection();
 
   const handleEdit = (query: string) => {
     updateRecordRequest({ operation: query });
   };
 
   return (
-    <div className="schema-builder">
-      <div className="schema-builder__header">SCHEMA</div>
-      <div className="schema-builder__content">
-        <Explorer
-          // TEMPORARY USAGE OF GQ_SCHEMA.json
-          schema={buildClientSchema((GQ_SCHEMA.data as unknown) as IntrospectionQuery)}
-          query={query}
-          explorerIsOpen={true}
-          arrowClosed={<MdKeyboardArrowRight className="schema-builder__arrow" />}
-          arrowOpen={<MdKeyboardArrowDown className="schema-builder__arrow" />}
-          checkboxChecked={<Checkbox checked={true} className="schema-builder__checkbox" />}
-          checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
-          onEdit={(query: string) => handleEdit(query)}
-          colors={{
-            keyword: "#E29C6D",
-            property: "var(--requestly-color-text-default)",
-            def: "var(--requestly-color-text-default)",
-            attribute: "#FF8080",
-          }}
-          hideActions
-        />
-      </div>
-    </div>
+    <>
+      {introspectionData ? (
+        <div className="schema-builder">
+          <div className="schema-builder__header-container">
+            <div className="schema-builder__header-container__title">SCHEMA</div>
+            <div className="schema-builder__header-container__actions">
+              <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
+            </div>
+          </div>
+          <div className="schema-builder__content">
+            <Explorer
+              schema={introspectionData ? buildClientSchema(introspectionData) : {}}
+              query={query}
+              explorerIsOpen={true}
+              arrowClosed={<MdKeyboardArrowRight className="schema-builder__arrow" />}
+              arrowOpen={<MdKeyboardArrowDown className="schema-builder__arrow" />}
+              checkboxChecked={<Checkbox checked={true} className="schema-builder__checkbox" />}
+              checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
+              onEdit={(query: string) => handleEdit(query)}
+              colors={{
+                keyword: "#E29C6D",
+                property: "var(--requestly-color-text-default)",
+                def: "var(--requestly-color-text-default)",
+                attribute: "#FF8080",
+              }}
+              hideActions
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="schema-builder__empty-state">
+          <img src="/assets/media/rules/empty-inbox.svg" alt="empty drawer" />
+          <div className="schema-builder__empty-state__title">Nothing to see here!</div>
+          <div className="schema-builder__empty-state__description">Please enter a valid URL to load the schema.</div>
+        </div>
+      )}
+    </>
   );
 };
