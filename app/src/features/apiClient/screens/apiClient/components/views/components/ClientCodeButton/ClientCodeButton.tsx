@@ -2,10 +2,10 @@ import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
-import { ApiClientExecutor } from "features/apiClient/helpers/apiClientExecutor/apiClientExecutor";
+import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
 
 interface Props {
-  apiClientExecutor: ApiClientExecutor;
+  apiClientExecutor: HttpRequestExecutor;
 }
 
 export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor }) => {
