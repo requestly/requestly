@@ -7,24 +7,22 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { Avatar, Divider, Row, Space, Typography } from "antd";
-import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
-import { capitalize } from "lodash";
 import "./appNotificationBanner.scss";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import LINKS from "config/constants/sub/links";
 
 const UsersModal: React.FC<{
   users: any[];
   isModalOpen: boolean;
   onCancel: () => void;
   sendRequestEmail: () => void;
-  showCalendlyModal: () => void;
-}> = ({ users, isModalOpen, onCancel, sendRequestEmail, showCalendlyModal }) => {
+}> = ({ users, isModalOpen, onCancel, sendRequestEmail }) => {
   if (users.length === 0) return null;
 
   return (
@@ -38,9 +36,9 @@ const UsersModal: React.FC<{
             type="primary"
             onClick={() => {
               trackTeamPlanBannerClicked("get_subscription", "view_users_modal");
-              showCalendlyModal();
               onCancel();
               sendRequestEmail();
+              window.open(LINKS.BOOK_A_DEMO, "_blank");
             }}
           >
             Get a team subscription
@@ -74,7 +72,6 @@ export const OrgNotificationBanner = () => {
 
   const [userDetails, setUserDetails] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [openCalendlyModal, setOpenCalendlyModal] = useState(false);
 
   const orgBannerConfig = useFeatureValue("team_plan_banner", null);
 
@@ -145,9 +142,9 @@ export const OrgNotificationBanner = () => {
           <RQButton
             type="primary"
             onClick={() => {
-              setOpenCalendlyModal(true);
               trackTeamPlanBannerClicked("get_subscription", "banner");
               sendRequestEmail();
+              window.open(LINKS.BOOK_A_DEMO, "_blank");
             }}
           >
             Get a team subscription
@@ -176,16 +173,6 @@ export const OrgNotificationBanner = () => {
         isModalOpen={openModal}
         onCancel={() => setOpenModal(false)}
         sendRequestEmail={sendRequestEmail}
-        showCalendlyModal={() => setOpenCalendlyModal(true)}
-      />
-      <ContactUsModal
-        isOpen={openCalendlyModal}
-        onCancel={() => setOpenCalendlyModal(false)}
-        heading="Get In Touch"
-        subHeading={`Learn about the Benefits & Pricing of Team Plan for ${capitalize(
-          userDetails[0]?.domain?.split(".")[0]
-        )}`}
-        source="org_view_banner"
       />
     </>
   );
