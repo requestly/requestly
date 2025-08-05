@@ -27,6 +27,7 @@ import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButto
 import "./gqClientView.scss";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
+import { isNull } from "lodash";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -47,6 +48,9 @@ const GraphQLClientView: React.FC<Props> = ({
     collectionId,
     response,
     hasUnsavedChanges,
+    introspectionData,
+    isFetchingIntrospectionData,
+    hasIntrospectionFailed,
     updateRecordRequest,
     updateRecord,
     getRecord,
@@ -59,6 +63,9 @@ const GraphQLClientView: React.FC<Props> = ({
     state.record.collectionId,
     state.record.data.response,
     state.hasUnsavedChanges,
+    state.introspectionData,
+    state.isFetchingIntrospectionData,
+    state.hasIntrospectionFailed,
     state.updateRecordRequest,
     state.updateRecord,
     state.getRecord,
@@ -111,19 +118,15 @@ const GraphQLClientView: React.FC<Props> = ({
     [updateRecordRequest]
   );
 
-  const {
-    introspectAndSaveSchema,
-    isIntrospectionDataFetchingFailed,
-    fetchingIntrospectionData,
-  } = useGraphQLIntrospection();
+  const { introspectAndSaveSchema } = useGraphQLIntrospection();
 
   const debouncedIntrospection = useDebounce(introspectAndSaveSchema, 500);
 
   useEffect(() => {
-    if (url) {
+    if (url && isNull(introspectionData)) {
       debouncedIntrospection();
     }
-  }, [url, debouncedIntrospection]);
+  }, [url, debouncedIntrospection, introspectionData]);
 
   const handleUrlInputEnterPressed = useCallback((evt: KeyboardEvent) => {
     (evt.target as HTMLInputElement).blur();
@@ -293,8 +296,8 @@ const GraphQLClientView: React.FC<Props> = ({
                 currentEnvironmentVariables={currentEnvironmentVariables}
                 onEnterPress={handleUrlInputEnterPressed}
                 onUrlChange={handleUrlChange}
-                fetchingIntrospectionData={fetchingIntrospectionData}
-                isIntrospectionDataFetchingFailed={isIntrospectionDataFetchingFailed}
+                fetchingIntrospectionData={isFetchingIntrospectionData}
+                isIntrospectionDataFetchingFailed={hasIntrospectionFailed}
               />
             </Space.Compact>
             <RQButton
