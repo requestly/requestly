@@ -14,7 +14,7 @@ export const ApiClientFilesProvider = ({ children, records }: { children: ReactN
     const files: Record<FileId, ApiClientFile> = {};
     for (const record of records) {
       if (record.type === RQAPI.RecordType.API) {
-        if (record.data.request.contentType === RequestContentType.MULTIPARTFORM) {
+        if (record.data.request.contentType === RequestContentType.MULTIPART_FORM) {
           const requestBody = record.data.request.body as RQAPI.MultipartFormBody;
           for (const bodyEntry of requestBody) {
             const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
@@ -24,6 +24,7 @@ export const ApiClientFilesProvider = ({ children, records }: { children: ReactN
                   name: file.name,
                   path: file.path,
                   source: file.source,
+                  size: file.size,
                   isFileValid: true,
                 };
               });

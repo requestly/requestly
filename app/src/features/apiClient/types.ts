@@ -18,14 +18,19 @@ export enum RequestMethod {
   OPTIONS = "OPTIONS",
 }
 
+export enum FormDropDownOptions {
+  "FILE" = "file",
+  "TEXT" = "text",
+}
+
 export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  MULTIPART_FORM = "multipart/form-data",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
-  MULTIPARTFORM = "multipart/form-data",
 }
 
 export interface KeyValuePair {
@@ -107,12 +112,14 @@ export namespace RQAPI {
     id: string; // file id for each multipart key value pair
     name: string;
     path: string;
+    size: number;
     source: "extension" | "desktop";
   };
 
   export type RequestBodyContainer = {
     text?: string;
     form?: KeyValuePair[];
+    multipartForm?: FormDataKeyValuePair[];
   };
 
   export type Auth = {
@@ -245,6 +252,7 @@ export namespace RQAPI {
     CORE = "core",
     ABORT = "abort",
     SCRIPT = "script",
+    MISSING_FILE = "missing_file",
   }
 }
 
