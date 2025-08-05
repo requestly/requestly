@@ -26,6 +26,7 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import "./gqClientView.scss";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
+import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -83,7 +84,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
-  const { getIsActive, setUnsaved } = useGenericState();
+  const { getIsActive, setUnsaved, setIcon, setTitle } = useGenericState();
 
   const enableHotkey = getIsActive();
 
@@ -209,6 +210,15 @@ const GraphQLClientView: React.FC<Props> = ({
     },
     [getCurrentEnvironment, setVariables, setCollectionVariables, collectionId, environmentSyncRepository]
   );
+
+  useEffect(() => {
+    setIcon(<GrGraphQl />);
+  }, [setIcon]);
+
+  useEffect(() => {
+    setTitle(getRecordName());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (graphQLRequestExecutor) {

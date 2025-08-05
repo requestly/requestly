@@ -28,7 +28,7 @@ type Props = CreateModeProps | EditModeProps;
 export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
   const { isCreateMode, isHistoryMode } = props;
   const { history, addToHistory, setCurrentHistoryIndex } = useApiClientContext();
-  const selectedEntryDetails = useApiRecord(props?.apiEntryDetails?.id);
+  const selectedEntryDetails = useApiRecord(isCreateMode ? "" : (props as EditModeProps).requestId);
 
   const onSaveCallback = props.onSaveCallback ?? (() => {});
   const handleAppRequestFinished = useCallback(

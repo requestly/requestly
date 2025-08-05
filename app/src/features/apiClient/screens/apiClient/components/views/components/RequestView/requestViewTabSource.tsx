@@ -22,7 +22,7 @@ export class RequestViewTabSource extends BaseTabSource {
       name: "request",
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/${encodeURI(this.metadata.id)}`;
-    this.icon = this.getTabIcon(metadata.apiEntryDetails.data.type);
+    this.icon = metadata.apiEntryDetails?.data.type ? this.getTabIcon(metadata.apiEntryDetails.data.type) : null;
   }
 
   static create(matchedPath: MatchedTabSource["matchedPath"]): RequestViewTabSource {
