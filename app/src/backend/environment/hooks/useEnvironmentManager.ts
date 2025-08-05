@@ -505,7 +505,7 @@ const useEnvironmentManager = (options: UseEnvironmentManagerOptions = { initFet
       return syncRepository.apiClientRecordsRepository
         .setCollectionVariables(record.id, record.data.variables)
         .then((result) => {
-          onSaveRecord(result.data as RQAPI.Record, "open");
+          onSaveRecord(result.data as RQAPI.ApiClientRecord, "open");
           dispatch(variablesActions.updateCollectionVariables({ collectionId, variables }));
         })
         .catch(() => {

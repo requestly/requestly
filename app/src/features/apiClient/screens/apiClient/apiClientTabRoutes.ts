@@ -5,11 +5,12 @@ import { RequestViewTabSource } from "./components/views/components/RequestView/
 import { CollectionViewTabSource } from "./components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../environment/components/environmentView/EnvironmentViewTabSource";
 import { HistoryViewTabSource } from "./components/views/components/request/HistoryView/historyViewTabSource";
+import { RQAPI } from "features/apiClient/types";
 
 export const apiClientTabRoutes: TabRoute[] = [
   {
     path: PATHS.API_CLIENT.ABSOLUTE + "/request/new",
-    tabSourceFactory: DraftRequestContainerTabSource.create,
+    tabSourceFactory: () => DraftRequestContainerTabSource.create(RQAPI.ApiEntryType.HTTP),
   },
   {
     path: PATHS.API_CLIENT.REQUEST.ABSOLUTE,

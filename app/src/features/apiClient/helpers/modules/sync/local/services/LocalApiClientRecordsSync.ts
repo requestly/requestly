@@ -32,7 +32,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return `${basePath}${separator}${resourcePath}`;
   }
 
-  private parseAPIEntities(entities: APIEntity[]): RQAPI.Record[] {
+  private parseAPIEntities(entities: APIEntity[]): RQAPI.ApiClientRecord[] {
     return entities.map((e) => {
       if (e.type === "collection") {
         const collection: RQAPI.CollectionRecord = {
@@ -129,7 +129,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
     return this.getAllRecords();
   }
-  async getRecord(nativeId: string): RQAPI.RecordPromise {
+  async getRecord(nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
     const result: FileSystemResult<API> = await service.getRecord(id);
@@ -146,7 +146,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedRecords[0],
     };
   }
-  async createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.RecordPromise {
+  async createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.ApiClientRecordPromise {
     if (record.id) {
       return this.createRecordWithId(record, record.id);
     }
@@ -181,7 +181,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, "id">>): RQAPI.RecordPromise {
+  async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, "id">>): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.createCollection(record.name, record.collectionId);
 
@@ -204,7 +204,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createRecordWithId(record: Partial<RQAPI.ApiRecord>, nativeId: string): RQAPI.RecordPromise {
+  async createRecordWithId(record: Partial<RQAPI.ApiRecord>, nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
     const result = await service.createRecordWithId(
@@ -237,7 +237,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedApiRecord,
     };
   }
-  async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, "id">>, nativeId: string): RQAPI.RecordPromise {
+  async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, "id">>, nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
     const result = await service.updateRecord(
@@ -287,7 +287,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async getCollection(recordId: string): RQAPI.RecordPromise {
+  async getCollection(recordId: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.getCollection(recordId);
     if (result.type === "error") {
@@ -304,7 +304,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
+  async renameCollection(id: string, newName: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.renameCollection(id, newName);
     if (result.type === "error") {
@@ -378,7 +378,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async updateCollectionAuthData(
     collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
 
@@ -441,7 +441,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.createCollectionFromCompleteRecord(collection, id);
     if (result.type === "error") {
@@ -460,8 +460,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async batchWriteApiEntities(
     batchSize: number,
-    entities: RQAPI.Record[],
-    writeFunction: (entity: RQAPI.Record) => Promise<any>
+    entities: RQAPI.ApiClientRecord[],
+    writeFunction: (entity: RQAPI.ApiClientRecord) => Promise<any>
   ) {
     try {
       for (const entity of entities) {
@@ -478,8 +478,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async duplicateApiEntities(entities: RQAPI.Record[]) {
-    const result: RQAPI.Record[] = [];
+  async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
+    const result: RQAPI.ApiClientRecord[] = [];
     for (const entity of entities) {
       const duplicationResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
@@ -494,9 +494,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return result;
   }
 
-  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+  async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
     const service = await this.getAdapter();
-    const result: RQAPI.Record[] = [];
+    const result: RQAPI.ApiClientRecord[] = [];
     for (const entity of entities) {
       const moveResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
@@ -513,7 +513,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return result;
   }
 
-  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+  async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     if (records.length === 0) {
       return {
         success: true,

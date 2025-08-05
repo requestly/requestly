@@ -1,11 +1,11 @@
 import { RequestContentType, RQAPI } from "features/apiClient/types";
-import { QueryParamsTable } from "../../../components/request/components/QueryParamsTable/QueryParamsTable";
-import RequestBody from "../../../components/request/RequestBody";
-import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
-import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
+import { QueryParamsTable } from "../QueryParamsTable/QueryParamsTable";
+import RequestBody from "../../RequestBody";
+import { HeadersTable } from "../HeadersTable/HeadersTable";
+import AuthorizationView from "../AuthorizationView";
+import { ScriptEditor } from "../../../Scripts/components/ScriptEditor/ScriptEditor";
 import React, { useMemo } from "react";
-import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
+import { ApiClientRequestTabs } from "../ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -14,7 +14,7 @@ import { Conditional } from "components/common/Conditional";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { Checkbox } from "antd";
-import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
+import { RequestTabLabel } from "../ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",

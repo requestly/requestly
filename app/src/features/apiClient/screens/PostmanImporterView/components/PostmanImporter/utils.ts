@@ -301,6 +301,7 @@ const createApiRecord = (
     type: RQAPI.RecordType.API,
     deleted: false,
     data: {
+      type: RQAPI.ApiEntryType.HTTP,
       request: {
         url: typeof request.url === "string" ? request.url : request.url?.raw ?? "",
         method: request.method || RequestMethod.GET,
@@ -309,6 +310,7 @@ const createApiRecord = (
         body: requestBody,
         contentType,
       },
+      response: null,
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },

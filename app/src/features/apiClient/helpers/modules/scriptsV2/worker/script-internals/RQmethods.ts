@@ -90,13 +90,33 @@ export class RQ implements SandboxAPI {
   }
 
   private createRequestObject(originalRequest: RQAPI.Request): LocalScopeRequest {
+    // TODO: fix this when exposing GraphQL requests support in scripts
+    const isGraphQLRequest = "operation" in originalRequest;
+
     return Object.create(
       {
-        toJSON: () => ({
-          method: originalRequest.method,
-          url: originalRequest.url,
-          body: jsonifyObject(originalRequest.body),
-        }),
+        toJSON: () => {
+          if (isGraphQLRequest) {
+            const parsedOperation = jsonifyObject(originalRequest.operation);
+
+            const query = parsedOperation.query;
+            const variables = parsedOperation.variables;
+            const operationName = parsedOperation.operationName;
+
+            return {
+              url: originalRequest.url,
+              operation: query,
+              variables,
+              operationName,
+            };
+          } else {
+            return {
+              method: originalRequest.method,
+              url: originalRequest.url,
+              body: jsonifyObject(originalRequest.body),
+            };
+          }
+        },
       },
       Object.getOwnPropertyDescriptors(originalRequest)
     );

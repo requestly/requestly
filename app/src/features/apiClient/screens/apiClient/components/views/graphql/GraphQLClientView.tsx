@@ -181,14 +181,16 @@ const GraphQLClientView: React.FC<Props> = ({
 
       const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
       updateRecordResponse(entryWithResponse.response);
+      notifyApiRequestFinished(entryWithResponse);
 
       toast.success("Request executed successfully");
     } catch (error) {
+      console.error("Error sending request", error);
       toast.error("Something went wrong while sending the request");
     } finally {
       setIsSending(false);
     }
-  }, [graphQLRequestExecutor, getRecord, updateRecordResponse]);
+  }, [graphQLRequestExecutor, getRecord, updateRecordResponse, notifyApiRequestFinished]);
 
   const handleUpdatesFromExecutionWorker = useCallback(
     async (state: any) => {
