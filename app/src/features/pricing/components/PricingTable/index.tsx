@@ -3,7 +3,6 @@ import { Row } from "antd";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
 import { PRICING } from "../../constants/pricing";
-import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { PlanColumn } from "./components/PlanColumn";
 import "./index.scss";
 import { kebabCase } from "lodash";
@@ -24,8 +23,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   tableRef = null,
   isOpenedFromModal = false,
 }) => {
-  const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
-
   return (
     <>
       <Row wrap={false} className={`pricing-table ${kebabCase(product)}`} ref={tableRef}>
@@ -60,17 +57,11 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               duration={duration}
               product={product}
               source={source}
-              setIsContactUsModalOpen={setIsContactUsModalOpen}
               isOpenedFromModal={isOpenedFromModal}
             />
           );
         })}
       </Row>
-      <ContactUsModal
-        isOpen={isContactUsModalOpen}
-        onCancel={() => setIsContactUsModalOpen(false)}
-        source="pricing_table"
-      />
     </>
   );
 };

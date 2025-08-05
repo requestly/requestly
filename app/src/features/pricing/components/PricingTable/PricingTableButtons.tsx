@@ -24,6 +24,7 @@ import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import LINKS from "config/constants/sub/links";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -177,7 +178,6 @@ interface PricingTableButtonsProps {
   quantity: number;
   disabled: boolean;
   isNewCheckoutFlowEnabled: boolean;
-  setIsContactUsModalOpen: (value: boolean) => void;
 }
 
 export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
@@ -188,7 +188,6 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   quantity,
   disabled,
   isNewCheckoutFlowEnabled,
-  setIsContactUsModalOpen,
 }) => {
   const dispatch = useDispatch();
   const firebaseFunction = getFunctions();
@@ -397,7 +396,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.CONTACT_US: {
-        setIsContactUsModalOpen(true);
+        window.open(LINKS.BOOK_A_DEMO, "_blank");
         break;
       }
       default: {
