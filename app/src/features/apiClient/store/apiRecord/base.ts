@@ -3,12 +3,14 @@ import { RQAPI } from "features/apiClient/types";
 
 export type BaseApiRecordStoreState<T extends RQAPI.ApiRecord = RQAPI.ApiRecord, TAdditionalData = {}> = {
   record: T;
+  hasUnsavedChanges: boolean;
   updateRecordName: (name: string) => void;
   updateRecordRequest: (patch: Partial<T["data"]["request"]>) => void;
   updateRecordResponse: (response: T["data"]["response"]) => void;
   updateRecordAuth: (auth: RQAPI.Auth) => void;
   updateRecordScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => void;
   updateRecord: (record: T["data"]) => void;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
   getRecord: () => T;
   getRecordName: () => string;
 } & TAdditionalData;
@@ -31,16 +33,19 @@ export const createBaseApiRecordState = <T extends RQAPI.ApiRecord>(
   // type a = setType<T>;
   return {
     record,
+    hasUnsavedChanges: false,
     updateRecordRequest: (patch: Partial<RQAPI.GraphQLRequest>) => {
       const record = get().record;
       set({
         record: { ...record, data: { ...record.data, request: { ...record.data.request, ...patch } } },
+        hasUnsavedChanges: true,
       });
     },
     updateRecordAuth: (auth: RQAPI.Auth) => {
       const record = get().record;
       set({
         record: { ...record, data: { ...record.data, auth } },
+        hasUnsavedChanges: true,
       });
     },
     updateRecordResponse: (response: RQAPI.GraphQLResponse) => {
@@ -53,6 +58,7 @@ export const createBaseApiRecordState = <T extends RQAPI.ApiRecord>(
       const record = get().record;
       set({
         record: { ...record, data: { ...record.data, scripts } },
+        hasUnsavedChanges: true,
       });
     },
     updateRecordName: (name: string) => {
@@ -67,5 +73,8 @@ export const createBaseApiRecordState = <T extends RQAPI.ApiRecord>(
     },
     getRecord: () => get().record,
     getRecordName: () => get().record.name,
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => {
+      set({ hasUnsavedChanges });
+    },
   };
 };
