@@ -12,6 +12,7 @@ import { getAppMode } from "store/selectors";
 import MultipartFormRedirectScreen from "../MultipartFormRedirectScreen";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
@@ -57,6 +58,7 @@ function parseSingleModeBody(params: {
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
   const appMode = useSelector(getAppMode);
+  const isFileBodyEnabled = useFeatureIsOn("api_client_file_body_support");
 
   const requestBodyStateManager = useMemo(
     () =>
@@ -83,7 +85,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         >
           <Radio value="text">Raw</Radio>
           <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
-          {isFeatureCompatible(FEATURES.API_CLIENT_MULTIPART_FORM) && (
+          {isFeatureCompatible(FEATURES.API_CLIENT_MULTIPART_FORM) && isFileBodyEnabled && (
             <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
           )}
         </Radio.Group>
@@ -103,7 +105,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         ) : null}
       </div>
     );
-  }, [contentType, setContentType]);
+  }, [contentType, isFileBodyEnabled, setContentType]);
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
