@@ -94,9 +94,9 @@ const processScripts = (item: any) => {
 
   item.event.forEach((event: any) => {
     if (event.listen === "prerequest") {
-      scripts.preRequest = event.script ? migratePostmanScripts(event.script.exec.join("\n")) : "";
+      scripts.preRequest = event.script ? migratePostmanScripts(event.script.exec?.join("\n")) : "";
     } else if (event.listen === "test") {
-      scripts.postResponse = event.script ? migratePostmanScripts(event.script.exec.join("\n")) : "";
+      scripts.postResponse = event.script ? migratePostmanScripts(event.script.exec?.join("\n")) : "";
     }
   });
 

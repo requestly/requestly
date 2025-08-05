@@ -94,10 +94,10 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const originalRecord = useRef(getRecord().data);
 
-  const currentEnvironmentVariables = useMemo(
-    () => getVariablesWithPrecedence(collectionId),
-    [collectionId, getVariablesWithPrecedence]
-  );
+  const currentEnvironmentVariables = useMemo(() => getVariablesWithPrecedence(collectionId), [
+    collectionId,
+    getVariablesWithPrecedence,
+  ]);
 
   const handleUrlChange = useCallback(
     (value: string) => {
@@ -108,8 +108,11 @@ const GraphQLClientView: React.FC<Props> = ({
     [updateRecordRequest]
   );
 
-  const { introspectAndSaveSchema, isIntrospectionDataFetchingFailed, fetchingIntrospectionData } =
-    useGraphQLIntrospection();
+  const {
+    introspectAndSaveSchema,
+    isIntrospectionDataFetchingFailed,
+    fetchingIntrospectionData,
+  } = useGraphQLIntrospection();
 
   const debouncedIntrospection = useDebounce(introspectAndSaveSchema, 500);
 
@@ -170,7 +173,6 @@ const GraphQLClientView: React.FC<Props> = ({
       const apiClientExecutionResult = await graphQLRequestExecutor.executeGraphQLRequest(record);
 
       const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
-      console.log({ entryWithResponse });
       updateRecordResponse(entryWithResponse.response);
 
       toast.success("Request executed successfully");

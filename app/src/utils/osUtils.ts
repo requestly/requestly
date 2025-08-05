@@ -5,7 +5,9 @@ export enum ParsedOS {
   android = "Android",
   linux = "Linux",
 }
+let detectedOS: ParsedOS | null = null;
 export const getUserOS = (): ParsedOS | null => {
+  if (detectedOS) return detectedOS;
   let userAgent = window.navigator.userAgent,
     platform = window.navigator.platform,
     macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
@@ -24,6 +26,6 @@ export const getUserOS = (): ParsedOS | null => {
   } else if (!os && /Linux/.test(platform)) {
     os = ParsedOS.linux;
   }
-
+  detectedOS = os;
   return os;
 };
