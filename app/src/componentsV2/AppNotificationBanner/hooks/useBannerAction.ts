@@ -38,7 +38,7 @@ export const useBannerAction = (
         label: "contact us",
         type: "default",
         onClick: () => {
-          redirectToUrl(LINKS.CALENDLY_LINK, true);
+          redirectToUrl(LINKS.BOOK_A_DEMO, true);
         },
       },
       [BANNER_ACTIONS.REQUEST_ACCESS]: {
