@@ -5,6 +5,7 @@ import { AiOutlineYoutube } from "@react-icons/all-files/ai/AiOutlineYoutube";
 import { trackHomeHelpClicked } from "components/Home/analytics";
 import "./helpCard.scss";
 import { getLinkWithMetadata } from "modules/analytics/metadata";
+import LINKS from "config/constants/sub/links";
 
 export const HelpCard: React.FC = () => {
   const helperLinks = useMemo(
@@ -33,7 +34,7 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={"/assets/media/components/call.svg"} alt="call" />,
         title: "Schedule a demo",
-        href: "https://calendly.com/requestly/sagar",
+        href: LINKS.BOOK_A_DEMO,
       },
     ],
     []
