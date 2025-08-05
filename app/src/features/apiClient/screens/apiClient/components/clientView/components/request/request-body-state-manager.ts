@@ -9,11 +9,13 @@ import { RQAPI } from "../../../../../../types";
 export class RequestBodyStateManager {
   private text: string;
   private form: KeyValuePair[];
+  private multipartForm: RQAPI.FormDataKeyValuePair[];
 
   constructor(params: RQAPI.RequestBodyContainer) {
     // defaults are set since some databases like firestore don't handle "undefined"
     this.text = params?.text || "";
     this.form = params?.form || [];
+    this.multipartForm = params?.multipartForm || [];
   }
 
   setText(text: string) {
@@ -24,6 +26,10 @@ export class RequestBodyStateManager {
     this.form = form;
   }
 
+  setMultiPartForm(multiPartForm: RQAPI.FormDataKeyValuePair[]) {
+    this.multipartForm = multiPartForm;
+  }
+
   getText() {
     return this.text;
   }
@@ -32,12 +38,33 @@ export class RequestBodyStateManager {
     return this.form;
   }
 
+  getMultiPartForm() {
+    return this.multipartForm;
+  }
+
   serialize(): RQAPI.RequestBodyContainer {
     return {
       text: this.text,
       form: this.form,
+      multipartForm: this.multipartForm,
     };
   }
+}
+
+/**
+ * This is a utility hook which enables syncing react state and 'RequestBodyStateManager'
+ */
+export function useMultipartFormBody(requestBodyStateManager: RequestBodyStateManager) {
+  const [multiPartForm, _setMultiPartFormBody] = useState<RQAPI.MultipartFormBody>(
+    requestBodyStateManager.getMultiPartForm() || []
+  );
+  return {
+    multiPartForm,
+    setMultiPartForm(multipartForm: RQAPI.MultipartFormBody) {
+      requestBodyStateManager.setMultiPartForm(multipartForm);
+      _setMultiPartFormBody(multipartForm);
+    },
+  };
 }
 
 /**
