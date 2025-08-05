@@ -25,7 +25,6 @@ interface PlanColumnProps {
   product?: string;
   source: string;
   isOpenedFromModal: boolean;
-  setIsContactUsModalOpen: (value: boolean) => void;
 }
 
 export const PlanColumn: React.FC<PlanColumnProps> = ({
@@ -36,7 +35,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   product,
   source,
   isOpenedFromModal,
-  setIsContactUsModalOpen,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const [quantity, setQuantity] = useState(1);
@@ -309,7 +307,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             duration={duration}
             source={source}
             quantity={quantity}
-            setIsContactUsModalOpen={setIsContactUsModalOpen}
             disabled={disbaleUpgradeButton}
             isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
           />
