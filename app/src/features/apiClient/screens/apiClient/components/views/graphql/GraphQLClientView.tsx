@@ -15,7 +15,6 @@ import { useDebounce } from "hooks/useDebounce";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useHasUnsavedChanges } from "hooks";
 import { Space } from "antd";
 import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
@@ -46,21 +45,25 @@ const GraphQLClientView: React.FC<Props> = ({
     url,
     collectionId,
     response,
+    hasUnsavedChanges,
     updateRecordRequest,
     updateRecord,
     getRecord,
     getRecordName,
     updateRecordResponse,
+    setHasUnsavedChanges,
   ] = useGraphQLRecordStore((state) => [
     state.record.id,
     state.record.data.request.url,
     state.record.collectionId,
     state.record.data.response,
+    state.hasUnsavedChanges,
     state.updateRecordRequest,
     state.updateRecord,
     state.getRecord,
     state.getRecordName,
     state.updateRecordResponse,
+    state.setHasUnsavedChanges,
   ]);
 
   const { apiClientRecordsRepository, onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
@@ -80,8 +83,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
-  const { hasUnsavedChanges } = useHasUnsavedChanges(getRecord().data);
-  const { getIsActive } = useGenericState();
+  const { getIsActive, setUnsaved } = useGenericState();
 
   const enableHotkey = getIsActive();
 
@@ -151,12 +153,13 @@ const GraphQLClientView: React.FC<Props> = ({
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiRecord ?? {}), ...result.data, data: { ...result.data.data, ...recordToSave.data } });
       onSaveCallback(result.data as RQAPI.GraphQLApiRecord);
+      setHasUnsavedChanges(false);
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong while saving the request");
     }
     setIsSaving(false);
-  }, [onSaveCallback, getRecord, isCreateMode, apiClientRecordsRepository, onSaveRecord]);
+  }, [onSaveCallback, getRecord, isCreateMode, apiClientRecordsRepository, onSaveRecord, setHasUnsavedChanges]);
 
   const handleRevertChanges = () => {
     updateRecord(originalRecord.current);
@@ -225,6 +228,10 @@ const GraphQLClientView: React.FC<Props> = ({
     graphQLRequestExecutor,
     renderVariables,
   ]);
+
+  useEffect(() => {
+    setUnsaved(hasUnsavedChanges);
+  }, [hasUnsavedChanges, setUnsaved]);
 
   useEffect(() => {
     if (!graphQLRequestExecutor) {
