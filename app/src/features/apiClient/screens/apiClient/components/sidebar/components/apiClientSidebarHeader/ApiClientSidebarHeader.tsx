@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, DropdownProps } from "antd";
-import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
@@ -10,16 +9,14 @@ import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
-import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { trackCreateEnvironmentClicked } from "features/apiClient/screens/environment/analytics";
 import { SiPostman } from "@react-icons/all-files/si/SiPostman";
 import { SiBruno } from "@react-icons/all-files/si/SiBruno";
 import { PostmanImporterModal } from "../../../modals/postmanImporterModal/PostmanImporterModal";
-import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
+import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -28,13 +25,6 @@ interface Props {
   onImportClick: () => void;
   history: RQAPI.ApiEntry[];
   onClearHistory: () => void;
-}
-
-enum DropdownOption {
-  HTTP_REQUEST = "http_request",
-  GRAPHQL_REQUEST = "graphql_request",
-  COLLECTION = "collection",
-  ENVIRONMENT = "environment",
 }
 
 export const ApiClientSidebarHeader: React.FC<Props> = ({
@@ -104,58 +94,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
     [onImportClick]
   );
 
-  const items: DropdownProps["menu"]["items"] = [
-    {
-      key: DropdownOption.HTTP_REQUEST,
-      label: (
-        <div className="new-btn-option">
-          <MdOutlineSyncAlt />
-          <span>HTTP Request</span>
-        </div>
-      ),
-      onClick: () => {
-        onNewClick(RQAPI.RecordType.API, RQAPI.ApiEntryType.HTTP);
-      },
-    },
-    {
-      key: DropdownOption.GRAPHQL_REQUEST,
-      label: (
-        <div className="new-btn-option">
-          <GrGraphQl />
-          <span>GraphQL Request</span>
-        </div>
-      ),
-      onClick: () => {
-        onNewClick(RQAPI.RecordType.API, RQAPI.ApiEntryType.GRAPHQL);
-      },
-    },
-    {
-      key: DropdownOption.COLLECTION,
-      label: (
-        <div className="new-btn-option">
-          <BsCollection />
-          <span>Collection</span>
-        </div>
-      ),
-      onClick: () => {
-        onNewClick(RQAPI.RecordType.COLLECTION);
-      },
-    },
-    {
-      key: DropdownOption.ENVIRONMENT,
-      label: (
-        <div className="new-btn-option">
-          <MdHorizontalSplit />
-          <span>Environment</span>
-        </div>
-      ),
-      onClick: () => {
-        trackCreateEnvironmentClicked("api_client_sidebar_header");
-        onNewClick(RQAPI.RecordType.ENVIRONMENT);
-      },
-    },
-  ];
-
   useEffect(() => {
     if (state?.modal) {
       switch (state?.modal) {
@@ -180,16 +118,15 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
           <RoleBasedComponent resource="api_client_request" permission="create">
             <div>
-              <Dropdown
-                menu={{ items }}
-                trigger={["click"]}
-                className="api-client-new-btn-dropdown"
-                overlayClassName="api-client-new-btn-dropdown-overlay"
+              <NewApiRecordDropdown
+                onSelect={(params) => {
+                  onNewClick(params.recordType, params.entryType);
+                }}
               >
                 <RQButton type="transparent" size="small" icon={<MdAdd />}>
                   New
                 </RQButton>
-              </Dropdown>
+              </NewApiRecordDropdown>
               <Dropdown
                 menu={{ items: importItems }}
                 trigger={["click"]}

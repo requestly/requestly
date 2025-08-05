@@ -51,11 +51,11 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     onSaveBulkRecords,
     apiClientRecordsRepository,
   } = useApiClientContext();
-  const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
+  const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showSelection, setShowSelection] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
-  const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.Record["id"]>>(new Set());
+  const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
   const [expandedRecordIds, setExpandedRecordIds] = useState(
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
   );
@@ -75,7 +75,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     };
   }, []);
 
-  const prepareRecordsToRender = useCallback((records: RQAPI.Record[]) => {
+  const prepareRecordsToRender = useCallback((records: RQAPI.ApiClientRecord[]) => {
     const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
     setShowSelection(false);
 
@@ -151,7 +151,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   };
 
   const addNestedCollection = useCallback(
-    (record: RQAPI.CollectionRecord, newSelectedRecords: Set<RQAPI.Record["id"]>) => {
+    (record: RQAPI.CollectionRecord, newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>) => {
       newSelectedRecords.add(record.id);
       if (record.data.children) {
         record.data.children.forEach((child) => {
@@ -219,7 +219,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           if (isAllRecordsSelected) {
             setSelectedRecords(new Set());
           } else {
-            const newSelectedRecords: Set<RQAPI.Record["id"]> = new Set();
+            const newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]> = new Set();
             updatedRecords.collections.forEach((record) => {
               addNestedCollection(record, newSelectedRecords);
             });
@@ -252,10 +252,14 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   // Main toggle handler
   const recordsSelectionHandler = useCallback(
-    (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => {
+    (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => {
       const checked = event.target.checked;
 
-      const updateSelection = (record: RQAPI.Record, checked: boolean, newSelectedRecords: Set<RQAPI.Record["id"]>) => {
+      const updateSelection = (
+        record: RQAPI.ApiClientRecord,
+        checked: boolean,
+        newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>
+      ) => {
         const queue = [record];
         while (queue.length) {
           const current = queue.pop();
@@ -273,9 +277,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
       // Ensure parents are selected/deselected as needed
       const checkParentSelection = (
-        recordId: RQAPI.Record["id"],
+        recordId: RQAPI.ApiClientRecord["id"],
         checked: boolean,
-        newSelectedRecords: Set<RQAPI.Record["id"]>
+        newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>
       ) => {
         const { recordsMap } = updatedRecords;
         let parentId = childParentMap.get(recordId);
@@ -312,7 +316,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
   useEffect(() => {
     const id = requestId || collectionId;
-    setExpandedRecordIds((prev: RQAPI.Record["id"][]) =>
+    setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
       union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
     );
   }, [collectionId, requestId, apiClientRecords]);
@@ -320,7 +324,14 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="api-client-sidebar-header-container">
-        <SidebarListHeader onSearch={setSearchValue} multiSelectOptions={multiSelectOptions} />
+        <SidebarListHeader
+          onSearch={setSearchValue}
+          multiSelectOptions={multiSelectOptions}
+          newRecordActionOptions={{
+            showNewRecordAction: isValidPermission,
+            onNewRecordClick: onNewClick,
+          }}
+        />
         {showSelection && (
           <ActionMenu
             isAllRecordsSelected={isAllRecordsSelected}

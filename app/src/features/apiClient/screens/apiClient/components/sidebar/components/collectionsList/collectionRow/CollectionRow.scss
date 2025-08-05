@@ -21,6 +21,14 @@
       height: 8px;
     }
   }
+
+  .collection-options {
+    .ant-btn.ant-btn-sm.rq-custom-btn.icon-only-btn:hover {
+      svg {
+        color: white;
+      }
+    }
+  }
 }
 .collection-dropdown-menu .ant-dropdown-menu {
   min-width: 160px;

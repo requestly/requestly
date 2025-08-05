@@ -24,17 +24,46 @@ import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../../../../views/components/RequestView/requestViewTabSource";
 import { useDrag } from "react-dnd";
+import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 
 interface Props {
   record: RQAPI.ApiRecord;
   isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
-    selectedRecords: Set<RQAPI.Record["id"]>;
-    recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+    selectedRecords: Set<RQAPI.ApiClientRecord["id"]>;
+    recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
 }
+
+const HttpMethodIcon = ({ entry }: { entry: RQAPI.HttpApiEntry }) => {
+  return (
+    <Typography.Text
+      strong
+      className="request-method"
+      style={{
+        color: REQUEST_METHOD_COLORS[entry.request?.method],
+        backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[entry.request?.method],
+      }}
+    >
+      {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(entry.request?.method)
+        ? entry.request?.method.slice(0, 3)
+        : entry.request?.method}
+    </Typography.Text>
+  );
+};
+
+const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
+  switch (record.data.type) {
+    case RQAPI.ApiEntryType.HTTP:
+      return <HttpMethodIcon entry={record.data} />;
+    case RQAPI.ApiEntryType.GRAPHQL:
+      return <GrGraphQl className="graphql-request-icon" />;
+    default:
+      return <HttpMethodIcon entry={record.data} />;
+  }
+};
 
 export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
@@ -210,18 +239,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
                 checked={selectedRecords.has(record.id)}
               />
             )}
-            <Typography.Text
-              strong
-              className="request-method"
-              style={{
-                color: REQUEST_METHOD_COLORS[record.data.request?.method],
-                backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[record.data.request?.method],
-              }}
-            >
-              {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(record.data.request?.method)
-                ? record.data.request?.method.slice(0, 3)
-                : record.data.request?.method}
-            </Typography.Text>
+            <RequestIcon record={record} />
             <Typography.Text
               ellipsis={{
                 tooltip: {
