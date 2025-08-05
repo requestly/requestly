@@ -7,8 +7,8 @@ import "@graphiql/plugin-explorer/style.css";
 import { Checkbox } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
-import "./schemaBuilder.scss";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import "./schemaBuilder.scss";
 
 export const SchemaBuilder = () => {
   const [introspectionData, query, updateRecordRequest] = useGraphQLRecordStore((state) => [
@@ -54,7 +54,11 @@ export const SchemaBuilder = () => {
           </div>
         </div>
       ) : (
-        <div>No Schema Available</div>
+        <div className="schema-builder__empty-state">
+          <img src="/assets/media/rules/empty-inbox.svg" alt="empty drawer" />
+          <div className="schema-builder__empty-state__title">Nothing to see here!</div>
+          <div className="schema-builder__empty-state__description">Please enter a valid URL to load the schema.</div>
+        </div>
       )}
     </>
   );
