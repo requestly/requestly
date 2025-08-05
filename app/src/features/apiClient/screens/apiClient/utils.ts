@@ -21,12 +21,12 @@ const createAbortError = (signal: AbortSignal) => {
   return new Error("Request aborted");
 };
 
-type ResponseOrError = RQAPI.Response | { error: string };
+type ResponseOrError = RQAPI.HttpResponse | { error: string };
 export const makeRequest = async (
   appMode: string,
-  request: RQAPI.Request,
+  request: RQAPI.HttpRequest,
   signal?: AbortSignal
-): Promise<RQAPI.Response> => {
+): Promise<RQAPI.HttpResponse> => {
   return new Promise((resolve, reject) => {
     if (signal) {
       if (signal.aborted) {
@@ -146,8 +146,8 @@ export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request
   };
 };
 
-export const sanitizeEntry = (entry: RQAPI.Entry, removeDisabledKeys = true) => {
-  const sanitizedEntry: RQAPI.Entry = {
+export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = true) => {
+  const sanitizedEntry: RQAPI.HttpApiEntry = {
     ...entry,
     request: {
       ...entry.request,
@@ -276,15 +276,15 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   return request;
 };
 
-export const isApiRequest = (record: RQAPI.Record) => {
+export const isApiRequest = (record: RQAPI.ApiClientRecord) => {
   return record.type === RQAPI.RecordType.API;
 };
 
-export const isApiCollection = (record: RQAPI.Record) => {
+export const isApiCollection = (record: RQAPI.ApiClientRecord) => {
   return record?.type === RQAPI.RecordType.COLLECTION;
 };
 
-const sortRecords = (records: RQAPI.Record[]) => {
+const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
   return records.sort((a, b) => {
     // Sort by type first
     const typeComparison = a.type.localeCompare(b.type);
@@ -295,7 +295,7 @@ const sortRecords = (records: RQAPI.Record[]) => {
   });
 };
 
-const sortNestedRecords = (records: RQAPI.Record[]) => {
+const sortNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
   records.forEach((record) => {
     if (isApiCollection(record)) {
       record.data.children = sortRecords(record.data.children);
@@ -304,10 +304,10 @@ const sortNestedRecords = (records: RQAPI.Record[]) => {
   });
 };
 
-export const convertFlatRecordsToNestedRecords = (records: RQAPI.Record[]) => {
+export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
   const recordsCopy = [...records];
-  const recordsMap: Record<string, RQAPI.Record> = {};
-  const updatedRecords: RQAPI.Record[] = [];
+  const recordsMap: Record<string, RQAPI.ApiClientRecord> = {};
+  const updatedRecords: RQAPI.ApiClientRecord[] = [];
 
   recordsCopy.forEach((record) => {
     if (isApiCollection(record)) {
@@ -411,7 +411,10 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
   return `${baseUrl}${queryString ? `?${queryString}` : queryString}`;
 };
 
-export const filterRecordsBySearch = (records: RQAPI.Record[], searchValue: string): RQAPI.Record[] => {
+export const filterRecordsBySearch = (
+  records: RQAPI.ApiClientRecord[],
+  searchValue: string
+): RQAPI.ApiClientRecord[] => {
   if (!searchValue) return records;
 
   const search = searchValue.toLowerCase();
@@ -486,11 +489,14 @@ export const clearExpandedRecordIdsFromSession = (keysToBeDeleted: string[]) => 
   sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, updatedActiveKeys);
 };
 
-const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
-  const idToCollectionMap = data.reduce((collectionIdMap: Record<RQAPI.Record["id"], RQAPI.Record["id"]>, item) => {
-    collectionIdMap[item.id] = item.collectionId || "";
-    return collectionIdMap;
-  }, {});
+const getParentIds = (data: RQAPI.ApiClientRecord[], targetId: RQAPI.ApiClientRecord["id"]) => {
+  const idToCollectionMap = data.reduce(
+    (collectionIdMap: Record<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord["id"]>, item) => {
+      collectionIdMap[item.id] = item.collectionId || "";
+      return collectionIdMap;
+    },
+    {}
+  );
 
   const parentIds = [];
 
@@ -504,9 +510,9 @@ const getParentIds = (data: RQAPI.Record[], targetId: RQAPI.Record["id"]) => {
 };
 
 export const getRecordIdsToBeExpanded = (
-  id: RQAPI.Record["id"],
-  expandedKeys: RQAPI.Record["id"][],
-  records: RQAPI.Record[]
+  id: RQAPI.ApiClientRecord["id"],
+  expandedKeys: RQAPI.ApiClientRecord["id"][],
+  records: RQAPI.ApiClientRecord[]
 ) => {
   // If the provided ID is null or undefined, return the existing active keys.
   if (!id) {
@@ -529,7 +535,7 @@ export const getRecordIdsToBeExpanded = (
   return expandedKeysCopy;
 };
 
-export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarRequest => {
+export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): HarRequest => {
   const harRequest: HarRequest = {
     method: apiRequest.method,
     url: apiRequest.url,
@@ -564,20 +570,20 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.Request): HarReq
 };
 
 export const filterOutChildrenRecords = (
-  selectedRecords: Set<RQAPI.Record["id"]>,
-  childParentMap: Map<RQAPI.Record["id"], RQAPI.Record["id"]>,
-  recordsMap: Record<RQAPI.Record["id"], RQAPI.Record>
+  selectedRecords: Set<RQAPI.ApiClientRecord["id"]>,
+  childParentMap: Map<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord["id"]>,
+  recordsMap: Record<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord>
 ) =>
   [...selectedRecords]
     .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id)))
     .map((id) => recordsMap[id]);
 
 export const processRecordsForDuplication = (
-  recordsToProcess: RQAPI.Record[],
+  recordsToProcess: RQAPI.ApiClientRecord[],
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>
 ) => {
-  const recordsToDuplicate: RQAPI.Record[] = [];
-  const queue: RQAPI.Record[] = [...recordsToProcess];
+  const recordsToDuplicate: RQAPI.ApiClientRecord[] = [];
+  const queue: RQAPI.ApiClientRecord[] = [...recordsToProcess];
 
   while (queue.length > 0) {
     const record = queue.shift()!;
@@ -600,7 +606,7 @@ export const processRecordsForDuplication = (
         queue.push(...childrenToDuplicate);
       }
     } else {
-      const requestToDuplicate: RQAPI.Record = Object.assign({}, record, {
+      const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
         id: apiClientRecordsRepository.generateApiRecordId(record.collectionId),
         name: `(Copy) ${record.name}`,
       });
@@ -616,10 +622,10 @@ export const resolveAuth = (
   auth: RQAPI.Auth,
   childDetails: { id: string; parentId: string },
   getParentChain: (id: string) => string[],
-  getData: (id: string) => RQAPI.Record
+  getData: (id: string) => RQAPI.ApiClientRecord
 ): RQAPI.Auth => {
   //create a record array
-  const apiRecords: RQAPI.Record[] = [];
+  const apiRecords: RQAPI.ApiClientRecord[] = [];
   const parentChainIds = getParentChain(childDetails?.id);
   for (const parentId in parentChainIds) {
     const parentRecord = getData(parentChainIds[parentId]);
@@ -634,11 +640,11 @@ export const resolveAuth = (
   return auth;
 };
 
-export const parseRequestEntry = (
-  entry: RQAPI.Entry,
+export const parseHttpRequestEntry = (
+  entry: RQAPI.HttpApiEntry,
   childDetails: { id: string; parentId: string },
   getParentChain: (id: string) => string[],
-  getData: (id: string) => RQAPI.Record
+  getData: (id: string) => RQAPI.ApiClientRecord
 ): AutogeneratedFieldsStore["namespaces"] => {
   const result: AutogeneratedFieldsStore["namespaces"] = {};
   if (!entry) {
