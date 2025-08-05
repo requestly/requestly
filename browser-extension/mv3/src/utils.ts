@@ -98,10 +98,11 @@ export const debounce = (func: Function, wait: number) => {
 };
 
 let cachedBlockedDomains: string[] | null = null;
+const BASE_BLOCKED_DOMAINS = ["mail.google.com"];
 
 export const cacheBlockedDomains = async () => {
-  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
-  cachedBlockedDomains = blockedDomains ?? [];
+  const blockedDomains = (await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS)) ?? [];
+  cachedBlockedDomains = [...blockedDomains, ...BASE_BLOCKED_DOMAINS];
 };
 
 export const getBlockedDomains = async () => {
