@@ -18,10 +18,16 @@ export enum RequestMethod {
   OPTIONS = "OPTIONS",
 }
 
+export enum FormDropDownOptions {
+  "FILE" = "file",
+  "TEXT" = "text",
+}
+
 export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  MULTIPART_FORM = "multipart/form-data",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
@@ -88,17 +94,32 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
-  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
+  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
   export type RequestHtmlBody = string;
   export type RequestJavascriptBody = string;
   export type RequestXmlBody = string;
   export type RequestFormBody = KeyValuePair[];
+  export type MultipartFormBody = FormDataKeyValuePair[];
+  // TODO:nafees will need to add discriminant based on contentType
+
+  export type FormDataKeyValuePair = KeyValuePair & {
+    value: string | MultipartFileValue[];
+  };
+
+  type MultipartFileValue = {
+    id: string; // file id for each multipart key value pair
+    name: string;
+    path: string;
+    size: number;
+    source: "extension" | "desktop";
+  };
 
   export type RequestBodyContainer = {
     text?: string;
     form?: KeyValuePair[];
+    multipartForm?: FormDataKeyValuePair[];
   };
 
   export type Auth = {
@@ -231,6 +252,7 @@ export namespace RQAPI {
     CORE = "core",
     ABORT = "abort",
     SCRIPT = "script",
+    MISSING_FILE = "missing_file",
   }
 }
 

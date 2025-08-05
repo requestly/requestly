@@ -2,16 +2,40 @@ import { Button } from "antd";
 
 export function displayFileSelector(callback) {
   const handleDialogPromise = (result) => {
-    const { canceled, filePaths } = result;
+    const { canceled, filePaths, files } = result;
     if (!canceled) {
       if (callback) {
-        return callback(filePaths[0]);
+        if (filePaths) {
+          // for compatibility with how the UI expected open-file-dialog to respond earlier
+          return callback(filePaths[0]);
+        } else {
+          return callback(files[0]?.path);
+        }
       }
     }
   };
 
   if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {}).then((result) => {
+      handleDialogPromise(result);
+    });
+  }
+}
+
+export function displayMultiFileSelector(callback, config = {}) {
+  const handleDialogPromise = (result) => {
+    const { canceled, files } = result;
+    if (!canceled) {
+      if (callback) {
+        return callback(files);
+      }
+    }
+  };
+
+  if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {
+      properties: ["openFile", "multiSelections", "openDirectory"],
+    }).then((result) => {
       handleDialogPromise(result);
     });
   }
