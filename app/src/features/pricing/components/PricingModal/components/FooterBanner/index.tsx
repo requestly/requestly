@@ -10,7 +10,7 @@ export const PricingModalFooterBanner = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={LINKS.CONTACT_US}
+          href={LINKS.BOOK_A_DEMO}
           className="pricing-modal-footer-banner-link"
           onClick={() => {
             trackContactUsClicked("pricing_modal");
