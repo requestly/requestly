@@ -286,7 +286,12 @@ const GraphQLClientView: React.FC<Props> = ({
               onBlur={() => {}}
             />
 
-            <ClientCodeButton apiClientExecutor={graphQLRequestExecutor} />
+            <ClientCodeButton
+              handleOnClick={() => {
+                graphQLRequestExecutor.prepareGraphQLRequest(getRecord());
+              }}
+              apiClientExecutor={graphQLRequestExecutor}
+            />
           </div>
 
           <div className="api-client-header__url">
