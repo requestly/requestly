@@ -108,6 +108,29 @@
       }
     }
   }
+
+  &__empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-11, 48px) var(--space-5, 12px);
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    &__title {
+      margin-top: var(--space-6, 16px);
+      color: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-sm);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    &__description {
+      margin-top: var(--space-2, 4px);
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
 }
 
 // Styling to make field types more visible
