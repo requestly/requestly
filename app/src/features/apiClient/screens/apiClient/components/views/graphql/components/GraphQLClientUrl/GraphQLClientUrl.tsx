@@ -1,6 +1,5 @@
 import { memo } from "react";
-import { EnvironmentVariableValue } from "backend/environment/types";
-
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { ApiClientUrl } from "features/apiClient/screens/apiClient/components/views/components/request/components/ApiClientUrl/ApiClientUrl";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
@@ -11,7 +10,7 @@ import "./graphqlClientUrl.scss";
 
 interface GraphQLClientUrlProps {
   url: string;
-  currentEnvironmentVariables: Record<string, EnvironmentVariableValue>;
+  currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string) => void;
   fetchingIntrospectionData: boolean;

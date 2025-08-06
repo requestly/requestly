@@ -3,7 +3,6 @@ import { ApiClientRequestTabs } from "../../../components/request/components/Api
 import React, { useMemo } from "react";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import { QueryView } from "../QueryView/QueryView";
-import { EnvironmentVariables } from "backend/environment/types";
 import { RequestHeaders } from "./components/RequestHeaders/RequestHeaders";
 import { GraphQLAuthView } from "./components/GraphQLAuthView/GraphQLAuthView";
 import { GraphQLScripts } from "./components/GraphQLAuthView/GraphQLScripts";
@@ -17,10 +16,9 @@ enum GraphQLRequestTab {
 
 interface Props {
   requestId: RQAPI.ApiRecord["id"];
-  variables: EnvironmentVariables;
 }
 
-export const GraphQLRequestTabs: React.FC<Props> = ({ requestId, variables }) => {
+export const GraphQLRequestTabs: React.FC<Props> = ({ requestId }) => {
   const tabItems = useMemo(() => {
     return [
       {
@@ -31,12 +29,12 @@ export const GraphQLRequestTabs: React.FC<Props> = ({ requestId, variables }) =>
       {
         key: GraphQLRequestTab.HEADERS,
         label: <RequestTabLabel label="Headers" />,
-        children: <RequestHeaders variables={variables} />,
+        children: <RequestHeaders requestId={requestId} />,
       },
       {
         key: GraphQLRequestTab.AUTHORIZATION,
         label: <RequestTabLabel label="Authorization" />,
-        children: <GraphQLAuthView variables={variables} />,
+        children: <GraphQLAuthView />,
       },
       {
         key: GraphQLRequestTab.SCRIPTS,
@@ -44,6 +42,6 @@ export const GraphQLRequestTabs: React.FC<Props> = ({ requestId, variables }) =>
         children: <GraphQLScripts />,
       },
     ];
-  }, [variables]);
+  }, [requestId]);
   return <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />;
 };

@@ -7,7 +7,6 @@ import { ScriptEditor } from "../../../components/Scripts/components/ScriptEdito
 import React, { useMemo } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Conditional } from "components/common/Conditional";
@@ -41,8 +40,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   setContentType,
   handleAuthChange,
 }) => {
-  const { getVariablesWithPrecedence } = useEnvironmentManager();
-  const variables = useMemo(() => getVariablesWithPrecedence(collectionId), [collectionId, getVariablesWithPrecedence]);
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
   const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
@@ -56,7 +53,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Query Params" count={queryParams.length} />,
         children: (
           <QueryParamsTable
-            variables={variables}
+            recordId={requestId}
             onQueryParamsChange={(newParams) => {
               setRequestEntry((prev) => ({
                 ...prev,
@@ -77,20 +74,20 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
             mode="multiple"
+            recordId={requestId}
             bodyContainer={requestEntry.request.bodyContainer}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
-            variables={variables}
           />
         ) : (
           <RequestBody
             mode="single"
+            recordId={requestId}
             body={requestEntry.request.body}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
-            variables={variables}
           />
         ),
         disabled: !isRequestBodySupported,
@@ -100,8 +97,8 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Headers" count={sanitizeKeyValuePairs(requestEntry.request.headers).length} />,
         children: (
           <HeadersTable
+            recordId={requestId}
             headers={requestEntry.request.headers}
-            variables={variables}
             onHeadersChange={(newHeaders) => {
               setRequestEntry((prev) => ({
                 ...prev,
@@ -116,10 +113,10 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: <RequestTabLabel label="Authorization" />,
         children: (
           <AuthorizationView
+            recordId={requestId}
             defaults={requestEntry.auth}
             onAuthUpdate={handleAuthChange}
             isRootLevelRecord={!collectionId}
-            variables={variables}
           />
         ),
       },
@@ -143,6 +140,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
     ];
   }, [
+    requestId,
     collectionId,
     handleAuthChange,
     isRequestBodySupported,
@@ -155,7 +153,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     requestEntry.scripts,
     setContentType,
     setRequestEntry,
-    variables,
   ]);
 
   return (

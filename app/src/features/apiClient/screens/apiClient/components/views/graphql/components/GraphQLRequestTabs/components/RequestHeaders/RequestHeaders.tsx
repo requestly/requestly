@@ -1,14 +1,13 @@
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { HeadersTable } from "../../../../../components/request/components/HeadersTable/HeadersTable";
-import { KeyValuePair } from "features/apiClient/types";
-import { EnvironmentVariables } from "backend/environment/types";
+import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import React from "react";
 
 interface Props {
-  variables: EnvironmentVariables;
+  requestId: RQAPI.ApiRecord["id"];
 }
 
-export const RequestHeaders: React.FC<Props> = ({ variables }) => {
+export const RequestHeaders: React.FC<Props> = ({ requestId }) => {
   const [headers, updateRecordRequest] = useGraphQLRecordStore((state) => [
     state.record.data.request.headers,
     state.updateRecordRequest,
@@ -21,7 +20,7 @@ export const RequestHeaders: React.FC<Props> = ({ variables }) => {
   };
   return (
     <div className="graphql-request-tab-content">
-      <HeadersTable headers={headers} variables={variables} onHeadersChange={handleHeadersChange} />
+      <HeadersTable headers={headers} recordId={requestId} onHeadersChange={handleHeadersChange} />
     </div>
   );
 };
