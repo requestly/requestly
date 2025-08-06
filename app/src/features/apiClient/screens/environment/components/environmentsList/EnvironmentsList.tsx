@@ -11,6 +11,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isGlobalEnvironment } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
+import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
 import { RBAC, useRBAC } from "features/rbac";
@@ -28,6 +29,7 @@ export const EnvironmentsList = () => {
   const [searchValue, setSearchValue] = useState("");
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
   const { setIsRecordBeingCreated, isRecordBeingCreated } = useApiClientContext();
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
@@ -88,6 +90,16 @@ export const EnvironmentsList = () => {
     [getEnvironmentVariables]
   );
 
+  const handlePostmanExportEnvironments = useCallback(
+    (environment: { id: string; name: string }) => {
+      const variables = getEnvironmentVariables(environment.id);
+      setEnvironmentsToExport([{ ...environment, variables }]);
+
+      setIsPostmanExportModalOpen(true);
+    },
+    [getEnvironmentVariables]
+  );
+
   return (
     <div style={{ height: "inherit" }}>
       {environments?.length === 0 ? (
@@ -111,12 +123,18 @@ export const EnvironmentsList = () => {
                 <>
                   {filteredEnvironments.map((environment) =>
                     isGlobalEnvironment(environment.id) ? (
-                      <EnvironmentsListItem environment={environment} isReadOnly={!isValidPermission} />
+                      <EnvironmentsListItem
+                        key={environment.id}
+                        environment={environment}
+                        isReadOnly={!isValidPermission}
+                      />
                     ) : (
                       <EnvironmentsListItem
+                        key={environment.id}
                         environment={environment}
                         isReadOnly={!isValidPermission}
                         onExportClick={handleExportEnvironments}
+                        onPostmanExportClick={handlePostmanExportEnvironments}
                       />
                     )
                   )}
@@ -136,6 +154,16 @@ export const EnvironmentsList = () => {
               isOpen={isExportModalOpen}
               onClose={() => {
                 setIsExportModalOpen(false);
+              }}
+            />
+          )}
+          {isPostmanExportModalOpen && (
+            <PostmanEnvironmentExportModal
+              environments={environmentsToExport}
+              isOpen={isPostmanExportModalOpen}
+              onClose={() => {
+                setEnvironmentsToExport([]);
+                setIsPostmanExportModalOpen(false);
               }}
             />
           )}
