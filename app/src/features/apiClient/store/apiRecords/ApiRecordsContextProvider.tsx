@@ -11,6 +11,7 @@ import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sy
 import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
+import { ApiClientFilesProvider } from "../ApiClientFilesContextProvider";
 
 export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState> | null>(null);
 
@@ -72,7 +73,9 @@ const RecordsProvider = ({
     <ApiRecordsStoreContext.Provider value={store}>
       <ExampleCollectionsDaemon store={store} />
       <AutoSyncLocalStoreDaemon />
-      <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
+      <ApiClientFilesProvider records={data.records}>
+        <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
+      </ApiClientFilesProvider>
     </ApiRecordsStoreContext.Provider>
   );
 };
