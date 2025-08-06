@@ -8,6 +8,7 @@ export type BaseApiRecordStoreState<T extends RQAPI.ApiRecord = RQAPI.ApiRecord,
   updateRecordRequest: (patch: Partial<T["data"]["request"]>) => void;
   updateRecordResponse: (response: T["data"]["response"]) => void;
   updateRecordAuth: (auth: RQAPI.Auth) => void;
+  updateRecordTestResults: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => void;
   updateRecordScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => void;
   updateRecord: (record: T["data"]) => void;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
@@ -52,6 +53,13 @@ export const createBaseApiRecordState = <T extends RQAPI.ApiRecord>(
       const record = get().record;
       set({
         record: { ...record, data: { ...record.data, response } },
+      });
+    },
+    updateRecordTestResults: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => {
+      const record = get().record;
+      set({
+        record: { ...record, data: { ...record.data, testResults } },
+        hasUnsavedChanges: true,
       });
     },
     updateRecordScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => {
