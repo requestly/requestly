@@ -1,22 +1,25 @@
-import { useState } from "react";
 import { useGraphQLRecordStore } from "./useGraphQLRecordStore";
 import { fetchGraphQLIntrospectionData } from "../helpers/introspectionQuery";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 
 export const useGraphQLIntrospection = () => {
-  const [url, setIntrospectionData] = useGraphQLRecordStore((state) => [
+  const [
+    url,
+    setIntrospectionData,
+    setIsFetchingIntrospectionData,
+    setHasIntrospectionFailed,
+  ] = useGraphQLRecordStore((state) => [
     state.record.data.request.url,
     state.setIntrospectionData,
+    state.setIsFetchingIntrospectionData,
+    state.setHasIntrospectionFailed,
   ]);
   const appMode = useSelector(getAppMode);
 
-  const [fetchingIntrospectionData, setFetchingIntrospectionData] = useState(false);
-  const [isIntrospectionDataFetchingFailed, setIsIntrospectionDataFetchingFailed] = useState(false);
-
   const introspectAndSaveSchema = async () => {
-    setFetchingIntrospectionData(true);
-    setIsIntrospectionDataFetchingFailed(false);
+    setIsFetchingIntrospectionData(true);
+    setHasIntrospectionFailed(false);
     try {
       const introspectionData = await fetchGraphQLIntrospectionData(url, appMode);
       if (!introspectionData) {
@@ -25,15 +28,13 @@ export const useGraphQLIntrospection = () => {
       setIntrospectionData(introspectionData);
     } catch (error) {
       setIntrospectionData(null);
-      setIsIntrospectionDataFetchingFailed(true);
+      setHasIntrospectionFailed(true);
     } finally {
-      setFetchingIntrospectionData(false);
+      setIsFetchingIntrospectionData(false);
     }
   };
 
   return {
     introspectAndSaveSchema,
-    fetchingIntrospectionData,
-    isIntrospectionDataFetchingFailed,
   };
 };
