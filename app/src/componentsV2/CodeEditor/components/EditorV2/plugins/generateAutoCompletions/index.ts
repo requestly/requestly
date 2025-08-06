@@ -6,7 +6,6 @@ import {
   insertCompletionText,
 } from "@codemirror/autocomplete";
 import { EditorView } from "@codemirror/view";
-import { EnvironmentVariables } from "backend/environment/types";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 /**
