@@ -10,6 +10,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
@@ -24,11 +25,14 @@ import { CollectionViewTabSource } from "../../../../clientView/components/Colle
 import { useDrag, useDrop } from "react-dnd";
 import "./CollectionRow.scss";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
 
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
-  onExportClick: (collection: RQAPI.CollectionRecord) => void;
+  onRequestlyExportClick: (collection: RQAPI.CollectionRecord) => void;
+  onPostmanExportClick?: (collection: RQAPI.CollectionRecord) => void;
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -43,7 +47,8 @@ interface Props {
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
-  onExportClick,
+  onRequestlyExportClick: onExportClick,
+  onPostmanExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -96,15 +101,41 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "1",
           label: (
-            <div>
+            <span>
               <MdOutlineIosShare style={{ marginRight: 8 }} />
               Export
-            </div>
+            </span>
           ),
-          onClick: (itemInfo) => {
-            itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
-          },
+          expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
+          children: [
+            {
+              key: "1-title",
+              type: "group",
+              label: <div style={{ fontSize: "12px" }}>Choose Export format</div>,
+            },
+            {
+              key: "1-1",
+              label: "Requestly",
+              icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                onExportClick(record);
+                setIsDropdownVisible(false);
+              },
+            },
+            {
+              key: "1-2",
+              label: "Postman (v2.1 format)",
+              icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                if (onPostmanExportClick) {
+                  onPostmanExportClick(record);
+                }
+                setIsDropdownVisible(false);
+              },
+            },
+          ],
         },
         {
           key: "2",
@@ -410,7 +441,8 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             onNewClick={onNewClick}
-                            onExportClick={onExportClick}
+                            onRequestlyExportClick={onExportClick}
+                            onPostmanExportClick={onPostmanExportClick}
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
