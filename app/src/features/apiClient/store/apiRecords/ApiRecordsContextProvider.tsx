@@ -17,7 +17,7 @@ export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState> | 
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
-  const [data, setData] = useState<{ records: RQAPI.Record[]; erroredRecords: ErroredRecord[] } | null>(null);
+  const [data, setData] = useState<{ records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] } | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 

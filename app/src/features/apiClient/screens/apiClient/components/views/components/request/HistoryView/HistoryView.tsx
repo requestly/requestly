@@ -29,7 +29,7 @@ export const HistoryView: React.FC = () => {
   );
 
   const handleAppRequestFinished = useCallback(
-    (entry: RQAPI.Entry) => {
+    (entry: RQAPI.ApiEntry) => {
       setCurrentHistoryIndex(history.length);
       addToHistory(entry);
     },

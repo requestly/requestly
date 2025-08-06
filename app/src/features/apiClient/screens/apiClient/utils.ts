@@ -702,6 +702,14 @@ export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.Gra
   return record.data.type === RQAPI.ApiEntryType.GRAPHQL;
 }
 
+export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
+  return "redirectUrl" in response;
+};
+
+export const isGraphQLResponse = (response: RQAPI.Response): response is RQAPI.GraphQLResponse => {
+  return "type" in response;
+};
+
 export const getFileExtension = (fileName: string) => {
   const extension = fileName.includes(".") ? fileName.slice(fileName.lastIndexOf(".")) : "";
   return extension;

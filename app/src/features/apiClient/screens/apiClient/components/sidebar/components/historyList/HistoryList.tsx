@@ -31,6 +31,27 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
     [onSelectionFromHistory, openTab]
   );
 
+  const getTimelineItemColor = (entry: RQAPI.ApiEntry) => {
+    if (entry.type === RQAPI.ApiEntryType.HTTP) {
+      return REQUEST_METHOD_COLORS[entry.request.method];
+    }
+    if (entry.type === RQAPI.ApiEntryType.GRAPHQL) {
+      return "#e91e63";
+    }
+    return REQUEST_METHOD_COLORS[(entry as RQAPI.HttpApiEntry).request.method];
+  };
+
+  const getTimelineItemMethod = (entry: RQAPI.ApiEntry) => {
+    if (entry.type === RQAPI.ApiEntryType.HTTP) {
+      return entry.request.method;
+    }
+    if (entry.type === RQAPI.ApiEntryType.GRAPHQL) {
+      return "GQL";
+    }
+
+    return (entry as RQAPI.HttpApiEntry).request.method;
+  };
+
   return history?.length ? (
     <>
       {!dismissNote && (
@@ -49,18 +70,14 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
           </div>
         </Timeline.Item>
         {history.map((entry, index) => (
-          <Timeline.Item key={index} color={REQUEST_METHOD_COLORS[entry.request.method]}>
+          <Timeline.Item key={index} color={getTimelineItemColor(entry)}>
             <div
               className={`api-history-row ${entry.request.url ? "clickable" : ""} ${
                 selectedHistoryIndex === index ? "active" : ""
               }`}
             >
-              <Typography.Text
-                strong
-                className="api-method"
-                style={{ color: REQUEST_METHOD_COLORS[entry.request.method] }}
-              >
-                {entry.request.method}
+              <Typography.Text strong className="api-method" style={{ color: getTimelineItemColor(entry) }}>
+                {getTimelineItemMethod(entry)}
               </Typography.Text>
               <Typography.Text
                 ellipsis={{ suffix: "...", tooltip: entry.request.url }}

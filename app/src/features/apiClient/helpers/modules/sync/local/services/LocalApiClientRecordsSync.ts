@@ -1,7 +1,7 @@
 import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
-import { API, APIEntity, FileSystemResult, FileType } from "./types";
+import { API, APIEntity, ApiRequestDetails, FileSystemResult, FileType } from "./types";
 import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
@@ -32,7 +32,30 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return `${basePath}${separator}${resourcePath}`;
   }
 
-  private parseAPIEntities(entities: APIEntity[]): RQAPI.Record[] {
+  private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
+    switch (requestDetails.type) {
+      case "http":
+        return {
+          url: requestDetails.url,
+          queryParams: requestDetails.queryParams,
+          method: requestDetails.method as RQAPI.HttpRequest["method"],
+          headers: requestDetails.headers,
+          body: requestDetails.body,
+          bodyContainer: requestDetails.bodyContainer,
+          contentType: requestDetails.contentType,
+        };
+      case "graphql":
+        return {
+          operation: requestDetails.operation,
+          variables: requestDetails.variables,
+          operationName: requestDetails.operationName,
+          headers: requestDetails.headers,
+          url: requestDetails.url,
+        };
+    }
+  }
+
+  private parseAPIEntities(entities: APIEntity[]): RQAPI.ApiClientRecord[] {
     return entities.map((e) => {
       if (e.type === "collection") {
         const collection: RQAPI.CollectionRecord = {
@@ -62,7 +85,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           id: parseFsId(e.id),
           collectionId: e.collectionId,
           name: e.request.name,
-
           ownerId: this.meta.rootPath,
           deleted: false,
           createdBy: "local",
@@ -72,26 +94,51 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
           type: RQAPI.RecordType.API,
           data: {
-            request: {
-              url: e.request.url,
-              queryParams: e.request.queryParams,
-              method: e.request.method as RQAPI.Request["method"],
-              headers: e.request.headers,
-              body: e.request?.body,
-              bodyContainer: e.request?.bodyContainer,
-              contentType: e.request?.contentType,
-            },
+            request: this.parseApiRequestDetails(e.request),
             scripts: e.request.scripts,
             auth: e.request.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
-          },
+            response: null,
+            testResults: [],
+          } as RQAPI.ApiEntry,
         };
 
         return api;
       }
     });
+  }
+
+  private parseApiRecordRequest(record: Partial<RQAPI.ApiRecord>): API["request"] {
+    switch (record.data.type) {
+      case RQAPI.ApiEntryType.HTTP:
+        return {
+          type: record.data.type,
+          name: record.name || "Untitled Request",
+          url: record.data.request.url,
+          scripts: record.data.scripts,
+          method: record.data.request.method,
+          queryParams: record.data.request.queryParams,
+          headers: record.data.request.headers,
+          body: record.data.request?.body,
+          bodyContainer: record.data.request?.bodyContainer,
+          contentType: record.data.request?.contentType,
+          auth: record.data.auth,
+        };
+      case RQAPI.ApiEntryType.GRAPHQL:
+        return {
+          type: record.data.type,
+          name: record.name || "Untitled Request",
+          url: record.data.request.url,
+          scripts: record.data.scripts,
+          operation: record.data.request.operation,
+          variables: record.data.request.variables,
+          operationName: record.data.request.operationName,
+          headers: record.data.request.headers,
+          auth: record.data.auth,
+        };
+    }
   }
 
   generateApiRecordId(parentId?: string) {
@@ -129,7 +176,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
     return this.getAllRecords();
   }
-  async getRecord(nativeId: string): RQAPI.RecordPromise {
+  async getRecord(nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
     const result: FileSystemResult<API> = await service.getRecord(id);
@@ -146,22 +193,14 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedRecords[0],
     };
   }
-  async createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.RecordPromise {
+  async createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.ApiClientRecordPromise {
     if (record.id) {
       return this.createRecordWithId(record, record.id);
     }
     const service = await this.getAdapter();
     const result = await service.createRecord(
       {
-        name: record.name || "Untitled Request",
-        url: record.data.request.url,
-        method: record.data.request.method,
-        queryParams: record.data.request.queryParams,
-        headers: record.data.request.headers,
-        body: record.data.request?.body,
-        bodyContainer: record.data.request?.bodyContainer,
-        contentType: record.data.request?.contentType,
-        scripts: record.data.scripts,
+        ...this.parseApiRecordRequest(record),
       },
       record.collectionId
     );
@@ -181,7 +220,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, "id">>): RQAPI.RecordPromise {
+  async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, "id">>): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.createCollection(record.name, record.collectionId);
 
@@ -204,21 +243,12 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createRecordWithId(record: Partial<RQAPI.ApiRecord>, nativeId: string): RQAPI.RecordPromise {
+  async createRecordWithId(record: Partial<RQAPI.ApiRecord>, nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
     const result = await service.createRecordWithId(
       {
-        name: record.name || "Untitled Request",
-        url: record.data.request.url,
-        method: record.data.request.method,
-        queryParams: record.data.request.queryParams,
-        headers: record.data.request.headers,
-        body: record.data.request?.body,
-        bodyContainer: record.data.request?.bodyContainer,
-        contentType: record.data.request?.contentType,
-        scripts: record.data.scripts,
-        auth: record.data.auth,
+        ...this.parseApiRecordRequest(record),
       },
       id
     );
@@ -237,21 +267,13 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: parsedApiRecord,
     };
   }
-  async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, "id">>, nativeId: string): RQAPI.RecordPromise {
+  async updateRecord(patch: Partial<Omit<RQAPI.ApiRecord, "id">>, nativeId: string): RQAPI.ApiClientRecordPromise {
     const id = parseNativeId(nativeId);
     const service = await this.getAdapter();
     const result = await service.updateRecord(
       {
+        ...this.parseApiRecordRequest(patch),
         name: patch.name,
-        url: patch.data.request.url,
-        method: patch.data.request.method,
-        queryParams: patch.data.request.queryParams,
-        headers: patch.data.request.headers,
-        body: patch.data.request?.body,
-        bodyContainer: patch.data.request?.bodyContainer,
-        contentType: patch.data.request?.contentType,
-        scripts: patch.data.scripts,
-        auth: patch.data.auth,
       },
       id
     );
@@ -287,7 +309,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async getCollection(recordId: string): RQAPI.RecordPromise {
+  async getCollection(recordId: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.getCollection(recordId);
     if (result.type === "error") {
@@ -304,7 +326,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
+  async renameCollection(id: string, newName: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.renameCollection(id, newName);
     if (result.type === "error") {
@@ -378,7 +400,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async updateCollectionAuthData(
     collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
 
@@ -441,7 +463,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.createCollectionFromCompleteRecord(collection, id);
     if (result.type === "error") {
@@ -460,8 +482,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async batchWriteApiEntities(
     batchSize: number,
-    entities: RQAPI.Record[],
-    writeFunction: (entity: RQAPI.Record) => Promise<any>
+    entities: RQAPI.ApiClientRecord[],
+    writeFunction: (entity: RQAPI.ApiClientRecord) => Promise<any>
   ) {
     try {
       for (const entity of entities) {
@@ -478,8 +500,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async duplicateApiEntities(entities: RQAPI.Record[]) {
-    const result: RQAPI.Record[] = [];
+  async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
+    const result: RQAPI.ApiClientRecord[] = [];
     for (const entity of entities) {
       const duplicationResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
@@ -494,9 +516,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return result;
   }
 
-  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+  async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
     const service = await this.getAdapter();
-    const result: RQAPI.Record[] = [];
+    const result: RQAPI.ApiClientRecord[] = [];
     for (const entity of entities) {
       const moveResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
@@ -513,7 +535,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return result;
   }
 
-  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+  async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     if (records.length === 0) {
       return {
         success: true,
