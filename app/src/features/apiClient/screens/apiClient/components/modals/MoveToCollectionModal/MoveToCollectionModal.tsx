@@ -14,7 +14,7 @@ import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface Props {
-  recordsToMove: RQAPI.Record[];
+  recordsToMove: RQAPI.ApiClientRecord[];
   isOpen: boolean;
   onClose: () => void;
 }

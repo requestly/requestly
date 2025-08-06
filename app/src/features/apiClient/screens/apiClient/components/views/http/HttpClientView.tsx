@@ -68,6 +68,8 @@ import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 import { ApiClientFilesContext } from "features/apiClient/store/ApiClientFilesContextProvider";
 import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
@@ -112,6 +114,7 @@ const HttpClientView: React.FC<Props> = ({
   apiEntryDetails,
 }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
@@ -138,6 +141,7 @@ const HttpClientView: React.FC<Props> = ({
   const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
     apiEntryDetails?.data ?? (getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry)
   );
+
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
@@ -159,6 +163,8 @@ const HttpClientView: React.FC<Props> = ({
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(
     sanitizeEntry({ ...entryWithoutResponse, response: null })
   );
+
+  const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
 
   const [purgeAndAdd, purgeAndAddHeaders] = useAutogenerateStore((state) => [
     state.purgeAndAdd,
@@ -320,9 +326,13 @@ const HttpClientView: React.FC<Props> = ({
   }, [setIcon]);
 
   useEffect(() => {
-    setTitle(apiEntryDetails?.name || "Untitled request");
+    if (isHistoryView) {
+      setTitle("History");
+    } else {
+      setTitle(apiEntryDetails?.name || "Untitled request");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTitle]);
+  }, [setTitle, isHistoryView]);
 
   useEffect(() => {
     //on mount run this

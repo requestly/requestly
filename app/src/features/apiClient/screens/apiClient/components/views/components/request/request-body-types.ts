@@ -3,7 +3,7 @@ import { RQAPI, RequestContentType } from "../../../../../../types";
 export type RequestBodyProps = {
   contentType: RequestContentType;
   recordId: string;
-  setRequestEntry: (updaterFn: (prev: RQAPI.Entry) => RQAPI.Entry) => void;
+  setRequestEntry: (updaterFn: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
   setContentType: (contentType: RequestContentType) => void;
 } & /**
  * We maintain two modes now, single and multiple. In single mode the body can hold

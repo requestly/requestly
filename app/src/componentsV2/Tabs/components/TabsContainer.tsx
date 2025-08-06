@@ -10,6 +10,7 @@ import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import "./tabsContainer.scss";
+import { RQAPI } from "features/apiClient/types";
 
 export const TabsContainer: React.FC = () => {
   const [
@@ -155,7 +156,7 @@ export const TabsContainer: React.FC = () => {
         }}
         onEdit={(key, action) => {
           if (action === "add") {
-            openTab(new DraftRequestContainerTabSource());
+            openTab(new DraftRequestContainerTabSource(RQAPI.ApiEntryType.HTTP));
           }
         }}
       />

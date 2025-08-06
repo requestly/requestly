@@ -6,6 +6,7 @@ import { statusCodes } from "config/constants/sub/statusCode";
 import NetworkStatusField from "components/misc/NetworkStatusField";
 import { NodeIndexOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system-v2/components";
+import { isHttpResponse } from "features/apiClient/screens/apiClient/utils";
 
 interface Props {
   response: RQAPI.Response;
@@ -45,7 +46,7 @@ const StatusLine: React.FC<Props> = ({ response }) => {
 
   return (
     <Space className="api-response-status-line" size={0}>
-      {response.redirectedUrl && (
+      {isHttpResponse(response) && response.redirectedUrl && (
         <Popover content={response.redirectedUrl}>
           <RQButton type="transparent" size="small" icon={<NodeIndexOutlined />}>
             Redirected
