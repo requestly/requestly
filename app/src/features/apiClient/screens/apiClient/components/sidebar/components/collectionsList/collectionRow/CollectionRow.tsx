@@ -10,7 +10,6 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
-import { MdAddCircleOutline } from "@react-icons/all-files/md/MdAddCircleOutline";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
@@ -22,9 +21,10 @@ import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
 import { useDrag, useDrop } from "react-dnd";
-import "./CollectionRow.scss";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
+import "./CollectionRow.scss";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -342,7 +342,7 @@ export const CollectionRow: React.FC<Props> = ({
                         <RQButton
                           size="small"
                           type="transparent"
-                          icon={<MdAddCircleOutline />}
+                          icon={<MdAdd />}
                           onClick={(e) => e.stopPropagation()}
                         />
                       </NewApiRecordDropdown>
