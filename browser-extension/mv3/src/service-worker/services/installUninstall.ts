@@ -3,8 +3,8 @@ import { DEFAULT_BLOCKED_DOMAINS, saveBlockedDomainsToStorage } from "../../util
 
 const handleExtensionInstalledOrUpdated = (details: chrome.runtime.InstalledDetails) => {
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-    chrome.tabs.create({ url: config.LANDING_PAGE_BASE_URL + "/extension-installed-success" });
     saveBlockedDomainsToStorage(DEFAULT_BLOCKED_DOMAINS);
+    chrome.tabs.create({ url: config.LANDING_PAGE_BASE_URL + "/extension-installed-success" });
   }
 
   if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {

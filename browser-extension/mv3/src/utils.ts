@@ -2,7 +2,7 @@ import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
 import { getVariable, Variable } from "./service-worker/variable";
-import { ChangeType, getRecord, onRecordChange, saveRecord } from "common/storage";
+import { getRecord, onRecordChange, saveRecord } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
@@ -101,8 +101,8 @@ let cachedBlockedDomains: string[] | null = null;
 export const DEFAULT_BLOCKED_DOMAINS = ["mail.google.com"];
 
 export const cacheBlockedDomains = async () => {
-  const blockedDomains = (await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS)) ?? [];
-  cachedBlockedDomains = [...blockedDomains];
+  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+  cachedBlockedDomains = blockedDomains ?? [];
 };
 
 export const saveBlockedDomainsToStorage = async (domains: string[]) => {
@@ -143,7 +143,6 @@ export const onBlockListChange = (callback: () => void) => {
   onRecordChange<string[]>(
     {
       keyFilter: STORAGE_KEYS.BLOCKED_DOMAINS,
-      changeTypes: [ChangeType.MODIFIED],
     },
     () => {
       cacheBlockedDomains().then(() => {
