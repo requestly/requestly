@@ -6,7 +6,7 @@ import { RQAPI } from "features/apiClient/types";
 import { useState } from "react";
 
 export const useApiRecordState = (id: string) => {
-  const [noopStore] = useState(() => createRecordStore({} as RQAPI.Record));
+  const [noopStore] = useState(() => createRecordStore({} as RQAPI.ApiRecord));
   const [getRecordStore] = useAPIRecords((s) => [s.getRecordStore]);
 
   const recordStore = getRecordStore(id);
