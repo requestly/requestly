@@ -8,7 +8,10 @@ import { variablesActions } from "store/features/variables/slice";
 import { RBACButton, useRBAC } from "features/rbac";
 import { notification } from "antd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { NewApiRecordDropdown } from "../../../sidebar/components/NewApiRecordDropdown/NewApiRecordDropdown";
+import {
+  NewApiRecordDropdown,
+  NewRecordDropdownItemType,
+} from "../../../sidebar/components/NewApiRecordDropdown/NewApiRecordDropdown";
 import "./apiClientEmptyView.scss";
 
 export const ApiClientEmptyView = () => {
@@ -76,6 +79,7 @@ export const ApiClientEmptyView = () => {
               loading: isRecordCreating === RQAPI.RecordType.API,
               children: "Create a new request",
             }}
+            invalidActions={[NewRecordDropdownItemType.ENVIRONMENT, NewRecordDropdownItemType.COLLECTION]}
           />
           <RBACButton
             permission="create"

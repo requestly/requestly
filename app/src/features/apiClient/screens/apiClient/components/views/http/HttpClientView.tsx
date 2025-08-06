@@ -142,6 +142,7 @@ const HttpClientView: React.FC<Props> = ({
   const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
     apiEntryDetails?.data ?? (getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry)
   );
+
   const [isFailed, setIsFailed] = useState(false);
   const [error, setError] = useState<RQAPI.ExecutionError>(null);
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
