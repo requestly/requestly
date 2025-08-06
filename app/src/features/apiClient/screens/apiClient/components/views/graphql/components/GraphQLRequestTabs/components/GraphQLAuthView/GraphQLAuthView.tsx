@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { EnvironmentVariables } from "backend/environment/types";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import AuthorizationView from "../../../../../components/request/components/AuthorizationView";
 import { resolveAuth } from "features/apiClient/screens/apiClient/utils";
@@ -9,30 +8,29 @@ import {
   parseAuth,
   SimpleKeyValuePair,
 } from "features/apiClient/store/autogenerateStore";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { RQAPI } from "features/apiClient/types";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
+import { renderVariables } from "backend/environment/utils";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
-interface Props {
-  variables: EnvironmentVariables;
-}
+interface Props {}
 
-export const GraphQLAuthView: React.FC<Props> = ({ variables }) => {
+export const GraphQLAuthView: React.FC<Props> = () => {
   const [recordId, collectionId, auth, updateAuth] = useGraphQLRecordStore((state) => [
     state.record.id,
     state.record.collectionId,
     state.record.data.auth,
     state.updateRecordAuth,
   ]);
-  const { renderVariables } = useEnvironmentManager();
   const [getData, getParentChain] = useAPIRecords((state) => [state.getData, state.getParentChain]);
   const [purgeAndAdd] = useAutogenerateStore((state) => [state.purgeAndAdd, state.purgeAndAddHeaders]);
+  const ctx = useApiClientFeatureContext();
 
   const resolver = useCallback(
     <T extends Record<string, any>>(template: T) => {
-      return renderVariables(template, collectionId).result;
+      return renderVariables(template, collectionId, ctx).result;
     },
-    [renderVariables, collectionId]
+    [collectionId, ctx]
   );
 
   const handleAuthUpdate = useCallback(
@@ -62,7 +60,7 @@ export const GraphQLAuthView: React.FC<Props> = ({ variables }) => {
         defaults={auth}
         onAuthUpdate={handleAuthUpdate}
         isRootLevelRecord={!collectionId}
-        variables={variables}
+        recordId={recordId}
       />
     </div>
   );
