@@ -22,18 +22,16 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     if (isSheetPlacedAtBottom && splitPane.current) {
       if (isBottomSheetOpen) {
         splitPane.current.split.setSizes(initialSizes);
-      } else {
-        splitPane.current.split.setSizes([100, 0]);
       }
     }
-  }, [isBottomSheetOpen, isSheetPlacedAtBottom, initialSizes]);
+  }, []);
 
   return (
     <Split
       key={splitDirection}
       ref={splitPane}
       direction={splitDirection}
-      sizes={isSheetPlacedAtBottom ? [100, 0] : initialSizes}
+      sizes={initialSizes}
       minSize={minSize || 350}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
