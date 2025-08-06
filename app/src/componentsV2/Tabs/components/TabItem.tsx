@@ -46,6 +46,14 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           [incrementVersion, props.store]
         ),
 
+        setIcon: useMemo(
+          () => (icon: React.ReactNode) => {
+            props.store.getState().setIcon(icon);
+            incrementVersion();
+          },
+          [incrementVersion, props.store]
+        ),
+
         setPreview: (preview: boolean) => {
           props.store.getState().setPreview(preview);
           if (!preview) {
