@@ -32,7 +32,6 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(props.onChange);
   const initialDocRef = useRef(props.initialDoc);
-  const isUpdatingRef = useRef(false);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const myTheme = EditorView.theme({
@@ -97,7 +96,6 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
         const currentDoc = viewRef.current?.state.doc.toString();
         if (currentDoc !== props.initialDoc) {
           // Only update if the content is actually different
-          isUpdatingRef.current = true;
           const transaction = viewRef.current!.state.update({
             changes: {
               from: 0,
@@ -106,7 +104,6 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
             },
           });
           viewRef.current!.dispatch(transaction);
-          isUpdatingRef.current = false;
         }
       }, 50);
     }
@@ -122,7 +119,7 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
     if (!editorRef.current) return;
 
     const updateListener = EditorView.updateListener.of((update) => {
-      if (update.docChanged && !isUpdatingRef.current) {
+      if (update.docChanged) {
         const doc = update.state.doc.toString();
         onChangeRef.current?.(doc);
       }
