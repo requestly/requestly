@@ -8,6 +8,7 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import "./newApiRecordDropdown.scss";
 import { DropdownButtonProps } from "antd/lib/dropdown";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 type OnSelectParams =
   | { recordType: RQAPI.RecordType.API; entryType: RQAPI.ApiEntryType }
@@ -38,6 +39,8 @@ type NewRecordDropdownProps = {
 );
 
 export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) => {
+  const isGraphQLSupportEnabled = useFeatureIsOn("graphql-support");
+
   const { onSelect, buttonProps, children, disabled, invalidActions } = props;
 
   const allDropdownItems: DropDownProps["menu"]["items"] = useMemo(() => {
@@ -54,6 +57,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         key: NewRecordDropdownItemType.GRAPHQL,
         label: "New GraphQL request",
         icon: <GrGraphQl />,
+        hidden: !isGraphQLSupportEnabled,
         onClick: () => {
           onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.GRAPHQL });
         },
@@ -75,7 +79,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         },
       },
     ];
-  }, [onSelect]);
+  }, [onSelect, isGraphQLSupportEnabled]);
 
   const dropdownItems = useMemo(() => {
     if (!invalidActions) {
