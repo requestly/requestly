@@ -448,7 +448,7 @@ const GraphQLClientView: React.FC<Props> = ({
 const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
-      <GraphQLRecordProvider record={props.selectedEntryDetails}>
+      <GraphQLRecordProvider record={props.apiEntryDetails}>
         <Component {...props} />
       </GraphQLRecordProvider>
     );
