@@ -140,6 +140,15 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       });
     }
 
+    if (response && isFailed) {
+      return baseTabItems.map((tabItem) => {
+        return {
+          ...tabItem,
+          children: <RequestError error={error} onRetry={executeRequest} />,
+        };
+      });
+    }
+
     return baseTabItems;
   }, [
     response,
