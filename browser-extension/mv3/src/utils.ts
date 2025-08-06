@@ -98,20 +98,16 @@ export const debounce = (func: Function, wait: number) => {
 };
 
 let cachedBlockedDomains: string[] | null = null;
-export const DEFAULT_BLOCKED_DOMAINS = ["mail.google.com"];
 
 export const cacheBlockedDomains = async () => {
   const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
   cachedBlockedDomains = blockedDomains ?? [];
 };
 
-export const saveBlockedDomainsToStorage = async (domains: string[]) => {
-  if (!domains || domains.length === 0) {
-    return;
-  }
-
+export const DEFAULT_BLOCKED_DOMAINS = ["mail.google.com"];
+export const initBlockedDomainsStorage = async () => {
   const existingBlockedDomains = (await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS)) ?? [];
-  const updatedBlockedDomains = Array.from(new Set([...existingBlockedDomains, ...domains]));
+  const updatedBlockedDomains = Array.from(new Set([...existingBlockedDomains, ...DEFAULT_BLOCKED_DOMAINS]));
 
   await saveRecord(STORAGE_KEYS.BLOCKED_DOMAINS, updatedBlockedDomains);
 };
