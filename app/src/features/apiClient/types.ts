@@ -286,7 +286,7 @@ export namespace RQAPI {
 
   export type ApiRecord = {
     type: RecordType.API;
-    data: HttpApiEntry | GraphQLApiEntry;
+    data: ApiEntry;
   } & BaseApiRecord;
 
   export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };

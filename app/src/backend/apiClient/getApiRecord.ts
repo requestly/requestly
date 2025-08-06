@@ -5,14 +5,14 @@ import { enforceLatestRecordSchema } from "./parser";
 
 export const getApiRecord = async (
   recordId: string
-): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> => {
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> => {
   const result = await getApiRecordFromFirebase(recordId);
   return result;
 };
 
 const getApiRecordFromFirebase = async (
   recordId: string
-): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> => {
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> => {
   const db = getFirestore(firebaseApp);
   const docRef = doc(db, "apis", recordId);
 

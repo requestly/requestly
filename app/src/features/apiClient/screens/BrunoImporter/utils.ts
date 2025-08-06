@@ -99,6 +99,7 @@ const createApiRecord = (
     name: item.name,
     type: RQAPI.RecordType.API,
     data: {
+      type: RQAPI.ApiEntryType.HTTP,
       request: {
         url: request.url,
         method: (request.method || "GET") as RequestMethod,
@@ -107,6 +108,7 @@ const createApiRecord = (
         body: requestBody,
         contentType,
       },
+      response: null,
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processBrunoScripts(request),
     },

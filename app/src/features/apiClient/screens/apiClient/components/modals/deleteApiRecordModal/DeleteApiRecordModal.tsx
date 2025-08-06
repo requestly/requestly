@@ -15,7 +15,7 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 
 interface DeleteApiRecordModalProps {
   open: boolean;
-  records: RQAPI.Record[];
+  records: RQAPI.ApiClientRecord[];
   onClose: () => void;
   onSuccess?: () => void;
 }
@@ -33,8 +33,8 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
   let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
   const getAllRecordsToDelete = () => {
-    const recordsToBeDeleted: RQAPI.Record[] = [];
-    const stack: RQAPI.Record[] = [...records];
+    const recordsToBeDeleted: RQAPI.ApiClientRecord[] = [];
+    const stack: RQAPI.ApiClientRecord[] = [...records];
 
     while (stack.length) {
       const record = stack.pop()!;

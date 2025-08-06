@@ -12,11 +12,11 @@ import { v4 as uuidv4 } from "uuid";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private queryService: ApiClientLocalDbQueryService<RQAPI.Record>;
+  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
-    this.queryService = new ApiClientLocalDbQueryService<RQAPI.Record>(meta, ApiClientLocalDbTable.APIS);
+    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
   }
 
   private getNewId() {
@@ -35,7 +35,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async getApiRecord(recordId: string): RQAPI.RecordPromise {
+  async getApiRecord(recordId: string): RQAPI.ApiClientRecordPromise {
     const record = await this.queryService.getRecord(recordId);
 
     if (record) {
@@ -52,8 +52,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return this.getApiRecord(recordId);
   }
 
-  async createRecord(record: Partial<RQAPI.Record>): RQAPI.RecordPromise {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+  async createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise {
+    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
 
     const newRecord = {
       ...sanitizedRecord,
@@ -69,19 +69,19 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedBy: null,
       createdTs: Timestamp.now().toMillis(),
       updatedTs: Timestamp.now().toMillis(),
-    } as RQAPI.Record;
+    } as RQAPI.ApiClientRecord;
 
     await this.queryService.createRecord(newRecord);
     return { success: true, data: newRecord };
   }
 
-  async createCollection(record: Partial<RQAPI.Record>) {
+  async createCollection(record: Partial<RQAPI.ApiClientRecord>) {
     return this.createRecord(record);
   }
 
   // TODO: refactor this to avoid code duplication
-  async createRecordWithId(record: Partial<RQAPI.Record>, id: string) {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+  async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
+    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
 
     const newRecord = {
       ...sanitizedRecord,
@@ -97,14 +97,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       updatedBy: null,
       createdTs: Timestamp.now().toMillis(),
       updatedTs: Timestamp.now().toMillis(),
-    } as RQAPI.Record;
+    } as RQAPI.ApiClientRecord;
 
     await this.queryService.createRecord(newRecord);
     return { success: true, data: newRecord };
   }
 
-  async updateRecord(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+  async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
+    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
     const existingRecord = await this.getApiRecord(id);
 
     const updatedRecord = {
@@ -112,7 +112,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       ...sanitizedRecord,
       id,
       updatedTs: Timestamp.now().toMillis(),
-    } as RQAPI.Record;
+    } as RQAPI.ApiClientRecord;
 
     await this.queryService.updateRecord(id, updatedRecord);
     return { success: true, data: updatedRecord };
@@ -190,7 +190,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return this.getNewId();
   }
 
-  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     return {
       success: true,
       data: undefined,
@@ -207,14 +207,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     return this.createRecordWithId(collection, id);
   }
 
   async batchWriteApiEntities(
     batchSize: number,
-    entities: RQAPI.Record[],
-    writeFunction: (entity: RQAPI.Record) => Promise<any>
+    entities: RQAPI.ApiClientRecord[],
+    writeFunction: (entity: RQAPI.ApiClientRecord) => Promise<any>
   ) {
     try {
       for (const entity of entities) {
@@ -231,7 +231,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+  async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     await this.queryService.createBulkRecords(records);
     return {
       success: true,
@@ -242,8 +242,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async duplicateApiEntities(entities: RQAPI.Record[]) {
-    const result: RQAPI.Record[] = [];
+  async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
+    const result: RQAPI.ApiClientRecord[] = [];
     for (const entity of entities) {
       const duplicationResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
@@ -259,7 +259,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return result;
   }
 
-  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+  async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
     const updatedRequests = entities.map((record) => {
       return isApiCollection(record)
         ? {

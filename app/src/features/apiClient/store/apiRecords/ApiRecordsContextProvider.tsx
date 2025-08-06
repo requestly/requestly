@@ -20,9 +20,9 @@ export type AllApiClientStores = {
   erroredRecords: StoreApi<ErroredRecordsState>;
 };
 
-type FetchedData<T> = { records: T; erroredRecords: ErroredRecord[] };
+type FetchedData<T> = { data: T; erroredRecords: ErroredRecord[] };
 type FetchedStoreData = {
-  records: FetchedData<RQAPI.ApiRecord[]>;
+  records: FetchedData<RQAPI.ApiClientRecord[]>;
   environments: { global: EnvironmentData; nonGlobalEnvironments: FetchedData<EnvironmentMap> };
 };
 /* todo: rename both context and provider to something close to AllApiClientStores */
@@ -36,29 +36,32 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     (async () => {
       try {
-        const [recordsResult, envResult] = await Promise.all([
+        const [fetchedRecordsResult, fetchedEnvResult] = await Promise.all([
           apiClientRecordsRepository.getAllRecords(),
           environmentVariablesRepository.getAllEnvironments(),
         ]);
 
-        if (!recordsResult.success) {
+        if (!fetchedRecordsResult.success) {
           notification.error({
             message: "Could not fetch records!",
-            description: recordsResult.message || "Please try reloading the app", // fix-me: need good copy here
+            description: fetchedRecordsResult.message || "Please try reloading the app", // fix-me: need good copy here
             placement: "bottomRight",
           });
         } else {
-          setRecords(recordsResult.data);
+          setRecords({
+            data: fetchedRecordsResult.data.records,
+            erroredRecords: fetchedRecordsResult.data.erroredRecords,
+          });
         }
 
-        if (!envResult.success) {
+        if (!fetchedEnvResult.success) {
           notification.error({
             message: "Could not fetch environments!",
             description: "Please try reloading the app", // fix-me: need good copy here
             placement: "bottomRight",
           });
         } else {
-          const allEnvironments = envResult.data.environments;
+          const allEnvironments = fetchedEnvResult.data.environments;
           const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
           const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
 
@@ -67,8 +70,8 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
           setEnvironments({
             global: globalEnv,
             nonGlobalEnvironments: {
-              records: otherEnvs,
-              erroredRecords: envResult.data.erroredRecords,
+              data: otherEnvs,
+              erroredRecords: fetchedEnvResult.data.erroredRecords,
             },
           });
         }
@@ -93,10 +96,10 @@ type RecordsProviderProps = {
 };
 const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { environments, records } }) => {
   const environmentStore = createEnvironmentsStore({
-    environments: environments.nonGlobalEnvironments.records,
+    environments: environments.nonGlobalEnvironments.data,
     globalEnvironment: environments.global,
   });
-  const apiRecordsStore = createApiRecordsStore(records);
+  const apiRecordsStore = createApiRecordsStore({ records: records.data, erroredRecords: records.erroredRecords });
   const errorStore = createErroredRecordsStore({
     apiErroredRecords: records.erroredRecords,
     environmentErroredRecords: environments.nonGlobalEnvironments.erroredRecords,
@@ -110,9 +113,7 @@ const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { env
       }}
     >
       <Daemon />
-
-      {/* FIXME: fix type */}
-      <ApiClientFilesProvider records={records as any}>
+      <ApiClientFilesProvider records={records.data}>
         <ApiClientProvider>{children}</ApiClientProvider>
       </ApiClientFilesProvider>
     </ApiRecordsStoreContext.Provider>

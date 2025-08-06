@@ -19,7 +19,7 @@ import {
   ApiClientRepositoryContext,
   useGetApiClientSyncRepo,
 } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
-import { GenericApiClient } from "features/apiClient/screens/apiClient/clientView/GenericApiClient";
+import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -38,7 +38,8 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       return getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, parseCurlRequest(request));
     }
 
-    const entry: RQAPI.ApiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP);
+    const entry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry;
+    entry.type = RQAPI.ApiEntryType.HTTP;
     const urlObj = new URL(request.url);
     const searchParams = Object.fromEntries(new URLSearchParams(urlObj.search));
     urlObj.search = "";
@@ -77,7 +78,6 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     entry.request = {
       ...entry.request,
     };
-
     return entry;
   }, [request]);
 
@@ -104,9 +104,10 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
           <ApiClientRepositoryContext.Provider value={repository} key={key}>
             <ApiRecordsProvider>
               <AutogenerateProvider>
-                <GenericApiClient
-                  apiEntryDetails={{ data: apiEntry }}
-                  handleAppRequestFinished={() => {}}
+                <ClientViewFactory
+                  // TODO: fix this
+                  apiRecord={{ data: apiEntry }}
+                  handleRequestFinished={() => {}}
                   onSaveCallback={() => {}}
                   isCreateMode={true}
                 />

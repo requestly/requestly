@@ -2,10 +2,17 @@ import { StoreApi } from "zustand";
 import { ApiClientFile, ApiClientFilesStore, createApiClientFilesStore, FileId } from "./apiClientFilesStore";
 import { createContext, ReactNode, useMemo } from "react";
 import { RequestContentType, RQAPI } from "../types";
+import { isHttpApiRecord } from "../screens/apiClient/utils";
 
 export const ApiClientFilesContext = createContext<StoreApi<ApiClientFilesStore>>(null);
 
-export const ApiClientFilesProvider = ({ children, records }: { children: ReactNode; records: RQAPI.ApiRecord[] }) => {
+export const ApiClientFilesProvider = ({
+  children,
+  records,
+}: {
+  children: ReactNode;
+  records: RQAPI.ApiClientRecord[];
+}) => {
   const initialFiles: Record<FileId, ApiClientFile> = useMemo(() => {
     if (!records?.length) {
       return {};
@@ -14,7 +21,7 @@ export const ApiClientFilesProvider = ({ children, records }: { children: ReactN
     const files: Record<FileId, ApiClientFile> = {};
     for (const record of records) {
       if (record.type === RQAPI.RecordType.API) {
-        if (record.data.request.contentType === RequestContentType.MULTIPART_FORM) {
+        if (isHttpApiRecord(record) && record.data.request.contentType === RequestContentType.MULTIPART_FORM) {
           const requestBody = record.data.request.body as RQAPI.MultipartFormBody;
           for (const bodyEntry of requestBody) {
             const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
