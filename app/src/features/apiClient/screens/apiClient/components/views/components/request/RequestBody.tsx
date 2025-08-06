@@ -6,6 +6,14 @@ import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";
 import { RequestBodyProps } from "./request-body-types";
 import "./requestBody.scss";
+import { MultipartFormBodyRenderer } from "./renderers/multipart-form-body-renderer";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import MultipartFormRedirectScreen from "../../../clientView/components/MultipartFormRedirectScreen";
+
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -15,6 +23,10 @@ function parseSingleModeBody(params: {
     case RequestContentType.FORM:
       return {
         form: body as RQAPI.RequestFormBody,
+      };
+    case RequestContentType.MULTIPART_FORM:
+      return {
+        multipartForm: body as RQAPI.MultipartFormBody,
       };
     case RequestContentType.JSON:
       return {
@@ -45,6 +57,8 @@ function parseSingleModeBody(params: {
 
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, variables, setRequestEntry, setContentType } = props;
+  const appMode = useSelector(getAppMode);
+  const isFileBodyEnabled = useFeatureIsOn("api_client_file_body_support");
 
   const requestBodyStateManager = useMemo(
     () =>
@@ -70,7 +84,10 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
           }
         >
           <Radio value="text">Raw</Radio>
-          <Radio value={RequestContentType.FORM}>Form</Radio>
+          <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
+          {isFeatureCompatible(FEATURES.API_CLIENT_MULTIPART_FORM) && isFileBodyEnabled && (
+            <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
+          )}
         </Radio.Group>
 
         {contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? (
@@ -88,7 +105,7 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
         ) : null}
       </div>
     );
-  }, [contentType, setContentType]);
+  }, [contentType, isFileBodyEnabled, setContentType]);
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
@@ -109,10 +126,17 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
       case RequestContentType.FORM:
         return <FormBody environmentVariables={variables} setRequestEntry={setRequestEntry} />;
 
+      case RequestContentType.MULTIPART_FORM:
+        return appMode === "DESKTOP" ? (
+          <MultipartFormBodyRenderer environmentVariables={variables} setRequestEntry={setRequestEntry} />
+        ) : (
+          <MultipartFormRedirectScreen />
+        );
+
       default:
         return null;
     }
-  }, [contentType, variables, setRequestEntry, requestBodyOptions]);
+  }, [contentType, variables, setRequestEntry, requestBodyOptions, appMode]);
 
   /*
   In select, label is used is 'Text' & RequestContentType.RAW is used as value since we have RAW, JSON, Form as types,
@@ -120,7 +144,9 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   */
   return (
     <div className="api-request-body">
-      {contentType === RequestContentType.FORM ? requestBodyOptions : null}
+      {contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM
+        ? requestBodyOptions
+        : null}
       <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
     </div>
   );

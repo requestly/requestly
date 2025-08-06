@@ -96,7 +96,7 @@ const LINKS = {
   // Contact Us Page
   CONTACT_US_PAGE: getLinkWithMetadata("https://requestly.com/contact-us/"),
   // Book A Demo
-  BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
+  BOOK_A_DEMO: "https://www.browserstack.com/contact?utm_source=Requestly&utm_medium=redirect&utm_platform=external",
 
   /** SUPPORT */
 
@@ -143,8 +143,6 @@ const LINKS = {
   },
 
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
-
-  CALENDLY_LINK: "https://calendly.com/requestly/sagar",
 
   ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
 

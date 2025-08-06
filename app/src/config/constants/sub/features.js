@@ -77,6 +77,7 @@ FEATURES.NETWORK_SESSIONS = "network-sessions"; // todo: replace redundancy
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
 FEATURES.API_CLIENT_INCLUDE_CREDENTIALS = "api-client-include-credentials";
+FEATURES.API_CLIENT_MULTIPART_FORM = "api-client-multipart-form";
 
 // session recording
 FEATURES.SESSION_ONBOARDING = "session_onboarding";

@@ -2,7 +2,12 @@ import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionA
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { AbortReason, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
-import { CONTENT_TYPE_HEADER, DEMO_API_URL, SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "../../constants";
+import {
+  CONTENT_TYPE_HEADER,
+  DEMO_API_URL,
+  LARGE_FILE_SIZE,
+  SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
+} from "../../constants";
 import * as curlconverter from "curlconverter";
 import { forEach, omit, split } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
@@ -168,13 +173,24 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = tr
         entry.request.body as RQAPI.RequestFormBody,
         removeDisabledKeys
       );
+    } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
+      sanitizedEntry.request.body = sanitizeKeyValuePairs(
+        entry.request.body as RQAPI.MultipartFormBody,
+        removeDisabledKeys
+      );
     }
   }
 
   return sanitizedEntry;
 };
 
-export const sanitizeKeyValuePairs = (keyValuePairs: KeyValuePair[], removeDisabledKeys = true): KeyValuePair[] => {
+/**
+ * generic sanitization fx for keyValuePairs (form & multipartform)
+ */
+export const sanitizeKeyValuePairs = <T extends { key: string; isEnabled: boolean }>(
+  keyValuePairs: T[],
+  removeDisabledKeys = true
+): T[] => {
   return keyValuePairs
     .map((pair) => ({
       ...pair,
@@ -685,3 +701,41 @@ export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpAp
 export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.GraphQLApiRecord {
   return record.data.type === RQAPI.ApiEntryType.GRAPHQL;
 }
+
+export const getFileExtension = (fileName: string) => {
+  const extension = fileName.includes(".") ? fileName.slice(fileName.lastIndexOf(".")) : "";
+  return extension;
+};
+
+export const formatBytes = (bytes: number) => {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
+};
+
+export const truncateString = (str: string, maxLength: number) => {
+  const nameWithoutExtension = str.includes(".") ? str.slice(0, str.lastIndexOf(".")) : str;
+  if (nameWithoutExtension.length > maxLength) {
+    return nameWithoutExtension.slice(0, maxLength) + "...";
+  } else {
+    return nameWithoutExtension;
+  }
+};
+
+export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
+  if (Array.isArray(body)) {
+    return body.some((item: any) => {
+      if (item.type === "file" && item.value && Array.isArray(item.value)) {
+        return item.value.some((file: any) => {
+          return file.size && file.size > LARGE_FILE_SIZE;
+        });
+      }
+      return false;
+    });
+  }
+
+  return false;
+};
