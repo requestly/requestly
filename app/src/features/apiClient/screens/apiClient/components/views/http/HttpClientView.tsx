@@ -757,7 +757,16 @@ const HttpClientView: React.FC<Props> = ({
               OnRecordNameUpdate={setRequestName}
               onBlur={handleRecordNameUpdate}
             />
-            <ClientCodeButton apiClientExecutor={apiClientExecutor} />
+            <ClientCodeButton
+              handleOnClick={() => {
+                apiClientExecutor.updateEntryDetails({
+                  entry: sanitizeEntry(entry),
+                  recordId: apiEntryDetails?.id,
+                  collectionId: apiEntryDetails?.collectionId,
+                });
+              }}
+              apiClientExecutor={apiClientExecutor}
+            />
           </div>
 
           <div className="api-client-header__url">

@@ -243,7 +243,7 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     const contentType = RequestContentType.JSON;
     const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
     return {
-      requestBody: "",
+      requestBody: JSON.stringify(graphql),
       contentType,
       headers: updatedHeaders,
     };
@@ -314,7 +314,7 @@ const createApiRecord = (
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
-  };
+  } as RQAPI.HttpApiRecord;
 };
 
 const createCollectionRecord = (
