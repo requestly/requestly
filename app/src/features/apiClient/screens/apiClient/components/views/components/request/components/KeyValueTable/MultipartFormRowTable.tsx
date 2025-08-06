@@ -9,8 +9,8 @@ import SingleLineEditor from "features/apiClient/screens/environment/components/
 import { FormDropDownOptions, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import FileDropdown from "./FileDropdown";
-import { EnvironmentVariables } from "backend/environment/types";
 import * as Sentry from "@sentry/react";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -34,7 +34,7 @@ interface EditableCellProps {
   editable: boolean;
   dataIndex: keyof RQAPI.FormDataKeyValuePair;
   record: RQAPI.FormDataKeyValuePair;
-  variables: EnvironmentVariables;
+  variables: ScopedVariables;
   handleUpdatePair: (record: RQAPI.FormDataKeyValuePair) => void;
   checkInvalidCharacter?: boolean;
 }

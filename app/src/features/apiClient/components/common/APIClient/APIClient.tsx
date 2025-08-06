@@ -28,6 +28,7 @@ interface Props {
   modalTitle?: string;
 }
 
+// Its okay if we dont open GraphQL request from network table
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const apiEntry = useMemo<RQAPI.ApiEntry>(() => {
     if (!request) {
