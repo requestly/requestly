@@ -12,7 +12,7 @@ import "./apiClientSnippetModal.scss";
 interface ApiClientSnippetModalProps {
   open: boolean;
   onClose: () => void;
-  apiRequest: RQAPI.Request;
+  apiRequest: RQAPI.HttpRequest;
 }
 
 type TargetId = ReturnType<typeof availableTargets>[number]["key"];
