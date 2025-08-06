@@ -216,9 +216,8 @@ const GraphQLClientView: React.FC<Props> = ({
   }, [setIcon]);
 
   useEffect(() => {
-    setTitle(getRecordName());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setTitle(getRecordName() || "Untitled request");
+  }, [setTitle, getRecordName]);
 
   useEffect(() => {
     if (graphQLRequestExecutor) {
