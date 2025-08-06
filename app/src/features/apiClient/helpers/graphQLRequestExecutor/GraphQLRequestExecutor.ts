@@ -12,15 +12,7 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
    * @returns Promise<RQAPI.ExecutionResult>
    */
   async executeGraphQLRequest(record: RQAPI.GraphQLApiRecord): Promise<RQAPI.ExecutionResult> {
-    const graphQLRequestEntry = record.data as RQAPI.GraphQLApiEntry;
-    const httpRequestEntry = graphQLEntryToHttpEntryAdapter(graphQLRequestEntry);
-
-    this.updateEntryDetails({
-      entry: httpRequestEntry,
-      recordId: record.id,
-      collectionId: record.collectionId,
-    });
-
+    this.prepareGraphQLRequest(record);
     const apiClientExecutionResult = await this.execute();
     const graphQLEntryWithResponse: RQAPI.GraphQLApiEntry = httpEntryToGraphQLEntryAdapter(
       apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry
@@ -30,5 +22,18 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
       ...apiClientExecutionResult,
       executedEntry: graphQLEntryWithResponse,
     };
+  }
+
+  prepareGraphQLRequest(record: RQAPI.GraphQLApiRecord) {
+    const graphQLRequestEntry = record.data as RQAPI.GraphQLApiEntry;
+    const httpRequestEntry = graphQLEntryToHttpEntryAdapter(graphQLRequestEntry);
+
+    this.updateEntryDetails({
+      entry: httpRequestEntry,
+      recordId: record.id,
+      collectionId: record.collectionId,
+    });
+
+    return super.prepareRequest();
   }
 }

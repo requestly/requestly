@@ -2,13 +2,15 @@ import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
+import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
 import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
 
 interface Props {
-  apiClientExecutor: HttpRequestExecutor;
+  apiClientExecutor: GraphQLRequestExecutor | HttpRequestExecutor;
+  handleOnClick?: () => void;
 }
 
-export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor }) => {
+export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor, handleOnClick }) => {
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
   return (
     <>
@@ -18,12 +20,7 @@ export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor }) => {
         size="small"
         className="api-client-view_get-code-btn"
         onClick={() => {
-          // TODO: handle sanitization after implementation of adapter
-          //   apiClientExecutor.updateEntryDetails({
-          //     entry: sanitizeEntry(entry),
-          //     recordId: apiEntryDetails?.id,
-          //     collectionId: apiEntryDetails?.collectionId,
-          //   });
+          handleOnClick?.();
           setIsSnippetModalVisible(true);
         }}
       >
@@ -31,7 +28,7 @@ export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor }) => {
       </RQButton>
       {isSnippetModalVisible ? (
         <ApiClientSnippetModal
-          apiRequest={apiClientExecutor.prepareRequest()}
+          apiRequest={apiClientExecutor?.prepareRequest()}
           open={isSnippetModalVisible}
           onClose={() => setIsSnippetModalVisible(false)}
         />
