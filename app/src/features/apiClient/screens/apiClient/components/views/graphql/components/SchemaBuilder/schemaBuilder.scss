@@ -1,0 +1,165 @@
+.schema-builder {
+  height: 100%;
+  overflow: hidden;
+
+  &__header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3, 4px);
+
+    &__title {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-2xs, 9px);
+      font-weight: var(--requestly-font-weight-medium);
+      line-height: 13px;
+      letter-spacing: 1px;
+      padding: var(--space-3, 6px) var(--space-4, 8px);
+    }
+
+    &__actions {
+      .ant-btn.ant-btn-sm svg {
+        color: var(--requestly-color-text-subtle);
+      }
+
+      .ant-btn.ant-btn-sm:hover svg {
+        color: var(--requestly-color-text-default);
+      }
+    }
+  }
+
+  &__content {
+    height: calc(100% - 25px);
+    overflow: hidden;
+    padding: var(--space-3, 6px) var(--space-5, 12px);
+
+    .schema-builder__arrow {
+      color: var(--requestly-color-text-subtle);
+      transform: scale(1.4);
+      position: relative;
+      top: 3px;
+    }
+
+    .schema-builder__checkbox {
+      .ant-checkbox-inner {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .docExplorerWrap {
+    width: 100% !important;
+    height: inherit !important;
+    overflow: auto !important;
+
+    .doc-explorer-title-bar {
+      display: none;
+    }
+
+    .doc-explorer-contents {
+      height: 100%;
+      font-size: var(--requestly-font-size-sm);
+
+      .graphiql-operation-title-bar {
+        span {
+          input {
+            width: 150px !important;
+            height: 24px !important;
+            border-radius: 4px;
+            border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+            padding: var(--space-3, 6px) var(--space-4, 8px);
+          }
+        }
+      }
+
+      .toolbar-button {
+        display: none !important;
+      }
+
+      .graphiql-explorer-node {
+        margin-top: 6px;
+
+        input[type="text"] {
+          width: 150px !important;
+          height: 24px !important;
+          border-radius: 4px;
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+          padding: var(--space-3, 6px) var(--space-4, 8px);
+        }
+
+        span {
+          gap: 8px;
+        }
+        .graphiql-explorer-graphql-arguments {
+          margin-top: 6px;
+          .ant-checkbox-wrapper {
+            margin-right: 8px;
+          }
+          input[type="text"] {
+            margin-left: 8px;
+          }
+
+          svg {
+            top: unset;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  &__empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-11, 48px) var(--space-5, 12px);
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    &__title {
+      margin-top: var(--space-6, 16px);
+      color: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-sm);
+      font-weight: var(--requestly-font-weight-medium);
+    }
+
+    &__description {
+      margin-top: var(--space-2, 4px);
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
+}
+
+// Styling to make field types more visible
+.graphiql-explorer-root {
+  .graphiql-explorer-node {
+    span[data-field-type] {
+      position: relative;
+
+      &::after {
+        content: " " attr(data-field-type) "";
+        font-family: "Roboto Mono", monospace;
+        color: #4880b0;
+        font-size: var(--requestly-font-size-xs, 11px);
+        margin-left: 4px;
+        letter-spacing: 0.25px;
+      }
+    }
+  }
+
+  .graphiql-explorer-graphql-arguments {
+    div[data-arg-type] {
+      &::after {
+        content: " " attr(data-arg-type) "";
+        font-family: "Roboto Mono", monospace;
+        color: #4880b0;
+        font-size: var(--requestly-font-size-xs, 11px);
+        margin-left: 4px;
+        letter-spacing: 0.25px;
+      }
+    }
+  }
+}

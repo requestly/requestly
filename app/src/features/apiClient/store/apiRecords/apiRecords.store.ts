@@ -7,8 +7,8 @@ import { createVariablesStore, parseVariables, VariablesState } from "../variabl
 type BaseRecordState = {
   type: RQAPI.RecordType;
   version: number;
-  record: RQAPI.Record;
-  updateRecordState: (patch: Partial<RQAPI.Record>) => void;
+  record: RQAPI.ApiClientRecord;
+  updateRecordState: (patch: Partial<RQAPI.ApiClientRecord>) => void;
   incrementVersion: () => void;
 };
 
@@ -29,7 +29,7 @@ export type ApiRecordsState = {
   /**
    * This is the list of records that are currently in the apiClientRecords.
    */
-  apiClientRecords: RQAPI.Record[];
+  apiClientRecords: RQAPI.ApiClientRecord[];
 
   /**
    * This maintains a map of child <-> parent. This field is mostly for internal use,
@@ -42,7 +42,7 @@ export type ApiRecordsState = {
    * This is a helper map, which provides actual data for a given id. Again, not for external use
    * unless neccessary.
    */
-  index: Map<string, RQAPI.Record>;
+  index: Map<string, RQAPI.ApiClientRecord>;
 
   /**
    * This maintains a version for each entity. This version is kept in a zunstand store so that
@@ -61,16 +61,16 @@ export type ApiRecordsState = {
   /**
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
-  refresh: (records: RQAPI.Record[]) => void;
-  getData: (id: string) => RQAPI.Record;
+  refresh: (records: RQAPI.ApiClientRecord[]) => void;
+  getData: (id: string) => RQAPI.ApiClientRecord | undefined;
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState> | undefined;
-  getAllRecords: () => RQAPI.Record[];
+  getAllRecords: () => RQAPI.ApiClientRecord[];
 
-  addNewRecord: (record: RQAPI.Record) => void;
-  addNewRecords: (records: RQAPI.Record[]) => void;
-  updateRecord: (record: RQAPI.Record) => void;
-  updateRecords: (records: RQAPI.Record[]) => void;
+  addNewRecord: (record: RQAPI.ApiClientRecord) => void;
+  addNewRecords: (records: RQAPI.ApiClientRecord[]) => void;
+  updateRecord: (record: RQAPI.ApiClientRecord) => void;
+  updateRecords: (records: RQAPI.ApiClientRecord[]) => void;
   deleteRecords: (recordIds: string[]) => void;
 
   /**
@@ -95,9 +95,9 @@ function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
   return result;
 }
 
-function parseRecords(records: RQAPI.Record[]) {
+function parseRecords(records: RQAPI.ApiClientRecord[]) {
   const childParentMap = new Map<string, string>();
-  const index = new Map<string, RQAPI.Record>();
+  const index = new Map<string, RQAPI.ApiClientRecord>();
 
   for (const record of records) {
     if (record.collectionId) {
@@ -112,15 +112,15 @@ function parseRecords(records: RQAPI.Record[]) {
   };
 }
 
-export const createRecordStore = (record: RQAPI.Record) => {
+export const createRecordStore = (record: RQAPI.ApiClientRecord) => {
   return create<CollectionRecordState | ApiRecordState>()((set, get) => {
     const baseRecordState: BaseRecordState = {
       type: record.type,
       version: 0,
       record,
-      updateRecordState: (patch: Partial<RQAPI.Record>) => {
+      updateRecordState: (patch: Partial<RQAPI.ApiClientRecord>) => {
         const record = get().record;
-        const updatedRecord = { ...record, ...patch } as RQAPI.Record;
+        const updatedRecord = { ...record, ...patch } as RQAPI.ApiClientRecord;
         set({
           record: updatedRecord,
         } as RecordState);
@@ -147,13 +147,16 @@ export const createRecordStore = (record: RQAPI.Record) => {
 function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<RecordState>>();
   for (const [id] of index) {
-    indexStore.set(id, createRecordStore(index.get(id) as RQAPI.Record));
+    indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
   }
 
   return indexStore;
 }
 
-export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] }) => {
+export const createApiRecordsStore = (initialRecords: {
+  records: RQAPI.ApiClientRecord[];
+  erroredRecords: ErroredRecord[];
+}) => {
   const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
   return create<ApiRecordsState>()((set, get) => ({
     apiClientRecords: initialRecords.records,
@@ -170,7 +173,7 @@ export const createApiRecordsStore = (initialRecords: { records: RQAPI.Record[];
 
       for (const [id] of index) {
         if (!indexStore.has(id)) {
-          indexStore.set(id, createRecordStore(index.get(id) as RQAPI.Record));
+          indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
         }
       }
 

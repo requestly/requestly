@@ -1,17 +1,18 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { StoreApi, useStore } from "zustand";
 import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
-import { useShallow } from "zustand/shallow";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { ApiClientProvider } from "features/apiClient/contexts/apiClient";
 import { notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
-import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
 import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { createEnvironmentsStore, EnvironmentsState } from "../environments/environments.store";
 import Daemon from "./Daemon";
 import { createErroredRecordsStore, ErroredRecordsState } from "../erroredRecords/erroredRecords.store";
+import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
+import { ApiClientFilesProvider } from "../ApiClientFilesContextProvider";
+import { useShallow } from "zustand/shallow";
 
 export type AllApiClientStores = {
   records: StoreApi<ApiRecordsState>;
@@ -21,7 +22,7 @@ export type AllApiClientStores = {
 
 type FetchedData<T> = { records: T; erroredRecords: ErroredRecord[] };
 type FetchedStoreData = {
-  records: FetchedData<RQAPI.Record[]>;
+  records: FetchedData<RQAPI.ApiRecord[]>;
   environments: { global: EnvironmentData; nonGlobalEnvironments: FetchedData<EnvironmentMap> };
 };
 /* todo: rename both context and provider to something close to AllApiClientStores */
@@ -109,7 +110,11 @@ const RecordsProvider: React.FC<RecordsProviderProps> = ({ children, data: { env
       }}
     >
       <Daemon />
-      <ApiClientProvider>{children}</ApiClientProvider>
+
+      {/* FIXME: fix type */}
+      <ApiClientFilesProvider records={records as any}>
+        <ApiClientProvider>{children}</ApiClientProvider>
+      </ApiClientFilesProvider>
     </ApiRecordsStoreContext.Provider>
   );
 };

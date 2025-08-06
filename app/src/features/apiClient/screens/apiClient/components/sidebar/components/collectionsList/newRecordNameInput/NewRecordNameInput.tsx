@@ -1,37 +1,21 @@
 import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
-import { Input, notification } from "antd";
-import { useDispatch } from "react-redux";
+import { Input } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
-import { getEmptyAPIEntry } from "features/apiClient/screens/apiClient/utils";
 import "./newRecordNameInput.scss";
-import {
-  trackCollectionSaved,
-  trackCollectionRenamed,
-  trackRequestSaved,
-  trackRequestRenamed,
-} from "modules/analytics/events/features/apiClient";
-import { variablesActions } from "store/features/variables/slice";
+import { trackCollectionRenamed, trackRequestRenamed } from "modules/analytics/events/features/apiClient";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 export interface NewRecordNameInputProps {
-  recordToBeEdited?: RQAPI.Record;
-  newRecordCollectionId?: string;
+  recordToBeEdited?: RQAPI.ApiClientRecord;
   recordType: RQAPI.RecordType;
   onSuccess: () => void;
   analyticEventSource: RQAPI.AnalyticsEventSource;
 }
 
-export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
-  recordToBeEdited,
-  recordType,
-  onSuccess,
-  newRecordCollectionId,
-  analyticEventSource = "",
-}) => {
-  const dispatch = useDispatch();
+export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordToBeEdited, recordType, onSuccess }) => {
   const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
   const [updateTabBySource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.updateTabBySource,
@@ -41,77 +25,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
   const defaultRecordName = recordType === RQAPI.RecordType.API ? "Untitled request" : "New collection";
   const [recordName, setRecordName] = useState(recordToBeEdited?.name || defaultRecordName);
   const [isLoading, setIsLoading] = useState(false);
-  const isEditMode = !!recordToBeEdited;
-
-  // TODO: Refactor and merge save and update handler
-  const saveNewRecord = useCallback(async () => {
-    setIsLoading(true);
-
-    if (!recordName) {
-      setIsLoading(false);
-      onSuccess?.();
-      return;
-    }
-
-    const record: Partial<RQAPI.Record> = {
-      name: recordName || defaultRecordName,
-    };
-
-    if (recordType === RQAPI.RecordType.API) {
-      record.type = RQAPI.RecordType.API;
-      record.data = getEmptyAPIEntry();
-    } else {
-      record.type = RQAPI.RecordType.COLLECTION;
-
-      // @ts-ignore TODO: Fix type
-      record.data = {};
-    }
-
-    if (newRecordCollectionId) {
-      record.collectionId = newRecordCollectionId;
-    }
-
-    const result =
-      record.type === RQAPI.RecordType.API
-        ? await apiClientRecordsRepository.createRecord(record)
-        : await apiClientRecordsRepository.createCollection(record);
-
-    if (result.success) {
-      onSaveRecord(result.data, "open");
-
-      if (recordType === RQAPI.RecordType.API) {
-        trackRequestSaved({
-          src: analyticEventSource,
-          has_scripts: Boolean(record?.data?.scripts?.preRequest?.length),
-          auth_type: record?.data?.auth?.currentAuthType,
-        });
-      } else {
-        trackCollectionSaved(analyticEventSource);
-        dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
-      }
-
-      const toastSuccessMessage = recordType === RQAPI.RecordType.API ? "Request created!" : "Collection Created!";
-      toast.success(toastSuccessMessage);
-    } else {
-      notification.error({
-        message: `Could not save ${record.type === RQAPI.RecordType.COLLECTION ? "Collection" : "Request"}.`,
-        placement: "bottomRight",
-      });
-    }
-
-    setIsLoading(false);
-    onSuccess?.();
-  }, [
-    recordName,
-    defaultRecordName,
-    recordType,
-    newRecordCollectionId,
-    apiClientRecordsRepository,
-    onSuccess,
-    onSaveRecord,
-    analyticEventSource,
-    dispatch,
-  ]);
 
   const updateRecord = useCallback(async () => {
     setIsLoading(true);
@@ -122,7 +35,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
       return;
     }
 
-    const record: Partial<RQAPI.Record> = {
+    const record: Partial<RQAPI.ApiClientRecord> = {
       ...recordToBeEdited,
       name: recordName,
     };
@@ -168,8 +81,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
     updateTabBySource,
   ]);
 
-  const onBlur = isEditMode ? updateRecord : saveNewRecord;
-
   return (
     <div className="new-record-input-container">
       {isLoading ? (
@@ -181,8 +92,8 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({
         <Input
           autoFocus
           value={recordName}
-          onBlur={onBlur}
-          onPressEnter={onBlur}
+          onBlur={updateRecord}
+          onPressEnter={updateRecord}
           className="new-record-input"
           status={recordName.length === 0 ? "error" : ""}
           onChange={(e) => {

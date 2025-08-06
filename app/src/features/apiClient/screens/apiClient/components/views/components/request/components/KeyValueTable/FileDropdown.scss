@@ -1,0 +1,125 @@
+.key-value-table-file-dropdown {
+  padding: 12px !important;
+  display: flex;
+  flex-direction: column;
+  width: 368px;
+  border-radius: 6px;
+  border: 1px solid var(--requestly-color-white-t-20);
+  background-color: var(--requestly-color-surface-0);
+  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+
+  .file-list-scroll-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    padding-right: 4px;
+  }
+
+  .file-dropdown-item-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .file-icon .invalid-icon {
+        flex-shrink: 0;
+        width: 13px;
+        height: 13px;
+      }
+
+      .invalid-icon {
+        color: var(--requestly-color-error-soft);
+      }
+
+      .file-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+        white-space: nowrap;
+        font-size: var(--requestly-font-size-sm);
+
+        .file-extension {
+          position: relative;
+          left: -2px;
+        }
+
+        &.file-invalid {
+          color: var(--requestly-color-error-soft);
+        }
+      }
+    }
+
+    .file-details {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+
+      .file-size {
+        font-size: var(--requestly-font-size-sm);
+        color: var(--requestly-color-text-subtle);
+        white-space: nowrap;
+      }
+
+      .file-dropdown-remove-button {
+        background-color: transparent;
+        border: none;
+      }
+    }
+  }
+
+  .add-more-file-container {
+    border-top: 1px solid var(--requestly-color-white-t-20);
+    padding-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .add-more-file-container {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    border-top: 1px solid var(--requestly-color-white-t-20);
+    padding-top: 12px;
+    padding-left: 200px;
+  }
+}
+
+.key-value-table-file-button {
+  gap: 4px !important;
+
+  .invalid-icon {
+    color: var(--requestly-color-error-soft) !important;
+  }
+
+  .file-counter {
+    flex-direction: column;
+    padding: 0px 4px;
+    gap: 0px;
+    border-radius: 4px;
+    background-color: var(--requestly-color-white-t-10);
+  }
+
+  .button-text {
+    .file-extension {
+      position: relative;
+      left: -5px;
+    }
+    .file-invalid {
+      color: var(--requestly-color-error-soft);
+    }
+  }
+
+  &.down-outlined-icon {
+    svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--requestly-color-white-t-10);
+      stroke-width: 50px;
+    }
+  }
+}

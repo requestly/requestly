@@ -6,15 +6,19 @@ import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
 import { captureException } from "./utils";
 
-export function sanitizeRecord(record: Partial<RQAPI.Record>) {
+export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
   if (sanitizedRecord.type === RQAPI.RecordType.API) {
-    delete sanitizedRecord.data.response;
-    delete sanitizedRecord.data.testResults;
+    if (sanitizedRecord.data) {
+      delete sanitizedRecord.data.response;
+      delete sanitizedRecord.data.testResults;
+    }
   }
 
   if (sanitizedRecord.type === RQAPI.RecordType.COLLECTION) {
-    delete sanitizedRecord.data.children;
+    if (sanitizedRecord.data) {
+      delete sanitizedRecord.data.children;
+    }
   }
 
   return sanitizedRecord;
@@ -22,10 +26,10 @@ export function sanitizeRecord(record: Partial<RQAPI.Record>) {
 
 export const upsertApiRecord = async (
   uid: string,
-  record: Partial<RQAPI.Record>,
+  record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
   docId?: string
-): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
   let result;
 
   const sanitizedRecord = sanitizeRecord(record);
@@ -41,10 +45,10 @@ export const upsertApiRecord = async (
 
 const createApiRecord = async (
   uid: string,
-  record: Partial<RQAPI.Record>,
+  record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
   docId?: string
-): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
   const db = getFirestore(firebaseApp);
   const rootApiRecordsCollectionRef = collection(db, "apis");
   const ownerId = getOwnerId(uid, teamId);
@@ -60,7 +64,7 @@ const createApiRecord = async (
     updatedBy: uid,
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
-  } as RQAPI.Record;
+  } as RQAPI.ApiClientRecord;
 
   if (record.type === RQAPI.RecordType.COLLECTION) {
     newRecord.description = record.description || "";
@@ -98,9 +102,9 @@ const createApiRecord = async (
 
 export const updateApiRecord = async (
   uid: string,
-  record: Partial<RQAPI.Record>,
+  record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string
-): Promise<{ success: boolean; data: RQAPI.Record | null }> => {
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
   const db = getFirestore(firebaseApp);
   const apiRecordDocRef = doc(db, "apis", record.id);
 
@@ -108,7 +112,7 @@ export const updateApiRecord = async (
     ...record,
     updatedBy: uid,
     updatedTs: Timestamp.now().toMillis(),
-  } as RQAPI.Record;
+  } as RQAPI.ApiClientRecord;
 
   try {
     await updateDoc(apiRecordDocRef, { ...updatedRecord });

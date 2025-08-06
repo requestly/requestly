@@ -1,12 +1,12 @@
 import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
 import { KeyValuePair, PostmanBodyMode, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
-import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { isEmpty } from "lodash";
 import {
   getDefaultAuth,
   getDefaultAuthType,
-} from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
+} from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 
 interface PostmanCollectionExport {
@@ -243,7 +243,7 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     const contentType = RequestContentType.JSON;
     const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
     return {
-      requestBody: "",
+      requestBody: JSON.stringify(graphql),
       contentType,
       headers: updatedHeaders,
     };
@@ -309,10 +309,11 @@ const createApiRecord = (
         body: requestBody,
         contentType,
       },
+      response: null,
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
-  };
+  } as RQAPI.HttpApiRecord;
 };
 
 const createCollectionRecord = (
