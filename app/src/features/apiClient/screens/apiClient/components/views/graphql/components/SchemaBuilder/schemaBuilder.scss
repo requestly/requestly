@@ -1,6 +1,7 @@
 .schema-builder {
   height: 100%;
   overflow: hidden;
+  position: relative;
 
   &__header-container {
     display: flex;
@@ -29,9 +30,10 @@
   }
 
   &__content {
-    height: calc(100% - 25px);
+    height: calc(100% - 32px);
     overflow: hidden;
     padding: var(--space-3, 6px) var(--space-5, 12px);
+    padding-top: unset;
 
     .schema-builder__arrow {
       color: var(--requestly-color-text-subtle);
@@ -60,6 +62,55 @@
     .doc-explorer-contents {
       height: 100%;
       font-size: var(--requestly-font-size-sm);
+
+      form.graphiql-explorer-actions.variable-editor-title {
+        position: absolute;
+        top: 5px;
+        left: unset;
+        right: 40px;
+        bottom: unset !important;
+        border-top: unset !important;
+        width: unset !important;
+        margin: unset !important;
+        border-radius: 4px !important;
+        padding: 0 !important;
+
+        // padding: unset !important;
+        border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+
+        select {
+          background: transparent !important;
+          width: 90px !important;
+          // border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+          border-radius: 4px !important;
+          padding: var(--space-2, 4px) var(--space-3, 6px) !important;
+          color: var(--requestly-color-text-subtle) !important;
+          font-size: var(--requestly-font-size-sm) !important;
+          font-weight: var(--requestly-font-weight-medium) !important;
+        }
+
+        & > span {
+          display: none !important;
+        }
+
+        .toolbar-button {
+          display: unset !important;
+          width: 24px !important;
+          height: 24px !important;
+          transition: all 0.2s ease-in-out !important;
+          margin-left: 4px;
+
+          span {
+            color: var(--requestly-color-text-subtle);
+            font-size: var(--requestly-font-size-xl);
+          }
+
+          &:hover {
+            background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+            color: var(--requestly-color-text-default) !important;
+          }
+        }
+      }
 
       .graphiql-operation-title-bar {
         span {
@@ -135,6 +186,25 @@
 
 // Styling to make field types more visible
 .graphiql-explorer-root {
+  div:nth-child(2) {
+    min-height: 0 !important;
+  }
+
+  & div[id^="query-"],
+  & div[id^="mutation-"],
+  & div[id^="subscription-"] {
+    border-color: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12)) !important;
+
+    .graphiql-operation-title-bar {
+      margin-top: 12px !important;
+
+      input {
+        font-size: var(--requestly-font-size-xs) !important;
+        color: var(--requestly-color-text-default) !important;
+      }
+    }
+  }
+
   .graphiql-explorer-node {
     span[data-field-type] {
       position: relative;
@@ -146,6 +216,7 @@
         font-size: var(--requestly-font-size-xs, 11px);
         margin-left: 4px;
         letter-spacing: 0.25px;
+        margin-top: -3px;
       }
     }
   }
@@ -159,6 +230,7 @@
         font-size: var(--requestly-font-size-xs, 11px);
         margin-left: 4px;
         letter-spacing: 0.25px;
+        margin-top: -3px;
       }
     }
   }
