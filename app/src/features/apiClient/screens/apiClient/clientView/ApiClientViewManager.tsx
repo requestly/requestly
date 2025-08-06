@@ -36,7 +36,6 @@ export const ApiClientViewManager: React.FC<Props> = React.memo((props) => {
       if (isHistoryMode) {
         setCurrentHistoryIndex(history.length);
       }
-      console.log("ADDING TO HISTORY", entry);
       addToHistory(entry);
     },
     [addToHistory, isHistoryMode, setCurrentHistoryIndex, history]

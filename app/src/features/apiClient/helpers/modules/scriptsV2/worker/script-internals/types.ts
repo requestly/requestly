@@ -19,18 +19,11 @@ interface StatusAssertions {
 }
 
 export type LocalScopeRequest = RQAPI.Request & {
-  toJSON: () =>
-    | {
-        method: string;
-        url: string;
-        body: object;
-      }
-    | {
-        url: string;
-        operation: string;
-        variables: object;
-        operationName?: string;
-      };
+  toJSON: () => {
+    method: string;
+    url: string;
+    body: object;
+  };
 };
 
 interface HaveJsonBody {
