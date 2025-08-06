@@ -15,7 +15,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
     return (
       <HttpClientView
         selectedEntryDetails={apiRecord}
-        handleAppRequestFinished={handleRequestFinished}
+        notifyApiRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}
         isCreateMode={isCreateMode}
       />
@@ -26,7 +26,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
     return (
       <GraphQLClientView
         selectedEntryDetails={apiRecord}
-        handleAppRequestFinished={handleRequestFinished}
+        notifyApiRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}
         isCreateMode={isCreateMode}
       />
@@ -36,7 +36,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
   return (
     <HttpClientView
       apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
-      handleAppRequestFinished={handleRequestFinished}
+      notifyApiRequestFinished={handleRequestFinished}
       onSaveCallback={onSaveCallback}
       isCreateMode={isCreateMode}
     />

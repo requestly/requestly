@@ -5,7 +5,7 @@ import Logger from "lib/logger";
 import { patchMissingIdInVariables } from "./utils";
 import { enforceLatestRecordSchema } from "./parser";
 
-function patchCollectionVariablesMissingId(params: { success: boolean; data: RQAPI.Record[] }) {
+function patchCollectionVariablesMissingId(params: { success: boolean; data: RQAPI.ApiClientRecord[] }) {
   if (!params.success) {
     return params;
   }
@@ -25,7 +25,7 @@ function patchCollectionVariablesMissingId(params: { success: boolean; data: RQA
   return params;
 }
 
-export const getApiRecords = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
+export const getApiRecords = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.ApiClientRecord[] }> => {
   if (!ownerId) {
     return { success: false, data: [] };
   }
@@ -34,14 +34,16 @@ export const getApiRecords = async (ownerId: string): Promise<{ success: boolean
   return patchCollectionVariablesMissingId(result);
 };
 
-const getApiRecordsFromFirebase = async (ownerId: string): Promise<{ success: boolean; data: RQAPI.Record[] }> => {
+const getApiRecordsFromFirebase = async (
+  ownerId: string
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord[] }> => {
   const db = getFirestore(firebaseApp);
   const rootApiRecordsRef = collection(db, "apis");
 
   try {
     const q = query(rootApiRecordsRef, where("ownerId", "==", ownerId), where("deleted", "in", [false]));
 
-    const result: RQAPI.Record[] = [];
+    const result: RQAPI.ApiClientRecord[] = [];
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {

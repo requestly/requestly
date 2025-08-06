@@ -38,7 +38,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       return getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, parseCurlRequest(request));
     }
 
-    const entry: RQAPI.ApiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP);
+    const entry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry;
     const urlObj = new URL(request.url);
     const searchParams = Object.fromEntries(new URLSearchParams(urlObj.search));
     urlObj.search = "";
@@ -105,6 +105,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
             <ApiRecordsProvider>
               <AutogenerateProvider>
                 <GenericApiClient
+                  // TODO: fix this
                   apiEntryDetails={{ data: apiEntry }}
                   handleAppRequestFinished={() => {}}
                   onSaveCallback={() => {}}
