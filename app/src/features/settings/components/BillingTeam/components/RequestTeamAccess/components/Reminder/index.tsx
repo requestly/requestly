@@ -134,7 +134,7 @@ export const RequestBillingTeamAccessReminder = () => {
               enterprise.support@requestly.io
             </a>
             . For any queries, you can schedule a call with our team{" "}
-            <a href={LINKS.CALENDLY_LINK} target="_blank" rel="noreferrer">
+            <a href={LINKS.BOOK_A_DEMO} target="_blank" rel="noreferrer">
               here
             </a>
             .
@@ -149,7 +149,7 @@ export const RequestBillingTeamAccessReminder = () => {
               enterprise.support@requestly.io
             </a>
             . For any queries, you can schedule a call with our team{" "}
-            <a href={LINKS.CALENDLY_LINK} target="_blank" rel="noreferrer">
+            <a href={LINKS.BOOK_A_DEMO} target="_blank" rel="noreferrer">
               here
             </a>
             .
