@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import { Col, Row, Space, Tooltip, Typography } from "antd";
@@ -51,6 +51,13 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     () => shouldShowNewCheckoutFlow(isBrowserstackIntegrationOn, isBrowserstackCheckoutEnabled),
     [isBrowserstackIntegrationOn, isBrowserstackCheckoutEnabled]
   );
+
+  useEffect(() => {
+    //is user logs out set quantity to 1, it will reset the pricing according to 1
+    if (!user.loggedIn) {
+      setQuantity(1);
+    }
+  }, [user.loggedIn]);
 
   const getHeaderPlanName = () => {
     const pricingPlansOrder = [
