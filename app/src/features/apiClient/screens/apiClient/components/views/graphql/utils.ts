@@ -43,7 +43,11 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
   };
 
   if (request.variables) {
-    requestBody.variables = request.variables;
+    try {
+      requestBody.variables = JSON.parse(request.variables);
+    } catch {
+      throw new Error("Invalid JSON format for GraphQL variables");
+    }
   }
 
   const stringifiedRequestBody: RQAPI.RequestJsonBody = JSON.stringify(requestBody);
