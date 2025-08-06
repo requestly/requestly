@@ -1,22 +1,22 @@
 import { isEmpty, unionBy } from "lodash";
-import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/AuthorizationForm/formStructure/types";
+import { AUTH_ENTRY_IDENTIFIER } from "../screens/apiClient/components/views/components/request/components/AuthorizationView/AuthorizationForm/formStructure/types";
 import { KeyValuePair, RQAPI } from "../types";
-import { Authorization } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
-import { getDefaultAuth } from "../screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
+import { Authorization } from "../screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
+import { getDefaultAuth } from "../screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 
 /*
   allRecords is passed to resolve the "INHERIT" auth type, to recursively
   resolve the parent record's auth type
 */
 export const getEffectiveAuthForEntry = (
-  entry: RQAPI.Entry,
+  entry: RQAPI.ApiEntry,
   entryDetails: {
-    id: RQAPI.Record["id"];
-    parentId: RQAPI.Record["collectionId"];
+    id: RQAPI.ApiClientRecord["id"];
+    parentId: RQAPI.ApiClientRecord["collectionId"];
   },
-  allRecords: RQAPI.Record[]
+  allRecords: RQAPI.ApiClientRecord[]
 ) => {
-  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.Entry;
+  const entryCopy = JSON.parse(JSON.stringify(entry)) as RQAPI.ApiEntry;
   const currentAuth = entryCopy.auth;
 
   let finalAuth: RQAPI.Auth | null = currentAuth;
@@ -43,10 +43,10 @@ export const getHeadersAndQueryParams = (auth: RQAPI.Auth) => {
 
 export function inheritAuthFromParent(
   childDetails: {
-    id: RQAPI.Record["id"];
-    parentId: RQAPI.Record["collectionId"];
+    id: RQAPI.ApiClientRecord["id"];
+    parentId: RQAPI.ApiClientRecord["collectionId"];
   },
-  allRecords: RQAPI.Record[]
+  allRecords: RQAPI.ApiClientRecord[]
 ) {
   const parentRecord = allRecords.find((record) => record.id === childDetails.parentId);
   if (!parentRecord) {

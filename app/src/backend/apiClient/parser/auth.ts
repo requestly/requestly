@@ -1,8 +1,8 @@
-import { getDefaultAuth } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
+import { getDefaultAuth } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import {
   Authorization,
   AuthConfigMeta,
-} from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+} from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { RQAPI } from "features/apiClient/types";
 
 export function patchAuthSchema(record: Partial<RQAPI.Record>): RQAPI.Record["data"]["auth"] {

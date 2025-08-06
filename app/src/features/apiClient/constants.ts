@@ -1,4 +1,4 @@
-import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { RQAPI } from "./types";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";
@@ -73,3 +73,9 @@ export const DEFAULT_SCRIPT_VALUES = {
  * Also checks the braces, cases where ex:{{RQ_CLIENT_ID}} environment variables are used, this should be not marked invalid other than this will be flagged
  */
 export const INVALID_KEY_CHARACTERS = /^(?!\{\{.*\}\}|^\{\{?$|^\}\}?$)[^!#$%&'*+\-.^_`|~0-9A-Za-z]/;
+
+export enum Headers {
+  CONTENT_TYPE = "Content-Type",
+}
+
+export const LARGE_FILE_SIZE = 104857600;

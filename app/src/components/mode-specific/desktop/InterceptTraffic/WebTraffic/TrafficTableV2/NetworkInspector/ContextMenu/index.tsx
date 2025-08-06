@@ -19,7 +19,7 @@ import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/clientView/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
+import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/views/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 

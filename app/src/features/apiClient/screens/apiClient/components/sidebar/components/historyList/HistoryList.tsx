@@ -7,10 +7,10 @@ import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/Analytics
 import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { HistoryViewTabSource } from "../../../clientView/components/request/HistoryView/historyViewTabSource";
+import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
 
 interface Props {
-  history: RQAPI.Entry[];
+  history: RQAPI.ApiEntry[];
   selectedHistoryIndex: number;
   onSelectionFromHistory: (index: number) => void;
 }
