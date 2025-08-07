@@ -22,7 +22,7 @@ export const SendQueryButton: React.FC<Props> = ({ disabled, loading, onSendClic
     }));
   }, [operationNames, onSendClick]);
 
-  if (operationNames.length === 0) {
+  if (operationNames.length <= 1) {
     return (
       <RQButton
         type="primary"
