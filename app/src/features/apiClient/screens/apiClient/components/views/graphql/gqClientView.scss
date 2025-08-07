@@ -17,4 +17,20 @@
       font-size: var(--requestly-font-size-md);
     }
   }
+
+  .subscription-operation-warning {
+    color: var(--requestly-color-text-default);
+    background: var(--requestly-color-error-darker, #591a1a);
+    font-size: var(--requestly-font-size-sm);
+    padding: var(--space-2, 4px) var(--space-9, 32px) var(--space-2, 4px) var(--space-4, 8px);
+    position: relative;
+
+    &__icon {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      cursor: pointer;
+      color: var(--requestly-color-text-default);
+    }
+  }
 }
