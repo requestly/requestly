@@ -36,15 +36,39 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
   });
   const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
 
-  const handleExport = useCallback(() => {
+  const handleExport = useCallback(async () => {
     try {
       // Convert Requestly collection to Postman format
-      const postmanCollection = postmanCollectionExporter(exportData);
+      const result = postmanCollectionExporter(exportData);
 
-      const fileContent = JSON.stringify(postmanCollection, null, 2);
-      const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
+      // Check if result is a Promise (multiple collections case)
+      if (result instanceof Promise) {
+        // Multiple collections - will return ZIP
+        const multipleResult = await result;
+        if (multipleResult.type === "multiple") {
+          // Create a blob from the zip data and download it
+          const blob = new Blob([multipleResult.zipData], { type: "application/zip" });
+          const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.zip`;
 
-      fileDownload(fileContent, fileName, "application/json");
+          // Create a download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      } else {
+        // Single collection - return JSON
+        if (result.type === "single") {
+          const fileContent = JSON.stringify(result.collection, null, 2);
+          const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
+          fileDownload(fileContent, fileName, "application/json");
+        }
+      }
+
       trackExportCollectionsClicked();
       onClose();
     } catch (error) {
@@ -116,6 +140,7 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
         <div className="export-details-card">
           <div className="export-name">
             Postman-{fileInfo.label}-{getFormattedDate("DD_MM_YYYY")}
+            {recordsToBeExported?.length > 1 ? ".zip" : ".json"}
           </div>
           <div className="export-details">
             <div className="export-details-item">
@@ -124,8 +149,18 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
             </div>
             <div className="export-details-item">
               <span className="export-details-item-label">Format: </span>
-              <span className="export-details-item-value">Postman Collection v2.1</span>
+              <span className="export-details-item-value">
+                {recordsToBeExported?.length > 1 ? "ZIP Archive" : "Postman Collection v2.1"}
+              </span>
             </div>
+            {recordsToBeExported?.length > 1 && (
+              <div className="export-details-item">
+                <span className="export-details-item-label">Note: </span>
+                <span className="export-details-item-value">
+                  Multiple collections will be exported as separate JSON files in a ZIP archive
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

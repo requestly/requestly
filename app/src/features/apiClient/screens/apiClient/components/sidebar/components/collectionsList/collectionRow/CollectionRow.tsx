@@ -111,7 +111,7 @@ export const CollectionRow: React.FC<Props> = ({
             {
               key: "1-title",
               type: "group",
-              label: <div style={{ fontSize: "12px" }}>Choose Export format</div>,
+              label: <div style={{ fontSize: "12px" }}>Export as:</div>,
             },
             {
               key: "1-1",

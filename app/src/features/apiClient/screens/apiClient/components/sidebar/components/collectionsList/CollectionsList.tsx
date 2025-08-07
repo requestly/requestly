@@ -212,9 +212,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
 
         case BulkActions.EXPORT:
+          // This case is now deprecated, handled by specific export actions
+          break;
+
+        case BulkActions.EXPORT_REQUESTLY:
           setIsExportModalOpen(true);
           setCollectionsToExport(processedRecords);
+          break;
 
+        case BulkActions.EXPORT_POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          setCollectionsToExport(processedRecords);
           break;
 
         case BulkActions.MOVE:
