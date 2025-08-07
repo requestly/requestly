@@ -28,15 +28,33 @@ interface Props {
   modalTitle?: string;
 }
 
+const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord => {
+  // This record is created only for cases when client view is opened without any option to save the request.
+  // if saving is enabled in such cases, please take the necessary fields into account (eg. id, ownerId...).
+  return {
+    id: "",
+    name: "Untitled request",
+    type: RQAPI.RecordType.API,
+    data: apiEntry,
+    collectionId: "",
+    ownerId: "",
+    deleted: false,
+    createdBy: "",
+    createdTs: Date.now(),
+    updatedTs: Date.now(),
+    updatedBy: "",
+  };
+};
+
 // Its okay if we dont open GraphQL request from network table
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
-  const apiEntry = useMemo<RQAPI.ApiEntry>(() => {
+  const apiRecord = useMemo<RQAPI.ApiRecord>(() => {
     if (!request) {
       return null;
     }
 
     if (typeof request === "string") {
-      return getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, parseCurlRequest(request));
+      return createDummyApiRecord(getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, parseCurlRequest(request)));
     }
 
     const entry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry;
@@ -79,13 +97,13 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     entry.request = {
       ...entry.request,
     };
-    return entry;
+    return createDummyApiRecord(entry);
   }, [request]);
 
   const repository = useGetApiClientSyncRepo();
   const key = repository.constructor.name;
 
-  if (!apiEntry) {
+  if (!apiRecord.data) {
     return null;
   }
 
@@ -106,8 +124,8 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
             <ApiRecordsProvider>
               <AutogenerateProvider>
                 <ClientViewFactory
-                  // TODO: fix this
-                  apiRecord={{ data: apiEntry }}
+                  isOpenInModal
+                  apiRecord={apiRecord}
                   handleRequestFinished={() => {}}
                   onSaveCallback={() => {}}
                   isCreateMode={true}

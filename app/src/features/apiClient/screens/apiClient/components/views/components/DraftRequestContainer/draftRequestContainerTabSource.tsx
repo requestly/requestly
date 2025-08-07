@@ -5,24 +5,30 @@ import { BaseTabSource } from "componentsV2/Tabs/helpers/baseTabSource";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { RQAPI } from "features/apiClient/types";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
+import { TabSourceMetadata } from "componentsV2/Tabs/types";
+
+interface DraftRequestContainerTabSourceMetadata extends Partial<TabSourceMetadata> {
+  apiEntryType?: RQAPI.ApiEntryType;
+}
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
-  constructor(apiEntryType: RQAPI.ApiEntryType) {
+  constructor(metadata?: DraftRequestContainerTabSourceMetadata) {
     super();
     this.metadata = {
       id: `${Date.now()}`,
       name: "request",
       title: "Untitled request",
+      ...metadata,
     };
     this.component = (
-      <DraftRequestContainer key={this.metadata.id} draftId={this.metadata.id} apiEntryType={apiEntryType} />
+      <DraftRequestContainer key={this.metadata.id} draftId={this.metadata.id} apiEntryType={metadata.apiEntryType} />
     );
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
-    this.icon = this.getTabIcon(apiEntryType);
+    this.icon = this.getTabIcon(metadata.apiEntryType);
   }
 
-  static create(apiEntryType: RQAPI.ApiEntryType): DraftRequestContainerTabSource {
-    return new DraftRequestContainerTabSource(apiEntryType);
+  static create(metadata?: DraftRequestContainerTabSourceMetadata): DraftRequestContainerTabSource {
+    return new DraftRequestContainerTabSource({ apiEntryType: metadata.apiEntryType ?? RQAPI.ApiEntryType.HTTP });
   }
 
   setUrlPath(path: string) {
