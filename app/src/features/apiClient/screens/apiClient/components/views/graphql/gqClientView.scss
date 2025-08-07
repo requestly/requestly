@@ -6,4 +6,15 @@
   .graphql-request-tab-content {
     padding: 12px 16px;
   }
+
+  .gql-send-query-dropdown-button.ant-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    svg {
+      font-size: var(--requestly-font-size-md);
+    }
+  }
 }
