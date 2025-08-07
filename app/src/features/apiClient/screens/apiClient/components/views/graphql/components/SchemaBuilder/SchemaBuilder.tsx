@@ -49,7 +49,12 @@ export const SchemaBuilder = () => {
                 def: "var(--requestly-color-text-default)",
                 attribute: "#FF8080",
               }}
-              hideActions
+              styles={{
+                buttonStyle: {
+                  background: "transparent",
+                  borderRadius: "4px",
+                },
+              }}
             />
           </div>
         </div>
