@@ -28,7 +28,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
   }
 
   static create(metadata?: DraftRequestContainerTabSourceMetadata): DraftRequestContainerTabSource {
-    return new DraftRequestContainerTabSource({ apiEntryType: metadata.apiEntryType ?? RQAPI.ApiEntryType.HTTP });
+    return new DraftRequestContainerTabSource({ apiEntryType: metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP });
   }
 
   setUrlPath(path: string) {
