@@ -26,6 +26,35 @@ export const ApiClientEmptyView = () => {
 
   const isEmpty = apiClientRecords.length === 0;
 
+  const collectionButton = (
+    <RBACButton
+      permission="create"
+      resource="api_client_collection"
+      tooltipTitle="Creating a new collection is not allowed in view-only mode."
+      loading={isRecordCreating === RQAPI.RecordType.COLLECTION}
+      onClick={() => handleNewRecordClick(RQAPI.RecordType.COLLECTION)}
+      type={isEmpty ? "primary" : "secondary"}
+    >
+      Create a new collection
+    </RBACButton>
+  );
+
+  const requestButton = (
+    <NewApiRecordDropdown
+      disabled={!isValidPermission}
+      onSelect={(params: { recordType: RQAPI.RecordType; entryType?: RQAPI.ApiEntryType }) =>
+        handleNewRecordClick(params.recordType, params?.entryType)
+      }
+      buttonProps={{
+        disabled: !isValidPermission,
+        loading: isRecordCreating === RQAPI.RecordType.API,
+        children: "Create a new request",
+        type: isEmpty ? "default" : "primary",
+      }}
+      invalidActions={[NewRecordDropdownItemType.ENVIRONMENT, NewRecordDropdownItemType.COLLECTION]}
+    />
+  );
+
   const handleNewRecordClick = (recordType: RQAPI.RecordType, entryType?: RQAPI.ApiEntryType) => {
     recordType === RQAPI.RecordType.API
       ? trackNewRequestClicked("api_client_home")
@@ -71,26 +100,17 @@ export const ApiClientEmptyView = () => {
             : "View saved collections and requests, continue from where you left off, or start something new."}
         </div>
         <div className="api-client-empty-view-actions">
-          <NewApiRecordDropdown
-            disabled={!isValidPermission}
-            onSelect={(params) => handleNewRecordClick(params.recordType, params?.entryType)}
-            buttonProps={{
-              disabled: !isValidPermission,
-              loading: isRecordCreating === RQAPI.RecordType.API,
-              children: "Create a new request",
-            }}
-            invalidActions={[NewRecordDropdownItemType.ENVIRONMENT, NewRecordDropdownItemType.COLLECTION]}
-          />
-          <RBACButton
-            permission="create"
-            resource="api_client_collection"
-            tooltipTitle="Creating a new collection is not allowed in view-only mode."
-            loading={isRecordCreating === RQAPI.RecordType.COLLECTION}
-            onClick={() => handleNewRecordClick(RQAPI.RecordType.COLLECTION)}
-            type="primary"
-          >
-            Create a new collection
-          </RBACButton>
+          {isEmpty ? (
+            <>
+              {collectionButton}
+              {requestButton}
+            </>
+          ) : (
+            <>
+              {requestButton}
+              {collectionButton}
+            </>
+          )}
         </div>
       </div>
     </div>
