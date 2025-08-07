@@ -12,7 +12,7 @@ interface DraftRequestContainerTabSourceMetadata extends Partial<TabSourceMetada
 }
 
 export class DraftRequestContainerTabSource extends BaseTabSource {
-  constructor(metadata: DraftRequestContainerTabSourceMetadata) {
+  constructor(metadata?: DraftRequestContainerTabSourceMetadata) {
     super();
     this.metadata = {
       id: `${Date.now()}`,

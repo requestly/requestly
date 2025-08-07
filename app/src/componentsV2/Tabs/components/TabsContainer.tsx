@@ -155,7 +155,7 @@ export const TabsContainer: React.FC = () => {
         }}
         onEdit={(key, action) => {
           if (action === "add") {
-            openTab(new DraftRequestContainerTabSource({}));
+            openTab(new DraftRequestContainerTabSource());
           }
         }}
       />
