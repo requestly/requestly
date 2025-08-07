@@ -4,7 +4,7 @@ import { MailOutlined } from "@ant-design/icons";
 import { FaUsers } from "@react-icons/all-files/fa/FaUsers";
 import { EVENTS, trackClaimVolumeDiscountsCTAClicked } from "./analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import ContactUsModal from "components/landing/contactUsModal";
+import LINKS from "config/constants/sub/links";
 
 const { Title, Text } = Typography;
 // TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
@@ -47,8 +47,6 @@ const styles = {
 };
 
 const HowToClaimVolumeDiscounts = () => {
-  const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
-
   const handleCTAOnClick = () => {
     trackClaimVolumeDiscountsCTAClicked();
     const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
@@ -59,7 +57,7 @@ const HowToClaimVolumeDiscounts = () => {
     } catch (error) {
       console.error(error);
     }
-    setIsContactUsModalOpen(true);
+    window.open(LINKS.BOOK_A_DEMO, "_blank");
   };
 
   return (
@@ -84,10 +82,6 @@ const HowToClaimVolumeDiscounts = () => {
           </div>
         </Card>
       </div>
-      <ContactUsModal
-        isOpen={isContactUsModalOpen}
-        handleToggleModal={() => setIsContactUsModalOpen(!isContactUsModalOpen)}
-      />
     </>
   );
 };

@@ -1,17 +1,14 @@
-import { useState } from "react";
 import { RQButton } from "lib/design-system/components";
-import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
-import { SOURCE } from "modules/analytics/events/common/constants";
 import React from "react";
 import "./enterprisePlanCard.scss";
 import { PRICING } from "features/pricing/constants/pricing";
+import LINKS from "config/constants/sub/links";
 
 interface Props {
   product?: string;
 }
 
 export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS.HTTP_RULES }) => {
-  const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const features = [
     "Unlimited everything",
     "API access",
@@ -60,7 +57,13 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
           </div>
           <div className="enterprise-contact-us-container">
             <div className="enterprise-plan-price">Starts at $59</div>
-            <RQButton type="primary" size="large" className="mt-16" onClick={() => setIsContactUsModalOpen(true)}>
+            <RQButton
+              type="primary"
+              size="large"
+              className="mt-16 rq-custom-btn"
+              href={LINKS.BOOK_A_DEMO}
+              target="_blank"
+            >
               Contact sales
             </RQButton>
           </div>
@@ -72,12 +75,6 @@ export const EnterprisePlanCard: React.FC<Props> = ({ product = PRICING.PRODUCTS
           Requestly is trusted by <span>50,000+</span> companies globally.
         </div> */}
       </div>
-
-      <ContactUsModal
-        isOpen={isContactUsModalOpen}
-        onCancel={() => setIsContactUsModalOpen(false)}
-        source={SOURCE.PRICING_PAGE}
-      />
     </>
   );
 };
