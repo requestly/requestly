@@ -197,7 +197,8 @@ const GraphQLClientView: React.FC<Props> = ({
     setWarning(undefined);
     setIsRequestCancelled(false);
     setIsRequestFailed(false);
-  }, []);
+    updateRecordResponse(null);
+  }, [updateRecordResponse]);
 
   const handleSend = useCallback(
     async (operationName?: string) => {
@@ -233,6 +234,7 @@ const GraphQLClientView: React.FC<Props> = ({
         toast.success("Request executed successfully");
       } catch (error) {
         setIsRequestFailed(true);
+        setError(error as RQAPI.ExecutionError);
         toast.error("Something went wrong while sending the request");
       } finally {
         setIsSending(false);
