@@ -1,8 +1,6 @@
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { buildClientSchema } from "graphql";
-import { MdKeyboardArrowRight } from "@react-icons/all-files/md/MdKeyboardArrowRight";
-import { MdKeyboardArrowDown } from "@react-icons/all-files/md/MdKeyboardArrowDown";
 import "@graphiql/plugin-explorer/style.css";
 import { Checkbox } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
@@ -38,8 +36,8 @@ export const SchemaBuilder = () => {
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
               query={query}
               explorerIsOpen={true}
-              arrowClosed={<MdKeyboardArrowRight className="schema-builder__arrow" />}
-              arrowOpen={<MdKeyboardArrowDown className="schema-builder__arrow" />}
+              arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
+              arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxChecked={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
               onEdit={(query: string) => handleEdit(query)}
