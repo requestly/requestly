@@ -153,7 +153,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           {
             key: "1-title",
             type: "group",
-            label: <div style={{ fontSize: "12px" }}>Choose Export format</div>,
+            label: <div style={{ fontSize: "12px" }}>Export as:</div>,
           },
           {
             key: EnvironmentMenuKey.EXPORT_REQUESTLY,

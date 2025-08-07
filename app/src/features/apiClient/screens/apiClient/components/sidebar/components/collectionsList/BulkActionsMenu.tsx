@@ -3,11 +3,14 @@ import { IoCloseSharp } from "@react-icons/all-files/io5/IoCloseSharp";
 import { CgTrash } from "@react-icons/all-files/cg/CgTrash";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { IoDuplicateOutline } from "@react-icons/all-files/io5/IoDuplicateOutline";
+import { MdOutlineArrowDropDown } from "@react-icons/all-files/md/MdOutlineArrowDropDown";
 import React from "react";
 import { BulkActions } from "features/apiClient/types";
-import { Checkbox, Tooltip } from "antd";
+import { Checkbox, Tooltip, Dropdown } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import "./bulkActionsMenu.scss";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
 
 interface Props {
   isAllRecordsSelected: boolean;
@@ -16,6 +19,26 @@ interface Props {
 }
 
 const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bulkActionsHandler }) => {
+  const exportMenuItems = [
+    {
+      key: "title",
+      label: "Export As",
+      type: "group",
+    },
+    {
+      key: "requestly",
+      label: "Requestly",
+      icon: <img src={RequestlyIcon} alt="Requestly Icon" height="16px" width="16px" />,
+      onClick: () => bulkActionsHandler(BulkActions.EXPORT_REQUESTLY),
+    },
+    {
+      key: "postman",
+      label: "Postman (v2.1 format)",
+      icon: <img src={PostmanIcon} alt="Postman Icon" height="16px" width="16px" />,
+      onClick: () => bulkActionsHandler(BulkActions.EXPORT_POSTMAN),
+    },
+  ];
+
   const actionsItems = [
     {
       title: "Duplicate",
@@ -30,7 +53,8 @@ const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bu
     {
       title: "Export",
       icon: <MdOutlineFileDownload />,
-      onClick: () => bulkActionsHandler(BulkActions.EXPORT),
+      isDropdown: true,
+      dropdownItems: exportMenuItems,
     },
     {
       title: "Delete",
@@ -55,9 +79,24 @@ const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bu
       <div className="api-client-actions-container">
         {actionsItems.map((item, index) => (
           <Tooltip key={index} title={item.title} placement="top">
-            <RQButton type="transparent" size="small" className="api-client-action-btn" onClick={item.onClick}>
-              {item.icon}
-            </RQButton>
+            {item.isDropdown ? (
+              <Dropdown
+                menu={{
+                  items: item.dropdownItems,
+                }}
+                trigger={["click"]}
+                placement="bottomLeft"
+              >
+                <RQButton type="transparent" size="small" className="api-client-action-btn export-dropdown">
+                  {item.icon}
+                  <MdOutlineArrowDropDown />
+                </RQButton>
+              </Dropdown>
+            ) : (
+              <RQButton type="transparent" size="small" className="api-client-action-btn" onClick={item.onClick}>
+                {item.icon}
+              </RQButton>
+            )}
           </Tooltip>
         ))}
       </div>
