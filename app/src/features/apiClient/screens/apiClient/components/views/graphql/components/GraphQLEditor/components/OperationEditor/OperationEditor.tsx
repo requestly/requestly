@@ -2,6 +2,9 @@ import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecord
 import { GraphQLEditor } from "../../GraphQLEditor";
 import { useDebounce } from "hooks/useDebounce";
 import { extractOperationNames } from "../../../../utils";
+import { useState } from "react";
+import { parse } from "graphql";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 
 export const OperationEditor = () => {
   const [operation, introspectionData, updateRecordRequest, updateOperationNames] = useGraphQLRecordStore((state) => [
@@ -11,8 +14,34 @@ export const OperationEditor = () => {
     state.updateOperationNames,
   ]);
 
+  const [isUsingSubscriptionOperation, setIsUsingSubscriptionOperation] = useState(false);
+  const [isWarningVisible, setIsWarningVisible] = useState(false);
+
   const debouncedUpdateOperationNames = useDebounce((operationNames: string[]) => {
     updateOperationNames(operationNames);
+  }, 500);
+
+  const debouncedCheckForSubscriptionOperation = useDebounce(() => {
+    if (!operation || typeof operation !== "string") {
+      setIsUsingSubscriptionOperation(false);
+      return;
+    }
+
+    try {
+      const document = parse(operation);
+
+      const isSubscriptionUsed = document.definitions.some((definition) => {
+        if (definition.kind === "OperationDefinition") {
+          return definition.operation === "subscription";
+        }
+        return false;
+      });
+      setIsUsingSubscriptionOperation(isSubscriptionUsed);
+      setIsWarningVisible(isSubscriptionUsed);
+    } catch (error) {
+      setIsUsingSubscriptionOperation(false);
+      setIsWarningVisible(false);
+    }
   }, 500);
 
   const handleChange = (value: string) => {
@@ -24,15 +53,26 @@ export const OperationEditor = () => {
     if (operationNames.length > 0) {
       debouncedUpdateOperationNames(operationNames);
     }
+    debouncedCheckForSubscriptionOperation();
   };
 
   return (
-    <GraphQLEditor
-      type="operation"
-      className="operations-editor"
-      introspectionData={introspectionData}
-      initialDoc={operation}
-      onChange={handleChange}
-    />
+    <>
+      {isUsingSubscriptionOperation && isWarningVisible && (
+        <div className="subscription-operation-warning">
+          Subscription operations are not supported in the API Client
+          <span className="subscription-operation-warning__icon">
+            <MdClose onClick={() => setIsWarningVisible(false)} />
+          </span>
+        </div>
+      )}
+      <GraphQLEditor
+        type="operation"
+        className="operations-editor"
+        introspectionData={introspectionData}
+        initialDoc={operation}
+        onChange={handleChange}
+      />
+    </>
   );
 };
