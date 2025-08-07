@@ -41,8 +41,11 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
 
   const requestBody: Record<string, any> = {
     query: request.operation,
-    operationName: request.operationName,
   };
+
+  if (request.operationName) {
+    requestBody.operationName = request.operationName;
+  }
 
   if (request.variables) {
     try {
