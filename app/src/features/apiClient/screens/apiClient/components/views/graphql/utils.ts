@@ -44,6 +44,10 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
     operationName: request.operationName,
   };
 
+  if (request.operationName) {
+    requestBody.operationName = request.operationName;
+  }
+
   if (request.variables) {
     try {
       requestBody.variables = JSON.parse(request.variables);

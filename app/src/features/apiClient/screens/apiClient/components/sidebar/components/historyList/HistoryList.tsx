@@ -36,7 +36,7 @@ export const HistoryList: React.FC<Props> = ({ history, selectedHistoryIndex, on
       return REQUEST_METHOD_COLORS[entry.request.method];
     }
     if (entry.type === RQAPI.ApiEntryType.GRAPHQL) {
-      return "#e91e63";
+      return "#FF14A9";
     }
     return REQUEST_METHOD_COLORS[(entry as RQAPI.HttpApiEntry).request.method];
   };
