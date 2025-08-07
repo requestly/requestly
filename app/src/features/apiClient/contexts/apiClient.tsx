@@ -143,7 +143,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const openDraftRequest = useCallback(
     (apiEntryType?: RQAPI.ApiEntryType) => {
-      openTab(new DraftRequestContainerTabSource(apiEntryType));
+      openTab(new DraftRequestContainerTabSource({ apiEntryType }));
     },
     [openTab]
   );

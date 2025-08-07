@@ -736,7 +736,7 @@ const HttpClientView: React.FC<Props> = ({
         postScriptExecutionCallback: handleUpdatesFromExecutionWorker,
       });
     }
-  }, [handleUpdatesFromExecutionWorker, apiClientExecutorRef]);
+  }, [handleUpdatesFromExecutionWorker]);
 
   const handleRevertChanges = () => {
     setEntry(apiEntryDetails?.data);
