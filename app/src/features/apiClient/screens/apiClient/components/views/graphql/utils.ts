@@ -133,7 +133,10 @@ export const extractOperationNames = (operationString: string): string[] => {
 
     document.definitions.forEach((definition) => {
       if (definition.kind === "OperationDefinition" && definition.name) {
-        operationNames.push(definition.name.value);
+        // Exclude subscription operations
+        if (definition.operation !== "subscription") {
+          operationNames.push(definition.name.value);
+        }
       }
     });
 
