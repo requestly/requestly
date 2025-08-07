@@ -3,10 +3,10 @@ import { Input, Tooltip } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system-v2/components";
 import { BiSelectMultiple } from "@react-icons/all-files/bi/BiSelectMultiple";
-import { MdAddCircleOutline } from "@react-icons/all-files/md/MdAddCircleOutline";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 import { RQAPI } from "features/apiClient/types";
 import "./sidebarListHeader.scss";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 
 interface ListHeaderProps {
   onSearch: (value: string) => void;
@@ -56,12 +56,7 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
             onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
           }}
         >
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdAddCircleOutline />}
-            className="sidebar-list-header-button"
-          />
+          <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
         </NewApiRecordDropdown>
       )}
     </div>

@@ -139,6 +139,11 @@ export const extractOperationNames = (operationString: string): string[] => {
         }
       }
     });
+    console.log("!!!debug", "extract", {
+      operationNames,
+      operationString,
+      document,
+    });
 
     return operationNames;
   } catch (error) {
