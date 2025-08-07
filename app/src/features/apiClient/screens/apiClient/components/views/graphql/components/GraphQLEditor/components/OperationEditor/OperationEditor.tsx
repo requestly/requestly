@@ -5,6 +5,7 @@ import { extractOperationNames } from "../../../../utils";
 import { useState } from "react";
 import { parse } from "graphql";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import "./operationsEditor.css";
 
 export const OperationEditor = () => {
   const [operation, introspectionData, updateRecordRequest, updateOperationNames] = useGraphQLRecordStore((state) => [
@@ -68,7 +69,9 @@ export const OperationEditor = () => {
       )}
       <GraphQLEditor
         type="operation"
-        className="operations-editor"
+        className={`operations-editor ${
+          isUsingSubscriptionOperation && isWarningVisible ? "operations-editor-with-warning" : ""
+        }`}
         introspectionData={introspectionData}
         initialDoc={operation}
         onChange={handleChange}
