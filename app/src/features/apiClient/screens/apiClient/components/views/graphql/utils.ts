@@ -41,6 +41,7 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
 
   const requestBody: Record<string, any> = {
     query: request.operation,
+    operationName: request.operationName,
   };
 
   if (request.operationName) {
@@ -141,11 +142,6 @@ export const extractOperationNames = (operationString: string): string[] => {
           operationNames.push(definition.name.value);
         }
       }
-    });
-    console.log("!!!debug", "extract", {
-      operationNames,
-      operationString,
-      document,
     });
 
     return operationNames;
