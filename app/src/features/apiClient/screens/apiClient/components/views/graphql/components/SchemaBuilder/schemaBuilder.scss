@@ -139,7 +139,7 @@
       }
 
       .graphiql-explorer-node {
-        margin-top: 6px;
+        margin-top: 8px;
 
         input[type="text"] {
           width: 150px !important;
@@ -199,6 +199,7 @@
   & > div:first-child {
     flex-grow: unset !important;
     height: calc(100% - 48px) !important;
+    font-family: var(--requestly-font-family-code) !important;
   }
   div:nth-child(2) {
     min-height: unset !important;
@@ -232,7 +233,6 @@
         font-size: var(--requestly-font-size-xs, 11px);
         margin-left: 4px;
         letter-spacing: 0.25px;
-        margin-top: -3px;
       }
     }
   }
@@ -246,7 +246,6 @@
         font-size: var(--requestly-font-size-xs, 11px);
         margin-left: 4px;
         letter-spacing: 0.25px;
-        margin-top: -3px;
       }
     }
   }

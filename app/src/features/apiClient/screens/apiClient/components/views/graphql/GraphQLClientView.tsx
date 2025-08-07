@@ -164,6 +164,9 @@ const GraphQLClientView: React.FC<Props> = ({
         ...apiRecord.data,
       },
     };
+
+    delete apiRecord.data.request.operationName;
+
     if (isCreateMode) {
       const requestId = apiClientRecordsRepository.generateApiRecordId();
       recordToSave.id = requestId;
@@ -213,7 +216,11 @@ const GraphQLClientView: React.FC<Props> = ({
 
         if (operationName) {
           record.data.request.operationName = operationName;
+        } else {
+          delete record.data.request.operationName;
         }
+
+        console.log("record", record);
 
         const apiClientExecutionResult = await graphQLRequestExecutor.executeGraphQLRequest(record);
 
@@ -230,12 +237,9 @@ const GraphQLClientView: React.FC<Props> = ({
           setError(apiClientExecutionResult.error);
           setIsRequestFailed(true);
         }
-
-        toast.success("Request executed successfully");
       } catch (error) {
         setIsRequestFailed(true);
         setError(error as RQAPI.ExecutionError);
-        toast.error("Something went wrong while sending the request");
       } finally {
         setIsSending(false);
       }
