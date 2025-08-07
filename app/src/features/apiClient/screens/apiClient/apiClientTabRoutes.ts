@@ -5,12 +5,11 @@ import { RequestViewTabSource } from "./components/views/components/RequestView/
 import { CollectionViewTabSource } from "./components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../environment/components/environmentView/EnvironmentViewTabSource";
 import { HistoryViewTabSource } from "./components/views/components/request/HistoryView/historyViewTabSource";
-import { RQAPI } from "features/apiClient/types";
 
 export const apiClientTabRoutes: TabRoute[] = [
   {
     path: PATHS.API_CLIENT.ABSOLUTE + "/request/new",
-    tabSourceFactory: () => DraftRequestContainerTabSource.create(RQAPI.ApiEntryType.HTTP),
+    tabSourceFactory: () => DraftRequestContainerTabSource.create(), //For now keep it like this, to avoid passing matchedPaths
   },
   {
     path: PATHS.API_CLIENT.REQUEST.ABSOLUTE,

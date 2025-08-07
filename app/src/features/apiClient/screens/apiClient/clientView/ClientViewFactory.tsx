@@ -8,9 +8,16 @@ interface Props {
   handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
   onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
   isCreateMode: boolean;
+  isOpenInModal?: boolean;
 }
 
-export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCallback, isCreateMode }: Props) => {
+export const ClientViewFactory = ({
+  apiRecord,
+  handleRequestFinished,
+  onSaveCallback,
+  isCreateMode,
+  isOpenInModal,
+}: Props) => {
   if (isHttpApiRecord(apiRecord)) {
     return (
       <HttpClientView
@@ -18,6 +25,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
         notifyApiRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}
         isCreateMode={isCreateMode}
+        openInModal={isOpenInModal}
       />
     );
   }
@@ -29,6 +37,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
         notifyApiRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}
         isCreateMode={isCreateMode}
+        openInModal={isOpenInModal}
       />
     );
   }
@@ -39,6 +48,7 @@ export const ClientViewFactory = ({ apiRecord, handleRequestFinished, onSaveCall
       notifyApiRequestFinished={handleRequestFinished}
       onSaveCallback={onSaveCallback}
       isCreateMode={isCreateMode}
+      openInModal={isOpenInModal}
     />
   );
 };
