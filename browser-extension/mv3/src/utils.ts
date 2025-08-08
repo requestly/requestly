@@ -2,7 +2,7 @@ import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
 import { getVariable, Variable } from "./service-worker/variable";
-import { ChangeType, getRecord, onRecordChange } from "common/storage";
+import { getRecord, onRecordChange, saveRecord } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
@@ -98,11 +98,18 @@ export const debounce = (func: Function, wait: number) => {
 };
 
 let cachedBlockedDomains: string[] | null = null;
-const BASE_BLOCKED_DOMAINS = ["mail.google.com"];
 
 export const cacheBlockedDomains = async () => {
-  const blockedDomains = (await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS)) ?? [];
-  cachedBlockedDomains = [...blockedDomains, ...BASE_BLOCKED_DOMAINS];
+  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+  cachedBlockedDomains = blockedDomains ?? [];
+};
+
+export const DEFAULT_BLOCKED_DOMAINS = ["mail.google.com"];
+export const initBlockedDomainsStorage = async () => {
+  const existingBlockedDomains = (await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS)) ?? [];
+  const updatedBlockedDomains = Array.from(new Set([...existingBlockedDomains, ...DEFAULT_BLOCKED_DOMAINS]));
+
+  await saveRecord(STORAGE_KEYS.BLOCKED_DOMAINS, updatedBlockedDomains);
 };
 
 export const getBlockedDomains = async () => {
@@ -132,7 +139,6 @@ export const onBlockListChange = (callback: () => void) => {
   onRecordChange<string[]>(
     {
       keyFilter: STORAGE_KEYS.BLOCKED_DOMAINS,
-      changeTypes: [ChangeType.MODIFIED],
     },
     () => {
       cacheBlockedDomains().then(() => {
