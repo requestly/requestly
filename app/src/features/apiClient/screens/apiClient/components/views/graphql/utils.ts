@@ -1,4 +1,5 @@
 import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
+import { DocumentNode, parse } from "graphql";
 import { isEmpty } from "lodash";
 
 export const graphQLEntryToHttpEntryAdapter = (entry: RQAPI.GraphQLApiEntry): RQAPI.HttpApiEntry => {
@@ -40,7 +41,12 @@ export const graphQLRequestToHttpRequestAdapter = (request: RQAPI.GraphQLRequest
 
   const requestBody: Record<string, any> = {
     query: request.operation,
+    operationName: request.operationName,
   };
+
+  if (request.operationName) {
+    requestBody.operationName = request.operationName;
+  }
 
   if (request.variables) {
     try {
@@ -118,4 +124,28 @@ export const graphQLResponseToHttpResponseAdapter = (response: RQAPI.GraphQLResp
     time: response.time,
     redirectedUrl: "", // GraphQL responses do not have a redirected URL
   };
+};
+
+export const extractOperationNames = (operationString: string): string[] => {
+  if (!operationString || typeof operationString !== "string") {
+    return [];
+  }
+
+  try {
+    const document: DocumentNode = parse(operationString);
+    const operationNames: string[] = [];
+
+    document.definitions.forEach((definition) => {
+      if (definition.kind === "OperationDefinition" && definition.name) {
+        // Exclude subscription operations
+        if (definition.operation !== "subscription") {
+          operationNames.push(definition.name.value);
+        }
+      }
+    });
+
+    return operationNames;
+  } catch (error) {
+    return [];
+  }
 };

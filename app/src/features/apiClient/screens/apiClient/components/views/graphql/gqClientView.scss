@@ -6,4 +6,31 @@
   .graphql-request-tab-content {
     padding: 12px 16px;
   }
+
+  .gql-send-query-dropdown-button.ant-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    svg {
+      font-size: var(--requestly-font-size-md);
+    }
+  }
+
+  .subscription-operation-warning {
+    color: var(--requestly-color-text-default);
+    background: var(--requestly-color-error-darker, #591a1a);
+    font-size: var(--requestly-font-size-sm);
+    padding: var(--space-2, 4px) var(--space-9, 32px) var(--space-2, 4px) var(--space-4, 8px);
+    position: relative;
+
+    &__icon {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      cursor: pointer;
+      color: var(--requestly-color-text-default);
+    }
+  }
 }
