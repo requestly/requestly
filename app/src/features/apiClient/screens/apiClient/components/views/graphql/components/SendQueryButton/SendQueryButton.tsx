@@ -23,11 +23,12 @@ export const SendQueryButton: React.FC<Props> = ({ disabled, loading, onSendClic
   }, [operationNames, onSendClick]);
 
   if (operationNames.length <= 1) {
+    const operationName = operationNames[0];
     return (
       <RQButton
         type="primary"
         showHotKeyText
-        onClick={() => onSendClick()}
+        onClick={() => onSendClick(operationName)}
         hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
         className="text-bold"
         disabled={disabled}

@@ -4,7 +4,8 @@ import { AbortReason, KeyValuePair, RQAPI, RequestContentType, RequestMethod } f
 import { CONSTANTS } from "@requestly/requestly-core";
 import {
   CONTENT_TYPE_HEADER,
-  DEMO_API_URL,
+  DEMO_HTTP_API_URL,
+  DEMO_GRAPHQL_API_URL,
   LARGE_FILE_SIZE,
   SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
 } from "../../constants";
@@ -88,7 +89,7 @@ export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry =
   return {
     type: RQAPI.ApiEntryType.HTTP,
     request: {
-      url: DEMO_API_URL,
+      url: DEMO_HTTP_API_URL,
       method: RequestMethod.GET,
       headers: [],
       queryParams: [],
@@ -108,7 +109,7 @@ export const getEmptyGraphQLEntry = (request?: RQAPI.Request): RQAPI.GraphQLApiE
   return {
     type: RQAPI.ApiEntryType.GRAPHQL,
     request: {
-      url: DEMO_API_URL,
+      url: DEMO_GRAPHQL_API_URL,
       headers: [],
       operation: "",
       variables: "",
