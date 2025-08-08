@@ -6,21 +6,20 @@ import {
   filterHeadersToImport,
   generateKeyValuePairs,
   getContentTypeFromRequestHeaders,
-  getEmptyAPIEntry,
+  getEmptyApiEntry,
   parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
-import APIClientView from "../../../screens/apiClient/components/clientView/APIClientView";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./apiClient.scss";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
-import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import {
   ApiClientRepositoryContext,
   useGetApiClientSyncRepo,
 } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -30,16 +29,17 @@ interface Props {
 }
 
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
-  const apiEntry = useMemo<RQAPI.Entry>(() => {
+  const apiEntry = useMemo<RQAPI.ApiEntry>(() => {
     if (!request) {
       return null;
     }
 
     if (typeof request === "string") {
-      return getEmptyAPIEntry(parseCurlRequest(request));
+      return getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, parseCurlRequest(request));
     }
 
-    const entry: RQAPI.Entry = getEmptyAPIEntry();
+    const entry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry;
+    entry.type = RQAPI.ApiEntryType.HTTP;
     const urlObj = new URL(request.url);
     const searchParams = Object.fromEntries(new URLSearchParams(urlObj.search));
     urlObj.search = "";
@@ -78,7 +78,6 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     entry.request = {
       ...entry.request,
     };
-
     return entry;
   }, [request]);
 
@@ -105,9 +104,13 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
           <ApiClientRepositoryContext.Provider value={repository} key={key}>
             <ApiRecordsProvider>
               <AutogenerateProvider>
-                <QueryParamsProvider entry={apiEntry}>
-                  <APIClientView isCreateMode={true} apiEntryDetails={{ data: apiEntry }} openInModal />
-                </QueryParamsProvider>
+                <ClientViewFactory
+                  // TODO: fix this
+                  apiRecord={{ data: apiEntry }}
+                  handleRequestFinished={() => {}}
+                  onSaveCallback={() => {}}
+                  isCreateMode={true}
+                />
               </AutogenerateProvider>
             </ApiRecordsProvider>
           </ApiClientRepositoryContext.Provider>

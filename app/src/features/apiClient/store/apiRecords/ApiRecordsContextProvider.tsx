@@ -8,7 +8,7 @@ import { notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
+import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
 import { ApiClientFilesProvider } from "../ApiClientFilesContextProvider";
@@ -17,7 +17,7 @@ export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState> | 
 
 export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
-  const [data, setData] = useState<{ records: RQAPI.Record[]; erroredRecords: ErroredRecord[] } | null>(null);
+  const [data, setData] = useState<{ records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] } | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,7 +64,7 @@ const RecordsProvider = ({
   repository,
 }: {
   children: ReactNode;
-  data: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] };
+  data: { records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] };
   repository: ApiClientRecordsInterface<Record<string, any>>;
 }) => {
   const store = useMemo(() => createApiRecordsStore(data), [data]);

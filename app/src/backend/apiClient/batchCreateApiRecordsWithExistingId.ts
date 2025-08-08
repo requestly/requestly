@@ -7,7 +7,7 @@ import { getOwnerId } from "backend/utils";
 export const batchCreateApiRecordsWithExistingId = async (
   uid: string,
   teamId: string,
-  records: RQAPI.Record[]
+  records: RQAPI.ApiClientRecord[]
 ): Promise<RQAPI.RecordsPromise> => {
   if (!uid) {
     return { success: false, data: null };
@@ -21,15 +21,15 @@ export const batchCreateApiRecordsWithExistingId = async (
 const batchCreateApiRecordsWithExistingIdInFirebase = async (
   uid: string,
   ownerId: string,
-  records: RQAPI.Record[]
+  records: RQAPI.ApiClientRecord[]
 ): Promise<RQAPI.RecordsPromise> => {
   try {
     const db = getFirestore(firebaseApp);
-    const updatedRecords: RQAPI.Record[] = [];
+    const updatedRecords: RQAPI.ApiClientRecord[] = [];
 
     await runTransaction(db, async (transaction) => {
       records.forEach((record) => {
-        const updatedRecord: RQAPI.Record = {
+        const updatedRecord: RQAPI.ApiClientRecord = {
           ...record,
           id: record.id,
           deleted: false,
