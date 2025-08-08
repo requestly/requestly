@@ -36,59 +36,63 @@ import { useScopedVariables } from "features/apiClient/helpers/variableResolver/
 import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "features/apiClient/commands";
 import { SendQueryButton } from "./components/SendQueryButton/SendQueryButton";
-import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
+import { DEFAULT_REQUEST_NAME, INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { trackRequestRenamed } from "modules/analytics/events/features/apiClient";
 import { extractOperationNames } from "./utils";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
+import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 
 interface Props {
+  recordId: string;
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
   onSaveCallback: (apiEntryDetails: RQAPI.GraphQLApiRecord) => void;
   isCreateMode: boolean;
   openInModal?: boolean;
 }
 
+const createApiRecord = (entry: RQAPI.GraphQLApiEntry, record: RQAPI.GraphQLApiRecord) => {
+  return {
+    ...record,
+    data: { ...entry },
+  };
+};
+
 const GraphQLClientView: React.FC<Props> = ({
+  recordId,
   notifyApiRequestFinished,
   onSaveCallback,
   isCreateMode,
   openInModal = false,
 }) => {
   const [
-    recordId,
     url,
-    collectionId,
     response,
     testResults,
     hasUnsavedChanges,
     introspectionData,
     isFetchingIntrospectionData,
     hasIntrospectionFailed,
-    updateRecordRequest,
-    updateRecord,
-    getRecord,
-    getRecordName,
-    updateRecordResponse,
+    updateEntryRequest,
+    updateEntry,
+    getEntry,
+    updateEntryResponse,
     setHasUnsavedChanges,
-    updateRecordTestResults,
+    updateEntryTestResults,
   ] = useGraphQLRecordStore((state) => [
-    state.record.id,
-    state.record.data.request.url,
-    state.record.collectionId,
-    state.record.data.response,
-    state.record.data.testResults,
+    state.entry.request.url,
+    state.entry.response,
+    state.entry.testResults,
     state.hasUnsavedChanges,
     state.introspectionData,
     state.isFetchingIntrospectionData,
     state.hasIntrospectionFailed,
-    state.updateRecordRequest,
-    state.updateRecord,
-    state.getRecord,
-    state.getRecordName,
-    state.updateRecordResponse,
+    state.updateEntryRequest,
+    state.updateEntry,
+    state.getEntry,
+    state.updateEntryResponse,
     state.setHasUnsavedChanges,
-    state.updateRecordTestResults,
+    state.updateEntryTestResults,
   ]);
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
@@ -101,6 +105,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
 
   const { getIsActive, setUnsaved, setTitle, setIcon } = useGenericState();
+  const { record } = useApiRecordState(recordId) as { record: RQAPI.GraphQLApiRecord };
 
   const ctx = useApiClientFeatureContext();
   const [getActiveEnvironment] = useAPIEnvironment((s) => [s.getActiveEnvironment]);
@@ -122,7 +127,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [isRequestFailed, setIsRequestFailed] = useState(false);
 
-  const originalRecord = useRef(getRecord().data);
+  const originalRecord = useRef(getEntry());
   const graphQLRequestExecutorRef = useRef<GraphQLRequestExecutor | null>(null);
 
   const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
@@ -131,11 +136,11 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const handleUrlChange = useCallback(
     (value: string) => {
-      updateRecordRequest({
+      updateEntryRequest({
         url: value,
       });
     },
-    [updateRecordRequest]
+    [updateEntryRequest]
   );
 
   const { introspectAndSaveSchema } = useGraphQLIntrospection();
@@ -160,19 +165,26 @@ const GraphQLClientView: React.FC<Props> = ({
   }, [purgeAndAddHeaders]);
 
   const handleSave = useCallback(async () => {
-    const apiRecord = getRecord();
+    const entry = getEntry();
+    const apiRecord = createApiRecord(entry, record);
     const operationNames = extractOperationNames(apiRecord.data.request.operation);
 
+    const hasDefaultOrEmptyName = !apiRecord.name || apiRecord.name === DEFAULT_REQUEST_NAME;
+    const hasSingleOperation = operationNames.length === 1;
+
     const recordName =
-      apiRecord.name === "Untitled request" && operationNames.length === 1 ? operationNames[0] : apiRecord.name;
+      hasDefaultOrEmptyName && hasSingleOperation ? operationNames[0] : apiRecord.name || DEFAULT_REQUEST_NAME;
 
     const recordToSave: Partial<RQAPI.ApiRecord> = {
+      ...apiRecord,
       name: recordName,
       type: RQAPI.RecordType.API,
       data: {
         ...apiRecord.data,
       },
     };
+
+    console.log("recordToSave", recordToSave, operationNames, apiRecord);
 
     delete apiRecord.data.request.operationName;
 
@@ -198,15 +210,15 @@ const GraphQLClientView: React.FC<Props> = ({
       toast.error("Something went wrong while saving the request");
     }
     setIsSaving(false);
-  }, [onSaveCallback, getRecord, isCreateMode, apiClientRecordsRepository, onSaveRecord, setHasUnsavedChanges]);
+  }, [getEntry, record, isCreateMode, apiClientRecordsRepository, onSaveRecord, onSaveCallback, setHasUnsavedChanges]);
 
   const handleRecordNameUpdate = useCallback(
     async (newName: string) => {
-      const recordName = getRecordName();
-      if (!newName || newName === recordName) {
+      if (!newName || newName === record.name) {
         return;
       }
-      const apiRecord = getRecord();
+      const entry = getEntry();
+      const apiRecord = createApiRecord(entry, record);
 
       const isValidHeader = apiRecord.data.request?.headers?.every((header) => {
         return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
@@ -226,23 +238,23 @@ const GraphQLClientView: React.FC<Props> = ({
         return;
       }
 
-      const record: Partial<RQAPI.GraphQLApiRecord> = {
+      const recordToUpdate: Partial<RQAPI.GraphQLApiRecord> = {
         type: RQAPI.RecordType.API,
         data: { ...apiRecord.data },
       };
 
       if (apiRecord?.id) {
-        record.id = apiRecord?.id;
-        record.name = newName;
+        recordToUpdate.id = apiRecord?.id;
+        recordToUpdate.name = newName;
       }
 
       if (isCreateMode) {
-        record.name = newName;
+        recordToUpdate.name = newName;
       }
 
       const result = isCreateMode
-        ? await apiClientRecordsRepository.createRecord(record)
-        : await apiClientRecordsRepository.updateRecord(record, record.id);
+        ? await apiClientRecordsRepository.createRecord(recordToUpdate)
+        : await apiClientRecordsRepository.updateRecord(recordToUpdate, recordToUpdate.id);
 
       if (result.success && result.data.type === RQAPI.RecordType.API) {
         setTitle(newName);
@@ -265,11 +277,11 @@ const GraphQLClientView: React.FC<Props> = ({
         });
       }
     },
-    [apiClientRecordsRepository, getRecord, getRecordName, isCreateMode, onSaveCallback, onSaveRecord, setTitle]
+    [apiClientRecordsRepository, record, getEntry, isCreateMode, onSaveCallback, onSaveRecord, setTitle]
   );
 
   const handleRevertChanges = () => {
-    updateRecord(originalRecord.current);
+    updateEntry(originalRecord.current);
   };
 
   const resetState = useCallback(() => {
@@ -277,14 +289,15 @@ const GraphQLClientView: React.FC<Props> = ({
     setWarning(undefined);
     setIsRequestCancelled(false);
     setIsRequestFailed(false);
-    updateRecordResponse(null);
-  }, [updateRecordResponse]);
+    updateEntryResponse(null);
+  }, [updateEntryResponse]);
 
   const handleSend = useCallback(
     async (operationName?: string) => {
-      const record = getRecord();
+      const entry = getEntry();
+      const apiRecord = createApiRecord(entry, record);
       try {
-        if (!record) {
+        if (!apiRecord) {
           throw new Error("Record not found");
         }
 
@@ -292,16 +305,16 @@ const GraphQLClientView: React.FC<Props> = ({
         setIsSending(true);
 
         if (operationName) {
-          record.data.request.operationName = operationName;
+          apiRecord.data.request.operationName = operationName;
         } else {
-          delete record.data.request.operationName;
+          delete apiRecord.data.request.operationName;
         }
 
-        const apiClientExecutionResult = await graphQLRequestExecutorRef.current.executeGraphQLRequest(record);
+        const apiClientExecutionResult = await graphQLRequestExecutorRef.current.executeGraphQLRequest(apiRecord);
 
         const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
-        updateRecordResponse(entryWithResponse.response);
-        updateRecordTestResults(entryWithResponse.testResults ?? []);
+        updateEntryResponse(entryWithResponse.response);
+        updateEntryTestResults(entryWithResponse.testResults ?? []);
         notifyApiRequestFinished(entryWithResponse);
 
         if (apiClientExecutionResult.status === RQAPI.ExecutionStatus.SUCCESS) {
@@ -319,23 +332,25 @@ const GraphQLClientView: React.FC<Props> = ({
         setIsSending(false);
       }
     },
-    [getRecord, resetState, updateRecordResponse, updateRecordTestResults, notifyApiRequestFinished]
+    [getEntry, resetState, updateEntryResponse, updateEntryTestResults, notifyApiRequestFinished, record]
   );
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
-      graphQLRequestExecutorRef.current.prepareGraphQLRequest(getRecord());
+      const entry = getEntry();
+      const apiRecord = createApiRecord(entry, record);
+      graphQLRequestExecutorRef.current.prepareGraphQLRequest(apiRecord);
 
       const result = await graphQLRequestExecutorRef.current.rerun();
       if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
-        updateRecordTestResults(result.artifacts.testResults);
+        updateEntryTestResults(result.artifacts.testResults);
       } else {
         setError(result.error);
       }
     } catch (error) {
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [getRecord, updateRecordTestResults]);
+  }, [getEntry, updateEntryTestResults, record]);
 
   const handleUpdatesFromExecutionWorker = useCallback(
     async (state: any) => {
@@ -353,12 +368,12 @@ const GraphQLClientView: React.FC<Props> = ({
         }
 
         if (key === "collectionVariables") {
-          if (!collectionId) {
+          if (!record.collectionId) {
             return;
           }
 
           await patchCollectionVariables({
-            collectionId,
+            collectionId: record.collectionId,
             variables: state[key],
           });
         }
@@ -369,7 +384,7 @@ const GraphQLClientView: React.FC<Props> = ({
       patchEnvironmentVariables,
       environmentVariablesRepository,
       patchCollectionVariables,
-      collectionId,
+      record.collectionId,
     ]
   );
 
@@ -386,9 +401,9 @@ const GraphQLClientView: React.FC<Props> = ({
     if (isHistoryView) {
       setTitle("History");
     } else {
-      setTitle(getRecordName() || "Untitled request");
+      setTitle(record.name || "Untitled request");
     }
-  }, [setTitle, isHistoryView, getRecordName]);
+  }, [setTitle, isHistoryView, record.name]);
 
   useEffect(() => {
     if (graphQLRequestExecutorRef.current) {
@@ -447,14 +462,14 @@ const GraphQLClientView: React.FC<Props> = ({
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
               openInModal={openInModal}
-              name={getRecordName()}
+              name={record.name}
               OnRecordNameUpdate={() => {}}
               onBlur={(newName) => handleRecordNameUpdate(newName)}
             />
 
             <ClientCodeButton
               handleOnClick={() => {
-                graphQLRequestExecutorRef.current.prepareGraphQLRequest(getRecord());
+                graphQLRequestExecutorRef.current.prepareGraphQLRequest(createApiRecord(getEntry(), record));
               }}
               apiClientExecutor={graphQLRequestExecutorRef.current}
             />
@@ -514,7 +529,7 @@ const GraphQLClientView: React.FC<Props> = ({
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [60, 40]}
       >
         <div className="api-client-body">
-          <GraphQLRequestTabs requestId={recordId} />
+          <GraphQLRequestTabs requestId={recordId} collectionId={record.collectionId} />
         </div>
       </BottomSheetLayout>
     </div>
@@ -524,7 +539,7 @@ const GraphQLClientView: React.FC<Props> = ({
 const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
-      <GraphQLRecordProvider record={props.apiEntryDetails}>
+      <GraphQLRecordProvider entry={props.apiEntryDetails.data}>
         <Component {...props} />
       </GraphQLRecordProvider>
     );
