@@ -159,18 +159,20 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   @FsErrorHandler
   async createCollectionFromCompleteRecord(collection: RQAPI.CollectionRecord, id: string) {
     return this.invokeProcedureInBG("createCollectionFromCompleteRecord", collection, id) as Promise<
-      FileSystemResult<RQAPI.Record>
+      FileSystemResult<RQAPI.ApiClientRecord>
     >;
   }
 
   @FsErrorHandler
   async moveRecord(id: string, newParentId: string) {
-    return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+    return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.ApiClientRecord>>;
   }
 
   @FsErrorHandler
   async moveCollection(id: string, newParentId: string) {
-    return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+    return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<
+      FileSystemResult<RQAPI.ApiClientRecord>
+    >;
   }
 }
 

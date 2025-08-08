@@ -3,10 +3,10 @@ import { DocumentData } from "firebase/firestore";
 import { patchAuthSchema } from "./auth";
 
 // a place to write migrations against any schema/type changes
-export function enforceLatestRecordSchema(id: DocumentData["id"], rawData: DocumentData): RQAPI.Record {
-  let record = rawData as Partial<RQAPI.Record>;
+export function enforceLatestRecordSchema(id: DocumentData["id"], rawData: DocumentData): RQAPI.ApiClientRecord {
+  let record = rawData as Partial<RQAPI.ApiClientRecord>;
   record.id = id;
   const auth = patchAuthSchema(record);
   record.data.auth = auth;
-  return record as RQAPI.Record;
+  return record as RQAPI.ApiClientRecord;
 }

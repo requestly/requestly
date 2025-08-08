@@ -1,0 +1,78 @@
+// Source: constants/requestMethodColors.ts
+@mixin request-method-colors($class) {
+  & .#{$class}[title="GET"] {
+    color: var(--requestly-color-success-300);
+  }
+  & .#{$class}[title="POST"] {
+    color: var(--requestly-color-warning-300);
+  }
+  & .#{$class}[title="PUT"] {
+    color: var(--requestly-color-primary-300);
+  }
+  & .#{$class}[title="PATCH"] {
+    color: var(--requestly-color-secondary-300);
+  }
+  & .#{$class}[title="DELETE"] {
+    color: var(--requestly-color-error-300);
+  }
+  & .#{$class}[title="HEAD"] {
+    color: #5fd7de;
+  }
+  & .#{$class}[title="OPTIONS"] {
+    color: #f335ec;
+  }
+}
+
+.api-request-method-selector.ant-select-dropdown {
+  @include request-method-colors("ant-select-item");
+
+  .rc-virtual-list-holder {
+    justify-content: center;
+  }
+
+  .ant-select-item {
+    width: 100%;
+    font-size: var(--requestly-font-size-xs);
+    font-weight: var(--requestly-font-weight-medium);
+    padding: 5px 18px;
+  }
+}
+
+.http-client-view {
+  // HEADER URL AND METHOD SELECTOR
+  .api-client-header__url {
+    .api-client-url-container {
+      .api-request-url {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+      }
+
+      .api-request-method-selector {
+        width: 100px;
+      }
+
+      .api-request-method-selector .ant-select-selector {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+
+        .ant-select-selection-item {
+          min-width: 68px;
+          font-size: var(--requestly-font-size-xs);
+          font-weight: var(--requestly-font-weight-medium);
+        }
+      }
+
+      .ant-select-selector {
+        @include request-method-colors("ant-select-selection-item");
+      }
+    }
+  }
+
+  //TABS
+  .api-request-tabs.ant-tabs.ant-tabs-small {
+    .ant-tabs-content-holder {
+      padding: 12px 16px;
+    }
+  }
+}

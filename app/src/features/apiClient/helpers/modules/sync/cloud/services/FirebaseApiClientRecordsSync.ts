@@ -56,24 +56,24 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return getApiRecord(recordId);
   }
 
-  async renameCollection(id: string, newName: string): RQAPI.RecordPromise {
+  async renameCollection(id: string, newName: string): RQAPI.ApiClientRecordPromise {
     return this.updateRecord({ id, name: newName }, id, RQAPI.RecordType.COLLECTION);
   }
 
-  async createRecord(record: Partial<RQAPI.Record>) {
+  async createRecord(record: Partial<RQAPI.ApiClientRecord>) {
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId);
   }
 
-  async createCollection(record: Partial<RQAPI.Record>) {
+  async createCollection(record: Partial<RQAPI.ApiClientRecord>) {
     return this.createRecord(record);
   }
 
-  async createRecordWithId(record: Partial<RQAPI.Record>, id: string) {
+  async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
     return upsertApiRecord(this.meta.uid, record, this.meta.teamId, id);
   }
 
-  async updateRecord(record: Partial<RQAPI.Record>, id: string, type?: RQAPI.Record["type"]) {
-    const sanitizedRecord = sanitizeRecord(record as RQAPI.Record);
+  async updateRecord(record: Partial<RQAPI.ApiClientRecord>, id: string, type?: RQAPI.ApiClientRecord["type"]) {
+    const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
     sanitizedRecord.id = id;
     if (type) {
       sanitizedRecord.type = type;
@@ -94,14 +94,23 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     variables: EnvironmentVariables
   ): Promise<{ success: boolean; data: unknown; message?: string }> {
     const record = await this.getCollection(id);
+
+    const variablesToSet = Object.fromEntries(
+      Object.entries(variables).map(([key, value]) => [
+        key,
+        { syncValue: value.syncValue, type: value.type, id: value.id },
+      ])
+    );
+
     const updatedRecord: RQAPI.CollectionRecord = {
       ...record.data,
       type: RQAPI.RecordType.COLLECTION,
       data: {
         ...record.data.data,
-        variables,
+        variables: variablesToSet,
       },
     };
+
     return this.updateRecord(updatedRecord, updatedRecord.id);
   }
 
@@ -119,11 +128,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
   async updateCollectionAuthData(
     collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     return this.updateRecord(collection, collection.id);
   }
 
-  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     return {
       success: true,
       data: undefined,
@@ -140,14 +149,14 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }> {
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
     return this.createRecordWithId(collection, id);
   }
 
   async batchWriteApiEntities(
     batchSize: number,
-    entities: RQAPI.Record[],
-    writeFunction: (entity: RQAPI.Record) => Promise<any>
+    entities: RQAPI.ApiClientRecord[],
+    writeFunction: (entity: RQAPI.ApiClientRecord) => Promise<any>
   ) {
     try {
       const result = await batchWrite(batchSize, entities, writeFunction);
@@ -162,11 +171,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     }
   }
 
-  async duplicateApiEntities(entities: RQAPI.Record[]) {
+  async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
     return firebaseBatchWrite("apis", entities);
   }
 
-  async moveAPIEntities(entities: RQAPI.Record[], newParentId: string) {
+  async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
     const updatedRequests = entities.map((record) =>
       isApiCollection(record)
         ? { ...record, collectionId: newParentId, data: omit(record.data, "children") }
@@ -175,7 +184,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return await firebaseBatchWrite("apis", updatedRequests);
   }
 
-  async batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise {
+  async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     if (records.length === 0) {
       return {
         success: true,

@@ -19,6 +19,8 @@ import {
   trackExampleCollectionsImported,
   trackExampleCollectionsImportFailed,
 } from "modules/analytics/events/features/apiClient";
+import { EnvironmentData } from "backend/environment/types";
+import { useCommand } from "features/apiClient/commands";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
 
@@ -44,7 +46,7 @@ type ExampleCollectionsActions = {
     ownerId: string | null;
     recordsStore: StoreApi<ApiRecordsState>;
     envsStore: {
-      forceRefreshEnvironments: () => void;
+      createEnvironments: ReturnType<typeof useCommand>["env"]["createEnvironments"];
     };
     dispatch: Dispatch<unknown>;
   }) => Promise<{ success: true } | { success: false; message: string }>;
@@ -124,16 +126,16 @@ const createExampleCollectionsStore = () => {
 
               return markAsExample(r);
             });
-            proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r));
+            proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r)) as EnvironmentData[];
 
             const recordsToImport = [...proccessedData.apis, ...proccessedData.collections];
+
+            // TODO: extract into a command
             const recordsResult = await respository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(
               recordsToImport
             );
 
-            const envsResult = await respository.environmentVariablesRepository.createEnvironments(
-              proccessedData.environments
-            );
+            await envsStore.createEnvironments({ environmentsToCreate: proccessedData.environments });
 
             if (recordsResult.success && recordsResult.data.records.length > 0) {
               const collectionsToBeExpanded = proccessedData.collections.map((collection) => collection.id);
@@ -148,10 +150,6 @@ const createExampleCollectionsStore = () => {
               window.dispatchEvent(event);
 
               recordsStore.getState().addNewRecords(recordsResult.data.records);
-            }
-
-            if (envsResult.length > 0) {
-              envsStore.forceRefreshEnvironments();
             }
 
             trackExampleCollectionsImported();
