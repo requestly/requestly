@@ -1,0 +1,169 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { Modal } from "antd";
+import { RQAPI } from "features/apiClient/types";
+import { getFormattedDate } from "utils/DateTimeUtils";
+import "./postmanExportModal.scss";
+import fileDownload from "js-file-download";
+import { omit } from "lodash";
+import { isApiCollection } from "../../../utils";
+import {
+  trackExportApiCollectionsFailed,
+  trackExportCollectionsClicked,
+} from "modules/analytics/events/features/apiClient";
+import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
+import { postmanCollectionExporter } from "@requestly/alternative-importers";
+
+interface PostmanExportModalProps {
+  recordsToBeExported: RQAPI.Record[];
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+type ExportRecord = Omit<RQAPI.Record, "createdBy" | "updatedBy" | "ownerId" | "createdTs" | "updatedTs">;
+
+interface RequestlyExportData {
+  schema_version: string;
+  records: ExportRecord[];
+}
+
+const COLLECTIONS_SCHEMA_VERSION = "1.0.0";
+
+export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsToBeExported, isOpen, onClose }) => {
+  const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
+  const [exportData, setExportData] = useState<RequestlyExportData>({
+    schema_version: COLLECTIONS_SCHEMA_VERSION,
+    records: [],
+  });
+  const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
+
+  const handleExport = useCallback(async () => {
+    try {
+      // Convert Requestly collection to Postman format
+      const result = postmanCollectionExporter(exportData);
+
+      // Check if result is a Promise (multiple collections case)
+      if (result instanceof Promise) {
+        // Multiple collections - will return ZIP
+        const multipleResult = await result;
+        if (multipleResult.type === "multiple") {
+          // Create a blob from the zip data and download it
+          const blob = new Blob([multipleResult.zipData], { type: "application/zip" });
+          const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.zip`;
+
+          // Create a download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      } else {
+        // Single collection - return JSON
+        if (result.type === "single") {
+          const fileContent = JSON.stringify(result.collection, null, 2);
+          const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
+          fileDownload(fileContent, fileName, "application/json");
+        }
+      }
+
+      trackExportCollectionsClicked();
+      onClose();
+    } catch (error) {
+      console.error("Error exporting to Postman format:", error);
+      trackExportApiCollectionsFailed(exportData.records?.length, 0);
+    }
+  }, [exportData, fileInfo.label, onClose]);
+
+  const sanitizeRecord = (record: RQAPI.Record): ExportRecord =>
+    omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
+
+  const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord, recordsToExport: ExportRecord[]) => {
+    recordsToExport.push(
+      sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord
+    );
+    if (collection.data.children) {
+      collection.data.children.forEach((record: RQAPI.Record) => {
+        if (record.type === RQAPI.RecordType.API) {
+          recordsToExport.push(sanitizeRecord(record) as ExportRecord);
+        } else {
+          sanitizeRecords(record, recordsToExport);
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen || isApiRecordsProcessed) return;
+
+    const recordsToExport: ExportRecord[] = [];
+
+    recordsToBeExported.forEach((record) => {
+      if (isApiCollection(record)) {
+        sanitizeRecords(record, recordsToExport);
+      } else {
+        recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" });
+      }
+    });
+
+    setExportData({
+      schema_version: COLLECTIONS_SCHEMA_VERSION,
+      records: recordsToExport,
+    });
+    setIsApiRecordsProcessed(true);
+  }, [isOpen, recordsToBeExported, isApiRecordsProcessed, sanitizeRecords]);
+
+  useEffect(() => {
+    setFileInfo({
+      label: recordsToBeExported.length > 1 ? "Collections" : "Collection",
+      type: "COL",
+    });
+  }, [recordsToBeExported.length]);
+
+  return (
+    <Modal
+      title={
+        <div className="postman-export-modal-title">
+          <MdOutlineIosShare />
+          Export to Postman
+        </div>
+      }
+      open={isOpen}
+      onCancel={onClose}
+      className="custom-rq-modal postman-export-modal"
+      onOk={handleExport}
+      okText="Export to Postman"
+    >
+      <div className="postman-export-modal-content">
+        <div className="export-details-card">
+          <div className="export-name">
+            Postman-{fileInfo.label}-{getFormattedDate("DD_MM_YYYY")}
+            {recordsToBeExported?.length > 1 ? ".zip" : ".json"}
+          </div>
+          <div className="export-details">
+            <div className="export-details-item">
+              <span className="export-details-item-label">{fileInfo.label}: </span>
+              <span className="export-details-item-value">{recordsToBeExported?.length}</span>
+            </div>
+            <div className="export-details-item">
+              <span className="export-details-item-label">Format: </span>
+              <span className="export-details-item-value">
+                {recordsToBeExported?.length > 1 ? "ZIP Archive" : "Postman Collection v2.1"}
+              </span>
+            </div>
+            {recordsToBeExported?.length > 1 && (
+              <div className="export-details-item">
+                <span className="export-details-item-label">Note: </span>
+                <span className="export-details-item-value">
+                  Multiple collections will be exported as separate JSON files in a ZIP archive
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};

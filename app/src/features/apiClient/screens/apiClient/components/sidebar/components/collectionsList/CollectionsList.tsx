@@ -24,6 +24,7 @@ import "./collectionsList.scss";
 import { head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
+import { PostmanExportModal } from "../../../modals/postmanExportModal/PostmanExportModal";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";
@@ -53,6 +54,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.Record[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
   const [showSelection, setShowSelection] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.Record["id"]>>(new Set());
@@ -134,9 +136,14 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     return recordsToRender;
   }, [apiClientRecords, childParentMap, prepareRecordsToRender, searchValue]);
 
-  const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
+  const handleExportRequestlyCollection = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
     setIsExportModalOpen(true);
+  }, []);
+
+  const handlePostmanExport = useCallback((collection: RQAPI.CollectionRecord) => {
+    setCollectionsToExport((prev) => [...prev, collection]);
+    setIsPostmanExportModalOpen(true);
   }, []);
 
   const toggleSelection = useCallback(() => {
@@ -205,9 +212,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           break;
 
         case BulkActions.EXPORT:
+          // This case is now deprecated, handled by specific export actions
+          break;
+
+        case BulkActions.EXPORT_REQUESTLY:
           setIsExportModalOpen(true);
           setCollectionsToExport(processedRecords);
+          break;
 
+        case BulkActions.EXPORT_POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          setCollectionsToExport(processedRecords);
           break;
 
         case BulkActions.MOVE:
@@ -343,7 +358,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     onNewClick={onNewClick}
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
-                    onExportClick={handleExportCollection}
+                    onRequestlyExportClick={handleExportRequestlyCollection}
+                    onPostmanExportClick={handlePostmanExport}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
@@ -393,6 +409,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           onClose={() => {
             setCollectionsToExport([]);
             setIsExportModalOpen(false);
+          }}
+        />
+      )}
+      {isPostmanExportModalOpen && (
+        <PostmanExportModal
+          recordsToBeExported={collectionsToExport}
+          isOpen={isPostmanExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsPostmanExportModalOpen(false);
           }}
         />
       )}

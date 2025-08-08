@@ -12,7 +12,8 @@
   background-color: var(--component-dark-background);
 }
 
-.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+.ant-dropdown-menu .ant-dropdown-menu-item,
+.ant-dropdown-menu-submenu .ant-dropdown-menu-submenu-title {
   padding: 8px;
   font-size: var(--requestly-font-size-sm, 13px);
   line-height: 14.06px;
