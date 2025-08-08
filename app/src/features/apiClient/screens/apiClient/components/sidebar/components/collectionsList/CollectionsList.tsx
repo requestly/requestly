@@ -81,12 +81,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
+      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
         return -1;
       }
 
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
-        return -1;
+      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
+        return 1;
       }
 
       if (recordA.type !== recordB.type) {
