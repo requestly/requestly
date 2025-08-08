@@ -1,4 +1,4 @@
-import { EnvironmentVariableKey, EnvironmentVariableValue, VariableScope } from "backend/environment/types";
+import { EnvironmentVariableKey, VariableScope } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
 import { VariablesState } from "features/apiClient/store/variables/variables.store";
 import { RQAPI } from "features/apiClient/types";
@@ -10,17 +10,21 @@ import {
 } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
+import { VariableData, VariableDataForScope } from "features/apiClient/store/variables/types";
+import { runtimeVariablesStore } from "features/apiClient/store/variables/runtimeVariables.store";
 
-type VariableSource = {
-  scope: VariableScope;
+type VariableSource<T extends VariableScope> = {
+  scope: T;
   scopeId: string;
   name: string;
   level: number;
 };
 
-export type ScopedVariable = [EnvironmentVariableValue, VariableSource];
+export type ScopedVariable<T extends VariableScope = VariableScope> = [VariableDataForScope<T>, VariableSource<T>];
+
+type Scope = [VariableSource<VariableScope>, StoreApi<VariablesState<VariableData>>];
+
 export type ScopedVariables = Map<EnvironmentVariableKey, ScopedVariable>;
-type Scope = [VariableSource, StoreApi<VariablesState>];
 
 /**
  * This class is used to maintains and store variables, keeping in check that scopes that are higher in chain
@@ -35,7 +39,10 @@ export class VariableHolder {
   private data = new Map<number, ScopedVariables>();
   private isDestroyed = false;
 
-  private parseVariableState(state: VariablesState["data"], variableSource: VariableSource) {
+  private parseVariableState(
+    state: VariablesState<VariableData>["data"],
+    variableSource: VariableSource<VariableScope>
+  ) {
     const result: ScopedVariables = new Map();
     for (const [key, value] of state) {
       result.set(key, [value, variableSource]);
@@ -44,7 +51,7 @@ export class VariableHolder {
     return result;
   }
 
-  refresh(params: { variableSource: VariableSource; variableState: VariablesState }) {
+  refresh(params: { variableSource: VariableSource<VariableScope>; variableState: VariablesState<VariableData> }) {
     if (this.isDestroyed) {
       return false;
     }
@@ -78,17 +85,31 @@ export class VariableHolder {
 }
 
 function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
-  const scopes: [VariableSource, StoreApi<VariablesState>][] = [];
+  const scopes: Scope[] = [];
   let currentScopeLevel = 0;
   const {
     activeEnvironment: activeEnvironmentStore,
     globalEnvironment: globalEnvironmentStore,
   } = stores.environments.getState();
 
+  const runtimeVaribles = runtimeVariablesStore.getState();
   const activeEnvironment = activeEnvironmentStore?.getState();
   const globalEnvironment = globalEnvironmentStore.getState();
 
   const { getRecordStore } = stores.records.getState();
+
+  // 0. Runtime Variables
+  if (runtimeVaribles) {
+    scopes.push([
+      {
+        scope: VariableScope.RUNTIME,
+        scopeId: "runtime",
+        name: "Runtime Variables",
+        level: currentScopeLevel++,
+      },
+      runtimeVariablesStore,
+    ]);
+  }
 
   //1. Active Envrionment
   if (activeEnvironment) {
@@ -170,7 +191,7 @@ export function resolveVariable(key: string, parents: string[], stores: AllApiCl
 class VariableEventsManager {
   private variableHolder: VariableHolder;
   private map = new Map<
-    VariableSource["scopeId"],
+    VariableSource<VariableScope>["scopeId"],
     {
       unsubscriber: (...args: any[]) => any[] | void;
     }
@@ -205,7 +226,7 @@ class VariableEventsManager {
     });
   }
 
-  private deleteScope(scopeId: VariableSource["scopeId"]) {
+  private deleteScope(scopeId: VariableSource<VariableScope>["scopeId"]) {
     const data = this.map.get(scopeId);
     if (!data) {
       return false;
