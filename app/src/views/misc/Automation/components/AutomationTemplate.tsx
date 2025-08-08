@@ -13,6 +13,7 @@ interface AutomationTemplateProps {
   description: React.ReactNode;
   queryParams: Array<{ key: string; value: string }>;
   instructionText?: string;
+  successMsg?: string;
   exampleCode?: string;
   exampleData?: Array<{ key: string; value: string }>;
   showTitleIcon?: React.ReactNode;
@@ -30,6 +31,7 @@ export const AutomationTemplate: React.FC<AutomationTemplateProps> = ({
   queryParams,
   instructionText = "This will create header modification for you and insert it into the requestly extension, append your headers like this:",
   exampleCode = "?<headerName>=<headerValue>",
+  successMsg = "Header modification rule has been successfully created and applied to the Requestly extension.",
   exampleData = [{ key: "<HEADER_NAME>", value: "<HEADER_VALUE>" }],
   showTitleIcon,
   hasApiKey,
@@ -86,7 +88,7 @@ export const AutomationTemplate: React.FC<AutomationTemplateProps> = ({
           message={
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Spin indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />
-              Processing header modification...
+              Processing modifications...
             </div>
           }
           type="info"
@@ -98,7 +100,7 @@ export const AutomationTemplate: React.FC<AutomationTemplateProps> = ({
       {success && !isLoading && (
         <Alert
           message="Success!"
-          description="Header modification rule has been successfully created and applied to the Requestly extension."
+          description={successMsg}
           type="success"
           icon={<CheckCircleOutlined />}
           style={{ marginBottom: "16px" }}
