@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { ApiClientRepositoryInterface } from "../helpers/modules/sync/interfaces";
 import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { AllApiClientStores, ApiRecordsStoreContext } from "../store/apiRecords/ApiRecordsContextProvider";
@@ -8,6 +8,7 @@ export type ApiClientFeatureContext = {
   stores: AllApiClientStores;
   repositories: ApiClientRepositoryInterface;
 };
+
 export function useApiClientFeatureContext(): ApiClientFeatureContext {
   const stores = useContext(ApiRecordsStoreContext);
   if (!stores) {
@@ -15,5 +16,7 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
   }
   const repositories = useApiClientRepository();
 
-  return { stores, repositories };
+  return useMemo(() => {
+    return { stores, repositories };
+  }, [stores, repositories]);
 }
