@@ -3,7 +3,9 @@ import { RQAPI } from "./types";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";
 
-export const DEMO_API_URL = "https://app.requestly.io/echo";
+export const DEMO_HTTP_API_URL = "https://app.requestly.io/echo";
+
+export const DEMO_GRAPHQL_API_URL = "https://rickandmortyapi.com/graphql";
 
 export const SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY = "expanded_record_ids";
 

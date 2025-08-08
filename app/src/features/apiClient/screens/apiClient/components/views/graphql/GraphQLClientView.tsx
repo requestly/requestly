@@ -2,7 +2,6 @@ import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecord
 import { RequestContentType, RQAPI } from "features/apiClient/types";
 import GraphQLClientUrl from "./components/GraphQLClientUrl/GraphQLClientUrl";
 import React, { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { RQButton } from "lib/design-system-v2/components";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
@@ -14,7 +13,7 @@ import { useDebounce } from "hooks/useDebounce";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { Space } from "antd";
+import { notification, Space } from "antd";
 import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useGenericState } from "hooks/useGenericState";
@@ -25,7 +24,6 @@ import { ApiClientBottomSheet } from "../components/response/ApiClientBottomShee
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import "./gqClientView.scss";
 import { GraphQLRecordProvider } from "features/apiClient/store/apiRecord/graphqlRecord/GraphQLRecordContextProvider";
-import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { isNull } from "lodash";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -37,6 +35,12 @@ import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "features/apiClient/commands";
+import { SendQueryButton } from "./components/SendQueryButton/SendQueryButton";
+import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
+import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
+import { trackRequestRenamed } from "modules/analytics/events/features/apiClient";
+import { extractOperationNames } from "./utils";
+import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 
 interface Props {
   notifyApiRequestFinished: (entry: RQAPI.GraphQLApiEntry) => void;
@@ -96,7 +100,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
-  const { getIsActive, setUnsaved, setIcon, setTitle } = useGenericState();
+  const { getIsActive, setUnsaved, setTitle, setIcon } = useGenericState();
 
   const ctx = useApiClientFeatureContext();
   const [getActiveEnvironment] = useAPIEnvironment((s) => [s.getActiveEnvironment]);
@@ -157,13 +161,21 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const handleSave = useCallback(async () => {
     const apiRecord = getRecord();
+    const operationNames = extractOperationNames(apiRecord.data.request.operation);
+
+    const recordName =
+      apiRecord.name === "Untitled request" && operationNames.length === 1 ? operationNames[0] : apiRecord.name;
 
     const recordToSave: Partial<RQAPI.ApiRecord> = {
+      name: recordName,
       type: RQAPI.RecordType.API,
       data: {
         ...apiRecord.data,
       },
     };
+
+    delete apiRecord.data.request.operationName;
+
     if (isCreateMode) {
       const requestId = apiClientRecordsRepository.generateApiRecordId();
       recordToSave.id = requestId;
@@ -188,6 +200,74 @@ const GraphQLClientView: React.FC<Props> = ({
     setIsSaving(false);
   }, [onSaveCallback, getRecord, isCreateMode, apiClientRecordsRepository, onSaveRecord, setHasUnsavedChanges]);
 
+  const handleRecordNameUpdate = useCallback(
+    async (newName: string) => {
+      const recordName = getRecordName();
+      if (!newName || newName === recordName) {
+        return;
+      }
+      const apiRecord = getRecord();
+
+      const isValidHeader = apiRecord.data.request?.headers?.every((header) => {
+        return !header.isEnabled || !INVALID_KEY_CHARACTERS.test(header.key);
+      });
+
+      const isValidAuthKey =
+        apiRecord.data.auth?.currentAuthType !== Authorization.Type.API_KEY ||
+        !apiRecord.data.auth?.authConfigStore?.API_KEY?.key ||
+        !INVALID_KEY_CHARACTERS.test(apiRecord.data.auth?.authConfigStore?.API_KEY?.key);
+
+      if (!isValidHeader || !isValidAuthKey) {
+        notification.error({
+          message: `Could not save request.`,
+          description: "key contains invalid characters.",
+          placement: "bottomRight",
+        });
+        return;
+      }
+
+      const record: Partial<RQAPI.GraphQLApiRecord> = {
+        type: RQAPI.RecordType.API,
+        data: { ...apiRecord.data },
+      };
+
+      if (apiRecord?.id) {
+        record.id = apiRecord?.id;
+        record.name = newName;
+      }
+
+      if (isCreateMode) {
+        record.name = newName;
+      }
+
+      const result = isCreateMode
+        ? await apiClientRecordsRepository.createRecord(record)
+        : await apiClientRecordsRepository.updateRecord(record, record.id);
+
+      if (result.success && result.data.type === RQAPI.RecordType.API) {
+        setTitle(newName);
+        const savedRecord: RQAPI.GraphQLApiRecord = {
+          ...(apiRecord ?? {}),
+          ...result.data,
+          data: { ...result.data.data, ...record.data },
+        };
+        onSaveRecord(savedRecord);
+        trackRequestRenamed("breadcrumb");
+        onSaveCallback(savedRecord);
+        setTitle(newName);
+
+        toast.success("Request name updated!");
+      } else {
+        notification.error({
+          message: `Could not rename Request.`,
+          description: result?.message,
+          placement: "bottomRight",
+        });
+      }
+    },
+    [apiClientRecordsRepository, getRecord, getRecordName, isCreateMode, onSaveCallback, onSaveRecord, setTitle]
+  );
+
   const handleRevertChanges = () => {
     updateRecord(originalRecord.current);
   };
@@ -200,41 +280,47 @@ const GraphQLClientView: React.FC<Props> = ({
     updateRecordResponse(null);
   }, [updateRecordResponse]);
 
-  const handleSend = useCallback(async () => {
-    const record = getRecord();
-    try {
-      if (!record) {
-        throw new Error("Record not found");
-      }
-
-      resetState();
-      setIsSending(true);
-
-      const apiClientExecutionResult = await graphQLRequestExecutorRef.current.executeGraphQLRequest(record);
-
-      const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
-      updateRecordResponse(entryWithResponse.response);
-      updateRecordTestResults(entryWithResponse.testResults ?? []);
-      notifyApiRequestFinished(entryWithResponse);
-
-      if (apiClientExecutionResult.status === RQAPI.ExecutionStatus.SUCCESS) {
-        if (apiClientExecutionResult.warning) {
-          setWarning(apiClientExecutionResult.warning);
+  const handleSend = useCallback(
+    async (operationName?: string) => {
+      const record = getRecord();
+      try {
+        if (!record) {
+          throw new Error("Record not found");
         }
-      } else if (apiClientExecutionResult.status === RQAPI.ExecutionStatus.ERROR) {
-        setError(apiClientExecutionResult.error);
-        setIsRequestFailed(true);
-      }
 
-      toast.success("Request executed successfully");
-    } catch (error) {
-      setIsRequestFailed(true);
-      setError(error as RQAPI.ExecutionError);
-      toast.error("Something went wrong while sending the request");
-    } finally {
-      setIsSending(false);
-    }
-  }, [getRecord, resetState, updateRecordResponse, updateRecordTestResults, notifyApiRequestFinished]);
+        resetState();
+        setIsSending(true);
+
+        if (operationName) {
+          record.data.request.operationName = operationName;
+        } else {
+          delete record.data.request.operationName;
+        }
+
+        const apiClientExecutionResult = await graphQLRequestExecutorRef.current.executeGraphQLRequest(record);
+
+        const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
+        updateRecordResponse(entryWithResponse.response);
+        updateRecordTestResults(entryWithResponse.testResults ?? []);
+        notifyApiRequestFinished(entryWithResponse);
+
+        if (apiClientExecutionResult.status === RQAPI.ExecutionStatus.SUCCESS) {
+          if (apiClientExecutionResult.warning) {
+            setWarning(apiClientExecutionResult.warning);
+          }
+        } else if (apiClientExecutionResult.status === RQAPI.ExecutionStatus.ERROR) {
+          setError(apiClientExecutionResult.error);
+          setIsRequestFailed(true);
+        }
+      } catch (error) {
+        setIsRequestFailed(true);
+        setError(error as RQAPI.ExecutionError);
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [getRecord, resetState, updateRecordResponse, updateRecordTestResults, notifyApiRequestFinished]
+  );
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
@@ -331,6 +417,7 @@ const GraphQLClientView: React.FC<Props> = ({
   }, [apiClientWorkloadManager, ctx, recordId, appMode, autoGeneratedStore, apiClientFilesStore]);
 
   const isDefaultPlacementRef = useRef(false);
+
   useLayoutEffect(() => {
     if (isDefaultPlacementRef.current) {
       return;
@@ -362,7 +449,7 @@ const GraphQLClientView: React.FC<Props> = ({
               openInModal={openInModal}
               name={getRecordName()}
               OnRecordNameUpdate={() => {}}
-              onBlur={() => {}}
+              onBlur={(newName) => handleRecordNameUpdate(newName)}
             />
 
             <ClientCodeButton
@@ -384,17 +471,7 @@ const GraphQLClientView: React.FC<Props> = ({
                 isIntrospectionDataFetchingFailed={hasIntrospectionFailed}
               />
             </Space.Compact>
-            <RQButton
-              showHotKeyText
-              onClick={() => handleSend()}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-              type="primary"
-              className="text-bold"
-              disabled={!url}
-              loading={isSending}
-            >
-              Send
-            </RQButton>
+            <SendQueryButton disabled={!url} loading={isSending} onSendClick={handleSend} />
 
             <Conditional condition={!openInModal}>
               <RBACButton

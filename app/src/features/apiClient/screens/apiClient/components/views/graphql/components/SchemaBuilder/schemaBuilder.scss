@@ -1,6 +1,7 @@
 .schema-builder {
   height: 100%;
   overflow: hidden;
+  position: relative;
 
   &__header-container {
     display: flex;
@@ -29,9 +30,9 @@
   }
 
   &__content {
-    height: calc(100% - 25px);
+    height: calc(100% - 32px);
     overflow: hidden;
-    padding: var(--space-3, 6px) var(--space-5, 12px);
+    padding-top: unset;
 
     .schema-builder__arrow {
       color: var(--requestly-color-text-subtle);
@@ -50,7 +51,7 @@
 
   .docExplorerWrap {
     width: 100% !important;
-    height: inherit !important;
+    height: 100% !important;
     overflow: auto !important;
 
     .doc-explorer-title-bar {
@@ -60,6 +61,66 @@
     .doc-explorer-contents {
       height: 100%;
       font-size: var(--requestly-font-size-sm);
+
+      form.graphiql-explorer-actions.variable-editor-title {
+        bottom: unset !important;
+        border-top: unset !important;
+        width: unset !important;
+        margin: unset !important;
+        padding: 0 !important;
+        padding: var(--space-3, 6px) var(--space-5, 12px) !important;
+        border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06)) !important;
+        background: var(--requestly-color-background) !important;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px !important;
+
+        select {
+          background: transparent !important;
+          padding: var(--space-2, 4px) var(--space-3, 6px) !important;
+          color: var(--requestly-color-text-subtle) !important;
+          font-size: var(--requestly-font-size-sm) !important;
+          font-weight: var(--requestly-font-weight-medium) !important;
+          border-radius: 4px !important;
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+        }
+
+        & > span {
+          color: var(--requestly-color-text-subtle) !important;
+        }
+
+        .toolbar-button {
+          display: unset !important;
+          width: 54px !important;
+          height: 24px !important;
+          transition: all 0.2s ease-in-out !important;
+          margin-left: 4px;
+          border-radius: 4px;
+          border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+          background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06)) !important;
+
+          span {
+            color: var(--requestly-color-text-subtle);
+            &::after {
+              content: " Add" !important;
+
+              &:hover {
+                background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+                color: var(--requestly-color-text-default) !important;
+              }
+            }
+          }
+
+          &:hover {
+            background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12)) !important;
+
+            span {
+              color: var(--requestly-color-text-default) !important;
+            }
+          }
+        }
+      }
 
       .graphiql-operation-title-bar {
         span {
@@ -78,7 +139,7 @@
       }
 
       .graphiql-explorer-node {
-        margin-top: 6px;
+        margin-top: 8px;
 
         input[type="text"] {
           width: 150px !important;
@@ -135,6 +196,32 @@
 
 // Styling to make field types more visible
 .graphiql-explorer-root {
+  & > div:first-child {
+    flex-grow: unset !important;
+    height: calc(100% - 48px) !important;
+    font-family: var(--requestly-font-family-code) !important;
+  }
+  div:nth-child(2) {
+    min-height: unset !important;
+    max-height: unset !important;
+    overflow: hidden !important;
+  }
+
+  & div[id^="query-"],
+  & div[id^="mutation-"],
+  & div[id^="subscription-"] {
+    border-color: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12)) !important;
+    padding: var(--space-3, 6px) var(--space-5, 12px);
+
+    .graphiql-operation-title-bar {
+      margin-top: 12px !important;
+      input {
+        font-size: var(--requestly-font-size-xs) !important;
+        color: var(--requestly-color-text-default) !important;
+      }
+    }
+  }
+
   .graphiql-explorer-node {
     span[data-field-type] {
       position: relative;
