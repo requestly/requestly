@@ -60,13 +60,13 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
     }
 
     const functions = getFunctions();
-    const archiveTeam = httpsCallable(functions, "teams-archiveTeam");
+    const deleteTeam = httpsCallable(functions, "teams-deleteTeam");
 
     try {
       setDeleteInProgress(true);
-      await archiveTeam({ teamId });
+      await deleteTeam({ teamId });
       trackWorkspaceDeleted();
-      toast.info("Workspace deletion scheduled");
+      toast.info("Workspace deleted successfully");
       redirectToRules(navigate);
       handleSwitchToPrivateWorkspace();
     } catch (err) {
