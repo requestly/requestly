@@ -76,11 +76,11 @@ function createApiClientMultiWorkspaceViewStore() {
 
 export const apiClientMultiWorkspaceViewStore = createApiClientMultiWorkspaceViewStore();
 
-export function useApiClientMultiWorkspaceViewStore<T>(selector: (state: ApiClientMultiWorkspaceViewState) => T) {
+export function useApiClientMultiWorkspaceView<T>(selector: (state: ApiClientMultiWorkspaceViewState) => T) {
   return useStore(apiClientMultiWorkspaceViewStore, useShallow(selector));
 }
 
-export function useWorkspaceStore<T>(
+export function useWorkspace<T>(
   workspaceId: RenderableWorkspaceState["id"],
   selector: (state: RenderableWorkspaceState) => T
 ) {
