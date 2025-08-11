@@ -12,28 +12,25 @@ interface Props {
 }
 
 export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100, initialSizes = [40, 60] }) => {
-  const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
+  const { sheetPlacement } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
   const splitPane = useRef(null);
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
   useEffect(() => {
-    if (isSheetPlacedAtBottom && splitPane.current) {
-      if (isBottomSheetOpen) {
-        splitPane.current.split.setSizes(initialSizes);
-      } else {
-        splitPane.current.split.setSizes([100, 0]);
-      }
+    // this useEffect on mount set sizes of split pane
+    if (splitPane.current) {
+      splitPane.current.split.setSizes(isSheetPlacedAtBottom ? initialSizes : [55, 45]);
     }
-  }, [isBottomSheetOpen, isSheetPlacedAtBottom, initialSizes]);
+  }, []);
 
   return (
     <Split
       key={splitDirection}
       ref={splitPane}
       direction={splitDirection}
-      sizes={isSheetPlacedAtBottom ? [100, 0] : initialSizes}
+      sizes={isSheetPlacedAtBottom ? initialSizes : [55, 45]}
       minSize={minSize || 350}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
