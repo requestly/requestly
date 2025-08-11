@@ -1,5 +1,4 @@
 import { WorkspaceType } from "features/workspaces/types";
-
 import { NativeError } from "errors/NativeError";
 import { create, StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
@@ -9,7 +8,7 @@ enum ApiClientViewMode {
   MULTI = "MULTI",
 }
 
-type RenderableWorkspaceState = {
+export type RenderableWorkspaceState = {
   id: string;
   name: string;
   type: WorkspaceType.LOCAL;
