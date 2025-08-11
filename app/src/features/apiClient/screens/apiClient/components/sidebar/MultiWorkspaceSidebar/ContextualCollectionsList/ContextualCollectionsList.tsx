@@ -1,13 +1,14 @@
 import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { RQAPI } from "features/apiClient/types";
+import { BulkActions, RQAPI } from "features/apiClient/types";
 import { useRBAC } from "features/rbac";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { CollectionsList } from "./CollectionsList/CollectionsList";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
+import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
 
 export const ContextualCollectionsList: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -18,37 +19,47 @@ export const ContextualCollectionsList: React.FC<{
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
 
   const [searchValue, setSearchValue] = useState("");
+  const [showSelection, setShowSelection] = useState(false);
+  const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+  const [bulkAction, setBulkAction] = useState<BulkActions | null>(null);
 
-  // const toggleSelection = useCallback(() => {
-  //   setSelectedRecords(new Set());
-  //   setShowSelection((prev) => !prev);
-  //   setIsAllRecordsSelected(false);
-  // }, [setSelectedRecords, setShowSelection]);
+  const bulkActionHandler = useCallback(async (action: BulkActions) => {
+    // TODO: handle special cases for move and export
+    setBulkAction(action);
+  }, []);
 
-  // const multiSelectOptions = {
-  //   showMultiSelect: isValidPermission,
-  //   toggleMultiSelect: toggleSelection,
-  // };
+  const deselectRecords = useCallback(() => {
+    setIsAllRecordsSelected(false);
+  }, []);
+
+  const handleShowSelection = useCallback((value: boolean) => {
+    setShowSelection(value);
+  }, []);
+
+  const multiSelectOptions = {
+    showMultiSelect: isValidPermission,
+    toggleMultiSelect: deselectRecords,
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="api-client-sidebar-header-container">
         <SidebarListHeader
           onSearch={setSearchValue}
-          // multiSelectOptions={multiSelectOptions}
+          multiSelectOptions={multiSelectOptions}
           newRecordActionOptions={{
             showNewRecordAction: isValidPermission,
             onNewRecordClick: onNewClick,
           }}
         />
 
-        {/* {showSelection && (
+        {showSelection && (
           <ActionMenu
             isAllRecordsSelected={isAllRecordsSelected}
-            toggleSelection={toggleSelection}
+            toggleSelection={deselectRecords}
             bulkActionsHandler={bulkActionHandler}
           />
-        )} */}
+        )}
       </div>
 
       {selectedWorkspaces.map((workspace) => {
@@ -56,6 +67,10 @@ export const ContextualCollectionsList: React.FC<{
           <ContextId id={workspace.getState().id}>
             <WorkspaceLoader>
               <CollectionsList
+                bulkAction={bulkAction}
+                isAllRecordsSelected={isAllRecordsSelected}
+                showSelection={showSelection}
+                handleShowSelection={handleShowSelection}
                 searchValue={searchValue}
                 onNewClick={onNewClick}
                 recordTypeToBeCreated={recordTypeToBeCreated}
