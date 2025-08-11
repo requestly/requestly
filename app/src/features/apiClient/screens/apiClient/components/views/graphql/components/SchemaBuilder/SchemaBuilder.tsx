@@ -1,3 +1,4 @@
+import React from "react";
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { buildClientSchema } from "graphql";
@@ -7,8 +8,13 @@ import { RQButton } from "lib/design-system-v2/components";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 import "./schemaBuilder.scss";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 
-export const SchemaBuilder = () => {
+interface Props {
+  setIsSchemaBuilderOpen: (isOpen: boolean) => void;
+}
+
+export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
   const [introspectionData, query, updateEntryRequest] = useGraphQLRecordStore((state) => [
     state.introspectionData,
     state.entry.request.operation,
@@ -29,6 +35,12 @@ export const SchemaBuilder = () => {
             <div className="schema-builder__header-container__title">SCHEMA</div>
             <div className="schema-builder__header-container__actions">
               <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
+              <RQButton
+                size="small"
+                type="transparent"
+                icon={<MdClose />}
+                onClick={() => setIsSchemaBuilderOpen(false)}
+              />
             </div>
           </div>
           <div className="schema-builder__content">

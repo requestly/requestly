@@ -126,6 +126,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const [warning, setWarning] = useState<RQAPI.ExecutionWarning | undefined>(undefined);
   const [isRequestCancelled, setIsRequestCancelled] = useState(false);
   const [isRequestFailed, setIsRequestFailed] = useState(false);
+  const [isSchemaBuilderOpen, setIsSchemaBuilderOpen] = useState(true);
 
   const originalRecord = useRef(getEntry());
   const graphQLRequestExecutorRef = useRef<GraphQLRequestExecutor | null>(null);
@@ -183,8 +184,6 @@ const GraphQLClientView: React.FC<Props> = ({
         ...apiRecord.data,
       },
     };
-
-    console.log("recordToSave", recordToSave, operationNames, apiRecord);
 
     delete apiRecord.data.request.operationName;
 
@@ -439,7 +438,7 @@ const GraphQLClientView: React.FC<Props> = ({
     }
 
     isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth < 1600 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
     toggleSheetPlacement(bottomSheetPlacement);
   }, [toggleSheetPlacement]);
 
@@ -506,7 +505,6 @@ const GraphQLClientView: React.FC<Props> = ({
           </div>
         </div>
       </div>
-      {/* TODO: update props when integrating execution adapter */}
       <BottomSheetLayout
         layout={SheetLayout.SPLIT}
         bottomSheet={
@@ -529,7 +527,12 @@ const GraphQLClientView: React.FC<Props> = ({
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [60, 40]}
       >
         <div className="api-client-body">
-          <GraphQLRequestTabs requestId={recordId} collectionId={record.collectionId} />
+          <GraphQLRequestTabs
+            requestId={recordId}
+            collectionId={record.collectionId}
+            isSchemaBuilderOpen={isSchemaBuilderOpen}
+            setIsSchemaBuilderOpen={setIsSchemaBuilderOpen}
+          />
         </div>
       </BottomSheetLayout>
     </div>
