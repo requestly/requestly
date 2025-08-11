@@ -29,7 +29,6 @@ export const MultiWorkspaceSidebar: React.FC<Props> = () => {
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
 
   const {
@@ -96,14 +95,7 @@ export const MultiWorkspaceSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: (
-        <ContextualCollectionsList
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          onNewClick={onNewClick}
-          recordTypeToBeCreated={recordTypeToBeCreated}
-        />
-      ),
+      children: <ContextualCollectionsList onNewClick={onNewClick} recordTypeToBeCreated={recordTypeToBeCreated} />,
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
