@@ -67,8 +67,6 @@ function createApiClientFeatureContextProviderStore() {
 
 export const apiClientFeatureContextProviderStore = createApiClientFeatureContextProviderStore();
 
-export function useApiClientFeatureContextProviderStore<T>(
-  selector: (state: ApiClientFeatureContextProviderState) => T
-) {
+export function useApiClientFeatureContextProvider<T>(selector: (state: ApiClientFeatureContextProviderState) => T) {
   return useStore(apiClientFeatureContextProviderStore, useShallow(selector));
 }
