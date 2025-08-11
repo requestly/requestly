@@ -3,6 +3,7 @@ import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarLis
 import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { EnvironmentsList } from "./EnvironmentsList/EnvironmentsList";
+import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
 
 export const ContextualEnvironmentsList: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -21,7 +22,9 @@ export const ContextualEnvironmentsList: React.FC = () => {
       {selectedWorkspaces.map((workspace) => {
         return (
           <ContextId id={workspace.getState().id}>
-            <EnvironmentsList searchValue={searchValue} />
+            <WorkspaceLoader>
+              <EnvironmentsList searchValue={searchValue} />
+            </WorkspaceLoader>
           </ContextId>
         );
       })}
