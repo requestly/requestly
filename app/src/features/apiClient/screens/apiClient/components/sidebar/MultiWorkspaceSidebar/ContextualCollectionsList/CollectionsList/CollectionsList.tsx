@@ -4,7 +4,7 @@ import { BulkActions, RQAPI } from "features/apiClient/types";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { sessionStorage } from "utils/sessionStorage";
-import "./contextualCollectionsList.scss";
+import "./collectionsList.scss";
 import { head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { toast } from "utils/Toast";
