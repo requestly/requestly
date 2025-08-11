@@ -13,15 +13,13 @@ import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateSt
 import { renderVariables } from "backend/environment/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
-interface Props {}
+interface Props {
+  recordId: RQAPI.ApiRecord["id"];
+  collectionId: RQAPI.ApiRecord["collectionId"];
+}
 
-export const GraphQLAuthView: React.FC<Props> = () => {
-  const [recordId, collectionId, auth, updateAuth] = useGraphQLRecordStore((state) => [
-    state.record.id,
-    state.record.collectionId,
-    state.record.data.auth,
-    state.updateRecordAuth,
-  ]);
+export const GraphQLAuthView: React.FC<Props> = ({ recordId, collectionId }) => {
+  const [auth, updateAuth] = useGraphQLRecordStore((state) => [state.entry.auth, state.updateEntryAuth]);
   const [getData, getParentChain] = useAPIRecords((state) => [state.getData, state.getParentChain]);
   const [purgeAndAdd] = useAutogenerateStore((state) => [state.purgeAndAdd, state.purgeAndAddHeaders]);
   const ctx = useApiClientFeatureContext();

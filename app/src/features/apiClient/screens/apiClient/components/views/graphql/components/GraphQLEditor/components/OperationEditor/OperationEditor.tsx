@@ -8,10 +8,10 @@ import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./operationsEditor.css";
 
 export const OperationEditor = () => {
-  const [operation, introspectionData, updateRecordRequest, updateOperationNames] = useGraphQLRecordStore((state) => [
-    state.record.data.request.operation,
+  const [operation, introspectionData, updateEntryRequest, updateOperationNames] = useGraphQLRecordStore((state) => [
+    state.entry.request.operation,
     state.introspectionData,
-    state.updateRecordRequest,
+    state.updateEntryRequest,
     state.updateOperationNames,
   ]);
 
@@ -46,7 +46,7 @@ export const OperationEditor = () => {
   }, 500);
 
   const handleChange = (value: string) => {
-    updateRecordRequest({
+    updateEntryRequest({
       operation: value,
     });
 

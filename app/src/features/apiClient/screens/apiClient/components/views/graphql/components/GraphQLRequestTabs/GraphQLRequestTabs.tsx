@@ -16,9 +16,10 @@ enum GraphQLRequestTab {
 
 interface Props {
   requestId: RQAPI.ApiRecord["id"];
+  collectionId: RQAPI.ApiRecord["collectionId"];
 }
 
-export const GraphQLRequestTabs: React.FC<Props> = ({ requestId }) => {
+export const GraphQLRequestTabs: React.FC<Props> = ({ requestId, collectionId }) => {
   const tabItems = useMemo(() => {
     return [
       {
@@ -34,7 +35,7 @@ export const GraphQLRequestTabs: React.FC<Props> = ({ requestId }) => {
       {
         key: GraphQLRequestTab.AUTHORIZATION,
         label: <RequestTabLabel label="Authorization" />,
-        children: <GraphQLAuthView />,
+        children: <GraphQLAuthView recordId={requestId} collectionId={collectionId} />,
       },
       {
         key: GraphQLRequestTab.SCRIPTS,
@@ -42,6 +43,6 @@ export const GraphQLRequestTabs: React.FC<Props> = ({ requestId }) => {
         children: <GraphQLScripts />,
       },
     ];
-  }, [requestId]);
+  }, [requestId, collectionId]);
   return <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />;
 };
