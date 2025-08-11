@@ -7,6 +7,8 @@ export const DEMO_HTTP_API_URL = "https://app.requestly.io/echo";
 
 export const DEMO_GRAPHQL_API_URL = "https://rickandmortyapi.com/graphql";
 
+export const DEFAULT_REQUEST_NAME = "Untitled request";
+
 export const SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY = "expanded_record_ids";
 
 export namespace PostmanAuth {

@@ -9,16 +9,16 @@ import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntr
 import "./schemaBuilder.scss";
 
 export const SchemaBuilder = () => {
-  const [introspectionData, query, updateRecordRequest] = useGraphQLRecordStore((state) => [
+  const [introspectionData, query, updateEntryRequest] = useGraphQLRecordStore((state) => [
     state.introspectionData,
-    state.record.data.request.operation,
-    state.updateRecordRequest,
+    state.entry.request.operation,
+    state.updateEntryRequest,
   ]);
 
   const { introspectAndSaveSchema } = useGraphQLIntrospection();
 
   const handleEdit = (query: string) => {
-    updateRecordRequest({ operation: query });
+    updateEntryRequest({ operation: query });
   };
 
   return (

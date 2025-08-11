@@ -10,7 +10,7 @@ export const useGraphQLIntrospection = () => {
     setIsFetchingIntrospectionData,
     setHasIntrospectionFailed,
   ] = useGraphQLRecordStore((state) => [
-    state.record.data.request.url,
+    state.entry.request.url,
     state.setIntrospectionData,
     state.setIsFetchingIntrospectionData,
     state.setHasIntrospectionFailed,
