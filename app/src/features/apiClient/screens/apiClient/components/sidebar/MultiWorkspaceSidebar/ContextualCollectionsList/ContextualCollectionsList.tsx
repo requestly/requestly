@@ -88,6 +88,7 @@ export const ContextualCollectionsList: React.FC<{
       {selectedWorkspaces.map((workspace) => {
         const contextId = workspace.getState().id;
 
+        // ASK: Should we merge ContextId + WorkspaceLoader under WorkspaceWrapper
         return (
           <ContextId id={contextId}>
             <WorkspaceLoader>
