@@ -5,6 +5,8 @@ import { create, useStore } from "zustand";
 import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
 
+export const _SINGLE_MODE_WORKSPACE_CONTEXT_ID = "single_mode_workspace_context";
+
 export type ApiClientFeatureContext = {
   id: RenderableWorkspaceState["id"];
   workspaceId: RenderableWorkspaceState["id"];
@@ -51,9 +53,9 @@ function createApiClientFeatureContextProviderStore() {
 
       getSingleViewContext() {
         const { contexts } = get();
-        const context = contexts.values().next().value as ApiClientFeatureContext;
+        const context = contexts.get(_SINGLE_MODE_WORKSPACE_CONTEXT_ID);
 
-        if (!context) {
+        if (contexts.size !== 1 || !context) {
           throw new NativeError("Context does not exist in single mode");
         }
 

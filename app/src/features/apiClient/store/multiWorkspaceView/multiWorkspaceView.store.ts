@@ -25,7 +25,7 @@ type ApiClientMultiWorkspaceViewState = {
   viewMode: ApiClientViewMode;
   selectedWorkspaces: StoreApi<RenderableWorkspaceState>[];
 
-  updateViewMode(mode: ApiClientViewMode): void;
+  setViewMode(mode: ApiClientViewMode): void;
   addWorkspace(workspace: Omit<RenderableWorkspaceState, "setState" | "state">): void;
   removeWorkspace(id: RenderableWorkspaceState["id"]): void;
 };
@@ -51,7 +51,7 @@ function createApiClientMultiWorkspaceViewStore() {
       viewMode: ApiClientViewMode.SINGLE, // TODO: update it when app is restarted
       selectedWorkspaces: [],
 
-      updateViewMode(mode) {
+      setViewMode(mode) {
         set({ viewMode: mode });
       },
 
@@ -63,12 +63,12 @@ function createApiClientMultiWorkspaceViewStore() {
       removeWorkspace(id) {
         const { selectedWorkspaces } = get();
 
-        const workspace = selectedWorkspaces.find((w) => w.getState().id === id);
-        if (!workspace) {
+        const updatedWorkspaces = selectedWorkspaces.filter((w) => w.getState().id !== id);
+        if (selectedWorkspaces.length === updatedWorkspaces.length) {
           return;
         }
 
-        set({ selectedWorkspaces: selectedWorkspaces.filter((w) => w.getState().id !== id) });
+        set({ selectedWorkspaces: updatedWorkspaces });
       },
     };
   });
