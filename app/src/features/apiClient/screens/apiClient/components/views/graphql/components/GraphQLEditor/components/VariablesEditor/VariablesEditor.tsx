@@ -2,9 +2,9 @@ import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecord
 import { GraphQLEditor } from "../../GraphQLEditor";
 
 export const VariablesEditor = () => {
-  const [variables, updateRecordRequest] = useGraphQLRecordStore((state) => [
-    state.record.data.request.variables,
-    state.updateRecordRequest,
+  const [variables, updateEntryRequest] = useGraphQLRecordStore((state) => [
+    state.entry.request.variables,
+    state.updateEntryRequest,
   ]);
   return (
     <GraphQLEditor
@@ -12,7 +12,7 @@ export const VariablesEditor = () => {
       className="variables-editor"
       initialDoc={variables}
       onChange={(value) => {
-        updateRecordRequest({
+        updateEntryRequest({
           variables: value,
         });
       }}
