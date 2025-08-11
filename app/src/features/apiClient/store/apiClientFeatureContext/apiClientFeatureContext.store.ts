@@ -6,7 +6,8 @@ import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
 
 export type ApiClientFeatureContext = {
-  id: RenderableWorkspaceState["id"]; // Instead of id, should this be workspaceId or as a new property ?
+  id: RenderableWorkspaceState["id"];
+  workspaceId: RenderableWorkspaceState["id"];
   stores: AllApiClientStores;
   repositories: ApiClientRepositoryInterface;
 };
@@ -18,7 +19,6 @@ type ApiClientFeatureContextProviderState = {
   removeContext(id: RenderableWorkspaceState["id"]): void;
   getContext(id: RenderableWorkspaceState["id"]): ApiClientFeatureContext | undefined;
   getSingleViewContext(): ApiClientFeatureContext;
-  refreshContext(id: RenderableWorkspaceState["id"], context: ApiClientFeatureContext): void;
 };
 
 function createApiClientFeatureContextProviderStore() {
@@ -58,12 +58,6 @@ function createApiClientFeatureContextProviderStore() {
         }
 
         return context;
-      },
-
-      refreshContext(id, context) {
-        const { contexts } = get();
-        contexts.set(id, context);
-        set({ contexts });
       },
     };
   });
