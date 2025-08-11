@@ -1,5 +1,4 @@
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { DEMO_HTTP_API_URL } from "features/apiClient/constants";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { useCallback } from "react";
 import "./apiClientUrl.css";
@@ -22,7 +21,7 @@ export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, o
   return (
     <SingleLineEditor
       className="api-request-url"
-      placeholder={DEMO_HTTP_API_URL}
+      placeholder="Enter or paste GraphQL endpoint URL"
       //value={entry.request.url}
       defaultValue={url}
       onChange={(value) => {
