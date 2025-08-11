@@ -7,15 +7,13 @@ import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "../components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "../components/apiClientSidebarHeader/ApiClientSidebarHeader";
-import { EnvironmentsList } from "features/apiClient/screens/environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
-import "./multiWorkspaceSidebar.scss";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { ContextualCollectionsList } from "./ContextualCollectionsList/ContextualCollectionsList";
-
-interface Props {}
+import { ContextualEnvironmentsList } from "./ContextualEnvironmentsList/ContextualEnvironmentsList";
+import "./multiWorkspaceSidebar.scss";
 
 export enum ApiClientSidebarTabKey {
   HISTORY = "history",
@@ -23,7 +21,7 @@ export enum ApiClientSidebarTabKey {
   ENVIRONMENTS = "environments",
 }
 
-export const MultiWorkspaceSidebar: React.FC<Props> = () => {
+export const MultiWorkspaceSidebar: React.FC = () => {
   const { state } = useLocation();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
@@ -106,7 +104,7 @@ export const MultiWorkspaceSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: <EnvironmentsList />,
+      children: <ContextualEnvironmentsList />,
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,
