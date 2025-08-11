@@ -61,9 +61,10 @@ export const WindowsAndLinuxGatedHoc: React.FC<WindowsAndLinuxGatedHocProps> = (
         />
 
         <div className="content">
-          <div className="title">Coming soon on Windows 🚀</div>
+          <div className="title">Coming soon on Windows and Linux 🚀</div>
           <div className="description">
-            The {featureName} is currently available only for macOS, but support for Windows is coming soon! 🚀
+            The {featureName} is currently available only for macOS, but support for Windows and Linux is coming soon!
+            🚀
             <br />
             <br />
             In the meantime, you can use the {featureName} in your browser with the{" "}

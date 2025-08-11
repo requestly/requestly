@@ -139,6 +139,7 @@ const LINKS = {
   DOWNLOAD_DESKTOP_APP: {
     MACOS: "https://bit.ly/rq-mac",
     WINDOWS: "https://bit.ly/rq-windows",
+    LINUX: "https://bit.ly/rq-linux",
   },
 
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
