@@ -7,6 +7,7 @@ import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarLis
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { CollectionsList } from "./CollectionsList/CollectionsList";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
+import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
 
 export const ContextualCollectionsList: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -53,11 +54,13 @@ export const ContextualCollectionsList: React.FC<{
       {selectedWorkspaces.map((workspace) => {
         return (
           <ContextId id={workspace.getState().id}>
-            <CollectionsList
-              searchValue={searchValue}
-              onNewClick={onNewClick}
-              recordTypeToBeCreated={recordTypeToBeCreated}
-            />
+            <WorkspaceLoader>
+              <CollectionsList
+                searchValue={searchValue}
+                onNewClick={onNewClick}
+                recordTypeToBeCreated={recordTypeToBeCreated}
+              />
+            </WorkspaceLoader>
           </ContextId>
         );
       })}
