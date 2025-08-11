@@ -1,22 +1,18 @@
 import { EnvironmentVariableKey, EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 
 export type VariablesState = {
-  // state
-  version: number;
   data: Map<EnvironmentVariableKey, EnvironmentVariableValue>;
 
   reset: (data: Map<EnvironmentVariableKey, EnvironmentVariableValue>) => void;
-
-  // actions
   delete: (key: EnvironmentVariableKey) => void;
   add: (key: EnvironmentVariableKey, variable: EnvironmentVariableValue) => void;
   update: (key: EnvironmentVariableKey, updates: Omit<EnvironmentVariableValue, "id">) => void;
   getVariable: (key: EnvironmentVariableKey) => EnvironmentVariableValue | undefined;
   getAll: () => Map<EnvironmentVariableKey, EnvironmentVariableValue>;
   search: (value: string) => Map<EnvironmentVariableKey, EnvironmentVariableValue>;
-  incrementVersion: () => void;
 };
 
 export const parseVariables = (rawVariables: EnvironmentVariables): VariablesState["data"] => {
@@ -24,74 +20,69 @@ export const parseVariables = (rawVariables: EnvironmentVariables): VariablesSta
 };
 
 export const createVariablesStore = ({ variables }: { variables: EnvironmentVariables }) => {
-  return create<VariablesState>()((set, get) => ({
-    version: 0,
-    data: parseVariables(variables),
+  return create<VariablesState>()(
+    immer((set, get) => ({
+      data: parseVariables(variables),
 
-    reset(data) {
-      set({
-        data,
-      });
-    },
+      reset(data) {
+        set((state) => {
+          state.data = data;
+        });
+      },
 
-    delete(key) {
-      const { data } = get();
+      delete(key) {
+        const { data } = get();
 
-      if (!data.has(key)) {
-        return;
-      }
+        if (!data.has(key)) {
+          return;
+        }
 
-      data.delete(key);
-      set({ data });
-      get().incrementVersion();
-    },
+        set((state) => {
+          state.data.delete(key);
+        });
+      },
 
-    add(key, variable) {
-      const { data } = get();
-      data.set(key, variable);
-      set({ data });
-      get().incrementVersion();
-    },
+      add(key, variable) {
+        set((state) => {
+          state.data.set(key, variable);
+        });
+      },
 
-    update(key, updates) {
-      const { data } = get();
-      const existingValue = data.get(key);
+      update(key, updates) {
+        const { data } = get();
+        const existingValue = data.get(key);
 
-      if (!existingValue) {
-        throw new NativeError("Variable does not exist!").addContext({ variableKey: key });
-      }
+        if (!existingValue) {
+          throw new NativeError("Variable does not exist!").addContext({ variableKey: key });
+        }
 
-      const updatedValue = { ...existingValue, ...updates };
-      data.set(key, updatedValue);
-      set({ data });
-      get().incrementVersion();
-    },
+        const updatedValue = { ...existingValue, ...updates };
 
-    getVariable(key) {
-      const { data } = get();
+        set((state) => {
+          state.data.set(key, updatedValue);
+        });
+      },
 
-      if (!data.has(key)) {
-        return;
-      }
+      getVariable(key) {
+        const { data } = get();
 
-      return data.get(key);
-    },
+        if (!data.has(key)) {
+          return;
+        }
 
-    getAll() {
-      const { data } = get();
-      return data;
-    },
+        return data.get(key);
+      },
 
-    search(value) {
-      const { data } = get();
-      const searchResults = Object.entries(data).filter(([key]) => key.toLowerCase().includes(value.toLowerCase()));
-      return new Map(searchResults);
-    },
+      getAll() {
+        const { data } = get();
+        return data;
+      },
 
-    incrementVersion() {
-      set({
-        version: get().version + 1,
-      });
-    },
-  }));
+      search(value) {
+        const { data } = get();
+        const searchResults = Object.entries(data).filter(([key]) => key.toLowerCase().includes(value.toLowerCase()));
+        return new Map(searchResults);
+      },
+    }))
+  );
 };
