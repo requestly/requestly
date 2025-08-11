@@ -6,7 +6,7 @@ import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
 
 type ApiClientFeatureContext = {
-  id: RenderableWorkspaceState["id"]; // Instead of id we should this be workspaceId or as a new property ?
+  id: RenderableWorkspaceState["id"]; // Instead of id, should this be workspaceId or as a new property ?
   stores: AllApiClientStores;
   repositories: ApiClientRepositoryInterface;
 };
