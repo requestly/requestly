@@ -8,6 +8,10 @@ export const WorkspaceLoader: React.FC<{ children: React.ReactNode }> = ({ child
   const contextId = useContextId();
   const state = useWorkspace(contextId, (s) => s.state);
 
+  if (state.errored) {
+    // TBD
+  }
+
   if (state.loading) {
     return (
       <div className="workspace-loader-container">
