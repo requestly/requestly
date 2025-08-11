@@ -4,7 +4,6 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
-import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
@@ -17,6 +16,7 @@ import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
+import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
