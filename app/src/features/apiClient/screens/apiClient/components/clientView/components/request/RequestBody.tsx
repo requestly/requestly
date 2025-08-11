@@ -129,31 +129,29 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   we are considering RAW & Json as 'Text'
   */
   return (
-    <>
-      <div className="api-request-body-container">
-        <div className="api-request-body-radio-btns">
-          <Radio.Group
-            onChange={(e) => setContentType(e.target.value === "text" ? RequestContentType.RAW : e.target.value)}
-            defaultValue={RequestContentType.RAW}
-            value={
-              contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? "text" : contentType
-            }
-          >
-            <Radio value="text">Raw</Radio>
-            <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
-            {isFeatureCompatible(FEATURES.API_CLIENT_MULTIPART_FORM) && isFileBodyEnabled && (
-              <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
-            )}
-          </Radio.Group>
-        </div>
-        <div className="api-request-body">
-          {contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM
-            ? requestBodyOptions
-            : null}
-          <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
-        </div>
+    <div className="api-request-body-container">
+      <div className="api-request-body-radio-btns">
+        <Radio.Group
+          onChange={(e) => setContentType(e.target.value === "text" ? RequestContentType.RAW : e.target.value)}
+          defaultValue={RequestContentType.RAW}
+          value={
+            contentType === RequestContentType.RAW || contentType === RequestContentType.JSON ? "text" : contentType
+          }
+        >
+          <Radio value="text">Raw</Radio>
+          <Radio value={RequestContentType.FORM}>x-www-form-urlencoded</Radio>
+          {isFeatureCompatible(FEATURES.API_CLIENT_MULTIPART_FORM) && isFileBodyEnabled && (
+            <Radio value={RequestContentType.MULTIPART_FORM}>multipart/form-data</Radio>
+          )}
+        </Radio.Group>
       </div>
-    </>
+      <div className="api-request-body">
+        {contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM
+          ? requestBodyOptions
+          : null}
+        <RequestBodyContext.Provider value={{ requestBodyStateManager }}>{bodyEditor}</RequestBodyContext.Provider>
+      </div>
+    </div>
   );
 };
 
