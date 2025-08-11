@@ -3,7 +3,7 @@ import { NativeError } from "errors/NativeError";
 import { create, StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 
-enum ApiClientViewMode {
+export enum ApiClientViewMode {
   SINGLE = "SINGLE",
   MULTI = "MULTI",
 }
@@ -25,6 +25,7 @@ type ApiClientMultiWorkspaceViewState = {
   viewMode: ApiClientViewMode;
   selectedWorkspaces: StoreApi<RenderableWorkspaceState>[];
 
+  updateViewMode(mode: ApiClientViewMode): void;
   addWorkspace(workspace: Omit<RenderableWorkspaceState, "setState" | "state">): void;
   removeWorkspace(id: RenderableWorkspaceState["id"]): void;
 };
@@ -47,8 +48,12 @@ function createRenderableWorkspaceStore(workspace: Omit<RenderableWorkspaceState
 function createApiClientMultiWorkspaceViewStore() {
   return create<ApiClientMultiWorkspaceViewState>()((set, get) => {
     return {
-      viewMode: get().selectedWorkspaces.length > 0 ? ApiClientViewMode.MULTI : ApiClientViewMode.SINGLE,
+      viewMode: ApiClientViewMode.SINGLE, // TODO: update it when app is restarted
       selectedWorkspaces: [],
+
+      updateViewMode(mode) {
+        set({ viewMode: mode });
+      },
 
       addWorkspace(workspace) {
         const { selectedWorkspaces } = get();
@@ -60,7 +65,7 @@ function createApiClientMultiWorkspaceViewStore() {
 
         const workspace = selectedWorkspaces.find((w) => w.getState().id === id);
         if (!workspace) {
-          throw new NativeError("Workspace not found!").addContext({ workspaceId: id });
+          return;
         }
 
         set({ selectedWorkspaces: selectedWorkspaces.filter((w) => w.getState().id !== id) });
