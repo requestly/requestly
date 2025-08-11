@@ -36,6 +36,7 @@ interface Props {
   handleShowSelection: (value: boolean) => void;
   isAllRecordsSelected: boolean;
   bulkAction: BulkActions;
+  handleRecordSelection: (recordIds: string[]) => void;
 }
 
 export const CollectionsList: React.FC<Props> = ({
@@ -46,6 +47,7 @@ export const CollectionsList: React.FC<Props> = ({
   handleShowSelection,
   isAllRecordsSelected: allRecordsSelected,
   bulkAction,
+  handleRecordSelection,
 }) => {
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
@@ -220,7 +222,7 @@ export const CollectionsList: React.FC<Props> = ({
       };
 
       // Keeping track of selected records to auto check/uncheck select all checkbox in bulk action menu
-      let newSelection = new Set();
+      let newSelection = new Set<string>();
 
       setSelectedRecords((prevSelected) => {
         let newSelectedRecords = new Set(prevSelected);
@@ -230,10 +232,11 @@ export const CollectionsList: React.FC<Props> = ({
         return newSelectedRecords;
       });
 
+      handleRecordSelection(Array.from(newSelection));
       const totalRecordsCount = updatedRecords.collections.length + updatedRecords.requests.length;
       setIsAllRecordsSelected(newSelection.size === totalRecordsCount);
     },
-    [updatedRecords, childParentMap]
+    [updatedRecords, childParentMap, handleRecordSelection]
   );
 
   useEffect(() => {
