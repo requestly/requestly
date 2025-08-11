@@ -9,6 +9,8 @@ import { CollectionsList } from "./CollectionsList/CollectionsList";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
 import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
+import { toast } from "utils/Toast";
+import { capitalize } from "lodash";
 
 export const ContextualCollectionsList: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -22,14 +24,28 @@ export const ContextualCollectionsList: React.FC<{
   const [showSelection, setShowSelection] = useState(false);
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
   const [bulkAction, setBulkAction] = useState<BulkActions | null>(null);
+  const [selectedRecordsAcrossWorkspaces, setSelectedRecordsAcrossWorkspaces] = useState<{
+    [contextId: string]: Set<string>;
+  } | null>(null);
 
-  const bulkActionHandler = useCallback(async (action: BulkActions) => {
-    // TODO: handle special cases for move and export
-    setBulkAction(action);
-  }, []);
+  const bulkActionHandler = useCallback(
+    async (action: BulkActions) => {
+      const isRecordsSelectedAcrossWorkspaces = Object.keys(selectedRecordsAcrossWorkspaces).length > 1;
+      if (isRecordsSelectedAcrossWorkspaces) {
+        if ([BulkActions.MOVE, BulkActions.EXPORT].includes(action)) {
+          toast.error(`${capitalize(action)} not supported across workspaces!`);
+          return;
+        }
+      }
+
+      setBulkAction(action);
+    },
+    [selectedRecordsAcrossWorkspaces]
+  );
 
   const deselectRecords = useCallback(() => {
     setIsAllRecordsSelected(false);
+    setSelectedRecordsAcrossWorkspaces(null);
   }, []);
 
   const handleShowSelection = useCallback((value: boolean) => {
@@ -40,6 +56,13 @@ export const ContextualCollectionsList: React.FC<{
     showMultiSelect: isValidPermission,
     toggleMultiSelect: deselectRecords,
   };
+
+  const handleRecordSelection = useCallback((contextId: string, recordIds: string[]) => {
+    setSelectedRecordsAcrossWorkspaces((prev) => ({
+      ...(prev ?? {}),
+      [contextId]: new Set(recordIds),
+    }));
+  }, []);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -63,8 +86,10 @@ export const ContextualCollectionsList: React.FC<{
       </div>
 
       {selectedWorkspaces.map((workspace) => {
+        const contextId = workspace.getState().id;
+
         return (
-          <ContextId id={workspace.getState().id}>
+          <ContextId id={contextId}>
             <WorkspaceLoader>
               <CollectionsList
                 bulkAction={bulkAction}
@@ -74,6 +99,7 @@ export const ContextualCollectionsList: React.FC<{
                 searchValue={searchValue}
                 onNewClick={onNewClick}
                 recordTypeToBeCreated={recordTypeToBeCreated}
+                handleRecordSelection={(recordIds) => handleRecordSelection(contextId, recordIds)}
               />
             </WorkspaceLoader>
           </ContextId>
