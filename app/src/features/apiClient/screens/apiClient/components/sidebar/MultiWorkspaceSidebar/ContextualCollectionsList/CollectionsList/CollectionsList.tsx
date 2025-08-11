@@ -32,9 +32,21 @@ interface Props {
   searchValue: string;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType | null;
+  showSelection: boolean;
+  handleShowSelection: (value: boolean) => void;
+  isAllRecordsSelected: boolean;
+  bulkAction: BulkActions;
 }
 
-export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, recordTypeToBeCreated }) => {
+export const CollectionsList: React.FC<Props> = ({
+  searchValue,
+  onNewClick,
+  recordTypeToBeCreated,
+  showSelection,
+  handleShowSelection,
+  isAllRecordsSelected: allRecordsSelected,
+  bulkAction,
+}) => {
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
@@ -50,7 +62,6 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
   } = useApiClientContext();
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [showSelection, setShowSelection] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
   const [expandedRecordIds, setExpandedRecordIds] = useState(
@@ -58,6 +69,12 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
   );
 
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+
+  useEffect(() => {
+    if (allRecordsSelected) {
+      setIsAllRecordsSelected(allRecordsSelected);
+    }
+  }, [allRecordsSelected]);
 
   const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
@@ -72,40 +89,43 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
     };
   }, []);
 
-  const prepareRecordsToRender = useCallback((records: RQAPI.ApiClientRecord[]) => {
-    const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
-    setShowSelection(false);
+  const prepareRecordsToRender = useCallback(
+    (records: RQAPI.ApiClientRecord[]) => {
+      const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
+      handleShowSelection(false);
 
-    updatedRecords.sort((recordA, recordB) => {
-      // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
-        return -1;
-      }
+      updatedRecords.sort((recordA, recordB) => {
+        // If different type, then keep collection first
+        if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
+          return -1;
+        }
 
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
-        return -1;
-      }
+        if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
+          return -1;
+        }
 
-      if (recordA.type !== recordB.type) {
-        return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-      }
+        if (recordA.type !== recordB.type) {
+          return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
+        }
 
-      // If types are the same, sort lexicographically by name
-      if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-        return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-      }
+        // If types are the same, sort lexicographically by name
+        if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
+          return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
+        }
 
-      // If names are the same, sort by creation date
-      return recordA.createdTs - recordB.createdTs;
-    });
+        // If names are the same, sort by creation date
+        return recordA.createdTs - recordB.createdTs;
+      });
 
-    return {
-      count: updatedRecords.length,
-      collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-      requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
-      recordsMap: recordsMap,
-    };
-  }, []);
+      return {
+        count: updatedRecords.length,
+        collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
+        requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
+        recordsMap: recordsMap,
+      };
+    },
+    [handleShowSelection]
+  );
 
   const updatedRecords = useMemo(() => {
     const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
@@ -135,17 +155,6 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
     setCollectionsToExport((prev) => [...prev, collection]);
     setIsExportModalOpen(true);
   }, []);
-
-  // const toggleSelection = useCallback(() => {
-  //   setSelectedRecords(new Set());
-  //   setShowSelection((prev) => !prev);
-  //   setIsAllRecordsSelected(false);
-  // }, [setSelectedRecords, setShowSelection]);
-
-  // const multiSelectOptions = {
-  //   showMultiSelect: isValidPermission,
-  //   toggleMultiSelect: toggleSelection,
-  // };
 
   const addNestedCollection = useCallback(
     (record: RQAPI.CollectionRecord, newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>) => {
@@ -234,11 +243,117 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
     );
   }, [collectionId, requestId, apiClientRecords]);
 
+  const bulkActionHandler = useCallback(
+    async (action: BulkActions) => {
+      if (isEmpty(selectedRecords) && action !== BulkActions.SELECT_ALL) {
+        toast.error("Please Select Records");
+        return;
+      }
+
+      const processedRecords = filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap);
+      switch (action) {
+        case BulkActions.DUPLICATE: {
+          const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
+
+          try {
+            const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);
+
+            toast.success("Records Duplicated successfully");
+            result.length === 1 ? onSaveRecord(head(result)!, "open") : onSaveBulkRecords(result);
+          } catch (error) {
+            console.error("Error Duplicating records: ", error);
+            notification.error({
+              message: "Failed to duplicate some records",
+              description: error?.message,
+              placement: "bottomRight",
+            });
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "api_client_record_duplication");
+              Sentry.captureException(error);
+            });
+          }
+
+          break;
+        }
+
+        case BulkActions.DELETE:
+          setIsDeleteModalOpen(true);
+          updateRecordsToBeDeleted(processedRecords);
+          break;
+
+        case BulkActions.EXPORT:
+          setIsExportModalOpen(true);
+          setCollectionsToExport(processedRecords);
+
+          break;
+
+        case BulkActions.MOVE:
+          setIsMoveCollectionModalOpen(true);
+          break;
+
+        case BulkActions.SELECT_ALL:
+          setIsAllRecordsSelected((prev) => !prev);
+          if (isAllRecordsSelected) {
+            setSelectedRecords(new Set());
+          } else {
+            const newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]> = new Set();
+            updatedRecords.collections.forEach((record) => {
+              addNestedCollection(record, newSelectedRecords);
+            });
+            updatedRecords.requests.forEach((record) => {
+              newSelectedRecords.add(record.id);
+            });
+            setSelectedRecords(newSelectedRecords);
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+    [
+      selectedRecords,
+      childParentMap,
+      updatedRecords.recordsMap,
+      updatedRecords.collections,
+      updatedRecords.requests,
+      setIsDeleteModalOpen,
+      updateRecordsToBeDeleted,
+      isAllRecordsSelected,
+      apiClientRecordsRepository,
+      onSaveRecord,
+      onSaveBulkRecords,
+      addNestedCollection,
+    ]
+  );
+
+  useEffect(() => {
+    if (!bulkAction) {
+      return;
+    }
+
+    // TODO: check rerenders
+    bulkActionHandler(bulkAction);
+  }, [bulkAction, bulkActionHandler]);
+
+  const toggleSelection = useCallback(() => {
+    setSelectedRecords(new Set());
+    handleShowSelection(false);
+    setIsAllRecordsSelected(false);
+  }, [setSelectedRecords, handleShowSelection]);
+
+  useEffect(() => {
+    if (showSelection) {
+      return;
+    }
+
+    toggleSelection();
+  }, [showSelection, toggleSelection]);
+
   return (
     <>
       <div className={`collections-list-container ${showSelection ? "selection-enabled" : ""}`}>
         <div className="collections-list-content">
-          {/* <ExampleCollectionsNudge /> */}
           {updatedRecords.count > 0 ? (
             <div className="collections-list">
               {updatedRecords.collections.map((record) => {
@@ -251,7 +366,12 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
                     onExportClick={handleExportCollection}
-                    bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
+                    bulkActionOptions={{
+                      showSelection,
+                      selectedRecords,
+                      recordsSelectionHandler,
+                      setShowSelection: handleShowSelection,
+                    }}
                   />
                 );
               })}
@@ -269,7 +389,12 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
                     key={record.id}
                     record={record}
                     isReadOnly={!isValidPermission}
-                    bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
+                    bulkActionOptions={{
+                      showSelection,
+                      selectedRecords,
+                      recordsSelectionHandler,
+                      setShowSelection: handleShowSelection,
+                    }}
                   />
                 );
               })}
@@ -302,6 +427,7 @@ export const CollectionsList: React.FC<Props> = ({ searchValue, onNewClick, reco
           }}
         />
       )}
+
       {isMoveCollectionModalOpen && (
         <MoveToCollectionModal
           recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
