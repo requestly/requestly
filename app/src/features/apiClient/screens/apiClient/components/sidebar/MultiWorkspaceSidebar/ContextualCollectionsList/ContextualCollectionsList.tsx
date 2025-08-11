@@ -4,7 +4,7 @@ import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWo
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { useRBAC } from "features/rbac";
 import { head, isEmpty } from "lodash";
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { toast } from "utils/Toast";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
@@ -15,17 +15,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { notification } from "antd";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-
-const ContextIdContext = createContext<string | null>(null);
-
-export function ContextId(props: { id: string; children: React.ReactNode }) {
-  return <ContextIdContext.Provider value={props.id}>{props.children}</ContextIdContext.Provider>;
-}
-
-export function useContextId() {
-  const contextId = useContext(ContextIdContext);
-  return contextId;
-}
+import { ContextId } from "features/apiClient/contexts/contextId.context";
 
 export const ContextualCollectionsList: React.FC<{
   searchValue: string;
