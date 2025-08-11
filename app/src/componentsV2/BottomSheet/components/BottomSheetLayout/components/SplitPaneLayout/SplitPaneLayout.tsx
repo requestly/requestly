@@ -19,7 +19,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
   useEffect(() => {
-    //on mount set sizes of split pane
+    // this useEffect on mount set sizes of split pane
     if (splitPane.current) {
       splitPane.current.split.setSizes(isSheetPlacedAtBottom ? initialSizes : [55, 45]);
     }
