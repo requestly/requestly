@@ -28,6 +28,7 @@ type ApiClientMultiWorkspaceViewState = {
   setViewMode(mode: ApiClientViewMode): void;
   addWorkspace(workspace: Omit<RenderableWorkspaceState, "setState" | "state">): void;
   removeWorkspace(id: RenderableWorkspaceState["id"]): void;
+  setStateForSelectedWorkspace(id: RenderableWorkspaceState["id"], state: RenderableWorkspaceState["state"]): void;
 };
 
 function createRenderableWorkspaceStore(workspace: Omit<RenderableWorkspaceState, "setState" | "state">) {
@@ -69,6 +70,16 @@ function createApiClientMultiWorkspaceViewStore() {
         }
 
         set({ selectedWorkspaces: updatedWorkspaces });
+      },
+      setStateForSelectedWorkspace(id, state) {
+        const { selectedWorkspaces } = get();
+
+        const workspaceStore = selectedWorkspaces.find((w) => w.getState().id === id);
+        if (!workspaceStore) {
+          throw new NativeError("Workspace not found!").addContext({ workspaceId: id });
+        }
+
+        workspaceStore.getState().setState(state);
       },
     };
   });
