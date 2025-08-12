@@ -17,6 +17,10 @@ import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -34,6 +38,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
+  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
   const { state } = useLocation();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -151,7 +156,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </RQButton>
         ) : null}
 
-        <EnvironmentSwitcher />
+        {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null}
       </div>
 
       {isImportModalOpen && (
