@@ -125,7 +125,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick, record.id, record.name]
+    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
   );
 
   const collapseChangeHandler = useCallback(
