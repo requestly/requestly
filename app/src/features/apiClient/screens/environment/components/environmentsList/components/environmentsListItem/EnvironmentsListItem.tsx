@@ -147,14 +147,9 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
       {
         key: EnvironmentMenuKey.EXPORT,
-        label: "Export",
         expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
+        label: <span style={{ marginRight: 12 }}>Export as</span>,
         children: [
-          {
-            key: "1-title",
-            type: "group",
-            label: <div style={{ fontSize: "12px" }}>Export as:</div>,
-          },
           {
             key: EnvironmentMenuKey.EXPORT_REQUESTLY,
             label: "Requestly",

@@ -127,14 +127,14 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
       title={
         <div className="postman-export-modal-title">
           <MdOutlineIosShare />
-          Export to Postman
+          Export as Postman (v2.1 format)
         </div>
       }
       open={isOpen}
       onCancel={onClose}
       className="custom-rq-modal postman-export-modal"
       onOk={handleExport}
-      okText="Export to Postman"
+      okText="Export"
     >
       <div className="postman-export-modal-content">
         <div className="export-details-card">

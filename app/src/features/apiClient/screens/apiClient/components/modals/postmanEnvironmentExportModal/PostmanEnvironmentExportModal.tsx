@@ -101,14 +101,14 @@ export const PostmanEnvironmentExportModal: React.FC<PostmanEnvironmentExportMod
       title={
         <div className="postman-environment-export-modal-title">
           <MdOutlineIosShare />
-          Export to Postman Environment
+          Export as Postman (v2.1 format)
         </div>
       }
       open={isOpen}
       onCancel={onClose}
       className="custom-rq-modal postman-environment-export-modal"
       onOk={handleExport}
-      okText="Export to Postman"
+      okText="Export"
     >
       <div className="postman-environment-export-modal-content">
         <div className="export-details-card">
