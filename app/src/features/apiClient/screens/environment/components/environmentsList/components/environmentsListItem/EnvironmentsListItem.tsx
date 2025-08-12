@@ -163,7 +163,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
           },
           {
             key: EnvironmentMenuKey.EXPORT_POSTMAN,
-            label: "Export to Postman",
+            label: "Postman (v2.1 format)",
             onClick: () => onPostmanExportClick?.(environment),
             icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
           },
