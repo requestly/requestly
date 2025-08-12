@@ -33,6 +33,10 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
    * (e.g., in different tabs), they share the same parsed query cache, causing field
    * selection state to be shared between instances.
    *
+   * Additionally, when a query fails to parse, the Explorer component may fall back to
+   * using a previously cached query, which can lead to unexpected behavior and further
+   * state sharing issues between different instances.
+   *
    * By only passing the query to Explorer after it has been successfully parsed once,
    * we prevent the Explorer from caching invalid queries and reduce the likelihood of
    * shared state issues between different instances.
