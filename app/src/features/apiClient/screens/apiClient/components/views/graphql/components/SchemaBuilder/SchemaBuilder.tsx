@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
-import { buildClientSchema } from "graphql";
+import { buildClientSchema, parse } from "graphql";
 import "@graphiql/plugin-explorer/style.css";
 import { Checkbox } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
@@ -23,6 +23,34 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
   ]);
 
   const { introspectAndSaveSchema } = useGraphQLIntrospection();
+
+  const hasParsedSuccessfully = useRef(false);
+
+  /*
+   * This effect is added due to Explorer component's internal query caching logic.
+   * The graphiql-explorer package uses module-level memoization that caches parsed queries
+   * across all component instances. When multiple SchemaBuilder components are rendered
+   * (e.g., in different tabs), they share the same parsed query cache, causing field
+   * selection state to be shared between instances.
+   *
+   * Additionally, when a query fails to parse, the Explorer component may fall back to
+   * using a previously cached query, which can lead to unexpected behavior and further
+   * state sharing issues between different instances.
+   *
+   * By only passing the query to Explorer after it has been successfully parsed once,
+   * we prevent the Explorer from caching invalid queries and reduce the likelihood of
+   * shared state issues between different instances.
+   */
+  useEffect(() => {
+    if (!hasParsedSuccessfully.current) {
+      try {
+        parse(query);
+        hasParsedSuccessfully.current = true;
+      } catch (e) {
+        // NO OP
+      }
+    }
+  }, [query]);
 
   const handleEdit = (query: string) => {
     updateEntryRequest({ operation: query });
@@ -47,7 +75,7 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
-              query={query}
+              query={hasParsedSuccessfully.current ? query : ""}
               explorerIsOpen={true}
               arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
               arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
