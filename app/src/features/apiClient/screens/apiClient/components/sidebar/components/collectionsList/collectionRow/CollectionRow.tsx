@@ -296,11 +296,16 @@ export const CollectionRow: React.FC<Props> = ({
                   className="collection-name-container"
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
-                  onClick={(e) => {
-                    // Open the collection tab to "select" it
-                    openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
-                      preview: true,
-                    });
+                  onClick={() => {
+                    const isExpanded = activeKey === record.id;
+                    const isAlreadyActive = activeTabSourceId === record.id;
+                    // Only open a tab if currently collapsed and not already the active tab
+                    if (!isExpanded && !isAlreadyActive) {
+                      openTab(
+                        new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                        { preview: true }
+                      );
+                    }
                     // Don't stop propagation so the collapse/expand functionality also works
                   }}
                   style={{
