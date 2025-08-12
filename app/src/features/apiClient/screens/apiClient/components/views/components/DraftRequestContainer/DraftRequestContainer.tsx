@@ -3,7 +3,8 @@ import { RequestView } from "../RequestView/RequestView";
 import { DraftRequestView } from "./DraftRequestView";
 import { useGenericState } from "hooks/useGenericState";
 import { RQAPI } from "features/apiClient/types";
-import { RequestViewTabSource } from "../RequestView/requestViewTabSource";
+// import { RequestViewTabSource } from "../RequestView/requestViewTabSource";
+// import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 type RequestViewState =
   | {
@@ -26,13 +27,17 @@ export const DraftRequestContainer: React.FC<{ draftId: string; apiEntryType: RQ
 
   const updateTabSource = useCallback(
     (apiEntryDetails: RQAPI.ApiRecord) => {
-      replace(
-        new RequestViewTabSource({
-          id: apiEntryDetails.id,
-          title: apiEntryDetails.name,
-          apiEntryDetails: apiEntryDetails,
-        })
-      );
+      throw new Error("Not implemented!");
+      // replace(
+      //   new RequestViewTabSource({
+      //     id: apiEntryDetails.id,
+      //     title: apiEntryDetails.name,
+      //     apiEntryDetails: apiEntryDetails,
+      //     context: {
+      //       id: contextId,
+      //     }
+      //   })
+      // );
     },
     [replace]
   );

@@ -15,6 +15,7 @@ import "./environmentSwitcher.scss";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { EnvironmentState } from "features/apiClient/store/environments/environments.store";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 function SwitcherListItemLabel(props: { environmentId: EnvironmentState["id"] }) {
   const environmentName = useEnvironment(props.environmentId, (s) => s.name);
@@ -40,6 +41,7 @@ export const EnvironmentSwitcher = () => {
 
   const activeEnvironment = useActiveEnvironment();
 
+  const contextId = useContextId();
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const dropdownItems = useMemo(() => {
@@ -62,6 +64,9 @@ export const EnvironmentSwitcher = () => {
               new EnvironmentViewTabSource({
                 id: environment.id,
                 title: environment.name,
+                context: {
+                  id: contextId,
+                }
               })
             );
           }
