@@ -25,6 +25,7 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -70,6 +71,7 @@ export const CollectionRow: React.FC<Props> = ({
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
+  const contextId = useContextId();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
   const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
 
@@ -303,7 +305,9 @@ export const CollectionRow: React.FC<Props> = ({
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={() => {
-                    openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
+                    openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection", context: {
+                      id: contextId,
+                    } }), {
                       preview: true,
                     });
                   }}
