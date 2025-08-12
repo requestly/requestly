@@ -1,9 +1,9 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { getApiClientCollectionVariablesStore } from "../store.utils";
 import { NativeError } from "errors/NativeError";
 import { parseVariables } from "features/apiClient/store/variables/variables.store";
 import { sanitizePatch } from "../utils";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export async function patchCollectionVariables(
   ctx: ApiClientFeatureContext,
