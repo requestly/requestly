@@ -596,7 +596,7 @@ const WorkspaceSelector = () => {
                 onClick={(e) => {
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
                   trackWorkspaceDropdownClicked("switch_workspace");
-                  e?.stopPropagation();
+                  e?.stopPropagation?.();
                 }}
               >
                 <Tooltip

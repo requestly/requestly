@@ -1,21 +1,21 @@
 import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
 import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
 import React from "react";
-import { useAPIRecordsStore } from "../ApiRecordsContextProvider";
 import EnvironmentDaemon from "./EnvironmentDaemon";
 import CollectionVariablesDaemon from "./CollectionVariablesDaemon";
+import { useApiClientFeatureContextProvider } from "../../apiClientFeatureContext/apiClientFeatureContext.store";
+import { ContextId } from "features/apiClient/contexts/contextId.context";
 
 const Daemon: React.FC = () => {
-  const recordsStore = useAPIRecordsStore();
-
-  return (
-    <>
+  const contexts = useApiClientFeatureContextProvider((s) => s.contexts);
+  return Array.from(contexts.values()).map(({ id: contextId }) => (
+    <ContextId id={contextId}>
       <EnvironmentDaemon />
       <CollectionVariablesDaemon />
-      <ExampleCollectionsDaemon store={recordsStore} />
+      <ExampleCollectionsDaemon />
       <AutoSyncLocalStoreDaemon />
-    </>
-  );
+    </ContextId>
+  ));
 };
 
 export default Daemon;
