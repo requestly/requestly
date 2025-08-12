@@ -3,15 +3,10 @@ import {
   apiClientMultiWorkspaceViewStore,
   ApiClientViewMode,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { WorkspaceType } from "types";
 import { setupContext } from "../context";
+import { Workspace } from "features/workspaces/types";
 
-export const resetToSingleView = (
-  workspaceInSingleView: { id: string; type: WorkspaceType; name: string },
-  userId?: string
-) => {
-  const { id, type } = workspaceInSingleView;
-
+export const resetToSingleView = (workspaceInSingleView: Workspace, userId?: string) => {
   apiClientFeatureContextProviderStore.getState().clearAll();
 
   const selectedWorkspaces = apiClientMultiWorkspaceViewStore.getState().selectedWorkspaces;
@@ -20,12 +15,8 @@ export const resetToSingleView = (
   });
   apiClientMultiWorkspaceViewStore.getState().setViewMode(ApiClientViewMode.SINGLE);
 
-  return setupContext({
-    workspaceId: id,
-    workspaceType: type,
-    user: {
-      loggedIn: !!userId,
-      uid: userId ?? "",
-    },
+  return setupContext(workspaceInSingleView, {
+    loggedIn: !!userId,
+    uid: userId ?? "",
   });
 };
