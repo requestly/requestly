@@ -1,0 +1,22 @@
+{
+  "name": "Untitled request",
+  "url": "http://localhost:11434/api/generate",
+  "method": "POST",
+  "queryParams": [],
+  "headers": [],
+  "body": "{\n  \"model\": \"deepseek-r1:8b\",\n  \"prompt\": \"Write a simple python script to extract email address from text string\",\n  \"stream\": false\n}",
+  "contentType": "application/json",
+  "scripts": {
+    "preRequest": "",
+    "postResponse": ""
+  },
+  "bodyContainer": {
+    "text": "{\n  \"model\": \"deepseek-r1:8b\",\n  \"prompt\": \"Write a simple python script to extract email address from text string\",\n  \"stream\": false\n}",
+    "form": [],
+    "multipartForm": []
+  },
+  "auth": {
+    "currentAuthType": "NO_AUTH",
+    "authConfigStore": {}
+  }
+}

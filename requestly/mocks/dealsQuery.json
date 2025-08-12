@@ -1,0 +1,823 @@
+{
+    "data": {
+      "deals": [
+        {
+          "departureDate": "2025-06-13",
+          "arrivalDate": "2025-06-16",
+          "destination": { "iata": "LON", "name": "London SimplyHealth Demo" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 215.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 160.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 23.7
+        },
+        {
+          "departureDate": "2025-06-17",
+          "arrivalDate": "2025-06-27",
+          "destination": { "iata": "PAR", "name": "Paris" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 112.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 76.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 31.87
+        },
+        {
+          "departureDate": "2025-08-18",
+          "arrivalDate": "2025-08-22",
+          "destination": { "iata": "MAD", "name": "Madrid" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 241.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 189.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 21.49
+        },
+        {
+          "departureDate": "2025-09-26",
+          "arrivalDate": "2025-09-29",
+          "destination": { "iata": "LIS", "name": "Lisbon" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 218.16, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 154.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 28.96
+        },
+        {
+          "departureDate": "2025-07-15",
+          "arrivalDate": "2025-07-24",
+          "destination": { "iata": "BCN", "name": "Barcelona" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 138.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 105.68, "currency": "EUR" }
+            }
+          ],
+          "discount": 23.95
+        },
+        {
+          "departureDate": "2025-08-09",
+          "arrivalDate": "2025-08-18",
+          "destination": { "iata": "AMS", "name": "Amsterdam" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 156.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 121.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 22.3
+        },
+        {
+          "departureDate": "2025-06-09",
+          "arrivalDate": "2025-06-12",
+          "destination": { "iata": "BHX", "name": "Birmingham" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 79.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 53.68, "currency": "EUR" }
+            }
+          ],
+          "discount": 32.87
+        },
+        {
+          "departureDate": "2025-06-20",
+          "arrivalDate": "2025-06-23",
+          "destination": { "iata": "MAN", "name": "Manchester" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 134.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 91.82, "currency": "EUR" }
+            }
+          ],
+          "discount": 31.97
+        },
+        {
+          "departureDate": "2025-07-23",
+          "arrivalDate": "2025-07-27",
+          "destination": { "iata": "BUH", "name": "Bucharest" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 261.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 204.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 21.76
+        },
+        {
+          "departureDate": "2025-07-25",
+          "arrivalDate": "2025-08-03",
+          "destination": { "iata": "MUC", "name": "Munich" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 193.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 185.51, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.36
+        },
+        {
+          "departureDate": "2025-06-18",
+          "arrivalDate": "2025-06-26",
+          "destination": { "iata": "FRA", "name": "Frankfurt" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 231.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 174.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 24.57
+        },
+        {
+          "departureDate": "2025-06-11",
+          "arrivalDate": "2025-06-16",
+          "destination": { "iata": "AGP", "name": "Malaga" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 188.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 181.39, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.01
+        },
+        {
+          "departureDate": "2025-07-07",
+          "arrivalDate": "2025-07-10",
+          "destination": { "iata": "EDI", "name": "Edinburgh" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 96.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 72.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 24.75
+        },
+        {
+          "departureDate": "2025-07-01",
+          "arrivalDate": "2025-07-04",
+          "destination": { "iata": "GLA", "name": "Glasgow" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 72.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 69.57, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.66
+        },
+        {
+          "departureDate": "2025-06-15",
+          "arrivalDate": "2025-06-20",
+          "destination": { "iata": "IST", "name": "Istanbul" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 282.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 231.1, "currency": "EUR" }
+            }
+          ],
+          "discount": 18.33
+        },
+        {
+          "departureDate": "2025-06-17",
+          "arrivalDate": "2025-06-24",
+          "destination": { "iata": "BRU", "name": "Brussels" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 142.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 136.75, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.35
+        },
+        {
+          "departureDate": "2025-08-13",
+          "arrivalDate": "2025-08-17",
+          "destination": { "iata": "MIL", "name": "Milan" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 225.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 182.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 19.03
+        },
+        {
+          "departureDate": "2025-09-19",
+          "arrivalDate": "2025-09-22",
+          "destination": { "iata": "ROM", "name": "Rome" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 197.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 184.54, "currency": "EUR" }
+            }
+          ],
+          "discount": 6.78
+        },
+        {
+          "departureDate": "2025-07-06",
+          "arrivalDate": "2025-07-09",
+          "destination": { "iata": "DUS", "name": "Duesseldorf" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 130.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 101.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 22.14
+        },
+        {
+          "departureDate": "2025-09-08",
+          "arrivalDate": "2025-09-16",
+          "destination": { "iata": "ZRH", "name": "Zurich" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 163.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 122.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 25
+        },
+        {
+          "departureDate": "2025-07-09",
+          "arrivalDate": "2025-07-16",
+          "destination": { "iata": "CLJ", "name": "Cluj-Napoca" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 363.37, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 322.37, "currency": "EUR" }
+            }
+          ],
+          "discount": 11.28
+        },
+        {
+          "departureDate": "2025-06-07",
+          "arrivalDate": "2025-06-10",
+          "destination": { "iata": "BRS", "name": "Bristol" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 89.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 60.68, "currency": "EUR" }
+            }
+          ],
+          "discount": 32.56
+        },
+        {
+          "departureDate": "2025-08-13",
+          "arrivalDate": "2025-08-17",
+          "destination": { "iata": "BUD", "name": "Budapest" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 226.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 183.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 18.95
+        },
+        {
+          "departureDate": "2025-06-21",
+          "arrivalDate": "2025-06-29",
+          "destination": { "iata": "FAO", "name": "Faro" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 377.98, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 326.98, "currency": "EUR" }
+            }
+          ],
+          "discount": 13.49
+        },
+        {
+          "departureDate": "2025-06-26",
+          "arrivalDate": "2025-07-01",
+          "destination": { "iata": "BER", "name": "Berlin" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 219.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 166.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 24.09
+        },
+        {
+          "departureDate": "2025-07-03",
+          "arrivalDate": "2025-07-06",
+          "destination": { "iata": "LPL", "name": "Liverpool" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 96.57, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 65.67, "currency": "EUR" }
+            }
+          ],
+          "discount": 32
+        },
+        {
+          "departureDate": "2025-08-04",
+          "arrivalDate": "2025-08-08",
+          "destination": { "iata": "LBA", "name": "Leeds Bradford" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 269.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 212.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 21.11
+        },
+        {
+          "departureDate": "2025-09-24",
+          "arrivalDate": "2025-10-02",
+          "destination": { "iata": "ALC", "name": "Alicante" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 255.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 204.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 19.92
+        },
+        {
+          "departureDate": "2025-06-11",
+          "arrivalDate": "2025-06-15",
+          "destination": { "iata": "GVA", "name": "Geneva" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 169.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 128.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 24.12
+        },
+        {
+          "departureDate": "2025-07-18",
+          "arrivalDate": "2025-07-21",
+          "destination": { "iata": "CPH", "name": "Copenhagen" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 233.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 163.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 29.92
+        },
+        {
+          "departureDate": "2025-07-27",
+          "arrivalDate": "2025-08-05",
+          "destination": { "iata": "LYS", "name": "Lyon" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 290.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 229.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 20.96
+        },
+        {
+          "departureDate": "2025-07-08",
+          "arrivalDate": "2025-07-13",
+          "destination": { "iata": "RMO", "name": "Chisinau" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 323.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 255.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 20.99
+        },
+        {
+          "departureDate": "2025-06-10",
+          "arrivalDate": "2025-06-13",
+          "destination": { "iata": "ATH", "name": "Athens" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 347.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 274.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 20.98
+        },
+        {
+          "departureDate": "2025-09-03",
+          "arrivalDate": "2025-09-07",
+          "destination": { "iata": "NCE", "name": "Nice" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 242.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 183.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 24.28
+        },
+        {
+          "departureDate": "2025-06-24",
+          "arrivalDate": "2025-06-28",
+          "destination": { "iata": "PRG", "name": "Prague" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 297.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 285.68, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.12
+        },
+        {
+          "departureDate": "2025-09-07",
+          "arrivalDate": "2025-09-18",
+          "destination": { "iata": "ACE", "name": "Lanzarote" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 306.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 265.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 13.36
+        },
+        {
+          "departureDate": "2025-09-06",
+          "arrivalDate": "2025-09-11",
+          "destination": { "iata": "VIE", "name": "Vienna" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 118.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 113.98, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.19
+        },
+        {
+          "departureDate": "2025-07-04",
+          "arrivalDate": "2025-07-08",
+          "destination": { "iata": "PMI", "name": "Palma de Mallorca" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 280.66, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 222.96, "currency": "EUR" }
+            }
+          ],
+          "discount": 20.56
+        },
+        {
+          "departureDate": "2025-07-30",
+          "arrivalDate": "2025-08-03",
+          "destination": { "iata": "OSL", "name": "Oslo" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 262.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 188.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 28.14
+        },
+        {
+          "departureDate": "2025-06-20",
+          "arrivalDate": "2025-06-25",
+          "destination": { "iata": "OPO", "name": "Porto" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 296.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 242.11, "currency": "EUR" }
+            }
+          ],
+          "discount": 18.47
+        },
+        {
+          "departureDate": "2025-10-01",
+          "arrivalDate": "2025-10-16",
+          "destination": { "iata": "ALG", "name": "Algiers" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 298.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 233.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 21.74
+        },
+        {
+          "departureDate": "2025-06-26",
+          "arrivalDate": "2025-06-30",
+          "destination": { "iata": "NAP", "name": "Naples" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 343.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 286.18, "currency": "EUR" }
+            }
+          ],
+          "discount": 16.8
+        },
+        {
+          "departureDate": "2025-09-24",
+          "arrivalDate": "2025-09-28",
+          "destination": { "iata": "SVQ", "name": "Sevilla" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 279.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 265.41, "currency": "EUR" }
+            }
+          ],
+          "discount": 5.2
+        },
+        {
+          "departureDate": "2025-06-26",
+          "arrivalDate": "2025-06-30",
+          "destination": { "iata": "IBZ", "name": "Ibiza" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 260.98, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 250.04, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.19
+        },
+        {
+          "departureDate": "2025-06-09",
+          "arrivalDate": "2025-06-12",
+          "destination": { "iata": "RAK", "name": "Marrakech" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 290.94, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 231.95, "currency": "EUR" }
+            }
+          ],
+          "discount": 20.28
+        },
+        {
+          "departureDate": "2025-06-26",
+          "arrivalDate": "2025-07-04",
+          "destination": { "iata": "TIA", "name": "Tirana" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 342.24, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 284.95, "currency": "EUR" }
+            }
+          ],
+          "discount": 16.74
+        },
+        {
+          "departureDate": "2025-06-29",
+          "arrivalDate": "2025-07-06",
+          "destination": { "iata": "FNC", "name": "Funchal" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 615.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 591.04, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.05
+        },
+        {
+          "departureDate": "2025-06-25",
+          "arrivalDate": "2025-06-29",
+          "destination": { "iata": "CMN", "name": "Casablanca" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 342.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 270.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 20.99
+        },
+        {
+          "departureDate": "2025-07-01",
+          "arrivalDate": "2025-07-06",
+          "destination": { "iata": "MLA", "name": "Malta" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 406.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 377.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 7.13
+        },
+        {
+          "departureDate": "2025-08-30",
+          "arrivalDate": "2025-09-07",
+          "destination": { "iata": "TCI", "name": "Tenerife" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 257.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 247.48, "currency": "EUR" }
+            }
+          ],
+          "discount": 4.07
+        },
+        {
+          "departureDate": "2025-07-26",
+          "arrivalDate": "2025-08-06",
+          "destination": { "iata": "VLC", "name": "Valencia" },
+          "apparentPricesByPax": [
+            {
+              "id": "MINIMUM_PURCHASABLE_PRICE",
+              "price": { "amount": 422.97, "currency": "EUR" }
+            },
+            {
+              "id": "MINIMUM_PURCHASABLE_MEMBERSHIP_PRICE",
+              "price": { "amount": 363.97, "currency": "EUR" }
+            }
+          ],
+          "discount": 13.95
+        }
+      ]
+    }
+  }
+  
