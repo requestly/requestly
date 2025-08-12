@@ -27,6 +27,7 @@ import { EnvironmentViewTabSource } from "../screens/environment/components/envi
 import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
 import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { useCommand } from "../commands";
+import { useContextId } from "./contextId.context";
 
 interface ApiClientContextInterface {
   onSaveRecord: (apiClientRecord: RQAPI.ApiClientRecord, onSaveTabAction?: "open") => void;
@@ -130,6 +131,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     api: { forceRefreshRecords },
   } = useCommand();
 
+  const contextId = useContextId();
+
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.ApiClientRecord[]>();
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -177,7 +180,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       if (onSaveTabAction === "open") {
         if (apiClientRecord.type === RQAPI.RecordType.API) {
           openTab(
-            new RequestViewTabSource({ id: recordId, apiEntryDetails: apiClientRecord, title: apiClientRecord.name })
+            new RequestViewTabSource({ id: recordId, apiEntryDetails: apiClientRecord, title: apiClientRecord.name, context: {
+              id: contextId,
+            } })
           );
           return;
         }
@@ -188,6 +193,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               id: recordId,
               title: apiClientRecord.name,
               focusBreadcrumb: !doesRecordExist,
+              context: {
+                id:contextId,
+              }
             })
           );
           return;
@@ -295,6 +303,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   id: newEnvironment.id,
                   title: newEnvironment.name,
                   focusBreadcrumb: true,
+                  context: {
+                    id: contextId,
+                  }
                 })
               );
             })

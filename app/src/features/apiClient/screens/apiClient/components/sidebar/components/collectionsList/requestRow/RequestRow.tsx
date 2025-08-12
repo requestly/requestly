@@ -25,6 +25,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { RequestViewTabSource } from "../../../../views/components/RequestView/requestViewTabSource";
 import { useDrag } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -77,6 +78,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   } = useApiClientContext();
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
+  const contextId = useContextId();
   const [activeTabSource, openTab] = useTabServiceWithSelector((state) => [state.activeTabSource, state.openTab]);
 
   const activeTabSourceId = useMemo(() => {
@@ -228,6 +230,9 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
                   id: record.id,
                   apiEntryDetails: record,
                   title: record.name || record.data.request?.url,
+                  context: {
+                    id: contextId,
+                  }
                 }),
                 { preview: true }
               );
