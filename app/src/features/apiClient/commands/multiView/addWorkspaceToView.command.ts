@@ -25,6 +25,10 @@ export const addWorkspaceToView = async (param: Workspace) => {
   if (param.type !== WorkspaceType.LOCAL)
     throw new NativeError("[ADD TO VIEW] Multi view only avaiable for local workspaces");
   const contextId = param.id; // assumes contextId is the same as workspace id
+  const existingContext = apiClientMultiWorkspaceViewStore.getState().getSelectedWorkspace(contextId);
+  if (existingContext) {
+    return;
+  }
 
   const renderableParam = {
     id: contextId,
