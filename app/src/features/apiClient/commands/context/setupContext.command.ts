@@ -1,33 +1,28 @@
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
 import { setupContextWithRepo } from "./setupContextWithRepo.command";
-import { WorkspaceType } from "features/workspaces/types";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
 import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
-export type RepositoryMeta = {
-  user: UserDetails;
-  workspaceId: string;
-  workspaceType: WorkspaceType;
-};
-
 export const setupContext = async (
-  meta: RepositoryMeta
+  workspace: Workspace,
+  user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
-  if (!meta.user.loggedIn) {
+  if (!user.loggedIn) {
     const anonRepo = localStoreRepository;
-    const id = await setupContextWithRepo(meta.workspaceId, anonRepo);
+    const id = await setupContextWithRepo(workspace.id, anonRepo);
     return { id };
   }
 
-  const userId = meta.user.uid;
-  const workspaceId = meta.workspaceId;
-  const workspaceType = meta.workspaceType;
+  const userId = user.uid;
+  const workspaceId = workspace.id;
+  const workspaceType = workspace.workspaceType;
 
   if (workspaceType === WorkspaceType.LOCAL) {
-    const localRepo = new ApiClientLocalRepository({ rootPath: workspaceId });
+    const localRepo = new ApiClientLocalRepository({ rootPath: workspace.rootPath });
     const id = await setupContextWithRepo(workspaceId, localRepo);
     return { id };
   }
