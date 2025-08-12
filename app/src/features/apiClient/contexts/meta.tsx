@@ -1,22 +1,30 @@
-import { useContext, useMemo } from "react";
-import { ApiClientRepositoryInterface } from "../helpers/modules/sync/interfaces";
-import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
-import { AllApiClientStores, ApiRecordsStoreContext } from "../store/apiRecords/ApiRecordsContextProvider";
-import { NativeError } from "errors/NativeError";
+import { ApiClientViewMode, useApiClientMultiWorkspaceView } from "../store/multiWorkspaceView/multiWorkspaceView.store";
+import { useContextId } from "./contextId.context";
+import { ApiClientFeatureContext, useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { useMemo } from "react";
 
-export type ApiClientFeatureContext = {
-  stores: AllApiClientStores;
-  repositories: ApiClientRepositoryInterface;
-};
 
 export function useApiClientFeatureContext(): ApiClientFeatureContext {
-  const stores = useContext(ApiRecordsStoreContext);
-  if (!stores) {
-    throw new NativeError("Command can't be called before stores are initialized");
+  const viewMode = useApiClientMultiWorkspaceView(s => s.viewMode);
+  const [getSingleViewContext, getContext] = useApiClientFeatureContextProvider(s => [s.getSingleViewContext, s.getContext]);
+  const contextId = useContextId();
+
+  const context = (() => {
+    if(viewMode === ApiClientViewMode.SINGLE) {
+      return getSingleViewContext();
+    }
+    if(!contextId) {
+      throw new Error("Mode is multi but no contextId found!");
+    }
+    return getContext(contextId);
+  })();
+
+  if(!context) {
+    throw new Error("No context found!");
   }
-  const repositories = useApiClientRepository();
+  
 
   return useMemo(() => {
-    return { stores, repositories };
-  }, [stores, repositories]);
+    return context;
+  }, [context]);
 }
