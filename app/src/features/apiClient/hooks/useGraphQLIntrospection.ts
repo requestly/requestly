@@ -19,13 +19,13 @@ export const useGraphQLIntrospection = () => {
 
   const introspectAndSaveSchema = async () => {
     setIsFetchingIntrospectionData(true);
-    setHasIntrospectionFailed(false);
     try {
       const introspectionData = await fetchGraphQLIntrospectionData(url, appMode);
       if (!introspectionData) {
         throw new Error("No introspection data received");
       }
       setIntrospectionData(introspectionData);
+      setHasIntrospectionFailed(false);
     } catch (error) {
       setIntrospectionData(null);
       setHasIntrospectionFailed(true);
