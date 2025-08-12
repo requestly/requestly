@@ -23,6 +23,7 @@ export const AutomationPage = () => {
         </>
       }
       queryParams={dataSource}
+      successMsg="Rules have been successfully imported and applied to the Requestly extension."
       showTitleIcon={<SiSelenium className="new-page-title-icon" />}
       hasApiKey={hasApiKey}
       apiKeyQueryParam="api-key"
