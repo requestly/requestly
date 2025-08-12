@@ -1,3 +1,4 @@
+import React from "react";
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { buildClientSchema } from "graphql";
@@ -6,13 +7,19 @@ import { Checkbox } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./schemaBuilder.scss";
 
-export const SchemaBuilder = () => {
-  const [introspectionData, query, updateEntryRequest] = useGraphQLRecordStore((state) => [
+interface Props {
+  setIsSchemaBuilderOpen: (isOpen: boolean) => void;
+}
+
+export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
+  const [introspectionData, query, updateEntryRequest, hasIntrospectionFailed] = useGraphQLRecordStore((state) => [
     state.introspectionData,
     state.entry.request.operation,
     state.updateEntryRequest,
+    state.hasIntrospectionFailed,
   ]);
 
   const { introspectAndSaveSchema } = useGraphQLIntrospection();
@@ -23,14 +30,20 @@ export const SchemaBuilder = () => {
 
   return (
     <>
-      {introspectionData ? (
-        <div className="schema-builder">
-          <div className="schema-builder__header-container">
-            <div className="schema-builder__header-container__title">SCHEMA</div>
-            <div className="schema-builder__header-container__actions">
-              <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
-            </div>
+      <div className="schema-builder">
+        <div className="schema-builder__header-container">
+          <div className="schema-builder__header-container__title">SCHEMA</div>
+          <div className="schema-builder__header-container__actions">
+            <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdClose />}
+              onClick={() => setIsSchemaBuilderOpen(false)}
+            />
           </div>
+        </div>
+        {introspectionData ? (
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
@@ -55,14 +68,25 @@ export const SchemaBuilder = () => {
               }}
             />
           </div>
-        </div>
-      ) : (
-        <div className="schema-builder__empty-state">
-          <img src="/assets/media/rules/empty-inbox.svg" alt="empty drawer" />
-          <div className="schema-builder__empty-state__title">Nothing to see here!</div>
-          <div className="schema-builder__empty-state__description">Please enter a valid URL to load the schema.</div>
-        </div>
-      )}
+        ) : hasIntrospectionFailed ? (
+          <div className="schema-builder__error-view">
+            <img src="/assets/media/apiClient/request-error.svg" alt="error window" />
+            <div className="schema-builder__error-view__title">Error loading GraphQL schema</div>
+            <div className="schema-builder__error-view__description">
+              404 not found — the endpoint may be missing or misconfigured.
+            </div>
+            <RQButton size="small" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />}>
+              Fetch again
+            </RQButton>
+          </div>
+        ) : (
+          <div className="schema-builder__empty-state">
+            <img src="/assets/media/rules/empty-inbox.svg" alt="empty drawer" />
+            <div className="schema-builder__empty-state__title">Nothing to see here!</div>
+            <div className="schema-builder__empty-state__description">Please enter a valid URL to load the schema.</div>
+          </div>
+        )}
+      </div>
     </>
   );
 };
