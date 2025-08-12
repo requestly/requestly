@@ -1,27 +1,17 @@
 import { WorkspaceType } from "types";
 import { setupContext } from "../context/setupContext.command";
 import { NativeError } from "errors/NativeError";
-import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import {
+  apiClientMultiWorkspaceViewStore,
+  ApiClientViewMode,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
-type Workspace = {
+export const addWorkspaceToView = async (param: {
   id: string;
   name: string;
   userId?: string; // if not present, then we assume that user is logged out
   type: WorkspaceType;
-};
-
-const addWorkspaceToAppCtx = async (param: Workspace) => {
-  return setupContext({
-    workspaceId: param.id,
-    workspaceType: param.type,
-    user: {
-      loggedIn: !!param.userId,
-      uid: param.userId ?? "",
-    },
-  });
-};
-
-export const addWorkspaceToView = async (param: Workspace) => {
+}) => {
   if (param.type !== WorkspaceType.LOCAL)
     throw new NativeError("[ADD TO VIEW] Multi view only avaiable for local workspaces");
   const contextId = param.id; // assumes contextId is the same as workspace id
@@ -40,7 +30,14 @@ export const addWorkspaceToView = async (param: Workspace) => {
     .getState()
     .setStateForSelectedWorkspace(contextId, { loading: true, errored: false });
   try {
-    await addWorkspaceToAppCtx(param);
+    await setupContext({
+      workspaceId: param.id,
+      workspaceType: param.type,
+      user: {
+        loggedIn: !!param.userId,
+        uid: param.userId ?? "",
+      },
+    });
     apiClientMultiWorkspaceViewStore
       .getState()
       .setStateForSelectedWorkspace(contextId, { loading: false, errored: false });
@@ -52,5 +49,11 @@ export const addWorkspaceToView = async (param: Workspace) => {
       errored: true,
       error: errorMessage,
     });
+  }
+
+  const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
+
+  if (viewMode !== ApiClientViewMode.MULTI) {
+    apiClientMultiWorkspaceViewStore.getState().setViewMode(ApiClientViewMode.MULTI);
   }
 };
