@@ -3,16 +3,12 @@ import { ApiClientFile, ApiClientFilesStore, createApiClientFilesStore, FileId }
 import { createContext, ReactNode, useMemo } from "react";
 import { RequestContentType, RQAPI } from "../types";
 import { isHttpApiRecord } from "../screens/apiClient/utils";
+import { useAPIRecords } from "./apiRecords/ApiRecordsContextProvider";
 
 export const ApiClientFilesContext = createContext<StoreApi<ApiClientFilesStore>>(null);
 
-export const ApiClientFilesProvider = ({
-  children,
-  records,
-}: {
-  children: ReactNode;
-  records: RQAPI.ApiClientRecord[];
-}) => {
+export const ApiClientFilesProvider = ({ children }: { children: ReactNode }) => {
+  const records = useAPIRecords((s) => s.apiClientRecords);
   const initialFiles: Record<FileId, ApiClientFile> = useMemo(() => {
     if (!records?.length) {
       return {};
