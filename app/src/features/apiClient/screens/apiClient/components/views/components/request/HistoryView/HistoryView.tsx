@@ -16,14 +16,15 @@ export const HistoryView: React.FC = () => {
 
   const handleSaveCallback = useCallback(
     (entryDetails: RQAPI.ApiRecord) => {
-      openTab(
-        new RequestViewTabSource({
-          id: entryDetails.id,
-          apiEntryDetails: entryDetails,
-          title: entryDetails.name || entryDetails.data.request?.url,
-        }),
-        { preview: false }
-      );
+      throw new Error("Not implemented!");
+      // openTab(
+      //   new RequestViewTabSource({
+      //     id: entryDetails.id,
+      //     apiEntryDetails: entryDetails,
+      //     title: entryDetails.name || entryDetails.data.request?.url,
+      //   }),
+      //   { preview: false }
+      // );
     },
     [openTab]
   );
