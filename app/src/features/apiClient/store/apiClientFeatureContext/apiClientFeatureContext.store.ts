@@ -4,6 +4,7 @@ import { RenderableWorkspaceState } from "../multiWorkspaceView/multiWorkspaceVi
 import { create, useStore } from "zustand";
 import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
+import { immer } from "zustand/middleware/immer";
 
 export const _SINGLE_MODE_WORKSPACE_CONTEXT_ID = "single_mode_workspace_context";
 
@@ -24,45 +25,48 @@ type ApiClientFeatureContextProviderState = {
 };
 
 function createApiClientFeatureContextProviderStore() {
-  return create<ApiClientFeatureContextProviderState>()((set, get) => {
-    return {
-      contexts: new Map(),
+  return create<ApiClientFeatureContextProviderState>()(
+    immer((set, get) => {
+      return {
+        contexts: new Map(),
 
-      addContext(context) {
-        const { contexts } = get();
-        contexts.set(context.id, context);
-        set({ contexts });
-      },
+        addContext(context) {
+          set((state) => {
+            state.contexts.set(context.id, context);
+          });
+        },
 
-      removeContext(id) {
-        const { contexts } = get();
-        const context = contexts.get(id);
+        removeContext(id) {
+          const { contexts } = get();
+          const context = contexts.get(id);
 
-        if (!context) {
-          throw new NativeError("Context not found!").addContext({ contextId: id });
-        }
+          if (!context) {
+            throw new NativeError("Context not found!").addContext({ contextId: id });
+          }
 
-        contexts.delete(id);
-        set({ contexts });
-      },
+          set((state) => {
+            state.contexts.delete(id);
+          });
+        },
 
-      getContext(id) {
-        const { contexts } = get();
-        return contexts.get(id);
-      },
+        getContext(id) {
+          const { contexts } = get();
+          return contexts.get(id);
+        },
 
-      getSingleViewContext() {
-        const { contexts } = get();
-        const context = contexts.get(_SINGLE_MODE_WORKSPACE_CONTEXT_ID);
+        getSingleViewContext() {
+          const { contexts } = get();
+          const context = contexts.get(_SINGLE_MODE_WORKSPACE_CONTEXT_ID);
 
-        if (contexts.size !== 1 || !context) {
-          throw new NativeError("Context does not exist in single mode");
-        }
+          if (contexts.size !== 1 || !context) {
+            throw new NativeError("Context does not exist in single mode");
+          }
 
-        return context;
-      },
-    };
-  });
+          return context;
+        },
+      };
+    })
+  );
 }
 
 export const apiClientFeatureContextProviderStore = createApiClientFeatureContextProviderStore();
