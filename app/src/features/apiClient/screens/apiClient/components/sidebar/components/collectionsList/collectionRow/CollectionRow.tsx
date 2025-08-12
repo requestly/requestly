@@ -94,6 +94,21 @@ export const CollectionRow: React.FC<Props> = ({
           },
         },
         {
+          key: "view",
+          label: (
+            <div>
+              <MdOutlineFolder style={{ marginRight: 8 }} />
+              View
+            </div>
+          ),
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
+              preview: true,
+            });
+          },
+        },
+        {
           key: "1",
           label: (
             <div>
@@ -125,7 +140,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
+    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick, openTab, record.id, record.name]
   );
 
   const collapseChangeHandler = useCallback(
@@ -297,18 +312,8 @@ export const CollectionRow: React.FC<Props> = ({
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={(e) => {
-                    // If collection is expanded, allow the collapse functionality to handle the click
-                    // If collection is collapsed, open the tab
-                    if (activeKey === record.id) {
-                      // Collection is expanded, let the collapse handle this click by not stopping propagation
-                      return;
-                    } else {
-                      // Collection is collapsed, open the tab
-                      e.stopPropagation();
-                      openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
-                        preview: true,
-                      });
-                    }
+                    // Allow the collapse/expand functionality to handle all clicks
+                    // Remove tab opening to prioritize expand/collapse behavior
                   }}
                   style={{
                     opacity: isDragging ? 0.5 : 1,
