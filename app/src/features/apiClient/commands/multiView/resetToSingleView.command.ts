@@ -12,11 +12,7 @@ export const resetToSingleView = (
 ) => {
   const { id, type, name } = workspaceInSingleView;
 
-  const contexts = apiClientFeatureContextProviderStore.getState().contexts;
-
-  contexts.forEach((context) => {
-    apiClientFeatureContextProviderStore.getState().removeContext(context.id);
-  });
+  apiClientFeatureContextProviderStore.getState().clearAll();
 
   const selectedWorkspaces = apiClientMultiWorkspaceViewStore.getState().selectedWorkspaces;
   selectedWorkspaces.forEach((workspace) => {

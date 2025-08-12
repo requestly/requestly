@@ -19,6 +19,7 @@ type ApiClientFeatureContextProviderState = {
   removeContext(id: RenderableWorkspaceState["id"]): void;
   getContext(id: RenderableWorkspaceState["id"]): ApiClientFeatureContext | undefined;
   getSingleViewContext(): ApiClientFeatureContext;
+  clearAll(): void;
 };
 
 function createApiClientFeatureContextProviderStore() {
@@ -57,6 +58,10 @@ function createApiClientFeatureContextProviderStore() {
         }
 
         return contexts.values().next().value as ApiClientFeatureContext;
+      },
+
+      clearAll() {
+        set({ contexts: new Map() });
       },
     };
   });
