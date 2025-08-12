@@ -264,7 +264,7 @@ export const CollectionRow: React.FC<Props> = ({
           <Collapse
             activeKey={activeKey}
             onChange={collapseChangeHandler}
-            collapsible={activeKey === record.id ? "icon" : "header"}
+            collapsible="header"
             defaultActiveKey={[record.id]}
             ghost
             className="collections-list-item collection"
@@ -302,10 +302,31 @@ export const CollectionRow: React.FC<Props> = ({
                   className="collection-name-container"
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
-                  onClick={() => {
-                    openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
-                      preview: true,
-                    });
+                  onClick={(e) => {
+                    const isExpanded = activeKey === record.id;
+                    const isAlreadyActive = activeTabSourceId === record.id;
+                    
+                    if (!isExpanded) {
+                      // Collection is collapsed - open tab and expand
+                      if (!isAlreadyActive) {
+                        openTab(
+                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          { preview: true }
+                        );
+                      }
+                      // Don't stop propagation - allow expand
+                    } else {
+                      // Collection is expanded
+                      if (!isAlreadyActive) {
+                        // First click - make tab active and prevent collapse
+                        e.stopPropagation();
+                        openTab(
+                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          { preview: true }
+                        );
+                      }
+                      // Second click (when already active) - allow collapse by not stopping propagation
+                    }
                   }}
                   style={{
                     opacity: isDragging ? 0.5 : 1,
