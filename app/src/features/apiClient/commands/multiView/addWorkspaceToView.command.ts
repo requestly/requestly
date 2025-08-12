@@ -1,20 +1,23 @@
-import { WorkspaceType } from "types";
 import { setupContext } from "../context/setupContext.command";
 import { NativeError } from "errors/NativeError";
 import {
   apiClientMultiWorkspaceViewStore,
   ApiClientViewMode,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
-export const addWorkspaceToView = async (param: {
-  id: string;
-  name: string;
-  userId?: string; // if not present, then we assume that user is logged out
-  type: WorkspaceType;
-}) => {
-  if (param.type !== WorkspaceType.LOCAL)
+export const addWorkspaceToView = async (workspace: Workspace, userId?: string) => {
+  if (workspace.workspaceType !== WorkspaceType.LOCAL) {
     throw new NativeError("[ADD TO VIEW] Multi view only avaiable for local workspaces");
-  const contextId = param.id; // assumes contextId is the same as workspace id
+  }
+
+  const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
+
+  if (viewMode !== ApiClientViewMode.MULTI) {
+    apiClientMultiWorkspaceViewStore.getState().setViewMode(ApiClientViewMode.MULTI);
+  }
+
+  const contextId = workspace.id; // assumes contextId is the same as workspace id
   const existingContext = apiClientMultiWorkspaceViewStore.getState().getSelectedWorkspace(contextId);
   if (existingContext) {
     return;
@@ -22,21 +25,17 @@ export const addWorkspaceToView = async (param: {
 
   const renderableParam = {
     id: contextId,
-    name: param.name,
-    type: param.type,
+    name: workspace.name,
+    type: workspace.workspaceType,
   };
   apiClientMultiWorkspaceViewStore.getState().addWorkspace(renderableParam);
   apiClientMultiWorkspaceViewStore
     .getState()
     .setStateForSelectedWorkspace(contextId, { loading: true, errored: false });
   try {
-    await setupContext({
-      workspaceId: param.id,
-      workspaceType: param.type,
-      user: {
-        loggedIn: !!param.userId,
-        uid: param.userId ?? "",
-      },
+    await setupContext(workspace, {
+      loggedIn: !!userId,
+      uid: userId ?? "",
     });
     apiClientMultiWorkspaceViewStore
       .getState()
@@ -49,11 +48,5 @@ export const addWorkspaceToView = async (param: {
       errored: true,
       error: errorMessage,
     });
-  }
-
-  const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
-
-  if (viewMode !== ApiClientViewMode.MULTI) {
-    apiClientMultiWorkspaceViewStore.getState().setViewMode(ApiClientViewMode.MULTI);
   }
 };

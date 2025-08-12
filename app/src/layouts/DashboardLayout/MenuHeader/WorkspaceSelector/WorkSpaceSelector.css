@@ -10,6 +10,26 @@
   gap: 4px;
 }
 
+.workspace-selector-dropdown__content .workspace-selector-dropdown__count .workspace-selector-dropdown__down-icon svg {
+  width: 10px;
+  height: 10px;
+  margin-bottom: 1px;
+  stroke: white;
+  stroke-width: 40px;
+}
+
+.workspace-selector-dropdown__content .local-workspace-avatar {
+  border-radius: 39px;
+  border: var(--requestly-color-white-t-20);
+  background: var(--requestly-color-surface-2);
+  box-shadow: -2px 0 4px 1px rgba(0, 0, 0, 0.16);
+  display: flex;
+  padding: 3.2px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .local-sync-refresh-btn.ant-btn {
   margin: 0 16px 0 4px;
 }
@@ -53,7 +73,7 @@
 
 .active-workspace-name-down-icon.anticon {
   font-size: var(--requestly-font-size-2xs, 9px);
-  margin-top: 1px;
+  margin-bottom: 3px;
   margin-left: 10px;
 }
 
@@ -99,7 +119,15 @@
   justify-content: space-between;
   flex-wrap: nowrap;
 }
-
+.workspace-item-wrapper .workspace-checkbox-wrapper .single-workspace-hover:hover {
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+.workspace-item-wrapper .workspace-checkbox-wrapper .multi-workspace-no-hover {
+  background-color: transparent;
+  cursor: default;
+}
 .workspace-item-wrapper span.ant-tag.ant-tag-gold {
   flex-shrink: 0;
   font-size: var(--requestly-font-size-sm, 12px);
