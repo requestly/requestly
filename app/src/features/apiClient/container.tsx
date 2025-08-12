@@ -10,7 +10,7 @@ import { setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useApiClientMultiWorkspaceView } from "./store/multiWorkspaceView/multiWorkspaceView.store";
-import { ApiClientFilesProvider } from "./store/ApiClientFilesContextProvider";
+// import { ApiClientFilesProvider } from "./store/ApiClientFilesContextProvider";
 import Daemon from "./store/apiRecords/Daemon";
 import { ApiClientProvider } from "./contexts";
 
@@ -37,12 +37,13 @@ const ApiClientFeatureContainer: React.FC = () => {
       <LocalSyncRefreshHandler />
       <div className="api-client-container">
         <Daemon />
-        <ApiClientFilesProvider>
-          <ApiClientProvider>
-            <APIClientSidebar />
-            <TabsContainer />
-          </ApiClientProvider>
-        </ApiClientFilesProvider>
+        {/* TODO: FIGURE OUT HOW TO MAKE FILE HOLDER NOT SO AGGRESSIVE*/}
+        {/* <ApiClientFilesProvider> */}
+        <ApiClientProvider>
+          <APIClientSidebar />
+          <TabsContainer />
+        </ApiClientProvider>
+        {/* </ApiClientFilesProvider> */}
       </div>
     </TabServiceProvider>
   );
