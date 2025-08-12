@@ -28,6 +28,9 @@ type ApiClientMultiWorkspaceViewState = {
   setViewMode(mode: ApiClientViewMode): void;
   addWorkspace(workspace: Omit<RenderableWorkspaceState, "setState" | "state">): void;
   removeWorkspace(id: RenderableWorkspaceState["id"]): void;
+  getSelectedWorkspace(id: RenderableWorkspaceState["id"]): StoreApi<RenderableWorkspaceState> | null;
+  setStateForSelectedWorkspace(id: RenderableWorkspaceState["id"], state: RenderableWorkspaceState["state"]): void;
+  isSelected(id: RenderableWorkspaceState["id"]): boolean;
 };
 
 function createRenderableWorkspaceStore(workspace: Omit<RenderableWorkspaceState, "setState" | "state">) {
@@ -69,6 +72,25 @@ function createApiClientMultiWorkspaceViewStore() {
         }
 
         set({ selectedWorkspaces: updatedWorkspaces });
+      },
+
+      getSelectedWorkspace(id) {
+        const { selectedWorkspaces } = get();
+        return selectedWorkspaces.find((w) => w.getState().id === id) || null;
+      },
+      setStateForSelectedWorkspace(id, state) {
+        const { selectedWorkspaces } = get();
+
+        const workspaceStore = selectedWorkspaces.find((w) => w.getState().id === id);
+        if (!workspaceStore) {
+          throw new NativeError("Workspace not found!").addContext({ workspaceId: id });
+        }
+
+        workspaceStore.getState().setState(state);
+      },
+
+      isSelected(id) {
+        return get().selectedWorkspaces.some((w) => w.getState().id === id);
       },
     };
   });
