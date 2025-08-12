@@ -98,8 +98,8 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
             </div>
             <div id="actions-container">
                 <button id="settings-button" class="hidden" data-tooltip="Hide widget in app settings">${VisibilityIcon}</button>
-                <button id="minimize-button">${MinimizeIcon}</buttton>
-                <button id="close-button" class="hidden">${CloseIcon}</buttton>
+                <button id="minimize-button">${MinimizeIcon}</button>
+                <button id="close-button" class="hidden">${CloseIcon}</button>
             </div>
         </div>
         <div id="test-rule-container"></div>
