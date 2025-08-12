@@ -20,11 +20,13 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
     createRule(
       RuleEditorUrlFragment.REDIRECT,
       (rule) => {
-        rule.pairs[0].source = {
-          key: SourceKey.URL,
-          operator: SourceOperator.EQUALS,
-          value: networkEvent.request.url,
-        };
+        if (rule.pairs?.[0]) {
+          rule.pairs[0].source = {
+            key: SourceKey.URL,
+            operator: SourceOperator.EQUALS,
+            value: networkEvent.request.url,
+          };
+        }
         rule.name = generateRuleName("Redirect request");
         rule.description = `Redirect ${getBaseUrl(networkEvent.request.url)}`;
       },
@@ -36,13 +38,15 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
     createRule(
       RuleEditorUrlFragment.REPLACE,
       (rule) => {
-        rule.pairs[0].source = {
-          key: SourceKey.URL,
-          operator: SourceOperator.CONTAINS,
-          value: getBaseUrl(networkEvent.request.url),
-        };
-        // @ts-ignore
-        rule.pairs[0].from = getHostFromUrl(networkEvent.request.url);
+        if (rule.pairs?.[0]) {
+          rule.pairs[0].source = {
+            key: SourceKey.URL,
+            operator: SourceOperator.CONTAINS,
+            value: getBaseUrl(networkEvent.request.url),
+          };
+          // @ts-ignore
+          rule.pairs[0].from = getHostFromUrl(networkEvent.request.url);
+        }
         rule.name = generateRuleName("Replace host");
         rule.description = `Replace host in ${getBaseUrl(networkEvent.request.url)}`;
       },
@@ -54,11 +58,13 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
     createRule(
       RuleEditorUrlFragment.REPLACE,
       (rule) => {
-        rule.pairs[0].source = {
-          key: SourceKey.URL,
-          operator: SourceOperator.CONTAINS,
-          value: getBaseUrl(networkEvent.request.url),
-        };
+        if (rule.pairs?.[0]) {
+          rule.pairs[0].source = {
+            key: SourceKey.URL,
+            operator: SourceOperator.CONTAINS,
+            value: getBaseUrl(networkEvent.request.url),
+          };
+        }
         rule.name = generateRuleName("Modify URL");
         rule.description = `Modify ${getBaseUrl(networkEvent.request.url)}`;
       },
@@ -70,11 +76,13 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
     createRule(
       RuleEditorUrlFragment.CANCEL,
       (rule) => {
-        rule.pairs[0].source = {
-          key: SourceKey.URL,
-          operator: SourceOperator.EQUALS,
-          value: networkEvent.request.url,
-        };
+        if (rule.pairs?.[0]) {
+          rule.pairs[0].source = {
+            key: SourceKey.URL,
+            operator: SourceOperator.EQUALS,
+            value: networkEvent.request.url,
+          };
+        }
         rule.name = generateRuleName("Cancel request");
         rule.description = `Cancel ${getBaseUrl(networkEvent.request.url)}`;
       },
@@ -86,11 +94,13 @@ const GeneralTabContent: React.FC<Props> = ({ networkEvent }) => {
     createRule(
       RuleEditorUrlFragment.DELAY,
       (rule) => {
-        rule.pairs[0].source = {
-          key: SourceKey.URL,
-          operator: SourceOperator.EQUALS,
-          value: networkEvent.request.url,
-        };
+        if (rule.pairs?.[0]) {
+          rule.pairs[0].source = {
+            key: SourceKey.URL,
+            operator: SourceOperator.EQUALS,
+            value: networkEvent.request.url,
+          };
+        }
         rule.name = generateRuleName("Delay request");
         rule.description = `Delay ${getBaseUrl(networkEvent.request.url)}`;
       },

@@ -22,12 +22,17 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     [dispatch, pairIndex]
   );
 
+  // Add null check to prevent TypeError when pair is undefined
+  if (!pair) {
+    return null;
+  }
+
   return (
     <Row align="middle" key={rowIndex} span={24} gutter={16} className="margin-top-one">
       <Col span={12} data-tour-id="rule-editor-replace-from">
         <Input
           type="text"
-          value={pair.from}
+          value={pair.from || ""}
           addonBefore="Replace"
           placeholder="This part in URL"
           disabled={isInputDisabled}
@@ -38,7 +43,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       <Col span={12} data-tour-id="rule-editor-replace-to">
         <Input
           type="text"
-          value={pair.to}
+          value={pair.to || ""}
           addonBefore="With"
           placeholder="This part"
           disabled={isInputDisabled}

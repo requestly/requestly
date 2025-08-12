@@ -59,23 +59,26 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
       RuleEditorUrlFragment.RESPONSE,
       (rule) => {
         const baseUrl = getBaseUrl(networkEvent.request.url);
-        rule.pairs[0].source = {
+        if (rule.pairs?.[0]) {
+          rule.pairs[0].source = {
           key: SourceKey.URL,
           operator: SourceOperator.CONTAINS,
           value: baseUrl,
         };
-        // @ts-ignore
-        rule.pairs[0].response = {
-          type: "static",
-          value: response || "{}",
-          resourceType: "restApi",
-          statusCode: "",
-        };
+            // @ts-ignore
+            rule.pairs[0].response = {
+              type: "static",
+              value: response || "{}",
+              resourceType: "restApi",
+              statusCode: "",
+            };
+          }
 
         if (networkEvent?.metadata?.graphQLDetails) {
           const { operationName } = networkEvent.metadata.graphQLDetails;
 
-          rule.pairs[0].source.filters = [
+          if (rule.pairs?.[0]?.source) {
+            rule.pairs[0].source.filters = [
             // @ts-ignore
             {
               requestPayload: {
@@ -85,8 +88,9 @@ const ResponseTabContent: React.FC<Props> = ({ networkEvent }) => {
             },
           ];
 
-          // @ts-ignore
-          rule.pairs[0].response.resourceType = "graphqlApi";
+            // @ts-ignore
+            rule.pairs[0].response.resourceType = "graphqlApi";
+          }
         }
 
         rule.name = generateRuleName("Modify Response Body");

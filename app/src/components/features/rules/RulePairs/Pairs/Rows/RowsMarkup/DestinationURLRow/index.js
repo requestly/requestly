@@ -161,7 +161,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           )
         }
         onBlur={preValidateURL}
-        value={pair.destination}
+        value={pair?.destination || ""}
         disabled={isInputDisabled}
         status={showInputWarning() ? "warning" : null}
       />
@@ -223,7 +223,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                 style={{
                   width: 350,
                 }}
-                value={pair.destination}
+                value={pair?.destination || ""}
                 onChange={(e) => {
                   dispatch(
                     globalActions.updateRulePairAtGivenPath({
