@@ -42,7 +42,7 @@
   }
 
   .gql-url__fetch-status {
-    margin-top: 2px;
+    align-self: flex-end;
 
     .gql-url__fetch-status-icon {
       font-size: var(--requestly-font-size-sm);
