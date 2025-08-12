@@ -1,0 +1,11 @@
+{
+  "name": "StackExchange Prod",
+  "variables": {
+    "api_key": {
+      "value": "1234567890",
+      "type": "string",
+      "id": 0,
+      "isSecret": false
+    }
+  }
+}

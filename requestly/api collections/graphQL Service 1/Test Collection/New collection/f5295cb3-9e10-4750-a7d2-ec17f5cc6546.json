@@ -1,0 +1,13 @@
+{
+  "name": "Untitled request",
+  "url": "https://app.requestly.io/echo",
+  "method": "GET",
+  "queryParams": [],
+  "headers": [],
+  "body": null,
+  "contentType": "text/plain",
+  "scripts": {
+    "preRequest": "",
+    "postResponse": ""
+  }
+}

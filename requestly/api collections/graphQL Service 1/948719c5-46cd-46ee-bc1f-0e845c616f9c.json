@@ -1,0 +1,42 @@
+{
+  "name": "Fetch Comments 123",
+  "url": "https://api.stackexchange.com/posts/18829971/comments",
+  "method": "GET",
+  "queryParams": [
+    {
+      "id": 0.7283223109827621,
+      "key": "site",
+      "value": "stackoverflow",
+      "isEnabled": true
+    },
+    {
+      "id": 1749020847033,
+      "key": "key",
+      "value": "{{api_key}}",
+      "isEnabled": true
+    },
+    {
+      "id": 1752750713652,
+      "key": "test",
+      "value": "123",
+      "isEnabled": true
+    },
+    {
+      "id": 1752814314160,
+      "key": "test2",
+      "value": "New Value",
+      "isEnabled": true
+    }
+  ],
+  "headers": [],
+  "body": null,
+  "contentType": "text/plain",
+  "scripts": {
+    "preRequest": "",
+    "postResponse": ""
+  },
+  "auth": {
+    "currentAuthType": "NO_AUTH",
+    "authConfigStore": {}
+  }
+}
