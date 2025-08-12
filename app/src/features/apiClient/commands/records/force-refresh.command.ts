@@ -1,4 +1,4 @@
-import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export async function forceRefreshRecords(ctx: ApiClientFeatureContext) {
   const {
