@@ -12,7 +12,7 @@ const DelayRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
       <Col align="right" span={24} data-tour-id="rule-editor-delay-value">
         <RQInput
           type="text"
-          value={pair.delay}
+          value={pair?.delay || ""}
           placeholder="Time in ms"
           disabled={isInputDisabled}
           className="delay-rule-input display-inline-block"

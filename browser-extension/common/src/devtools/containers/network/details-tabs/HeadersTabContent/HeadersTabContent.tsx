@@ -74,14 +74,16 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
         RuleEditorUrlFragment.HEADERS,
         (rule) => {
           // @ts-ignore
-          rule.pairs[0].modifications[headerType] = [
-            {
-              type: HeaderModificationType.MODIFY,
-              header: header.name,
-              value: header.value,
-            },
-          ];
-          rule.pairs[0].source = ruleSource;
+          if (rule.pairs?.[0]) {
+            rule.pairs[0].modifications[headerType] = [
+              {
+                type: HeaderModificationType.MODIFY,
+                header: header.name,
+                value: header.value,
+              },
+            ];
+            rule.pairs[0].source = ruleSource;
+          }
           rule.name = generateRuleName(`Override ${headerType} header`);
           rule.description = `Override ${headerType.toLowerCase()} header "${header.name}" for ${ruleSource.value}`;
         },
@@ -98,14 +100,16 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
         RuleEditorUrlFragment.HEADERS,
         (rule) => {
           // @ts-ignore
-          rule.pairs[0].modifications[headerType] = [
-            {
-              type: HeaderModificationType.REMOVE,
-              header: header.name,
-              value: "",
-            },
-          ];
-          rule.pairs[0].source = ruleSource;
+          if (rule.pairs?.[0]) {
+            rule.pairs[0].modifications[headerType] = [
+              {
+                type: HeaderModificationType.REMOVE,
+                header: header.name,
+                value: "",
+              },
+            ];
+            rule.pairs[0].source = ruleSource;
+          }
           rule.name = generateRuleName(`Delete ${headerType} header`);
           rule.description = `Delete ${headerType.toLowerCase()} header "${header.name}" for ${ruleSource.value}`;
         },
@@ -122,14 +126,16 @@ const HeadersTabContent: React.FC<Props> = ({ networkEvent }) => {
         RuleEditorUrlFragment.HEADERS,
         (rule) => {
           // @ts-ignore
-          rule.pairs[0].modifications[headerType] = [
-            {
-              type: HeaderModificationType.ADD,
-              header: "",
-              value: "",
-            },
-          ];
-          rule.pairs[0].source = ruleSource;
+          if (rule.pairs?.[0]) {
+            rule.pairs[0].modifications[headerType] = [
+              {
+                type: HeaderModificationType.ADD,
+                header: "",
+                value: "",
+              },
+            ];
+            rule.pairs[0].source = ruleSource;
+          }
           rule.name = generateRuleName(`Add ${headerType} header`);
           rule.description = `Add new ${headerType.toLowerCase()} header for ${ruleSource.value}`;
         },

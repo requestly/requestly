@@ -309,7 +309,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                 );
               }}
               className="rules-pair-input"
-              value={pair.source.value}
+              value={pair?.source?.value || ""}
               disabled={isInputDisabled}
               data-selectionid="source-value"
             />

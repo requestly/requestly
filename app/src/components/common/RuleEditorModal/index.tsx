@@ -107,8 +107,9 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       if (ruleType === RuleType.RESPONSE && prefilledRule.ruleType === RuleType.RESPONSE) {
         // Handling prefill for graphql resource type response rule
         const { GQLDetails } = ruleData.metadata || {};
-        const pair = prefilledRule.pairs[0];
-        const sourceFilters = pair.source.filters;
+        const pair = prefilledRule.pairs?.[0];
+        if (!pair) return;
+        const sourceFilters = pair.source?.filters;
         if (GQLDetails?.operationName) {
           pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
           pair.source.filters = [

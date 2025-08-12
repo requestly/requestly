@@ -15,9 +15,14 @@ const updateRulePairSource = <T extends Rule>(data: any, rule: T): T => {
     operator: RuleSourceOperator.EQUALS,
   };
 
+  const firstPair = rule.pairs?.[0];
+  if (!firstPair) {
+    return rule;
+  }
+  
   return {
     ...rule,
-    pairs: [{ ...rule.pairs[0], source: { ...rule.pairs[0].source, ...source } }],
+    pairs: [{ ...firstPair, source: { ...firstPair.source, ...source } }],
   };
 };
 
@@ -28,12 +33,17 @@ const prefillRequestRuleData = <T extends RequestRule.Record>(data: unknown, new
     value: data?.request?.body ?? "",
   };
 
+  const firstPair = updatedRule.pairs?.[0];
+  if (!firstPair) {
+    return updatedRule;
+  }
+  
   return {
     ...updatedRule,
     pairs: [
       {
-        ...updatedRule.pairs[0],
-        request: { ...updatedRule.pairs[0].request, ...updatedRequestData },
+        ...firstPair,
+        request: { ...firstPair.request, ...updatedRequestData },
       },
     ],
   };
@@ -47,12 +57,17 @@ const prefillResponseRuleData = <T extends ResponseRule.Record>(data: unknown, n
     resourceType: ResponseRule.ResourceType.REST_API,
   };
 
+  const firstPair = updatedRule.pairs?.[0];
+  if (!firstPair) {
+    return updatedRule;
+  }
+  
   return {
     ...updatedRule,
     pairs: [
       {
-        ...updatedRule.pairs[0],
-        response: { ...updatedRule.pairs[0].response, ...updatedResponseData },
+        ...firstPair,
+        response: { ...firstPair.response, ...updatedResponseData },
       },
     ],
   };

@@ -65,7 +65,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     return (
       <Radio.Group
         onChange={(e) => onChangeRequestType(e.target.value)}
-        value={pair.request.type}
+        value={pair?.request?.type || ""}
         disabled={isInputDisabled}
         data-tour-id="rule-editor-requestbody-types"
         className="response-body-type-radio-group"
