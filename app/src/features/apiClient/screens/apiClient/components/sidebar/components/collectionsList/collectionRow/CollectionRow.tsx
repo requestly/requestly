@@ -258,7 +258,7 @@ export const CollectionRow: React.FC<Props> = ({
           <Collapse
             activeKey={activeKey}
             onChange={collapseChangeHandler}
-            collapsible={activeKey === record.id ? "icon" : "header"}
+            collapsible="header"
             defaultActiveKey={[record.id]}
             ghost
             className="collections-list-item collection"
@@ -296,10 +296,19 @@ export const CollectionRow: React.FC<Props> = ({
                   className="collection-name-container"
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
-                  onClick={() => {
-                    openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
-                      preview: true,
-                    });
+                  onClick={(e) => {
+                    // If collection is expanded, allow the collapse functionality to handle the click
+                    // If collection is collapsed, open the tab
+                    if (activeKey === record.id) {
+                      // Collection is expanded, let the collapse handle this click by not stopping propagation
+                      return;
+                    } else {
+                      // Collection is collapsed, open the tab
+                      e.stopPropagation();
+                      openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }), {
+                        preview: true,
+                      });
+                    }
                   }}
                   style={{
                     opacity: isDragging ? 0.5 : 1,
