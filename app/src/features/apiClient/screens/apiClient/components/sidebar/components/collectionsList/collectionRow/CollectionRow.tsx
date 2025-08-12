@@ -299,12 +299,23 @@ export const CollectionRow: React.FC<Props> = ({
                   onClick={() => {
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
-                    // Only open a tab if currently collapsed and not already the active tab
-                    if (!isExpanded && !isAlreadyActive) {
-                      openTab(
-                        new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
-                        { preview: true }
-                      );
+                    
+                    if (!isExpanded) {
+                      // Collection is collapsed - open tab and expand
+                      if (!isAlreadyActive) {
+                        openTab(
+                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          { preview: true }
+                        );
+                      }
+                    } else {
+                      // Collection is expanded - make tab active first, then allow collapse
+                      if (!isAlreadyActive) {
+                        openTab(
+                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          { preview: true }
+                        );
+                      }
                     }
                     // Don't stop propagation so the collapse/expand functionality also works
                   }}
