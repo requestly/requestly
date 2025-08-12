@@ -78,6 +78,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
     this.shadowRoot.getElementById("close-button").addEventListener("click", () => {
       this.hide();
+      // Remove the widget from DOM to prevent it from showing again
+      this.remove();
     });
 
     this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
