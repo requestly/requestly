@@ -5,7 +5,8 @@
   background-color: var(--component-background);
 }
 
-.ant-dropdown .ant-dropdown-menu {
+.ant-dropdown .ant-dropdown-menu,
+.ant-dropdown-menu .ant-dropdown-menu-sub {
   padding: 4px 0;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);

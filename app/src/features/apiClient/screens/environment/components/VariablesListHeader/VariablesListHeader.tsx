@@ -92,11 +92,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
                 menu={{
                   items: [
                     {
-                      key: "export",
-                      label: "Export As",
-                      type: "group",
-                    },
-                    {
                       key: "requestly",
                       label: "Requestly",
                       icon: <img src={RequestlyIcon} alt="Requestly Icon" height={16} />,
@@ -114,7 +109,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
                 placement="bottomLeft"
               >
                 <RQButton type="secondary" disabled={!exportActions?.enableExport}>
-                  Export
+                  Export as
                 </RQButton>
               </Dropdown>
             )}

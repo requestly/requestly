@@ -52,7 +52,7 @@ const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bu
     },
     {
       title: "Export",
-      icon: <MdOutlineFileDownload />,
+      icon: <MdOutlineFileDownload style={{ height: "14px", width: "14px" }} />,
       isDropdown: true,
       dropdownItems: exportMenuItems,
     },
@@ -89,7 +89,6 @@ const ActionMenu: React.FC<Props> = ({ isAllRecordsSelected, toggleSelection, bu
               >
                 <RQButton type="transparent" size="small" className="api-client-action-btn export-dropdown">
                   {item.icon}
-                  <MdOutlineArrowDropDown />
                 </RQButton>
               </Dropdown>
             ) : (

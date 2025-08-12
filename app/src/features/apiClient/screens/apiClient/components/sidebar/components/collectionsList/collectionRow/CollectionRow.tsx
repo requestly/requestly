@@ -103,16 +103,11 @@ export const CollectionRow: React.FC<Props> = ({
           label: (
             <span>
               <MdOutlineIosShare style={{ marginRight: 8 }} />
-              Export
+              Export as
             </span>
           ),
           expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
           children: [
-            {
-              key: "1-title",
-              type: "group",
-              label: <div style={{ fontSize: "12px" }}>Export as:</div>,
-            },
             {
               key: "1-1",
               label: "Requestly",
