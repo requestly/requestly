@@ -23,7 +23,7 @@ async function _refreshContext(
 export const refreshContext = async (ctxId: ApiClientFeatureContext["id"]) => {
   const contexts = apiClientFeatureContextProviderStore.getState().contexts;
 
-  if (!contexts.has(ctxId)) throw new NativeError("Add context to the store before trying to refresh");
+  if (!contexts.has(ctxId)) throw new NativeError("Add the context to the store before trying to refresh it");
 
   const context = contexts.get(ctxId);
   return _refreshContext(context.stores, context.repositories);
