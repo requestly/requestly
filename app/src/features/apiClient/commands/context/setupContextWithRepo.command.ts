@@ -10,6 +10,10 @@ import { createEnvironmentsStore } from "features/apiClient/store/environments/e
 import { createErroredRecordsStore } from "features/apiClient/store/erroredRecords/erroredRecords.store";
 import { RQAPI } from "features/apiClient/types";
 import { extractSetupDataFromRepository } from "./utils";
+import {
+  apiClientMultiWorkspaceViewStore,
+  ApiClientViewMode,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 export type ContextSetupData = {
   apiClientRecords: { records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] }; // old api expects errors to also be passed in
@@ -21,6 +25,9 @@ export const setupContextWithRepo = async (
   workspaceId: ApiClientFeatureContext["workspaceId"],
   repoForWorkspace: ApiClientRepositoryInterface
 ) => {
+  const contexts = apiClientFeatureContextProviderStore.getState().contexts;
+  if (contexts.has(workspaceId)) return workspaceId; // context already exists
+
   const { apiClientRecords, erroredRecords, environments } = await extractSetupDataFromRepository(repoForWorkspace);
   const environmentStore = createEnvironmentsStore({
     environments: environments.nonGlobalEnvironments,
@@ -40,6 +47,11 @@ export const setupContextWithRepo = async (
     stores,
     repositories: repoForWorkspace,
   };
+
+  const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
+  if (viewMode === ApiClientViewMode.SINGLE) {
+    apiClientFeatureContextProviderStore.getState().clearAll();
+  }
 
   apiClientFeatureContextProviderStore.getState().addContext(context);
   return context.id;
