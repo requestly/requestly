@@ -5,13 +5,7 @@ import { RQAPI } from "features/apiClient/types";
 
 export const GraphQLRecordStoreContext = createContext<StoreApi<GraphQLRecordState> | null>(null);
 
-export const GraphQLRecordProvider = ({
-  children,
-  record,
-}: {
-  children: ReactNode;
-  record: RQAPI.GraphQLApiRecord;
-}) => {
-  const [store] = useState(() => createGraphQLRecordStore(record));
+export const GraphQLRecordProvider = ({ children, entry }: { children: ReactNode; entry: RQAPI.GraphQLApiEntry }) => {
+  const [store] = useState(() => createGraphQLRecordStore(entry));
   return <GraphQLRecordStoreContext.Provider value={store}>{children}</GraphQLRecordStoreContext.Provider>;
 };

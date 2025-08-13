@@ -1,10 +1,10 @@
 import { RQAPI } from "features/apiClient/types";
 import { create } from "zustand";
-import { BaseApiRecordStoreState, createBaseApiRecordState } from "../base";
+import { BaseApiEntryStoreState, createBaseApiEntryState } from "../base";
 import { IntrospectionData } from "features/apiClient/helpers/introspectionQuery";
 import { extractOperationNames } from "features/apiClient/screens/apiClient/components/views/graphql/utils";
 
-export type GraphQLRecordState = BaseApiRecordStoreState<RQAPI.GraphQLApiRecord> & {
+export type GraphQLRecordState = BaseApiEntryStoreState<RQAPI.GraphQLApiEntry> & {
   operationNames: string[];
   introspectionData: IntrospectionData | null;
   isFetchingIntrospectionData: boolean;
@@ -15,9 +15,9 @@ export type GraphQLRecordState = BaseApiRecordStoreState<RQAPI.GraphQLApiRecord>
   updateOperationNames: (newNames: string[]) => void;
 };
 
-export function createGraphQLRecordStore(record: RQAPI.GraphQLApiRecord) {
+export function createGraphQLRecordStore(entry: RQAPI.GraphQLApiEntry) {
   return create<GraphQLRecordState>()((set, get) => ({
-    operationNames: extractOperationNames(record.data.request.operation),
+    operationNames: extractOperationNames(entry.request.operation),
     introspectionData: null,
     isFetchingIntrospectionData: false,
     hasIntrospectionFailed: false,
@@ -25,6 +25,6 @@ export function createGraphQLRecordStore(record: RQAPI.GraphQLApiRecord) {
     setHasIntrospectionFailed: (hasFailed: boolean) => set({ hasIntrospectionFailed: hasFailed }),
     setIntrospectionData: (data: any) => set({ introspectionData: data }),
     updateOperationNames: (newNames: string[]) => set({ operationNames: newNames }),
-    ...createBaseApiRecordState(record, set, get),
+    ...createBaseApiEntryState(entry, set, get),
   }));
 }

@@ -8,6 +8,7 @@ import {
   DEMO_GRAPHQL_API_URL,
   LARGE_FILE_SIZE,
   SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
+  DEFAULT_REQUEST_NAME,
 } from "../../constants";
 import * as curlconverter from "curlconverter";
 import { forEach, omit, split } from "lodash";
@@ -141,7 +142,7 @@ export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request
     data: getEmptyApiEntry(apiEntryType),
     type: RQAPI.RecordType.API,
     id: "",
-    name: "Untitled request",
+    name: DEFAULT_REQUEST_NAME,
     collectionId: "",
     ownerId: "",
     deleted: false,

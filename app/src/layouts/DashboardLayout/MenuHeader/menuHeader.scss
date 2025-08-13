@@ -38,6 +38,11 @@
     }
   }
 
+  &__mid {
+    position: absolute;
+    left: 50%;
+  }
+
   &__right {
     display: flex;
     align-items: center;

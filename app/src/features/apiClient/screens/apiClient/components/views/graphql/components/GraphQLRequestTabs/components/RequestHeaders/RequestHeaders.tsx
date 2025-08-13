@@ -8,13 +8,13 @@ interface Props {
 }
 
 export const RequestHeaders: React.FC<Props> = ({ requestId }) => {
-  const [headers, updateRecordRequest] = useGraphQLRecordStore((state) => [
-    state.record.data.request.headers,
-    state.updateRecordRequest,
+  const [headers, updateEntryRequest] = useGraphQLRecordStore((state) => [
+    state.entry.request.headers,
+    state.updateEntryRequest,
   ]);
 
   const handleHeadersChange = (newHeaders: KeyValuePair[]) => {
-    updateRecordRequest({
+    updateEntryRequest({
       headers: newHeaders,
     });
   };

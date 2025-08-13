@@ -2,7 +2,7 @@ import { compile } from "handlebars";
 import { EnvironmentVariables, EnvironmentVariableValue } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
-import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { getScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 

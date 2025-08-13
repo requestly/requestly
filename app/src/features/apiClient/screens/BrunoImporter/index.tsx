@@ -22,6 +22,8 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -43,7 +45,8 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     }>;
   }>({ collections: [], apis: [], environments: [] });
 
-  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const {
     env: { createEnvironment },
   } = useCommand();

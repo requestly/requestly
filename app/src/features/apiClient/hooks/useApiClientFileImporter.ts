@@ -16,6 +16,7 @@ import { EnvironmentVariableValue } from "backend/environment/types";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "../commands";
 import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "./useNewApiClientContext";
 
 const BATCH_SIZE = 25;
 
@@ -57,7 +58,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   } = useCommand();
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 

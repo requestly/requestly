@@ -27,6 +27,6 @@ export class EnvironmentViewTabSource extends BaseTabSource {
       throw new Error("Environment id not found!");
     }
 
-    return new EnvironmentViewTabSource({ id: envId, title: "Environment" });
+    return new EnvironmentViewTabSource({ id: envId, title: "Environment", context: {} });
   }
 }

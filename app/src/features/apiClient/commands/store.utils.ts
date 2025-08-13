@@ -1,4 +1,4 @@
-import { ApiClientFeatureContext } from "../contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "../types";
 
 export function getStores(ctx: ApiClientFeatureContext) {

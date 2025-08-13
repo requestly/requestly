@@ -18,6 +18,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       id: `${Date.now()}`,
       name: "request",
       title: "Untitled request",
+      context: {},
       ...metadata,
     };
     this.component = (
