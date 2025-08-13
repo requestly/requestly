@@ -11,6 +11,7 @@ import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
 import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
 import { capitalize } from "lodash";
+import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export const ContextualCollectionsList: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -19,6 +20,7 @@ export const ContextualCollectionsList: React.FC<{
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
 
   const [searchValue, setSearchValue] = useState("");
   const [showSelection, setShowSelection] = useState(false);
@@ -64,6 +66,8 @@ export const ContextualCollectionsList: React.FC<{
     }));
   }, []);
 
+  console.log({ selectedWorkspaces });
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="api-client-sidebar-header-container">
@@ -86,12 +90,12 @@ export const ContextualCollectionsList: React.FC<{
       </div>
 
       {selectedWorkspaces.map((workspace) => {
-        const contextId = workspace.getState().id;
+        const workspaceId = workspace.getState().id;
+        const contextId = getContext(workspaceId)?.id;
 
-        // ASK: Should we merge ContextId + WorkspaceLoader under WorkspaceWrapper
         return (
-          <ContextId id={contextId}>
-            <WorkspaceLoader>
+          <WorkspaceLoader workspaceId={workspaceId}>
+            <ContextId id={contextId} key={contextId}>
               <CollectionsList
                 bulkAction={bulkAction}
                 isAllRecordsSelected={isAllRecordsSelected}
@@ -102,8 +106,8 @@ export const ContextualCollectionsList: React.FC<{
                 recordTypeToBeCreated={recordTypeToBeCreated}
                 handleRecordSelection={(recordIds) => handleRecordSelection(contextId, recordIds)}
               />
-            </WorkspaceLoader>
-          </ContextId>
+            </ContextId>
+          </WorkspaceLoader>
         );
       })}
     </DndProvider>
