@@ -1,12 +1,9 @@
-.api-client-container {
-  .api-client-view,
-  .api-client-container-content {
-    flex: auto;
-    width: 100%;
-    height: 100%;
-    min-width: 0;
-    overflow-y: hidden;
-  }
+.api-client-container-content {
+  flex: auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  overflow-y: hidden;
 
   .api-client-view {
     height: 100%;
