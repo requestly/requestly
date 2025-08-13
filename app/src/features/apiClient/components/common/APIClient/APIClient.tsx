@@ -15,6 +15,8 @@ import "./apiClient.scss";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
+import { ContextId } from "features/apiClient/contexts/contextId.context";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -112,15 +114,18 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-          <AutogenerateProvider>
-            <ClientViewFactory
-              isOpenInModal
-              apiRecord={apiRecord}
-              handleRequestFinished={() => {}}
-              onSaveCallback={() => {}}
-              isCreateMode={true}
-            />
-          </AutogenerateProvider>
+          <ContextId id={NoopContextId}>
+            <AutogenerateProvider>
+              <ClientViewFactory
+                isOpenInModal
+                apiRecord={apiRecord}
+                handleRequestFinished={() => { }}
+                onSaveCallback={() => { }}
+                isCreateMode={true}
+              />
+            </AutogenerateProvider>
+          </ContextId>
+
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>
