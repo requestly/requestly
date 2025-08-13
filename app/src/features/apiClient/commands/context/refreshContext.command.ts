@@ -8,16 +8,26 @@ import { forceRefreshRecords } from "../records";
 import { forceRefreshEnvironments } from "../environments";
 import { reloadFsManager } from "services/fsManagerServiceAdapter";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
+import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 export const refreshContext = async (ctxId: ApiClientFeatureContext["id"]) => {
-  const contexts = apiClientFeatureContextProviderStore.getState().contexts;
+  try {
+    const contexts = apiClientFeatureContextProviderStore.getState().contexts;
 
-  if (!contexts.has(ctxId)) throw new NativeError("Add the context to the store before trying to refresh it");
+    if (!contexts.has(ctxId)) throw new NativeError("Add the context to the store before trying to refresh it");
 
-  const context = contexts.get(ctxId);
-  if (context.repositories.apiClientRecordsRepository instanceof ApiClientLocalRepository) {
-    await reloadFsManager(context.repositories.apiClientRecordsRepository.meta.rootPath);
+    const context = contexts.get(ctxId);
+    if (context.repositories.apiClientRecordsRepository instanceof ApiClientLocalRepository) {
+      await reloadFsManager(context.repositories.apiClientRecordsRepository.meta.rootPath);
+    }
+
+    return Promise.all([forceRefreshRecords(context), forceRefreshEnvironments(context)]);
+  } catch(e) {
+      apiClientMultiWorkspaceViewStore.getState().setStateForSelectedWorkspace(ctxId, {
+        loading: false,
+        errored: true,
+        error: e,
+      });
+    throw e;
   }
-
-  return Promise.all([forceRefreshRecords(context), forceRefreshEnvironments(context)]);
 };
