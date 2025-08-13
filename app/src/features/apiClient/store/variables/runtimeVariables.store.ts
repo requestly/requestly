@@ -12,35 +12,34 @@ export type RuntimeVariableStore = StoreApi<RuntimeVariableState>;
 export const createRuntimeVariablesStore = ({ variables }: { variables: RuntimeVariableState["data"] }) => {
   return create<RuntimeVariableState>()((set, get) => ({
     data: variables,
-    version: 0,
+    version: 0, // to be removed soon
     reset() {
       set({ data: new Map(), version: 0 });
     },
     delete(key) {
       const { data } = get();
-
       if (!data.has(key)) {
         return;
       }
-
-      data.delete(key);
-      set({ data });
+      const newData = new Map(data);
+      newData.delete(key);
+      set({ data: newData });
     },
     add(key, variable) {
       const { data } = get();
-      data.set(key, variable);
-      set({ data });
+      const newData = new Map(data);
+      newData.set(key, variable);
+      set({ data: newData });
     },
     update(key, updates) {
       const { data } = get();
       const existingValue = data.get(key);
-
       if (!existingValue) {
         throw new Error(`Variable with key "${key}" does not exist.`);
       }
-
-      data.set(key, { ...existingValue, ...updates });
-      set({ data });
+      const newData = new Map(data);
+      newData.set(key, { ...existingValue, ...updates });
+      set({ data: newData });
     },
     getVariable(key) {
       return get().data.get(key);
