@@ -12,10 +12,10 @@ import { EnvironmentsList } from "features/apiClient/screens/environment/compone
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
-import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import "./singleWorkspaceSidebar.scss";
 
 interface Props {}
 
