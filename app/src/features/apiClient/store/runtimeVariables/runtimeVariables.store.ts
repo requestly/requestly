@@ -1,6 +1,6 @@
 import { StoreApi } from "zustand";
-import { VariableData } from "./types";
-import { VariablesState } from "./variables.store";
+import { VariableData } from "../variables/types";
+import { VariablesState } from "../variables/variables.store";
 import { create } from "zustand";
 
 type RuntimeVariableValue = VariableData;

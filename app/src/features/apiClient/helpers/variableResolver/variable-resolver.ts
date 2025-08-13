@@ -11,7 +11,7 @@ import {
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 import { VariableData, VariableDataForScope } from "features/apiClient/store/variables/types";
-import { runtimeVariablesStore } from "features/apiClient/store/variables/runtimeVariables.store";
+import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 
 type VariableSource<T extends VariableScope> = {
   scope: T;
