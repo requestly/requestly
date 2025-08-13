@@ -179,6 +179,9 @@ const APIClientSidebar: React.FC<Props> = () => {
     }
   }, [state?.modal, setIsImportModalOpen]);
 
+  // Get initial cURL command from state if available
+  const initialCurlCommand = state?.curlCommand || "";
+
   return (
     <>
       <div className="api-client-sidebar">
@@ -211,6 +214,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
         onClose={onImportRequestModalClose}
+        initialCurlCommand={initialCurlCommand}
       />
     </>
   );

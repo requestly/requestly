@@ -13,9 +13,16 @@ interface Props {
   isRequestLoading: boolean;
   handleImportRequest: (request: RQAPI.Request) => void;
   onClose: () => void;
+  initialCurlCommand?: string;
 }
 
-export const ImportFromCurlModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose, isRequestLoading }) => {
+export const ImportFromCurlModal: React.FC<Props> = ({
+  isOpen,
+  handleImportRequest,
+  onClose,
+  isRequestLoading,
+  initialCurlCommand,
+}) => {
   const [curlCommand, setCurlCommand] = useState("");
   const [error, setError] = useState(null);
   const inputRef = useRef<HTMLInputElement>();
@@ -23,14 +30,18 @@ export const ImportFromCurlModal: React.FC<Props> = ({ isOpen, handleImportReque
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
+      // Pre-fill with initial cURL command if provided
+      if (initialCurlCommand) {
+        setCurlCommand(initialCurlCommand);
+      }
     } else {
       setCurlCommand("");
     }
-  }, [isOpen]);
+  }, [isOpen, initialCurlCommand]);
 
   const onImportClicked = useCallback(() => {
     if (!curlCommand) {
-      setError("Please enter a cURL command");
+      setError("Please enter a valid cURL command");
       inputRef.current?.focus();
       return;
     }
