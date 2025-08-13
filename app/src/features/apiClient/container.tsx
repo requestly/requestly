@@ -37,13 +37,10 @@ const ApiClientFeatureContainer: React.FC = () => {
       <LocalSyncRefreshHandler />
       <div className="api-client-container">
         <Daemon />
-        {/* TODO: FIGURE OUT HOW TO MAKE FILE HOLDER NOT SO AGGRESSIVE*/}
-        {/* <ApiClientFilesProvider> */}
         <ApiClientProvider>
           <APIClientSidebar />
           <TabsContainer />
         </ApiClientProvider>
-        {/* </ApiClientFilesProvider> */}
       </div>
     </TabServiceProvider>
   );
