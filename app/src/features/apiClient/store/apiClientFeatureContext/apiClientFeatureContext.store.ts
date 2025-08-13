@@ -13,13 +13,16 @@ export type ApiClientFeatureContext = {
 };
 
 type ApiClientFeatureContextProviderState = {
+  lastUsedContext?: ApiClientFeatureContext;
   contexts: Map<RenderableWorkspaceState["id"], ApiClientFeatureContext>;
 
   addContext(context: ApiClientFeatureContext): void;
   removeContext(id: RenderableWorkspaceState["id"]): void;
   getContext(id: RenderableWorkspaceState["id"]): ApiClientFeatureContext | undefined;
   getSingleViewContext(): ApiClientFeatureContext;
+  getLastUsedContext(): ApiClientFeatureContext | undefined;
   clearAll(): void;
+  setLastUsedContext: (context?: ApiClientFeatureContext) => void;
 };
 
 function createApiClientFeatureContextProviderStore() {
@@ -28,13 +31,14 @@ function createApiClientFeatureContextProviderStore() {
       contexts: new Map(),
 
       addContext(context) {
-        const { contexts } = get();
+        const { contexts, setLastUsedContext } = get();
         contexts.set(context.id, context);
         set({ contexts });
+        setLastUsedContext(context);
       },
 
       removeContext(id) {
-        const { contexts } = get();
+        const { contexts, lastUsedContext, setLastUsedContext } = get();
         const context = contexts.get(id);
 
         if (!context) {
@@ -42,12 +46,27 @@ function createApiClientFeatureContextProviderStore() {
         }
 
         contexts.delete(id);
+
+        if (lastUsedContext?.id === id) {
+          setLastUsedContext(undefined);
+        }
+
         set({ contexts });
       },
 
+      setLastUsedContext(context) {
+        set({
+          lastUsedContext: context,
+        });
+      },
+
       getContext(id) {
-        const { contexts } = get();
-        return contexts.get(id);
+        const { contexts, setLastUsedContext } = get();
+        const context = contexts.get(id);
+        if (context) {
+          setLastUsedContext(context);
+        }
+        return context;
       },
 
       getSingleViewContext() {
@@ -60,8 +79,20 @@ function createApiClientFeatureContextProviderStore() {
         return contexts.values().next().value as ApiClientFeatureContext;
       },
 
+      getLastUsedContext() {
+        const { contexts, lastUsedContext, setLastUsedContext } = get();
+        if (lastUsedContext) {
+          return lastUsedContext;
+        }
+        if (contexts.size) {
+          const topContext = contexts.values().next().value; // debatable
+          setLastUsedContext(topContext);
+          return topContext;
+        }
+      },
+
       clearAll() {
-        set({ contexts: new Map() });
+        set({ contexts: new Map(), lastUsedContext: undefined });
       },
     };
   });

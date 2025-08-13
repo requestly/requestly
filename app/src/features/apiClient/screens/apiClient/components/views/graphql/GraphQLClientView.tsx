@@ -42,6 +42,7 @@ import { trackRequestRenamed } from "modules/analytics/events/features/apiClient
 import { extractOperationNames } from "./utils";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 interface Props {
   recordId: string;
@@ -96,7 +97,8 @@ const GraphQLClientView: React.FC<Props> = ({
   ]);
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
-  const { onSaveRecord, apiClientWorkloadManager } = useApiClientContext();
+  const { apiClientWorkloadManager } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
   const { sheetPlacement, toggleSheetPlacement } = useBottomSheetContext();
 
   const location = useLocation();

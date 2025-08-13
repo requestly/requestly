@@ -7,6 +7,9 @@ import { LoadingOutlined } from "@ant-design/icons";
 import "./newRecordNameInput.scss";
 import { trackCollectionRenamed, trackRequestRenamed } from "modules/analytics/events/features/apiClient";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { useCommand } from "features/apiClient/commands";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.ApiClientRecord;
@@ -16,7 +19,11 @@ export interface NewRecordNameInputProps {
 }
 
 export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordToBeEdited, recordType, onSuccess }) => {
-  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const {
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
   const [updateTabBySource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.updateTabBySource,
     state.closeTabBySource,
