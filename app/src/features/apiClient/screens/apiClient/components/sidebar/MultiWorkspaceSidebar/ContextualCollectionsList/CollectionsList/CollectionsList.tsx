@@ -27,6 +27,8 @@ import { RequestRow } from "../../../components/collectionsList/requestRow/Reque
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 interface Props {
   searchValue: string;
@@ -54,14 +56,11 @@ export const CollectionsList: React.FC<Props> = ({
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
 
-  const {
-    isRecordBeingCreated,
-    setIsDeleteModalOpen,
-    updateRecordsToBeDeleted,
-    onSaveRecord,
-    onSaveBulkRecords,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  const { isRecordBeingCreated, setIsDeleteModalOpen, updateRecordsToBeDeleted } = useApiClientContext();
+
+  const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
