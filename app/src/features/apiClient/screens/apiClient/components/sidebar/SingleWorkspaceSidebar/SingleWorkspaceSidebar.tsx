@@ -32,8 +32,6 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isImportModalOpen, onImportRequestModalClose, setIsImportModalOpen } = useApiClientContext();
-
   const {
     history,
     clearHistory,
@@ -44,6 +42,9 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
+    isImportModalOpen,
+    onImportRequestModalClose,
+    setIsImportModalOpen,
   } = useApiClientContext();
 
   const { onSaveRecord } = useNewApiClientContext();
