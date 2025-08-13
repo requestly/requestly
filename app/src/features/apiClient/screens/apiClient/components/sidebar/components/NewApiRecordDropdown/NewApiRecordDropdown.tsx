@@ -47,7 +47,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
     return [
       {
         key: NewRecordDropdownItemType.HTTP,
-        label: "New HTTP request",
+        label: "HTTP request",
         icon: <MdOutlineSyncAlt />,
         onClick: () => {
           onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.HTTP });
@@ -55,7 +55,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
       },
       {
         key: NewRecordDropdownItemType.GRAPHQL,
-        label: "New GraphQL request",
+        label: "GraphQL request",
         icon: <GrGraphQl />,
         hidden: !isGraphQLSupportEnabled,
         onClick: () => {
@@ -64,7 +64,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
       },
       {
         key: NewRecordDropdownItemType.COLLECTION,
-        label: "New Collection",
+        label: "Collection",
         icon: <BsCollection />,
         onClick: () => {
           onSelect({ recordType: RQAPI.RecordType.COLLECTION });
@@ -72,7 +72,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
       },
       {
         key: NewRecordDropdownItemType.ENVIRONMENT,
-        label: "New Environment",
+        label: "Environment",
         icon: <MdHorizontalSplit />,
         onClick: () => {
           onSelect({ recordType: RQAPI.RecordType.ENVIRONMENT });

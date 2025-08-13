@@ -33,4 +33,14 @@
       color: var(--requestly-color-text-default);
     }
   }
+
+  .schema-builder-toggle-button {
+    position: absolute;
+    right: 16px;
+    top: 5px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
 }
