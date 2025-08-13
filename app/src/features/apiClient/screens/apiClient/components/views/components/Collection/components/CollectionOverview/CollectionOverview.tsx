@@ -11,6 +11,9 @@ import { useOutsideClick } from "hooks";
 import { useRBAC } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
 import "./collectionOverview.scss";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useCommand } from "features/apiClient/commands";
 
 interface CollectionOverviewProps {
   collection: RQAPI.CollectionRecord;
@@ -19,7 +22,13 @@ interface CollectionOverviewProps {
 const COLLECTION_DETAILS_PLACEHOLDER = "Collection description";
 
 export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collection }) => {
-  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const { onSaveRecord } = useNewApiClientContext();
+  const {
+    api: {
+      forceRefreshRecords: forceRefreshApiClientRecords
+    }
+  } = useCommand()
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
   const { setTitle, close } = useGenericState();

@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 export function useApiClientFeatureContext(): ApiClientFeatureContext {
   const viewMode = useApiClientMultiWorkspaceView(s => s.viewMode);
-  const [getSingleViewContext, getContext] = useApiClientFeatureContextProvider(s => [s.getSingleViewContext, s.getContext]);
+  const [getSingleViewContext, getContext, getLastUsedContext] = useApiClientFeatureContextProvider(s => [s.getSingleViewContext, s.getContext, s.getLastUsedContext]);
   const contextId = useContextId();
 
   const context = (() => {
@@ -14,7 +14,7 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
       return getSingleViewContext();
     }
     if(!contextId) {
-      throw new Error("Mode is multi but no contextId found!");
+      return getLastUsedContext();
     }
     return getContext(contextId);
   })();
@@ -22,7 +22,7 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
   if(!context) {
     throw new Error("No context found!");
   }
-  
+
 
   return useMemo(() => {
     return context;

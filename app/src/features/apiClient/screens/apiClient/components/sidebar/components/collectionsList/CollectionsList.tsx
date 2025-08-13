@@ -32,6 +32,8 @@ import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -47,10 +49,15 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     isRecordBeingCreated,
     setIsDeleteModalOpen,
     updateRecordsToBeDeleted,
+  } = useApiClientContext();
+
+  const {
     onSaveRecord,
     onSaveBulkRecords,
-    apiClientRecordsRepository,
-  } = useApiClientContext();
+  } = useNewApiClientContext();
+
+  const { apiClientRecordsRepository } = useApiClientRepository();
+
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showSelection, setShowSelection] = useState(false);

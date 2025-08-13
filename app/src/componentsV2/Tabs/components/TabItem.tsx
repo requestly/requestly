@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
@@ -62,10 +62,10 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           incrementVersion();
         },
 
-        setUnsaved: (unsaved: boolean) => {
+        setUnsaved: useCallback((unsaved: boolean) => {
           props.store.getState().setUnsaved(unsaved);
           incrementVersion();
-        },
+        }, [incrementVersion, props.store]),
       }}
     >
       {props.children}

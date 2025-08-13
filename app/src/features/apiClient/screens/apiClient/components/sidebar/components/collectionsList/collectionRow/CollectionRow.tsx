@@ -26,6 +26,8 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -65,10 +67,12 @@ export const CollectionRow: React.FC<Props> = ({
   const {
     updateRecordsToBeDeleted,
     setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
     forceRefreshApiClientRecords,
   } = useApiClientContext();
+
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const contextId = useContextId();

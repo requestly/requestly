@@ -26,6 +26,8 @@ import { RequestViewTabSource } from "../../../../views/components/RequestView/r
 import { useDrag } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -73,9 +75,11 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   const {
     updateRecordsToBeDeleted,
     setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
   } = useApiClientContext();
+
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const { onSaveRecord } = useNewApiClientContext();
+
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const contextId = useContextId();
