@@ -4,6 +4,23 @@ import { RenderableWorkspaceState } from "../multiWorkspaceView/multiWorkspaceVi
 import { create, useStore } from "zustand";
 import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
+import { createApiRecordsStore } from "../apiRecords/apiRecords.store";
+import { createEnvironmentsStore } from "../environments/environments.store";
+import { createErroredRecordsStore } from "../erroredRecords/erroredRecords.store";
+
+function createInfiniteChainable<T>() {
+  const handler = {
+    get: () => {
+      return new Proxy(() => {}, handler);
+    },
+    apply: () => {
+      return new Proxy(() => {}, handler);
+    },
+  };
+
+  return new Proxy({}, handler) as T;
+};
+
 
 export type ApiClientFeatureContext = {
   id: RenderableWorkspaceState["id"];
@@ -102,4 +119,20 @@ export const apiClientFeatureContextProviderStore = createApiClientFeatureContex
 
 export function useApiClientFeatureContextProvider<T>(selector: (state: ApiClientFeatureContextProviderState) => T) {
   return useStore(apiClientFeatureContextProviderStore, useShallow(selector));
+}
+
+export const NoopContextId = '__stub_context_id';
+export const NoopContext: ApiClientFeatureContext = {
+    id: NoopContextId,
+    workspaceId: NoopContextId,
+    stores: {
+        records: createApiRecordsStore({records: [], erroredRecords: []}),
+        environments: createEnvironmentsStore({environments: {}, globalEnvironment: {
+          id: 'na',
+          name: 'na',
+          variables: {},
+        }}),
+        erroredRecords: createErroredRecordsStore({apiErroredRecords: [], environmentErroredRecords: []})
+    },
+    repositories: createInfiniteChainable(),
 }

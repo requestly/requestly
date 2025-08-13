@@ -1,6 +1,6 @@
 import { ApiClientViewMode, useApiClientMultiWorkspaceView } from "../store/multiWorkspaceView/multiWorkspaceView.store";
 import { useContextId } from "./contextId.context";
-import { ApiClientFeatureContext, useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { ApiClientFeatureContext, NoopContext, NoopContextId, useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { useMemo } from "react";
 
 
@@ -9,7 +9,12 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
   const [getSingleViewContext, getContext, getLastUsedContext] = useApiClientFeatureContextProvider(s => [s.getSingleViewContext, s.getContext, s.getLastUsedContext]);
   const contextId = useContextId();
 
+  
+
   const context = (() => {
+    if(contextId === NoopContextId) {
+      return NoopContext;
+    }
     if(viewMode === ApiClientViewMode.SINGLE) {
       return getSingleViewContext();
     }
@@ -26,5 +31,5 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
 
   return useMemo(() => {
     return context;
-  }, [context]);
+  }, [contextId]);
 }
