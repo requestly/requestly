@@ -5,7 +5,6 @@ import { CONSTANTS } from "@requestly/requestly-core";
 import {
   CONTENT_TYPE_HEADER,
   DEMO_HTTP_API_URL,
-  DEMO_GRAPHQL_API_URL,
   LARGE_FILE_SIZE,
   SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY,
   DEFAULT_REQUEST_NAME,
@@ -110,7 +109,7 @@ export const getEmptyGraphQLEntry = (request?: RQAPI.Request): RQAPI.GraphQLApiE
   return {
     type: RQAPI.ApiEntryType.GRAPHQL,
     request: {
-      url: DEMO_GRAPHQL_API_URL,
+      url: "",
       headers: [],
       operation: "",
       variables: "",
