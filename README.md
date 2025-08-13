@@ -1,9 +1,10 @@
+[![Requestly](https://github.com/user-attachments/assets/526e6e17-cdaa-435a-8b0c-171c8add6e35)](https://requestly.com)
 
-![Requestly Logo](https://github.com/user-attachments/assets/d0f13ec3-ca42-4b6c-ab6c-16e380ad04b3)
+
 
 <br/>
 
-## Requestly - A Free-Forever & Open-Source API Client with HTTP Interceptor, Modfications, API Testing & Mocking.
+## Requestly - API Client with HTTP Interceptor, Modfications, Testing & Mocking.
 
 Requestly is a powerful combination of a local API Client (like Postman) & HTTP Interceptor (like Charles Proxy) with API Testing and Mocking. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.
 
