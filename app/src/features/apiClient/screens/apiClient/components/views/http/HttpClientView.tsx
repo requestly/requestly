@@ -70,7 +70,6 @@ import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContext
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { ApiClientFilesContext } from "features/apiClient/store/ApiClientFilesContextProvider";
 import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
