@@ -1,30 +1,31 @@
-import { EnvironmentVariableKey, EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
+import { VariableData, VariableKey } from "./types";
 
-export type VariablesState = {
+export type VariablesState<T extends VariableData> = {
   // state
   version: number;
-  data: Map<EnvironmentVariableKey, EnvironmentVariableValue>;
+  data: Map<VariableKey, T>;
 
-  reset: (data: Map<EnvironmentVariableKey, EnvironmentVariableValue>) => void;
+  reset: (data: Map<VariableKey, T>) => void;
 
   // actions
-  delete: (key: EnvironmentVariableKey) => void;
-  add: (key: EnvironmentVariableKey, variable: EnvironmentVariableValue) => void;
-  update: (key: EnvironmentVariableKey, updates: Omit<EnvironmentVariableValue, "id">) => void;
-  getVariable: (key: EnvironmentVariableKey) => EnvironmentVariableValue | undefined;
-  getAll: () => Map<EnvironmentVariableKey, EnvironmentVariableValue>;
-  search: (value: string) => Map<EnvironmentVariableKey, EnvironmentVariableValue>;
+  delete: (key: VariableKey) => void;
+  add: (key: VariableKey, variable: T) => void;
+  update: (key: VariableKey, updates: Omit<T, "id">) => void;
+  getVariable: (key: VariableKey) => T | undefined;
+  getAll: () => Map<VariableKey, T>;
+  search: (value: string) => Map<VariableKey, T>;
   incrementVersion: () => void;
 };
 
-export const parseVariables = (rawVariables: EnvironmentVariables): VariablesState["data"] => {
+export const parseVariables = (rawVariables: EnvironmentVariables): VariablesState<VariableData>["data"] => {
   return new Map(Object.entries(rawVariables));
 };
 
 export const createVariablesStore = ({ variables }: { variables: EnvironmentVariables }) => {
-  return create<VariablesState>()((set, get) => ({
+  return create<VariablesState<EnvironmentVariableValue>>()((set, get) => ({
     version: 0,
     data: parseVariables(variables),
 
