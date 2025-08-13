@@ -184,7 +184,7 @@ export const MultiWorkspaceSidebar: React.FC = () => {
 
   return (
     <>
-      <div className="api-client-sidebar">
+      <div className="multi-workspace-api-client-sidebar">
         <div className="api-client-sidebar-content">
           <ApiClientSidebarHeader
             activeTab={activeKey}
