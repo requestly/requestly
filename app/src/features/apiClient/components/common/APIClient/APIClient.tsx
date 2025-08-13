@@ -119,13 +119,12 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
               <ClientViewFactory
                 isOpenInModal
                 apiRecord={apiRecord}
-                handleRequestFinished={() => { }}
-                onSaveCallback={() => { }}
+                handleRequestFinished={() => {}}
+                onSaveCallback={() => {}}
                 isCreateMode={true}
               />
             </AutogenerateProvider>
           </ContextId>
-
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>

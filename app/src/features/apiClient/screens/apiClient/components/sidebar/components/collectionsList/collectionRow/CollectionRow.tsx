@@ -307,7 +307,6 @@ export const CollectionRow: React.FC<Props> = ({
                   onClick={(e) => {
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
-
                     if (!isExpanded) {
                       // Collection is collapsed - open tab and expand
                       if (!isAlreadyActive) {
