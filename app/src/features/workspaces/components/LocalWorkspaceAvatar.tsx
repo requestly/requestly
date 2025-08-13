@@ -7,15 +7,17 @@ interface Props {
   size?: AvatarProps["size"];
 }
 
-const LocalWorkspaceAvatar: React.FC<Props> = ({ workspace }) => {
+const LocalWorkspaceAvatar: React.FC<Props> = ({ workspace, size }) => {
   return (
     <Avatar
-      size="default"
+      size={size}
       shape="circle"
       className="workspace-avatar"
       style={{
-        backgroundColor: "#383838",
+        backgroundColor: "var(--requestly-color-surface-2)",
+        border: "1px solid var(--requestly-color-white-t-20)",
         verticalAlign: "middle",
+        fontSize: "var(--requestly-font-size-sm)",
       }}
     >
       {workspace?.name ? workspace.name[0].toUpperCase() : "?"}
