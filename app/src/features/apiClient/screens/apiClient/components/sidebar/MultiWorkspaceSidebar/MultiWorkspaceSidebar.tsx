@@ -1,17 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { RQAPI } from "../../../../../types";
-import { useParams } from "react-router-dom";
-import { Tabs, TabsProps, Tooltip } from "antd";
+import { ApiClientImporterType, RQAPI } from "../../../../../types";
+import { useLocation, useParams } from "react-router-dom";
+import { notification, Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "../components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "../components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { DeleteApiRecordModal } from "../../modals";
+import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { ContextualCollectionsList } from "./ContextualCollectionsList/ContextualCollectionsList";
 import { ContextualEnvironmentsList } from "./ContextualEnvironmentsList/ContextualEnvironmentsList";
+import { getEmptyApiEntry } from "../../../utils";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import "./multiWorkspaceSidebar.scss";
 
 export enum ApiClientSidebarTabKey {
@@ -21,9 +24,11 @@ export enum ApiClientSidebarTabKey {
 }
 
 export const MultiWorkspaceSidebar: React.FC = () => {
+  const { state } = useLocation();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     history,
@@ -35,7 +40,13 @@ export const MultiWorkspaceSidebar: React.FC = () => {
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
+    isImportModalOpen,
+    onImportRequestModalClose,
+    setIsImportModalOpen,
   } = useApiClientContext();
+
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
@@ -127,6 +138,50 @@ export const MultiWorkspaceSidebar: React.FC = () => {
     setActiveKey(activeKey);
   };
 
+  // TODO: Move this import logic and the import modal to the api client container which wraps all the routes.
+  const handleImportRequest = useCallback(
+    async (request: RQAPI.Request) => {
+      setIsLoading(true);
+
+      try {
+        // TODO: handle import for graphql requests
+        const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, request);
+
+        const record: Partial<RQAPI.ApiRecord> = {
+          type: RQAPI.RecordType.API,
+          data: apiEntry,
+        };
+
+        const result = await apiClientRecordsRepository.createRecord(record);
+
+        if (result.success) {
+          onSaveRecord(result.data, "open");
+
+          setIsImportModalOpen(false);
+        } else {
+          throw new Error(result.message);
+        }
+        return result.data;
+      } catch (error) {
+        notification.error({
+          message: `Error importing request`,
+          description: error?.message,
+          placement: "bottomRight",
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
+  );
+
+  useEffect(() => {
+    if (state?.modal === ApiClientImporterType.CURL) {
+      setIsImportModalOpen(true);
+    }
+  }, [state?.modal, setIsImportModalOpen]);
+
   return (
     <>
       <div className="api-client-sidebar">
@@ -155,6 +210,13 @@ export const MultiWorkspaceSidebar: React.FC = () => {
       </div>
 
       <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
+
+      <ImportFromCurlModal
+        isRequestLoading={isLoading}
+        isOpen={isImportModalOpen}
+        handleImportRequest={handleImportRequest}
+        onClose={onImportRequestModalClose}
+      />
     </>
   );
 };
