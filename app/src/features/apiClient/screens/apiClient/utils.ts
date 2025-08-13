@@ -94,6 +94,7 @@ export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry =
       headers: [],
       queryParams: [],
       body: null,
+      contentType: RequestContentType.RAW,
       ...(request || {}),
     },
     response: null,
