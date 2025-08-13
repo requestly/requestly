@@ -16,7 +16,14 @@ const loadPersistedData = async (dbHolder: PersistedVariablesIDB, store: StoreAp
   try {
     const persistedVariables = await dbHolder.getPersistedRuntimeVariables();
     const { data: currentData } = store.getState();
-    const mergedVariables = new Map([...currentData, ...persistedVariables]);
+
+    const allVariables = [...currentData.entries(), ...persistedVariables.entries()];
+    const mergedVariables = new Map<string, RuntimeVariableValue>();
+
+    allVariables.forEach(([key, variable], index) => {
+      mergedVariables.set(key, { ...variable, id: index });
+    });
+
     store.setState({ data: mergedVariables });
   } catch (error) {
     console.error("Failed to load persistent variables:", error);
