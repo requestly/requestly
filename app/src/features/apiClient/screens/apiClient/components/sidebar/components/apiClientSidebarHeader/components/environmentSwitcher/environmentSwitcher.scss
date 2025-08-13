@@ -1,4 +1,7 @@
 .environment-switcher-button.ant-btn.ant-btn-default {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-left: auto;
   font-weight: 500;
   color: var(--requestly-color-text-default);
@@ -6,19 +9,18 @@
   max-width: 145px;
   background-color: var(--requestly-color-background);
   border: none;
-  padding: 0px 4px 0px 6px;
+  padding: 0.5em 1em;
 
   & > span {
     position: relative;
-    left: 4px;
-    display: unset;
+    bottom: 0.5px;
   }
 
   svg {
     position: relative;
-    right: 2px;
-    height: 18px;
+    bottom: 0.5px;
     width: 18px;
+    height: 18px;
     color: var(--requestly-color-text-default);
   }
 

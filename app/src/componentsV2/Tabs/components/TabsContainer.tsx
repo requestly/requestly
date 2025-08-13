@@ -72,7 +72,7 @@ export const TabsContainer: React.FC = () => {
     if (activeTabSource) {
       const newPath = activeTabSource.getUrlPath();
 
-      if (newPath !== window.location.pathname) {
+      if (newPath !== window.location.pathname + window.location.search) {
         setUrl(newPath, isInitialLoadRef.current);
       }
 

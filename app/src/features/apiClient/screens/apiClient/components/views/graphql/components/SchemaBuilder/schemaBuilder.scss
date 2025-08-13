@@ -19,6 +19,10 @@
     }
 
     &__actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
       .ant-btn.ant-btn-sm svg {
         color: var(--requestly-color-text-subtle);
       }
@@ -248,5 +252,37 @@
         letter-spacing: 0.25px;
       }
     }
+  }
+}
+
+.schema-builder__error-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-11, 48px) var(--space-5, 12px);
+  flex-direction: column;
+
+  img {
+    width: 56px;
+  }
+
+  &__title {
+    color: var(--requestly-color-text-default, #fff);
+    text-align: center;
+    text-overflow: ellipsis;
+    font-size: var(--requestly-font-size-sm, 12px);
+    font-weight: var(--requestly-font-weight-medium);
+    margin-top: 20px;
+  }
+
+  &__description {
+    color: var(--requestly-color-text-subtle);
+    text-align: center;
+    font-size: var(--requestly-font-size-xs);
+    margin-top: 4px;
+  }
+
+  .ant-btn {
+    margin-top: 1rem;
   }
 }
