@@ -10,7 +10,6 @@ import { setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { useApiClientMultiWorkspaceView } from "./store/multiWorkspaceView/multiWorkspaceView.store";
-// import { ApiClientFilesProvider } from "./store/ApiClientFilesContextProvider";
 import Daemon from "./store/apiRecords/Daemon";
 import { ApiClientProvider } from "./contexts";
 
