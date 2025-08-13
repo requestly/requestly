@@ -28,6 +28,7 @@ import "./CollectionRow.scss";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useCommand } from "features/apiClient/commands";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -64,10 +65,13 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
-  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, forceRefreshApiClientRecords } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const {
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 

@@ -40,6 +40,7 @@ interface Props {
   isAllRecordsSelected: boolean;
   bulkAction: BulkActions;
   handleRecordSelection: (recordIds: string[]) => void;
+  clearBulkAction: () => void;
 }
 
 export const CollectionsList: React.FC<Props> = ({
@@ -50,6 +51,7 @@ export const CollectionsList: React.FC<Props> = ({
   handleShowSelection,
   isAllRecordsSelected: allRecordsSelected,
   bulkAction,
+  clearBulkAction,
   handleRecordSelection,
 }) => {
   const { collectionId, requestId } = useParams();
@@ -75,9 +77,7 @@ export const CollectionsList: React.FC<Props> = ({
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
   useEffect(() => {
-    if (allRecordsSelected) {
-      setIsAllRecordsSelected(allRecordsSelected);
-    }
+    setIsAllRecordsSelected(allRecordsSelected);
   }, [allRecordsSelected]);
 
   const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
@@ -300,6 +300,7 @@ export const CollectionsList: React.FC<Props> = ({
           setIsAllRecordsSelected((prev) => !prev);
           if (isAllRecordsSelected) {
             setSelectedRecords(new Set());
+            handleRecordSelection(Array.from(new Set()));
           } else {
             const newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]> = new Set();
             updatedRecords.collections.forEach((record) => {
@@ -309,6 +310,7 @@ export const CollectionsList: React.FC<Props> = ({
               newSelectedRecords.add(record.id);
             });
             setSelectedRecords(newSelectedRecords);
+            handleRecordSelection(Array.from(newSelectedRecords));
           }
           break;
 
@@ -329,6 +331,7 @@ export const CollectionsList: React.FC<Props> = ({
       onSaveRecord,
       onSaveBulkRecords,
       addNestedCollection,
+      handleRecordSelection,
     ]
   );
 
@@ -337,15 +340,19 @@ export const CollectionsList: React.FC<Props> = ({
       return;
     }
 
+    console.log({ bulkAction });
+
     // TODO: check rerenders
     bulkActionHandler(bulkAction);
-  }, [bulkAction, bulkActionHandler]);
+    clearBulkAction();
+  }, [bulkAction, clearBulkAction]);
 
   const toggleSelection = useCallback(() => {
     setSelectedRecords(new Set());
+    handleRecordSelection(Array.from(new Set()));
     handleShowSelection(false);
     setIsAllRecordsSelected(false);
-  }, [setSelectedRecords, handleShowSelection]);
+  }, [setSelectedRecords, handleRecordSelection, handleShowSelection]);
 
   useEffect(() => {
     if (showSelection) {
