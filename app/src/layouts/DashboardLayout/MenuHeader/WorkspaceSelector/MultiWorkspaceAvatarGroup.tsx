@@ -32,7 +32,10 @@ export const MultiWorkspaceAvatarGroup: React.FC = () => {
           );
         })}
       </Avatar.Group>
-      <span className="workspace-selector-dropdown__count">{selectedWorkspaces.length} Workspace selected</span>
+      <span className="workspace-selector-dropdown__count">
+        {selectedWorkspaces.length}
+        {`${selectedWorkspaces.length > 1 ? " Workspaces" : " Workspace"} selected`}
+      </span>
     </div>
   );
 };
