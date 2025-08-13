@@ -3,6 +3,7 @@ import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/ser
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, parseVariables, VariablesState } from "../variables/variables.store";
+import { useApiClientFileStore } from "../apiClientFilesStore";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -183,6 +184,13 @@ export const createApiRecordsStore = (initialRecords: {
         }
       }
 
+      // We initimate the file store to sync with updated records.
+      // This is not performant, as we'd want to provide granular updates
+      // so that the file store is only contacted with changed records.
+      // This works out only because there's no reactive field in the file store
+      // and frequent resetting doesn't cause any renders.
+      // TODO: Send patches to file store
+      useApiClientFileStore.getState().initialize(records);
       set({
         apiClientRecords: records,
         childParentMap,

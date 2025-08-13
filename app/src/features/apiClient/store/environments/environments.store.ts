@@ -1,10 +1,10 @@
-import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
 
 type EnvironmentData = {
-  variables: StoreApi<VariablesState>;
+  variables: StoreApi<VariablesState<EnvironmentVariableValue>>;
 };
 
 export const LOCAL_STORAGE_ACTIVE_ENV_ID_KEY = "__rq_api_client_active_environment_id";
