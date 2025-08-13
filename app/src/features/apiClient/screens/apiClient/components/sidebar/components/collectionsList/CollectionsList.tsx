@@ -45,16 +45,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
-  const {
-    isRecordBeingCreated,
-    setIsDeleteModalOpen,
-    updateRecordsToBeDeleted,
-  } = useApiClientContext();
+  const { isRecordBeingCreated, setIsDeleteModalOpen, updateRecordsToBeDeleted } = useApiClientContext();
 
-  const {
-    onSaveRecord,
-    onSaveBulkRecords,
-  } = useNewApiClientContext();
+  const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
 
@@ -88,12 +81,12 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
 
     updatedRecords.sort((recordA, recordB) => {
       // If different type, then keep collection first
-      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
+      if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample && !recordB.isExample) {
         return -1;
       }
 
-      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
-        return -1;
+      if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample && !recordA.isExample) {
+        return 1;
       }
 
       if (recordA.type !== recordB.type) {

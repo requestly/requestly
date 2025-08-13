@@ -6,6 +6,8 @@ import { QueryView } from "../QueryView/QueryView";
 import { RequestHeaders } from "./components/RequestHeaders/RequestHeaders";
 import { GraphQLAuthView } from "./components/GraphQLAuthView/GraphQLAuthView";
 import { GraphQLScripts } from "./components/GraphQLAuthView/GraphQLScripts";
+import { RQButton } from "lib/design-system/components";
+import { MdOutlineBallot } from "@react-icons/all-files/md/MdOutlineBallot";
 
 enum GraphQLRequestTab {
   QUERY = "query",
@@ -17,15 +19,24 @@ enum GraphQLRequestTab {
 interface Props {
   requestId: RQAPI.ApiRecord["id"];
   collectionId: RQAPI.ApiRecord["collectionId"];
+  isSchemaBuilderOpen: boolean;
+  setIsSchemaBuilderOpen: (isOpen: boolean) => void;
 }
 
-export const GraphQLRequestTabs: React.FC<Props> = ({ requestId, collectionId }) => {
+export const GraphQLRequestTabs: React.FC<Props> = ({
+  requestId,
+  collectionId,
+  isSchemaBuilderOpen,
+  setIsSchemaBuilderOpen,
+}) => {
   const tabItems = useMemo(() => {
     return [
       {
         key: GraphQLRequestTab.QUERY,
         label: <RequestTabLabel label="Query" />,
-        children: <QueryView />,
+        children: (
+          <QueryView isSchemaBuilderOpen={isSchemaBuilderOpen} setIsSchemaBuilderOpen={setIsSchemaBuilderOpen} />
+        ),
       },
       {
         key: GraphQLRequestTab.HEADERS,
@@ -43,6 +54,20 @@ export const GraphQLRequestTabs: React.FC<Props> = ({ requestId, collectionId })
         children: <GraphQLScripts />,
       },
     ];
-  }, [requestId, collectionId]);
-  return <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />;
+  }, [requestId, collectionId, setIsSchemaBuilderOpen, isSchemaBuilderOpen]);
+  return (
+    <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>
+      <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />
+      {!isSchemaBuilderOpen && (
+        <RQButton
+          className="schema-builder-toggle-button"
+          icon={<MdOutlineBallot />}
+          size="small"
+          onClick={() => setIsSchemaBuilderOpen(true)}
+        >
+          Schema
+        </RQButton>
+      )}
+    </div>
+  );
 };
