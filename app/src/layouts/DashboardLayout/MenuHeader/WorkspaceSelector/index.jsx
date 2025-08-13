@@ -141,7 +141,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
                     />
                   )}
                   <span className="items-center active-workspace-name">
-                    <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                    <span className="active-workspace-text">{prettifyWorkspaceName(activeWorkspaceName)}</span>
                     {hasNewInvites ? <Badge dot={true} /> : null}
                   </span>
                 </>
@@ -589,7 +589,7 @@ const WorkspaceSelector = () => {
               <Menu.Item
                 key={team.id}
                 disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
-                icon={<LocalWorkspaceAvatar workspace={team} />}
+                icon={<LocalWorkspaceAvatar size={28} workspace={team} />}
                 className={`workspace-menu-item ${
                   team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                 }`}
@@ -618,13 +618,15 @@ const WorkspaceSelector = () => {
                       {team.archived ? (
                         <Tag color="gold">archived</Tag>
                       ) : viewMode !== ApiClientViewMode.MULTI && isTeamCurrentlyActive(team.id) ? (
-                        <Tag color="green">current</Tag>
+                        <Tag className="tag-current" color="green">
+                          current
+                        </Tag>
                       ) : null}
                     </>
 
                     <div
                       className={`workspace-checkbox-wrapper ${
-                        selectedWorkspaces.length === 1 ? "single-workspace-hover" : "multi-workspace-no-hover"
+                        selectedWorkspaces.length === 0 ? "single-workspace-hover" : "multi-workspace-no-hover"
                       }`}
                     >
                       <Checkbox
