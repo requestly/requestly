@@ -33,6 +33,7 @@ export const ClientViewFactory = ({
   if (isGraphQLApiRecord(apiRecord)) {
     return (
       <GraphQLClientView
+        recordId={apiRecord.id}
         apiEntryDetails={apiRecord}
         notifyApiRequestFinished={handleRequestFinished}
         onSaveCallback={onSaveCallback}

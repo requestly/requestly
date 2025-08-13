@@ -73,6 +73,7 @@ import PATHS from "config/constants/sub/paths";
 import { ApiClientFilesContext } from "features/apiClient/store/ApiClientFilesContextProvider";
 import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -121,7 +122,9 @@ const HttpClientView: React.FC<Props> = ({
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
 
-  const { onSaveRecord, apiClientWorkloadManager, apiClientRecordsRepository } = useApiClientContext();
+  const { apiClientWorkloadManager } = useApiClientContext();
+
+  const { onSaveRecord } = useNewApiClientContext();
 
   const ctx = useApiClientFeatureContext();
 
@@ -132,7 +135,7 @@ const HttpClientView: React.FC<Props> = ({
     api: { patchCollectionVariables },
   } = useCommand();
 
-  const { environmentVariablesRepository } = useApiClientRepository();
+  const { environmentVariablesRepository, apiClientRecordsRepository } = useApiClientRepository();
 
   const scopedVariables = useScopedVariables(apiEntryDetails!.id!);
 
@@ -200,6 +203,7 @@ const HttpClientView: React.FC<Props> = ({
   }, [apiEntryDetails?.data]);
 
   useLayoutEffect(() => {
+    debugger
     setUnsaved(hasUnsavedChanges);
   }, [setUnsaved, hasUnsavedChanges]);
 
@@ -747,6 +751,7 @@ const HttpClientView: React.FC<Props> = ({
       ...prevEntry,
       request: { ...prevEntry.request, url: value, queryParams: params },
     }));
+    debugger;
     setUnsaved(true);
   };
 

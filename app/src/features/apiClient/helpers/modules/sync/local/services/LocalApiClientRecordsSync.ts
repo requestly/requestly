@@ -94,6 +94,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
           type: RQAPI.RecordType.API,
           data: {
+            type: e.request.type,
             request: this.parseApiRequestDetails(e.request),
             scripts: e.request.scripts,
             auth: e.request.auth || {

@@ -1,86 +1,66 @@
 import { RQAPI } from "features/apiClient/types";
-// import { create } from "zustand";
 
-export type BaseApiRecordStoreState<T extends RQAPI.ApiRecord = RQAPI.ApiRecord, TAdditionalData = {}> = {
-  record: T;
+export type BaseApiEntryStoreState<T extends RQAPI.ApiEntry = RQAPI.ApiEntry, TAdditionalData = {}> = {
+  entry: T;
   hasUnsavedChanges: boolean;
-  updateRecordName: (name: string) => void;
-  updateRecordRequest: (patch: Partial<T["data"]["request"]>) => void;
-  updateRecordResponse: (response: T["data"]["response"]) => void;
-  updateRecordAuth: (auth: RQAPI.Auth) => void;
-  updateRecordTestResults: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => void;
-  updateRecordScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => void;
-  updateRecord: (record: T["data"]) => void;
+  updateEntryRequest: (patch: Partial<T["request"]>) => void;
+  updateEntryResponse: (response: T["response"]) => void;
+  updateEntryAuth: (auth: RQAPI.Auth) => void;
+  updateEntryTestResults: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => void;
+  updateEntryScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => void;
+  updateEntry: (updatedEntry: T) => void;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
-  getRecord: () => T;
-  getRecordName: () => string;
+  getEntry: () => T;
 } & TAdditionalData;
 
-// type setType<T extends RQAPI.ApiRecord> = ReturnType<typeof create<BaseApiRecordStoreState<T, {}>>> extends (
-//   set: infer S,
-//   ...args: any[]
-// ) => any
-//   ? S
-//   : unknown;
-// type setType<T extends RQAPI.ApiRecord> = Params UseBoundStore<StoreApi<GraphQLRecordState>> => any
-//   ? S
-//   : unknown;
-
-export const createBaseApiRecordState = <T extends RQAPI.ApiRecord>(
-  record: T,
+export const createBaseApiEntryState = <T extends RQAPI.ApiEntry>(
+  entry: T,
   set: any,
   get: any
-): BaseApiRecordStoreState<T, {}> => {
+): BaseApiEntryStoreState<T, {}> => {
   // type a = setType<T>;
   return {
-    record,
+    entry,
     hasUnsavedChanges: false,
-    updateRecordRequest: (patch: Partial<RQAPI.GraphQLRequest>) => {
-      const record = get().record;
+    updateEntryRequest: (patch: Partial<T["request"]>) => {
+      const entry = get().entry;
       set({
-        record: { ...record, data: { ...record.data, request: { ...record.data.request, ...patch } } },
+        entry: { ...entry, request: { ...entry.request, ...patch } },
         hasUnsavedChanges: true,
       });
     },
-    updateRecordAuth: (auth: RQAPI.Auth) => {
-      const record = get().record;
+    updateEntryAuth: (auth: RQAPI.Auth) => {
+      const entry = get().entry;
       set({
-        record: { ...record, data: { ...record.data, auth } },
+        entry: { ...entry, auth },
         hasUnsavedChanges: true,
       });
     },
-    updateRecordResponse: (response: RQAPI.GraphQLResponse) => {
-      const record = get().record;
+    updateEntryResponse: (response: T["response"]) => {
+      const entry = get().entry;
       set({
-        record: { ...record, data: { ...record.data, response } },
+        entry: { ...entry, response },
       });
     },
-    updateRecordTestResults: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => {
-      const record = get().record;
+    updateEntryTestResults: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => {
+      const entry = get().entry;
       set({
-        record: { ...record, data: { ...record.data, testResults } },
+        entry: { ...entry, testResults },
         hasUnsavedChanges: true,
       });
     },
-    updateRecordScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => {
-      const record = get().record;
+    updateEntryScripts: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => {
+      const entry = get().entry;
       set({
-        record: { ...record, data: { ...record.data, scripts } },
+        entry: { ...entry, scripts },
         hasUnsavedChanges: true,
       });
     },
-    updateRecordName: (name: string) => {
-      const record = get().record;
-      set({
-        record: { ...record, name },
-      });
+    updateEntry: (updatedEntry: T) => {
+      const currentEntry = get().entry;
+      set({ entry: { ...currentEntry, ...updatedEntry } });
     },
-    updateRecord: (record: T["data"]) => {
-      const currentRecord = get().record;
-      set({ record: { ...currentRecord, data: record } });
-    },
-    getRecord: () => get().record,
-    getRecordName: () => get().record.name,
+    getEntry: () => get().entry,
     setHasUnsavedChanges: (hasUnsavedChanges: boolean) => {
       set({ hasUnsavedChanges });
     },

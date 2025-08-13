@@ -2,16 +2,14 @@ import { EnvironmentVariableKey, VariableScope } from "backend/environment/types
 import { NativeError } from "errors/NativeError";
 import { VariablesState } from "features/apiClient/store/variables/variables.store";
 import { RQAPI } from "features/apiClient/types";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { StoreApi } from "zustand";
-import {
-  AllApiClientStores,
-  ApiRecordsStoreContext,
-} from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { AllApiClientStores } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 import { VariableData, VariableDataForScope } from "features/apiClient/store/variables/types";
 import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 type VariableSource<T extends VariableScope> = {
   scope: T;
@@ -254,7 +252,7 @@ class VariableEventsManager {
 }
 
 export function useScopedVariables(id: string) {
-  const stores = useContext(ApiRecordsStoreContext);
+  const stores = useApiClientFeatureContext().stores;
   if (!stores) {
     throw new Error("Unable to locate stores!");
   }

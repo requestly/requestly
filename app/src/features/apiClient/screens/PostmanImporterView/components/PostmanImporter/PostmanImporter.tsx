@@ -20,6 +20,7 @@ import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
@@ -49,7 +50,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
 
   const collectionsCount = useRef(0);
 
