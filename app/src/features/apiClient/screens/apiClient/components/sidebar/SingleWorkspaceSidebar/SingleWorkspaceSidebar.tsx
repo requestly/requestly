@@ -12,8 +12,10 @@ import { EnvironmentsList } from "features/apiClient/screens/environment/compone
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
-import "./singleWorkspaceSidebar.scss";
+import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 interface Props {}
 
@@ -30,7 +32,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
+  const { isImportModalOpen, onImportRequestModalClose, setIsImportModalOpen } = useApiClientContext();
 
   const {
     history,
@@ -42,8 +44,10 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     isDeleteModalOpen,
     onDeleteModalClose,
     selectedHistoryIndex,
-    apiClientRecordsRepository,
   } = useApiClientContext();
+
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {

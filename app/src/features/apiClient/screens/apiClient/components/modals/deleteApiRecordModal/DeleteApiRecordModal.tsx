@@ -12,6 +12,7 @@ import * as Sentry from "@sentry/react";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { notification } from "antd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
@@ -22,7 +23,7 @@ interface DeleteApiRecordModalProps {
 
 export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
   const deleteRecords = useAPIRecords((state) => state.deleteRecords);
-  const { apiClientRecordsRepository } = useApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
   const [isDeleting, setIsDeleting] = useState(false);

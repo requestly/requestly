@@ -1,6 +1,5 @@
 import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "utils/Toast";
@@ -12,6 +11,9 @@ import { head, isEmpty, omit } from "lodash";
 import { Authorization } from "../../views/components/request/components/AuthorizationView/types/AuthConfig";
 import * as Sentry from "@sentry/react";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useCommand } from "features/apiClient/commands";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 interface Props {
   recordsToMove: RQAPI.ApiClientRecord[];
@@ -21,12 +23,11 @@ interface Props {
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
   const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
+  const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const {
-    onSaveRecord,
-    onSaveBulkRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 

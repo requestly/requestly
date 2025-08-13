@@ -26,6 +26,8 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -62,13 +64,11 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
-  const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen, forceRefreshApiClientRecords } = useApiClientContext();
+
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const contextId = useContextId();
@@ -305,11 +305,18 @@ export const CollectionRow: React.FC<Props> = ({
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={() => {
-                    openTab(new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection", context: {
-                      id: contextId,
-                    } }), {
-                      preview: true,
-                    });
+                    openTab(
+                      new CollectionViewTabSource({
+                        id: record.id,
+                        title: record.name || "New Collection",
+                        context: {
+                          id: contextId,
+                        },
+                      }),
+                      {
+                        preview: true,
+                      }
+                    );
                   }}
                   style={{
                     opacity: isDragging ? 0.5 : 1,
