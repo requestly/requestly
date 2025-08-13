@@ -7,6 +7,7 @@ import { stopRecordingOnAllTabs } from "./sessionRecording";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
+  RUN_CURL_REQUEST = "run-curl-request",
 }
 
 enum ToggleActivationStatusLabel {
@@ -49,7 +50,13 @@ export const initContextMenu = async () => {
     contexts: ["action"],
   });
 
-  chrome.contextMenus.onClicked.addListener(async (info) => {
+  chrome.contextMenus.create({
+    id: MenuItem.RUN_CURL_REQUEST,
+    title: "Run cURL Request",
+    contexts: ["selection"],
+  });
+
+  chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData) => {
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
       const isExtensionStatusEnabled = await isExtensionEnabled();
       const extensionStatus = !isExtensionStatusEnabled;
@@ -65,6 +72,12 @@ export const initContextMenu = async () => {
         isExtensionEnabled: extensionStatus,
         extensionIconState: extensionIconManager.getState(),
       });
+    } else if (info.menuItemId === MenuItem.RUN_CURL_REQUEST) {
+      console.log(
+        `[initContextMenu.listener] Run cURL Request clicked with selected text:`,
+        info.pageUrl,
+        info.selectionText
+      );
     }
   });
 
