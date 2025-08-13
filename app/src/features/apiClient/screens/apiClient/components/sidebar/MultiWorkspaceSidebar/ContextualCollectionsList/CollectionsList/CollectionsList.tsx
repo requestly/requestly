@@ -29,6 +29,7 @@ import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientEx
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 interface Props {
   searchValue: string;
@@ -57,6 +58,8 @@ export const CollectionsList: React.FC<Props> = ({
   const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
 
   const { isRecordBeingCreated, setIsDeleteModalOpen, updateRecordsToBeDeleted } = useApiClientContext();
+  const contextId = useContextId();
+  console.log({ fromCollectionList: contextId, apiClientRecords });
 
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();

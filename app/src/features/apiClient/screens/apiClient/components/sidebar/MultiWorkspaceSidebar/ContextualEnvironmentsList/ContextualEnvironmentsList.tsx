@@ -4,10 +4,12 @@ import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWo
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { EnvironmentsList } from "./EnvironmentsList/EnvironmentsList";
 import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
+import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export const ContextualEnvironmentsList: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
 
   return (
     <div style={{ height: "inherit" }}>
@@ -20,12 +22,15 @@ export const ContextualEnvironmentsList: React.FC = () => {
       />
 
       {selectedWorkspaces.map((workspace) => {
+        const workspaceId = workspace.getState().id;
+        const contextId = getContext(workspaceId)?.id;
+
         return (
-          <ContextId id={workspace.getState().id}>
-            <WorkspaceLoader>
+          <WorkspaceLoader workspaceId={workspaceId}>
+            <ContextId id={contextId} key={contextId}>
               <EnvironmentsList searchValue={searchValue} />
-            </WorkspaceLoader>
-          </ContextId>
+            </ContextId>
+          </WorkspaceLoader>
         );
       })}
     </div>
