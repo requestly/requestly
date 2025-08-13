@@ -23,11 +23,10 @@ export const ContextualEnvironmentsList: React.FC = () => {
 
       {selectedWorkspaces.map((workspace) => {
         const workspaceId = workspace.getState().id;
-        const contextId = getContext(workspaceId)?.id;
 
         return (
-          <WorkspaceLoader workspaceId={workspaceId}>
-            <ContextId id={contextId} key={contextId}>
+          <WorkspaceLoader key={workspaceId} workspaceId={workspaceId}>
+            <ContextId id={getContext(workspaceId)?.id}>
               <EnvironmentsList searchValue={searchValue} />
             </ContextId>
           </WorkspaceLoader>
