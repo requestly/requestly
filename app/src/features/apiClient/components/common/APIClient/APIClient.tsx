@@ -123,13 +123,15 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
           <ApiClientRepositoryContext.Provider value={repository} key={key}>
             <ApiRecordsProvider>
               <AutogenerateProvider>
-                <ClientViewFactory
-                  isOpenInModal
-                  apiRecord={apiRecord}
-                  handleRequestFinished={() => {}}
-                  onSaveCallback={() => {}}
-                  isCreateMode={true}
-                />
+                <div className="api-client-container-content">
+                  <ClientViewFactory
+                    isOpenInModal
+                    apiRecord={apiRecord}
+                    handleRequestFinished={() => {}}
+                    onSaveCallback={() => {}}
+                    isCreateMode={true}
+                  />
+                </div>
               </AutogenerateProvider>
             </ApiRecordsProvider>
           </ApiClientRepositoryContext.Provider>
