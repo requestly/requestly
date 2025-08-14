@@ -1,22 +1,16 @@
 import { filterOutChildrenRecords, processRecordsForDuplication } from "features/apiClient/screens/apiClient/utils";
-import { getApiClientFeatureContext, getApiClientRecordsStore, getChildParentMap } from "../store.utils";
-import { NativeError } from "errors/NativeError";
+import { getApiClientRecordsStore, getChildParentMap } from "../store.utils";
 import { getRecordsToRender } from "../utils";
 import { forceRefreshRecords } from "../records";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
-export async function bulkDuplicateRecords(contextId: string, recordIds: Set<string>) {
-  const context = getApiClientFeatureContext(contextId);
-
-  if (!context) {
-    throw new NativeError("Context not found to duplicate records").addContext({ contextId });
-  }
-
+export async function duplicateRecords(context: ApiClientFeatureContext, params: { recordIds: Set<string> }) {
   const apiClientRecords = getApiClientRecordsStore(context).getState().apiClientRecords;
   const apiClientRecordsRepository = context.repositories.apiClientRecordsRepository;
 
   const recordsToRender = getRecordsToRender({ apiClientRecords });
   const childParentMap = getChildParentMap(context);
-  const processedRecords = filterOutChildrenRecords(recordIds, childParentMap, recordsToRender.recordsMap);
+  const processedRecords = filterOutChildrenRecords(params.recordIds, childParentMap, recordsToRender.recordsMap);
   const recordsToDuplicate = processRecordsForDuplication(processedRecords, apiClientRecordsRepository);
 
   const result = await apiClientRecordsRepository.duplicateApiEntities(recordsToDuplicate);

@@ -12,9 +12,10 @@ import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
 import { capitalize } from "lodash";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { bulkDuplicateRecords } from "features/apiClient/commands/multiView/bulkDuplicateRecords.command";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { getRecordsToMove } from "features/apiClient/commands/utils";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
+import { duplicateRecords } from "features/apiClient/commands/records/duplicateRecords.command";
 
 export type RecordSelectionAction = "select" | "unselect";
 
@@ -114,9 +115,10 @@ export const ContextualCollectionsList: React.FC<{
     }
   }, [isSelectAll, deselect]);
 
-  const duplicateRecords = useCallback(async () => {
+  const handleDuplicateRecords = useCallback(async () => {
     const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
-      return bulkDuplicateRecords(ctxId, value.recordIds);
+      const context = getApiClientFeatureContext(ctxId);
+      return duplicateRecords(context, { recordIds: value.recordIds });
     });
 
     // TODO: TBD, what to do in partial fail cases?
@@ -131,7 +133,7 @@ export const ContextualCollectionsList: React.FC<{
       }
 
       if (action === BulkActions.DUPLICATE) {
-        duplicateRecords();
+        handleDuplicateRecords();
         deselect();
         return;
       }
@@ -152,6 +154,7 @@ export const ContextualCollectionsList: React.FC<{
 
         if (BulkActions.MOVE) {
           setIsMoveCollectionModalOpen(true);
+          return;
         }
 
         if (action === BulkActions.EXPORT) {
@@ -159,7 +162,7 @@ export const ContextualCollectionsList: React.FC<{
         }
       }
     },
-    [deselect, handleSelectToggle, duplicateRecords]
+    [deselect, handleSelectToggle, handleDuplicateRecords]
   );
 
   const toggleMultiSelect = useCallback(() => {
