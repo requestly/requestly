@@ -388,6 +388,7 @@ const WorkspaceSelector = () => {
 
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
+    resetToSingleView(team, user.details?.profile?.uid);
     switchWorkspace(
       {
         teamId: team.id,
@@ -405,12 +406,13 @@ const WorkspaceSelector = () => {
       "workspaces_dropdown"
     )
       .then(() => {
-        if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
+        if (!isModalOpen) {
+          showSwitchWorkspaceSuccessToast(team.name);
+        }
+
         setIsModalOpen(false);
-        resetToSingleView(team, user.details?.profile?.uid);
       })
       .catch((error) => {
-        console.error(error);
         setIsModalOpen(false);
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
