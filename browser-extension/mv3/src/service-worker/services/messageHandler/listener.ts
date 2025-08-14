@@ -22,7 +22,7 @@ import {
   saveTestRuleResult,
 } from "../testThisRuleHandler";
 import ruleExecutionHandler from "../ruleExecutionHandler";
-import { isExtensionEnabled, isUrlInBlockList } from "../../../utils";
+import { getPopupConfig, isExtensionEnabled, isUrlInBlockList } from "../../../utils";
 import { globalStateManager } from "../globalStateManager";
 import { isProxyApplied } from "../proxy";
 import {
@@ -212,6 +212,16 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN:
         checkIfDesktopAppOpen().then(sendResponse);
+        return true;
+
+      case EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED:
+        getPopupConfig().then((config) => {
+          if (config?.session_replay === true) {
+            sendResponse(true);
+          } else {
+            sendResponse(false);
+          }
+        });
         return true;
     }
 
