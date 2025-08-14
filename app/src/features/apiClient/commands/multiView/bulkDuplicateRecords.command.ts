@@ -1,11 +1,11 @@
 import { filterOutChildrenRecords, processRecordsForDuplication } from "features/apiClient/screens/apiClient/utils";
-import { getApiClientFeatureContextProviderStore, getApiClientRecordsStore, getChildParentMap } from "../store.utils";
+import { getApiClientFeatureContext, getApiClientRecordsStore, getChildParentMap } from "../store.utils";
 import { NativeError } from "errors/NativeError";
 import { getRecordsToRender } from "../utils";
 import { forceRefreshRecords } from "../records";
 
 export async function bulkDuplicateRecords(contextId: string, recordIds: Set<string>) {
-  const context = getApiClientFeatureContextProviderStore(contextId);
+  const context = getApiClientFeatureContext(contextId);
 
   if (!context) {
     throw new NativeError("Context not found to duplicate records").addContext({ contextId });
