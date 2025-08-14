@@ -1,5 +1,4 @@
 import { notification, Result, Tabs } from "antd";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
@@ -139,7 +138,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         setTitle(result.data.name);
       });
     },
-    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
+    [collection, contextId, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
 
   const collectionName = collection?.name || "New Collection";
