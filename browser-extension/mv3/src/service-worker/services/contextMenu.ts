@@ -4,7 +4,7 @@ import extensionIconManager from "./extensionIconManager";
 import { sendMessageToApp } from "./messageHandler/sender";
 import { CLIENT_MESSAGES } from "common/constants";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
-import { handleRunCurlRequest } from "./utils";
+import { triggerOpenCurlModalMessage } from "./utils";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -61,7 +61,7 @@ export const initContextMenu = async () => {
       });
     } else if (info.menuItemId === MenuItem.RUN_CURL_REQUEST) {
       // Handle the cURL request action
-      await handleRunCurlRequest(info.selectionText, info.pageUrl);
+      await triggerOpenCurlModalMessage(info.selectionText, info.pageUrl);
     }
   });
 

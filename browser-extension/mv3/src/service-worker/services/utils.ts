@@ -5,7 +5,6 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import extensionIconManager from "./extensionIconManager";
 import { updateActivationStatus } from "./contextMenu";
 import { tabService } from "./tabService";
-import config from "common/config";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -185,7 +184,7 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
   return newStatus;
 };
 
-export const handleRunCurlRequest = async (selectedText: string, pageURL: string) => {
+export const triggerOpenCurlModalMessage = async (selectedText: string, pageURL: string) => {
   try {
     // Create a new tab with the web URL
     const newTab = await tabService.createAppTab();
@@ -206,6 +205,6 @@ export const handleRunCurlRequest = async (selectedText: string, pageURL: string
     // Send message without expecting a response (one-way notification)
     chrome.tabs.sendMessage(newTab.id, message);
   } catch (error) {
-    console.error(`[handleRunCurlRequest] Error:`, error);
+    console.error(`[triggerOpenCurlModalMessage] Error:`, error);
   }
 };
