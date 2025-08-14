@@ -293,13 +293,20 @@ const WorkspaceSelector = () => {
     }
   };
 
-  const handleMultiworkspaceAdder = (workspace, isChecked) => {
-    if (isChecked) {
-      addWorkspaceToView(workspace, user.details?.profile?.uid).catch((e) => toast.error(e.message));
-    } else {
-      removeWorkspaceFromView(workspace.id).catch((e) => toast.error(e.message));
-    }
-  };
+  const handleMultiworkspaceAdder = useCallback(
+    async (workspace, isChecked) => {
+      try {
+        if (isChecked) {
+          await addWorkspaceToView(workspace, user.details?.profile?.uid);
+        } else {
+          removeWorkspaceFromView(workspace.id);
+        }
+      } catch (e) {
+        toast.error(e.message);
+      }
+    },
+    [user.details?.profile?.uid]
+  );
 
   const handleInviteTeammatesClick = () => {
     if (user.loggedIn) {
