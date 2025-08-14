@@ -37,7 +37,6 @@ export function getApiClientFeatureContextProviderStore(contextId: string) {
   return apiClientFeatureContextProviderStore.getState().getContext(contextId);
 }
 
-export function getChildParentMapByContextId(contextId: string) {
-  const context = getApiClientFeatureContextProviderStore(contextId);
+export function getChildParentMap(context: ApiClientFeatureContext) {
   return context.stores.records.getState().childParentMap;
 }
