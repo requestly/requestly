@@ -201,7 +201,6 @@ const HttpClientView: React.FC<Props> = ({
   }, [apiEntryDetails?.data]);
 
   useLayoutEffect(() => {
-    debugger
     setUnsaved(hasUnsavedChanges);
   }, [setUnsaved, hasUnsavedChanges]);
 
@@ -749,7 +748,6 @@ const HttpClientView: React.FC<Props> = ({
       ...prevEntry,
       request: { ...prevEntry.request, url: value, queryParams: params },
     }));
-    debugger;
     setUnsaved(true);
   };
 
