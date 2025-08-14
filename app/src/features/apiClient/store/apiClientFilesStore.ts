@@ -1,7 +1,8 @@
-import { create } from "zustand";
+import { create, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { RequestContentType, RQAPI } from "../types";
 import { isHttpApiRecord } from "../screens/apiClient/utils";
+import { useShallow } from "zustand/shallow";
 
 function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
   const files: Record<FileId, ApiClientFile> = {};
@@ -129,4 +130,8 @@ const createApiClientFilesStore = (appMode: "desktop",) => {
   );
 };
 
-export const useApiClientFileStore = createApiClientFilesStore("desktop");
+export const apiClientFileStore = createApiClientFilesStore("desktop");
+
+export function useApiClientFileStore<T>(selector: (state: ApiClientFilesStore) => T ) {
+  return useStore(apiClientFileStore, useShallow(selector));
+}

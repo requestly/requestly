@@ -29,7 +29,7 @@ import {
 } from "features/apiClient/commands/store.utils";
 import { parseEnvironmentState } from "features/apiClient/commands/environments/utils";
 import { NativeError } from "errors/NativeError";
-import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
 
 type InternalFunctions = {
@@ -140,7 +140,7 @@ export class HttpRequestExecutor {
         (body) => body.type === FormDropDownOptions.FILE && typeof body.value !== "string"
       );
 
-      const validateFile = useApiClientFileStore.getState().isFilePresentLocally;
+      const validateFile = apiClientFileStore.getState().isFilePresentLocally;
 
       const invalidFiles: string[] = [];
 
