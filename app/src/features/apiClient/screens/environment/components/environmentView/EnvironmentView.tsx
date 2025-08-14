@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
+// import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -12,6 +12,8 @@ import { useCommand } from "features/apiClient/commands";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
+import { EnvironmentVariablesList, EnvironmentVariableTableRow } from "../VariablesList/EnvironmentVariablesList";
+import { useRuntimeVariables } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 
 interface EnvironmentViewProps {
   envId: string;
@@ -25,6 +27,10 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     env: { setEnvironmentVariables },
   } = useCommand();
 
+  //FIXME: cleanup this before final merge
+
+  //const runtimeVariableData = useRuntimeVariables((s) => s.data);
+  //const rnvariablesData = Object.fromEntries(runtimeVariableData);
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>("");
@@ -109,10 +115,10 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
             onExportClick: () => setIsExportModalOpen(true),
           }}
         />
-        <VariablesList
+        <EnvironmentVariablesList
           searchValue={searchValue}
-          variables={pendingVariables}
-          onVariablesChange={handleSetPendingVariables}
+          pendingVariables={pendingVariables}
+          handleSetPendingVariables={handleSetPendingVariables}
         />
         {isExportModalOpen && (
           <ApiClientExportModal
