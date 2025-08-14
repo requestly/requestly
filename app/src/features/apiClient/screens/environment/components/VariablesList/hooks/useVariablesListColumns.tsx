@@ -1,5 +1,5 @@
-import { TableProps, Tooltip } from "antd";
-import { isEnvironmentVariableRow, MetaVariableRow } from "../VariablesList";
+import { Switch, TableProps, Tooltip } from "antd";
+import { isEnvironmentVariableRow, isRuntimeVariableRow, MetaVariableRow } from "../VariablesList";
 import { RQButton } from "lib/design-system-v2/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
@@ -11,6 +11,7 @@ import { RoleBasedComponent } from "features/rbac";
 interface Props {
   handleVariableChange: (record: MetaVariableRow, fieldChanged: keyof MetaVariableRow) => void;
   handleDeleteVariable: (key: number) => void;
+  handleUpdatePersisted: (id: number, isPersisted: boolean) => void;
   visibleSecretsRowIds: number[];
   updateVisibleSecretsRowIds: (id: number) => void;
   recordsCount: number;
@@ -24,6 +25,7 @@ type ColumnTypes = Exclude<TableProps<MetaVariableRow>["columns"], undefined>;
 export const useVariablesListColumns = ({
   handleVariableChange,
   handleDeleteVariable,
+  handleUpdatePersisted,
   visibleSecretsRowIds,
   updateVisibleSecretsRowIds,
   recordsCount,
@@ -122,14 +124,24 @@ export const useVariablesListColumns = ({
       ? {
           title: "Persisted", // todo
           editable: true,
-          onCell: (record) => ({
-            record,
-            editable: true,
-            dataIndex: "isPersisted",
-            title: "Persisted",
-            handleVariableChange,
-            isReadOnly,
-          }),
+          render: (_, record) => {
+            return (
+              <span>
+                <Switch
+                  checked={isRuntimeVariableRow(record) && record.isPersisted}
+                  onChange={(checked) => handleUpdatePersisted(record.id, checked)}
+                />
+              </span>
+            );
+          },
+          // onCell: (record) => ({
+          //   record,
+          //   editable: true,
+          //   dataIndex: "isPersisted",
+          //   title: "Persisted",
+          //   handleVariableChange,
+          //   isReadOnly,
+          // }),
         }
       : null,
     {
