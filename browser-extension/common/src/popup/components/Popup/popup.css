@@ -1,7 +1,7 @@
 /* popup */
 .popup {
   width: 560px;
-  min-height: 412px;
+  /* min-height: 412px; */
   max-height: 600px;
   font-size: 14px;
   line-height: 20px;
