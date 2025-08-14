@@ -1,17 +1,19 @@
-![Requestly Logo](https://github.com/user-attachments/assets/d0f13ec3-ca42-4b6c-ab6c-16e380ad04b3)
+[![Requestly](https://github.com/user-attachments/assets/526e6e17-cdaa-435a-8b0c-171c8add6e35)](https://requestly.com)
+
+
 
 <br/>
 
-## Open-Source API Platform - Build, Test, Intercept & Mock APIs
+## Requestly - API Client with HTTP Interceptor, Modfications, Testing & Mocking.
 
-Requestly is a powerful combination of a local HTTP Proxy and an API client with collaboration features. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.
+Requestly is a powerful combination of a local API Client (like Postman) & HTTP Interceptor (like Charles Proxy) with API Testing and Mocking. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.
 
 
-#### ⚡ A Local-first, Beautiful & Powerful alternative to Postman, Insomnia & Charles Proxy ⚡
+#### ⚡ A Local-first & Powerful alternative to Postman & Charles Proxy ⚡
 ![requestly-overview](https://github.com/user-attachments/assets/04c32f25-96c4-46d9-a31d-b6887ce7bfdc)
 <br/>
 
-![GitHub closed issues](https://img.shields.io/github/issues-closed/requestly/requestly)     [![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/mdnleldcmiljblolnjhpnblkcekpdkpa) ![Chrome Web Store Reviews](https://img.shields.io/chrome-web-store/rating-count/mdnleldcmiljblolnjhpnblkcekpdkpa?label=reviews) ![Chrome Web Store Downloads](https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads)](https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/) [![Status badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://status.requestly.io)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/requestly/requestly)     [![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/mdnleldcmiljblolnjhpnblkcekpdkpa) ![Chrome Web Store Reviews](https://img.shields.io/chrome-web-store/rating-count/mdnleldcmiljblolnjhpnblkcekpdkpa?label=reviews) ![Chrome Web Store Downloads](https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads)](https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/) [![Status badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://status.requestly.io)
 
 <br/>
 <br/>
