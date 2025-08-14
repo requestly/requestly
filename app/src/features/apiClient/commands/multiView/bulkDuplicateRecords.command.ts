@@ -4,7 +4,7 @@ import { NativeError } from "errors/NativeError";
 import { getRecordsToRender } from "../utils";
 import { forceRefreshRecords } from "../records";
 
-export const bulkDuplicateRecords = async (contextId: string, recordIds: Set<string>) => {
+export async function bulkDuplicateRecords(contextId: string, recordIds: Set<string>) {
   const context = getApiClientFeatureContextProviderStore(contextId);
 
   if (!context) {
@@ -24,4 +24,4 @@ export const bulkDuplicateRecords = async (contextId: string, recordIds: Set<str
   await forceRefreshRecords(context);
 
   return result; // TODO: handle UI after duplicate eg expanding collections
-};
+}
