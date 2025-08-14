@@ -1,25 +1,62 @@
-import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
-import { Input } from "antd";
-import InfoIcon from "components/misc/InfoIcon";
 import React from "react";
+import { Input } from "antd";
+import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
+import { RQButton } from "lib/design-system-v2/components";
+import "./runtimevariableHeader.scss";
+import InfoIcon from "components/misc/InfoIcon";
+import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 
-export const RuntimevariablesHeader: React.FC = () => {
+interface RuntimeVariablesHeaderProps {
+  searchValue: string;
+  onSearchValueChange: (value: string) => void;
+  onSave: () => Promise<void>;
+}
+export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
+  searchValue,
+  onSearchValueChange,
+  onSave,
+}) => {
   return (
-    <div className="runtime-variables-header">
-      <div className="runtime-variables-header-title">Runtime Variables</div>
-      <div className="runtime-variables-info-icon">
-        {/*FIXME: Add message here */}
-        <InfoIcon text="pata nhi" />
+    <div className="runtime-variables-list-header">
+      <div className="runtime-variables-header-info">
+        <span className="header-title">RuntimeVariables</span>
+        <InfoIcon text="runtime" />
       </div>
-
-      <div className="runtime-variables-action-container">
+      <div className="runtime-variables-list-action-container">
         <Input
-          placeholder="Search Variables"
+          placeholder="Search"
           prefix={<MdOutlineSearch />}
-          className="runtime-variables-search-input"
-          value={""}
-          onChange={() => {}}
+          className="runtime-variables-list-search-input"
+          value={searchValue}
+          onChange={(e) => onSearchValueChange(e.target.value)}
         />
+
+        <div className="runtime-variables-list-action-btn">
+          <RQButton
+            icon={<MdOutlineDelete />}
+            type="primary"
+            onClick={() => {}}
+            style={{
+              background: "none",
+              border: "none",
+            }}
+          >
+            Delete All
+          </RQButton>
+          <RQButton
+            icon={<MdOutlineDelete />}
+            type="primary"
+            onClick={() => {
+              onSave();
+            }}
+            style={{
+              background: "none",
+              border: "none",
+            }}
+          >
+            Save
+          </RQButton>
+        </div>
       </div>
     </div>
   );

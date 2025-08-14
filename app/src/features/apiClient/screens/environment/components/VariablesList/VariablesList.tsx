@@ -93,9 +93,14 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
 
   const handleAddNewRow = useCallback(
     (dataSource: MetaVariableRow[]) => {
-      setDataSource([...dataSource, createNewVariable(dataSource.length, EnvironmentVariableType.String)]);
+      const newVariable = createNewVariable(dataSource.length, EnvironmentVariableType.String);
+      const newDataSource = [...dataSource, newVariable];
+      setDataSource(newDataSource);
+      if (isRuntimeVariableRow(newVariable)) {
+        onVariablesChange(newDataSource);
+      }
     },
-    [createNewVariable]
+    [createNewVariable, onVariablesChange]
   );
 
   const handleDeleteVariable = useCallback(
@@ -127,9 +132,27 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
     [visibleSecretsRowIds]
   );
 
+  const handleUpdatePersisted = useCallback(
+    (id: number, isPersisted: boolean) => {
+      const variableRows = [...dataSource];
+      const index = variableRows.findIndex((variable) => variable.id === id);
+      const item = variableRows[index];
+
+      if (item) {
+        const updatedRow = { ...item, isPersisted };
+        variableRows.splice(index, 1, updatedRow);
+        setDataSource(variableRows);
+
+        onVariablesChange(variableRows);
+      }
+    },
+    [dataSource, onVariablesChange]
+  );
+
   const columns = useVariablesListColumns({
     handleVariableChange,
     handleDeleteVariable,
+    handleUpdatePersisted,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
     recordsCount: dataSource.length,
