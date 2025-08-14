@@ -3,6 +3,7 @@ import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } fro
 import { ColorTokens, generateColorTokens } from "../tokens/colors";
 import { generateCSSVariables } from "../utils";
 import { TypographyTokens, generateTypographyTokens } from "../tokens/typography";
+import { generateSpaceTokens } from "../tokens/spacing";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -23,6 +24,9 @@ const generateTheme = (primaryColor?: string, secondaryColor?: string, neutralCo
   const typographyTokens = generateTypographyTokens();
   const typographyCssVariables = generateCSSVariables(typographyTokens, "requestly-font-");
 
+  const spaceTokens = generateSpaceTokens();
+  const spaceCssVariables = generateCSSVariables(spaceTokens, "requestly-");
+
   const theme: Theme = {
     colors: colorTokens,
     typography: typographyTokens,
@@ -31,6 +35,7 @@ const generateTheme = (primaryColor?: string, secondaryColor?: string, neutralCo
   const themeCssVariables = {
     ...colorCssVariables,
     ...typographyCssVariables,
+    ...spaceCssVariables,
   };
 
   return { theme, themeCssVariables };
