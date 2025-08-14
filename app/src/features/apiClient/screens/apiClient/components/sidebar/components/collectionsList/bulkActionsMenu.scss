@@ -61,6 +61,16 @@
         height: 14px;
         width: auto;
       }
+
+      // Styling for export dropdown button
+      &.export-dropdown {
+        gap: 2px;
+
+        svg:last-child {
+          height: 10px;
+          width: 10px;
+        }
+      }
     }
   }
 
@@ -74,4 +84,7 @@
       cursor: pointer;
     }
   }
+}
+.ant-dropdown-menu-item-group-title {
+  font-size: var(--requestly-font-size-sm);
 }
