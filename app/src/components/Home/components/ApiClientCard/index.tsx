@@ -2,7 +2,7 @@ import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { isEmpty } from "lodash";
 import { useCallback, useState } from "react";
 import { getOptions } from "./utils";
@@ -21,7 +21,6 @@ import { trackHomeApisActionClicked } from "components/Home/analytics";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { globalActions } from "store/slices/global/slice";
 import "./apiClientCard.scss";
 
 interface CardOptions {
@@ -31,7 +30,6 @@ interface CardOptions {
 
 const ApiClientCard = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isLoggedIn = user?.details?.isLoggedIn;
   const [tabs] = useTabServiceWithSelector((state) => [state.tabs]);
@@ -49,14 +47,10 @@ const ApiClientCard = () => {
 
   const importTriggerHandler = useCallback(
     (modal: ApiClientImporterType) => {
-      if (!isLoggedIn) {
-        dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
-      } else {
-        navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { modal } });
-        trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
-      }
+      navigate(PATHS.API_CLIENT.ABSOLUTE, { state: { modal } });
+      trackHomeApisActionClicked(`${modal.toLowerCase()}_importer_clicked`);
     },
-    [navigate, isLoggedIn, dispatch]
+    [navigate]
   );
 
   const items: MenuProps["items"] = [
@@ -77,7 +71,7 @@ const ApiClientCard = () => {
     },
     {
       key: "3",
-      label: "Import a cURL",
+      label: "Import cURL Request",
       icon: <MdOutlineSyncAlt />,
       onClick: () => importTriggerHandler(ApiClientImporterType.CURL),
     },

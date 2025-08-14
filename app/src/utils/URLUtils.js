@@ -21,3 +21,14 @@ export const prefixUrlWithHttps = (url) => {
   }
   return newUrl;
 };
+
+export const getDomainFromURL = (url) => {
+  if (!url) return "";
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname;
+  } catch (error) {
+    // If URL parsing fails, return empty string
+    return "";
+  }
+};

@@ -9,7 +9,7 @@ It currently supports three modes:
 
 ## Install
 
-Please make sure that Node version >= 16.15.0 is installed on your system. 
+Please make sure that Node version >= 18.18.0 is installed on your system. 
 
 ```sh
 npm install
