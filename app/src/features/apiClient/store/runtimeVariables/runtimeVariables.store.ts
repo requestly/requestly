@@ -2,34 +2,65 @@ import { StoreApi } from "zustand";
 import { VariableData } from "../variables/types";
 import { VariablesState } from "../variables/variables.store";
 import { create } from "zustand";
+import { PersistedVariablesIDB } from "./persistedVariables";
 
-type RuntimeVariableValue = VariableData;
+export interface RuntimeVariableValue extends VariableData {
+  isPersisted: boolean;
+}
 
 type RuntimeVariableState = VariablesState<RuntimeVariableValue>;
 
 export type RuntimeVariableStore = StoreApi<RuntimeVariableState>;
 
+const loadPersistedData = async (dbHolder: PersistedVariablesIDB, store: StoreApi<RuntimeVariableState>) => {
+  const persistedVariables = await dbHolder.getPersistedRuntimeVariables();
+  const { data: currentData } = store.getState();
+
+  const allVariables = [...currentData.entries(), ...persistedVariables.entries()];
+  const mergedVariables = new Map<string, RuntimeVariableValue>();
+
+  allVariables.forEach(([key, variable], index) => {
+    mergedVariables.set(key, { ...variable, id: index });
+  });
+
+  store.setState({ data: mergedVariables });
+};
+
 export const createRuntimeVariablesStore = ({ variables }: { variables: RuntimeVariableState["data"] }) => {
-  return create<RuntimeVariableState>()((set, get) => ({
+  const db = new PersistedVariablesIDB({ version: 1 });
+
+  const persistChanges = async (currentData: Map<string, RuntimeVariableValue>) => {
+    await db.savePersistedVariables(currentData);
+  };
+
+  const store = create<RuntimeVariableState>()((set, get) => ({
     data: variables,
     version: 0, // to be removed soon
     reset() {
       set({ data: new Map(), version: 0 });
+      persistChanges(new Map());
     },
     delete(key) {
       const { data } = get();
       if (!data.has(key)) {
         return;
       }
+      const variable = data.get(key);
       const newData = new Map(data);
       newData.delete(key);
       set({ data: newData });
+
+      if (variable.isPersisted) {
+        db.deleteVariable(key);
+        persistChanges(newData);
+      }
     },
     add(key, variable) {
       const { data } = get();
       const newData = new Map(data);
       newData.set(key, variable);
       set({ data: newData });
+      persistChanges(newData);
     },
     update(key, updates) {
       const { data } = get();
@@ -40,6 +71,7 @@ export const createRuntimeVariablesStore = ({ variables }: { variables: RuntimeV
       const newData = new Map(data);
       newData.set(key, { ...existingValue, ...updates });
       set({ data: newData });
+      persistChanges(newData);
     },
     getVariable(key) {
       return get().data.get(key);
@@ -64,6 +96,10 @@ export const createRuntimeVariablesStore = ({ variables }: { variables: RuntimeV
       set({ version: version + 1 });
     },
   }));
+
+  loadPersistedData(db, store);
+
+  return store;
 };
 
 export const runtimeVariablesStore = createRuntimeVariablesStore({ variables: new Map() });
