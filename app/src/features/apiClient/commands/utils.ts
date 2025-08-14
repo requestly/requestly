@@ -40,8 +40,8 @@ export function addNestedCollection(
 }
 
 export function getChildParentMap(contextId: string) {
-  const currentContext = apiClientFeatureContextProviderStore.getState().getContext(contextId);
-  return currentContext.stores.records.getState().childParentMap;
+  const context = apiClientFeatureContextProviderStore.getState().getContext(contextId);
+  return context.stores.records.getState().childParentMap;
 }
 
 export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
