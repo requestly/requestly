@@ -36,9 +36,10 @@ export const createRuntimeVariablesStore = ({ variables }: { variables: RuntimeV
   const store = create<RuntimeVariableState>()((set, get) => ({
     data: variables,
     version: 0, // to be removed soon
-    reset() {
-      set({ data: new Map(), version: 0 });
-      persistChanges(new Map());
+    reset(data) {
+      const newData = data ?? new Map();
+      set({ data: newData, version: 0 });
+      persistChanges(newData);
     },
     delete(key) {
       const { data } = get();
