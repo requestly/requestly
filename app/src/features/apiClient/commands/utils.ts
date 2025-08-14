@@ -7,7 +7,7 @@ import {
   convertFlatRecordsToNestedRecords,
   filterOutChildrenRecords,
 } from "../screens/apiClient/utils";
-import { getApiClientFeatureContextProviderStore, getChildParentMap } from "./store.utils";
+import { getApiClientFeatureContext, getChildParentMap } from "./store.utils";
 import { isEmpty } from "lodash";
 
 export function sanitizePatch(patch: EnvironmentVariables) {
@@ -86,7 +86,7 @@ export function getRecordsToExpandBySearchValue(params: {
     return;
   }
 
-  const context = getApiClientFeatureContextProviderStore(contextId);
+  const context = getApiClientFeatureContext(contextId);
   const childParentMap = getChildParentMap(context);
   const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
 
@@ -119,7 +119,7 @@ export function selectAllRecords(params: { contextId: string; searchValue: strin
 
   const newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]> = new Set();
 
-  const context = getApiClientFeatureContextProviderStore(contextId);
+  const context = getApiClientFeatureContext(contextId);
   const apiClientRecords = context.stores.records.getState().apiClientRecords;
 
   const records = getRecordsToRender({
@@ -139,7 +139,7 @@ export function selectAllRecords(params: { contextId: string; searchValue: strin
 }
 
 export function getRecordsToMove(contextId: string, selectedRecords: Set<RQAPI.ApiClientRecord["id"]>) {
-  const context = getApiClientFeatureContextProviderStore(contextId);
+  const context = getApiClientFeatureContext(contextId);
 
   const childParentMap = getChildParentMap(context);
   const apiClientRecords = context.stores.records.getState().apiClientRecords;
@@ -149,7 +149,7 @@ export function getRecordsToMove(contextId: string, selectedRecords: Set<RQAPI.A
 }
 
 export const getCollectionOptionsToMoveIn = (contextId: string, recordsToMove: RQAPI.ApiClientRecord[]) => {
-  const context = getApiClientFeatureContextProviderStore(contextId);
+  const context = getApiClientFeatureContext(contextId);
   const apiClientRecords = context.stores.records.getState().apiClientRecords;
 
   const exclusions = new Set();
