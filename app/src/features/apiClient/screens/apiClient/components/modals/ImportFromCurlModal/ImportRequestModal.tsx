@@ -24,16 +24,19 @@ export const ImportFromCurlModal: React.FC<Props> = ({
   initialCurlCommand,
 }) => {
   const [curlCommand, setCurlCommand] = useState("");
-  const [error, setError] = useState(null);
-  const inputRef = useRef<HTMLInputElement>();
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      inputRef.current?.focus();
       // Pre-fill with initial cURL command if provided
       if (initialCurlCommand) {
         setCurlCommand(initialCurlCommand);
+      } else {
+        setCurlCommand("");
       }
+
+      inputRef.current?.focus();
     } else {
       setCurlCommand("");
     }
@@ -72,6 +75,10 @@ export const ImportFromCurlModal: React.FC<Props> = ({
     onClose();
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <Modal
       className="import-modal"
@@ -96,6 +103,7 @@ export const ImportFromCurlModal: React.FC<Props> = ({
         value={curlCommand}
         onChange={(e) => setCurlCommand(e.target.value)}
         placeholder="curl https://example.com"
+        autoFocus={true}
       />
     </Modal>
   );
