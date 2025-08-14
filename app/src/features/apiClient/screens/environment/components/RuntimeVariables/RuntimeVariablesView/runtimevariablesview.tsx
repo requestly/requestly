@@ -8,11 +8,7 @@ import { useGenericState } from "hooks/useGenericState";
 import { mapRuntimeArray } from "features/apiClient/store/runtimeVariables/utils";
 import { toast } from "utils/Toast";
 
-interface RuntimeVariablesViewProps {
-  varId: string;
-}
-
-export const RuntimeVariablesView: React.FC<RuntimeVariablesViewProps> = ({ varId }) => {
+export const RuntimeVariablesView: React.FC = () => {
   const [runtimeVariablesMap, resetVariables] = useRuntimeVariables((s) => [s.data, s.reset]);
   const runtimeVariableData = Object.fromEntries(runtimeVariablesMap);
 
@@ -40,6 +36,13 @@ export const RuntimeVariablesView: React.FC<RuntimeVariablesViewProps> = ({ varI
       setPendingVariables(variables);
     }
   }, [variables, isSaving]);
+
+  const handleDeleteAll = useCallback(() => {
+    pendingVariablesRef.current = [];
+    setPendingVariables([]);
+    resetChanges();
+    resetVariables();
+  }, [resetChanges, resetVariables]);
 
   const handleSetPendingVariables = useCallback((variables: RuntimeVariableTableRow[]) => {
     setPendingVariables(variables);
@@ -81,13 +84,15 @@ export const RuntimeVariablesView: React.FC<RuntimeVariablesViewProps> = ({ varI
   };
   const [searchValue, setSearchValue] = useState<string>("");
   return (
-    <div key={varId} className="runtime-variables-view-container">
+    <div className="runtime-variables-view-container">
       <div className="runtime-variables-list-view">
         <RuntimeVariablesHeader
           searchValue={searchValue}
           onSearchValueChange={setSearchValue}
           onSave={handleSaveVariables}
+          onDeleteAll={handleDeleteAll}
         />
+
         <RuntimeVariablesList
           searchValue={searchValue}
           variables={variables}

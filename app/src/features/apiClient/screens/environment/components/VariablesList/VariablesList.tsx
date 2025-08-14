@@ -80,7 +80,7 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key) {
+      if (row.key || row.syncValue) {
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
