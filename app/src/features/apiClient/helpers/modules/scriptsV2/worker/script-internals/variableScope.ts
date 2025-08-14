@@ -1,19 +1,17 @@
 import { LocalScope } from "modules/localScope";
-// here
 export class VariableScope {
   constructor(
     private localScope: LocalScope,
-    private variableScopeName: "environment" | "global" | "collectionVariables" | "runtime"
+    private variableScopeName: "environment" | "global" | "collectionVariables" | "variables"
   ) {}
 
   set(key: string, value: any, options?: any) {
     if (key === undefined || value === undefined) {
       throw new Error(`Key or value is undefined while setting ${this.variableScopeName} variable.`);
     }
-    if (this.variableScopeName === "runtime") {
-      const LOCAL_SCOPE_NAME = "variables"; // because the scope name is different from the attribute exposed in the script
-      const currentVariables = this.localScope.get(LOCAL_SCOPE_NAME);
-      this.localScope.set(LOCAL_SCOPE_NAME, {
+    const currentVariables = this.localScope.get(this.variableScopeName);
+    if (this.variableScopeName === "variables") {
+      this.localScope.set(this.variableScopeName, {
         ...currentVariables,
         [key]:
           key in currentVariables
@@ -21,7 +19,6 @@ export class VariableScope {
             : { syncValue: value, type: typeof value, isPersisted: !!options?.persist },
       });
     } else {
-      const currentVariables = this.localScope.get(this.variableScopeName);
       this.localScope.set(this.variableScopeName, {
         ...currentVariables,
         [key]:
