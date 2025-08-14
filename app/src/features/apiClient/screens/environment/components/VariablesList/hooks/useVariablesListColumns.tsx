@@ -121,10 +121,10 @@ export const useVariablesListColumns = ({
     container === "runtime"
       ? {
           title: "Persisted", // todo
-          editable: false,
+          editable: true,
           onCell: (record) => ({
             record,
-            editable: false,
+            editable: true,
             dataIndex: "isPersisted",
             title: "Persisted",
             handleVariableChange,
