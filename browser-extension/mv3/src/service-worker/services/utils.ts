@@ -188,13 +188,7 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
 export const handleRunCurlRequest = async (selectedText: string, pageURL: string) => {
   try {
     // Create a new tab with the web URL
-    const webUrl = config.WEB_URL;
-
-    const newTab = await new Promise<chrome.tabs.Tab>((resolve) => {
-      chrome.tabs.create({ url: webUrl }, (tab) => {
-        resolve(tab);
-      });
-    });
+    const newTab = await tabService.createAppTab();
 
     // Wait for the tab to load completely
     await tabService.ensureTabLoadingComplete(newTab.id);
