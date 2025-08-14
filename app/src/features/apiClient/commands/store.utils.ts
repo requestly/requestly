@@ -1,4 +1,7 @@
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import {
+  ApiClientFeatureContext,
+  apiClientFeatureContextProviderStore,
+} from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "../types";
 
 export function getStores(ctx: ApiClientFeatureContext) {
@@ -27,4 +30,14 @@ export function getApiClientCollectionVariablesStore(ctx: ApiClientFeatureContex
     return;
   }
   return recordState.collectionVariables;
+}
+
+// Multiview
+export function getApiClientFeatureContextProviderStore(contextId: string) {
+  return apiClientFeatureContextProviderStore.getState().getContext(contextId);
+}
+
+export function getChildParentMapByContextId(contextId: string) {
+  const context = getApiClientFeatureContextProviderStore(contextId);
+  return context.stores.records.getState().childParentMap;
 }
