@@ -76,6 +76,7 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
           });
         }
       } catch (e) {
+        console.error(e);
         notification.error({
           message: "Could not fetch data!",
           description: e.message,
