@@ -9,7 +9,7 @@ export class ApiClientLocalDb {
 
   constructor(metadata: ApiClientLocalStoreMeta) {
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie & {
-      [ApiClientLocalDbTable.APIS]: EntityTable<RQAPI.Record, "id">; // indexed by id
+      [ApiClientLocalDbTable.APIS]: EntityTable<RQAPI.ApiClientRecord, "id">; // indexed by id
       [ApiClientLocalDbTable.ENVIRONMENTS]: EntityTable<EnvironmentData, "id">;
     };
 

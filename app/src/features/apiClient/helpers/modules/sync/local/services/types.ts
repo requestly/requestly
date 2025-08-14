@@ -24,27 +24,43 @@ export type Collection = {
   auth?: RQAPI.Auth;
 };
 
-export type APIRequestDetails = {
-  name: string;
-  url: string;
+export type GraphQLRequestDetails = {
+  type: "graphql";
+  headers: KeyValuePair[];
+  operation: string;
+  variables: string;
+  operationName?: string;
+};
+
+export type HTTPRequestDetails = {
+  type: "http";
   method: string;
   queryParams: KeyValuePair[];
   headers: KeyValuePair[];
   body?: RQAPI.RequestBody;
   bodyContainer: RQAPI.RequestBodyContainer;
   contentType: RequestContentType;
-  auth?: RQAPI.Auth;
+};
+
+export type BaseApiRequestDetails = {
+  name: string;
+  url: string;
+  auth: RQAPI.Auth;
   scripts: {
     preRequest: string;
     postResponse: string;
   };
 };
 
+export type ApiRequestDetails =
+  | (BaseApiRequestDetails & HTTPRequestDetails)
+  | (BaseApiRequestDetails & GraphQLRequestDetails);
+
 export type API = {
   type: "api";
   collectionId?: string;
   id: string;
-  request: APIRequestDetails;
+  request: ApiRequestDetails;
 };
 
 export type VariableEntity = Record<

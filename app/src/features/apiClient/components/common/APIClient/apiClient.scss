@@ -5,5 +5,11 @@
     border: 1px solid #303030;
     border-radius: 4px;
     overflow: hidden;
+
+    .api-client-header-container {
+      .api-client-breadcrumb-container {
+        justify-content: flex-end;
+      }
+    }
   }
 }

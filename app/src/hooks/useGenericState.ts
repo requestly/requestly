@@ -1,9 +1,11 @@
 import { createContext, useContext } from "react";
+import { ReactNode } from "react";
 
 export interface GenericState {
   setTitle: (title: string) => void;
   setPreview: (preview: boolean) => void;
   setUnsaved: (unsaved: boolean) => void;
+  setIcon: (icon: ReactNode) => void;
   getIsNew: () => boolean;
   getIsActive: () => boolean;
 
@@ -15,6 +17,7 @@ const defaultGenericState: GenericState = {
   setTitle: () => {},
   setPreview: () => {},
   setUnsaved: () => {},
+  setIcon: () => {},
   getIsNew: () => false,
   getIsActive: () => false,
   replace: () => {},

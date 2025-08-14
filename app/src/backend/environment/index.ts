@@ -21,7 +21,6 @@ import {
   trackEnvironmentDeletedFromDB,
   trackEnvironmentUpdatedInDB,
 } from "features/apiClient/screens/environment/analytics";
-import { fetchLock } from "./fetch-lock";
 import { patchMissingIdInVariables } from "backend/apiClient/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
@@ -149,7 +148,6 @@ const createGlobalEnvironmentInDB = async (ownerId: string) => {
 };
 
 export const fetchAllEnvironmentDetails = async (ownerId: string) => {
-  const releaseLock = await fetchLock.acquire();
   try {
     if (!ownerId) {
       return {};
@@ -179,8 +177,6 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
     return environmentDetails;
   } catch (e) {
     console.log("aaa", e);
-  } finally {
-    releaseLock();
   }
 };
 
