@@ -11,7 +11,6 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
 import {
   convertFlatRecordsToNestedRecords,
-  filterOutChildrenRecords,
   filterRecordsBySearch,
   getRecordIdsToBeExpanded,
   isApiCollection,
@@ -22,7 +21,6 @@ import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderIt
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
-import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { RecordSelectionAction } from "../ContextualCollectionsList";
 import { selectAllRecords } from "features/apiClient/commands/utils";
@@ -61,7 +59,6 @@ export const CollectionsList: React.FC<Props> = ({
 
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
   const [expandedRecordIds, setExpandedRecordIds] = useState(
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
@@ -316,16 +313,6 @@ export const CollectionsList: React.FC<Props> = ({
           onClose={() => {
             setCollectionsToExport([]);
             setIsExportModalOpen(false);
-          }}
-        />
-      )}
-
-      {isMoveCollectionModalOpen && (
-        <MoveToCollectionModal
-          recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
-          isOpen={isMoveCollectionModalOpen}
-          onClose={() => {
-            setIsMoveCollectionModalOpen(false);
           }}
         />
       )}
