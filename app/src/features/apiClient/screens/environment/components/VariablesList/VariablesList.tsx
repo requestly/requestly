@@ -7,23 +7,40 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
-import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
+import { VariableData } from "features/apiClient/store/variables/types";
+import { RuntimeVariableValue } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 
-interface VariablesListProps {
-  variables: EnvironmentVariableTableRow[];
+interface VariablesListProps<T extends VariableData> {
+  variables: VariableRow<T>[];
   searchValue?: string;
-  onVariablesChange: (variables: EnvironmentVariableTableRow[]) => void;
+  onVariablesChange: (variables: VariableRow<T>[]) => void;
+  createNewVariable: (id: number, type: EnvironmentVariableType) => VariableRow<T>;
+  isReadOnly?: boolean;
+  container: "environments" | "runtime";
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
+export type VariableRow<T extends VariableData> = T & { key: string };
+export type MetaVariableRow = VariableRow<EnvironmentVariableValue | RuntimeVariableValue>;
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
+export function isEnvironmentVariableRow(row: MetaVariableRow): row is VariableRow<EnvironmentVariableValue> {
+  return "localValue" in row && row.localValue !== undefined;
+}
+
+export function isRuntimeVariableRow(row: MetaVariableRow): row is VariableRow<RuntimeVariableValue> {
+  return "isPersisted" in row && row.isPersisted !== undefined;
+}
+
+export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue | RuntimeVariableValue>> = ({
+  searchValue = "",
+  variables,
+  onVariablesChange,
+  createNewVariable,
+  isReadOnly = false,
+  container = "environments",
+}) => {
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
-  const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission("api_client_environment", "create");
-
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
     [dataSource, searchValue]
@@ -58,7 +75,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   }, [dataSource]);
 
   const handleVariableChange = useCallback(
-    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+    (row: MetaVariableRow, fieldChanged: keyof MetaVariableRow) => {
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
@@ -74,16 +91,12 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     [dataSource, onVariablesChange]
   );
 
-  const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
-    const newData = {
-      id: dataSource.length,
-      key: "",
-      type: EnvironmentVariableType.String,
-      localValue: "",
-      syncValue: "",
-    };
-    setDataSource([...dataSource, newData]);
-  }, []);
+  const handleAddNewRow = useCallback(
+    (dataSource: MetaVariableRow[]) => {
+      setDataSource([...dataSource, createNewVariable(dataSource.length, EnvironmentVariableType.String)]);
+    },
+    [createNewVariable]
+  );
 
   const handleDeleteVariable = useCallback(
     async (id: number) => {
@@ -121,6 +134,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
     recordsCount: dataSource.length,
     duplicateKeyIndices,
+    isReadOnly,
+    container,
   });
 
   useEffect(() => {
@@ -164,7 +179,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        !isValidPermission
+        isReadOnly
           ? null
           : () => (
               <div className="variables-list-footer">
