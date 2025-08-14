@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import isEmpty from "is-empty";
 import { Col, Row } from "antd";
-import { globalActions } from "store/slices/global/slice";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { StorageService } from "../../../../init";
 import {
   cleanup,
   getModeData,
@@ -19,7 +16,6 @@ import {
 } from "./actions";
 import {
   getAppMode,
-  getAllRules,
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
   getIsCurrentlySelectedRuleDetailsPanelShown,
@@ -36,6 +32,7 @@ import { RuleEditorMode } from "features/rules";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleBuilder.css";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -53,7 +50,6 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const isDetailsPanelShown = useSelector(getIsCurrentlySelectedRuleDetailsPanelShown);
 
-  const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
@@ -66,7 +62,6 @@ const RuleBuilder = (props) => {
   //References
   const isCleaningUpRef = useRef(false);
   //Component State
-  const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [showDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
@@ -116,19 +111,17 @@ const RuleBuilder = (props) => {
         stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE], navigate);
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
         Logger.log("Reading to storage in RuleBuilder");
-        StorageService(appMode)
-          .getRecord(RULE_TO_EDIT_ID)
-          .then((rule) => {
-            if (rule === undefined) {
-              RedirectionUtils.redirectTo404(navigate);
-            } else {
-              //Prevent updating state when component is about to unmount
-              if (!isCleaningUpRef.current) {
-                stableSetCurrentlySelectedRule(dispatch, rule);
-                stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
-              }
+        clientRuleStorageService.getRecordById(RULE_TO_EDIT_ID).then((rule) => {
+          if (rule === undefined) {
+            RedirectionUtils.redirectTo404(navigate);
+          } else {
+            //Prevent updating state when component is about to unmount
+            if (!isCleaningUpRef.current) {
+              stableSetCurrentlySelectedRule(dispatch, rule);
+              stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
             }
-          });
+          }
+        });
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW) {
         //View only
         if (props.rule) {
@@ -157,18 +150,6 @@ const RuleBuilder = (props) => {
     appMode,
     ruleGroupId,
   ]);
-
-  //If "all rules" are not already there in state, fetch them.
-  if (!fetchAllRulesComplete && isEmpty(allRules)) {
-    Logger.log("Reading to storage in RuleBuilder");
-    StorageService(appMode)
-      .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
-      .then((rules) => {
-        //Set Flag to prevent loop
-        setFetchAllRulesComplete(true);
-        dispatch(globalActions.updateRulesAndGroups({ rules, groups: [] }));
-      });
-  }
 
   useEffect(() => {
     if (

@@ -15,13 +15,11 @@ import {
   trackMigrationNotificationClosed,
   trackMigrationNotificationShown,
 } from "features/rules/analytics";
-import { StorageService } from "init";
-import { getAppMode } from "store/selectors";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 export function NotificationCard() {
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
-  const appMode = useSelector(getAppMode);
 
   const [isVisible, setIsVisible] = useState(false);
   const [doesAnyRuleExist, setDoesAnyRuleExist] = useState(false);
@@ -74,13 +72,11 @@ export function NotificationCard() {
 
   useEffect(() => {
     Object.keys(migratedRulesLogs).forEach((ruleId) => {
-      StorageService(appMode)
-        .getRecord(ruleId)
-        .then((rule) => {
-          if (rule) {
-            setDoesAnyRuleExist(true);
-          }
-        });
+      clientRuleStorageService.getRecordById(ruleId).then((rule) => {
+        if (rule) {
+          setDoesAnyRuleExist(true);
+        }
+      });
     });
   });
 
