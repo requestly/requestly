@@ -3,9 +3,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { parseCurlRequest } from "../../../utils";
 import { RQAPI } from "../../../../../types";
 import { toast } from "utils/Toast";
-import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";
+import {
+  trackCurlImportFailed,
+  trackCurlImported,
+  trackCurlImportModalOpened,
+} from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
+import { getDomainFromURL } from "utils/URLUtils";
 import "./importFromCurlModal.scss";
 
 interface Props {
@@ -14,6 +19,8 @@ interface Props {
   handleImportRequest: (request: RQAPI.Request) => void;
   onClose: () => void;
   initialCurlCommand?: string;
+  source: string;
+  pageURL: string;
 }
 
 export const ImportFromCurlModal: React.FC<Props> = ({
@@ -22,6 +29,8 @@ export const ImportFromCurlModal: React.FC<Props> = ({
   onClose,
   isRequestLoading,
   initialCurlCommand,
+  source,
+  pageURL,
 }) => {
   const [curlCommand, setCurlCommand] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,11 +45,17 @@ export const ImportFromCurlModal: React.FC<Props> = ({
         setCurlCommand("");
       }
 
+      trackCurlImportModalOpened({
+        source,
+        page_url: pageURL,
+        page_domain: getDomainFromURL(pageURL),
+      });
+
       inputRef.current?.focus();
     } else {
       setCurlCommand("");
     }
-  }, [isOpen, initialCurlCommand]);
+  }, [isOpen, initialCurlCommand, source, pageURL]);
 
   const onImportClicked = useCallback(() => {
     if (!curlCommand) {

@@ -225,6 +225,8 @@ const APIClientSidebar: React.FC<Props> = () => {
         handleImportRequest={handleImportRequest}
         onClose={handleImportRequestModalClose}
         initialCurlCommand={initialCurlCommand}
+        source={state?.source || ""}
+        pageURL={state?.pageURL || ""}
       />
     </>
   );

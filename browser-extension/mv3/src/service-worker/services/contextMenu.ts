@@ -2,7 +2,7 @@ import { setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
 import extensionIconManager from "./extensionIconManager";
 import { sendMessageToApp } from "./messageHandler/sender";
-import { EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import { tabService } from "./tabService";
 import config from "common/config";
@@ -33,7 +33,7 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
   }
 };
 
-const handleRunCurlRequest = async (selectedText: string, pageUrl: string) => {
+const handleRunCurlRequest = async (selectedText: string, pageURL: string) => {
   try {
     // Create a new tab with the web URL
     const webUrl = config.WEB_URL;
@@ -52,7 +52,8 @@ const handleRunCurlRequest = async (selectedText: string, pageUrl: string) => {
       action: EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL,
       payload: {
         curlCommand: selectedText,
-        sourceUrl: pageUrl,
+        pageURL,
+        source: "context_menu",
       },
     };
 

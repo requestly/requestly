@@ -365,13 +365,14 @@ const AppModeInitializer = () => {
       });
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL, (message) => {
-        const { curlCommand, sourceUrl } = message.payload;
+        const { curlCommand, pageURL, source } = message.payload;
 
         // Navigate to API Client with cURL import modal state
         const navigationState = {
           modal: ApiClientImporterType.CURL,
-          curlCommand: curlCommand,
-          sourceUrl: sourceUrl,
+          curlCommand,
+          pageURL,
+          source,
         };
 
         navigate(PATHS.API_CLIENT.ABSOLUTE, { state: navigationState });
