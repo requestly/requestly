@@ -33,10 +33,27 @@ export function getApiClientCollectionVariablesStore(ctx: ApiClientFeatureContex
 }
 
 // Multiview
-export function getApiClientFeatureContextProviderStore(contextId: string) {
+export function getApiClientFeatureContext(contextId: string) {
   return apiClientFeatureContextProviderStore.getState().getContext(contextId);
 }
 
 export function getChildParentMap(context: ApiClientFeatureContext) {
   return context.stores.records.getState().childParentMap;
+}
+
+export function saveOrUpdateRecord(context: ApiClientFeatureContext, apiClientRecord: RQAPI.ApiClientRecord) {
+  const recordId = apiClientRecord.id;
+  const apiRecordsStore = context.stores.records;
+  const doesRecordExist = !!apiRecordsStore.getState().getData(recordId);
+
+  if (doesRecordExist) {
+    apiRecordsStore.getState().updateRecord(apiClientRecord);
+  } else {
+    apiRecordsStore.getState().addNewRecord(apiClientRecord);
+  }
+}
+
+export function saveBulkRecords(context: ApiClientFeatureContext, records: RQAPI.ApiClientRecord[]) {
+  const apiRecordsStore = context.stores.records;
+  apiRecordsStore.getState().updateRecords(records);
 }
