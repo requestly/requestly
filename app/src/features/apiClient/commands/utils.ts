@@ -78,32 +78,42 @@ export function prepareRecordsToRender(records: RQAPI.ApiClientRecord[]) {
   };
 }
 
-export function getUpdatedRecords(params: {
+export function getRecordsToExpandBySearchValue(params: {
   contextId: string;
   apiClientRecords: RQAPI.ApiClientRecord[];
-  searchValue: string;
-}) {
+  searchValue?: string;
+}): undefined | RQAPI.ApiClientRecord["id"][] {
   const { contextId, apiClientRecords, searchValue } = params;
+
+  if (!searchValue) {
+    return;
+  }
+
   const childParentMap = getChildParentMap(contextId);
+  const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
+
+  const recordsToExpand: string[] = [];
+  filteredRecords.forEach((record) => {
+    if (record.collectionId) {
+      recordsToExpand.push(record.collectionId);
+      let parentId = childParentMap.get(record.collectionId);
+      while (parentId) {
+        recordsToExpand.push(parentId);
+        parentId = childParentMap.get(parentId);
+      }
+    }
+  });
+
+  return recordsToExpand;
+}
+
+export function getRecordsToRender(params: { apiClientRecords: RQAPI.ApiClientRecord[]; searchValue?: string }) {
+  const { apiClientRecords, searchValue } = params;
 
   const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
   const recordsToRender = prepareRecordsToRender(filteredRecords);
 
-  if (searchValue) {
-    const recordsToExpand: string[] = [];
-    filteredRecords.forEach((record) => {
-      if (record.collectionId) {
-        recordsToExpand.push(record.collectionId);
-        let parentId = childParentMap.get(record.collectionId);
-        while (parentId) {
-          recordsToExpand.push(parentId);
-          parentId = childParentMap.get(parentId);
-        }
-      }
-    });
-
-    return recordsToRender;
-  }
+  return recordsToRender;
 }
 
 export function selectAllRecords(params: { contextId: string; searchValue: string }) {
@@ -113,17 +123,17 @@ export function selectAllRecords(params: { contextId: string; searchValue: strin
 
   const context = apiClientFeatureContextProviderStore.getState().getContext(contextId);
   const apiClientRecords = context.stores.records.getState().apiClientRecords;
-  const updatedRecords = getUpdatedRecords({
-    contextId,
+
+  const records = getRecordsToRender({
     apiClientRecords,
     searchValue,
   });
 
-  updatedRecords.collections.forEach((record) => {
+  records.collections.forEach((record) => {
     addNestedCollection(record, newSelectedRecords);
   });
 
-  updatedRecords.requests.forEach((record) => {
+  records.requests.forEach((record) => {
     newSelectedRecords.add(record.id);
   });
 

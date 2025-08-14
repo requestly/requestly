@@ -12,6 +12,7 @@ import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
 import { capitalize } from "lodash";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { bulkDuplicateRecords } from "features/apiClient/commands/multiView/bulkDuplicateRecords.command";
 
 export type RecordSelectionAction = "select" | "unselect";
 
@@ -106,11 +107,28 @@ export const ContextualCollectionsList: React.FC<{
     }
   }, [isSelectAll]);
 
+  const duplicateRecords = useCallback(async () => {
+    const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
+      return bulkDuplicateRecords(ctxId, value.recordIds);
+    });
+
+    // TODO: TBD, what to do in partial fail cases?
+    return await Promise.all(promises);
+  }, []);
+
   const onBulkActionClick = useCallback(
     (action: BulkActions) => {
       if (action === BulkActions.SELECT_ALL) {
         handleSelectToggle();
         return;
+      }
+
+      if (action === BulkActions.DUPLICATE) {
+        duplicateRecords();
+      }
+
+      if (action === BulkActions.DELETE) {
+        // NOOP
       }
 
       if ([BulkActions.MOVE, BulkActions.EXPORT].includes(action)) {
@@ -122,7 +140,7 @@ export const ContextualCollectionsList: React.FC<{
         }
       }
     },
-    [handleSelectToggle]
+    [handleSelectToggle, duplicateRecords]
   );
 
   const toggleMultiSelect = useCallback(() => {
