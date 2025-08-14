@@ -9,11 +9,13 @@ import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 interface RuntimeVariablesHeaderProps {
   searchValue: string;
   onSearchValueChange: (value: string) => void;
+  onDeleteAll: () => void;
   onSave: () => Promise<void>;
 }
 export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
   searchValue,
   onSearchValueChange,
+  onDeleteAll,
   onSave,
 }) => {
   return (
@@ -35,7 +37,7 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
           <RQButton
             icon={<MdOutlineDelete />}
             type="primary"
-            onClick={() => {}}
+            onClick={onDeleteAll}
             style={{
               background: "none",
               border: "none",
