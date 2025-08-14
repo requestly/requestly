@@ -25,7 +25,7 @@ import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientEx
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { RecordSelectionAction } from "../ContextualCollectionsList";
-import { selectAllRecords } from "../../../utils";
+import { selectAllRecords } from "features/apiClient/commands/utils";
 
 interface Props {
   searchValue: string;
