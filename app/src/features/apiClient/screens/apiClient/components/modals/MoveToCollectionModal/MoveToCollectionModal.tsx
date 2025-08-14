@@ -7,13 +7,14 @@ import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
 import { isApiCollection } from "../../../utils";
-import { head, isEmpty, omit } from "lodash";
+import { head, omit } from "lodash";
 import { Authorization } from "../../views/components/request/components/AuthorizationView/types/AuthConfig";
 import * as Sentry from "@sentry/react";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { getCollectionOptionsToMoveIn } from "features/apiClient/commands/utils";
 
 interface Props {
   recordsToMove: RQAPI.ApiClientRecord[];
@@ -22,38 +23,19 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const {
     api: { forceRefreshRecords: forceRefreshApiClientRecords },
   } = useCommand();
+  const contextId = useContextId();
+
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const collectionOptions = useMemo(() => {
-    const exclusions = new Set();
-
-    for (const record of recordsToMove) {
-      const stack = [record];
-      record.collectionId && exclusions.add(record.collectionId);
-      while (stack.length) {
-        const current = stack.pop();
-        exclusions.add(current.id);
-
-        if (isApiCollection(current) && !isEmpty(current.data?.children)) {
-          stack.push(...current.data.children);
-        }
-      }
-    }
-
-    return apiClientRecords
-      .filter((record) => isApiCollection(record) && !exclusions.has(record.id))
-      .map((record) => ({
-        label: record.name,
-        value: record.id,
-      }));
-  }, [apiClientRecords, recordsToMove]);
+    return getCollectionOptionsToMoveIn(contextId, recordsToMove);
+  }, [contextId, recordsToMove]);
 
   const createNewCollection = useCallback(async () => {
     const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
@@ -69,6 +51,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         },
       },
     };
+
     const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
       onSaveRecord(newCollection.data, "open");
@@ -78,6 +61,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     }
   }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
 
+  // TODO: refactor into a command
   const moveRecordsToCollection = useCallback(
     async (collectionId: string, isNewCollection: boolean) => {
       const updatedRequests = recordsToMove.map((record) =>

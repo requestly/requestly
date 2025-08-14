@@ -13,6 +13,8 @@ import { toast } from "utils/Toast";
 import { capitalize } from "lodash";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { bulkDuplicateRecords } from "features/apiClient/commands/multiView/bulkDuplicateRecords.command";
+import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
+import { getRecordsToMove } from "features/apiClient/commands/utils";
 
 export type RecordSelectionAction = "select" | "unselect";
 
@@ -31,6 +33,7 @@ export const ContextualCollectionsList: React.FC<{
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
 
   const [isSelectAll, setIsSelectAll] = useState(false);
+  const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
 
   const selectedRecordsAcrossWorkspaces = useRef<{
     [contextId: string]:
@@ -97,15 +100,19 @@ export const ContextualCollectionsList: React.FC<{
     []
   );
 
+  const deselect = useCallback(() => {
+    selectedRecordsAcrossWorkspaces.current = null;
+    setIsSelectAll(false);
+    setIsAllRecordsSelected(false);
+  }, []);
+
   const handleSelectToggle = useCallback(() => {
     if (isSelectAll) {
-      selectedRecordsAcrossWorkspaces.current = null;
-      setIsSelectAll(false);
-      setIsAllRecordsSelected(false);
+      deselect();
     } else {
       setIsSelectAll(true);
     }
-  }, [isSelectAll]);
+  }, [isSelectAll, deselect]);
 
   const duplicateRecords = useCallback(async () => {
     const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
@@ -125,6 +132,8 @@ export const ContextualCollectionsList: React.FC<{
 
       if (action === BulkActions.DUPLICATE) {
         duplicateRecords();
+        deselect();
+        return;
       }
 
       if (action === BulkActions.DELETE) {
@@ -132,15 +141,25 @@ export const ContextualCollectionsList: React.FC<{
       }
 
       if ([BulkActions.MOVE, BulkActions.EXPORT].includes(action)) {
-        const isRecordsSelectedAcrossWorkspaces = Object.keys(selectedRecordsAcrossWorkspaces ?? {}).length > 1;
+        const workspacesWithSelectedRecordsCount = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
+          (value) => value.recordIds.size > 0
+        ).length;
 
-        if (isRecordsSelectedAcrossWorkspaces) {
+        if (workspacesWithSelectedRecordsCount > 1) {
           toast.error(`${capitalize(action)} not supported across workspaces!`);
           return;
         }
+
+        if (BulkActions.MOVE) {
+          setIsMoveCollectionModalOpen(true);
+        }
+
+        if (action === BulkActions.EXPORT) {
+          // NOOP
+        }
       }
     },
-    [handleSelectToggle, duplicateRecords]
+    [deselect, handleSelectToggle, duplicateRecords]
   );
 
   const toggleMultiSelect = useCallback(() => {
@@ -164,6 +183,19 @@ export const ContextualCollectionsList: React.FC<{
       showMultiSelect: isValidPermission,
     };
   }, [toggleMultiSelect, isValidPermission]);
+
+  const getRecordsToMoveByContext: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
+    const workspacesWithSelectedRecords = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
+      ([ctxId, value]) => value.recordIds.size > 0
+    );
+
+    if (workspacesWithSelectedRecords.length === 1) {
+      const [ctxId, value] = workspacesWithSelectedRecords[0];
+      return [ctxId, getRecordsToMove(ctxId, value.recordIds)];
+    }
+
+    return [undefined, []];
+  }, []);
 
   return (
     <>
@@ -208,6 +240,19 @@ export const ContextualCollectionsList: React.FC<{
           );
         })}
       </DndProvider>
+
+      {isMoveCollectionModalOpen && (
+        // TODO: TBD on modals
+        <ContextId id={getRecordsToMoveByContext()[0]}>
+          <MoveToCollectionModal
+            recordsToMove={getRecordsToMoveByContext()[1]}
+            isOpen={isMoveCollectionModalOpen}
+            onClose={() => {
+              setIsMoveCollectionModalOpen(false);
+            }}
+          />
+        </ContextId>
+      )}
     </>
   );
 };
