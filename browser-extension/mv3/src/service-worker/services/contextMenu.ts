@@ -2,10 +2,9 @@ import { setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
 import extensionIconManager from "./extensionIconManager";
 import { sendMessageToApp } from "./messageHandler/sender";
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES } from "common/constants";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
-import { tabService } from "./tabService";
-import config from "common/config";
+import { handleRunCurlRequest } from "./utils";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -30,40 +29,6 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
 
   if (isExtensionEnabled === false) {
     stopRecordingOnAllTabs();
-  }
-};
-
-const handleRunCurlRequest = async (selectedText: string, pageURL: string) => {
-  try {
-    // Create a new tab with the web URL
-    const webUrl = config.WEB_URL;
-
-    const newTab = await new Promise<chrome.tabs.Tab>((resolve) => {
-      chrome.tabs.create({ url: webUrl }, (tab) => {
-        resolve(tab);
-      });
-    });
-
-    // Wait for the tab to load completely
-    await tabService.ensureTabLoadingComplete(newTab.id);
-
-    // Send message to the new tab to open cURL import modal with pre-filled text
-    const message = {
-      action: EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL,
-      payload: {
-        curlCommand: selectedText,
-        pageURL,
-        source: "context_menu",
-      },
-    };
-
-    chrome.tabs.sendMessage(newTab.id, message, (response) => {
-      if (chrome.runtime.lastError) {
-        console.error(`[handleRunCurlRequest] Error sending message:`, chrome.runtime.lastError);
-      }
-    });
-  } catch (error) {
-    console.error(`[handleRunCurlRequest] Error:`, error);
   }
 };
 
