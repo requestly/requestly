@@ -2,9 +2,10 @@ import React from "react";
 import { Avatar, AvatarProps } from "antd";
 
 import { LockOutlined } from "@ant-design/icons";
+import { IoCloudOfflineOutline } from "@react-icons/all-files/io5/IoCloudOfflineOutline";
 import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
 
-import { isLocalFSWorkspace, isPersonalWorkspace } from "../utils";
+import { isLocalFSWorkspace, isLocalStorageWorkspace, isPersonalWorkspace } from "../utils";
 import { getColorFromString } from "utils/getColorFromString";
 import { Workspace } from "../types";
 
@@ -16,6 +17,8 @@ interface Props {
 const getWorkspaceIcon = (workspace: Workspace) => {
   if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "W";
 
+  if (isLocalStorageWorkspace(workspace?.id)) return <IoCloudOfflineOutline />;
+
   if (isPersonalWorkspace(workspace)) return <LockOutlined />;
 
   if (isLocalFSWorkspace(workspace)) return <LuFolderSync />;
@@ -25,6 +28,8 @@ const getWorkspaceIcon = (workspace: Workspace) => {
 
 const getUniqueColorForWorkspace = (workspace: Workspace) => {
   if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "#ffffff4d";
+
+  if (isLocalStorageWorkspace(workspace?.id)) return "#ffffff4d";
 
   if (isPersonalWorkspace(workspace)) return "#1E69FF";
 

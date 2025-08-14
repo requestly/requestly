@@ -5,10 +5,10 @@ import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import APP_CONSTANTS from "config/constants";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import "./index.scss";
 import { getActiveWorkspaceId, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "features/workspaces/types";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
 import { isPersonalWorkspace } from "features/workspaces/utils";
 
 const getWorkspaceIcon = (workspaceName: string) => {
@@ -18,7 +18,7 @@ const getWorkspaceIcon = (workspaceName: string) => {
 
 const WorkspaceDropdown: React.FC<{
   isAppSumo?: boolean;
-  workspaceToUpgrade: { name: string; id: string; accessCount: number };
+  workspaceToUpgrade: { name: string; id: string; accessCount?: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
   className?: string;
   disabled?: boolean;
@@ -30,7 +30,8 @@ const WorkspaceDropdown: React.FC<{
   const filteredAvailableTeams = useMemo(() => {
     return (
       availableWorkspaces?.filter(
-        (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
+        (team: Workspace) =>
+          !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === WorkspaceMemberRole.admin
       ) ?? []
     );
   }, [availableWorkspaces, user?.details?.profile?.uid]);
@@ -50,14 +51,7 @@ const WorkspaceDropdown: React.FC<{
 
   const workspaceMenuItems = {
     items: [
-      {
-        key: "private_workspace",
-        label: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-        icon: (
-          <WorkspaceAvatar workspace={{ id: "private", name: "", workspaceType: WorkspaceType.PERSONAL }} size={18} />
-        ),
-      },
-      ...filteredAvailableTeams.map((team: any) => ({
+      ...filteredAvailableTeams.map((team) => ({
         label: team.name,
         key: team.id,
         icon: <WorkspaceAvatar workspace={team} size={18} />,

@@ -5,7 +5,7 @@ import * as Sentry from "@sentry/react";
 
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
-import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
+import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
@@ -20,16 +20,14 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { teamsActions } from "store/features/teams/slice";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
-import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface Props {
   isOpen: boolean;
@@ -42,7 +40,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
@@ -50,28 +47,14 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
+  const { switchWorkspace } = useWorkspaceHelpers();
   const folderSelectCallback = (path: string) => {
     setFolderPath(path);
   };
 
   const handlePostTeamCreationStep = useCallback(
     (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-          workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode: isSharedWorkspaceMode,
-        },
-        appMode,
-        null,
-        "create_workspace_modal"
-      );
+      switchWorkspace(teamId, "create_workspace_modal");
       if (workspaceType === WorkspaceType.SHARED) {
         redirectToTeam(navigate, teamId, {
           state: {
@@ -80,15 +63,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
         });
       }
     },
-    [
-      dispatch,
-      appMode,
-      isNotifyAllSelected,
-      isSharedWorkspaceMode,
-      navigate,
-      user?.details?.isSyncEnabled,
-      workspaceType,
-    ]
+    [switchWorkspace, workspaceType, navigate, isNotifyAllSelected]
   );
 
   const handleDomainInvitesCreation = useCallback(
@@ -164,7 +139,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
             workspaceType: WorkspaceType.LOCAL,
             rootPath: partialWorkspace.path,
           };
-          dispatch(teamsActions.addToAvailableTeams(localWorkspace));
           dispatch(workspaceActions.upsertWorkspace(localWorkspace));
           return partialWorkspace.id;
         } else {
