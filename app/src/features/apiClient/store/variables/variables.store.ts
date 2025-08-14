@@ -8,7 +8,7 @@ export type VariablesState<T extends VariableData> = {
   version: number;
   data: Map<VariableKey, T>;
 
-  reset: (data: Map<VariableKey, T>) => void;
+  reset: (data?: Map<VariableKey, T>) => void;
 
   // actions
   delete: (key: VariableKey) => void;
@@ -31,7 +31,7 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
 
     reset(data) {
       set({
-        data,
+        data: data ?? new Map(),
       });
     },
 

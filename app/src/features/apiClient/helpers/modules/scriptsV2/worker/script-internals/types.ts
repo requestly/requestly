@@ -93,6 +93,11 @@ export interface SandboxAPI {
     get(key: string): any;
     unset(key: string): void;
   };
+  variables: {
+    set(key: string, value: VariableValueType, options?: { persist: boolean }): void;
+    get(key: string): any;
+    unset(key: string): void;
+  };
   test: TestFunction;
   expect: Chai.ExpectStatic;
   cookies: any;
@@ -101,7 +106,6 @@ export interface SandboxAPI {
   iterationData: any;
   require: any;
   sendRequest: any;
-  variables: any;
   vault: any;
   visualizer: any;
 }
