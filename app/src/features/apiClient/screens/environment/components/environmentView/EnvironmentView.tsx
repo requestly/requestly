@@ -13,7 +13,6 @@ import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 import { EnvironmentVariablesList, EnvironmentVariableTableRow } from "../VariablesList/EnvironmentVariablesList";
-import { useRuntimeVariables } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 
 interface EnvironmentViewProps {
   envId: string;
@@ -27,10 +26,6 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     env: { setEnvironmentVariables },
   } = useCommand();
 
-  //FIXME: cleanup this before final merge
-
-  //const runtimeVariableData = useRuntimeVariables((s) => s.data);
-  //const rnvariablesData = Object.fromEntries(runtimeVariableData);
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>("");
