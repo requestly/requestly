@@ -66,7 +66,7 @@ export class RQ implements SandboxAPI {
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
-    this.variables = new VariableScope(localScope, "runtime");
+    this.variables = new VariableScope(localScope, "variables");
     this.expect = expect;
     this.test = this.createTestObject();
     this.request = this.createRequestObject(localScope.get("request"));
