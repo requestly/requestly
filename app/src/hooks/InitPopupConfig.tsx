@@ -1,13 +1,17 @@
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
 import { StorageService } from "init";
-import { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAttributes } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
-export const InitPopupConfig = () => {
+export const InitPopupConfig: React.FC = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const userAttributes = useSelector(getUserAttributes);
+
+  const isSessionReplayEnabled = useFeatureValue("is_session_replay_enabled", true); // mark default value as false after testing
 
   const fetchConfig = useCallback(async () => {
     const popupConfig = await StorageService(appMode).getRecord("popupConfig");
@@ -23,20 +27,25 @@ export const InitPopupConfig = () => {
       session_replay: true,
     };
 
-    if (userAttributes.num_sessions > 0 || userAttributes.rq_subscription_type === "appsumo") {
+    if (isSessionReplayEnabled) {
       await StorageService(appMode).saveRecord({
         popup_config: defaultConfig,
       });
       dispatch(globalActions.updatePopupConfig(defaultConfig));
     }
-  }, [appMode, dispatch, fetchConfig, userAttributes.num_sessions, userAttributes.rq_subscription_type]);
+  }, [appMode, dispatch, fetchConfig, isSessionReplayEnabled]);
 
   useEffect(() => {
-    // TODO: add feature compatibility
+    if (!isFeatureCompatible(FEATURES.POPUP_CONFIG)) {
+      return;
+    }
+
     if (appMode !== "EXTENSION") {
       return;
     }
 
     setDefaultConfig();
-  }, [appMode, setDefaultConfig]);
+  }, [appMode, isSessionReplayEnabled, setDefaultConfig]);
+
+  return null;
 };
