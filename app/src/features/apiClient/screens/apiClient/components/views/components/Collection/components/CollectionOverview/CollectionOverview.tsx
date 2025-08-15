@@ -25,10 +25,8 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
-    api: {
-      forceRefreshRecords: forceRefreshApiClientRecords
-    }
-  } = useCommand()
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
   const { setTitle, close } = useGenericState();

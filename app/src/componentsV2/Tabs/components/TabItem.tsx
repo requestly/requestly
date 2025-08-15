@@ -62,10 +62,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           incrementVersion();
         },
 
-        setUnsaved: useCallback((unsaved: boolean) => {
-          props.store.getState().setUnsaved(unsaved);
-          incrementVersion();
-        }, [incrementVersion, props.store]),
+        setUnsaved: useCallback(
+          (unsaved: boolean) => {
+            props.store.getState().setUnsaved(unsaved);
+            incrementVersion();
+          },
+          [incrementVersion, props.store]
+        ),
       }}
     >
       {props.children}

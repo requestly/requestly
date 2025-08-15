@@ -22,9 +22,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const {
-    api: {
-      forceRefreshRecords: forceRefreshApiClientRecords
-    }
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
   } = useCommand();
   const [updateTabBySource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.updateTabBySource,

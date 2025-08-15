@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { useSelector } from "react-redux";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import {

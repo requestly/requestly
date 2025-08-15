@@ -22,7 +22,11 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       ...metadata,
     };
     this.component = (
-      <DraftRequestContainer key={this.metadata.id} draftId={this.metadata.id} apiEntryType={metadata?.apiEntryType} />
+      <DraftRequestContainer
+        key={this.metadata.id}
+        draftId={this.metadata.id}
+        apiEntryType={metadata?.apiEntryType ?? RQAPI.ApiEntryType.HTTP}
+      />
     );
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}/new`;
     this.icon = this.getTabIcon((this.metadata as DraftRequestContainerTabSourceMetadata).apiEntryType);

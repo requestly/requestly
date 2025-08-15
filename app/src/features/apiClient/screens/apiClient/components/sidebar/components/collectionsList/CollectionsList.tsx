@@ -34,6 +34,8 @@ import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollectio
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { ContextId } from "features/apiClient/contexts/contextId.context";
+import { apiClientFeatureContextProviderStore } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -133,11 +135,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     }
     return recordsToRender;
   }, [apiClientRecords, childParentMap, prepareRecordsToRender, searchValue]);
-
-  const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
-    setIsExportModalOpen(true);
-  }, []);
 
   const toggleSelection = useCallback(() => {
     setSelectedRecords(new Set());
@@ -354,7 +351,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     onNewClick={onNewClick}
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
-                    onExportClick={handleExportCollection}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
@@ -407,13 +403,16 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         />
       )}
       {isMoveCollectionModalOpen && (
-        <MoveToCollectionModal
-          recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
-          isOpen={isMoveCollectionModalOpen}
-          onClose={() => {
-            setIsMoveCollectionModalOpen(false);
-          }}
-        />
+        // TODO: to be fix
+        <ContextId id={apiClientFeatureContextProviderStore.getState().getSingleViewContext()?.id}>
+          <MoveToCollectionModal
+            recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
+            isOpen={isMoveCollectionModalOpen}
+            onClose={() => {
+              setIsMoveCollectionModalOpen(false);
+            }}
+          />
+        </ContextId>
       )}
     </DndProvider>
   );

@@ -1,4 +1,7 @@
-import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import {
+  ApiClientFeatureContext,
+  apiClientFeatureContextProviderStore,
+} from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "../types";
 
 export function getStores(ctx: ApiClientFeatureContext) {
@@ -27,4 +30,30 @@ export function getApiClientCollectionVariablesStore(ctx: ApiClientFeatureContex
     return;
   }
   return recordState.collectionVariables;
+}
+
+// Multiview
+export function getApiClientFeatureContext(contextId: string) {
+  return apiClientFeatureContextProviderStore.getState().getContext(contextId);
+}
+
+export function getChildParentMap(context: ApiClientFeatureContext) {
+  return context.stores.records.getState().childParentMap;
+}
+
+export function saveOrUpdateRecord(context: ApiClientFeatureContext, apiClientRecord: RQAPI.ApiClientRecord) {
+  const recordId = apiClientRecord.id;
+  const apiRecordsStore = context.stores.records;
+  const doesRecordExist = !!apiRecordsStore.getState().getData(recordId);
+
+  if (doesRecordExist) {
+    apiRecordsStore.getState().updateRecord(apiClientRecord);
+  } else {
+    apiRecordsStore.getState().addNewRecord(apiClientRecord);
+  }
+}
+
+export function saveBulkRecords(context: ApiClientFeatureContext, records: RQAPI.ApiClientRecord[]) {
+  const apiRecordsStore = context.stores.records;
+  apiRecordsStore.getState().updateRecords(records);
 }

@@ -72,10 +72,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-  } = useApiClientContext();
+  const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
@@ -236,7 +233,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
                   title: record.name || record.data.request?.url,
                   context: {
                     id: contextId,
-                  }
+                  },
                 }),
                 { preview: true }
               );
