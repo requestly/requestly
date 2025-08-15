@@ -5,10 +5,10 @@ import { create } from "zustand";
 import { PersistedVariablesIDB } from "./persistedVariables";
 
 export interface RuntimeVariableValue extends VariableData {
-  isPersisted: boolean;
+  isPersisted?: boolean;
 }
 
-type RuntimeVariableState = VariablesState<RuntimeVariableValue>;
+export type RuntimeVariableState = VariablesState<RuntimeVariableValue>;
 
 export type RuntimeVariableStore = StoreApi<RuntimeVariableState>;
 

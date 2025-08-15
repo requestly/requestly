@@ -16,6 +16,8 @@ import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
+import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 
 interface Props {}
 
@@ -23,6 +25,7 @@ export enum ApiClientSidebarTabKey {
   HISTORY = "history",
   COLLECTIONS = "collections",
   ENVIRONMENTS = "environments",
+  RUNTIME_VARIABLES = "runtime_variables",
 }
 
 const APIClientSidebar: React.FC<Props> = () => {
@@ -46,7 +49,7 @@ const APIClientSidebar: React.FC<Props> = () => {
     selectedHistoryIndex,
   } = useApiClientContext();
 
-  const { onSaveRecord } = useNewApiClientContext()
+  const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
 
   const handleNewRecordClick = useCallback(
@@ -132,6 +135,20 @@ const APIClientSidebar: React.FC<Props> = () => {
           onSelectionFromHistory={setCurrentHistoryIndex}
         />
       ),
+    },
+    {
+      key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
+      label: (
+        <Tooltip title="Runtime-variables" placement="right">
+          <div
+            onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
+            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""}`}
+          >
+            <MdOutlineSpaceDashboard />
+          </div>
+        </Tooltip>
+      ),
+      children: <RuntimeVariables />,
     },
   ];
 

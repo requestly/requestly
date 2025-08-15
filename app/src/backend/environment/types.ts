@@ -6,7 +6,6 @@ export type VariableValueType = string | number | boolean;
 export type EnvironmentVariableKey = VariableKey;
 export interface EnvironmentVariableValue extends VariableData {
   localValue?: VariableValueType;
-  id: number;
 }
 
 export type EnvironmentVariables = Record<EnvironmentVariableKey, EnvironmentVariableValue>;

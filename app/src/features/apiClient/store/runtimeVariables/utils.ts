@@ -33,3 +33,10 @@ export const patchRuntimeStore = (patch: RuntimeVariables) => {
 };
 
 export type Primitive = VariableValueType | undefined;
+
+export const mapRuntimeArray = (variables: RuntimeVariables) => {
+  return Object.keys(variables).map((key) => ({
+    key,
+    ...variables[key],
+  }));
+};

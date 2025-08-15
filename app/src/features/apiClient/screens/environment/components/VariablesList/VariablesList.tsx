@@ -7,23 +7,40 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
-import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
+import { VariableData } from "features/apiClient/store/variables/types";
+import { RuntimeVariableValue } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 
-interface VariablesListProps {
-  variables: EnvironmentVariableTableRow[];
+interface VariablesListProps<T extends VariableData> {
+  variables: VariableRow<T>[];
   searchValue?: string;
-  onVariablesChange: (variables: EnvironmentVariableTableRow[]) => void;
+  onVariablesChange: (variables: VariableRow<T>[]) => void;
+  createNewVariable: (id: number, type: EnvironmentVariableType) => VariableRow<T>;
+  isReadOnly?: boolean;
+  container: "environments" | "runtime";
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
+export type VariableRow<T extends VariableData> = T & { key: string };
+export type MetaVariableRow = VariableRow<EnvironmentVariableValue | RuntimeVariableValue>;
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
+export function isEnvironmentVariableRow(row: MetaVariableRow): row is VariableRow<EnvironmentVariableValue> {
+  return "localValue" in row && row.localValue !== undefined;
+}
+
+export function isRuntimeVariableRow(row: MetaVariableRow): row is VariableRow<RuntimeVariableValue> {
+  return "isPersisted" in row && row.isPersisted !== undefined;
+}
+
+export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue | RuntimeVariableValue>> = ({
+  searchValue = "",
+  variables,
+  onVariablesChange,
+  createNewVariable,
+  isReadOnly = false,
+  container = "environments",
+}) => {
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
-  const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission("api_client_environment", "create");
-
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
     [dataSource, searchValue]
@@ -58,12 +75,12 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   }, [dataSource]);
 
   const handleVariableChange = useCallback(
-    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+    (row: MetaVariableRow, fieldChanged: keyof MetaVariableRow) => {
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key) {
+      if (row.key !== undefined && row.key !== null) {
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
@@ -74,16 +91,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     [dataSource, onVariablesChange]
   );
 
-  const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
-    const newData = {
-      id: dataSource.length,
-      key: "",
-      type: EnvironmentVariableType.String,
-      localValue: "",
-      syncValue: "",
-    };
-    setDataSource([...dataSource, newData]);
-  }, []);
+  const handleAddNewRow = useCallback(
+    (dataSource: MetaVariableRow[]) => {
+      const newVariable = createNewVariable(dataSource.length, EnvironmentVariableType.String);
+      const newDataSource = [...dataSource, newVariable];
+      setDataSource(newDataSource);
+      if (isRuntimeVariableRow(newVariable)) {
+        onVariablesChange(newDataSource);
+      }
+    },
+    [createNewVariable, onVariablesChange]
+  );
 
   const handleDeleteVariable = useCallback(
     async (id: number) => {
@@ -114,13 +132,33 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     [visibleSecretsRowIds]
   );
 
+  const handleUpdatePersisted = useCallback(
+    (id: number, isPersisted: boolean) => {
+      const variableRows = [...dataSource];
+      const index = variableRows.findIndex((variable) => variable.id === id);
+      const item = variableRows[index];
+
+      if (item) {
+        const updatedRow = { ...item, isPersisted };
+        variableRows.splice(index, 1, updatedRow);
+        setDataSource(variableRows);
+
+        onVariablesChange(variableRows);
+      }
+    },
+    [dataSource, onVariablesChange]
+  );
+
   const columns = useVariablesListColumns({
     handleVariableChange,
     handleDeleteVariable,
+    handleUpdatePersisted,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
     recordsCount: dataSource.length,
     duplicateKeyIndices,
+    isReadOnly,
+    container,
   });
 
   useEffect(() => {
@@ -130,17 +168,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       });
 
       if (formattedDataSource.length === 0) {
-        formattedDataSource.push({
-          id: 0,
-          key: "",
-          type: EnvironmentVariableType.String,
-          localValue: "",
-          syncValue: "",
-        });
+        formattedDataSource.push(createNewVariable(0, EnvironmentVariableType.String));
       }
       setDataSource(formattedDataSource);
     }
-  }, [variables]);
+  }, [variables, createNewVariable, container]);
 
   const handleAddVariable = () => {
     trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
@@ -164,7 +196,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        !isValidPermission
+        isReadOnly
           ? null
           : () => (
               <div className="variables-list-footer">
