@@ -32,6 +32,7 @@ import { useAppLanguageObserver } from "hooks/useAppLanguageObserver";
 import useClientStorageService from "services/clientStorageService/hooks/useClientStorageService";
 import { BlockScreenHoc } from "componentsV2/BlockScreen/BlockScreenHoc";
 import { AppUpdateNotifier } from "componentsV2/AppUpdateNotifier/AppUpdateNotifier";
+import { InitPopupConfig } from "hooks/InitPopupConfig";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -80,6 +81,7 @@ const App: React.FC = () => {
 
       <GrowthBookProvider growthbook={growthbook}>
         <DBListeners />
+        <InitPopupConfig />
         {/* <RuleExecutionsSyncer /> */}
         {/* @ts-ignore */}
         <ActiveWorkspace />

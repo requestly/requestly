@@ -41,6 +41,7 @@ export const EXTENSION_MESSAGES = {
   CONNECT_TO_DESKTOP_APP: "connectToDesktopApp",
   DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
   DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
+  IS_SESSION_REPLAY_ENABLED: "isSessionReplayEnabled",
 };
 
 export const EXTENSION_EXTERNAL_MESSAGES = {
@@ -94,6 +95,7 @@ export const STORAGE_KEYS = {
   TEST_REPORTS: "testReports",
   IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
   BLOCKED_DOMAINS: "blocked_domains",
+  POPUP_CONFIG: "popup_config",
 };
 
 export const LINKS = {

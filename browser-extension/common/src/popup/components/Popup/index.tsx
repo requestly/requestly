@@ -18,6 +18,7 @@ const Popup: React.FC = () => {
   const [isBlockedOnTab, setIsBlockedOnTab] = useState<boolean>(false);
   const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab>(null);
   const [isProxyApplied, setIsProxyApplied] = useState<boolean>(false);
+  const [isSessionReplayEnabled, setIsSessionReplayEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
@@ -44,6 +45,14 @@ const Popup: React.FC = () => {
       })
       ?.then(setIsBlockedOnTab);
   }, [currentTab]);
+
+  useEffect(() => {
+    chrome.runtime
+      .sendMessage({
+        action: EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED,
+      })
+      ?.then(setIsSessionReplayEnabled);
+  }, []);
 
   const handleToggleExtensionStatus = useCallback((newStatus: boolean) => {
     console.log("[Popup] handleToggleExtensionStatus", {
@@ -87,7 +96,7 @@ const Popup: React.FC = () => {
                   {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
                   <div className="popup-content">
                     {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
-                    <SessionRecordingView />
+                    {isSessionReplayEnabled && <SessionRecordingView />}
                     <DesktopAppProxy isProxyApplied={isProxyApplied} onProxyStatusChange={setIsProxyApplied} />
                   </div>
                 </>
