@@ -12,7 +12,7 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
   const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
 
   return (
-    <div style={{ height: "inherit" }}>
+    <div className="multiview-environments-sidebar-container">
       <SidebarListHeader
         onSearch={(value) => setSearchValue(value)}
         newRecordActionOptions={{
@@ -27,6 +27,7 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
         return (
           <WorkspaceLoader key={workspaceId} workspaceId={workspaceId}>
             <ContextId id={getContext(workspaceId)?.id}>
+              <h3>Workspace: {workspace.getState().name}</h3>
               <ContextualEnvironmentsList searchValue={searchValue} />
             </ContextId>
           </WorkspaceLoader>
