@@ -1,132 +1,119 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
 import { isApiCollection, isApiRequest } from "../../../utils";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
 import { isEmpty, partition } from "lodash";
 import * as Sentry from "@sentry/react";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { notification } from "antd";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { deleteRecords } from "features/apiClient/commands/records";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
-  records: RQAPI.ApiClientRecord[];
   onClose: () => void;
   onSuccess?: () => void;
+  getRecordsToDelete: () => {
+    context: ApiClientFeatureContext | undefined;
+    records: RQAPI.ApiClientRecord[];
+  }[];
 }
 
-export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
-  const deleteRecords = useAPIRecords((state) => state.deleteRecords);
-  const { apiClientRecordsRepository } = useApiClientRepository();
+export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
+  open,
+  getRecordsToDelete,
+  onClose,
+  onSuccess,
+}) => {
   const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
+  const records = useMemo(() => {
+    return getRecordsToDelete();
+  }, [getRecordsToDelete]);
+
+  console.log({ records });
+
   const [isDeleting, setIsDeleting] = useState(false);
+
   if (isEmpty(records)) {
     return null;
   }
 
-  let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
-
-  const getAllRecordsToDelete = () => {
-    const recordsToBeDeleted: RQAPI.ApiClientRecord[] = [];
-    const stack: RQAPI.ApiClientRecord[] = [...records];
-
-    while (stack.length) {
-      const record = stack.pop()!;
-      recordsToBeDeleted.push(record);
-      if (isApiCollection(record) && record.data.children) {
-        stack.push(...record.data.children);
-      }
-    }
-
-    return recordsToBeDeleted;
-  };
+  // let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
   const handleDeleteApiRecord = async () => {
-    const recordsToBeDeleted = getAllRecordsToDelete();
-    if (!recordsToBeDeleted.length) {
-      notification.error({
-        message: `Could not delete records.`,
-        placement: "bottomRight",
-      });
-      return;
-    }
+    try {
+      records.forEach(async ({ context, records }) => {
+        const { deletedApiRecords, deletedCollectionRecords } = await deleteRecords(context, { records });
 
-    setIsDeleting(true);
-    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
-    const apiRecordIds = apiRecords.map((record) => record.id);
-    const collectionRecordIds = collectionRecords.map((record) => record.id);
+        const isExampleCollection = deletedCollectionRecords.some((record) => !!record.isExample);
+        trackCollectionDeleted(isExampleCollection ? "example" : "");
 
-    // First delete records
-    const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
+        deletedApiRecords.forEach((r) => {
+          closeTabBySource(r.id, "request", true);
+        });
 
-    // Then delete collections
-    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds);
-
-    // Check if both deletions were successful
-    if (recordDeletionResult.success && collectionsDeletionResult.success) {
-      deleteRecords([...apiRecordIds, ...collectionRecordIds]);
-
-      const isExampleCollection = collectionRecords.some((record) => !!record.isExample);
-      trackCollectionDeleted(isExampleCollection ? "example" : "");
-
-      apiRecordIds.forEach((recordId) => {
-        closeTabBySource(recordId, "request", true);
+        deletedCollectionRecords.forEach((r) => {
+          closeTabBySource(r.id, "collection", true);
+        });
       });
 
-      collectionRecordIds.forEach((recordId) => {
-        closeTabBySource(recordId, "collection", true);
-      });
+      // First delete records
 
-      toast.success(
-        records.length === 1
-          ? records[0].type === RQAPI.RecordType.API
-            ? "API request deleted"
-            : "Collection deleted"
-          : "Records Deleted"
-      );
+      // toast.success(
+      //   records.length === 1
+      //     ? records[0].type === RQAPI.RecordType.API
+      //       ? "API request deleted"
+      //       : "Collection deleted"
+      //     : "Records Deleted"
+      // );
       onClose();
       onSuccess?.();
 
       // TODO: add analytics
-    } else {
-      const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
-      notification.error({
-        message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
-        description: erroredResult?.message,
-        placement: "bottomRight",
-      });
-
-      Sentry.withScope((scope) => {
-        scope.setTag("error_type", "api_client_record_deletion");
-        Sentry.captureException(
-          erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`
-        );
-      });
+    } catch (error) {
+      console.log(error);
+      // const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
+      // notification.error({
+      //   message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
+      //   description: erroredResult?.message,
+      //   placement: "bottomRight",
+      // });
+      // Sentry.withScope((scope) => {
+      //   scope.setTag("error_type", "api_client_record_deletion");
+      //   Sentry.captureException(
+      //     erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`
+      //   );
+      // });
+    } finally {
+      setIsDeleting(false);
     }
-
-    setIsDeleting(false);
   };
 
-  const header =
-    records.length === 1
-      ? records[0].type === RQAPI.RecordType.API
-        ? "Delete API Request"
-        : "Delete Collection"
-      : "Delete Records";
+  // const header =
+  //   records.length === 1
+  //     ? records[0].type === RQAPI.RecordType.API
+  //       ? "Delete API Request"
+  //       : "Delete Collection"
+  //     : "Delete Records";
 
-  const description =
-    records.length === 1
-      ? records[0].type === RQAPI.RecordType.API
-        ? `This action will permanently delete this API request. Are you sure you want to continue?`
-        : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
-      : "This action will permanently delete the selected Collections, APIs, and their associated requests. Are you sure you want to proceed?";
+  const header = "Delete Records";
+  //   records.length === 1
+  //     ? records[0].type === RQAPI.RecordType.API
+  //       ? "Delete API Request"
+  //       : "Delete Collection"
+  //     : "Delete Records";
+
+  const description = " This action will permanently delete this API request. Are you sure you want to continue?";
+  // records.length === 1
+  //   ? records[0].records.type === RQAPI.RecordType.API
+  //     ? `This action will permanently delete this API request. Are you sure you want to continue?`
+  //     : `This action will permanently delete the entire collection and its ${apiRequestCount} requests. Are you sure you want to continue?`
+  //   : "This action will permanently delete the selected Collections, APIs, and their associated requests. Are you sure you want to proceed?";
 
   return (
     <RQModal
@@ -146,11 +133,12 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
           Cancel
         </RQButton>
         <RQButton block type="danger" loading={isDeleting} onClick={handleDeleteApiRecord}>
-          {records.length === 1
+          {/* {records.length === 1
             ? records[0].type === RQAPI.RecordType.API
               ? "Delete API"
               : "Delete collection"
-            : "Delete Records"}
+            : "Delete Records"} */}
+          Delete Records
         </RQButton>
       </div>
     </RQModal>

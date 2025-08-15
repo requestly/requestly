@@ -8,7 +8,7 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { HistoryList } from "../components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "../components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
+import { ImportFromCurlModal } from "../../modals";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { ContextualCollectionsList } from "./ContextualCollectionsList/ContextualCollectionsList";
 import { ContextualEnvironmentsList } from "./ContextualEnvironmentsList/ContextualEnvironmentsList";
@@ -36,9 +36,6 @@ export const MultiWorkspaceSidebar: React.FC = () => {
     onNewClick,
     onImportClick,
     setCurrentHistoryIndex,
-    recordsToBeDeleted,
-    isDeleteModalOpen,
-    onDeleteModalClose,
     selectedHistoryIndex,
     isImportModalOpen,
     onImportRequestModalClose,
@@ -191,9 +188,9 @@ export const MultiWorkspaceSidebar: React.FC = () => {
             history={history}
             onClearHistory={clearHistory}
             onImportClick={onImportClick}
-            onNewClick={(recordType, entryType) =>
-              handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
-            }
+            onNewClick={(recordType, entryType) => {
+              handleNewRecordClick(recordType, "api_client_sidebar_header", entryType);
+            }}
           />
 
           <Tabs
@@ -208,8 +205,6 @@ export const MultiWorkspaceSidebar: React.FC = () => {
         </div>
         <ErrorFilesList />
       </div>
-
-      <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
 
       <ImportFromCurlModal
         isRequestLoading={isLoading}
