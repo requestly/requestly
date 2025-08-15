@@ -80,7 +80,7 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key) {
+      if (row.key !== undefined && row.key !== null) {
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
@@ -167,7 +167,7 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
         return a.id - b.id; // Sort by id if both ids are defined
       });
 
-      if (formattedDataSource.length === 0 && container !== "runtime") {
+      if (formattedDataSource.length === 0) {
         formattedDataSource.push(createNewVariable(0, EnvironmentVariableType.String));
       }
       setDataSource(formattedDataSource);
