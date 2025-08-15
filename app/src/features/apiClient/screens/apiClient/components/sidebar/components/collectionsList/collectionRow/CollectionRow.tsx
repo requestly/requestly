@@ -6,7 +6,6 @@ import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
@@ -30,6 +29,7 @@ import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useCommand } from "features/apiClient/commands";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -48,6 +48,7 @@ interface Props {
     recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
 export const CollectionRow: React.FC<Props> = ({
@@ -57,6 +58,7 @@ export const CollectionRow: React.FC<Props> = ({
   setExpandedRecordIds,
   bulkActionOptions,
   isReadOnly,
+  handleRecordsToBeDeleted,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -64,7 +66,6 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
-  const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [collectionsToExport, setCollectionsToExport] = useState([]);
 
@@ -135,15 +136,14 @@ export const CollectionRow: React.FC<Props> = ({
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            updateRecordsToBeDeleted([record]);
-            setIsDeleteModalOpen(true);
+            handleRecordsToBeDeleted([record]);
           },
         },
       ];
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordsToBeDeleted, handleCollectionExport]
+    [handleRecordsToBeDeleted, handleCollectionExport]
   );
 
   const collapseChangeHandler = useCallback(
@@ -448,6 +448,7 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             bulkActionOptions={bulkActionOptions}
+                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                           />
                         );
                       } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -460,6 +461,7 @@ export const CollectionRow: React.FC<Props> = ({
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
+                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                           />
                         );
                       }
