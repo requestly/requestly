@@ -11,13 +11,19 @@ import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
 import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
 import { capitalize } from "lodash";
-import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import {
+  ApiClientFeatureContext,
+  apiClientFeatureContextProviderStore,
+  useApiClientFeatureContextProvider,
+} from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { getProcessedRecords } from "features/apiClient/commands/utils";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { duplicateRecords } from "features/apiClient/commands/records/duplicateRecords.command";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { captureException } from "backend/apiClient/utils";
+import { DeleteApiRecordModal } from "../../../modals";
+import { useApiClientContext } from "features/apiClient/contexts";
 
 export type RecordSelectionAction = "select" | "unselect";
 
@@ -38,6 +44,8 @@ export const ContextualCollectionsList: React.FC<{
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  const { isDeleteModalOpen, setIsDeleteModalOpen, onDeleteModalClose } = useApiClientContext();
 
   const selectedRecordsAcrossWorkspaces = useRef<{
     [contextId: string]:
@@ -134,6 +142,10 @@ export const ContextualCollectionsList: React.FC<{
     }
   }, [deselect]);
 
+  const handleRecordsDelete = useCallback(() => {
+    setIsDeleteModalOpen(true);
+  }, [setIsDeleteModalOpen]);
+
   const onBulkActionClick = useCallback(
     (action: BulkActions) => {
       // TODO: add empty check
@@ -153,7 +165,8 @@ export const ContextualCollectionsList: React.FC<{
       }
 
       if (action === BulkActions.DELETE) {
-        // NOOP
+        handleRecordsDelete();
+        return;
       }
 
       if ([BulkActions.MOVE, BulkActions.EXPORT].includes(action)) {
@@ -178,7 +191,7 @@ export const ContextualCollectionsList: React.FC<{
         }
       }
     },
-    [handleSelectToggle, handleDuplicateRecords]
+    [handleSelectToggle, handleRecordsDelete, handleDuplicateRecords]
   );
 
   const toggleMultiSelect = useCallback(() => {
@@ -233,6 +246,22 @@ export const ContextualCollectionsList: React.FC<{
     return getRecordsBySingleContextSelection();
   }, [isExportModalOpen, getRecordsBySingleContextSelection]);
 
+  const getSelectedRecords = useCallback((): {
+    context: ApiClientFeatureContext | undefined;
+    records: RQAPI.ApiClientRecord[];
+  }[] => {
+    const recordsWithContext = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).map(([ctxId, value]) => {
+      const context = apiClientFeatureContextProviderStore.getState().getContext(ctxId);
+      return {
+        context,
+        // TODO: check why some records are undefind
+        records: getProcessedRecords(ctxId, value.recordIds).filter((r) => !!r),
+      };
+    });
+
+    return recordsWithContext;
+  }, []);
+
   return (
     <>
       <DndProvider backend={HTML5Backend}>
@@ -277,7 +306,7 @@ export const ContextualCollectionsList: React.FC<{
         })}
       </DndProvider>
 
-      {isMoveCollectionModalOpen && (
+      {isMoveCollectionModalOpen ? (
         // TODO: TBD on modals
         <ContextId id={recordsToMove[0]}>
           <MoveToCollectionModal
@@ -288,9 +317,9 @@ export const ContextualCollectionsList: React.FC<{
             }}
           />
         </ContextId>
-      )}
+      ) : null}
 
-      {isExportModalOpen && (
+      {isExportModalOpen ? (
         <ApiClientExportModal
           exportType="collection"
           recordsToBeExported={collectionsToExport[1]}
@@ -300,7 +329,15 @@ export const ContextualCollectionsList: React.FC<{
             setIsExportModalOpen(false);
           }}
         />
-      )}
+      ) : null}
+
+      {isDeleteModalOpen ? (
+        <DeleteApiRecordModal
+          open={isDeleteModalOpen}
+          getRecordsToDelete={getSelectedRecords}
+          onClose={onDeleteModalClose}
+        />
+      ) : null}
     </>
   );
 };

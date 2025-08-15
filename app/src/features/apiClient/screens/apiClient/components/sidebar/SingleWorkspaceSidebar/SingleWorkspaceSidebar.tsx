@@ -16,6 +16,8 @@ import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import "./singleWorkspaceSidebar.scss";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {}
 
@@ -49,6 +51,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
+  const context = useApiClientFeatureContext();
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
@@ -185,6 +188,18 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     }
   }, [state?.modal, setIsImportModalOpen]);
 
+  const getSelectedRecords = useCallback((): {
+    context: ApiClientFeatureContext | undefined;
+    records: RQAPI.ApiClientRecord[];
+  }[] => {
+    return [
+      {
+        context,
+        records: recordsToBeDeleted,
+      },
+    ];
+  }, [context, recordsToBeDeleted]);
+
   return (
     <>
       <div className="api-client-sidebar">
@@ -212,7 +227,13 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         <ErrorFilesList />
       </div>
 
-      <DeleteApiRecordModal open={isDeleteModalOpen} records={recordsToBeDeleted} onClose={onDeleteModalClose} />
+      {isDeleteModalOpen ? (
+        <DeleteApiRecordModal
+          open={isDeleteModalOpen}
+          onClose={onDeleteModalClose}
+          getRecordsToDelete={getSelectedRecords}
+        />
+      ) : null}
 
       <ImportFromCurlModal
         isRequestLoading={isLoading}
