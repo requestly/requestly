@@ -5,7 +5,6 @@ import { useRBAC } from "features/rbac";
 import { DndProvider } from "react-dnd";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { CollectionsList } from "./CollectionsList/CollectionsList";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
 import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
@@ -24,11 +23,11 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 
 export type RecordSelectionAction = "select" | "unselect";
 
-// TODO: update the name
-export const ContextualCollectionsList: React.FC<{
+export const ContextualCollectionsSidebar: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType | null;
 }> = ({ onNewClick, recordTypeToBeCreated }) => {
@@ -291,7 +290,7 @@ export const ContextualCollectionsList: React.FC<{
             <WorkspaceLoader key={workspaceId} workspaceId={workspaceId}>
               <ContextId id={getContext(workspaceId)?.id}>
                 <h3>Workspace: {workspace.getState().name}</h3>
-                <CollectionsList
+                <ContextualCollectionsList
                   isSelectAll={isSelectAll}
                   showSelection={showSelection}
                   handleShowSelection={handleShowSelection}

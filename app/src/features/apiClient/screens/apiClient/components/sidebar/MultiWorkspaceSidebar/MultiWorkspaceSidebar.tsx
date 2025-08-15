@@ -10,8 +10,8 @@ import { ApiClientSidebarHeader } from "../components/apiClientSidebarHeader/Api
 import { useApiClientContext } from "features/apiClient/contexts";
 import { ImportFromCurlModal } from "../../modals";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
-import { ContextualCollectionsList } from "./ContextualCollectionsList/ContextualCollectionsList";
-import { ContextualEnvironmentsList } from "./ContextualEnvironmentsList/ContextualEnvironmentsList";
+import { ContextualCollectionsSidebar } from "./ContextualCollectionsSidebar/ContextualCollectionsSidebar";
+import { ContextualEnvironmentsSidebar } from "./ContextualEnvironmentsSidebar/ContextualEnvironmentsSidebar";
 import { getEmptyApiEntry } from "../../../utils";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
@@ -96,7 +96,7 @@ export const MultiWorkspaceSidebar: React.FC = () => {
           </div>
         </Tooltip>
       ),
-      children: <ContextualCollectionsList onNewClick={onNewClick} recordTypeToBeCreated={recordTypeToBeCreated} />,
+      children: <ContextualCollectionsSidebar onNewClick={onNewClick} recordTypeToBeCreated={recordTypeToBeCreated} />,
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
@@ -107,7 +107,7 @@ export const MultiWorkspaceSidebar: React.FC = () => {
           </div>
         </Tooltip>
       ),
-      children: <ContextualEnvironmentsList />,
+      children: <ContextualEnvironmentsSidebar />,
     },
     {
       key: ApiClientSidebarTabKey.HISTORY,

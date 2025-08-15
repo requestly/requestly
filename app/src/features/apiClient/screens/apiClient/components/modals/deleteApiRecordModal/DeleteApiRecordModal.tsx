@@ -35,8 +35,6 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
     return getRecordsToDelete();
   }, [getRecordsToDelete]);
 
-  console.log({ records });
-
   const [isDeleting, setIsDeleting] = useState(false);
 
   if (isEmpty(records)) {

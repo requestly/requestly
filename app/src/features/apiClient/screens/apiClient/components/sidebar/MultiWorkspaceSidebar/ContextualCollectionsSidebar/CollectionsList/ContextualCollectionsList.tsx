@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { sessionStorage } from "utils/sessionStorage";
-import "./collectionsList.scss";
+import "./contextualCollectionsList.scss";
 import { union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { useRBAC } from "features/rbac";
@@ -15,7 +15,7 @@ import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderIt
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { RecordSelectionAction } from "../ContextualCollectionsList";
+import { RecordSelectionAction } from "../ContextualCollectionsSidebar";
 import {
   getRecordsToExpandBySearchValue,
   getRecordsToRender,
@@ -37,7 +37,7 @@ interface Props {
   }) => void;
 }
 
-export const CollectionsList: React.FC<Props> = ({
+export const ContextualCollectionsList: React.FC<Props> = ({
   searchValue,
   onNewClick,
   recordTypeToBeCreated,
