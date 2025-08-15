@@ -1,23 +1,32 @@
 import { LocalScope } from "modules/localScope";
-
 export class VariableScope {
   constructor(
     private localScope: LocalScope,
-    private variableScopeName: "environment" | "global" | "collectionVariables"
+    private variableScopeName: "environment" | "global" | "collectionVariables" | "variables"
   ) {}
 
-  set(key: string, value: any) {
+  set(key: string, value: any, options?: any) {
     if (key === undefined || value === undefined) {
       throw new Error(`Key or value is undefined while setting ${this.variableScopeName} variable.`);
     }
     const currentVariables = this.localScope.get(this.variableScopeName);
-    this.localScope.set(this.variableScopeName, {
-      ...currentVariables,
-      [key]:
-        key in currentVariables
-          ? { ...currentVariables[key], localValue: value }
-          : { localValue: value, syncValue: value, type: typeof value },
-    });
+    if (this.variableScopeName === "variables") {
+      this.localScope.set(this.variableScopeName, {
+        ...currentVariables,
+        [key]:
+          key in currentVariables
+            ? { ...currentVariables[key], syncValue: value, isPersisted: !!options?.persist }
+            : { syncValue: value, type: typeof value, isPersisted: !!options?.persist },
+      });
+    } else {
+      this.localScope.set(this.variableScopeName, {
+        ...currentVariables,
+        [key]:
+          key in currentVariables
+            ? { ...currentVariables[key], localValue: value }
+            : { localValue: value, syncValue: value, type: typeof value },
+      });
+    }
   }
 
   get(key: string) {

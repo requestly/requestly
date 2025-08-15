@@ -29,8 +29,9 @@ import {
 } from "features/apiClient/commands/store.utils";
 import { parseEnvironmentState } from "features/apiClient/commands/environments/utils";
 import { NativeError } from "errors/NativeError";
-import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
+import { getParsedRuntimeVariables } from "features/apiClient/store/runtimeVariables/utils";
 
 type InternalFunctions = {
   postScriptExecutionCallback(state: any): Promise<void>;
@@ -92,6 +93,7 @@ export class HttpRequestExecutor {
     const globalEnvironmentState = globalEnvironment.getState();
     const globalVariables = parseEnvironmentState(globalEnvironmentState).variables;
     const environmentVariables = activeEnvironment ? parseEnvironmentState(activeEnvironment.getState()).variables : {};
+    const variables = getParsedRuntimeVariables();
     const collectionVariables = (() => {
       const parent = getApiClientRecordsStore(this.ctx).getState().getParent(this.recordId);
       if (!parent) {
@@ -110,6 +112,7 @@ export class HttpRequestExecutor {
       global: globalVariables,
       collection: collectionVariables,
       environment: environmentVariables,
+      variables,
     };
   }
 
@@ -140,7 +143,7 @@ export class HttpRequestExecutor {
         (body) => body.type === FormDropDownOptions.FILE && typeof body.value !== "string"
       );
 
-      const validateFile = useApiClientFileStore.getState().isFilePresentLocally;
+      const validateFile = apiClientFileStore.getState().isFilePresentLocally;
 
       const invalidFiles: string[] = [];
 
