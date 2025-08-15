@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import { Input, notification, Tabs } from "antd";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { useDebounce } from "hooks/useDebounce";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";

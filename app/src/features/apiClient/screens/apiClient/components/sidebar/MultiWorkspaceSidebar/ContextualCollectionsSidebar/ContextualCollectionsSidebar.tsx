@@ -22,7 +22,6 @@ import { duplicateRecords } from "features/apiClient/commands/records/duplicateR
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
 import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 
 export type RecordSelectionAction = "select" | "unselect";
@@ -44,7 +43,21 @@ export const ContextualCollectionsSidebar: React.FC<{
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  const { isDeleteModalOpen, setIsDeleteModalOpen, onDeleteModalClose } = useApiClientContext();
+  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<{
+    records: RQAPI.ApiClientRecord[];
+    context: ApiClientFeatureContext;
+  } | null>({ context: null, records: [] });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleRecordsToBeDeleted = useCallback((records: RQAPI.ApiClientRecord[], context: ApiClientFeatureContext) => {
+    setRecordsToBeDeleted({ context, records });
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const onDeleteModalClose = useCallback(() => {
+    setRecordsToBeDeleted(null);
+    setIsDeleteModalOpen(false);
+  }, []);
 
   const selectedRecordsAcrossWorkspaces = useRef<{
     [contextId: string]:
@@ -261,8 +274,8 @@ export const ContextualCollectionsSidebar: React.FC<{
       };
     });
 
-    return recordsWithContext;
-  }, []);
+    return showSelection ? recordsWithContext : [recordsToBeDeleted];
+  }, [showSelection, recordsToBeDeleted]);
 
   return (
     <>
@@ -301,6 +314,7 @@ export const ContextualCollectionsSidebar: React.FC<{
                   onNewClick={onNewClick}
                   recordTypeToBeCreated={recordTypeToBeCreated}
                   handleRecordSelection={handleRecordSelection}
+                  handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                 />
               </ContextId>
             </WorkspaceLoader>

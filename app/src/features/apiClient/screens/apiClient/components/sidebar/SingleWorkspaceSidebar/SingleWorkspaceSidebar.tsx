@@ -43,9 +43,6 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     onNewClick,
     onImportClick,
     setCurrentHistoryIndex,
-    recordsToBeDeleted,
-    isDeleteModalOpen,
-    onDeleteModalClose,
     selectedHistoryIndex,
     isImportModalOpen,
     onImportRequestModalClose,
@@ -55,6 +52,19 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const context = useApiClientFeatureContext();
+
+  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.ApiClientRecord[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleRecordsToBeDeleted = useCallback((records: RQAPI.ApiClientRecord[]) => {
+    setRecordsToBeDeleted(records);
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const onDeleteModalClose = useCallback(() => {
+    setRecordsToBeDeleted([]);
+    setIsDeleteModalOpen(false);
+  }, []);
 
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
@@ -107,7 +117,13 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
           </div>
         </Tooltip>
       ),
-      children: <CollectionsList onNewClick={onNewClick} recordTypeToBeCreated={recordTypeToBeCreated} />,
+      children: (
+        <CollectionsList
+          onNewClick={onNewClick}
+          recordTypeToBeCreated={recordTypeToBeCreated}
+          handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+        />
+      ),
     },
     {
       key: ApiClientSidebarTabKey.ENVIRONMENTS,
@@ -209,12 +225,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     context: ApiClientFeatureContext | undefined;
     records: RQAPI.ApiClientRecord[];
   }[] => {
-    return [
-      {
-        context,
-        records: recordsToBeDeleted,
-      },
-    ];
+    return [{ context, records: recordsToBeDeleted }];
   }, [context, recordsToBeDeleted]);
 
   return (

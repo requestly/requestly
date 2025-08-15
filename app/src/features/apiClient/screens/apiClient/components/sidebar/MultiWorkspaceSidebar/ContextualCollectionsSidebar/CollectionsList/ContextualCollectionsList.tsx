@@ -14,13 +14,14 @@ import { CollectionRow } from "../../../components/collectionsList/collectionRow
 import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { RecordSelectionAction } from "../ContextualCollectionsSidebar";
 import {
   getRecordsToExpandBySearchValue,
   getRecordsToRender,
   selectAllRecords,
 } from "features/apiClient/commands/utils";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   searchValue: string;
@@ -35,6 +36,7 @@ interface Props {
     recordIds: Set<string>;
     isAllRecordsSelected: boolean;
   }) => void;
+  handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context: ApiClientFeatureContext) => void;
 }
 
 export const ContextualCollectionsList: React.FC<Props> = ({
@@ -45,6 +47,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   handleShowSelection,
   handleRecordSelection,
   isSelectAll,
+  handleRecordsToBeDeleted,
 }) => {
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
@@ -52,7 +55,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
 
   const { isRecordBeingCreated } = useApiClientContext();
-  const contextId = useContextId();
+  const context = useApiClientFeatureContext();
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
   const [expandedRecordIds, setExpandedRecordIds] = useState(
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
@@ -75,7 +78,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     handleShowSelection(false);
 
     const recordsToRender = getRecordsToRender({ apiClientRecords, searchValue });
-    const recordsToExpand = getRecordsToExpandBySearchValue({ contextId, apiClientRecords, searchValue });
+    const recordsToExpand = getRecordsToExpandBySearchValue({ contextId: context.id, apiClientRecords, searchValue });
 
     setExpandedRecordIds((prev: string[]) => {
       const newExpanded = prev.concat(recordsToExpand);
@@ -83,7 +86,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     });
 
     return recordsToRender;
-  }, [contextId, apiClientRecords, handleShowSelection, searchValue]);
+  }, [context.id, apiClientRecords, handleShowSelection, searchValue]);
 
   // Main toggle handler
   const recordsSelectionHandler = useCallback(
@@ -140,7 +143,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
 
         const totalRecordsCount = Object.keys(updatedRecords.recordsMap).length;
         handleRecordSelection({
-          contextId,
+          contextId: context.id,
           action: "select",
           recordIds: newSelectedRecords,
           isAllRecordsSelected: newSelectedRecords.size === totalRecordsCount,
@@ -149,7 +152,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
         return newSelectedRecords;
       });
     },
-    [contextId, updatedRecords, childParentMap, handleRecordSelection]
+    [context?.id, updatedRecords, childParentMap, handleRecordSelection]
   );
 
   useEffect(() => {
@@ -167,9 +170,9 @@ export const ContextualCollectionsList: React.FC<Props> = ({
 
   useEffect(() => {
     if (isSelectAll) {
-      const result = selectAllRecords({ contextId, searchValue });
+      const result = selectAllRecords({ contextId: context?.id, searchValue });
       handleRecordSelection({
-        contextId,
+        contextId: context?.id,
         action: "select",
         recordIds: result,
         isAllRecordsSelected: true,
@@ -178,7 +181,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     } else {
       setSelectedRecords(new Set());
     }
-  }, [isSelectAll, handleRecordSelection, contextId, searchValue]);
+  }, [isSelectAll, handleRecordSelection, context?.id, searchValue]);
 
   return (
     <>
@@ -201,6 +204,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       recordsSelectionHandler,
                       setShowSelection: handleShowSelection,
                     }}
+                    handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );
               })}
@@ -224,6 +228,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       recordsSelectionHandler,
                       setShowSelection: handleShowSelection,
                     }}
+                    handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );
               })}

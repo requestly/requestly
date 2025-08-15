@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Input } from "antd";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
 import { LoadingOutlined } from "@ant-design/icons";
 import "./newRecordNameInput.scss";

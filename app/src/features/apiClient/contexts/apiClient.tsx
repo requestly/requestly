@@ -28,12 +28,6 @@ import { useContextId } from "./contextId.context";
 import { useNewApiClientContext } from "../hooks/useNewApiClientContext";
 
 interface ApiClientContextInterface {
-  recordsToBeDeleted: RQAPI.ApiClientRecord[];
-  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.ApiClientRecord[]) => void;
-  isDeleteModalOpen: boolean;
-  setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onDeleteModalClose: () => void;
-
   history: RQAPI.ApiEntry[];
   addToHistory: (apiEntry: RQAPI.ApiEntry) => void;
   clearHistory: () => void;
@@ -59,11 +53,6 @@ interface ApiClientContextInterface {
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  recordsToBeDeleted: [],
-  updateRecordsToBeDeleted: () => {},
-  isDeleteModalOpen: false,
-  setIsDeleteModalOpen: () => {},
-  onDeleteModalClose: () => {},
   history: [],
   addToHistory: () => {},
   clearHistory: () => {},
@@ -117,7 +106,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const contextId = useContextId();
 
-  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.ApiClientRecord[]>([]);
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
@@ -135,21 +123,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     [openTab]
   );
 
-  // TODO: Create modal context
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
   useEffect(() => {
     debouncedTrackUserProperties();
   }, [apiClientRecords, debouncedTrackUserProperties]);
-
-  const updateRecordsToBeDeleted = useCallback((record: RQAPI.ApiClientRecord[]) => {
-    setRecordsToBeDeleted(record);
-  }, []);
-
-  const onDeleteModalClose = useCallback(() => {
-    setIsDeleteModalOpen(false);
-    setRecordsToBeDeleted(null);
-  }, []);
 
   const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     setHistory((history) => [...history, apiEntry]);
@@ -272,11 +248,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
   const value = {
-    recordsToBeDeleted,
-    updateRecordsToBeDeleted,
-    isDeleteModalOpen,
-    setIsDeleteModalOpen,
-    onDeleteModalClose,
     history,
     addToHistory,
     clearHistory,

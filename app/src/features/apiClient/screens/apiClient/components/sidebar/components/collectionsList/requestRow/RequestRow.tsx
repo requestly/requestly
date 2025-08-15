@@ -4,7 +4,6 @@ import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../.
 import { RequestMethod, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../../modals/MoveToCollectionModal/MoveToCollectionModal";
@@ -28,6 +27,7 @@ import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -38,6 +38,7 @@ interface Props {
     recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
 const HttpMethodIcon = ({ entry }: { entry: RQAPI.HttpApiEntry }) => {
@@ -68,11 +69,10 @@ const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
   }
 };
 
-export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions }) => {
+export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions, handleRecordsToBeDeleted }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
-  const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
@@ -193,13 +193,12 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
         danger: true,
         onClick: (itemInfo) => {
           itemInfo.domEvent?.stopPropagation?.();
-          updateRecordsToBeDeleted([record]);
-          setIsDeleteModalOpen(true);
+          handleRecordsToBeDeleted([record]);
           handleDropdownVisibleChange(false);
         },
       },
     ];
-  }, [record, updateRecordsToBeDeleted, setIsDeleteModalOpen, handleDuplicateRequest]);
+  }, [record, handleRecordsToBeDeleted, handleDuplicateRequest]);
 
   return (
     <>
@@ -212,6 +211,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
           }}
         />
       )}
+
       {isEditMode ? (
         <NewRecordNameInput
           analyticEventSource="collection_row"
