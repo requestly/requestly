@@ -20,7 +20,9 @@ interface EnvironmentViewProps {
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const environment = useEnvironment(envId, (s) => s);
   const variablesMap = useVariableStore(environment.data.variables);
-  const variablesData = Object.fromEntries(variablesMap.data);
+  const variablesData = useMemo(() => {
+    return mapToEnvironmentArray(Object.fromEntries(variablesMap.data));
+  }, [variablesMap]);
   const {
     env: { setEnvironmentVariables },
   } = useCommand();
@@ -34,7 +36,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
 
   // FIXME: Saves last input value even when cleared
   const variables = useMemo(() => {
-    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapToEnvironmentArray(variablesData);
+    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : variablesData;
   }, [variablesData]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
