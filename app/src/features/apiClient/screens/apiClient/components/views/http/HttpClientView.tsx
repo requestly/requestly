@@ -73,6 +73,7 @@ import PATHS from "config/constants/sub/paths";
 import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { patchRuntimeStore } from "features/apiClient/store/runtimeVariables/utils";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -302,6 +303,9 @@ const HttpClientView: React.FC<Props> = ({
             collectionId: apiEntryDetails?.collectionId,
             variables: state[key],
           });
+        }
+        if (key === "variables") {
+          patchRuntimeStore(state[key]);
         }
       }
     },
