@@ -13,14 +13,14 @@ import {
   parseEnvironmentState,
   parseEnvironmentStore,
 } from "features/apiClient/commands/environments/utils";
-import "./environmentsList.scss";
+import "./contextualEnvironmentsList.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
-interface EnvironmentsListProps {
+interface ContextualEnvironmentsListProps {
   searchValue: string;
 }
 
-export const EnvironmentsList: React.FC<EnvironmentsListProps> = ({ searchValue }) => {
+export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProps> = ({ searchValue }) => {
   const [globalEnvironment, nonGlobalEnvironments, getEnvironment] = useAPIEnvironment((s) => [
     s.globalEnvironment,
     s.environments,
