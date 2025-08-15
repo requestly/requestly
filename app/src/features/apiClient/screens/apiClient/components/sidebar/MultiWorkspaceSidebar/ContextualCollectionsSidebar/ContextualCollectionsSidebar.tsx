@@ -147,11 +147,14 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   const onBulkActionClick = useCallback(
     (action: BulkActions) => {
-      // TODO: add empty check
-      // if (isEmpty(selectedRecords) && action !== BulkActions.SELECT_ALL) {
-      //   toast.error("Please Select Records");
-      //   return;
-      // }
+      const isEmpty = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).every(
+        (value) => value.recordIds.size === 0
+      );
+
+      if (isEmpty && action !== BulkActions.SELECT_ALL) {
+        toast.error("Please Select Records");
+        return;
+      }
 
       if (action === BulkActions.SELECT_ALL) {
         handleSelectToggle();
