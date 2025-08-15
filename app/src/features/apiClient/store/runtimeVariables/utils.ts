@@ -10,14 +10,13 @@ export const getParsedRuntimeVariables = (): RuntimeVariables => {
 
 export const patchRuntimeStore = (patch: RuntimeVariables) => {
   const currentVariables = runtimeVariablesStore.getState().getAll();
-  const finalVariables = new Map(currentVariables);
+  const finalVariables = new Map();
 
   let counter = currentVariables.size;
   for (const key in patch) {
     if (finalVariables.has(key)) {
       const currentValue = currentVariables.get(key);
       finalVariables.set(key, {
-        ...currentValue,
         ...patch[key],
         id: currentValue.id,
       });
@@ -34,3 +33,10 @@ export const patchRuntimeStore = (patch: RuntimeVariables) => {
 };
 
 export type Primitive = VariableValueType | undefined;
+
+export const mapRuntimeArray = (variables: RuntimeVariables) => {
+  return Object.keys(variables).map((key) => ({
+    key,
+    ...variables[key],
+  }));
+};

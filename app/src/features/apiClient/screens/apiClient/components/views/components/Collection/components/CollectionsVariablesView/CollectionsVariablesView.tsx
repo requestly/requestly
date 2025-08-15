@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
-import {
-  EnvironmentVariableTableRow,
-  VariablesList,
-} from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -16,6 +12,7 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 import { NativeError } from "errors/NativeError";
+import { CollectionsVariablesList, EnvironmentVariableTableRow } from "../CollectionsVariablesList";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -102,7 +99,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
       />
-      <VariablesList
+      <CollectionsVariablesList
         variables={pendingVariables}
         onVariablesChange={handleSetPendingVariables}
         searchValue={searchValue}

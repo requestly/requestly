@@ -18,6 +18,8 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import "./singleWorkspaceSidebar.scss";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
+import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 
 interface Props {}
 
@@ -25,6 +27,7 @@ export enum ApiClientSidebarTabKey {
   HISTORY = "history",
   COLLECTIONS = "collections",
   ENVIRONMENTS = "environments",
+  RUNTIME_VARIABLES = "runtime_variables",
 }
 
 export const SingleWorkspaceSidebar: React.FC<Props> = () => {
@@ -136,6 +139,20 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
           onSelectionFromHistory={setCurrentHistoryIndex}
         />
       ),
+    },
+    {
+      key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
+      label: (
+        <Tooltip title="Runtime-variables" placement="right">
+          <div
+            onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
+            className={`api-client-tab-link ${activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""}`}
+          >
+            <MdOutlineSpaceDashboard />
+          </div>
+        </Tooltip>
+      ),
+      children: <RuntimeVariables />,
     },
   ];
 

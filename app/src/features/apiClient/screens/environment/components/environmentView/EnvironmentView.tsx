@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
+// import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -12,6 +12,7 @@ import { useCommand } from "features/apiClient/commands";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
+import { EnvironmentVariablesList, EnvironmentVariableTableRow } from "../VariablesList/EnvironmentVariablesList";
 
 interface EnvironmentViewProps {
   envId: string;
@@ -20,7 +21,9 @@ interface EnvironmentViewProps {
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   const environment = useEnvironment(envId, (s) => s);
   const variablesMap = useVariableStore(environment.data.variables);
-  const variablesData = Object.fromEntries(variablesMap.data);
+  const variablesData = useMemo(() => {
+    return mapToEnvironmentArray(Object.fromEntries(variablesMap.data));
+  }, [variablesMap]);
   const {
     env: { setEnvironmentVariables },
   } = useCommand();
@@ -34,7 +37,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
 
   // FIXME: Saves last input value even when cleared
   const variables = useMemo(() => {
-    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapToEnvironmentArray(variablesData);
+    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : variablesData;
   }, [variablesData]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
@@ -109,10 +112,10 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
             onExportClick: () => setIsExportModalOpen(true),
           }}
         />
-        <VariablesList
+        <EnvironmentVariablesList
           searchValue={searchValue}
-          variables={pendingVariables}
-          onVariablesChange={handleSetPendingVariables}
+          pendingVariables={pendingVariables}
+          handleSetPendingVariables={handleSetPendingVariables}
         />
         {isExportModalOpen && (
           <ApiClientExportModal
