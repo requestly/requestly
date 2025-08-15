@@ -57,7 +57,6 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
     }
   }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
 
-  // TODO: refactor into a command
   const moveRecordsToCollection = useCallback(
     async (recordsToMove: RQAPI.ApiClientRecord[], collectionId: string, isNewCollection: boolean) => {
       try {
