@@ -18,6 +18,7 @@ import { EnvironmentViewTabSource } from "features/apiClient/screens/environment
 import { useCommand } from "features/apiClient/commands";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
@@ -40,6 +41,8 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   const {
     env: { renameEnvironment, duplicateEnvironment, deleteEnvironment },
   } = useCommand();
+
+  const contextId = useContextId();
 
   const activeEnvironment = useActiveEnvironment();
   const environment = useEnvironment(environmentId, (s) => s);
@@ -71,7 +74,9 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       await renameEnvironment({ environmentId: environment.id, newName: newEnvironmentName });
 
       trackEnvironmentRenamed();
-      openTab(new EnvironmentViewTabSource({ id: environment.id, title: newEnvironmentName }));
+      openTab(
+        new EnvironmentViewTabSource({ id: environment.id, title: newEnvironmentName, context: { id: contextId } })
+      );
       toast.success("Environment renamed successfully");
     } catch (error) {
       toast.error("Failed to rename environment");
@@ -79,7 +84,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       setIsRenaming(false);
       setIsRenameInputVisible(false);
     }
-  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, openTab]);
+  }, [newEnvironmentName, environment.id, environment.name, renameEnvironment, contextId, openTab]);
 
   const handleEnvironmentDuplicate = useCallback(async () => {
     try {
@@ -138,7 +143,9 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     <div
       className={`environments-list-item ${environment.id === activeTabSourceId ? "active" : ""}`}
       onClick={() => {
-        openTab(new EnvironmentViewTabSource({ id: environment.id, title: environment.name }));
+        openTab(
+          new EnvironmentViewTabSource({ id: environment.id, title: environment.name, context: { id: contextId } })
+        );
       }}
     >
       <div className="environments-list-item__label">
