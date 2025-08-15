@@ -48,8 +48,7 @@ export const GlobalSettings = () => {
           <ImplicitRuleTesting />
         ) : null}
         {isFeatureCompatible(APP_CONSTANTS.FEATURES.BLOCK_LIST) && <BlockList />}
-        {/* TODO: Add feature compatibility */}
-        <PopupConfig />
+        {isFeatureCompatible(APP_CONSTANTS.FEATURES.POPUP_CONFIG) && <PopupConfig />}
       </div>
     </div>
   );
