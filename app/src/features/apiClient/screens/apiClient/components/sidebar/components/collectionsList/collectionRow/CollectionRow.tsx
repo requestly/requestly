@@ -29,6 +29,7 @@ import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useCommand } from "features/apiClient/commands";
+import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -38,7 +39,6 @@ interface Props {
     collectionId?: string,
     entryType?: RQAPI.ApiEntryType
   ) => Promise<void>;
-  onExportClick: (collection: RQAPI.CollectionRecord) => void;
   setExpandedRecordIds: (keys: RQAPI.ApiClientRecord["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -53,7 +53,6 @@ interface Props {
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
-  onExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -66,6 +65,8 @@ export const CollectionRow: React.FC<Props> = ({
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
   const { updateRecordsToBeDeleted, setIsDeleteModalOpen } = useApiClientContext();
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [collectionsToExport, setCollectionsToExport] = useState([]);
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
@@ -78,6 +79,11 @@ export const CollectionRow: React.FC<Props> = ({
   const contextId = useContextId();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
   const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
+
+  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord) => {
+    setCollectionsToExport((prev) => [...prev, collection]);
+    setIsExportModalOpen(true);
+  }, []);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -115,7 +121,7 @@ export const CollectionRow: React.FC<Props> = ({
           ),
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
+            handleCollectionExport(record);
           },
         },
         {
@@ -137,7 +143,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
+    [setIsDeleteModalOpen, updateRecordsToBeDeleted, handleCollectionExport]
   );
 
   const collapseChangeHandler = useCallback(
@@ -256,6 +262,18 @@ export const CollectionRow: React.FC<Props> = ({
 
   return (
     <>
+      {isExportModalOpen ? (
+        <ApiClientExportModal
+          exportType="collection"
+          recordsToBeExported={collectionsToExport}
+          isOpen={isExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsExportModalOpen(false);
+          }}
+        />
+      ) : null}
+
       {isEditMode ? (
         <NewRecordNameInput
           analyticEventSource="collection_row"
@@ -439,7 +457,6 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             onNewClick={onNewClick}
-                            onExportClick={onExportClick}
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
