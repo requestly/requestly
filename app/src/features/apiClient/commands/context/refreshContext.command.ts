@@ -22,12 +22,12 @@ export const refreshContext = async (ctxId: ApiClientFeatureContext["id"]) => {
     }
 
     return Promise.all([forceRefreshRecords(context), forceRefreshEnvironments(context)]);
-  } catch(e) {
-      apiClientMultiWorkspaceViewStore.getState().setStateForSelectedWorkspace(ctxId, {
-        loading: false,
-        errored: true,
-        error: e,
-      });
+  } catch (e) {
+    apiClientMultiWorkspaceViewStore.getState().setStateForSelectedWorkspace(ctxId, {
+      loading: false,
+      errored: true,
+      error: e,
+    });
     throw e;
   }
 };

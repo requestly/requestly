@@ -119,7 +119,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
                 <MultiWorkspaceAvatarGroup />
               ) : (
                 <>
-                  {activeWorkspace.workspaceType === WorkspaceType.LOCAL ? (
+                  {activeWorkspace?.workspaceType === WorkspaceType.LOCAL ? (
                     <>
                       <LocalWorkspaceAvatar
                         size={28}

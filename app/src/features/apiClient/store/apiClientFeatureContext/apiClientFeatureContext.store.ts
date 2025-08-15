@@ -19,8 +19,7 @@ function createInfiniteChainable<T>() {
   };
 
   return new Proxy({}, handler) as T;
-};
-
+}
 
 export type ApiClientFeatureContext = {
   id: RenderableWorkspaceState["id"];
@@ -39,7 +38,7 @@ type ApiClientFeatureContextProviderState = {
   getSingleViewContext(): ApiClientFeatureContext;
   getLastUsedContext(): ApiClientFeatureContext | undefined;
   clearAll(): void;
-  setLastUsedContext: (context?: ApiClientFeatureContext) => void,
+  setLastUsedContext: (context?: ApiClientFeatureContext) => void;
 };
 
 function createApiClientFeatureContextProviderStore() {
@@ -74,7 +73,7 @@ function createApiClientFeatureContextProviderStore() {
       setLastUsedContext(context) {
         set({
           lastUsedContext: context,
-        })
+        });
       },
 
       getContext(id) {
@@ -102,14 +101,14 @@ function createApiClientFeatureContextProviderStore() {
           return lastUsedContext;
         }
         if (contexts.size) {
-          const topContext = contexts.values().next().value // debatable
+          const topContext = contexts.values().next().value; // debatable
           setLastUsedContext(topContext);
           return topContext;
         }
       },
 
       clearAll() {
-        set({ contexts: new Map(), lastUsedContext: undefined, });
+        set({ contexts: new Map(), lastUsedContext: undefined });
       },
     };
   });
@@ -121,18 +120,21 @@ export function useApiClientFeatureContextProvider<T>(selector: (state: ApiClien
   return useStore(apiClientFeatureContextProviderStore, useShallow(selector));
 }
 
-export const NoopContextId = '__stub_context_id';
+export const NoopContextId = "__stub_context_id";
 export const NoopContext: ApiClientFeatureContext = {
-    id: NoopContextId,
-    workspaceId: NoopContextId,
-    stores: {
-        records: createApiRecordsStore({records: [], erroredRecords: []}),
-        environments: createEnvironmentsStore({environments: {}, globalEnvironment: {
-          id: 'na',
-          name: 'na',
-          variables: {},
-        }}),
-        erroredRecords: createErroredRecordsStore({apiErroredRecords: [], environmentErroredRecords: []})
-    },
-    repositories: createInfiniteChainable(),
-}
+  id: NoopContextId,
+  workspaceId: NoopContextId,
+  stores: {
+    records: createApiRecordsStore({ records: [], erroredRecords: [] }),
+    environments: createEnvironmentsStore({
+      environments: {},
+      globalEnvironment: {
+        id: "na",
+        name: "na",
+        variables: {},
+      },
+    }),
+    erroredRecords: createErroredRecordsStore({ apiErroredRecords: [], environmentErroredRecords: [] }),
+  },
+  repositories: createInfiniteChainable(),
+};

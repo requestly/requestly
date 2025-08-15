@@ -77,8 +77,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   setCurrentHistoryIndex: () => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
-  onNewClick: (
-      ) => Promise.resolve(),
+  onNewClick: () => Promise.resolve(),
 
   setIsImportModalOpen: () => {},
 
@@ -142,7 +141,6 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   useEffect(() => {
     debouncedTrackUserProperties();
   }, [apiClientRecords, debouncedTrackUserProperties]);
-
 
   const updateRecordsToBeDeleted = useCallback((record: RQAPI.ApiClientRecord[]) => {
     setRecordsToBeDeleted(record);
@@ -244,7 +242,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   focusBreadcrumb: true,
                   context: {
                     id: contextId,
-                  }
+                  },
                 })
               );
             })
@@ -258,7 +256,17 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         }
       }
     },
-    [isValidPermission, getRBACValidationFailureErrorMessage, recordsRepository, openDraftRequest, onSaveRecord, dispatch, createEnvironment, openTab, contextId]
+    [
+      isValidPermission,
+      getRBACValidationFailureErrorMessage,
+      recordsRepository,
+      openDraftRequest,
+      onSaveRecord,
+      dispatch,
+      createEnvironment,
+      openTab,
+      contextId,
+    ]
   );
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);

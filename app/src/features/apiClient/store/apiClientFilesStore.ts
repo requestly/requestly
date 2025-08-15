@@ -6,10 +6,11 @@ import { useShallow } from "zustand/shallow";
 
 function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
   const files: Record<FileId, ApiClientFile> = {};
-  const canHaveFiles = record.type === RQAPI.RecordType.API
-    && isHttpApiRecord(record)
-    && record.data.request.contentType === RequestContentType.MULTIPART_FORM;
-  
+  const canHaveFiles =
+    record.type === RQAPI.RecordType.API &&
+    isHttpApiRecord(record) &&
+    record.data.request.contentType === RequestContentType.MULTIPART_FORM;
+
   if (!canHaveFiles) {
     return;
   }
@@ -36,8 +37,8 @@ function parseRecordsToFiles(records: RQAPI.ApiClientRecord[]) {
   let files: Record<FileId, ApiClientFile> = {};
   for (const record of records) {
     const filesFromRecord = getFilesFromRecord(record);
-    if(filesFromRecord) {
-      files = {...files, ...filesFromRecord};
+    if (filesFromRecord) {
+      files = { ...files, ...filesFromRecord };
     }
   }
 
@@ -66,7 +67,7 @@ export interface ApiClientFilesStore {
   removeFile: (fileId: FileId) => void;
 }
 
-const createApiClientFilesStore = (appMode: "desktop",) => {
+const createApiClientFilesStore = (appMode: "desktop") => {
   return create<ApiClientFilesStore>()(
     persist(
       (set, get) => ({
@@ -90,8 +91,8 @@ const createApiClientFilesStore = (appMode: "desktop",) => {
         initialize(records) {
           const files = parseRecordsToFiles(records);
           set({
-            files
-          })
+            files,
+          });
         },
 
         addFile: (fileId: FileId, fileDetails: any) => {

@@ -6,28 +6,31 @@ export const LocalSyncRefreshHandler: React.FC = () => {
   const handleRefresh = useCallback(async () => {
     const result = await refreshAllContexts();
     const message = (() => {
-      if(result.every(r => r.status === 'fulfilled')) {
+      if (result.every((r) => r.status === "fulfilled")) {
         return {
-          type: 'success',
+          type: "success",
           message: "Refreshed Successfully!",
         } as const;
       }
-      if(result.length === 1) {
+      if (result.length === 1) {
         return {
-          type: 'error',
+          type: "error",
           message: "Could not refresh!",
         } as const;
       }
 
       return {
-        type: 'warn',
-        message: 'Some workspaces could not be refreshed!'
+        type: "warn",
+        message: "Some workspaces could not be refreshed!",
       } as const;
     })();
-    switch(message.type) {
-      case 'success': return toast.success(message.message);
-      case 'error': return toast.error(message.message);
-      case 'warn': return toast.warn(message.message);
+    switch (message.type) {
+      case "success":
+        return toast.success(message.message);
+      case "error":
+        return toast.error(message.message);
+      case "warn":
+        return toast.warn(message.message);
     }
   }, []);
 

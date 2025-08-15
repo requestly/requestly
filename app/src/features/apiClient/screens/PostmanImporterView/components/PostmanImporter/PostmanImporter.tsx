@@ -6,7 +6,6 @@ import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { notification, Row } from "antd";
 import {
