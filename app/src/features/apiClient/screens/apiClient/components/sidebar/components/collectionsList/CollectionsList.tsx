@@ -136,11 +136,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     return recordsToRender;
   }, [apiClientRecords, childParentMap, prepareRecordsToRender, searchValue]);
 
-  const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
-    setIsExportModalOpen(true);
-  }, []);
-
   const toggleSelection = useCallback(() => {
     setSelectedRecords(new Set());
     setShowSelection((prev) => !prev);
@@ -356,7 +351,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     onNewClick={onNewClick}
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
-                    onExportClick={handleExportCollection}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );

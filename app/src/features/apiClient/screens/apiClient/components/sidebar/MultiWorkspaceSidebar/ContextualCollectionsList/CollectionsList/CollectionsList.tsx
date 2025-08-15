@@ -9,13 +9,7 @@ import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/cons
 import { useRBAC } from "features/rbac";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollections/store";
-import {
-  convertFlatRecordsToNestedRecords,
-  filterRecordsBySearch,
-  getRecordIdsToBeExpanded,
-  isApiCollection,
-  isApiRequest,
-} from "features/apiClient/screens/apiClient/utils";
+import { getRecordIdsToBeExpanded, isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { CollectionRow } from "../../../components/collectionsList/collectionRow/CollectionRow";
 import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
@@ -23,7 +17,11 @@ import { ApiRecordEmptyState } from "../../../components/collectionsList/apiReco
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { RecordSelectionAction } from "../ContextualCollectionsList";
-import { selectAllRecords } from "features/apiClient/commands/utils";
+import {
+  getRecordsToExpandBySearchValue,
+  getRecordsToRender,
+  selectAllRecords,
+} from "features/apiClient/commands/utils";
 
 interface Props {
   searchValue: string;
@@ -77,72 +75,19 @@ export const CollectionsList: React.FC<Props> = ({
     };
   }, []);
 
-  const prepareRecordsToRender = useCallback(
-    (records: RQAPI.ApiClientRecord[]) => {
-      const { updatedRecords, recordsMap } = convertFlatRecordsToNestedRecords(records);
-      handleShowSelection(false);
-
-      updatedRecords.sort((recordA, recordB) => {
-        // If different type, then keep collection first
-        if (recordA.type === RQAPI.RecordType.COLLECTION && recordA.isExample) {
-          return -1;
-        }
-
-        if (recordB.type === RQAPI.RecordType.COLLECTION && recordB.isExample) {
-          return -1;
-        }
-
-        if (recordA.type !== recordB.type) {
-          return recordA.type === RQAPI.RecordType.COLLECTION ? -1 : 1;
-        }
-
-        // If types are the same, sort lexicographically by name
-        if (recordA.name.toLowerCase() !== recordB.name.toLowerCase()) {
-          return recordA.name.toLowerCase() < recordB.name.toLowerCase() ? -1 : 1;
-        }
-
-        // If names are the same, sort by creation date
-        return recordA.createdTs - recordB.createdTs;
-      });
-
-      return {
-        count: updatedRecords.length,
-        collections: updatedRecords.filter((record) => isApiCollection(record)) as RQAPI.CollectionRecord[],
-        requests: updatedRecords.filter((record) => isApiRequest(record)) as RQAPI.ApiRecord[],
-        recordsMap: recordsMap,
-      };
-    },
-    [handleShowSelection]
-  );
-
   const updatedRecords = useMemo(() => {
-    const filteredRecords = filterRecordsBySearch(apiClientRecords, searchValue);
-    const recordsToRender = prepareRecordsToRender(filteredRecords);
+    handleShowSelection(false);
 
-    if (searchValue) {
-      const recordsToExpand: string[] = [];
-      filteredRecords.forEach((record) => {
-        if (record.collectionId) {
-          recordsToExpand.push(record.collectionId);
-          let parentId = childParentMap.get(record.collectionId);
-          while (parentId) {
-            recordsToExpand.push(parentId);
-            parentId = childParentMap.get(parentId);
-          }
-        }
-      });
-      setExpandedRecordIds((prev: string[]) => {
-        const newExpanded = prev.concat(recordsToExpand);
-        return newExpanded;
-      });
-    }
+    const recordsToRender = getRecordsToRender({ apiClientRecords, searchValue });
+    const recordsToExpand = getRecordsToExpandBySearchValue({ contextId, apiClientRecords, searchValue });
+
+    setExpandedRecordIds((prev: string[]) => {
+      const newExpanded = prev.concat(recordsToExpand);
+      return newExpanded;
+    });
+
     return recordsToRender;
-  }, [apiClientRecords, childParentMap, prepareRecordsToRender, searchValue]);
-
-  const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
-    setIsExportModalOpen(true);
-  }, []);
+  }, [contextId, apiClientRecords, handleShowSelection, searchValue]);
 
   // Main toggle handler
   const recordsSelectionHandler = useCallback(
@@ -254,7 +199,6 @@ export const CollectionsList: React.FC<Props> = ({
                     onNewClick={onNewClick}
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
-                    onExportClick={handleExportCollection}
                     bulkActionOptions={{
                       showSelection,
                       selectedRecords,
