@@ -14,15 +14,17 @@ export const InitPopupConfig: React.FC = () => {
   const isSessionReplayEnabled = useFeatureValue("is_session_replay_enabled", true); // mark default value as false after testing
 
   const fetchConfig = useCallback(async () => {
-    const popupConfig = await StorageService(appMode).getRecord("popupConfig");
+    const popupConfig = await StorageService(appMode).getRecord("popup_config");
     return popupConfig;
   }, [appMode]);
 
   const setDefaultConfig = useCallback(async () => {
     const popupConfig = await fetchConfig();
     if (popupConfig) {
+      dispatch(globalActions.updatePopupConfig(popupConfig));
       return;
     }
+
     const defaultConfig = {
       session_replay: true,
     };
