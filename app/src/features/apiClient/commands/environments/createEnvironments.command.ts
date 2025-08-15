@@ -1,5 +1,5 @@
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
-import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export const createEnvironments = async (
   ctx: ApiClientFeatureContext,

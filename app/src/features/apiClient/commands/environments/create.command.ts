@@ -1,5 +1,5 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { ApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { patchEnvironmentVariables } from "./patchEnvironmentVariables.command";
 
 export const createEnvironment = async (

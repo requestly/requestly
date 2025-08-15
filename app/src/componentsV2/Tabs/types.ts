@@ -7,6 +7,9 @@ import { EnvironmentViewTabSource } from "features/apiClient/screens/environment
 export interface TabSourceMetadata {
   id: string;
   title: string;
+  context: {
+    id?: string | null;
+  };
   name?: string;
   isNewTab?: boolean;
 }

@@ -1,17 +1,19 @@
 import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
-import { isApiCollection } from "../../../utils";
-import { head, isEmpty, omit } from "lodash";
 import { Authorization } from "../../views/components/request/components/AuthorizationView/types/AuthConfig";
 import * as Sentry from "@sentry/react";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { getCollectionOptionsToMoveIn } from "features/apiClient/commands/utils";
+import { moveRecords } from "features/apiClient/commands/records";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 
 interface Props {
   recordsToMove: RQAPI.ApiClientRecord[];
@@ -20,39 +22,16 @@ interface Props {
 }
 
 export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
-  const {
-    onSaveRecord,
-    onSaveBulkRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const contextId = useContextId();
+
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const collectionOptions = useMemo(() => {
-    const exclusions = new Set();
-
-    for (const record of recordsToMove) {
-      const stack = [record];
-      record.collectionId && exclusions.add(record.collectionId);
-      while (stack.length) {
-        const current = stack.pop();
-        exclusions.add(current.id);
-
-        if (isApiCollection(current) && !isEmpty(current.data?.children)) {
-          stack.push(...current.data.children);
-        }
-      }
-    }
-
-    return apiClientRecords
-      .filter((record) => isApiCollection(record) && !exclusions.has(record.id))
-      .map((record) => ({
-        label: record.name,
-        value: record.id,
-      }));
-  }, [apiClientRecords, recordsToMove]);
+    return getCollectionOptionsToMoveIn(contextId, recordsToMove);
+  }, [contextId, recordsToMove]);
 
   const createNewCollection = useCallback(async () => {
     const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
@@ -68,6 +47,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         },
       },
     };
+
     const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
     if (newCollection.success) {
       onSaveRecord(newCollection.data, "open");
@@ -78,27 +58,18 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
   }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
 
   const moveRecordsToCollection = useCallback(
-    async (collectionId: string, isNewCollection: boolean) => {
-      const updatedRequests = recordsToMove.map((record) =>
-        isApiCollection(record)
-          ? { ...record, collectionId, data: omit(record.data, "children") }
-          : { ...record, collectionId }
-      );
-
-      // TODO: use apiClient interface
+    async (recordsToMove: RQAPI.ApiClientRecord[], collectionId: string, isNewCollection: boolean) => {
       try {
-        const result = await apiClientRecordsRepository.moveAPIEntities(updatedRequests, collectionId);
+        const context = getApiClientFeatureContext(contextId);
+        await moveRecords(context, { collectionId, recordsToMove });
 
         trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
         toast.success("Requests moved to collection successfully");
-        result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
-        forceRefreshApiClientRecords();
       } catch (error) {
-        console.error("Error moving records: ", error);
         throw new Error("Failed to move some requests to collection");
       }
     },
-    [onSaveRecord, recordsToMove, onSaveBulkRecords, apiClientRecordsRepository, forceRefreshApiClientRecords]
+    [contextId]
   );
 
   const handleRecordMove = useCallback(async () => {
@@ -107,25 +78,26 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       const collectionId = selectedCollection?.__isNew__ ? await createNewCollection() : selectedCollection.value;
 
       if (collectionId) {
-        await moveRecordsToCollection(collectionId, selectedCollection?.__isNew__);
+        await moveRecordsToCollection(recordsToMove, collectionId, selectedCollection?.__isNew__);
       }
     } catch (error) {
-      console.error("Error moving request to collection:", error);
       notification.error({
         message: `Error moving records to collection`,
         description: error?.message,
         placement: "bottomRight",
       });
+
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_client_move_to_collection");
         Sentry.captureException(error);
       });
+
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);
       onClose();
     }
-  }, [selectedCollection, onClose, createNewCollection, moveRecordsToCollection]);
+  }, [selectedCollection, recordsToMove, onClose, createNewCollection, moveRecordsToCollection]);
 
   return (
     <Modal

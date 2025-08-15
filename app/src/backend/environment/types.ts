@@ -1,13 +1,11 @@
+import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
+
 // TODO: move all in types "features/apiClient"
 export type VariableValueType = string | number | boolean;
 
-export type EnvironmentVariableKey = string;
-
-export interface EnvironmentVariableValue {
+export type EnvironmentVariableKey = VariableKey;
+export interface EnvironmentVariableValue extends VariableData {
   localValue?: VariableValueType;
-  syncValue?: VariableValueType;
-  type: EnvironmentVariableType;
-  id: number;
 }
 
 export type EnvironmentVariables = Record<EnvironmentVariableKey, EnvironmentVariableValue>;
@@ -32,7 +30,8 @@ export type VariableExport = EnvironmentVariableValue & {
 };
 
 export enum VariableScope {
-  GLOBAL = "global",
+  RUNTIME = "runtime",
   ENVIRONMENT = "environment",
   COLLECTION = "collection",
+  GLOBAL = "global",
 }

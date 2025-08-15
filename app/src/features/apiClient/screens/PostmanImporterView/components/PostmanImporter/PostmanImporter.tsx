@@ -6,7 +6,6 @@ import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { notification, Row } from "antd";
 import {
@@ -20,6 +19,7 @@ import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
@@ -49,7 +49,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     env: { createEnvironment, patchEnvironmentVariables },
   } = useCommand();
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
 
   const collectionsCount = useRef(0);
 

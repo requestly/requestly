@@ -1,5 +1,4 @@
 import { notification, Result, Tabs } from "antd";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
@@ -13,6 +12,10 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { CollectionViewTabSource } from "./collectionViewTabSource";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { isEmpty } from "lodash";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useCommand } from "features/apiClient/commands";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -25,7 +28,12 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const { onSaveRecord } = useNewApiClientContext();
+  const {
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
+  const contextId = useContextId();
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -121,13 +129,16 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             new CollectionViewTabSource({
               id: record.id,
               title: "",
+              context: {
+                id: contextId,
+              },
             })
           );
         }
         setTitle(result.data.name);
       });
     },
-    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
+    [collection, contextId, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
 
   const collectionName = collection?.name || "New Collection";

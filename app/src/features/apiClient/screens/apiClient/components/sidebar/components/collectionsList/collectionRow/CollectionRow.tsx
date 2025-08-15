@@ -6,7 +6,6 @@ import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
@@ -25,6 +24,12 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useCommand } from "features/apiClient/commands";
+import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -34,7 +39,6 @@ interface Props {
     collectionId?: string,
     entryType?: RQAPI.ApiEntryType
   ) => Promise<void>;
-  onExportClick: (collection: RQAPI.CollectionRecord) => void;
   setExpandedRecordIds: (keys: RQAPI.ApiClientRecord["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -44,16 +48,17 @@ interface Props {
     recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
-  onExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
   isReadOnly,
+  handleRecordsToBeDeleted,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -61,17 +66,25 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [collectionsToExport, setCollectionsToExport] = useState([]);
+
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
+
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
+  const contextId = useContextId();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
   const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
+
+  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord) => {
+    setCollectionsToExport((prev) => [...prev, collection]);
+    setIsExportModalOpen(true);
+  }, []);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -109,7 +122,7 @@ export const CollectionRow: React.FC<Props> = ({
           ),
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
+            handleCollectionExport(record);
           },
         },
         {
@@ -123,15 +136,14 @@ export const CollectionRow: React.FC<Props> = ({
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            updateRecordsToBeDeleted([record]);
-            setIsDeleteModalOpen(true);
+            handleRecordsToBeDeleted([record]);
           },
         },
       ];
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
+    [handleRecordsToBeDeleted, handleCollectionExport]
   );
 
   const collapseChangeHandler = useCallback(
@@ -250,6 +262,18 @@ export const CollectionRow: React.FC<Props> = ({
 
   return (
     <>
+      {isExportModalOpen ? (
+        <ApiClientExportModal
+          exportType="collection"
+          recordsToBeExported={collectionsToExport}
+          isOpen={isExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsExportModalOpen(false);
+          }}
+        />
+      ) : null}
+
       {isEditMode ? (
         <NewRecordNameInput
           analyticEventSource="collection_row"
@@ -305,12 +329,17 @@ export const CollectionRow: React.FC<Props> = ({
                   onClick={(e) => {
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
-                    
                     if (!isExpanded) {
                       // Collection is collapsed - open tab and expand
                       if (!isAlreadyActive) {
                         openTab(
-                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          new CollectionViewTabSource({
+                            id: record.id,
+                            title: record.name || "New Collection",
+                            context: {
+                              id: contextId,
+                            },
+                          }),
                           { preview: true }
                         );
                       }
@@ -321,7 +350,13 @@ export const CollectionRow: React.FC<Props> = ({
                         // First click - make tab active and prevent collapse
                         e.stopPropagation();
                         openTab(
-                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          new CollectionViewTabSource({
+                            id: record.id,
+                            title: record.name || "New Collection",
+                            context: {
+                              id: contextId,
+                            },
+                          }),
                           { preview: true }
                         );
                       }
@@ -413,6 +448,7 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             bulkActionOptions={bulkActionOptions}
+                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                           />
                         );
                       } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -422,10 +458,10 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             onNewClick={onNewClick}
-                            onExportClick={onExportClick}
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
+                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                           />
                         );
                       }

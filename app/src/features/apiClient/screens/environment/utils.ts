@@ -1,5 +1,5 @@
 import { EnvironmentVariables } from "backend/environment/types";
-import { EnvironmentVariableTableRow } from "./components/VariablesList/VariablesList";
+import { EnvironmentVariableTableRow } from "./components/VariablesList/EnvironmentVariablesList";
 
 export const isGlobalEnvironment = (environmentId: string) => {
   // FIXME: isGlobalEnvironment should be a method, which operates on an object or a flag.
