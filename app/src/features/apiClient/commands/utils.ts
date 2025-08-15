@@ -138,7 +138,7 @@ export function selectAllRecords(params: { contextId: string; searchValue: strin
   return newSelectedRecords;
 }
 
-export function getRecordsToMove(contextId: string, selectedRecords: Set<RQAPI.ApiClientRecord["id"]>) {
+export function getProcessedRecords(contextId: string, selectedRecords: Set<RQAPI.ApiClientRecord["id"]>) {
   const context = getApiClientFeatureContext(contextId);
 
   const childParentMap = getChildParentMap(context);

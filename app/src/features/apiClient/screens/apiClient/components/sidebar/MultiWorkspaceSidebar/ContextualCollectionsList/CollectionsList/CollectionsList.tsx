@@ -14,7 +14,6 @@ import { CollectionRow } from "../../../components/collectionsList/collectionRow
 import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
-import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { RecordSelectionAction } from "../ContextualCollectionsList";
 import {
@@ -54,9 +53,6 @@ export const CollectionsList: React.FC<Props> = ({
 
   const { isRecordBeingCreated } = useApiClientContext();
   const contextId = useContextId();
-
-  const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
   const [expandedRecordIds, setExpandedRecordIds] = useState(
     sessionStorage.getItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, [])
@@ -142,7 +138,7 @@ export const CollectionsList: React.FC<Props> = ({
         updateSelection(record, checked, newSelectedRecords);
         record.collectionId && checkParentSelection(record.id, checked, newSelectedRecords);
 
-        const totalRecordsCount = updatedRecords.collections.length + updatedRecords.requests.length;
+        const totalRecordsCount = Object.keys(updatedRecords.recordsMap).length;
         handleRecordSelection({
           contextId,
           action: "select",
@@ -248,18 +244,6 @@ export const CollectionsList: React.FC<Props> = ({
           )}
         </div>
       </div>
-
-      {isExportModalOpen && (
-        <ApiClientExportModal
-          exportType="collection"
-          recordsToBeExported={collectionsToExport}
-          isOpen={isExportModalOpen}
-          onClose={() => {
-            setCollectionsToExport([]);
-            setIsExportModalOpen(false);
-          }}
-        />
-      )}
     </>
   );
 };

@@ -13,9 +13,11 @@ import { toast } from "utils/Toast";
 import { capitalize } from "lodash";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
-import { getRecordsToMove } from "features/apiClient/commands/utils";
+import { getProcessedRecords } from "features/apiClient/commands/utils";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { duplicateRecords } from "features/apiClient/commands/records/duplicateRecords.command";
+import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
+import { captureException } from "backend/apiClient/utils";
 
 export type RecordSelectionAction = "select" | "unselect";
 
@@ -35,6 +37,7 @@ export const ContextualCollectionsList: React.FC<{
 
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const selectedRecordsAcrossWorkspaces = useRef<{
     [contextId: string]:
@@ -105,6 +108,7 @@ export const ContextualCollectionsList: React.FC<{
     selectedRecordsAcrossWorkspaces.current = null;
     setIsSelectAll(false);
     setIsAllRecordsSelected(false);
+    setShowSelection(false);
   }, []);
 
   const handleSelectToggle = useCallback(() => {
@@ -116,17 +120,28 @@ export const ContextualCollectionsList: React.FC<{
   }, [isSelectAll, deselect]);
 
   const handleDuplicateRecords = useCallback(async () => {
-    const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
-      const context = getApiClientFeatureContext(ctxId);
-      return duplicateRecords(context, { recordIds: value.recordIds });
-    });
+    try {
+      const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
+        const context = getApiClientFeatureContext(ctxId);
+        return duplicateRecords(context, { recordIds: value.recordIds });
+      });
 
-    // TODO: TBD, what to do in partial fail cases?
-    return await Promise.all(promises);
-  }, []);
+      // TODO: TBD, what to do in partial fail cases?
+      await Promise.all(promises);
+      deselect();
+    } catch (error) {
+      captureException(error);
+    }
+  }, [deselect]);
 
   const onBulkActionClick = useCallback(
     (action: BulkActions) => {
+      // TODO: add empty check
+      // if (isEmpty(selectedRecords) && action !== BulkActions.SELECT_ALL) {
+      //   toast.error("Please Select Records");
+      //   return;
+      // }
+
       if (action === BulkActions.SELECT_ALL) {
         handleSelectToggle();
         return;
@@ -134,7 +149,6 @@ export const ContextualCollectionsList: React.FC<{
 
       if (action === BulkActions.DUPLICATE) {
         handleDuplicateRecords();
-        deselect();
         return;
       }
 
@@ -143,6 +157,7 @@ export const ContextualCollectionsList: React.FC<{
       }
 
       if ([BulkActions.MOVE, BulkActions.EXPORT].includes(action)) {
+        // FIXME: check if any problem with select and unselect with downstreams
         const workspacesWithSelectedRecordsCount = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
           (value) => value.recordIds.size > 0
         ).length;
@@ -152,17 +167,18 @@ export const ContextualCollectionsList: React.FC<{
           return;
         }
 
-        if (BulkActions.MOVE) {
+        if (action === BulkActions.MOVE) {
           setIsMoveCollectionModalOpen(true);
           return;
         }
 
         if (action === BulkActions.EXPORT) {
-          // NOOP
+          setIsExportModalOpen(true);
+          return;
         }
       }
     },
-    [deselect, handleSelectToggle, handleDuplicateRecords]
+    [handleSelectToggle, handleDuplicateRecords]
   );
 
   const toggleMultiSelect = useCallback(() => {
@@ -187,18 +203,35 @@ export const ContextualCollectionsList: React.FC<{
     };
   }, [toggleMultiSelect, isValidPermission]);
 
-  const getRecordsToMoveByContext: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
+  const getRecordsBySingleContextSelection: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
+    // FIXME: not reactive
     const workspacesWithSelectedRecords = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
       ([ctxId, value]) => value.recordIds.size > 0
     );
 
     if (workspacesWithSelectedRecords.length === 1) {
       const [ctxId, value] = workspacesWithSelectedRecords[0];
-      return [ctxId, getRecordsToMove(ctxId, value.recordIds)];
+      return [ctxId, getProcessedRecords(ctxId, value.recordIds)];
     }
 
     return [undefined, []];
   }, []);
+
+  const recordsToMove: [string | undefined, RQAPI.ApiClientRecord[]] = useMemo(() => {
+    if (!isMoveCollectionModalOpen) {
+      return [undefined, []];
+    }
+
+    return getRecordsBySingleContextSelection();
+  }, [isMoveCollectionModalOpen, getRecordsBySingleContextSelection]);
+
+  const collectionsToExport: [string | undefined, RQAPI.ApiClientRecord[]] = useMemo(() => {
+    if (!isExportModalOpen) {
+      return [undefined, []];
+    }
+
+    return getRecordsBySingleContextSelection();
+  }, [isExportModalOpen, getRecordsBySingleContextSelection]);
 
   return (
     <>
@@ -246,15 +279,27 @@ export const ContextualCollectionsList: React.FC<{
 
       {isMoveCollectionModalOpen && (
         // TODO: TBD on modals
-        <ContextId id={getRecordsToMoveByContext()[0]}>
+        <ContextId id={recordsToMove[0]}>
           <MoveToCollectionModal
-            recordsToMove={getRecordsToMoveByContext()[1]}
+            recordsToMove={recordsToMove[1]}
             isOpen={isMoveCollectionModalOpen}
             onClose={() => {
               setIsMoveCollectionModalOpen(false);
             }}
           />
         </ContextId>
+      )}
+
+      {isExportModalOpen && (
+        <ApiClientExportModal
+          exportType="collection"
+          recordsToBeExported={collectionsToExport[1]}
+          isOpen={isExportModalOpen}
+          onClose={() => {
+            deselect();
+            setIsExportModalOpen(false);
+          }}
+        />
       )}
     </>
   );
