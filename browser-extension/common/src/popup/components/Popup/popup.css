@@ -13,8 +13,8 @@
 }
 
 .popup-header {
-  height: 56px;
-  padding: 12px 1rem;
+  height: 48px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -126,11 +126,10 @@
 }
 
 .popup-content {
-  padding: var(--space-6, 16px);
-  padding-bottom: 8px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .header-content-separator {

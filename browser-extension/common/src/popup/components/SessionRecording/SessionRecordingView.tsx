@@ -122,16 +122,14 @@ const SessionRecordingView: React.FC = () => {
           title={watchReplayBtnTooltipContent}
           overlayClassName="action-btn-tooltip watch-replay-btn"
         >
-          <span>
-            <PrimaryActionButton
-              block
-              icon={<ReplayLastFiveMinuteIcon />}
-              disabled={isRecordingInManualMode || !isRecordingSession}
-              onClick={viewRecordingOnClick}
-            >
-              Watch last 5 min replay
-            </PrimaryActionButton>
-          </span>
+          <PrimaryActionButton
+            block
+            icon={<ReplayLastFiveMinuteIcon />}
+            disabled={isRecordingInManualMode || !isRecordingSession}
+            onClick={viewRecordingOnClick}
+          >
+            Watch last 5 min replay
+          </PrimaryActionButton>
         </Tooltip>
       </Row>
       <div className="session-replay-security-msg">
