@@ -400,8 +400,8 @@ export const extractQueryParams = (inputString: string) => {
       const queryParamValues = split(queryParam, "=");
       queryParams.push({
         id: Math.random(),
-        key: queryParamValues[0],
-        value: queryParamValues[1],
+        key: queryParamValues[0] ?? "",
+        value: queryParamValues[1] ?? "",
         isEnabled: true,
       });
     });
