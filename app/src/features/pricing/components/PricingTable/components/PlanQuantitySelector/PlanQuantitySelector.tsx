@@ -43,7 +43,7 @@ const QuantityInput: React.FC<{
       max={1000}
       maxLength={4}
       value={value}
-      onChange={(val) => handleQuantityChange(typeof val === "number" ? val : minQuantity)}
+      onChange={(val) => handleQuantityChange(val)}
     />
     <div className="members">Members</div>
   </div>
