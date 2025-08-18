@@ -6,7 +6,7 @@ import { useState } from "react";
 import { NativeError } from "errors/NativeError";
 
 export function useParentApiRecord(id: string) {
-  const [noopStore] = useState(() => createRecordStore({} as RQAPI.Record));
+  const [noopStore] = useState(() => createRecordStore({} as RQAPI.ApiClientRecord));
   const [getParent, getRecordStore] = useAPIRecords((s) => [s.getParent, s.getRecordStore]);
 
   const parent = getParent(id);

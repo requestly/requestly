@@ -1,0 +1,13 @@
+.gql-editor {
+  height: calc(100% - 25px);
+}
+
+.gql-editor .cm-editor {
+  height: 100%;
+  background: transparent;
+  font-size: 12px;
+}
+
+.gql-editor .cm-editor .cm-line {
+  line-height: 18px;
+}

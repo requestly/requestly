@@ -6,6 +6,7 @@
   font-weight: 500;
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-xs, 11px);
+  max-width: 145px;
   background-color: var(--requestly-color-background);
   border: none;
   padding: 0.5em 1em;
@@ -21,6 +22,12 @@
     width: 18px;
     height: 18px;
     color: var(--requestly-color-text-default);
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    border: none;
   }
 }
 

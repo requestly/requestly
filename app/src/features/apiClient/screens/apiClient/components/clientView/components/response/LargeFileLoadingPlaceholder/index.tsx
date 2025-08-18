@@ -1,5 +1,5 @@
 import React from "react";
-import { PlaceholderKeyboardShortcuts } from "../../errors/PlaceholderKeyboardShortcuts/PlaceholderKeyboardShortcuts";
+import { PlaceholderKeyboardShortcuts } from "../../../../views/components/errors/PlaceholderKeyboardShortcuts/PlaceholderKeyboardShortcuts";
 import { RQButton } from "lib/design-system-v2/components";
 import "./index.scss";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";

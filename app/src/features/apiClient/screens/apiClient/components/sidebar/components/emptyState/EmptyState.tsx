@@ -1,35 +1,22 @@
 import React, { useState } from "react";
-import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { EnvironmentAnalyticsSource } from "features/apiClient/screens/environment/types";
-import "./emptyState.scss";
 import Link from "antd/lib/typography/Link";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
+import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../NewApiRecordDropdown/NewApiRecordDropdown";
+import "./emptyState.scss";
 
 export interface EmptyStateProps {
   disabled?: boolean;
-  analyticEventSource: RQAPI.AnalyticsEventSource | EnvironmentAnalyticsSource;
   message: string;
   newRecordBtnText: string;
-  onNewRecordClick?: () => Promise<void>;
-  onNewRequestClick?: () => Promise<void>;
+  onNewRecordClick?: (recordType: RQAPI.RecordType, entryType?: RQAPI.ApiEntryType) => Promise<void>;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({
-  message,
-  disabled = false,
-  newRecordBtnText,
-  onNewRecordClick,
-  analyticEventSource = "collections_empty_state",
-  onNewRequestClick,
-}) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ message, disabled = false, onNewRecordClick }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleOnClick = () => {
-    setIsLoading(true);
-    onNewRecordClick()
-      .then(() => {
-        // DO NOTHING
-      })
+  const handleNewRecordClick = (params: { recordType: RQAPI.RecordType; entryType?: RQAPI.ApiEntryType }) => {
+    onNewRecordClick?.(params.recordType, params.entryType)
       .catch((error) => {
         console.error("Error creating new API Client record", error);
       })
@@ -42,20 +29,25 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     <div className="empty-state-container">
       <div className="empty-message">{message}</div>
       <div className="empty-state-actions">
-        <RQButton
+        <NewApiRecordDropdown
+          invalidActions={[NewRecordDropdownItemType.ENVIRONMENT, NewRecordDropdownItemType.COLLECTION]}
           disabled={disabled}
-          loading={isLoading}
-          size="small"
-          className="new-record-btn"
-          onClick={handleOnClick}
+          onSelect={(params) => {
+            setIsLoading(true);
+            handleNewRecordClick(params);
+          }}
+          buttonProps={{
+            size: "small",
+            loading: isLoading,
+          }}
+        />
+        <Link
+          className="new-collection-link"
+          onClick={() => handleNewRecordClick({ recordType: RQAPI.RecordType.COLLECTION })}
         >
-          {newRecordBtnText}
-        </RQButton>
-        {analyticEventSource === EnvironmentAnalyticsSource.ENVIRONMENTS_LIST ? null : (
-          <Link className="new-request-link" onClick={onNewRequestClick}>
-            Add a request
-          </Link>
-        )}
+          <MdAdd />
+          <span>New collection</span>
+        </Link>
       </div>
     </div>
   );
