@@ -6,6 +6,7 @@ import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
+import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 type TabId = number;
 type SourceName = string;
@@ -136,6 +137,11 @@ const createTabServiceStore = () => {
         openTab(source, config) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
+
+          const contextId = source.metadata.context.id;
+          if(contextId) {
+            setLastUsedContextId(contextId);
+          }
 
           const {
             _generateNewTabId,
@@ -272,8 +278,15 @@ const createTabServiceStore = () => {
 
         setActiveTab(id: TabId) {
           const { tabs } = get();
-          if (tabs.has(id)) {
-            set({ activeTabId: id, activeTabSource: tabs.get(id).getState().source });
+          const tab = tabs.get(id)          
+          if (tab) {
+            const tabState = tab.getState();
+            set({ activeTabId: id, activeTabSource: tabState.source });
+            const contextId = tabState.source.metadata.context.id;
+            if(contextId) {
+              setLastUsedContextId(contextId);
+            }
+
           } else {
             set({
               activeTabId: undefined,

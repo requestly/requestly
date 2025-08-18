@@ -77,11 +77,8 @@ function createApiClientFeatureContextProviderStore() {
       },
 
       getContext(id) {
-        const { contexts, setLastUsedContext } = get();
+        const { contexts } = get();
         const context = contexts.get(id);
-        if (context) {
-          setLastUsedContext(context);
-        }
         return context;
       },
 
@@ -138,3 +135,11 @@ export const NoopContext: ApiClientFeatureContext = {
   },
   repositories: createInfiniteChainable(),
 };
+
+export function setLastUsedContextId(id: string) {
+  const context = apiClientFeatureContextProviderStore.getState().contexts.get(id);
+  if(!context) {
+    throw new Error("Could not find context!");
+  }
+  apiClientFeatureContextProviderStore.getState().setLastUsedContext(context);
+}
