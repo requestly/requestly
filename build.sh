@@ -40,6 +40,7 @@ cd ..
 echo -e "\n\033[1;37m\033[44m***** Building browser extension *****\033[0m"
 cd browser-extension
 bash build.sh ${env}
+cd ..
 
 
 echo -e "\n\033[1;37m\033[44m***** Requestly build complete *****\033[0m"
