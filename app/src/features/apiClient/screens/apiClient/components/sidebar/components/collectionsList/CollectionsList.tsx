@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
-import { CollectionRow } from "./collectionRow/CollectionRow";
+import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -136,14 +136,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     return recordsToRender;
   }, [apiClientRecords, childParentMap, prepareRecordsToRender, searchValue]);
 
-  const handleExportRequestlyCollection = useCallback((collection: RQAPI.CollectionRecord) => {
+  const handleExportCollection = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
     setCollectionsToExport((prev) => [...prev, collection]);
-    setIsExportModalOpen(true);
-  }, []);
 
-  const handlePostmanExport = useCallback((collection: RQAPI.CollectionRecord) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
-    setIsPostmanExportModalOpen(true);
+    switch (exportType) {
+      case ExportType.REQUESTLY:
+        setIsExportModalOpen(true);
+        break;
+      case ExportType.POSTMAN:
+        setIsPostmanExportModalOpen(true);
+        break;
+      default:
+        console.warn(`Unknown export type: ${exportType}`);
+    }
   }, []);
 
   const toggleSelection = useCallback(() => {
@@ -358,8 +363,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     onNewClick={onNewClick}
                     expandedRecordIds={expandedRecordIds}
                     setExpandedRecordIds={setExpandedRecordIds}
-                    onRequestlyExportClick={handleExportRequestlyCollection}
-                    onPostmanExportClick={handlePostmanExport}
+                    onRequestlyExportClick={handleExportCollection}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
