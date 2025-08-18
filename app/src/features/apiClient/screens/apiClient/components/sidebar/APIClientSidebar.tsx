@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiClientImporterType, RQAPI } from "../../../../types";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { notification, Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
@@ -25,6 +25,7 @@ export enum ApiClientSidebarTabKey {
 
 const APIClientSidebar: React.FC<Props> = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
@@ -155,6 +156,8 @@ const APIClientSidebar: React.FC<Props> = () => {
           onSaveRecord(result.data, "open");
 
           setIsImportModalOpen(false);
+          // Clear the navigation state after successful import
+          navigate(window.location.pathname, { replace: true });
         } else {
           throw new Error(result.message);
         }
@@ -171,7 +174,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         setIsLoading(false);
       }
     },
-    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
+    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository, navigate]
   );
 
   useEffect(() => {
@@ -179,6 +182,16 @@ const APIClientSidebar: React.FC<Props> = () => {
       setIsImportModalOpen(true);
     }
   }, [state?.modal, setIsImportModalOpen]);
+
+  // Get initial cURL command from state if available
+  const initialCurlCommand = state?.curlCommand || "";
+
+  // Handle modal close and clear navigation state
+  const handleImportRequestModalClose = useCallback(() => {
+    onImportRequestModalClose();
+    // Clear the navigation state when modal is closed
+    navigate(window.location.pathname, { replace: true });
+  }, [onImportRequestModalClose, navigate]);
 
   return (
     <>
@@ -213,7 +226,10 @@ const APIClientSidebar: React.FC<Props> = () => {
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
-        onClose={onImportRequestModalClose}
+        onClose={handleImportRequestModalClose}
+        initialCurlCommand={initialCurlCommand}
+        source={state?.source || ""}
+        pageURL={state?.pageURL || ""}
       />
     </>
   );

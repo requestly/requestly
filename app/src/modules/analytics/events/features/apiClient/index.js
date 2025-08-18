@@ -141,6 +141,10 @@ export const trackEnvironmentDeleted = () => {
 };
 
 // Import data
+export const trackCurlImportModalOpened = (params = {}) => {
+  trackEvent(API_CLIENT.CURL_IMPORT_MODAL_OPENED, params);
+};
+
 export const trackImportStarted = (type) => {
   trackEvent(API_CLIENT.IMPORT_STARTED, { import_type: type });
 };
