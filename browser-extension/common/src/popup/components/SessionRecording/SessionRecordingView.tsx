@@ -92,7 +92,7 @@ const SessionRecordingView: React.FC = () => {
     );
 
   return (
-    <div className="session-view-content popup-body-card">
+    <div className="session-view-content">
       <Row align="middle" justify="space-between">
         <div className="title">Record session for sharing & debugging</div>
         <div className="configure-btn" onClick={handleConfigureBtnClick}>

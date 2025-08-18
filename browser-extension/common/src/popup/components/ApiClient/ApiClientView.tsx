@@ -16,14 +16,19 @@ export const ApiClientView: React.FC = () => {
       <Row wrap={false} align="middle" className="action-btns">
         <PrimaryActionButton
           block
-          className={""}
+          className={"api-client-action-btn"}
           icon={<ApiRequest />}
           onClick={() => console.log("Send API request clicked")}
         >
           Send API request
         </PrimaryActionButton>
 
-        <PrimaryActionButton block icon={<ImportCurl />} onClick={() => console.log("Import cURL request clicked")}>
+        <PrimaryActionButton
+          block
+          className={"api-client-action-btn"}
+          icon={<ImportCurl />}
+          onClick={() => console.log("Import cURL request clicked")}
+        >
           Import a cURL request
         </PrimaryActionButton>
       </Row>
