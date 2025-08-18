@@ -68,7 +68,6 @@ export const CollectionRow: React.FC<Props> = ({
     apiClientRecordsRepository,
     forceRefreshApiClientRecords,
   } = useApiClientContext();
-  const [isDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
   const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
@@ -343,9 +342,7 @@ export const CollectionRow: React.FC<Props> = ({
                   </Typography.Text>
 
                   <Conditional condition={!isReadOnly}>
-                    <div
-                      className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}
-                    >
+                    <div className={`collection-options ${hoveredId === record.id ? "active" : " "}`}>
                       <NewApiRecordDropdown
                         invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
                         onSelect={(params) => {
