@@ -12,3 +12,25 @@
     }
   }
 }
+.move-to-collection-modal {
+  .multi-view-mode-info {
+    margin-top: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2, 4px);
+    align-self: stretch;
+
+    color: var(--requestly-color-text-placeholder, #8f8f8f);
+    font-size: var(--requestly-font-size-xs, 11px);
+    line-height: 17px; /* 154.545% */
+
+    svg {
+      flex-shrink: 0;
+      --size: 12px;
+
+      width: var(--size);
+      height: var(--size);
+      margin-top: 1px;
+    }
+  }
+}

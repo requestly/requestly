@@ -14,6 +14,11 @@ import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { getCollectionOptionsToMoveIn } from "features/apiClient/commands/utils";
 import { moveRecords } from "features/apiClient/commands/records";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 
 interface Props {
   recordsToMove: RQAPI.ApiClientRecord[];
@@ -25,6 +30,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const contextId = useContextId();
+  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
 
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -104,7 +110,7 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
       open={isOpen}
       onCancel={onClose}
       title="Move to Collection"
-      className="custom-rq-modal"
+      className="custom-rq-modal move-to-collection-modal"
       footer={
         <RQButton type="primary" disabled={!selectedCollection} loading={isLoading} onClick={handleRecordMove}>
           {selectedCollection?.__isNew__ ? "Create collection and Move" : "Move"}
@@ -131,6 +137,16 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         value={selectedCollection}
         onChange={(newSelectedOption) => setSelectedCollection(newSelectedOption)}
       />
+
+      {viewMode === ApiClientViewMode.MULTI ? (
+        <div className="multi-view-mode-info">
+          <MdInfoOutline />
+          <div className="info">
+            Moving requests between workspaces isn't supported yet. However, you can move the request files manually on
+            your system, and they'll reflect here after a refresh.
+          </div>
+        </div>
+      ) : null}
     </Modal>
   );
 };
