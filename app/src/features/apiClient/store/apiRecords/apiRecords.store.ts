@@ -286,7 +286,7 @@ export const createApiRecordsStore = (initialRecords: {
       for (const [recordId, newData] of Object.entries(variables)) {
         const record = indexStore.get(recordId)?.getState();
         if (record && record.type === RQAPI.RecordType.COLLECTION) {
-          record.collectionVariables.getState().reset(parseVariables(newData.variables));
+          record.collectionVariables.getState().reset(parseVariables(newData.variables ?? {}));
         }
       }
     },
