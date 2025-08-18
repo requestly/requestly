@@ -7,6 +7,8 @@ import { useHasUnsavedChanges } from "hooks/useHasUnsavedChanges";
 import { useGenericState } from "hooks/useGenericState";
 import { mapRuntimeArray } from "features/apiClient/store/runtimeVariables/utils";
 import { toast } from "utils/Toast";
+import "./runtimevariableview.scss";
+import { DeleteAllRuntimeVariablesModal } from "features/apiClient/screens/apiClient/components/modals/DeleteAllRuntimeVariablesModal/deleteAllRuntimeVariablesModal";
 
 export const RuntimeVariablesView: React.FC = () => {
   const [runtimeVariablesMap, resetVariables] = useRuntimeVariables((s) => [s.data, s.reset]);
@@ -22,6 +24,7 @@ export const RuntimeVariablesView: React.FC = () => {
   const [pendingVariables, setPendingVariables] = useState<RuntimeVariableTableRow[]>(variables);
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
   const { setPreview, setUnsaved } = useGenericState();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     setUnsaved(hasUnsavedChanges);
@@ -37,11 +40,21 @@ export const RuntimeVariablesView: React.FC = () => {
     }
   }, [variables, isSaving]);
 
+  const onDeleteModalClose = useCallback(() => {
+    setIsDeleteModalOpen(false);
+  }, []);
+
   const handleDeleteAll = useCallback(() => {
-    pendingVariablesRef.current = [];
-    setPendingVariables([]);
-    resetChanges();
-    resetVariables();
+    try {
+      pendingVariablesRef.current = [];
+      setPendingVariables([]);
+      resetVariables();
+      resetChanges();
+    } catch {
+      toast.error("Error while deleting all variables");
+    }
+
+    setIsDeleteModalOpen(false);
   }, [resetChanges, resetVariables]);
 
   const handleSetPendingVariables = useCallback((variables: RuntimeVariableTableRow[]) => {
@@ -90,9 +103,17 @@ export const RuntimeVariablesView: React.FC = () => {
           searchValue={searchValue}
           onSearchValueChange={setSearchValue}
           onSave={handleSaveVariables}
-          onDeleteAll={handleDeleteAll}
+          onDeleteAll={() => {
+            setIsDeleteModalOpen(true);
+          }}
         />
-
+        {isDeleteModalOpen ? (
+          <DeleteAllRuntimeVariablesModal
+            open={isDeleteModalOpen}
+            onClose={onDeleteModalClose}
+            onClickDelete={handleDeleteAll}
+          />
+        ) : null}
         <RuntimeVariablesList
           searchValue={searchValue}
           variables={variables}

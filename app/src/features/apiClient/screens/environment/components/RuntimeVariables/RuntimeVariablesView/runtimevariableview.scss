@@ -1,0 +1,14 @@
+.runtime-variables-view-container {
+  display: flex;
+  padding: 12px 0 12px 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 0 0;
+  align-self: stretch;
+
+  .runtime-variables-list-view .rq-content-list-table-container {
+    position: relative;
+    bottom: 8px;
+  }
+}

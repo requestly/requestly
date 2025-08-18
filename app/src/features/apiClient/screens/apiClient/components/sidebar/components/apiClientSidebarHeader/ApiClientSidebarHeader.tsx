@@ -120,7 +120,9 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   return (
     <>
       <div className="api-client-sidebar-header">
-        {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
+        {activeTab === ApiClientSidebarTabKey.COLLECTIONS ||
+        activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ||
+        activeTab === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? (
           <RoleBasedComponent resource="api_client_request" permission="create">
             <div>
               <NewApiRecordDropdown
