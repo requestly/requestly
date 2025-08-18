@@ -1,0 +1,30 @@
+.runtime-variables-container {
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
+
+  .runtime-variables-text-placeholder {
+    display: flex;
+    min-width: 144px;
+    padding: 4px;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 4px;
+    border-left: 2px solid var(--requestly-color-primary-500);
+    background: var(--requestly-color-white-t-20);
+
+    .text {
+      overflow: hidden;
+      color: var(--requestly-color-text-default);
+      text-overflow: ellipsis;
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-sm);
+      font-style: normal;
+      font-weight: 400;
+      line-height: var(--requestly-font-line-height-sm);
+    }
+  }
+}
