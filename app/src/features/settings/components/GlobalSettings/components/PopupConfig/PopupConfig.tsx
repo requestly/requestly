@@ -48,15 +48,13 @@ export const PopupConfig: React.FC = () => {
       title="Popup Configuration"
       caption="Show or hide elements in the extension popup"
       settingsBody={
-        <div className="implicit-test-rule-settings-container">
-          <div className="implicit-test-rule-types-list">
-            <Checkbox.Group
-              className="rule-types-checkbox-group"
-              options={CONFIG_OPTIONS}
-              value={enabledKeys}
-              onChange={handleCheckboxChange}
-            />
-          </div>
+        <div className="popup-config-list">
+          <Checkbox.Group
+            className="popup-config-checkbox-group"
+            options={CONFIG_OPTIONS}
+            value={enabledKeys}
+            onChange={handleCheckboxChange}
+          />
         </div>
       }
       isTogglable={false}
