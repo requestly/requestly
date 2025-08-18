@@ -31,8 +31,9 @@ const DEFAULT_QUANTITY_OPTIONS: PlanQuantityOption[] = [
 
 const QuantityInput: React.FC<{
   minQuantity: number;
+  value: number;
   handleQuantityChange: (value: number) => void;
-}> = ({ minQuantity, handleQuantityChange }) => (
+}> = ({ minQuantity, value, handleQuantityChange }) => (
   <div className="quantity-selector">
     <InputNumber
       style={{ width: "104px", height: "32px", display: "flex", alignItems: "center" }}
@@ -41,8 +42,8 @@ const QuantityInput: React.FC<{
       min={minQuantity}
       max={1000}
       maxLength={4}
-      defaultValue={minQuantity}
-      onChange={handleQuantityChange}
+      value={value}
+      onChange={(val) => handleQuantityChange(typeof val === "number" ? val : minQuantity)}
     />
     <div className="members">Members</div>
   </div>
@@ -50,13 +51,14 @@ const QuantityInput: React.FC<{
 
 const QuantitySelect: React.FC<{
   options: PlanQuantityOption[];
+  value: number;
   handleQuantityChange: (value: number, skipNotification?: boolean) => void;
-}> = ({ options, handleQuantityChange }) => (
+}> = ({ options, value, handleQuantityChange }) => (
   <Select
     className="pricing-plan-quantity-selector__select"
     options={options}
-    defaultValue={options[0].value}
-    onChange={(value) => handleQuantityChange(value)}
+    value={value}
+    onChange={(val) => handleQuantityChange(val)}
   />
 );
 
@@ -64,6 +66,7 @@ export const PlanQuantitySelector: React.FC<PlanQuantitySelectorProps> = ({
   currentSeats,
   currentPlanName,
   columnPlanName,
+  quantity,
   isNewCheckoutFlowEnabled,
   handleQuantityChange,
 }) => {
@@ -121,8 +124,14 @@ export const PlanQuantitySelector: React.FC<PlanQuantitySelectorProps> = ({
   )
     return null;
   if (isNewCheckoutFlowEnabled) {
-    return <QuantitySelect options={filteredOptions} handleQuantityChange={handleQuantityChange} />;
+    return <QuantitySelect options={filteredOptions} value={quantity} handleQuantityChange={handleQuantityChange} />;
   }
 
-  return <QuantityInput minQuantity={minQuantity} handleQuantityChange={handleQuantityChange} />;
+  return (
+    <QuantityInput
+      minQuantity={minQuantity}
+      value={quantity ?? minQuantity}
+      handleQuantityChange={handleQuantityChange}
+    />
+  );
 };
