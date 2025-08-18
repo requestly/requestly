@@ -87,7 +87,6 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
               checkboxChecked={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
               onEdit={(query: string) => {
-                console.log("DBG:: QUERY EDIT FROM SCHEMA BUILDER", query);
                 handleEdit(query);
               }}
               colors={{
