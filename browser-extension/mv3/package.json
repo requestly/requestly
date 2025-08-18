@@ -17,6 +17,10 @@
     "email": "contact@requestly.io",
     "url": "https://requestly.com/"
   },
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "config": "cd ../config && npm run build && cd ../mv3",

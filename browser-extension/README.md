@@ -1,7 +1,7 @@
 # Browser Extension
 
 This sub-project consists of following components:
-
+- Node version >= 18.18.0
 - [Extension on Manifest V3](./mv3/README.md)
 - [Common code between above two versions](./common/README.md)
 - [Configurations - browser, environment](./config/README.md)

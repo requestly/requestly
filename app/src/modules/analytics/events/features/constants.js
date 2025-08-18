@@ -187,6 +187,7 @@ export const MOCKSV2 = {
 };
 
 export const API_CLIENT = {
+  CURL_IMPORT_MODAL_OPENED: "api_client_curl_import_modal_opened",
   EXPORT_COLLECTIONS_FAILED: "api_client_export_collections_failed",
   EXPORT_COLLECTIONS_SUCCESSFUL: "api_client_export_collections_successful",
   EXPORT_COLLECTIONS_STARTED: "api_client_export_collections_started",
