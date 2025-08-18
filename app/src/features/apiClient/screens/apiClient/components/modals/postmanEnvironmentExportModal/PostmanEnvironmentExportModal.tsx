@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "antd";
 import { getFormattedDate } from "utils/DateTimeUtils";
+import { toast } from "utils/Toast";
 import "./postmanEnvironmentExportModal.scss";
 import fileDownload from "js-file-download";
 import { EnvironmentData } from "backend/environment/types";
@@ -32,7 +33,11 @@ export const PostmanEnvironmentExportModal: React.FC<PostmanEnvironmentExportMod
     schema_version: ENVIRONMENTS_SCHEMA_VERSION,
     environments: [],
   });
-  const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
+
+  const fileInfo = {
+    label: environments.length > 1 ? "Environments" : "Environment",
+    type: "ENV",
+  };
 
   const handleExport = useCallback(() => {
     try {
@@ -57,8 +62,7 @@ export const PostmanEnvironmentExportModal: React.FC<PostmanEnvironmentExportMod
       trackEnvironmentExported();
       onClose();
     } catch (error) {
-      console.error("Error exporting to Postman environment format:", error);
-      // You could add error tracking here similar to collections
+      toast.error("Failed to export environments. Please try again.");
     }
   }, [exportData, onClose]);
 
@@ -88,13 +92,6 @@ export const PostmanEnvironmentExportModal: React.FC<PostmanEnvironmentExportMod
     });
     setIsEnvironmentsProcessed(true);
   }, [isOpen, environments, isEnvironmentsProcessed, processEnvironments]);
-
-  useEffect(() => {
-    setFileInfo({
-      label: environments.length > 1 ? "Environments" : "Environment",
-      type: "ENV",
-    });
-  }, [environments.length]);
 
   return (
     <Modal

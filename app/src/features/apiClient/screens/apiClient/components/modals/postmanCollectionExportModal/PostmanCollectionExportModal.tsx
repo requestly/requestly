@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { getFormattedDate } from "utils/DateTimeUtils";
+import { toast } from "utils/Toast";
 import "./postmanExportModal.scss";
 import fileDownload from "js-file-download";
 import { omit } from "lodash";
@@ -34,45 +35,47 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
     schema_version: COLLECTIONS_SCHEMA_VERSION,
     records: [],
   });
-  const [fileInfo, setFileInfo] = useState<{ label: string; type: string }>({ label: "", type: "" });
+
+  const fileInfo = {
+    label: recordsToBeExported.length > 1 ? "Collections" : "Collection",
+    type: "COL",
+  };
 
   const handleExport = useCallback(async () => {
     try {
       // Convert Requestly collection to Postman format
-      const result = postmanCollectionExporter(exportData);
+      const result = await postmanCollectionExporter(exportData);
 
-      // Check if result is a Promise (multiple collections case)
-      if (result instanceof Promise) {
+      if (result.type === "multiple") {
         // Multiple collections - will return ZIP
-        const multipleResult = await result;
-        if (multipleResult.type === "multiple") {
-          // Create a blob from the zip data and download it
-          const blob = new Blob([multipleResult.zipData], { type: "application/zip" });
-          const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.zip`;
+        const multipleResult = result as { type: "multiple"; zipData: any };
+        const blob = new Blob([multipleResult.zipData], { type: "application/zip" });
+        const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.zip`;
 
-          // Create a download link
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }
-      } else {
+        // Create a download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else if (result.type === "single") {
         // Single collection - return JSON
-        if (result.type === "single") {
-          const fileContent = JSON.stringify(result.collection, null, 2);
-          const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
-          fileDownload(fileContent, fileName, "application/json");
-        }
+        const singleResult = result as { type: "single"; collection: any };
+        const fileContent = JSON.stringify(singleResult.collection, null, 2);
+        const fileName = `Postman-${fileInfo.label}-export-${getFormattedDate("DD_MM_YYYY")}.json`;
+        fileDownload(fileContent, fileName, "application/json");
+      } else {
+        throw new Error(`Unexpected result type: ${(result as any).type}`);
       }
 
       trackExportCollectionsClicked();
       onClose();
     } catch (error) {
       console.error("Error exporting to Postman format:", error);
+      toast.error("Failed to export collections. Please try again.");
       trackExportApiCollectionsFailed(exportData.records?.length, 0);
     }
   }, [exportData, fileInfo.label, onClose]);
@@ -80,29 +83,32 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
   const sanitizeRecord = (record: RQAPI.Record): ExportRecord =>
     omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
 
-  const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord, recordsToExport: ExportRecord[]) => {
-    recordsToExport.push(
-      sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord
-    );
+  const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord): ExportRecord[] => {
+    const records: ExportRecord[] = [];
+
+    // Add the collection itself (without children)
+    records.push(sanitizeRecord({ ...collection, data: omit(collection.data, "children") }) as RQAPI.CollectionRecord);
+
+    // Recursively process children
     if (collection.data.children) {
       collection.data.children.forEach((record: RQAPI.Record) => {
         if (record.type === RQAPI.RecordType.API) {
-          recordsToExport.push(sanitizeRecord(record) as ExportRecord);
+          records.push(sanitizeRecord(record) as ExportRecord);
         } else {
-          sanitizeRecords(record, recordsToExport);
+          records.push(...sanitizeRecords(record));
         }
       });
     }
+
+    return records;
   }, []);
 
   useEffect(() => {
-    if (!isOpen || isApiRecordsProcessed) return;
-
     const recordsToExport: ExportRecord[] = [];
 
     recordsToBeExported.forEach((record) => {
       if (isApiCollection(record)) {
-        sanitizeRecords(record, recordsToExport);
+        recordsToExport.push(...sanitizeRecords(record));
       } else {
         recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" });
       }
@@ -114,13 +120,6 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
     });
     setIsApiRecordsProcessed(true);
   }, [isOpen, recordsToBeExported, isApiRecordsProcessed, sanitizeRecords]);
-
-  useEffect(() => {
-    setFileInfo({
-      label: recordsToBeExported.length > 1 ? "Collections" : "Collection",
-      type: "COL",
-    });
-  }, [recordsToBeExported.length]);
 
   return (
     <Modal

@@ -20,6 +20,11 @@ import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 
+export enum ExportType {
+  REQUESTLY = "requestly",
+  POSTMAN = "postman",
+}
+
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
   environment: {
@@ -27,8 +32,7 @@ interface EnvironmentsListItemProps {
     name: string;
     isGlobal?: boolean;
   };
-  onExportClick?: (environment: { id: string; name: string }) => void;
-  onPostmanExportClick?: (environment: { id: string; name: string }) => void;
+  onExportClick?: (environment: { id: string; name: string }, exportType: ExportType) => void;
 }
 
 export enum EnvironmentMenuKey {
@@ -44,7 +48,6 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
   isReadOnly,
   environment,
   onExportClick,
-  onPostmanExportClick,
 }) => {
   const { envId } = useParams();
   const {
@@ -154,19 +157,19 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
             key: EnvironmentMenuKey.EXPORT_REQUESTLY,
             label: "Requestly",
             icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
-            onClick: () => onExportClick?.(environment),
+            onClick: () => onExportClick?.(environment, ExportType.REQUESTLY),
           },
           {
             key: EnvironmentMenuKey.EXPORT_POSTMAN,
             label: "Postman (v2.1 format)",
-            onClick: () => onPostmanExportClick?.(environment),
+            onClick: () => onExportClick?.(environment, ExportType.POSTMAN),
             icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
           },
         ],
       },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
-  }, [handleEnvironmentDuplicate, onExportClick, onPostmanExportClick, environment, handleEnvironmentDelete]);
+  }, [handleEnvironmentDuplicate, onExportClick, environment, handleEnvironmentDelete]);
 
   if (isRenameInputVisible) {
     return (
