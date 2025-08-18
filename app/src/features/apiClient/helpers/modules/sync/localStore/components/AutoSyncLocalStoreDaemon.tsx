@@ -19,11 +19,7 @@ const LoggedInDaemon: React.FC<{}> = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const syncRepository = useApiClientRepository();
   const [syncAll, setSyncTask] = useSyncService((state) => [state.syncAll, state.setSyncTask]);
-  const [addNewRecords, getAllRecords] = useAPIRecords((state) => [
-    state.addNewRecords,
-    state.getAllRecords,
-    state.refresh,
-  ]);
+  const [addNewRecords, getAllRecords] = useAPIRecords((state) => [state.addNewRecords, state.getAllRecords]);
 
   useEffect(() => {
     if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {

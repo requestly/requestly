@@ -89,7 +89,7 @@ export class RQ implements SandboxAPI {
     );
   }
 
-  private createRequestObject(originalRequest: RQAPI.Request): LocalScopeRequest {
+  private createRequestObject(originalRequest: RQAPI.HttpRequest): LocalScopeRequest {
     return Object.create(
       {
         toJSON: () => ({

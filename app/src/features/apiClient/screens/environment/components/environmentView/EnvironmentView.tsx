@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Skeleton } from "antd";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
@@ -10,25 +8,36 @@ import { convertEnvironmentToMap, isGlobalEnvironment, mapToEnvironmentArray } f
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import { useGenericState } from "hooks/useGenericState";
+import { useCommand } from "features/apiClient/commands";
+import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
+import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 
 interface EnvironmentViewProps {
   envId: string;
 }
 
 export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
-  const { isEnvironmentsLoading, getEnvironmentName, getEnvironmentVariables, setVariables } = useEnvironmentManager();
+  const environment = useEnvironment(envId, (s) => s);
+  const variablesMap = useVariableStore(environment.data.variables);
+  const variablesData = useMemo(() => {
+    return mapToEnvironmentArray(Object.fromEntries(variablesMap.data));
+  }, [variablesMap]);
+  const {
+    env: { setEnvironmentVariables },
+  } = useCommand();
 
   const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const environmentName = getEnvironmentName(envId);
+
+  const environmentName = environment.name;
+
+  // FIXME: Saves last input value even when cleared
   const variables = useMemo(() => {
-    return pendingVariablesRef.current.length > 0
-      ? pendingVariablesRef.current
-      : mapToEnvironmentArray(getEnvironmentVariables(envId));
-  }, [getEnvironmentVariables, envId]);
+    return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : variablesData;
+  }, [variablesData]);
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -64,63 +73,58 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
   }, []);
 
   const handleSaveVariables = async () => {
-    setIsSaving(true);
-    const variablesToSave = convertEnvironmentToMap(pendingVariables);
-    return setVariables(envId, variablesToSave)
-      .then(() => {
-        toast.success("Variables updated successfully");
-        trackVariablesSaved({
-          type: isGlobalEnvironment(envId) ? "global_variables" : "environment_variable",
-          num_variables: pendingVariables.length,
-        });
-        resetChanges();
-      })
-      .catch((error) => {
-        toast.error("Failed to update variables");
-        console.error("Failed to updated variables: ", error);
-      })
-      .finally(() => {
-        setIsSaving(false);
+    try {
+      setIsSaving(true);
+
+      const variablesToSave = convertEnvironmentToMap(pendingVariables);
+      await setEnvironmentVariables({ environmentId: envId, variables: variablesToSave });
+
+      toast.success("Variables updated successfully");
+      trackVariablesSaved({
+        type: isGlobalEnvironment(envId) ? "global_variables" : "environment_variable",
+        num_variables: pendingVariables.length,
       });
+
+      resetChanges();
+    } catch (error) {
+      console.error("Failed to update variables", error);
+      toast.error("Failed to update variables");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div key={envId} className="variables-list-view-container">
       <div className="variables-list-view">
-        {isEnvironmentsLoading ? (
-          <Skeleton active />
-        ) : (
-          <>
-            <VariablesListHeader
-              searchValue={searchValue}
-              onSearchValueChange={setSearchValue}
-              currentEnvironmentName={environmentName}
-              environmentId={envId}
-              onSave={handleSaveVariables}
-              hasUnsavedChanges={hasUnsavedChanges}
-              isSaving={isSaving}
-              exportActions={{
-                showExport: isGlobalEnvironment(envId),
-                enableExport: !isEmpty(variables),
-                onExportClick: () => setIsExportModalOpen(true),
-              }}
-            />
-            <VariablesList
-              searchValue={searchValue}
-              variables={pendingVariables}
-              onVariablesChange={handleSetPendingVariables}
-            />
-            {isExportModalOpen && (
-              <ApiClientExportModal
-                exportType="environment"
-                environments={[{ id: envId, name: environmentName, variables: convertEnvironmentToMap(variables) }]}
-                isOpen={isExportModalOpen}
-                onClose={() => {
-                  setIsExportModalOpen(false);
-                }}
-              />
-            )}
-          </>
+        <VariablesListHeader
+          searchValue={searchValue}
+          onSearchValueChange={setSearchValue}
+          currentEnvironmentName={environmentName}
+          environmentId={envId}
+          onSave={handleSaveVariables}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+          exportActions={{
+            showExport: isGlobalEnvironment(envId),
+            enableExport: !isEmpty(variables),
+            onExportClick: () => setIsExportModalOpen(true),
+          }}
+        />
+        <VariablesList
+          searchValue={searchValue}
+          variables={pendingVariables}
+          onVariablesChange={handleSetPendingVariables}
+        />
+        {isExportModalOpen && (
+          <ApiClientExportModal
+            exportType="environment"
+            environments={[{ id: envId, name: environmentName, variables: convertEnvironmentToMap(variables) }]}
+            isOpen={isExportModalOpen}
+            onClose={() => {
+              setIsExportModalOpen(false);
+            }}
+          />
         )}
       </div>
     </div>

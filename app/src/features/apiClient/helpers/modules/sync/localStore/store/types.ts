@@ -14,7 +14,7 @@ export namespace APIClientSyncService {
     | {
         success: true;
         data: {
-          records: RQAPI.Record[];
+          records: RQAPI.ApiClientRecord[];
           environments: EnvironmentData[];
         };
       }
@@ -39,7 +39,7 @@ export namespace APIClientSyncService {
     syncApis: (
       syncRepository: ApiClientRepositoryInterface,
       recordsToSkip?: Set<string>
-    ) => Promise<{ success: true; data: RQAPI.Record[] } | { success: false; error: string }>;
+    ) => Promise<{ success: true; data: RQAPI.ApiClientRecord[] } | { success: false; error: string }>;
     syncEnvs: (
       syncRepository: ApiClientRepositoryInterface,
       recordsToSkip?: Set<string>
@@ -51,7 +51,7 @@ export namespace APIClientSyncService {
         environmentsToSkip: Set<string>;
       }
     ) => Promise<{
-      records: RQAPI.Record[];
+      records: RQAPI.ApiClientRecord[];
       environments: EnvironmentData[];
     }>;
 

@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import { FilePicker } from "components/common/FilePicker";
 import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableValue } from "backend/environment/types";
@@ -19,6 +18,8 @@ import {
 import Logger from "lib/logger";
 import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
+import { useCommand } from "features/apiClient/commands";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
@@ -44,8 +45,11 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     variables: {},
   });
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const {
+    env: { createEnvironment, patchEnvironmentVariables },
+  } = useCommand();
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
+  const { onSaveRecord } = useApiClientContext();
 
   const collectionsCount = useRef(0);
 
@@ -153,15 +157,16 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     try {
       const importPromises = processedFileData.environments.map(async (env) => {
         if (env.isGlobal) {
-          const globalEnvVariables = getEnvironmentVariables("global");
-          await setVariables("global", { ...globalEnvVariables, ...env.variables });
+          await patchEnvironmentVariables({
+            environmentId: environmentVariablesRepository.getGlobalEnvironmentId(),
+            variables: env.variables,
+          });
           return true;
         } else {
-          const newEnvironment = await addNewEnvironment(env.name);
-          if (newEnvironment) {
-            await setVariables(newEnvironment.id, env.variables);
-            return true;
-          }
+          await createEnvironment({
+            newEnvironmentName: env.name,
+            variables: env.variables,
+          });
         }
         return false;
       });
@@ -172,7 +177,7 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       Logger.error("Postman data import failed:", error);
       throw error;
     }
-  }, [addNewEnvironment, setVariables, processedFileData.environments, getEnvironmentVariables]);
+  }, [processedFileData.environments, patchEnvironmentVariables, environmentVariablesRepository, createEnvironment]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;
