@@ -5,9 +5,9 @@ import config from "src/config";
 import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ApiRequest from "../../../../resources/icons/api-request.svg";
 import ImportCurl from "../../../../resources/icons/curl-import.svg";
-import "./apiClient.scss";
+import "./apiClientContainer.scss";
 
-export const ApiClientView: React.FC = () => {
+export const ApiClientContainer: React.FC = () => {
   return (
     <div className="apiclient-view-container popup-body-card">
       <Row align="middle" justify="space-between">
