@@ -18,7 +18,7 @@ export const initExtensionMessageListener = () => {
       case EXTENSION_MESSAGES.RULE_SAVE_ERROR:
       case EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED:
       case CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED:
-      case EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL:
+      case CLIENT_MESSAGES.OPEN_CURL_IMPORT_MODAL:
         sendExtensionMessage(message);
         break;
     }

@@ -1,7 +1,7 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { setVariable, Variable } from "../variable";
 import { sendMessageToApp } from "./messageHandler/sender";
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES } from "common/constants";
 import extensionIconManager from "./extensionIconManager";
 import { updateActivationStatus } from "./contextMenu";
 import { tabService } from "./tabService";
@@ -194,7 +194,7 @@ export const triggerOpenCurlModalMessage = async (selectedText: string, pageURL:
 
     // Send message to the new tab to open cURL import modal with pre-filled text
     const message = {
-      action: EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL,
+      action: CLIENT_MESSAGES.OPEN_CURL_IMPORT_MODAL,
       payload: {
         curlCommand: selectedText,
         pageURL,
