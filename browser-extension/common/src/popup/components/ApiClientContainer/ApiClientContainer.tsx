@@ -6,6 +6,7 @@ import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ApiRequest from "../../../../resources/icons/api-request.svg";
 import ImportCurl from "../../../../resources/icons/curl-import.svg";
 import "./apiClientContainer.scss";
+import { EXTENSION_MESSAGES } from "src/constants";
 
 export const ApiClientContainer: React.FC = () => {
   return (
@@ -18,7 +19,7 @@ export const ApiClientContainer: React.FC = () => {
           block
           className={"api-client-action-btn"}
           icon={<ApiRequest />}
-          onClick={() => console.log("Send API request clicked")}
+          onClick={() => window.open(`${config.WEB_URL}/api-client/request/new`, "_blank")}
         >
           Send API request
         </PrimaryActionButton>
@@ -27,7 +28,7 @@ export const ApiClientContainer: React.FC = () => {
           block
           className={"api-client-action-btn"}
           icon={<ImportCurl />}
-          onClick={() => console.log("Import cURL request clicked")}
+          onClick={() => chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL })}
         >
           Import a cURL request
         </PrimaryActionButton>

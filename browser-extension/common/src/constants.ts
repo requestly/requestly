@@ -43,6 +43,7 @@ export const EXTENSION_MESSAGES = {
   DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
   OPEN_CURL_IMPORT_MODAL: "openCurlImportModal",
   IS_SESSION_REPLAY_ENABLED: "isSessionReplayEnabled",
+  TRIGGER_OPEN_CURL_MODAL: "triggerOpenCurlModal",
 };
 
 export const EXTENSION_EXTERNAL_MESSAGES = {
