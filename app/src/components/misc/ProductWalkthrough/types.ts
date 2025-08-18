@@ -40,4 +40,5 @@ export enum SUB_TOUR_TYPES {
   FIRST_DRAFT_SESSION = "firstDraftSession",
   TEST_THIS_RULE = "testThisRule",
   UPGRADE_WORKSPACE_MENU = "upgradeWorkspaceMenu",
+  RUNTIME_VARIABLES = "firstRuntimeVariables",
 }

@@ -401,4 +401,16 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 0,
     },
   ],
+  [MISC_TOURS.RUNTIME_VARIABLES.FIRST_TIME_RUNTIME_VARIABLES]: [
+    {
+      ...tourTooltipPresets,
+      target: getTourTarget(MISC_TOURS.RUNTIME_VARIABLES.FIRST_TIME_RUNTIME_VARIABLES),
+      content: "Define and manage runtime values in the Variables section.",
+      showNext: false,
+      placement: "right",
+      hidePointer: true,
+      disableOverlay: true,
+      offset: 10,
+    },
+  ],
 };
