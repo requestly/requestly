@@ -7,9 +7,8 @@ import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarLis
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
-import ActionMenu from "../../components/collectionsList/BulkActionsMenu";
+import ActionMenu, { ActionMenuProps } from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
-import { capitalize } from "lodash";
 import {
   ApiClientFeatureContext,
   apiClientFeatureContextProviderStore,
@@ -38,6 +37,7 @@ export const ContextualCollectionsSidebar: React.FC<{
   const [searchValue, setSearchValue] = useState("");
   const [showSelection, setShowSelection] = useState(false);
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+  const [isSelectionAcrossWorkspaces, setIsSelectionAcrossWorkspaces] = useState(false);
 
   const [isSelectAll, setIsSelectAll] = useState(false);
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
@@ -88,10 +88,10 @@ export const ContextualCollectionsSidebar: React.FC<{
     (params: {
       contextId: string;
       action: RecordSelectionAction;
-      recordIds: Set<string>;
-      isAllRecordsSelected: boolean;
+      recordIds?: Set<string>;
+      isAllRecordsSelected?: boolean;
     }) => {
-      const { contextId, action, recordIds, isAllRecordsSelected } = params;
+      const { contextId, action, recordIds = new Set(), isAllRecordsSelected = false } = params;
 
       if (!selectedRecordsAcrossWorkspaces.current) {
         selectedRecordsAcrossWorkspaces.current = {};
@@ -110,9 +110,16 @@ export const ContextualCollectionsSidebar: React.FC<{
           selectedRecordsAcrossWorkspaces.current[contextId].recordIds.add(id);
         });
       } else {
-        recordIds.forEach((id) => {
-          selectedRecordsAcrossWorkspaces.current[contextId].recordIds.delete(id);
-        });
+        if (isAllRecordsSelected) {
+          selectedRecordsAcrossWorkspaces.current[contextId] = {
+            recordIds: new Set(),
+            isAllRecordsSelected: false,
+          };
+        } else {
+          recordIds.forEach((id) => {
+            selectedRecordsAcrossWorkspaces.current[contextId].recordIds.delete(id);
+          });
+        }
       }
 
       const isAll = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).every((value) => {
@@ -120,6 +127,12 @@ export const ContextualCollectionsSidebar: React.FC<{
       });
 
       setIsAllRecordsSelected(isAll);
+
+      const workspacesCountWithSelectedRecords = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
+        (value) => value.recordIds.size > 0
+      ).length;
+
+      setIsSelectionAcrossWorkspaces(workspacesCountWithSelectedRecords > 1);
     },
     []
   );
@@ -128,7 +141,7 @@ export const ContextualCollectionsSidebar: React.FC<{
     selectedRecordsAcrossWorkspaces.current = null;
     setIsSelectAll(false);
     setIsAllRecordsSelected(false);
-    setShowSelection(false);
+    setIsSelectionAcrossWorkspaces(false);
   }, []);
 
   const handleSelectToggle = useCallback(() => {
@@ -184,26 +197,14 @@ export const ContextualCollectionsSidebar: React.FC<{
         return;
       }
 
-      if ([BulkActions.MOVE, BulkActions.EXPORT].includes(action)) {
-        // FIXME: check if any problem with select and unselect with downstreams
-        const workspacesWithSelectedRecordsCount = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
-          (value) => value.recordIds.size > 0
-        ).length;
+      if (action === BulkActions.MOVE) {
+        setIsMoveCollectionModalOpen(true);
+        return;
+      }
 
-        if (workspacesWithSelectedRecordsCount > 1) {
-          toast.error(`${capitalize(action)} not supported across workspaces!`);
-          return;
-        }
-
-        if (action === BulkActions.MOVE) {
-          setIsMoveCollectionModalOpen(true);
-          return;
-        }
-
-        if (action === BulkActions.EXPORT) {
-          setIsExportModalOpen(true);
-          return;
-        }
+      if (action === BulkActions.EXPORT) {
+        setIsExportModalOpen(true);
+        return;
       }
     },
     [handleSelectToggle, handleRecordsDelete, handleDuplicateRecords]
@@ -211,14 +212,12 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   const toggleMultiSelect = useCallback(() => {
     if (showSelection) {
+      deselect();
       setShowSelection(false);
-      selectedRecordsAcrossWorkspaces.current = null;
-      setIsSelectAll(false);
-      setIsAllRecordsSelected(false);
     } else {
       setShowSelection(true);
     }
-  }, [showSelection]);
+  }, [showSelection, deselect]);
 
   const handleShowSelection = useCallback((value: boolean) => {
     setShowSelection(value);
@@ -232,7 +231,6 @@ export const ContextualCollectionsSidebar: React.FC<{
   }, [toggleMultiSelect, isValidPermission]);
 
   const getRecordsBySingleContextSelection: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
-    // FIXME: not reactive
     const workspacesWithSelectedRecords = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
       ([ctxId, value]) => value.recordIds.size > 0
     );
@@ -277,6 +275,19 @@ export const ContextualCollectionsSidebar: React.FC<{
     return showSelection ? recordsWithContext : [recordsToBeDeleted];
   }, [showSelection, recordsToBeDeleted]);
 
+  const disabledActions: ActionMenuProps["disabledActions"] = useMemo(() => {
+    return {
+      [BulkActions.MOVE]: {
+        value: isSelectionAcrossWorkspaces,
+        tooltip: "You can only move items within the same workspace.",
+      },
+      [BulkActions.EXPORT]: {
+        value: isSelectionAcrossWorkspaces,
+        tooltip: "You can only export requests from a single workspace.",
+      },
+    };
+  }, [isSelectionAcrossWorkspaces]);
+
   return (
     <>
       <DndProvider backend={HTML5Backend}>
@@ -295,6 +306,7 @@ export const ContextualCollectionsSidebar: React.FC<{
               isAllRecordsSelected={isAllRecordsSelected}
               toggleSelection={toggleMultiSelect}
               bulkActionsHandler={onBulkActionClick}
+              disabledActions={disabledActions}
             />
           )}
         </div>

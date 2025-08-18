@@ -22,6 +22,7 @@ import {
 } from "features/apiClient/commands/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { updateRecordSelection } from "./utils";
 
 interface Props {
   searchValue: string;
@@ -33,8 +34,8 @@ interface Props {
   handleRecordSelection: (params: {
     contextId: string;
     action: RecordSelectionAction;
-    recordIds: Set<string>;
-    isAllRecordsSelected: boolean;
+    recordIds?: Set<string>;
+    isAllRecordsSelected?: boolean;
   }) => void;
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context: ApiClientFeatureContext) => void;
 }
@@ -93,26 +94,6 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => {
       const checked = event.target.checked;
 
-      const updateSelection = (
-        record: RQAPI.ApiClientRecord,
-        checked: boolean,
-        newSelectedRecords: Set<RQAPI.ApiClientRecord["id"]>
-      ) => {
-        const queue = [record];
-        while (queue.length) {
-          const current = queue.pop();
-          if (checked) {
-            newSelectedRecords.add(current.id);
-          } else {
-            newSelectedRecords.delete(current.id);
-          }
-
-          if (isApiCollection(current) && current.data.children) {
-            queue.push(...current.data.children);
-          }
-        }
-      };
-
       // Ensure parents are selected/deselected as needed
       const checkParentSelection = (
         recordId: RQAPI.ApiClientRecord["id"],
@@ -136,23 +117,29 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       };
 
       // Keeping track of selected records to auto check/uncheck select all checkbox in bulk action menu
-      setSelectedRecords((prevSelected) => {
-        let newSelectedRecords = new Set(prevSelected);
-        updateSelection(record, checked, newSelectedRecords);
-        record.collectionId && checkParentSelection(record.id, checked, newSelectedRecords);
+      let { newSelectedRecords, unselectedRecords } = updateRecordSelection(record, checked, selectedRecords);
+      const totalRecordsCount = Object.keys(updatedRecords.recordsMap).length;
 
-        const totalRecordsCount = Object.keys(updatedRecords.recordsMap).length;
-        handleRecordSelection({
-          contextId: context.id,
-          action: "select",
-          recordIds: newSelectedRecords,
-          isAllRecordsSelected: newSelectedRecords.size === totalRecordsCount,
-        });
+      if (record.collectionId) {
+        checkParentSelection(record.id, checked, newSelectedRecords);
+      }
 
-        return newSelectedRecords;
+      setSelectedRecords(newSelectedRecords);
+
+      handleRecordSelection({
+        contextId: context.id,
+        action: "select",
+        recordIds: newSelectedRecords,
+        isAllRecordsSelected: newSelectedRecords.size === totalRecordsCount,
+      });
+
+      handleRecordSelection({
+        contextId: context.id,
+        action: "unselect",
+        recordIds: unselectedRecords,
       });
     },
-    [context?.id, updatedRecords, childParentMap, handleRecordSelection]
+    [context?.id, selectedRecords, updatedRecords, childParentMap, handleRecordSelection]
   );
 
   useEffect(() => {
@@ -171,15 +158,20 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   useEffect(() => {
     if (isSelectAll) {
       const result = selectAllRecords({ contextId: context?.id, searchValue });
+      setSelectedRecords(result);
       handleRecordSelection({
         contextId: context?.id,
         action: "select",
         recordIds: result,
         isAllRecordsSelected: true,
       });
-      setSelectedRecords(result);
     } else {
       setSelectedRecords(new Set());
+      handleRecordSelection({
+        contextId: context?.id,
+        action: "unselect",
+        isAllRecordsSelected: true,
+      });
     }
   }, [isSelectAll, handleRecordSelection, context?.id, searchValue]);
 
