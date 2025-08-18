@@ -2,12 +2,12 @@ import React from "react";
 import { Input, Dropdown } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import PATHS from "config/constants/sub/paths";
 import { isGlobalEnvironment } from "../../utils";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
+import { useCommand } from "features/apiClient/commands";
 import "./variablesListHeader.scss";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
@@ -40,16 +40,22 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   onSave,
   exportActions,
 }) => {
-  const { renameEnvironment } = useEnvironmentManager();
+  const {
+    env: { renameEnvironment },
+  } = useCommand();
   const { setTitle, getIsActive, getIsNew } = useGenericState();
   const enableHotKey = getIsActive();
   const isNewEnvironment = getIsNew();
 
-  const handleNewEnvironmentNameChange = (newName: string) => {
-    const updatedName = newName || "New Environment";
-    renameEnvironment(environmentId, updatedName).then(() => {
+  const handleNewEnvironmentNameChange = async (newName: string) => {
+    try {
+      const updatedName = newName || "New Environment";
+
+      await renameEnvironment({ environmentId, newName: updatedName });
       setTitle(updatedName);
-    });
+    } catch (error) {
+      // NOOP
+    }
   };
 
   return (

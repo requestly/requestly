@@ -3,26 +3,27 @@ import { Popover, Row } from "antd";
 import { EnvironmentVariableType, EnvironmentVariableValue, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
+import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
   popupPosition: { x: number; y: number };
   editorRef: React.RefObject<HTMLDivElement>;
-  variables: Record<string, any>;
+  variables: ScopedVariables;
 }
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
   hoveredVariable,
   editorRef,
   popupPosition,
-  variables = {},
+  variables,
 }) => {
-  const variableData = variables[hoveredVariable];
+  const variableData = variables.get(hoveredVariable);
   const popoverContent = variableData ? (
     <VariableInfo
-      variable={{
+      params={{
         name: hoveredVariable,
-        ...variableData,
+        variable: variableData,
       }}
     />
   ) : (
@@ -67,8 +68,16 @@ function getSanitizedVariableValue(variable: EnvironmentVariableValue) {
 }
 
 const VariableInfo: React.FC<{
-  variable: { name: string } & EnvironmentVariableValue;
-}> = ({ variable }) => {
+  params: {
+    name: string;
+    variable: ScopedVariable;
+  };
+}> = ({
+  params: {
+    name,
+    variable: [variable, source],
+  },
+}) => {
   const { syncValue, localValue } = getSanitizedVariableValue(variable);
   const infoFields = [
     { label: "Type", value: capitalize(variable.type) },
@@ -77,7 +86,7 @@ const VariableInfo: React.FC<{
   ];
   return (
     <>
-      <Row className="variable-info-header">{variable.name}</Row>
+      <Row className="variable-info-header">{name}</Row>
       <div className="variable-info-content">
         {infoFields.map(({ label, value }) => (
           <React.Fragment key={label}>

@@ -7,8 +7,8 @@ import { useExampleCollections } from "../store";
 import { WorkspaceType } from "features/workspaces/types";
 import { StoreApi } from "zustand";
 import { ApiRecordsState } from "features/apiClient/store/apiRecords/apiRecords.store";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { getOwnerId, LOGGED_OUT_STATE_UID } from "backend/utils";
+import { useCommand } from "features/apiClient/commands";
 
 export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsState> }> = ({ store }) => {
   const user = useSelector(getUserAuthDetails);
@@ -16,7 +16,10 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
   const uid = user?.details?.profile?.uid ?? getOwnerId(user?.details?.profile?.uid);
   const syncRepository = useApiClientRepository();
   const [importExampleCollections] = useExampleCollections((s) => [s.importExampleCollections]);
-  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const {
+    env: { createEnvironments },
+  } = useCommand();
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -24,11 +27,11 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
       return;
     }
 
-    if (activeWorkspace.workspaceType !== WorkspaceType.PERSONAL) {
+    if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
       return;
     }
 
-    const envsStore = { forceRefreshEnvironments };
+    const envsStore = { createEnvironments };
     importExampleCollections({
       ownerId: uid,
       respository: syncRepository,
@@ -38,11 +41,11 @@ export const ExampleCollectionsDaemon: React.FC<{ store: StoreApi<ApiRecordsStat
     });
   }, [
     uid,
-    activeWorkspace.workspaceType,
+    activeWorkspace?.workspaceType,
     syncRepository,
     importExampleCollections,
     store,
-    forceRefreshEnvironments,
+    createEnvironments,
     dispatch,
   ]);
 

@@ -1,9 +1,13 @@
-import { Authorization } from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { RQAPI } from "./types";
 
 export const CONTENT_TYPE_HEADER = "Content-Type";
 
-export const DEMO_API_URL = "https://app.requestly.io/echo";
+export const DEMO_HTTP_API_URL = "https://app.requestly.io/echo";
+
+export const DEMO_GRAPHQL_API_URL = "https://rickandmortyapi.com/graphql";
+
+export const DEFAULT_REQUEST_NAME = "Untitled request";
 
 export const SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY = "expanded_record_ids";
 

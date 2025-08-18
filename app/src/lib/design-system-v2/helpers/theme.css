@@ -4,10 +4,10 @@
 
 :root {
   --requestly-color-primary: #004eeb;
-  --requestly-color-secondary: #a447f8;
+  --requestly-color-secondary: #680cb7;
   --requestly-color-neutral: #787878;
   --requestly-color-success: #0baa60;
-  --requestly-color-error: #e43434;
+  --requestly-color-error: #dc2626;
   --requestly-color-warning: #e09400;
   --requestly-color-primary-0: #cbe2fe;
   --requestly-color-primary-100: #cbe2fe;
@@ -20,17 +20,17 @@
   --requestly-color-primary-800: #001f88;
   --requestly-color-primary-900: #001670;
   --requestly-color-primary-1000: #111a2c;
-  --requestly-color-secondary-0: #eedcfa;
-  --requestly-color-secondary-100: #E2COFA;
-  --requestly-color-secondary-200: #d5a3fb;
-  --requestly-color-secondary-300: #c686fa;
-  --requestly-color-secondary-400: #b568f9;
-  --requestly-color-secondary-500: #a447f8;
-  --requestly-color-secondary-600: #750fcd;
-  --requestly-color-secondary-700: #680cb7;
-  --requestly-color-secondary-800: #2b084b;
-  --requestly-color-secondary-900: #420975;
-  --requestly-color-secondary-1000: #240342;
+  --requestly-color-secondary-0: #e3dbf6;
+  --requestly-color-secondary-100: #c8b7ec;
+  --requestly-color-secondary-200: #ae93e0;
+  --requestly-color-secondary-300: #956fd4;
+  --requestly-color-secondary-400: #7e48c6;
+  --requestly-color-secondary-500: #680cb7;
+  --requestly-color-secondary-600: #50078f;
+  --requestly-color-secondary-700: #390469;
+  --requestly-color-secondary-800: #240245;
+  --requestly-color-secondary-900: #100024;
+  --requestly-color-secondary-1000: #020007;
   --requestly-color-neutral-0: #e9e9e9;
   --requestly-color-neutral-100: #e9e9e9;
   --requestly-color-neutral-200: #d1d1d1;
@@ -42,6 +42,7 @@
   --requestly-color-neutral-800: #282828;
   --requestly-color-neutral-900: #212121;
   --requestly-color-neutral-1000: #1a1a1a;
+  --requestly-color-neutral-1100: #141414;
   --requestly-color-success-0: #a6e9c8;
   --requestly-color-success-100: #a6e9c8;
   --requestly-color-success-200: #6fdaa6;
@@ -51,18 +52,18 @@
   --requestly-color-success-600: #0a9c55;
   --requestly-color-success-700: #0c7844;
   --requestly-color-success-800: #104b2f;
-  --requestly-color-success-900: #0d1f11;
+  --requestly-color-success-900: #00210e;
   --requestly-color-success-1000: #0d1f11;
   --requestly-color-error-0: #ffc7c7;
   --requestly-color-error-100: #ffc7c7;
   --requestly-color-error-200: #ffa7a7;
   --requestly-color-error-300: #ff8080;
   --requestly-color-error-400: #f95e5e;
-  --requestly-color-error-500: #e43434;
+  --requestly-color-error-500: #dc2626;
   --requestly-color-error-600: #cf2a2a;
   --requestly-color-error-700: #a41f1f;
   --requestly-color-error-800: #591a1a;
-  --requestly-color-error-900: #271111;
+  --requestly-color-error-900: #2f0404;
   --requestly-color-error-1000: #271111;
   --requestly-color-warning-0: #ffdd86;
   --requestly-color-warning-100: #ffdd86;
@@ -73,11 +74,14 @@
   --requestly-color-warning-600: #d07d00;
   --requestly-color-warning-700: #b55e0f;
   --requestly-color-warning-800: #5c3111;
-  --requestly-color-warning-900: #27170b;
+  --requestly-color-warning-900: #2e1b00;
   --requestly-color-warning-1000: #27170b;
+  --requestly-color-background: #1a1a1a;
+  --requestly-color-background-dark: #141414;
+  --requestly-color-primary-darker: #001670;
+  --requestly-color-primary-dark: #002ca9;
   --requestly-color-primary-soft: #3c7ff3;
   --requestly-color-primary-text: #639ff9;
-  --requestly-color-background: #1a1a1a;
   --requestly-color-surface-0: #212121;
   --requestly-color-surface-1: #282828;
   --requestly-color-surface-2: #383838;
@@ -85,13 +89,20 @@
   --requestly-color-text-placeholder: #8f8f8f;
   --requestly-color-text-subtle: #bbbbbb;
   --requestly-color-text-default: #ffffff;
+  --requestly-color-error-darker: #591a1a;
+  --requestly-color-error-dark: #a41f1f;
   --requestly-color-error-soft: #f95e5e;
   --requestly-color-error-text: #ff8080;
+  --requestly-color-warning-darker: #5c3111;
+  --requestly-color-warning-dark: #b55e0f;
   --requestly-color-warning-soft: #f2aa09;
-  --requestly-color-white-t-10: #ffffff19;
+  --requestly-color-warning-text: #ffcb45;
+  --requestly-color-success-darker: #104b2f;
+  --requestly-color-success-text: #6fdaa6;
   --requestly-color-white: #ffffff;
+  --requestly-color-white-t-10: #ffffff19;
   --requestly-color-white-t-20: #ffffff33;
-  --requestly-color-black: #000000;
+  --requestly-color-black: #0e0e0e;
   --requestly-color-black-t-70: #000000b3;
   --requestly-color-black-t-20: #00000033;
   --requestly-font-weight-thin: 100;
@@ -103,17 +114,16 @@
   --requestly-font-weight-bold: 700;
   --requestly-font-weight-extrabold: 800;
   --requestly-font-weight-black: 900;
-  --requestly-font-size-2xs: 0.563rem; /* 9px */
-  --requestly-font-size-xs: 0.688rem; /* 11px */
-  --requestly-font-size-sm: 0.75rem; /* 12px */
-  --requestly-font-size-md: 0.875rem; /* 14px */
-  --requestly-font-size-lg: 1rem; /* 16px */
-  --requestly-font-size-xl: 1.125rem; /* 18px */
+  --requestly-font-size-2xs: 0.563rem;
+  --requestly-font-size-xs: 0.688rem;
+  --requestly-font-size-sm: 0.75rem;
+  --requestly-font-size-md: 0.875rem;
+  --requestly-font-size-lg: 1rem;
+  --requestly-font-size-xl: 1.125rem;
   --requestly-font-line-height-2xs: 0.813rem;
   --requestly-font-line-height-xs: 0.938rem;
   --requestly-font-line-height-sm: 1.25rem;
   --requestly-font-line-height-md: 1.438rem;
-  --requestly-font-line-height-base: 1.5rem;
   --requestly-font-line-height-lg: 1.875rem;
   --requestly-font-line-height-xl: 2.25rem;
   --requestly-font-line-height-2xl: 2.813rem;
@@ -122,4 +132,20 @@
   --requestly-font-line-height-5xl: 5.625rem;
   --requestly-font-family-code: Roboto Mono;
   --requestly-font-family-default: Inter;
+  --requestly-space-0: 0rem;
+  --requestly-space-1: 0.125rem;
+  --requestly-space-2: 0.25rem;
+  --requestly-space-3: 0.375rem;
+  --requestly-space-4: 0.5rem;
+  --requestly-space-5: 0.75rem;
+  --requestly-space-6: 1rem;
+  --requestly-space-7: 1.25rem;
+  --requestly-space-8: 1.5rem;
+  --requestly-space-9: 2rem;
+  --requestly-space-10: 2.5rem;
+  --requestly-space-11: 3rem;
+  --requestly-space-12: 3.5rem;
+  --requestly-space-13: 4rem;
+  --requestly-space-14: 4.5rem;
+  --requestly-space-15: 5rem;
 }

@@ -17,7 +17,7 @@ export function patchMissingIdInVariables(variables: EnvironmentVariables): Envi
   );
 }
 
-export const updateRecordMetaData = (record: RQAPI.Record) => {
+export const updateRecordMetaData = (record: RQAPI.ApiClientRecord) => {
   const recordState = { ...record };
   delete recordState.createdTs;
   delete recordState.updatedTs;
