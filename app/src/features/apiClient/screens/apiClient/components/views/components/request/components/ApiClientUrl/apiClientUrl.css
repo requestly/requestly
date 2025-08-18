@@ -1,0 +1,14 @@
+.api-request-url.ant-input {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: var(--requestly-font-size-sm);
+
+  &:focus-within {
+    border: 1px solid var(--requestly-color-primary);
+  }
+
+  .cm-editor {
+    margin-top: -2px;
+  }
+}

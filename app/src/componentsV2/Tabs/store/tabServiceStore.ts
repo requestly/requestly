@@ -35,7 +35,7 @@ type TabActions = {
   updateTabBySource: (
     sourceId: SourceId,
     sourceName: SourceName,
-    updates: Partial<Pick<TabState, "preview" | "unsaved" | "title">>
+    updates: Partial<Pick<TabState, "preview" | "unsaved" | "title" | "icon">>
   ) => void;
   openTab: (source: AbstractTabSource, config?: TabConfig) => void;
   closeTab: (source: AbstractTabSource, skipUnsavedPrompt?: boolean) => void;
@@ -125,9 +125,11 @@ const createTabServiceStore = () => {
           const tabState = tabStore.getState();
           const updatedTitle = updates?.title ?? tabState.title;
           const updatedPreview = updates?.preview ?? tabState.preview;
+          const updatedIcon = updates?.icon ?? tabState.icon;
 
           tabStore.getState().setTitle(updatedTitle);
           tabStore.getState().setPreview(updatedPreview);
+          tabStore.getState().setIcon(updatedIcon);
           incrementVersion();
         },
 
@@ -148,6 +150,7 @@ const createTabServiceStore = () => {
 
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
+            // FIXME: This can cause a rerender
             setActiveTab(existingTabId);
             return;
           }

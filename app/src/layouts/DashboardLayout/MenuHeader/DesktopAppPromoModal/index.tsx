@@ -5,7 +5,6 @@ import { UAParser } from "ua-parser-js";
 import { Button } from "antd";
 import { AppleFilled, WindowsFilled } from "@ant-design/icons";
 import BlueUnderline from "./blue-underline.svg?react";
-import LinuxIcon from "./linux.svg?react";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./desktopAppPromoModal.css";
 
@@ -43,10 +42,10 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
 
       default:
         return {
-          os: "linux",
-          displayName: "Linux",
-          icon: <LinuxIcon />,
-          link: LINKS.DOWNLOAD_DESKTOP_APP.LINUX,
+          os: "mac",
+          displayName: "Mac",
+          icon: <AppleFilled />,
+          link: LINKS.DOWNLOAD_DESKTOP_APP.MACOS,
         };
     }
   }, []);

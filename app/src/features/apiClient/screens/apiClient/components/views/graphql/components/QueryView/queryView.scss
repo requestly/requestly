@@ -1,0 +1,53 @@
+/* Ensure the split containers take full space */
+.gql-split-horizontal,
+.gql-split-vertical {
+  height: 100%;
+  width: 100%;
+  display: flex;
+
+  .pane {
+    overflow: hidden;
+  }
+}
+
+.gql-split-horizontal {
+  flex-direction: row;
+}
+
+.gql-split-vertical {
+  flex-direction: column;
+  border-right: 1px solid var(--requestly-color-white-t-10);
+
+  .gql-variables-editor {
+    border-top: 1px solid var(--requestly-color-white-t-10);
+  }
+}
+
+.gql-split-horizontal > .gutter,
+.gql-split-vertical > .gutter {
+  background-color: #2e2e2e;
+  background-clip: content-box;
+  opacity: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.gql-split-horizontal > .gutter {
+  cursor: col-resize;
+  width: 3px !important;
+}
+
+.gql-split-vertical > .gutter {
+  cursor: row-resize;
+  height: 3px !important;
+}
+.gql-editor-header {
+  padding: var(--space-3, 6px) 8px;
+  color: var(--requestly-color-text-subtle, #bbb);
+  font-size: var(--requestly-font-size-2xs, 9px);
+  font-weight: var(--requestly-font-weight-medium);
+  line-height: 13px;
+  letter-spacing: 1px;
+}
