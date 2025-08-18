@@ -24,7 +24,7 @@ import "./collectionsList.scss";
 import { head, isEmpty, union } from "lodash";
 import { SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY } from "features/apiClient/constants";
 import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExportModal";
-import { PostmanExportModal } from "../../../modals/postmanExportModal/PostmanExportModal";
+import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { toast } from "utils/Toast";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import ActionMenu from "./BulkActionsMenu";

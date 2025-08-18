@@ -5,7 +5,7 @@ import { trackCreateEnvironmentClicked, trackEnvironmentCreated } from "../../an
 import { EmptyState } from "features/apiClient/screens/apiClient/components/sidebar/components/emptyState/EmptyState";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentAnalyticsSource } from "../../types";
-import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
+import { EnvironmentsListItem, ExportType } from "./components/environmentsListItem/EnvironmentsListItem";
 import { RQAPI } from "features/apiClient/types";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { SidebarPlaceholderItem } from "features/apiClient/screens/apiClient/components/sidebar/components/SidebarPlaceholderItem/SidebarPlaceholderItem";
@@ -81,21 +81,20 @@ export const EnvironmentsList = () => {
   }, [createNewEnvironment, isValidPermission, getRBACValidationFailureErrorMessage]);
 
   const handleExportEnvironments = useCallback(
-    (environment: { id: string; name: string }) => {
+    (environment: { id: string; name: string }, exportType: ExportType) => {
       const variables = getEnvironmentVariables(environment.id);
       setEnvironmentsToExport([{ ...environment, variables }]);
 
-      setIsExportModalOpen(true);
-    },
-    [getEnvironmentVariables]
-  );
-
-  const handlePostmanExportEnvironments = useCallback(
-    (environment: { id: string; name: string }) => {
-      const variables = getEnvironmentVariables(environment.id);
-      setEnvironmentsToExport([{ ...environment, variables }]);
-
-      setIsPostmanExportModalOpen(true);
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
     },
     [getEnvironmentVariables]
   );
@@ -134,7 +133,6 @@ export const EnvironmentsList = () => {
                         environment={environment}
                         isReadOnly={!isValidPermission}
                         onExportClick={handleExportEnvironments}
-                        onPostmanExportClick={handlePostmanExportEnvironments}
                       />
                     )
                   )}
