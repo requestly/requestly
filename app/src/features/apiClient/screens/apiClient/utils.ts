@@ -171,13 +171,17 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = tr
     if (!supportsRequestBody(entry.request.method)) {
       sanitizedEntry.request.body = null;
     } else if (entry.request.contentType === RequestContentType.FORM) {
+      // Ensure body is an array before sanitizing
+      const formBody = Array.isArray(entry.request.body) ? entry.request.body : [];
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        entry.request.body as RQAPI.RequestFormBody,
+        formBody as RQAPI.RequestFormBody,
         removeDisabledKeys
       );
     } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
+      // Ensure body is an array before sanitizing
+      const multipartBody = Array.isArray(entry.request.body) ? entry.request.body : [];
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        entry.request.body as RQAPI.MultipartFormBody,
+        multipartBody as RQAPI.MultipartFormBody,
         removeDisabledKeys
       );
     }
@@ -193,6 +197,11 @@ export const sanitizeKeyValuePairs = <T extends { key: string; isEnabled: boolea
   keyValuePairs: T[],
   removeDisabledKeys = true
 ): T[] => {
+  // Ensure keyValuePairs is an array, default to empty array if not
+  if (!Array.isArray(keyValuePairs)) {
+    return [];
+  }
+  
   return keyValuePairs
     .map((pair) => ({
       ...pair,
