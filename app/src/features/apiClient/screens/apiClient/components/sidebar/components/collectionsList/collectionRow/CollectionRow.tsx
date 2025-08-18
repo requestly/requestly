@@ -92,10 +92,6 @@ export const CollectionRow: React.FC<Props> = ({
     }
   }, [activeTabSource]);
 
-  const handleDropdownVisibleChange = (isOpen: boolean) => {
-    setIsDropdownVisible(isOpen);
-  };
-
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
       const items: MenuProps["items"] = [
@@ -407,8 +403,6 @@ export const CollectionRow: React.FC<Props> = ({
                         menu={{ items: getCollectionOptions(record) }}
                         placement="bottomRight"
                         overlayClassName="collection-dropdown-menu"
-                        open={isDropdownVisible}
-                        onOpenChange={handleDropdownVisibleChange}
                       >
                         <RQButton
                           onClick={(e) => {

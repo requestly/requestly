@@ -69,6 +69,7 @@ export const CLIENT_MESSAGES = {
   NOTIFY_RULE_EXECUTED: "notifyRuleExecuted",
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
   NOTIFY_EXTENSION_STATUS_UPDATED: "notifyExtensionStatusUpdated",
+  OPEN_CURL_IMPORT_MODAL: "openCurlImportModal",
 };
 
 export const STORAGE_TYPE = "local";
