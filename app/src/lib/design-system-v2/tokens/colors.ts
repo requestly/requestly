@@ -1,20 +1,30 @@
 type SeedTokenKeys = "primary" | "secondary" | "neutral" | "success" | "error" | "warning";
 type MapTokenVariations = 0 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000;
-type MapTokenKeys = `${SeedTokenKeys}-${MapTokenVariations}`;
+type MapTokenKeys = `${SeedTokenKeys}-${MapTokenVariations}` | "neutral-1100"; // Temp for neutral
 type AliasTokenKeys =
+  | "background"
+  | "background-dark"
+  | "primary-darker"
+  | "primary-dark"
   | "primary-soft"
   | "primary-text"
-  | "background"
   | "surface-0"
   | "surface-1"
   | "surface-2"
   | "surface-3"
+  | "success-darker"
+  | "success-text"
   | "text-placeholder"
   | "text-subtle"
   | "text-default"
+  | "error-darker"
+  | "error-dark"
   | "error-soft"
   | "error-text"
+  | "warning-darker"
+  | "warning-dark"
   | "warning-soft"
+  | "warning-text"
   | "white-t-10"
   | "white"
   | "white-t-20"
@@ -48,17 +58,17 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
   "primary-800": "#001F88",
   "primary-900": "#001670",
   "primary-1000": "#111A2C",
-  "secondary-0": "#EEDCFA",
-  "secondary-100": "#E2COFA",
-  "secondary-200": "#D5A3FB",
-  "secondary-300": "#C686FA",
-  "secondary-400": "#B568F9",
-  "secondary-500": "#A447F8",
-  "secondary-600": "#750FCD",
-  "secondary-700": "#680CB7",
-  "secondary-800": "#2B084B",
-  "secondary-900": "#420975",
-  "secondary-1000": "#240342",
+  "secondary-0": "#e3dbf6",
+  "secondary-100": "#c8b7ec",
+  "secondary-200": "#ae93e0",
+  "secondary-300": "#956fd4",
+  "secondary-400": "#7e48c6",
+  "secondary-500": "#680cb7",
+  "secondary-600": "#50078f",
+  "secondary-700": "#390469",
+  "secondary-800": "#240245",
+  "secondary-900": "#100024",
+  "secondary-1000": "#020007",
   "neutral-0": "#E9E9E9",
   "neutral-100": "#E9E9E9",
   "neutral-200": "#D1D1D1",
@@ -70,6 +80,7 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
   "neutral-800": "#282828",
   "neutral-900": "#212121",
   "neutral-1000": "#1A1A1A",
+  "neutral-1100": "#141414",
   "success-0": "#A6E9C8",
   "success-100": "#A6E9C8",
   "success-200": "#6FDAA6",
@@ -79,18 +90,18 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
   "success-600": "#0A9C55",
   "success-700": "#0C7844",
   "success-800": "#104B2F",
-  "success-900": "#0D1F11",
+  "success-900": "#00210e",
   "success-1000": "#0D1F11",
   "error-0": "#FFC7C7",
   "error-100": "#FFC7C7",
   "error-200": "#FFA7A7",
   "error-300": "#FF8080",
   "error-400": "#F95E5E",
-  "error-500": "#E43434",
+  "error-500": "#dc2626",
   "error-600": "#CF2A2A",
   "error-700": "#A41F1F",
   "error-800": "#591A1A",
-  "error-900": "#271111",
+  "error-900": "#2f0404",
   "error-1000": "#271111",
   "warning-0": "#FFDD86",
   "warning-100": "#FFDD86",
@@ -101,16 +112,16 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
   "warning-600": "#D07D00",
   "warning-700": "#B55E0F",
   "warning-800": "#5C3111",
-  "warning-900": "#27170B",
+  "warning-900": "#2e1b00",
   "warning-1000": "#27170B",
 };
 
 export const generateColorTokens = (
   primary = "#004EEB",
-  secondary = "#A447F8",
+  secondary = "#680cb7",
   neutral = "#787878",
   success = "#0BAA60",
-  error = "#E43434",
+  error = "#dc2626",
   warning = "#E09400"
 ) => {
   const seedTokens = { primary, secondary, neutral, success, error, warning };
@@ -141,9 +152,12 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
 const generateAliasTokens = (mapTokens: MapTokens) => {
   const aliasTokens: AliasTokens = {
     // Generated from Map Tokens
+    background: mapTokens["neutral-1000"],
+    "background-dark": mapTokens["neutral-1100"],
+    "primary-darker": mapTokens["primary-900"],
+    "primary-dark": mapTokens["primary-700"],
     "primary-soft": mapTokens["primary-400"],
     "primary-text": mapTokens["primary-300"],
-    background: mapTokens["neutral-1000"],
     "surface-0": mapTokens["neutral-900"],
     "surface-1": mapTokens["neutral-800"],
     "surface-2": mapTokens["neutral-700"],
@@ -151,13 +165,20 @@ const generateAliasTokens = (mapTokens: MapTokens) => {
     "text-placeholder": mapTokens["neutral-400"],
     "text-subtle": mapTokens["neutral-300"],
     "text-default": "#FFFFFF", // This needs to be generated depending upon neutral color. Light in case of dark and dark in case of light
+    "error-darker": mapTokens["error-800"],
+    "error-dark": mapTokens["error-700"],
     "error-soft": mapTokens["error-400"],
     "error-text": mapTokens["error-300"],
+    "warning-darker": mapTokens["warning-800"],
+    "warning-dark": mapTokens["warning-700"],
     "warning-soft": mapTokens["warning-400"],
+    "warning-text": mapTokens["warning-200"],
+    "success-darker": mapTokens["success-800"],
+    "success-text": mapTokens["success-200"],
 
     // Hardcoded Colors
-    "white-t-10": "#FFFFFF19",
     white: "#FFFFFF",
+    "white-t-10": "#FFFFFF19",
     "white-t-20": "#FFFFFF33",
     black: "#0E0E0E",
     "black-t-70": "#000000B3",
