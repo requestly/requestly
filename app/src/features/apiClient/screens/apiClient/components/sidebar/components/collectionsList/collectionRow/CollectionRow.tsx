@@ -28,11 +28,15 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 
+export enum ExportType {
+  REQUESTLY = "requestly",
+  POSTMAN = "postman",
+}
+
 interface Props {
   record: RQAPI.CollectionRecord;
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
-  onRequestlyExportClick: (collection: RQAPI.CollectionRecord) => void;
-  onPostmanExportClick?: (collection: RQAPI.CollectionRecord) => void;
+  onRequestlyExportClick: (collection: RQAPI.CollectionRecord, exportType: ExportType) => void;
   setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -48,7 +52,6 @@ export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
   onRequestlyExportClick: onExportClick,
-  onPostmanExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -114,7 +117,7 @@ export const CollectionRow: React.FC<Props> = ({
               icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
               onClick: (itemInfo) => {
                 itemInfo.domEvent?.stopPropagation?.();
-                onExportClick(record);
+                onExportClick(record, ExportType.REQUESTLY);
                 setIsDropdownVisible(false);
               },
             },
@@ -124,9 +127,7 @@ export const CollectionRow: React.FC<Props> = ({
               icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
               onClick: (itemInfo) => {
                 itemInfo.domEvent?.stopPropagation?.();
-                if (onPostmanExportClick) {
-                  onPostmanExportClick(record);
-                }
+                onExportClick(record, ExportType.POSTMAN);
                 setIsDropdownVisible(false);
               },
             },
@@ -437,7 +438,6 @@ export const CollectionRow: React.FC<Props> = ({
                             record={apiRecord}
                             onNewClick={onNewClick}
                             onRequestlyExportClick={onExportClick}
-                            onPostmanExportClick={onPostmanExportClick}
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
