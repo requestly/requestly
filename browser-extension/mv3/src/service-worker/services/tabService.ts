@@ -103,11 +103,7 @@ class TabService {
   async createAppTab(): Promise<chrome.tabs.Tab> {
     const webUrl = config.WEB_URL;
 
-    return new Promise<chrome.tabs.Tab>((resolve) => {
-      chrome.tabs.create({ url: webUrl }, (tab) => {
-        resolve(tab);
-      });
-    });
+    return chrome.tabs.create({ url: webUrl });
   }
 
   addOrUpdateTab(tab: TabData) {

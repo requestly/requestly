@@ -21,11 +21,21 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
     title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
   });
 
+  console.log(`[updateActivationStatus] starting...`, {
+    isExtensionEnabled,
+    extensionIconState: extensionIconManager.getState(),
+  });
+
   if (isExtensionEnabled) {
     extensionIconManager.markExtensionEnabled();
   } else {
     extensionIconManager.markExtensionDisabled();
   }
+
+  console.log(`[updateActivationStatus] finished...`, {
+    isExtensionEnabled,
+    extensionIconState: extensionIconManager.getState(),
+  });
 
   if (isExtensionEnabled === false) {
     stopRecordingOnAllTabs();
