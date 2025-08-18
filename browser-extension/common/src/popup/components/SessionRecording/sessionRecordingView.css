@@ -1,5 +1,5 @@
 .session-view-content {
-  padding: 8px 0;
+  padding-bottom: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;

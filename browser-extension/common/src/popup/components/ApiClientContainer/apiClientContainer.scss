@@ -11,12 +11,11 @@
   }
 
   .action-btns {
-    margin: 8px 0;
     column-gap: 12px;
-    background: transparent;
 
     .api-client-action-btn {
       border: var(--white-t-20) solid 1px;
+      background: transparent;
     }
   }
 
