@@ -17,6 +17,10 @@
     "email": "contact@requestly.io",
     "url": "https://requestly.com/"
   },
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "postinstall": "patch-package",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
