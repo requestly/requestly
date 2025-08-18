@@ -12,7 +12,7 @@ export const ApiClientContainer: React.FC = () => {
   return (
     <div className="apiclient-view-container popup-body-card">
       <Row align="middle" justify="space-between">
-        <div className="title">🚀 Try a simple and powerful API client</div>
+        <div className="title">🚀{"  "}Try a simple and powerful API client</div>
       </Row>
       <Row wrap={false} align="middle" className="action-btns">
         <PrimaryActionButton

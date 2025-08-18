@@ -2,7 +2,7 @@
   background: var(--surface-1);
   border-radius: var(--border-radius);
   padding: 8px 12px;
-  max-height: 270px;
+  overflow: hidden;
 }
 
 .tabs-header {
