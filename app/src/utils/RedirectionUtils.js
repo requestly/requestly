@@ -556,10 +556,6 @@ export const redirectToEnvironment = (navigate, environment) => {
   navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment}`);
 };
 
-export const redirectToNewEnvironment = (navigate) => {
-  navigate(PATHS.API_CLIENT.ENVIRONMENTS.NEW.ABSOLUTE);
-};
-
 export const redirectToUrl = (url, newTab = false) => {
   if (newTab) {
     return window.open(url, "_blank");
