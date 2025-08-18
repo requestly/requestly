@@ -1,6 +1,7 @@
 .https-rule-options-container {
   padding: 12px 16px;
-  background: var(--surface-1);
+  /* background: var(--surface-1); */
+  background: url("");
   border-radius: var(--border-radius-sm);
 }
 

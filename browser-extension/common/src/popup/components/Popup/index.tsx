@@ -11,6 +11,7 @@ import DesktopAppProxy from "../DesktopAppProxy/DesktopAppProxy";
 import { ConnectedToDesktopView } from "../DesktopAppProxy/components/ConnectedToDesktopView/ConnectedToDesktopView";
 import "./popup.css";
 import { message } from "antd";
+import { ApiClientView } from "../ApiClient/ApiClientView";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -96,6 +97,7 @@ const Popup: React.FC = () => {
                   {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
                   <div className="popup-content">
                     {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
+                    <ApiClientView />
                     {isSessionReplayEnabled && <SessionRecordingView />}
                     <DesktopAppProxy isProxyApplied={isProxyApplied} onProxyStatusChange={setIsProxyApplied} />
                   </div>
