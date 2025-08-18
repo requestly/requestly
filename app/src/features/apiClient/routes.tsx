@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import ApiClientFeatureContainer from "./container";
-import { ApiClientEmptyView } from "./screens/apiClient/components/clientView/components/ApiClientEmptyView/ApiClientEmptyView";
+import { ApiClientEmptyView } from "./screens/apiClient/components/views/components/ApiClientEmptyView/ApiClientEmptyView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { PostmanImporterView } from "./screens/PostmanImporterView/PostmanImporterView";
 import ApiClientErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
