@@ -47,7 +47,6 @@ export const ImportFromCurlModal: React.FC<Props> = ({
 
       trackCurlImportModalOpened({
         source,
-        page_url: pageURL,
         page_domain: getDomainFromURL(pageURL),
       });
 
