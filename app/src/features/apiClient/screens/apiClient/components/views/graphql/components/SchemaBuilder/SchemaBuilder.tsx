@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { buildClientSchema, parse } from "graphql";
@@ -24,7 +24,7 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
 
   const { introspectAndSaveSchema } = useGraphQLIntrospection();
 
-  const hasParsedSuccessfully = useRef(false);
+  const [hasParsedSuccessfully, setHasParsedSuccessfully] = useState(false);
 
   /*
    * This effect is added due to Explorer component's internal query caching logic.
@@ -41,16 +41,17 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
    * we prevent the Explorer from caching invalid queries and reduce the likelihood of
    * shared state issues between different instances.
    */
+
   useEffect(() => {
-    if (!hasParsedSuccessfully.current) {
+    if (!hasParsedSuccessfully) {
       try {
         parse(query);
-        hasParsedSuccessfully.current = true;
+        setHasParsedSuccessfully(true);
       } catch (e) {
         // NO OP
       }
     }
-  }, [query]);
+  }, [query, hasParsedSuccessfully]);
 
   const handleEdit = (query: string) => {
     updateEntryRequest({ operation: query });
@@ -79,13 +80,16 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
-              query={hasParsedSuccessfully.current ? query : ""}
+              query={hasParsedSuccessfully ? query : ""}
               explorerIsOpen={true}
               arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
               arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxChecked={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
-              onEdit={(query: string) => handleEdit(query)}
+              onEdit={(query: string) => {
+                console.log("DBG:: QUERY EDIT FROM SCHEMA BUILDER", query);
+                handleEdit(query);
+              }}
               colors={{
                 keyword: "#E29C6D",
                 property: "var(--requestly-color-text-default)",

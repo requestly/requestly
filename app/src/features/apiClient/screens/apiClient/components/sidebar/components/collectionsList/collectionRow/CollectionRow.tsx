@@ -68,7 +68,7 @@ export const CollectionRow: React.FC<Props> = ({
     apiClientRecordsRepository,
     forceRefreshApiClientRecords,
   } = useApiClientContext();
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isDropdownVisible] = useState(false);
 
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
   const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
@@ -78,10 +78,6 @@ export const CollectionRow: React.FC<Props> = ({
       return activeTabSource.getSourceId();
     }
   }, [activeTabSource]);
-
-  const handleDropdownVisibleChange = (isOpen: boolean) => {
-    setIsDropdownVisible(isOpen);
-  };
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -305,7 +301,7 @@ export const CollectionRow: React.FC<Props> = ({
                   onClick={(e) => {
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
-                    
+
                     if (!isExpanded) {
                       // Collection is collapsed - open tab and expand
                       if (!isAlreadyActive) {
@@ -372,8 +368,6 @@ export const CollectionRow: React.FC<Props> = ({
                         menu={{ items: getCollectionOptions(record) }}
                         placement="bottomRight"
                         overlayClassName="collection-dropdown-menu"
-                        open={isDropdownVisible}
-                        onOpenChange={handleDropdownVisibleChange}
                       >
                         <RQButton
                           onClick={(e) => {
