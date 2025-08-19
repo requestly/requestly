@@ -10,7 +10,7 @@ export const RuntimeVariables: React.FC = () => {
   }, [openTab]);
 
   return (
-    <div className="runtime-variables-container">
+    <div className="runtime-variables-container" onClick={() => openTab(new RuntimeVariablesViewTabSource())}>
       <div className="runtime-variables-text-placeholder">
         <span className="text">Runtime variables</span>
       </div>
