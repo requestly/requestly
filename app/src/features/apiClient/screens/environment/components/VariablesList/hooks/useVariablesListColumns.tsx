@@ -7,6 +7,7 @@ import { RiEyeOffLine } from "@react-icons/all-files/ri/RiEyeOffLine";
 import { useCallback } from "react";
 import { EnvironmentVariableType } from "backend/environment/types";
 import { RoleBasedComponent } from "features/rbac";
+import InfoIcon from "components/misc/InfoIcon";
 
 interface Props {
   handleVariableChange: (record: MetaVariableRow, fieldChanged: keyof MetaVariableRow) => void;
@@ -122,26 +123,48 @@ export const useVariablesListColumns = ({
       : null,
     container === "runtime"
       ? {
-          title: "Persisted", // todo
+          title: (
+            <div className="variable-value-column-title">
+              Persistent{" "}
+              <InfoIcon
+                text={
+                  <>
+                    Persisted runtime values retain their data across sessions and remain accessible until manually
+                    cleared by the user
+                    <a href="https://www.requestly.com" target="_blank" rel="noreferrer">
+                      Learn more
+                    </a>
+                  </>
+                }
+                showArrow={false}
+                tooltipPlacement="right"
+                style={{
+                  width: "14px",
+                  height: "14px",
+                  color: "var(--requestly-color-text-subtle)",
+                }}
+              />
+            </div>
+          ),
           editable: true,
           render: (_, record) => {
             return (
               <span>
                 <Switch
+                  disabled={!record.key && !record.syncValue}
+                  style={{
+                    padding: " 2px 14px 2px 2px",
+                    alignItems: "center",
+                    borderRadius: "16px",
+                  }}
                   checked={isRuntimeVariableRow(record) && record.isPersisted}
                   onChange={(checked) => handleUpdatePersisted(record.id, checked)}
                 />
+                {"  "}
+                <span>{isRuntimeVariableRow(record) && record.isPersisted ? "Yes" : "No"}</span>
               </span>
             );
           },
-          // onCell: (record) => ({
-          //   record,
-          //   editable: true,
-          //   dataIndex: "isPersisted",
-          //   title: "Persisted",
-          //   handleVariableChange,
-          //   isReadOnly,
-          // }),
         }
       : null,
     {
