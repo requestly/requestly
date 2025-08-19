@@ -24,7 +24,7 @@ export const DrawerLayout: React.FC<Props> = ({ bottomSheet, children, initialOf
         style={{
           bottom:
             sheetPlacement === BottomSheetPlacement.RIGHT ? 0 : isBottomSheetOpen ? 0 : `${initialOffset ?? -337}px`,
-          height: isSheetPlacedAtBottom ? "440px" : `100%`,
+          height: isSheetPlacedAtBottom ? "calc(100vh - 60px)" : `100%`,
         }}
       >
         {bottomSheet}

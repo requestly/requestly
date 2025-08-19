@@ -3,6 +3,8 @@ import { Tabs, TabsProps } from "antd";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
 import { BiDockBottom } from "@react-icons/all-files/bi/BiDockBottom";
+import { FiChevronDown } from "@react-icons/all-files/fi/FiChevronDown";
+import { FiChevronUp } from "@react-icons/all-files/fi/FiChevronUp";
 import { BottomSheetPlacement } from "./types";
 import { RQButton } from "lib/design-system-v2/components";
 import "./BottomSheet.scss";
@@ -22,7 +24,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   tabBarExtraContent = null,
   ...props
 }) => {
-  const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
+  const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
   const tabExtraContent = (
@@ -31,6 +33,18 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
       <div className="bottom-sheet-utilites">
         {utilities}
+
+        {/* Chevron icon for expand/collapse when bottom sheet is at bottom */}
+        {isSheetPlacedAtBottom && (
+          <RQButton
+            size="small"
+            type="transparent"
+            title={isBottomSheetOpen ? "Collapse" : "Expand"}
+            onClick={() => toggleBottomSheet({ isOpen: !isBottomSheetOpen, isTrack: true, action: "bottom_sheet_chevron_toggle" })}
+            className="bottom-sheet-chevron-btn"
+            icon={isBottomSheetOpen ? <FiChevronDown /> : <FiChevronUp />}
+          />
+        )}
 
         {disableDocking ? null : (
           <RQButton
