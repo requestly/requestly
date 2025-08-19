@@ -59,6 +59,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 };
 
 function getSanitizedVariableValue(variable: EnvironmentVariableValue | RuntimeVariableValue) {
+  console.log("LOG", variable.type);
   const isSecret = variable.type === EnvironmentVariableType.Secret;
   const makeSecret = (value: VariableValueType) => "•".repeat(String(value || "").length);
   const makeRenderable = (value: VariableValueType) => `${value}`;
@@ -71,7 +72,7 @@ function getSanitizedVariableValue(variable: EnvironmentVariableValue | RuntimeV
   return {
     syncValue: sanitize(variable.syncValue),
     localValue: sanitize((variable as EnvironmentVariableValue).localValue),
-    isPersisted: sanitize((variable as RuntimeVariableValue).isPersisted),
+    isPersisted: makeRenderable((variable as RuntimeVariableValue).isPersisted),
   };
 }
 
