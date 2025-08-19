@@ -10,6 +10,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
@@ -23,8 +24,15 @@ import { CollectionViewTabSource } from "../../../../views/components/Collection
 import { useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
+
+export enum ExportType {
+  REQUESTLY = "requestly",
+  POSTMAN = "postman",
+}
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -34,7 +42,7 @@ interface Props {
     collectionId?: string,
     entryType?: RQAPI.ApiEntryType
   ) => Promise<void>;
-  onExportClick: (collection: RQAPI.CollectionRecord) => void;
+  onRequestlyExportClick: (collection: RQAPI.CollectionRecord, exportType: ExportType) => void;
   setExpandedRecordIds: (keys: RQAPI.ApiClientRecord["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -49,7 +57,7 @@ interface Props {
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
-  onExportClick,
+  onRequestlyExportClick: onExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -97,15 +105,32 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "1",
           label: (
-            <div>
+            <span>
               <MdOutlineIosShare style={{ marginRight: 8 }} />
-              Export
-            </div>
+              Export as
+            </span>
           ),
-          onClick: (itemInfo) => {
-            itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
-          },
+          expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
+          children: [
+            {
+              key: "1-1",
+              label: "Requestly",
+              icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                onExportClick(record, ExportType.REQUESTLY);
+              },
+            },
+            {
+              key: "1-2",
+              label: "Postman (v2.1 format)",
+              icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                onExportClick(record, ExportType.POSTMAN);
+              },
+            },
+          ],
         },
         {
           key: "2",
@@ -413,7 +438,7 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             onNewClick={onNewClick}
-                            onExportClick={onExportClick}
+                            onRequestlyExportClick={onExportClick}
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
