@@ -82,7 +82,7 @@ div.n-popup {
     .variable-info-property-container {
       display: flex;
       padding: 10px 12px 8px 12px;
-      flex-direction: column;
+      flex-direction: row;
       align-items: flex-start;
       gap: 8px;
       align-self: stretch;
@@ -104,6 +104,26 @@ div.n-popup {
       line-height: var(--requestly-font-line-height-2xs);
       letter-spacing: 1px;
       text-transform: uppercase;
+    }
+
+    .variable-header-info-seperator {
+      position: relative;
+      left: -10px;
+      top: 2px;
+      font-size: 10px;
+    }
+
+    .variable-info-header-name {
+      position: relative;
+      left: -12px;
+      bottom: 1px;
+      overflow: hidden;
+      color: var(--alias-tokens-color-text-subtle, #bbb);
+      text-overflow: ellipsis;
+
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-xs, 12px);
+      font-style: normal;
     }
 
     .variable-info-content-container {

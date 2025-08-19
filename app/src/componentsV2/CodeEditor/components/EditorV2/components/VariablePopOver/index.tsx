@@ -108,6 +108,13 @@ const VariableInfo: React.FC<{
         <Tag icon={<PiHighlighterBold />} className="variable-info-header">
           {source.scope}
         </Tag>
+
+        {source.scope !== VariableScope.RUNTIME && (
+          <>
+            <span className="variable-header-info-seperator">/</span>
+            <div className="variable-info-header-name">{source.name}</div>
+          </>
+        )}
       </div>
 
       <div className="variable-info-content-container">
