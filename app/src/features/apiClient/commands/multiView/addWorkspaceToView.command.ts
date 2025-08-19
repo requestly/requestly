@@ -27,6 +27,7 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
     id: contextId,
     name: workspace.name,
     type: workspace.workspaceType,
+    rawWorkspace: workspace,
   };
   apiClientMultiWorkspaceViewStore.getState().addWorkspace(renderableParam);
   apiClientMultiWorkspaceViewStore
