@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100, initialSizes = [40, 60] }) => {
-  const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
+  const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
   const splitPane = useRef(null);
 
@@ -22,7 +22,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const getSplitSizes = () => {
     if (isSheetPlacedAtBottom) {
       // When collapsed, show only the header (~50px), when expanded show full content
-      return isBottomSheetOpen ? initialSizes : [85, 15];
+      return isBottomSheetOpen ? initialSizes : [95, 5];
     }
     return [55, 45];
   };
@@ -41,13 +41,28 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     }
   }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
 
+  // Handle manual resize via drag handle
+  const handleSplit = (sizes: number[]) => {
+    if (isSheetPlacedAtBottom) {
+      const bottomSheetSize = sizes[1];
+      // If user drags to expand beyond collapsed threshold, mark as open
+      // If user drags to collapse below threshold, mark as closed
+      const isExpanded = bottomSheetSize > 10; // 10% threshold
+      
+      if (isExpanded !== isBottomSheetOpen) {
+        toggleBottomSheet({ isOpen: isExpanded, isTrack: true, action: "bottom_sheet_drag_resize" });
+      }
+    }
+  };
+
   return (
     <Split
       key={splitDirection}
       ref={splitPane}
       direction={splitDirection}
       sizes={getSplitSizes()}
-      minSize={minSize || 100}
+      minSize={isSheetPlacedAtBottom ? [minSize || 100, 40] : minSize || 100}
+      onSplit={handleSplit}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
       }`}
@@ -79,7 +94,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
           }`}
           style={{
             height: "100%",
-            overflow: isSheetPlacedAtBottom && !isBottomSheetOpen ? "hidden" : "auto",
+            overflow: "auto",
           }}
         >
           {bottomSheet}

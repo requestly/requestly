@@ -104,5 +104,11 @@
   
   .ant-tabs-nav {
     margin-bottom: 0 !important;
+    padding-bottom: 4px !important;
+  }
+  
+  // Ensure no extra space when collapsed
+  .ant-tabs {
+    height: auto !important;
   }
 }
