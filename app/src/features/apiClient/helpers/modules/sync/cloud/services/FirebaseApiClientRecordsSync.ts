@@ -195,11 +195,4 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
     return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
   }
-
-  async batchCreateRecords(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
-    return {
-      success: true,
-      data: { records: [], erroredRecords: [] },
-    };
-  }
 }

@@ -73,7 +73,6 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   duplicateApiEntities(entities: Partial<RQAPI.ApiClientRecord>[]): Promise<RQAPI.ApiClientRecord[]>;
   moveAPIEntities(entities: Partial<RQAPI.ApiClientRecord>[], newParentId: string): Promise<RQAPI.ApiClientRecord[]>;
   batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise;
-  batchCreateRecords(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise;
 }
 
 export interface ApiClientRepositoryInterface {

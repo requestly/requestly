@@ -538,7 +538,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return result;
   }
 
-  async batchCreateRecords(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
+  async batchCreateRecordsWithExistingId(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     if (entities.length === 0) {
       return {
         success: true,
@@ -566,14 +566,5 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       success: true,
       data: { records: result, erroredRecords: [] },
     };
-  }
-
-  async batchCreateRecordsWithExistingId(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
-    if (entities.length === 0) {
-      return {
-        success: true,
-        data: { records: [], erroredRecords: [] },
-      };
-    }
   }
 }
