@@ -21,8 +21,8 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   // Calculate sizes based on bottom sheet open state
   const getSplitSizes = () => {
     if (isSheetPlacedAtBottom) {
-      // Always show the bottom sheet initially, only hide when explicitly collapsed
-      return isBottomSheetOpen ? initialSizes : [100, 0];
+      // When collapsed, show only the header (~50px), when expanded show full content
+      return isBottomSheetOpen ? initialSizes : [85, 15];
     }
     return [55, 45];
   };
@@ -74,10 +74,12 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       <Row style={splitDirection === SplitDirection.HORIZONTAL ? { height: "100%" } : { width: "100%" }}>
         <Col
           span={24}
-          className={`${isSheetPlacedAtBottom ? "bottom-sheet-container" : "bottom-sheet-panel-container"}`}
+          className={`${isSheetPlacedAtBottom ? "bottom-sheet-container" : "bottom-sheet-panel-container"} ${
+            isSheetPlacedAtBottom && !isBottomSheetOpen ? "collapsed" : ""
+          }`}
           style={{
             height: "100%",
-            overflow: "auto",
+            overflow: isSheetPlacedAtBottom && !isBottomSheetOpen ? "hidden" : "auto",
           }}
         >
           {bottomSheet}

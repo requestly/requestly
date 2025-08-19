@@ -94,3 +94,15 @@
     }
   }
 }
+
+// Collapsed state - hide content but show header
+.bottom-sheet-container.collapsed,
+.bottom-sheet-panel-container.collapsed {
+  .ant-tabs-content-holder {
+    display: none !important;
+  }
+  
+  .ant-tabs-nav {
+    margin-bottom: 0 !important;
+  }
+}
