@@ -7,12 +7,14 @@ import { MdOutlineDeleteForever } from "@react-icons/all-files/md/MdOutlineDelet
 import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 interface RuntimeVariablesHeaderProps {
   searchValue: string;
+  variables: any[];
   onSearchValueChange: (value: string) => void;
   onDeleteAll: () => void;
   onSave: () => Promise<void>;
 }
 export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
   searchValue,
+  variables,
   onSearchValueChange,
   onDeleteAll,
   onSave,
@@ -48,7 +50,12 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
           onChange={(e) => onSearchValueChange(e.target.value)}
         />
         <div className="runtime-variables-list-action-btn">
-          <RQButton className="delete-btn" icon={<MdOutlineDeleteForever />} onClick={onDeleteAll}>
+          <RQButton
+            disabled={variables.length < 1}
+            className="delete-btn"
+            icon={<MdOutlineDeleteForever />}
+            onClick={onDeleteAll}
+          >
             Delete all
           </RQButton>
           <RQButton

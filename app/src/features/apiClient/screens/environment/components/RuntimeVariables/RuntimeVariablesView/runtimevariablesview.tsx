@@ -101,6 +101,7 @@ export const RuntimeVariablesView: React.FC = () => {
       <div className="runtime-variables-list-view">
         <RuntimeVariablesHeader
           searchValue={searchValue}
+          variables={variables}
           onSearchValueChange={setSearchValue}
           onSave={handleSaveVariables}
           onDeleteAll={() => {
