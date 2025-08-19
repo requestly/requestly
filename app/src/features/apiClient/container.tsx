@@ -9,9 +9,10 @@ import { ApiClientLoadingView } from "./screens/apiClient/components/views/compo
 import { setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { useApiClientMultiWorkspaceView } from "./store/multiWorkspaceView/multiWorkspaceView.store";
+import { ApiClientViewMode, useApiClientMultiWorkspaceView } from "./store/multiWorkspaceView/multiWorkspaceView.store";
 import Daemon from "./store/apiRecords/Daemon";
 import { ApiClientProvider } from "./contexts";
+import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.command";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const repository = useGetApiClientSyncRepo();
@@ -21,6 +22,11 @@ const ApiClientFeatureContainer: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     (async () => {
+      if(viewMode === ApiClientViewMode.MULTI) {
+        await loadWorkspaces();
+        setIsLoaded(true);
+        return;
+      }
       await setupContextWithRepo(activeWorkspace.id, repository);
       setIsLoaded(true);
     })();
