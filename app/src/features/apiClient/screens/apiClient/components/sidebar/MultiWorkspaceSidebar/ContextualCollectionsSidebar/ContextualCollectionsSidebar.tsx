@@ -6,13 +6,12 @@ import { DndProvider } from "react-dnd";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
-import { WorkspaceLoader } from "../WorkspaceLoader/WorkspaceLoader";
+import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import ActionMenu, { ActionMenuProps } from "../../components/collectionsList/BulkActionsMenu";
 import { toast } from "utils/Toast";
 import {
   ApiClientFeatureContext,
   apiClientFeatureContextProviderStore,
-  useApiClientFeatureContextProvider,
 } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { getProcessedRecords } from "features/apiClient/commands/utils";
@@ -32,7 +31,6 @@ export const ContextualCollectionsSidebar: React.FC<{
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
-  const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
   const [searchValue, setSearchValue] = useState("");
   const [showSelection, setShowSelection] = useState(false);
@@ -315,21 +313,19 @@ export const ContextualCollectionsSidebar: React.FC<{
           const workspaceId = workspace.getState().id;
 
           return (
-            <WorkspaceLoader key={workspaceId} workspaceId={workspaceId}>
-              <ContextId id={getContext(workspaceId)?.id}>
-                <h3>Workspace: {workspace.getState().name}</h3>
-                <ContextualCollectionsList
-                  isSelectAll={isSelectAll}
-                  showSelection={showSelection}
-                  handleShowSelection={handleShowSelection}
-                  searchValue={searchValue}
-                  onNewClick={onNewClick}
-                  recordTypeToBeCreated={recordTypeToBeCreated}
-                  handleRecordSelection={handleRecordSelection}
-                  handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-                />
-              </ContextId>
-            </WorkspaceLoader>
+            <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
+              <h3>Workspace: {workspace.getState().name}</h3>
+              <ContextualCollectionsList
+                isSelectAll={isSelectAll}
+                showSelection={showSelection}
+                handleShowSelection={handleShowSelection}
+                searchValue={searchValue}
+                onNewClick={onNewClick}
+                recordTypeToBeCreated={recordTypeToBeCreated}
+                handleRecordSelection={handleRecordSelection}
+                handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+              />
+            </WorkspaceProvider>
           );
         })}
       </DndProvider>
