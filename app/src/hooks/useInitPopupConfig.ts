@@ -1,13 +1,13 @@
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { StorageService } from "init";
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
-export const InitPopupConfig: React.FC = () => {
+export const useInitPopupConfig = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
@@ -26,15 +26,13 @@ export const InitPopupConfig: React.FC = () => {
     }
 
     const defaultConfig = {
-      session_replay: true,
+      session_replay: isSessionReplayEnabled,
     };
 
-    if (isSessionReplayEnabled) {
-      await StorageService(appMode).saveRecord({
-        popup_config: defaultConfig,
-      });
-      dispatch(globalActions.updatePopupConfig(defaultConfig));
-    }
+    await StorageService(appMode).saveRecord({
+      popup_config: defaultConfig,
+    });
+    dispatch(globalActions.updatePopupConfig(defaultConfig));
   }, [appMode, dispatch, fetchConfig, isSessionReplayEnabled]);
 
   useEffect(() => {
@@ -48,6 +46,4 @@ export const InitPopupConfig: React.FC = () => {
 
     setDefaultConfig();
   }, [appMode, isSessionReplayEnabled, setDefaultConfig]);
-
-  return null;
 };
