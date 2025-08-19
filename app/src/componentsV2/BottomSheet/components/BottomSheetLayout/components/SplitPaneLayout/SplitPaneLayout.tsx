@@ -12,26 +12,41 @@ interface Props {
 }
 
 export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 100, initialSizes = [40, 60] }) => {
-  const { sheetPlacement } = useBottomSheetContext();
+  const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
   const splitPane = useRef(null);
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
+  // Calculate sizes based on bottom sheet open state
+  const getSplitSizes = () => {
+    if (isSheetPlacedAtBottom) {
+      return isBottomSheetOpen ? initialSizes : [100, 0];
+    }
+    return [55, 45];
+  };
+
   useEffect(() => {
     // this useEffect on mount set sizes of split pane
     if (splitPane.current) {
-      splitPane.current.split.setSizes(isSheetPlacedAtBottom ? initialSizes : [55, 45]);
+      splitPane.current.split.setSizes(getSplitSizes());
     }
   }, []);
+
+  useEffect(() => {
+    // Update split sizes when bottom sheet open state changes
+    if (splitPane.current && isSheetPlacedAtBottom) {
+      splitPane.current.split.setSizes(getSplitSizes());
+    }
+  }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
 
   return (
     <Split
       key={splitDirection}
       ref={splitPane}
       direction={splitDirection}
-      sizes={isSheetPlacedAtBottom ? initialSizes : [55, 45]}
-      minSize={minSize || 350}
+      sizes={getSplitSizes()}
+      minSize={isSheetPlacedAtBottom && !isBottomSheetOpen ? 0 : (minSize || 350)}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
       }`}
@@ -43,9 +58,11 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         return gutterContainer;
       }}
       gutterStyle={() => {
+        const isCollapsed = isSheetPlacedAtBottom && !isBottomSheetOpen;
         return {
-          height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : "0px",
-          width: splitDirection === SplitDirection.HORIZONTAL ? "0px" : "100%",
+          height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : (isCollapsed ? "0px" : "6px"),
+          width: splitDirection === SplitDirection.HORIZONTAL ? (isCollapsed ? "0px" : "6px") : "100%",
+          display: isCollapsed ? "none" : "block",
         };
       }}
       gutterAlign="center"
@@ -60,7 +77,8 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
           span={24}
           className={`${isSheetPlacedAtBottom ? "bottom-sheet-container" : "bottom-sheet-panel-container"}`}
           style={{
-            height: isSheetPlacedAtBottom ? "auto" : "100%",
+            height: isSheetPlacedAtBottom ? (isBottomSheetOpen ? "100%" : "0px") : "100%",
+            overflow: isSheetPlacedAtBottom && !isBottomSheetOpen ? "hidden" : "auto",
           }}
         >
           {bottomSheet}

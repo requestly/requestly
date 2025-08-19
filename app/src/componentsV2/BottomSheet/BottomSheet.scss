@@ -88,5 +88,9 @@
   .bottom-sheet-toggle-btn.ant-btn,
   .bottom-sheet-chevron-btn.ant-btn {
     color: var(--requestly-color-text-subtle);
+    
+    &:hover {
+      color: var(--requestly-color-text-default);
+    }
   }
 }
