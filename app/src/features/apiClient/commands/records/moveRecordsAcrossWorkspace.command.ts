@@ -1,11 +1,11 @@
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "features/apiClient/types";
 import { moveRecords } from "./moveRecords.command";
-import { getApiClientFeatureContext, getApiClientRecordsStore, getChildParentMap } from "../store.utils";
+import { getApiClientFeatureContext, getApiClientRecordsStore } from "../store.utils";
 import { deleteRecords } from "./deleteRecords.command";
 import { NativeError } from "errors/NativeError";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
-import { getAllChildren } from "features/apiClient/store/apiRecords/apiRecords.store";
+import { getAllRecords } from "../utils";
 
 export async function moveRecordsAcrossWorkspace(
   ctx: ApiClientFeatureContext,
@@ -18,6 +18,8 @@ export async function moveRecordsAcrossWorkspace(
   }
 ) {
   const { recordsToMove, destination } = params;
+
+  console.log({ recordsToMove });
 
   // move in same context
   if (ctx.id === destination.contextId) {
@@ -33,7 +35,6 @@ export async function moveRecordsAcrossWorkspace(
   const { apiClientRecordsRepository } = destinationContext.repositories;
 
   const recordIds: string[] = [];
-  const childParentMap = getChildParentMap(ctx);
   const rootLevelRecords = new Set<string>();
 
   // get all nested records
@@ -41,10 +42,11 @@ export async function moveRecordsAcrossWorkspace(
     rootLevelRecords.add(record.id);
 
     if (isApiCollection(record)) {
-      recordIds.push(...getAllChildren(record.id, childParentMap));
+      console.log({ collection: record });
+      recordIds.push(...getAllRecords([record]).map((r) => r.id));
+    } else {
+      recordIds.push(record.id);
     }
-
-    recordIds.push(record.id);
   });
 
   const oldToNewIdMap: Map<string, string> = new Map();
@@ -52,35 +54,40 @@ export async function moveRecordsAcrossWorkspace(
 
   const newToOldIdMap: Map<string, string> = new Map();
 
-  const allRecords = recordIds.map((id) => {
+  const _allRecords = recordIds.map((id) => {
     const record = getApiClientRecordsStore(ctx).getState().getData(id);
-
     recordIdToCollectionIdMap.set(record.id, record.collectionId);
-
-    if (isApiCollection(record)) {
-      const newCollectionId = apiClientRecordsRepository.generateCollectionId(record.name);
-      oldToNewIdMap.set(record.id, newCollectionId);
-      newToOldIdMap.set(newCollectionId, record.id);
-      return record;
-    }
-
-    const newApiId = apiClientRecordsRepository.generateApiRecordId();
-    oldToNewIdMap.set(record.id, newApiId);
-    newToOldIdMap.set(newApiId, record.id);
     return record;
   });
 
-  const updatedRecordsWithNewIds: RQAPI.ApiClientRecord[] = allRecords.map((record) => {
-    if (record.collectionId === destination.collectionId) {
-      return { ...record, id: oldToNewIdMap.get(record.id) };
+  _allRecords.forEach((record) => {
+    const newId = isApiCollection(record)
+      ? apiClientRecordsRepository.generateCollectionId(record.name)
+      : apiClientRecordsRepository.generateApiRecordId();
+
+    oldToNewIdMap.set(record.id, newId);
+    newToOldIdMap.set(newId, record.id);
+  });
+
+  const updatedRecordsWithNewIds: RQAPI.ApiClientRecord[] = _allRecords.map((record) => {
+    if (rootLevelRecords.has(record.id)) {
+      return { ...record, id: oldToNewIdMap.get(record.id), collectionId: destination.collectionId };
     } else {
-      return { ...record, id: oldToNewIdMap.get(record.id), collectionId: oldToNewIdMap.get(record.collectionId) };
+      return {
+        ...record,
+        id: oldToNewIdMap.get(record.id),
+        collectionId: rootLevelRecords.has(record.collectionId)
+          ? destination.collectionId
+          : oldToNewIdMap.get(record.collectionId),
+      };
     }
   });
 
   const createdRecordsResult = await apiClientRecordsRepository.batchCreateRecordsWithExistingId(
     updatedRecordsWithNewIds
   );
+
+  console.log({ rootLevelRecords, recordIds, _allRecords, updatedRecordsWithNewIds, createdRecordsResult });
 
   if (!createdRecordsResult.success) {
     throw new NativeError("Failed to move across workspaces!");
@@ -115,7 +122,7 @@ export async function moveRecordsAcrossWorkspace(
     throw new NativeError("Failed to move across workspaces!");
   }
 
-  await deleteRecords(ctx, { records: allRecords });
+  await deleteRecords(ctx, { records: _allRecords });
 
   return updatedResult;
 }
