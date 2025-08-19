@@ -11,13 +11,7 @@ export const setupContext = async (
   workspace: Workspace,
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
-  if (!user.loggedIn) {
-    const anonRepo = localStoreRepository;
-    const id = await setupContextWithRepo(workspace.id, anonRepo);
-    return { id };
-  }
 
-  const userId = user.uid;
   const workspaceId = workspace.id;
   const workspaceType = workspace.workspaceType;
 
@@ -27,6 +21,12 @@ export const setupContext = async (
     return { id };
   }
 
+  if (!user.loggedIn) {
+    const anonRepo = localStoreRepository;
+    const id = await setupContextWithRepo(workspace.id, anonRepo);
+    return { id };
+  }
+  const userId = user.uid;
   const firebaseRepo = new ApiClientCloudRepository({ uid: userId, teamId: workspaceId });
   const id = await setupContextWithRepo(workspaceId, firebaseRepo);
   return { id };
