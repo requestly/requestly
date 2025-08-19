@@ -51,6 +51,13 @@ interface Props {
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
+type DraggableApiRecord = {
+  id: RQAPI.ApiClientRecord["id"];
+  type: RQAPI.ApiClientRecord["type"];
+  collectionId: RQAPI.ApiClientRecord["collectionId"];
+  contextId: ApiClientFeatureContext["id"];
+};
+
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
@@ -167,7 +174,7 @@ export const CollectionRow: React.FC<Props> = ({
   }, []);
 
   const handleRecordDrop = useCallback(
-    async (item: Partial<RQAPI.ApiClientRecord>) => {
+    async (item: DraggableApiRecord) => {
       try {
         const entryToMove = getRecordDataFromId(item.id);
         const result = await apiClientRecordsRepository.moveAPIEntities([entryToMove], record.id);
@@ -203,7 +210,7 @@ export const CollectionRow: React.FC<Props> = ({
   );
 
   const checkCanDropItem = useCallback(
-    (item: Partial<RQAPI.ApiClientRecord>): boolean => {
+    (item: DraggableApiRecord): boolean => {
       if (item.id === record.id) {
         return false;
       }
@@ -227,7 +234,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.COLLECTION,
-      item: { id: record.id, type: record.type, collectionId: record.collectionId },
+      item: { id: record.id, type: record.type, collectionId: record.collectionId, contextId },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -238,7 +245,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: Partial<RQAPI.ApiClientRecord>, monitor) => {
+      drop: (item: DraggableApiRecord, monitor) => {
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) return;
 
