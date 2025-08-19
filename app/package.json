@@ -17,6 +17,10 @@
     "email": "contact@requestly.io",
     "url": "https://requestly.com/"
   },
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "postinstall": "patch-package",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
@@ -60,7 +64,7 @@
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.4.0/react-icons-all-files-5.4.0.tgz",
     "@readme/httpsnippet": "^11.0.0",
     "@reduxjs/toolkit": "^1.9.0",
-    "@requestly/alternative-importers": "^0.0.1",
+    "@requestly/alternative-importers": "^0.0.2",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/shared": "file:../shared",

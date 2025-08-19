@@ -2,6 +2,10 @@
   "name": "@requestly/shared",
   "version": "1.0.3",
   "description": "",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "run-s cleanup build-dist build-alias",

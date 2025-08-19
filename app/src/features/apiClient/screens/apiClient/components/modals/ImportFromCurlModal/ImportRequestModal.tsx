@@ -3,9 +3,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { parseCurlRequest } from "../../../utils";
 import { RQAPI } from "../../../../../types";
 import { toast } from "utils/Toast";
-import { trackCurlImportFailed, trackCurlImported } from "modules/analytics/events/features/apiClient";
+import {
+  trackCurlImportFailed,
+  trackCurlImported,
+  trackCurlImportModalOpened,
+} from "modules/analytics/events/features/apiClient";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { API_CLIENT } from "modules/analytics/events/features/constants";
+import { getDomainFromURL } from "utils/URLUtils";
 import "./importFromCurlModal.scss";
 
 interface Props {
@@ -13,24 +18,47 @@ interface Props {
   isRequestLoading: boolean;
   handleImportRequest: (request: RQAPI.Request) => void;
   onClose: () => void;
+  initialCurlCommand?: string;
+  source: string;
+  pageURL: string;
 }
 
-export const ImportFromCurlModal: React.FC<Props> = ({ isOpen, handleImportRequest, onClose, isRequestLoading }) => {
+export const ImportFromCurlModal: React.FC<Props> = ({
+  isOpen,
+  handleImportRequest,
+  onClose,
+  isRequestLoading,
+  initialCurlCommand,
+  source,
+  pageURL,
+}) => {
   const [curlCommand, setCurlCommand] = useState("");
-  const [error, setError] = useState(null);
-  const inputRef = useRef<HTMLInputElement>();
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isOpen) {
+      // Pre-fill with initial cURL command if provided
+      if (initialCurlCommand) {
+        setCurlCommand(initialCurlCommand);
+      } else {
+        setCurlCommand("");
+      }
+
+      trackCurlImportModalOpened({
+        source,
+        page_domain: getDomainFromURL(pageURL),
+      });
+
       inputRef.current?.focus();
     } else {
       setCurlCommand("");
     }
-  }, [isOpen]);
+  }, [isOpen, initialCurlCommand, source, pageURL]);
 
   const onImportClicked = useCallback(() => {
     if (!curlCommand) {
-      setError("Please enter a cURL command");
+      setError("Please enter a valid cURL command");
       inputRef.current?.focus();
       return;
     }
@@ -61,6 +89,10 @@ export const ImportFromCurlModal: React.FC<Props> = ({ isOpen, handleImportReque
     onClose();
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <Modal
       className="import-modal"
@@ -85,6 +117,7 @@ export const ImportFromCurlModal: React.FC<Props> = ({ isOpen, handleImportReque
         value={curlCommand}
         onChange={(e) => setCurlCommand(e.target.value)}
         placeholder="curl https://example.com"
+        autoFocus={true}
       />
     </Modal>
   );
