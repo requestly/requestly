@@ -21,6 +21,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   // Calculate sizes based on bottom sheet open state
   const getSplitSizes = () => {
     if (isSheetPlacedAtBottom) {
+      // Always show the bottom sheet initially, only hide when explicitly collapsed
       return isBottomSheetOpen ? initialSizes : [100, 0];
     }
     return [55, 45];
@@ -46,7 +47,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       ref={splitPane}
       direction={splitDirection}
       sizes={getSplitSizes()}
-      minSize={isSheetPlacedAtBottom && !isBottomSheetOpen ? 0 : (minSize || 350)}
+      minSize={minSize || 100}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
       }`}
@@ -58,11 +59,9 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         return gutterContainer;
       }}
       gutterStyle={() => {
-        const isCollapsed = isSheetPlacedAtBottom && !isBottomSheetOpen;
         return {
-          height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : (isCollapsed ? "0px" : "6px"),
-          width: splitDirection === SplitDirection.HORIZONTAL ? (isCollapsed ? "0px" : "6px") : "100%",
-          display: isCollapsed ? "none" : "block",
+          height: splitDirection === SplitDirection.HORIZONTAL ? "100%" : "6px",
+          width: splitDirection === SplitDirection.HORIZONTAL ? "6px" : "100%",
         };
       }}
       gutterAlign="center"
@@ -77,8 +76,8 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
           span={24}
           className={`${isSheetPlacedAtBottom ? "bottom-sheet-container" : "bottom-sheet-panel-container"}`}
           style={{
-            height: isSheetPlacedAtBottom ? (isBottomSheetOpen ? "100%" : "0px") : "100%",
-            overflow: isSheetPlacedAtBottom && !isBottomSheetOpen ? "hidden" : "auto",
+            height: "100%",
+            overflow: "auto",
           }}
         >
           {bottomSheet}
