@@ -1,7 +1,10 @@
-import { WorkspaceType } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { NativeError } from "errors/NativeError";
 import { create, StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
+import { persist } from "zustand/middleware";
+import * as Sentry from "@sentry/react";
+
 
 export enum ApiClientViewMode {
   SINGLE = "SINGLE",
@@ -12,11 +15,12 @@ export type RenderableWorkspaceState = {
   id: string;
   name: string;
   type: WorkspaceType.LOCAL;
+  rawWorkspace: Workspace,
 
   state:
-    | { loading: false; errored: true; error: string }
-    | { loading: true; errored: false }
-    | { loading: false; errored: false };
+  | { loading: false; errored: true; error: string }
+  | { loading: true; errored: false }
+  | { loading: false; errored: false };
 
   setState(state: RenderableWorkspaceState["state"]): void;
 };
@@ -34,11 +38,12 @@ type ApiClientMultiWorkspaceViewState = {
 };
 
 function createRenderableWorkspaceStore(workspace: Omit<RenderableWorkspaceState, "setState" | "state">) {
-  return create<RenderableWorkspaceState>()((set, get) => {
+  return create<RenderableWorkspaceState>()((set, _) => {
     return {
       id: workspace.id,
       name: workspace.name,
       type: workspace.type,
+      rawWorkspace: workspace.rawWorkspace,
       state: { loading: false, errored: false },
 
       setState(state) {
@@ -49,51 +54,114 @@ function createRenderableWorkspaceStore(workspace: Omit<RenderableWorkspaceState
 }
 
 function createApiClientMultiWorkspaceViewStore() {
-  return create<ApiClientMultiWorkspaceViewState>()((set, get) => {
-    return {
-      viewMode: ApiClientViewMode.SINGLE, // TODO: update it when app is restarted
-      selectedWorkspaces: [],
+  return create<ApiClientMultiWorkspaceViewState>()(persist(
+    (set, get) => {
+      return {
+        viewMode: ApiClientViewMode.SINGLE,
+        selectedWorkspaces: [] as StoreApi<RenderableWorkspaceState>[],
 
-      setViewMode(mode) {
-        set({ viewMode: mode });
-      },
+        setViewMode(mode) {
+          set({ viewMode: mode });
+        },
 
-      addWorkspace(workspace) {
-        const { selectedWorkspaces } = get();
-        set({ selectedWorkspaces: [...selectedWorkspaces, createRenderableWorkspaceStore(workspace)] });
-      },
+        addWorkspace(workspace) {
+          const { selectedWorkspaces } = get();
+          set({ selectedWorkspaces: [...selectedWorkspaces, createRenderableWorkspaceStore(workspace)] });
+        },
 
-      removeWorkspace(id) {
-        const { selectedWorkspaces } = get();
+        removeWorkspace(id) {
+          const { selectedWorkspaces } = get();
 
-        const updatedWorkspaces = selectedWorkspaces.filter((w) => w.getState().id !== id);
-        if (selectedWorkspaces.length === updatedWorkspaces.length) {
-          return;
+          const updatedWorkspaces = selectedWorkspaces.filter((w) => w.getState().id !== id);
+          if (selectedWorkspaces.length === updatedWorkspaces.length) {
+            return;
+          }
+
+          set({ selectedWorkspaces: updatedWorkspaces });
+        },
+
+        getSelectedWorkspace(id) {
+          const { selectedWorkspaces } = get();
+          return selectedWorkspaces.find((w) => w.getState().id === id) || null;
+        },
+        setStateForSelectedWorkspace(id, state) {
+          const { selectedWorkspaces } = get();
+
+          const workspaceStore = selectedWorkspaces.find((w) => w.getState().id === id);
+          if (!workspaceStore) {
+            throw new NativeError("Workspace not found!").addContext({ workspaceId: id });
+          }
+
+          workspaceStore.getState().setState(state);
+        },
+
+        isSelected(id) {
+          return get().selectedWorkspaces.some((w) => w.getState().id === id);
+        },
+      };
+    }, {
+    name: "rq_multi_workspace_state",
+    onRehydrateStorage() {
+      return (store, error) => {
+        if (error) {
+          Sentry.withScope((scope) => {
+            scope.setTag("error_type", "multi_workspace_view_rehydration_failed");
+            scope.setContext("context", {
+              tabServiceStore: store,
+            });
+            Sentry.captureException(new Error(`Multi Workspace view rehydration failed - error:${error}`));
+          });
+        }
+      }
+    },
+    storage: {
+      setItem(name, value) {
+        const { viewMode, selectedWorkspaces } = value.state;
+        const serializableObject = {
+          ...value,
+          state: {
+            ...value.state,
+            viewMode,
+            selectedWorkspaces: selectedWorkspaces.map(s => {
+              const state = s.getState();
+              return state;
+            })
+          }
         }
 
-        set({ selectedWorkspaces: updatedWorkspaces });
-      },
+        localStorage.setItem(name, JSON.stringify(serializableObject));
 
-      getSelectedWorkspace(id) {
-        const { selectedWorkspaces } = get();
-        return selectedWorkspaces.find((w) => w.getState().id === id) || null;
       },
-      setStateForSelectedWorkspace(id, state) {
-        const { selectedWorkspaces } = get();
-
-        const workspaceStore = selectedWorkspaces.find((w) => w.getState().id === id);
-        if (!workspaceStore) {
-          throw new NativeError("Workspace not found!").addContext({ workspaceId: id });
+      getItem(name) {
+        const stateString = localStorage.getItem(name);
+        if (!stateString) {
+          return null;
         }
+        const existingValue = JSON.parse(stateString);
+        const rawObject = existingValue as {
+          state: {
+            viewMode: ApiClientViewMode,
+            selectedWorkspaces: Omit<RenderableWorkspaceState, 'setState' | 'state'>[],
+          }
+        };
+        const { viewMode, selectedWorkspaces: rawSelectedWorkspaces } = rawObject.state;
 
-        workspaceStore.getState().setState(state);
-      },
+        const selectedWorkspaces = rawSelectedWorkspaces.map(s => createRenderableWorkspaceStore(s));
 
-      isSelected(id) {
-        return get().selectedWorkspaces.some((w) => w.getState().id === id);
+        return {
+          ...existingValue,
+          state: {
+            ...existingValue.state,
+            viewMode,
+            selectedWorkspaces,
+          }
+        };
       },
-    };
-  });
+      removeItem(name) {
+        localStorage.removeItem(name);
+      },
+    }
+  }));
 }
 
 export const apiClientMultiWorkspaceViewStore = createApiClientMultiWorkspaceViewStore();
