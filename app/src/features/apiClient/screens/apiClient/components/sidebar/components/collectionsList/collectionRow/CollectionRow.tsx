@@ -25,11 +25,10 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
-import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useCommand } from "features/apiClient/commands";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
+import { getApiClientFeatureContext, getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -51,7 +50,7 @@ interface Props {
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
-type DraggableApiRecord = {
+export type DraggableApiRecord = {
   id: RQAPI.ApiClientRecord["id"];
   type: RQAPI.ApiClientRecord["type"];
   collectionId: RQAPI.ApiClientRecord["collectionId"];
@@ -76,15 +75,9 @@ export const CollectionRow: React.FC<Props> = ({
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [collectionsToExport, setCollectionsToExport] = useState([]);
 
-  const { onSaveRecord } = useNewApiClientContext();
-  const { apiClientRecordsRepository } = useApiClientRepository();
-  const {
-    api: { forceRefreshRecords: forceRefreshApiClientRecords },
-  } = useCommand();
-
   const contextId = useContextId();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-  const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
+  const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
 
   const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord) => {
     setCollectionsToExport((prev) => [...prev, collection]);
@@ -174,21 +167,24 @@ export const CollectionRow: React.FC<Props> = ({
   }, []);
 
   const handleRecordDrop = useCallback(
-    async (item: DraggableApiRecord) => {
+    async (item: DraggableApiRecord, dropContextId: string) => {
       try {
-        const entryToMove = getRecordDataFromId(item.id);
-        const result = await apiClientRecordsRepository.moveAPIEntities([entryToMove], record.id);
-        onSaveRecord(result[0]);
-        forceRefreshApiClientRecords();
+        const sourceContext = getApiClientFeatureContext(item.contextId);
+        const entryToMove = getApiClientRecordsStore(sourceContext).getState().getData(item.id);
 
-        // Expand the collection after successful drop
+        const destination = {
+          contextId: dropContextId,
+          collectionId: record.id,
+        };
+
+        await moveRecordsAcrossWorkspace(sourceContext, { recordsToMove: [entryToMove], destination });
+
         if (!expandedRecordIds.includes(record.id)) {
-          const newExpandedRecordIds = [...expandedRecordIds, record.id];
+          const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
           setExpandedRecordIds(newExpandedRecordIds);
           sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
         }
       } catch (error) {
-        console.log("error DBG", error);
         notification.error({
           message: "Error moving item",
           description: error?.message || "Failed to move item. Please try again.",
@@ -198,15 +194,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [
-      record.id,
-      apiClientRecordsRepository,
-      onSaveRecord,
-      forceRefreshApiClientRecords,
-      expandedRecordIds,
-      setExpandedRecordIds,
-      getRecordDataFromId,
-    ]
+    [record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -234,12 +222,17 @@ export const CollectionRow: React.FC<Props> = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.COLLECTION,
-      item: { id: record.id, type: record.type, collectionId: record.collectionId, contextId },
+      item: {
+        id: record.id,
+        type: record.type,
+        collectionId: record.collectionId,
+        contextId,
+      },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record.id, record.type]
+    [record.id, record.type, record.collectionId, contextId]
   );
 
   const [{ isOver }, drop] = useDrop(
@@ -251,14 +244,14 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (item.id === record.id) return;
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item);
+        handleRecordDrop(item, contextId);
       },
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem]
+    [handleRecordDrop, checkCanDropItem, contextId]
   );
 
   return (
