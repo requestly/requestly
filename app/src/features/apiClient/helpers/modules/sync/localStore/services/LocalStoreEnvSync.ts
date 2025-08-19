@@ -7,6 +7,7 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import dbProvider from "../helpers/ApiClientLocalDbProvider";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
+import { getOwnerId } from "backend/utils";
 
 const createGlobalEnvironmentLock = withTimeout(new Mutex(), 10 * 1000);
 
@@ -18,6 +19,14 @@ export class LocalStoreEnvSync implements EnvironmentInterface<ApiClientLocalSto
     this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<EnvironmentData>(meta, ApiClientLocalDbTable.ENVIRONMENTS);
     this.createGlobalEnvironment();
+  }
+
+  private getPrimaryId() {
+    return getOwnerId(undefined);
+  }
+
+  getOwner() {
+    return this.getPrimaryId();
   }
 
   private getNewId() {

@@ -9,6 +9,7 @@ import { omit } from "lodash";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
+import { getOwnerId } from "backend/utils";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -17,6 +18,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
+  }
+
+  private getPrimaryId() {
+    return getOwnerId(undefined);
+  }
+
+  getOwner() {
+    return this.getPrimaryId();
   }
 
   private getNewId() {

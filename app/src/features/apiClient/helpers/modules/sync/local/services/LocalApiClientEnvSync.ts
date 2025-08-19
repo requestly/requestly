@@ -7,6 +7,14 @@ import { appendPath, parseEntityVariables } from "../../utils";
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   constructor(readonly meta: ApiClientLocalMeta) {}
 
+  private getPrimaryId() {
+    return this.meta.rootPath;
+  }
+
+  getOwner() {
+    return this.getPrimaryId();
+  }
+
   private async getAdapter() {
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }

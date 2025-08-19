@@ -4,6 +4,7 @@ import { ErroredRecord, FileType } from "./local/services/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
+  getOwner(): string;
   getAllEnvironments(): Promise<{
     success: boolean;
     data: { environments: EnvironmentMap; erroredRecords: ErroredRecord[] };
@@ -29,6 +30,7 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
 
 export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   meta: Meta;
+  getOwner(): string;
   getAllRecords(): RQAPI.RecordsPromise;
   getRecord(recordId: string): RQAPI.ApiClientRecordPromise;
   createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.ApiClientRecordPromise;

@@ -24,6 +24,10 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
+  getOwner() {
+    return this.getPrimaryId();
+  }
+
   async getAllEnvironments() {
     const result = await fetchAllEnvironmentDetails(this.getPrimaryId());
     return {

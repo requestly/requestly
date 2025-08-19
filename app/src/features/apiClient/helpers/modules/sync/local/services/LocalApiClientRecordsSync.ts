@@ -14,6 +14,14 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     this.meta = metadata;
   }
 
+  private getPrimaryId() {
+    return this.meta.rootPath;
+  }
+
+  getOwner() {
+    return this.getPrimaryId();
+  }
+
   private async getAdapter() {
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }

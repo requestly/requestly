@@ -25,6 +25,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
+  getOwner() {
+    return this.getPrimaryId();
+  }
+
   generateApiRecordId(parentId?: string) {
     return generateDocumentId("apis");
   }
