@@ -7,7 +7,7 @@ import {
 } from "../analytics";
 
 interface toggleParams {
-  isOpen: boolean;
+  isOpen?: boolean;
   isTrack: boolean;
   action: string;
 }
@@ -29,7 +29,7 @@ export const BottomSheetProvider: React.FC<{
   const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
 
   const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
-    if (isOpen) {
+    if (isOpen !== undefined) {
       setIsBottomSheetOpen(isOpen);
       if (isTrack) {
         trackBottomSheetToggled(isOpen, action);

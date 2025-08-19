@@ -40,7 +40,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             size="small"
             type="transparent"
             title={isBottomSheetOpen ? "Collapse" : "Expand"}
-            onClick={() => toggleBottomSheet({ isOpen: !isBottomSheetOpen, isTrack: true, action: "bottom_sheet_chevron_toggle" })}
+            onClick={() => toggleBottomSheet({ isTrack: true, action: "bottom_sheet_chevron_toggle" })}
             className="bottom-sheet-chevron-btn"
             icon={isBottomSheetOpen ? <FiChevronDown /> : <FiChevronUp />}
           />
