@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import Split from "react-split";
 import { Col, Row } from "antd";
 import { useBottomSheetContext } from "componentsV2/BottomSheet/context";
@@ -15,14 +15,20 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
   const splitPane = useRef(null);
+  const [lastKnownSizes, setLastKnownSizes] = useState(initialSizes);
+  const [isCollapsedByChevron, setIsCollapsedByChevron] = useState(false);
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
   // Calculate sizes based on bottom sheet open state
   const getSplitSizes = () => {
     if (isSheetPlacedAtBottom) {
-      // When collapsed, show only the header (~50px), when expanded show full content
-      return isBottomSheetOpen ? initialSizes : [95, 5];
+      if (isBottomSheetOpen) {
+        return lastKnownSizes;
+      } else {
+        // When collapsed by chevron, use a minimal size but keep header visible
+        return [92, 8];
+      }
     }
     return [55, 45];
   };
@@ -35,9 +41,17 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   }, []);
 
   useEffect(() => {
-    // Update split sizes when bottom sheet open state changes
+    // Update split sizes when bottom sheet open state changes (triggered by chevron)
     if (splitPane.current && isSheetPlacedAtBottom) {
-      splitPane.current.split.setSizes(getSplitSizes());
+      const newSizes = getSplitSizes();
+      splitPane.current.split.setSizes(newSizes);
+      
+      // Mark as collapsed by chevron when closing via chevron
+      if (!isBottomSheetOpen) {
+        setIsCollapsedByChevron(true);
+      } else {
+        setIsCollapsedByChevron(false);
+      }
     }
   }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
 
@@ -45,12 +59,21 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   const handleSplit = (sizes: number[]) => {
     if (isSheetPlacedAtBottom) {
       const bottomSheetSize = sizes[1];
-      // If user drags to expand beyond collapsed threshold, mark as open
-      // If user drags to collapse below threshold, mark as closed
-      const isExpanded = bottomSheetSize > 10; // 10% threshold
       
-      if (isExpanded !== isBottomSheetOpen) {
-        toggleBottomSheet({ isOpen: isExpanded, isTrack: true, action: "bottom_sheet_drag_resize" });
+      // Save the current sizes as last known if it's a reasonable size (not collapsed)
+      if (bottomSheetSize > 15) {
+        setLastKnownSizes(sizes);
+      }
+      
+      // Determine if this should be considered "open" or "closed"
+      const shouldBeOpen = bottomSheetSize > 12; // 12% threshold
+      
+      // Clear chevron collapse flag since user is dragging
+      setIsCollapsedByChevron(false);
+      
+      // Update the bottom sheet state if it changed
+      if (shouldBeOpen !== isBottomSheetOpen) {
+        toggleBottomSheet({ isOpen: shouldBeOpen, isTrack: true, action: "bottom_sheet_drag_resize" });
       }
     }
   };
@@ -61,7 +84,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       ref={splitPane}
       direction={splitDirection}
       sizes={getSplitSizes()}
-      minSize={isSheetPlacedAtBottom ? [minSize || 100, 40] : minSize || 100}
+      minSize={isSheetPlacedAtBottom ? [minSize || 100, 50] : minSize || 100}
       onSplit={handleSplit}
       className={`bottomsheet-layout-container ${
         splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
@@ -90,7 +113,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         <Col
           span={24}
           className={`${isSheetPlacedAtBottom ? "bottom-sheet-container" : "bottom-sheet-panel-container"} ${
-            isSheetPlacedAtBottom && !isBottomSheetOpen ? "collapsed" : ""
+            isSheetPlacedAtBottom && !isBottomSheetOpen && isCollapsedByChevron ? "collapsed" : ""
           }`}
           style={{
             height: "100%",

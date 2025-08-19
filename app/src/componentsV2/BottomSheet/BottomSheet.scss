@@ -95,7 +95,7 @@
   }
 }
 
-// Collapsed state - hide content but show header
+// Collapsed state - hide content but show header (only when collapsed by chevron)
 .bottom-sheet-container.collapsed,
 .bottom-sheet-panel-container.collapsed {
   .ant-tabs-content-holder {
@@ -110,5 +110,15 @@
   // Ensure no extra space when collapsed
   .ant-tabs {
     height: auto !important;
+    min-height: 40px;
+  }
+}
+
+// Ensure header is always visible regardless of split size
+.bottom-sheet-container,
+.bottom-sheet-panel-container {
+  .ant-tabs-nav {
+    flex-shrink: 0;
+    min-height: 40px;
   }
 }
