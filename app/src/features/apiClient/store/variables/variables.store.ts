@@ -5,7 +5,6 @@ import { VariableData, VariableKey } from "./types";
 
 export type VariablesState<T extends VariableData> = {
   // state
-  version: number;
   data: Map<VariableKey, T>;
 
   reset: (data?: Map<VariableKey, T>) => void;
@@ -17,7 +16,6 @@ export type VariablesState<T extends VariableData> = {
   getVariable: (key: VariableKey) => T | undefined;
   getAll: () => Map<VariableKey, T>;
   search: (value: string) => Map<VariableKey, T>;
-  incrementVersion: () => void;
 };
 
 export const parseVariables = (rawVariables: EnvironmentVariables): VariablesState<VariableData>["data"] => {
@@ -26,7 +24,6 @@ export const parseVariables = (rawVariables: EnvironmentVariables): VariablesSta
 
 export const createVariablesStore = ({ variables }: { variables: EnvironmentVariables }) => {
   return create<VariablesState<EnvironmentVariableValue>>()((set, get) => ({
-    version: 0,
     data: parseVariables(variables),
 
     reset(data) {
@@ -36,26 +33,27 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
     },
 
     delete(key) {
-      const { data } = get();
-
+      const { data: oldData } = get();
+      const data = new Map(oldData);
       if (!data.has(key)) {
         return;
       }
 
       data.delete(key);
       set({ data });
-      get().incrementVersion();
     },
 
     add(key, variable) {
-      const { data } = get();
+      const { data: oldData } = get();
+      const data = new Map(oldData);
       data.set(key, variable);
       set({ data });
-      get().incrementVersion();
     },
 
     update(key, updates) {
-      const { data } = get();
+      const { data: oldData } = get();
+      const data = new Map(oldData);
+
       const existingValue = data.get(key);
 
       if (!existingValue) {
@@ -65,7 +63,6 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       const updatedValue = { ...existingValue, ...updates };
       data.set(key, updatedValue);
       set({ data });
-      get().incrementVersion();
     },
 
     getVariable(key) {
@@ -87,12 +84,6 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       const { data } = get();
       const searchResults = Object.entries(data).filter(([key]) => key.toLowerCase().includes(value.toLowerCase()));
       return new Map(searchResults);
-    },
-
-    incrementVersion() {
-      set({
-        version: get().version + 1,
-      });
     },
   }));
 };
