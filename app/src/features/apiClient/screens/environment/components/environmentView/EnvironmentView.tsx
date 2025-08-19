@@ -6,6 +6,7 @@ import { useHasUnsavedChanges } from "hooks";
 import { isEmpty } from "lodash";
 import { convertEnvironmentToMap, isGlobalEnvironment, mapToEnvironmentArray } from "../../utils";
 import { ApiClientExportModal } from "features/apiClient/screens/apiClient/components/modals/exportModal/ApiClientExportModal";
+import { PostmanEnvironmentExportModal } from "features/apiClient/screens/apiClient/components/modals/postmanEnvironmentExportModal/PostmanEnvironmentExportModal";
 import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 import { useGenericState } from "hooks/useGenericState";
 import { useCommand } from "features/apiClient/commands";
@@ -41,6 +42,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
 
   const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
 
@@ -108,7 +110,8 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
           exportActions={{
             showExport: isGlobalEnvironment(envId),
             enableExport: !isEmpty(variables),
-            onExportClick: () => setIsExportModalOpen(true),
+            onRequestlyExportClick: () => setIsExportModalOpen(true),
+            onPostmanExportClick: () => setIsPostmanExportModalOpen(true),
           }}
         />
         <VariablesList
@@ -123,6 +126,15 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
             isOpen={isExportModalOpen}
             onClose={() => {
               setIsExportModalOpen(false);
+            }}
+          />
+        )}
+        {isPostmanExportModalOpen && (
+          <PostmanEnvironmentExportModal
+            environments={[{ id: envId, name: environmentName, variables: convertEnvironmentToMap(variables) }]}
+            isOpen={isPostmanExportModalOpen}
+            onClose={() => {
+              setIsPostmanExportModalOpen(false);
             }}
           />
         )}

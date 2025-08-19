@@ -1,5 +1,5 @@
 import React from "react";
-import { Input } from "antd";
+import { Input, Dropdown } from "antd";
 import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import { RQBreadcrumb, RQButton } from "lib/design-system-v2/components";
 import PATHS from "config/constants/sub/paths";
@@ -9,6 +9,8 @@ import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
 import { useCommand } from "features/apiClient/commands";
 import "./variablesListHeader.scss";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -17,7 +19,12 @@ interface VariablesListHeaderProps {
   hasUnsavedChanges: boolean;
   hideBreadcrumb?: boolean;
   isSaving: boolean;
-  exportActions?: { showExport: boolean; enableExport: boolean; onExportClick: () => void };
+  exportActions?: {
+    showExport: boolean;
+    enableExport: boolean;
+    onRequestlyExportClick: () => void;
+    onPostmanExportClick: () => void;
+  };
   onSearchValueChange: (value: string) => void;
   onSave: () => Promise<void>;
 }
@@ -85,6 +92,35 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
         />
 
         <div className="variables-list-btn-actions-container">
+          <RoleBasedComponent resource="api_client_environment" permission="update">
+            {exportActions?.showExport && (
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "requestly",
+                      label: "Requestly",
+                      icon: <img src={RequestlyIcon} alt="Requestly Icon" height={16} />,
+                      onClick: exportActions?.onRequestlyExportClick,
+                    },
+                    {
+                      key: "postman",
+                      label: "Postman (v2.1 format)",
+                      icon: <img src={PostmanIcon} alt="Postman Icon" height={16} />,
+                      onClick: exportActions?.onPostmanExportClick,
+                    },
+                  ],
+                }}
+                trigger={["click"]}
+                placement="bottomLeft"
+              >
+                <RQButton type="secondary" disabled={!exportActions?.enableExport}>
+                  Export as
+                </RQButton>
+              </Dropdown>
+            )}
+          </RoleBasedComponent>
+
           <RQButton
             showHotKeyText
             hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_ENVIRONMENT.hotKey}
@@ -96,14 +132,6 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           >
             Save
           </RQButton>
-
-          <RoleBasedComponent resource="api_client_environment" permission="update">
-            {exportActions?.showExport && (
-              <RQButton type="primary" onClick={exportActions?.onExportClick} disabled={!exportActions?.enableExport}>
-                Export
-              </RQButton>
-            )}
-          </RoleBasedComponent>
         </div>
       </div>
     </div>
