@@ -2,6 +2,10 @@
   "name": "analytics-vendors",
   "version": "1.0.0",
   "description": "\"List of popular analytics vendors, their Identifiers and helps you test, debug and validate the analytics implementation\"",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
