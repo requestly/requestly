@@ -25,10 +25,6 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return getOwnerId(this.meta.uid, this.meta.teamId);
   }
 
-  getOwner() {
-    return this.getPrimaryId();
-  }
-
   generateApiRecordId(parentId?: string) {
     return generateDocumentId("apis");
   }
@@ -157,6 +153,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return this.createRecordWithId(collection, id);
   }
 
+  // TODO: remove this
   async batchWriteApiEntities(
     batchSize: number,
     entities: RQAPI.ApiClientRecord[],
@@ -197,5 +194,12 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     }
 
     return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
+  }
+
+  async batchCreateRecords(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
+    return {
+      success: true,
+      data: { records: [], erroredRecords: [] },
+    };
   }
 }
