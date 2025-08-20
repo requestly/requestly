@@ -23,7 +23,7 @@ export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ work
           <div className="empty-workspace-list-body-description">
             {workspaceType === WorkspaceType.SHARED
               ? " Create or join team workspaces to collaborate with your teammates in real time. You'll need an account to get started."
-              : "Create a local workspace which stores all your data in your local machine, ensuring complete control and privacy."}
+              : "No local workspaces are available. Local workspaces store files on your device. Only API client files are supported."}
           </div>
           <RQButton
             size="small"
