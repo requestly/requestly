@@ -93,7 +93,11 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
 
   const tooltipTitle =
     activeWorkspace?.workspaceType === WorkspaceType.LOCAL
-      ? activeWorkspace.rootPath
+      ? viewMode === ApiClientViewMode.SINGLE
+        ? activeWorkspace.rootPath
+        : null
+      : viewMode === ApiClientViewMode.MULTI
+      ? null
       : prettifyWorkspaceName(activeWorkspaceName);
 
   return (
@@ -109,7 +113,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
             overlayClassName="workspace-selector-tooltip"
             style={{ top: "35px" }}
             title={tooltipTitle}
-            placement={"bottomRight"}
+            placement={"right"}
             showArrow={false}
             mouseEnterDelay={0.5}
             color="#000"
