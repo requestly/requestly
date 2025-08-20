@@ -92,16 +92,14 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
     () => ({
       type: RQAPI.RecordType.API,
       item: {
-        id: record.id,
-        type: record.type,
-        collectionId: record.collectionId,
+        record,
         contextId,
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record.id, record.type, record.collectionId, contextId]
+    [record, contextId]
   );
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {

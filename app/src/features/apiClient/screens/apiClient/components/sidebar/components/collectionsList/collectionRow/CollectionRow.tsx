@@ -28,7 +28,7 @@ import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
-import { getApiClientFeatureContext, getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -51,9 +51,7 @@ interface Props {
 }
 
 export type DraggableApiRecord = {
-  id: RQAPI.ApiClientRecord["id"];
-  type: RQAPI.ApiClientRecord["type"];
-  collectionId: RQAPI.ApiClientRecord["collectionId"];
+  record: RQAPI.ApiClientRecord;
   contextId: ApiClientFeatureContext["id"];
 };
 
@@ -170,14 +168,13 @@ export const CollectionRow: React.FC<Props> = ({
     async (item: DraggableApiRecord, dropContextId: string) => {
       try {
         const sourceContext = getApiClientFeatureContext(item.contextId);
-        const entryToMove = getApiClientRecordsStore(sourceContext).getState().getData(item.id);
 
         const destination = {
           contextId: dropContextId,
           collectionId: record.id,
         };
 
-        await moveRecordsAcrossWorkspace(sourceContext, { recordsToMove: [entryToMove], destination });
+        await moveRecordsAcrossWorkspace(sourceContext, { recordsToMove: [item.record], destination });
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -199,18 +196,18 @@ export const CollectionRow: React.FC<Props> = ({
 
   const checkCanDropItem = useCallback(
     (item: DraggableApiRecord): boolean => {
-      if (item.id === record.id) {
+      if (item.record.id === record.id) {
         return false;
       }
 
-      if (item.collectionId === record.id) {
+      if (item.record.collectionId === record.id) {
         return false;
       }
 
       // For collections, check for circular reference (parent-child relationship)
-      if (item.type === RQAPI.RecordType.COLLECTION) {
+      if (item.record.type === RQAPI.RecordType.COLLECTION) {
         const parentIds = getParentChain(record.id);
-        const wouldCreateCircularReference = parentIds.includes(item.id);
+        const wouldCreateCircularReference = parentIds.includes(item.record.id);
         return !wouldCreateCircularReference;
       }
 
@@ -223,16 +220,14 @@ export const CollectionRow: React.FC<Props> = ({
     () => ({
       type: RQAPI.RecordType.COLLECTION,
       item: {
-        id: record.id,
-        type: record.type,
-        collectionId: record.collectionId,
+        record,
         contextId,
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record.id, record.type, record.collectionId, contextId]
+    [record, contextId]
   );
 
   const [{ isOver }, drop] = useDrop(
@@ -242,7 +237,7 @@ export const CollectionRow: React.FC<Props> = ({
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) return;
 
-        if (item.id === record.id) return;
+        if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
         handleRecordDrop(item, contextId);
       },
