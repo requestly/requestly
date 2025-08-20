@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
+import { EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -9,33 +9,29 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
 import { VariableData } from "features/apiClient/store/variables/types";
-import { RuntimeVariableValue } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 
-interface VariablesListProps<T extends VariableData> {
-  variables: VariableRow<T>[];
+interface VariablesListProps {
+  variables: VariableRow[];
   searchValue?: string;
-  onVariablesChange: (variables: VariableRow<T>[]) => void;
-  createNewVariable: (id: number, type: EnvironmentVariableType) => VariableRow<T>;
+  onVariablesChange: (variables: VariableRow[]) => void;
   isReadOnly?: boolean;
   container: "environments" | "runtime";
 }
 
-export type VariableRow<T extends VariableData> = T & { key: string };
-export type MetaVariableRow = VariableRow<EnvironmentVariableValue | RuntimeVariableValue>;
+export type VariableRow = VariableData & { key: string };
 
-export function isEnvironmentVariableRow(row: MetaVariableRow): row is VariableRow<EnvironmentVariableValue> {
-  return "localValue" in row && row.localValue !== undefined;
-}
+const createNewVariable = (id: number, type: EnvironmentVariableType): VariableRow => ({
+  id,
+  key: "",
+  type,
+  syncValue: "",
+  isPersisted: true,
+});
 
-export function isRuntimeVariableRow(row: MetaVariableRow): row is VariableRow<RuntimeVariableValue> {
-  return "isPersisted" in row && row.isPersisted !== undefined;
-}
-
-export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue | RuntimeVariableValue>> = ({
+export const VariablesList: React.FC<VariablesListProps> = ({
   searchValue = "",
   variables,
   onVariablesChange,
-  createNewVariable,
   isReadOnly = false,
   container = "environments",
 }) => {
@@ -75,7 +71,7 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
   }, [dataSource]);
 
   const handleVariableChange = useCallback(
-    (row: MetaVariableRow, fieldChanged: keyof MetaVariableRow) => {
+    (row: VariableRow, fieldChanged: keyof VariableRow) => {
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
@@ -92,15 +88,15 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
   );
 
   const handleAddNewRow = useCallback(
-    (dataSource: MetaVariableRow[]) => {
+    (dataSource: VariableRow[]) => {
       const newVariable = createNewVariable(dataSource.length, EnvironmentVariableType.String);
       const newDataSource = [...dataSource, newVariable];
       setDataSource(newDataSource);
-      if (isRuntimeVariableRow(newVariable)) {
+      if (container === "runtime") {
         onVariablesChange(newDataSource);
       }
     },
-    [createNewVariable, onVariablesChange]
+    [container, onVariablesChange]
   );
 
   const handleDeleteVariable = useCallback(
@@ -172,7 +168,7 @@ export const VariablesList: React.FC<VariablesListProps<EnvironmentVariableValue
       }
       setDataSource(formattedDataSource);
     }
-  }, [variables, createNewVariable, container]);
+  }, [variables, container]);
 
   const handleAddVariable = () => {
     trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);

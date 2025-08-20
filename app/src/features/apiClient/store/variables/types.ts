@@ -1,26 +1,7 @@
-import {
-  EnvironmentVariableType,
-  EnvironmentVariableValue,
-  VariableScope,
-  VariableValueType,
-} from "backend/environment/types";
-
-export type VariableData = {
-  syncValue?: VariableValueType;
-  type: EnvironmentVariableType;
-  id: number;
-};
-
+import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 export type VariableKey = string;
 
-export type VariableDataForScope<T extends VariableScope> = T extends VariableScope.RUNTIME
-  ? VariableData
-  : EnvironmentVariableValue;
-
-
-
-/* --- */
-export type NewVariableData = {
+type BaseVariableData = {
   isPersisted?: boolean;
   syncValue?: VariableValueType;
   localValue?: VariableValueType;
@@ -28,3 +9,12 @@ export type NewVariableData = {
   id: number;
 };
 
+export interface EnvironmentVariableData extends BaseVariableData {
+  isPersisted: true;
+}
+
+export type VariableData = EnvironmentVariableData | BaseVariableData;
+
+export type IVariableValues<T extends VariableData> = Record<VariableKey, T>;
+
+export type VariableValues = IVariableValues<VariableData>;

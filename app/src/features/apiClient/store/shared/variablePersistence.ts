@@ -1,103 +1,80 @@
 import Dexie, { EntityTable } from "dexie";
-import { NewVariableData } from "../variables/types";
+import { EnvironmentVariableData, VariableData, IVariableValues } from "../variables/types";
+import { createVariablesStore, EnvVariableState, VariablesState } from "../variables/variables.store";
+import { RuntimeVariableStore as ExternalRNStore } from "../runtimeVariables/runtimeVariables.store";
+import { StoreApi } from "zustand";
 
 interface StoredVariable {
-  key: string;
-  localValue: NewVariableData["localValue"];
+  id: string; // composite key: contextId + key for environments/collections, just key for runtime
+  localValue: VariableData["localValue"];
 }
 
 const db = new Dexie("persistedVariables") as Dexie & {
-  [tableName: string]: EntityTable<StoredVariable, "key">;
+  runtime: EntityTable<StoredVariable, "id">;
+  environments: EntityTable<StoredVariable, "id">;
+  collectionVariables: EntityTable<StoredVariable, "id">;
 };
 
-const registeredTables = new Set<string>();
+// Static schema with 3 tables - no dynamic creation
+db.version(1).stores({
+  runtime: "id, localValue",
+  environments: "id, localValue",
+  collectionVariables: "id, localValue",
+});
 
-export namespace VariablePersistence {
-  export namespace TableId {
-    export function runtime(): string {
-      return "runtime";
-    }
+function createCompositeKey(contextId: string, variableKey: string): string {
+  return `${contextId}::${variableKey}`;
+}
 
-    export function environment(contextId: string, envId?: string): string {
-      return envId ? `${contextId}.env.${envId}` : `${contextId}.env.global`;
-    }
-
-    export function collection(contextId: string, recordId: string): string {
-      return `${contextId}.collection.${recordId}`;
-    }
-
-    export function parse(tableId: string): {
-      type: 'runtime' | 'environment' | 'collection';
-      contextId?: string;
-      envId?: string;
-      recordId?: string;
-      isGlobal?: boolean;
-    } {
-      if (tableId === "runtime") {
-        return { type: 'runtime' };
-      }
-
-      const parts = tableId.split('.');
-      
-      if (parts.length >= 3) {
-        const [contextId, type, id] = parts;
-        
-        if (type === 'env') {
-          return {
-            type: 'environment',
-            contextId,
-            envId: id === 'global' ? undefined : id,
-            isGlobal: id === 'global'
-          };
-        }
-        
-        if (type === 'collection') {
-          return {
-            type: 'collection',
-            contextId,
-            recordId: id
-          };
-        }
-      }
-
-      throw new Error(`Invalid table ID format: ${tableId}`);
-    }
-  }
-
-  function ensureTable(tableId: string, version: number = 1): void {
-    if (!registeredTables.has(tableId)) {
-      const stores: { [key: string]: string } = {};
-      
-      registeredTables.add(tableId);
-      registeredTables.forEach(table => {
-        stores[table] = "key";
-      });
-
-      db.version(version).stores(stores);
-    }
-  }
-
+function parseCompositeKey(compositeKey: string): { contextId: string; variableKey: string } {
+  const [contextId, variableKey] = compositeKey.split("::");
+  return { contextId, variableKey };
+}
+export namespace PersistedVariables {
   export abstract class Store {
-    private tableId: string;
+    protected contextId: string;
+    protected tableName: keyof typeof db;
+    loaded: boolean;
 
-    constructor(tableId: string, version: number = 1) {
-      this.tableId = tableId;
-      ensureTable(tableId, version);
+    constructor(contextId: string, tableName: keyof typeof db) {
+      this.loaded = false;
+      this.contextId = contextId;
+      this.tableName = tableName;
     }
 
     async delete(key: string): Promise<void> {
       try {
-        await db[this.tableId].delete(key);
+        const table = db[this.tableName] as EntityTable<StoredVariable, "id">;
+        if (this.tableName === "runtime") {
+          await table.delete(key);
+        } else {
+          const compositeKey = createCompositeKey(this.contextId, key);
+          await table.delete(compositeKey);
+        }
       } catch (error) {
         console.error(`Failed to delete ${key}:`, error);
       }
     }
 
-    async getAllEntries(): Promise<Map<string, NewVariableData["localValue"]>> {
+    async getAllEntries(): Promise<Map<string, VariableData["localValue"]>> {
       try {
-        const stored = await db[this.tableId].toArray();
-        const result = new Map<string, NewVariableData["localValue"]>();
-        stored.forEach(({ key, localValue }) => result.set(key, localValue));
+        const table = db[this.tableName] as EntityTable<StoredVariable, "id">;
+        const result = new Map<string, VariableData["localValue"]>();
+
+        if (this.tableName === "runtime") {
+          const stored = await table.toArray();
+          stored.forEach(({ id, localValue }: StoredVariable) => result.set(id, localValue));
+        } else {
+          const stored = await table
+            .where("id")
+            .startsWith(this.contextId + "::")
+            .toArray();
+
+          stored.forEach(({ id, localValue }: StoredVariable) => {
+            const { variableKey } = parseCompositeKey(id);
+            result.set(variableKey, localValue);
+          });
+        }
         return result;
       } catch (error) {
         console.error("Failed to get all variables:", error);
@@ -105,115 +82,151 @@ export namespace VariablePersistence {
       }
     }
 
-    async persistAll(variables: Map<string, { localValue?: NewVariableData["localValue"] }>): Promise<void> {
-      try {
-        const entries = Array.from(variables.entries())
-          .filter(([, variable]) => variable.localValue !== undefined)
-          .map(([key, variable]) => ({ key, localValue: variable.localValue }));
+    abstract persist(
+      variables: Map<string, { isPersisted?: boolean; localValue?: VariableData["localValue"] }>
+    ): Promise<void>;
 
-        await db.transaction("rw", db[this.tableId], async () => {
-          await db[this.tableId].clear();
-          if (entries.length > 0) {
-            await db[this.tableId].bulkAdd(entries);
-          }
-        });
-      } catch (error) {
-        console.error("Failed to persist dump:", error);
-      }
-    }
-
-    async persist(variables: Map<string, { isPersisted?: boolean; localValue?: NewVariableData["localValue"] }>): Promise<void> {
-      try {
-        const entries = Array.from(variables.entries())
-          .filter(([, variable]) => variable.isPersisted && variable.localValue !== undefined)
-          .map(([key, variable]) => ({ key, localValue: variable.localValue }));
-
-        await db.transaction("rw", db[this.tableId], async () => {
-          await db[this.tableId].clear();
-          if (entries.length > 0) {
-            await db[this.tableId].bulkAdd(entries);
-          }
-        });
-      } catch (error) {
-        console.error("Failed to persist runtime dump:", error);
-      }
-    }
-
-    abstract hydrate<T extends { localValue?: NewVariableData["localValue"] }>(
+    abstract hydrate<T extends { localValue?: VariableData["localValue"] }>(
       initialVariables: Map<string, T>
-    ): Promise<Map<string, T>>
-
-    async hydrateAll<T extends { localValue?: NewVariableData["localValue"] }>(
-      initialVariables: Map<string, T>
-    ): Promise<Map<string, T>> {
-      const persistedEntries = await this.getAllEntries();
-      const intialEntries = new Map(initialVariables);
-      const finalEntries = new Map()
-      for (const [key, localValue] of persistedEntries) {
-        // @ts-ignore todo: fix this somehow
-        let entry : T = {localValue, isPersisted: true}
-        const existing = intialEntries.get(key);
-        if (existing) {
-          entry = { ...existing, localValue };
-        }
-        finalEntries.set(key, entry)
-      }
-      
-      return finalEntries;
-    }
-
+    ): Promise<Map<string, T>>;
   }
 
   class RuntimeStore extends Store {
-    async hydrate<T extends { localValue?: NewVariableData["localValue"]; }>(initialVariables: Map<string, T>): Promise<Map<string, T>> {
-      const persistedEntries = await this.getAllEntries();
-      const intialEntries = new Map(initialVariables);
-      const finalEntries = new Map()
-      for (const [key, localValue] of persistedEntries) {
-        // @ts-ignore todo: fix this somehow
-        let entry : T = {localValue, isPersisted: true}
-        const existing = intialEntries.get(key);
-        if (existing) {
-          entry = { ...existing, localValue };
-        }
-        finalEntries.set(key, entry)
-      }
-      
-      return finalEntries;
+    constructor() {
+      super("runtime", "runtime");
     }
-  }
 
-  class EnvironmentStore extends Store {
-    async hydrate<T extends { localValue?: NewVariableData["localValue"] }>(
+    async hydrate<T extends { localValue?: VariableData["localValue"] }>(
       initialVariables: Map<string, T>
     ): Promise<Map<string, T>> {
       const persistedEntries = await this.getAllEntries();
       const intialEntries = new Map(initialVariables);
-      
+      const finalEntries = new Map();
+
+      for (const [key, localValue] of persistedEntries) {
+        // @ts-ignore todo: fix this somehow
+        let entry: T = { localValue, isPersisted: true };
+        const existing = intialEntries.get(key);
+        if (existing) {
+          entry = { ...existing, localValue };
+        }
+        finalEntries.set(key, entry);
+      }
+
+      return finalEntries;
+    }
+
+    async persist(
+      variables: Map<string, { isPersisted?: boolean; localValue?: VariableData["localValue"] }>
+    ): Promise<void> {
+      try {
+        const entries = Array.from(variables.entries())
+          .filter(([, variable]) => variable.isPersisted && variable.localValue !== undefined)
+          .map(([key, variable]) => ({
+            id: key, // Runtime uses simple key
+            localValue: variable.localValue,
+          }));
+
+        await db.transaction("rw", db.runtime, async () => {
+          await db.runtime.clear();
+          if (entries.length > 0) {
+            await db.runtime.bulkAdd(entries);
+          }
+        });
+      } catch (error) {
+        console.error("Failed to persist runtime variables:", error);
+      }
+    }
+  }
+
+  class ContextStore extends Store {
+    async hydrate<T extends { localValue?: VariableData["localValue"] }>(
+      initialVariables: Map<string, T>
+    ): Promise<Map<string, T>> {
+      const persistedEntries = await this.getAllEntries();
+      const intialEntries = new Map(initialVariables);
+
       for (const [key, localValue] of persistedEntries) {
         const existing = intialEntries.get(key);
         if (existing) {
           intialEntries.set(key, { ...existing, localValue });
         }
       }
-      
+
       return intialEntries;
+    }
+
+    async persist(variables: Map<string, { localValue?: VariableData["localValue"] }>): Promise<void> {
+      try {
+        const entries = Array.from(variables.entries())
+          .filter(([, variable]) => variable.localValue !== undefined)
+          .map(([key, variable]) => ({
+            id: createCompositeKey(this.contextId, key),
+            localValue: variable.localValue,
+          }));
+
+        const table = db[this.tableName] as EntityTable<StoredVariable, "id">;
+        await db.transaction("rw", table, async () => {
+          // Clear only this context's entries
+          await table
+            .where("id")
+            .startsWith(this.contextId + "::")
+            .delete();
+
+          if (entries.length > 0) {
+            await table.bulkAdd(entries);
+          }
+        });
+      } catch (error) {
+        console.error(`Failed to persist ${this.tableName} variables:`, error);
+      }
     }
   }
 
-  export function createRuntimeStore(): Store {
-    return new RuntimeStore(TableId.runtime());
+  export function createRuntimeStore(): ExternalRNStore {
+    const persistence = new RuntimeStore();
+    const variablesStore = createVariablesStore();
+    return _createPersistedVariableStore(variablesStore, persistence);
   }
 
-  export function environmentStorePersistance(contextId: string, envId: string): Store {
-    return new EnvironmentStore(TableId.environment(contextId, envId));
+  export function createEnvironmentVariablesStore(
+    contextId: string,
+    envId: string,
+    variables: IVariableValues<EnvironmentVariableData>
+  ): StoreApi<EnvVariableState> {
+    const fullContextId = `${contextId}.${envId}`;
+    const persistence = new ContextStore(fullContextId, "environments");
+    const variablesStore = createVariablesStore({ variables });
+    return _createPersistedVariableStore(variablesStore, persistence) as StoreApi<EnvVariableState>;
   }
 
-  export function collectionStorePersistance(contextId: string, recordId: string): Store {
-    return new EnvironmentStore(TableId.collection(contextId, recordId));
+  export function createCollectionVariablesStore(
+    contextId: string,
+    recordId: string,
+    variables: IVariableValues<EnvironmentVariableData>
+  ): StoreApi<EnvVariableState> {
+    const fullContextId = `${contextId}.${recordId}`;
+    const persistence = new ContextStore(fullContextId, "collectionVariables");
+    const variableStore = createVariablesStore({ variables });
+    return _createPersistedVariableStore(variableStore, persistence) as StoreApi<EnvVariableState>;
   }
-
-  
 }
 
+function _createPersistedVariableStore(
+  variableStore: StoreApi<VariablesState>,
+  persistenceDB: PersistedVariables.Store
+): StoreApi<VariablesState> {
+  const setupFromPersistedData = async () => {
+    const hydrated = await persistenceDB.hydrate(variableStore.getState().data);
+    variableStore.setState({
+      ...variableStore.getState(),
+      data: hydrated,
+      _persistence: persistenceDB,
+    });
 
+    persistenceDB.loaded = true;
+  };
+  setupFromPersistedData();
+
+  return variableStore;
+}

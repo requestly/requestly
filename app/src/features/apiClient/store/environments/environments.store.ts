@@ -1,12 +1,11 @@
 import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { create, StoreApi } from "zustand";
-import { createVariablesStore, VariablesState } from "../variables/variables.store";
+import { EnvVariableState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
-import { VariablePersistence } from "../shared/variablePersistence";
+import { PersistedVariables } from "../shared/variablePersistence";
 
 type EnvironmentData = {
-  variables: StoreApi<VariablesState>;
-  persistence: VariablePersistence.Store; // FIXME: remove this as well
+  variables: StoreApi<EnvVariableState>;
 };
 
 export const LOCAL_STORAGE_ACTIVE_ENV_ID_KEY = "__rq_api_client_active_environment_id";
@@ -44,26 +43,18 @@ export type EnvironmentsState = {
   refresh: (params: { globalEnvironment: EnvironmentMap[string]; environments: EnvironmentMap }) => void;
 };
 
-export function createEnvironmentStore(id: string, name: string, variables: EnvironmentVariables, contextId: string = "private") {
-  const persistence = VariablePersistence.environmentStorePersistance(contextId, id); // CALL IT DB
-  const variablesStore = createVariablesStore({ variables }); // FIXME: handle tableName creation for persistance here
-
-  const setupFromPersistedData = async () => {
-    const hydrated = await persistence.hydrate(variablesStore.getState().data);
-    variablesStore.setState({
-      ...variablesStore.getState(),
-      data: hydrated,
-      _persistence: persistence,
-    })
-  };
-  setupFromPersistedData();
-  
+export function createEnvironmentStore(
+  id: string,
+  name: string,
+  variables: EnvironmentVariables,
+  contextId: string = "private"
+) {
+  const variablesStore = PersistedVariables.createEnvironmentVariablesStore(contextId, id, variables);
   return create<EnvironmentState>((set) => ({
     id,
     name,
     data: {
       variables: variablesStore,
-      persistence,
     },
 
     update(patch) {
@@ -72,27 +63,29 @@ export function createEnvironmentStore(id: string, name: string, variables: Envi
   }));
 }
 
-const parseEnvironments = (rawEnvironments: EnvironmentMap): EnvironmentsState["environments"] => {
+const parseEnvironments = (rawEnvironments: EnvironmentMap, contextId: string): EnvironmentsState["environments"] => {
   const environmentsWithVariableStore = Object.values(rawEnvironments).map((value) => {
-    return createEnvironmentStore(value.id, value.name, value.variables);
+    return createEnvironmentStore(value.id, value.name, value.variables, contextId);
   });
 
   return environmentsWithVariableStore;
 };
 
-const parseGlobalEnvironment = (globalEnv: EnvironmentMap[string]): GlobalEnvironmentStore => {
-  return createEnvironmentStore(globalEnv.id, globalEnv.name, globalEnv.variables);
+const parseGlobalEnvironment = (globalEnv: EnvironmentMap[string], contextId: string): GlobalEnvironmentStore => {
+  return createEnvironmentStore(globalEnv.id, globalEnv.name, globalEnv.variables, contextId);
 };
 
 export const createEnvironmentsStore = ({
   environments,
   globalEnvironment,
+  contextId,
 }: {
   environments: EnvironmentMap;
   globalEnvironment: EnvironmentMap[string];
+  contextId: string;
 }) => {
-  const environmentsWithVariableStore = parseEnvironments(environments);
-  const globalEnvWithVariableStore = parseGlobalEnvironment(globalEnvironment);
+  const environmentsWithVariableStore = parseEnvironments(environments, contextId);
+  const globalEnvWithVariableStore = parseGlobalEnvironment(globalEnvironment, contextId);
 
   const persistedActiveEnvId = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ENV_ID_KEY);
   const activeEnvironment = persistedActiveEnvId
@@ -215,7 +208,7 @@ export const createEnvironmentsStore = ({
       }
 
       set({
-        globalEnvironment: parseGlobalEnvironment(params.globalEnvironment),
+        globalEnvironment: parseGlobalEnvironment(params.globalEnvironment, contextId),
       });
     },
   }));

@@ -1,7 +1,7 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { parseVariables } from "features/apiClient/store/variables/variables.store";
+import { parseEnvVariables } from "features/apiClient/store/variables/variables.store";
 import { createOrderedVariableMap } from "./utils";
 
 export async function setEnvironmentVariables(
@@ -21,5 +21,5 @@ export async function setEnvironmentVariables(
   const varMap = createOrderedVariableMap(params.variables);
 
   await environmentVariablesRepository.updateEnvironment(params.environmentId, { variables: varMap });
-  varStore.getState().reset(parseVariables(varMap));
+  varStore.getState().reset(parseEnvVariables(varMap));
 }

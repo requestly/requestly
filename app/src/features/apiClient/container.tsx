@@ -21,8 +21,9 @@ const ApiClientFeatureContainer: React.FC = () => {
 
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
+    setIsLoaded(false);
     (async () => {
-      if(viewMode === ApiClientViewMode.MULTI) {
+      if (viewMode === ApiClientViewMode.MULTI) {
         await loadWorkspaces();
         setIsLoaded(true);
         return;

@@ -75,7 +75,7 @@ export const CollectionRow: React.FC<Props> = ({
     api: { forceRefreshRecords: forceRefreshApiClientRecords },
   } = useCommand();
 
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isDropdownVisible] = useState(false);
 
   const contextId = useContextId();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);

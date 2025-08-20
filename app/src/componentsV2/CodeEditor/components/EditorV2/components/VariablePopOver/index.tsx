@@ -1,9 +1,10 @@
 import React from "react";
 import { Popover, Row } from "antd";
-import { EnvironmentVariableType, EnvironmentVariableValue, VariableValueType } from "backend/environment/types";
+import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
 import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { VariableData } from "features/apiClient/store/variables/types";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -51,7 +52,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   );
 };
 
-function getSanitizedVariableValue(variable: EnvironmentVariableValue) {
+function getSanitizedVariableValue(variable: VariableData) {
   const isSecret = variable.type === EnvironmentVariableType.Secret;
   const makeSecret = (value: VariableValueType) => "•".repeat(String(value || "").length);
   const makeRenderable = (value: VariableValueType) => `${value}`;
