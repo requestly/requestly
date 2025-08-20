@@ -27,7 +27,7 @@ export async function moveRecordsAcrossWorkspace(
       collectionId: destination.collectionId,
     });
 
-    return result;
+    return { movedRecords: result };
   }
 
   const destinationContext = getApiClientFeatureContext(destination.contextId);
@@ -85,12 +85,12 @@ export async function moveRecordsAcrossWorkspace(
   saveBulkRecords(destinationContext, createdRecordsResult.data.records);
 
   if (!createdRecordsResult.success) {
-    throw new NativeError("Failed to move across workspaces!");
+    throw new NativeError("Failed to move across workspace!");
   }
 
   await forceRefreshRecords(destinationContext);
 
   await deleteRecords(ctx, { records: _allRecords });
 
-  return createdRecordsResult.data.records;
+  return { oldContextRecords: _allRecords };
 }

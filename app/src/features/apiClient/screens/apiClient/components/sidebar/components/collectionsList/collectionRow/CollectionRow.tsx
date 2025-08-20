@@ -74,7 +74,11 @@ export const CollectionRow: React.FC<Props> = ({
   const [collectionsToExport, setCollectionsToExport] = useState([]);
 
   const contextId = useContextId();
-  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
+  const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
+    state.openTab,
+    state.activeTabSource,
+    state.closeTabBySource,
+  ]);
   const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
 
   const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord) => {
@@ -174,7 +178,14 @@ export const CollectionRow: React.FC<Props> = ({
           collectionId: record.id,
         };
 
-        await moveRecordsAcrossWorkspace(sourceContext, { recordsToMove: [item.record], destination });
+        const { oldContextRecords } = await moveRecordsAcrossWorkspace(sourceContext, {
+          recordsToMove: [item.record],
+          destination,
+        });
+
+        oldContextRecords?.forEach((r) => {
+          closeTabBySource(r.id, "request", true);
+        });
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -191,7 +202,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
