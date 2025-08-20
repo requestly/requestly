@@ -40,7 +40,7 @@
     }
 
     .ant-collapse-header-text {
-      flex-grow: 1;
+      flex-grow: auto;
 
       .workspace-name-container {
         display: flex;
@@ -68,6 +68,19 @@
       .environment-switcher-button {
         border-radius: 32px;
         background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+
+        color: var(--requestly-color-text-placeholder);
+        font-size: var(--requestly-font-size-xs, 11px);
+        line-height: 17px; /* 154.545% */
+
+        .environment-icon {
+          display: inline-flex;
+          align-items: center;
+        }
+
+        svg {
+          color: var(--requestly-color-text-placeholder);
+        }
       }
     }
   }
