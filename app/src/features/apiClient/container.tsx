@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
 import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
 import { LocalSyncRefreshHandler } from "./LocalSyncRefreshHandler";
 import "./container.scss";
-import { useGetApiClientSyncRepo } from "./helpers/modules/sync/useApiClientSyncRepo";
 import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
 import { setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
@@ -13,26 +12,27 @@ import { ApiClientViewMode, useApiClientMultiWorkspaceView } from "./store/multi
 import Daemon from "./store/apiRecords/Daemon";
 import { ApiClientProvider } from "./contexts";
 import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.command";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { createRepository } from "./commands/context/setupContext.command";
 
 const ApiClientFeatureContainer: React.FC = () => {
-  const repository = useGetApiClientSyncRepo();
+  const user: Record<string, any> = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
+  const [viewMode, isLoaded] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.isLoaded]);
 
-  const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
-    setIsLoaded(false);
     (async () => {
-      if (viewMode === ApiClientViewMode.MULTI) {
+      if(viewMode === ApiClientViewMode.MULTI) {
         await loadWorkspaces();
-        setIsLoaded(true);
         return;
       }
+      const repository = createRepository(activeWorkspace, {
+        loggedIn: user.loggedIn,
+        uid: user.details?.profile?.uid ?? "", 
+      })
       await setupContextWithRepo(activeWorkspace.id, repository);
-      setIsLoaded(true);
     })();
-    // TODO: handle case for when viewMode is MULTI
-  }, [repository, activeWorkspace.id, viewMode]);
+  }, [user, activeWorkspace.id, viewMode]);
 
   if (!isLoaded) {
     return <ApiClientLoadingView />;

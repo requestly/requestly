@@ -55,5 +55,6 @@ export const setupContextWithRepo = async (
   }
 
   apiClientFeatureContextProviderStore.getState().addContext(context);
+  apiClientMultiWorkspaceViewStore.getState().setIsLoaded(true);
   return context.id;
 };

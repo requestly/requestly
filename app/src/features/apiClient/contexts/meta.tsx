@@ -12,7 +12,7 @@ import {
 import { useMemo } from "react";
 
 export function useApiClientFeatureContext(): ApiClientFeatureContext {
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
+  const getViewMode = useApiClientMultiWorkspaceView((s) => s.getViewMode);
   const [getSingleViewContext, getContext, getLastUsedContext] = useApiClientFeatureContextProvider((s) => [
     s.getSingleViewContext,
     s.getContext,
@@ -24,6 +24,7 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
     if (contextId === NoopContextId) {
       return NoopContext;
     }
+    const viewMode = getViewMode();
     if (viewMode === ApiClientViewMode.SINGLE) {
       return getSingleViewContext();
     }

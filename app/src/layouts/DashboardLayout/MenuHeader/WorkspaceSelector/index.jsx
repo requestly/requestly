@@ -389,11 +389,11 @@ const WorkspaceSelector = () => {
   );
 
   const handleSwitchToPrivateWorkspace = useCallback(async () => {
+    resetToSingleView();
     setIsModalOpen(true);
     return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast();
-      resetToSingleView();
     });
   }, [appMode, dispatch, user.details?.profile?.uid]);
 
