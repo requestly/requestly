@@ -29,7 +29,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const environment: EnvironmentData = {
       id: entity.id,
       name: entity.name,
-      variables: entity.variables,
+      variables: parseEntityVariables(entity?.variables || {}),
     };
 
     return environment;

@@ -9,7 +9,6 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { notification, Row } from "antd";
 import Logger from "lib/logger";
 import "./brunoImporter.scss";
-import { EnvironmentVariableValue } from "backend/environment/types";
 import { useNavigate } from "react-router-dom";
 import { redirectToApiClient } from "utils/RedirectionUtils";
 import { RQModal } from "lib/design-system/components";
@@ -23,6 +22,7 @@ import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -40,7 +40,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     apis: Partial<RQAPI.ApiRecord>[];
     environments: Array<{
       name: string;
-      variables: Record<string, EnvironmentVariableValue>;
+      variables: Record<string, EnvironmentVariableData>;
     }>;
   }>({ collections: [], apis: [], environments: [] });
 
@@ -100,7 +100,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             apis: [] as Partial<RQAPI.ApiRecord>[],
             environments: [] as Array<{
               name: string;
-              variables: Record<string, EnvironmentVariableValue>;
+              variables: Record<string, EnvironmentVariableData>;
             }>,
           };
 

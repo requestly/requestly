@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { RuntimeVariablesList, RuntimeVariableTableRow } from "../RuntimeVariablesList/runtimevariableslist";
+import { RuntimeVariablesList } from "../RuntimeVariablesList/runtimevariableslist";
 import { RuntimeVariablesHeader } from "../RuntimeVariablesHeader";
 import { useRuntimeVariables } from "features/apiClient/hooks/useRuntimeVariables.hook";
 import { RuntimeVariableValue } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
@@ -9,19 +9,20 @@ import { mapRuntimeArray } from "features/apiClient/store/runtimeVariables/utils
 import { toast } from "utils/Toast";
 import "./runtimevariableview.scss";
 import { DeleteAllRuntimeVariablesModal } from "features/apiClient/screens/apiClient/components/modals/DeleteAllRuntimeVariablesModal/deleteAllRuntimeVariablesModal";
+import { VariableRow } from "../../VariablesList/VariablesList";
 
 export const RuntimeVariablesView: React.FC = () => {
   const [runtimeVariablesMap, resetVariables] = useRuntimeVariables((s) => [s.data, s.reset]);
   const runtimeVariableData = Object.fromEntries(runtimeVariablesMap);
 
-  const pendingVariablesRef = useRef<RuntimeVariableTableRow[]>([]);
+  const pendingVariablesRef = useRef<VariableRow[]>([]);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const variables = useMemo(() => {
     return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : mapRuntimeArray(runtimeVariableData);
   }, [runtimeVariableData]);
 
-  const [pendingVariables, setPendingVariables] = useState<RuntimeVariableTableRow[]>(variables);
+  const [pendingVariables, setPendingVariables] = useState<VariableRow[]>(variables);
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(pendingVariables);
   const { setPreview, setUnsaved } = useGenericState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -57,13 +58,13 @@ export const RuntimeVariablesView: React.FC = () => {
     setIsDeleteModalOpen(false);
   }, [resetChanges, resetVariables]);
 
-  const handleSetPendingVariables = useCallback((variables: RuntimeVariableTableRow[]) => {
+  const handleSetPendingVariables = useCallback((variables: VariableRow[]) => {
     setPendingVariables(variables);
     pendingVariablesRef.current = variables;
   }, []);
 
   const handleUpdate = useCallback(
-    (variables: RuntimeVariableTableRow[]) => {
+    (variables: VariableRow[]) => {
       const newVariablesMap = new Map(
         variables.map((v) => [
           v.key,

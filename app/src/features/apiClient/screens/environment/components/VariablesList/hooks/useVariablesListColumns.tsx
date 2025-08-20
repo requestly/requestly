@@ -1,5 +1,5 @@
 import { Switch, TableProps, Tooltip } from "antd";
-import { isEnvironmentVariableRow, isRuntimeVariableRow, MetaVariableRow } from "../VariablesList";
+import { VariableRow } from "../VariablesList";
 import { RQButton } from "lib/design-system-v2/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
@@ -10,7 +10,7 @@ import { RoleBasedComponent } from "features/rbac";
 import InfoIcon from "components/misc/InfoIcon";
 
 interface Props {
-  handleVariableChange: (record: MetaVariableRow, fieldChanged: keyof MetaVariableRow) => void;
+  handleVariableChange: (record: VariableRow, fieldChanged: keyof VariableRow) => void;
   handleDeleteVariable: (key: number) => void;
   handleUpdatePersisted: (id: number, isPersisted: boolean) => void;
   visibleSecretsRowIds: number[];
@@ -21,7 +21,7 @@ interface Props {
   container: "environments" | "runtime";
 }
 
-type ColumnTypes = Exclude<TableProps<MetaVariableRow>["columns"], undefined>;
+type ColumnTypes = Exclude<TableProps<VariableRow>["columns"], undefined>;
 
 export const useVariablesListColumns = ({
   handleVariableChange,
@@ -157,11 +157,11 @@ export const useVariablesListColumns = ({
                     alignItems: "center",
                     borderRadius: "16px",
                   }}
-                  checked={isRuntimeVariableRow(record) && record.isPersisted}
+                  checked={container === "runtime" && record.isPersisted}
                   onChange={(checked) => handleUpdatePersisted(record.id, checked)}
                 />
                 {"  "}
-                <span>{isRuntimeVariableRow(record) && record.isPersisted ? "Yes" : "No"}</span>
+                <span>{container === "runtime" && record.isPersisted ? "Yes" : "No"}</span>
               </span>
             );
           },
@@ -171,7 +171,7 @@ export const useVariablesListColumns = ({
       title: "",
       editable: false,
       width: "100px",
-      render: (_: any, record: MetaVariableRow) => {
+      render: (_: any, record: VariableRow) => {
         return (
           <RoleBasedComponent resource="api_client_environment" permission="delete">
             <div className="variable-row-actions">
@@ -189,7 +189,7 @@ export const useVariablesListColumns = ({
                 (recordsCount === 1 &&
                   (record.key !== "" ||
                     record.syncValue !== "" ||
-                    (isEnvironmentVariableRow(record) && record.localValue !== "")))) && (
+                    (container === "environments" && record.localValue !== "")))) && (
                 <RQButton
                   icon={<RiDeleteBin6Line />}
                   type="transparent"

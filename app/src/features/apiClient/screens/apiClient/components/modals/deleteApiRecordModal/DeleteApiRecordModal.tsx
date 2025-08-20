@@ -1,15 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { toast } from "utils/Toast";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection, isApiRequest } from "../../../utils";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
-import { isEmpty, partition } from "lodash";
-import * as Sentry from "@sentry/react";
+import { isEmpty } from "lodash";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { notification } from "antd";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { deleteRecords } from "features/apiClient/commands/records";
 

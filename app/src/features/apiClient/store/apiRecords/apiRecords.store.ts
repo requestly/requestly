@@ -2,9 +2,9 @@ import { NativeError } from "errors/NativeError";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
-import { createVariablesStore, parseVariables, VariablesState } from "../variables/variables.store";
+import { EnvVariableState, parseEnvVariables } from "../variables/variables.store";
 import { apiClientFileStore } from "../apiClientFilesStore";
-import { VariablePersistence } from "../shared/variablePersistence";
+import { PersistedVariables } from "../shared/variablePersistence";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -22,8 +22,8 @@ export type ApiRecordState = BaseRecordState & {
 export type CollectionRecordState = BaseRecordState & {
   type: RQAPI.RecordType.COLLECTION;
   record: RQAPI.CollectionRecord;
-  collectionVariables: StoreApi<VariablesState>;
-  persistence: VariablePersistence.Store;
+  collectionVariables: StoreApi<EnvVariableState>;
+  persistence: PersistedVariables.Store;
 };
 
 export type RecordState = ApiRecordState | CollectionRecordState;
@@ -139,24 +139,15 @@ export const createRecordStore = (record: RQAPI.ApiClientRecord, contextId: stri
     if (record.type === RQAPI.RecordType.API) {
       return baseRecordState as ApiRecordState;
     }
-    
-    const persistence = VariablePersistence.collectionStorePersistance(contextId, record.id);
-    const variablesStore = createVariablesStore({ variables: record.data?.variables ?? {} });
 
-    const setupFromPersistedData = async () => {
-      const hydrated = await persistence.hydrate(variablesStore.getState().data);
-      variablesStore.setState({
-        ...variablesStore.getState(),
-        data: hydrated,
-        _persistence: persistence,
-      })
-    };
-    setupFromPersistedData();
-
+    const variablesStore = PersistedVariables.createCollectionVariablesStore(
+      contextId,
+      record.id,
+      record.data?.variables
+    );
     return {
       ...baseRecordState,
       collectionVariables: variablesStore,
-      persistence,
     } as CollectionRecordState;
   });
 };
@@ -310,7 +301,7 @@ export const createApiRecordsStore = (initialRecords: {
       for (const [recordId, newData] of Object.entries(variables)) {
         const record = indexStore.get(recordId)?.getState();
         if (record && record.type === RQAPI.RecordType.COLLECTION) {
-          record.collectionVariables.getState().reset(parseVariables(newData.variables));
+          record.collectionVariables.getState().reset(parseEnvVariables(newData.variables));
         }
       }
     },
