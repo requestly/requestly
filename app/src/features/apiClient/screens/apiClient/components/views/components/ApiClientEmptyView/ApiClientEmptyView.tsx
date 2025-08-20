@@ -12,7 +12,7 @@ import {
   NewRecordDropdownItemType,
 } from "../../../sidebar/components/NewApiRecordDropdown/NewApiRecordDropdown";
 import "./apiClientEmptyView.scss";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 export const ApiClientEmptyView = () => {

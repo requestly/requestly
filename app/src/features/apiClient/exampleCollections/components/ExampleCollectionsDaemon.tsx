@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";

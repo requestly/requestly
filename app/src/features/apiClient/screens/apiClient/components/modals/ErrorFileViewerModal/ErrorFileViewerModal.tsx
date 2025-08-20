@@ -8,7 +8,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
 import "./errorFileViewerModal.scss";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 interface ErrorFileViewerModalProps {
   isOpen: boolean;

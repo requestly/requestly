@@ -22,11 +22,11 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
-import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { useCommand } from "../commands";
 import { useContextId } from "./contextId.context";
 import { useNewApiClientContext } from "../hooks/useNewApiClientContext";
 import { useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { useApiClientRepository } from "./meta";
 
 interface ApiClientContextInterface {
   history: RQAPI.ApiEntry[];

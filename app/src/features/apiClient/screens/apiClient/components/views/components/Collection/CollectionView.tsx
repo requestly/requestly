@@ -14,7 +14,7 @@ import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { isEmpty } from "lodash";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 const TAB_KEYS = {

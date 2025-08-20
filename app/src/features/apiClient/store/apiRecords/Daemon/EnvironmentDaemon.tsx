@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { VariableScope } from "backend/environment/types";
 import { useAPIEnvironment } from "../ApiRecordsContextProvider";
 import { parseEnvVariables } from "../../variables/variables.store";

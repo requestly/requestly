@@ -21,7 +21,7 @@ import {
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 interface BrunoImporterProps {

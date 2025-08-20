@@ -8,7 +8,7 @@ import { trackCollectionRenamed, trackRequestRenamed } from "modules/analytics/e
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 export interface NewRecordNameInputProps {
   recordToBeEdited?: RQAPI.ApiClientRecord;

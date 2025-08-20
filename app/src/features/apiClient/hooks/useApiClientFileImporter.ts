@@ -14,9 +14,9 @@ import { processRqImportData } from "features/apiClient/screens/apiClient/compon
 
 import * as Sentry from "@sentry/react";
 import { useCommand } from "../commands";
-import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "./useNewApiClientContext";
 import { EnvironmentVariableData } from "../store/variables/types";
+import { useApiClientRepository } from "../contexts/meta";
 
 const BATCH_SIZE = 25;
 

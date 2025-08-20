@@ -25,7 +25,7 @@ import { RequestViewTabSource } from "../../../../views/components/RequestView/r
 import { useDrag } from "react-dnd";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
