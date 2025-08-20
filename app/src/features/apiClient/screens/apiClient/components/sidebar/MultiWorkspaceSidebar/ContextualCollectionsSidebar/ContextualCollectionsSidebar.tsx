@@ -21,6 +21,7 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
+import "./contextualCollectionsSidebar.scss";
 
 export type RecordSelectionAction = "select" | "unselect";
 
@@ -309,25 +310,27 @@ export const ContextualCollectionsSidebar: React.FC<{
           )}
         </div>
 
-        {selectedWorkspaces.map((workspace) => {
-          const workspaceId = workspace.getState().id;
+        <div className="multi-view-collections-sidebar">
+          {selectedWorkspaces.map((workspace) => {
+            const workspaceId = workspace.getState().id;
 
-          return (
-            <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
-              <h3>Workspace: {workspace.getState().name}</h3>
-              <ContextualCollectionsList
-                isSelectAll={isSelectAll}
-                showSelection={showSelection}
-                handleShowSelection={handleShowSelection}
-                searchValue={searchValue}
-                onNewClick={onNewClick}
-                recordTypeToBeCreated={recordTypeToBeCreated}
-                handleRecordSelection={handleRecordSelection}
-                handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-              />
-            </WorkspaceProvider>
-          );
-        })}
+            return (
+              <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
+                <h3>Workspace: {workspace.getState().name}</h3>
+                <ContextualCollectionsList
+                  isSelectAll={isSelectAll}
+                  showSelection={showSelection}
+                  handleShowSelection={handleShowSelection}
+                  searchValue={searchValue}
+                  onNewClick={onNewClick}
+                  recordTypeToBeCreated={recordTypeToBeCreated}
+                  handleRecordSelection={handleRecordSelection}
+                  handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                />
+              </WorkspaceProvider>
+            );
+          })}
+        </div>
       </DndProvider>
 
       {isMoveCollectionModalOpen ? (
