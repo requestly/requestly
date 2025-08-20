@@ -35,52 +35,43 @@ export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     (async () => {
-      try {
-        const [fetchedRecordsResult, fetchedEnvResult] = await Promise.all([
-          apiClientRecordsRepository.getAllRecords(),
-          environmentVariablesRepository.getAllEnvironments(),
-        ]);
+      const [fetchedRecordsResult, fetchedEnvResult] = await Promise.all([
+        apiClientRecordsRepository.getAllRecords(),
+        environmentVariablesRepository.getAllEnvironments(),
+      ]);
 
-        if (!fetchedRecordsResult.success) {
-          notification.error({
-            message: "Could not fetch records!",
-            description: fetchedRecordsResult.message || "Please try reloading the app", // fix-me: need good copy here
-            placement: "bottomRight",
-          });
-        } else {
-          setRecords({
-            data: fetchedRecordsResult.data.records,
-            erroredRecords: fetchedRecordsResult.data.erroredRecords,
-          });
-        }
-
-        if (!fetchedEnvResult.success) {
-          notification.error({
-            message: "Could not fetch environments!",
-            description: "Please try reloading the app", // fix-me: need good copy here
-            placement: "bottomRight",
-          });
-        } else {
-          const allEnvironments = fetchedEnvResult.data.environments;
-          const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
-          const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
-
-          if (!globalEnv) throw new Error("Global Environment doesn't exist");
-
-          setEnvironments({
-            global: globalEnv,
-            nonGlobalEnvironments: {
-              data: otherEnvs,
-              erroredRecords: fetchedEnvResult.data.erroredRecords,
-            },
-          });
-        }
-      } catch (e) {
-        console.error(e);
+      if (!fetchedRecordsResult.success) {
         notification.error({
-          message: "Could not fetch data!",
-          description: e.message,
+          message: "Could not fetch records!",
+          description: fetchedRecordsResult.message || "Please try reloading the app", // fix-me: need good copy here
           placement: "bottomRight",
+        });
+      } else {
+        setRecords({
+          data: fetchedRecordsResult.data.records,
+          erroredRecords: fetchedRecordsResult.data.erroredRecords,
+        });
+      }
+
+      if (!fetchedEnvResult.success) {
+        notification.error({
+          message: "Could not fetch environments!",
+          description: "Please try reloading the app", // fix-me: need good copy here
+          placement: "bottomRight",
+        });
+      } else {
+        const allEnvironments = fetchedEnvResult.data.environments;
+        const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
+        const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
+
+        if (!globalEnv) throw new Error("Global Environment doesn't exist");
+
+        setEnvironments({
+          global: globalEnv,
+          nonGlobalEnvironments: {
+            data: otherEnvs,
+            erroredRecords: fetchedEnvResult.data.erroredRecords,
+          },
         });
       }
     })();
