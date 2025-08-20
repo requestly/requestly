@@ -30,17 +30,8 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
   const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
   const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
-  const [selectedCollection, setSelectedCollection] = useState(null);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<{
-    label: string;
-    value: string;
-  } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const context = useMemo(
-    () => (selectedWorkspace ? getContext(selectedWorkspace.value) : null),
-    [selectedWorkspace, getContext]
-  );
+  const [selectedCollection, setSelectedCollection] = useState(null);
 
   const workspacesOptions = useMemo(() => {
     return selectedWorkspaces.map((w) => ({
@@ -48,6 +39,16 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
       value: w.getState().id,
     }));
   }, [selectedWorkspaces]);
+
+  const [selectedWorkspace, setSelectedWorkspace] = useState<{
+    label: string;
+    value: string;
+  } | null>(() => workspacesOptions.find((w) => w.value === currentContextId));
+
+  const context = useMemo(() => (selectedWorkspace ? getContext(selectedWorkspace.value) : null), [
+    selectedWorkspace,
+    getContext,
+  ]);
 
   const collectionOptions = useMemo(() => {
     if (!context) {
@@ -109,6 +110,7 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
   return (
     <Modal
       open={isOpen}
+      destroyOnClose
       onCancel={onClose}
       title="Move to Collection"
       className="custom-rq-modal move-to-collection-modal"
@@ -240,6 +242,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
   return (
     <Modal
       open={isOpen}
+      destroyOnClose
       onCancel={onClose}
       title="Move to Collection"
       className="custom-rq-modal move-to-collection-modal"
