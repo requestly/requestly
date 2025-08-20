@@ -6,6 +6,7 @@ import { deleteRecords } from "./deleteRecords.command";
 import { NativeError } from "errors/NativeError";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { getAllRecords } from "../utils";
+import { forceRefreshRecords } from "./force-refresh.command";
 
 export async function moveRecordsAcrossWorkspace(
   ctx: ApiClientFeatureContext,
@@ -73,59 +74,26 @@ export async function moveRecordsAcrossWorkspace(
   });
 
   const updatedRecordsWithNewIds: RQAPI.ApiClientRecord[] = _allRecords.map((record) => {
-    if (rootLevelRecords.has(record.id)) {
-      return { ...record, id: oldToNewIdMap.get(record.id), collectionId: destination.collectionId };
-    } else {
-      return {
-        ...record,
-        id: oldToNewIdMap.get(record.id),
-        collectionId: rootLevelRecords.has(record.collectionId)
-          ? destination.collectionId
-          : oldToNewIdMap.get(record.collectionId),
-      };
-    }
+    return {
+      ...record,
+      id: oldToNewIdMap.get(record.id),
+      collectionId: rootLevelRecords.has(record.collectionId)
+        ? destination.collectionId
+        : oldToNewIdMap.get(record.collectionId),
+    };
   });
 
   const createdRecordsResult = await apiClientRecordsRepository.batchCreateRecordsWithExistingId(
     updatedRecordsWithNewIds
   );
 
-  console.log({ rootLevelRecords, recordIds, _allRecords, updatedRecordsWithNewIds, createdRecordsResult });
-
   if (!createdRecordsResult.success) {
     throw new NativeError("Failed to move across workspaces!");
   }
 
-  // move into updated collections
-  const updatedResult: RQAPI.ApiClientRecord[] = [];
-  for (const record of createdRecordsResult.data.records) {
-    const createResult = await (async () => {
-      const oldId = newToOldIdMap.get(record.id);
-
-      if (rootLevelRecords.has(oldId)) {
-        record.collectionId = destination.collectionId;
-      } else {
-        const oldCollectionId = recordIdToCollectionIdMap.get(oldId);
-        const newCollectionId = oldToNewIdMap.get(oldCollectionId);
-        record.collectionId = newCollectionId;
-      }
-
-      return moveRecords(destinationContext, {
-        recordsToMove: [record],
-        collectionId: record.collectionId,
-      });
-    })();
-
-    if (createResult.length) {
-      updatedResult.push(createResult[0]);
-    }
-  }
-
-  if (updatedResult.length === 0) {
-    throw new NativeError("Failed to move across workspaces!");
-  }
+  await forceRefreshRecords(destinationContext);
 
   await deleteRecords(ctx, { records: _allRecords });
 
-  return updatedResult;
+  return createdRecordsResult.data.records;
 }
