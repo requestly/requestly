@@ -389,13 +389,13 @@ const WorkspaceSelector = () => {
     return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast();
-      resetToSingleView(PrivateWorkspaceStub, user.details?.profile?.uid);
+      resetToSingleView();
     });
   }, [appMode, dispatch, user.details?.profile?.uid]);
 
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
-    resetToSingleView(team, user.details?.profile?.uid);
+    resetToSingleView();
     switchWorkspace(
       {
         teamId: team.id,
