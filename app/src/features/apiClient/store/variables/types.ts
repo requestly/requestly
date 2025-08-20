@@ -16,3 +16,15 @@ export type VariableKey = string;
 export type VariableDataForScope<T extends VariableScope> = T extends VariableScope.RUNTIME
   ? VariableData
   : EnvironmentVariableValue;
+
+
+
+/* --- */
+export type NewVariableData = {
+  isPersisted?: boolean;
+  syncValue?: VariableValueType;
+  localValue?: VariableValueType;
+  type: EnvironmentVariableType;
+  id: number;
+};
+

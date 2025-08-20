@@ -1,10 +1,12 @@
-import { EnvironmentMap, EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentMap, EnvironmentVariables } from "backend/environment/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, VariablesState } from "../variables/variables.store";
 import { NativeError } from "errors/NativeError";
+import { VariablePersistence } from "../shared/variablePersistence";
 
 type EnvironmentData = {
-  variables: StoreApi<VariablesState<EnvironmentVariableValue>>;
+  variables: StoreApi<VariablesState>;
+  persistence: VariablePersistence.Store; // FIXME: remove this as well
 };
 
 export const LOCAL_STORAGE_ACTIVE_ENV_ID_KEY = "__rq_api_client_active_environment_id";
@@ -42,14 +44,26 @@ export type EnvironmentsState = {
   refresh: (params: { globalEnvironment: EnvironmentMap[string]; environments: EnvironmentMap }) => void;
 };
 
-export function createEnvironmentStore(id: string, name: string, variables: EnvironmentVariables) {
-  return create<EnvironmentState>((set, get) => ({
+export function createEnvironmentStore(id: string, name: string, variables: EnvironmentVariables, contextId: string = "private") {
+  const persistence = VariablePersistence.environmentStorePersistance(contextId, id); // CALL IT DB
+  const variablesStore = createVariablesStore({ variables }); // FIXME: handle tableName creation for persistance here
+
+  const setupFromPersistedData = async () => {
+    const hydrated = await persistence.hydrate(variablesStore.getState().data);
+    variablesStore.setState({
+      ...variablesStore.getState(),
+      data: hydrated,
+      _persistence: persistence,
+    })
+  };
+  setupFromPersistedData();
+  
+  return create<EnvironmentState>((set) => ({
     id,
     name,
     data: {
-      variables: createVariablesStore({
-        variables,
-      }),
+      variables: variablesStore,
+      persistence,
     },
 
     update(patch) {

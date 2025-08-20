@@ -7,7 +7,7 @@ import { StoreApi } from "zustand";
 import { AllApiClientStores } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
-import { VariableData, VariableDataForScope } from "features/apiClient/store/variables/types";
+import { VariableDataForScope } from "features/apiClient/store/variables/types";
 import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
@@ -20,7 +20,7 @@ type VariableSource<T extends VariableScope> = {
 
 export type ScopedVariable<T extends VariableScope = VariableScope> = [VariableDataForScope<T>, VariableSource<T>];
 
-type Scope = [VariableSource<VariableScope>, StoreApi<VariablesState<VariableData>>];
+type Scope = [VariableSource<VariableScope>, StoreApi<VariablesState>];
 
 export type ScopedVariables = Map<EnvironmentVariableKey, ScopedVariable>;
 
@@ -38,7 +38,7 @@ export class VariableHolder {
   private isDestroyed = false;
 
   private parseVariableState(
-    state: VariablesState<VariableData>["data"],
+    state: VariablesState["data"],
     variableSource: VariableSource<VariableScope>
   ) {
     const result: ScopedVariables = new Map();
@@ -49,7 +49,7 @@ export class VariableHolder {
     return result;
   }
 
-  refresh(params: { variableSource: VariableSource<VariableScope>; variableState: VariablesState<VariableData> }) {
+  refresh(params: { variableSource: VariableSource<VariableScope>; variableState: VariablesState }) {
     if (this.isDestroyed) {
       return false;
     }
