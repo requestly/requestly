@@ -1,8 +1,32 @@
-.select-collection-group {
-  .select-collection-group__control {
+.select-workspace-group {
+  margin-bottom: 12px;
+
+  .select-workspace-group__control {
     border-color: var(--requestly-color-white-t-10);
 
     &:hover {
+      border-color: var(--requestly-color-white-t-10);
+    }
+
+    .select-workspace-group__single-value {
+      color: var(--requestly-color-default);
+      font-size: var(--requestly-font-size-sm);
+    }
+  }
+}
+
+.select-collection-group {
+  .select-collection-group__control {
+    background-color: inherit;
+    border-color: var(--requestly-color-white-t-10);
+
+    &:hover {
+      border-color: var(--requestly-color-white-t-10);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: inherit;
       border-color: var(--requestly-color-white-t-10);
     }
 
@@ -12,6 +36,7 @@
     }
   }
 }
+
 .move-to-collection-modal {
   .multi-view-mode-info {
     margin-top: 12px;
