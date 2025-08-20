@@ -134,10 +134,12 @@ const VariableInfo: React.FC<{
 const VariableNotFound: React.FC<{}> = () => {
   return (
     <>
-      <Row className="variable-info-header">{"Variable is not defined or resolved"}</Row>
-      <Row className="add-new-variable-info-content">
-        {"Make sure that the variable is defined in the globals or any of the active environments."}
-      </Row>
+      <div className="variable-not-found-info-container">
+        <Row className="variable-info-header">{"Variable is not defined or resolved"}</Row>
+        <Row className="add-new-variable-info-content">
+          {"Make sure that the variable is defined in the globals or any of the active environments."}
+        </Row>
+      </div>
     </>
   );
 };
