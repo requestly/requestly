@@ -14,7 +14,7 @@ import { ContextualCollectionsSidebar } from "./ContextualCollectionsSidebar/Con
 import { ContextualEnvironmentsSidebar } from "./ContextualEnvironmentsSidebar/ContextualEnvironmentsSidebar";
 import { getEmptyApiEntry } from "../../../utils";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import "./multiWorkspaceSidebar.scss";
 import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
 import { SUB_TOUR_TYPES } from "components/misc/ProductWalkthrough/types";

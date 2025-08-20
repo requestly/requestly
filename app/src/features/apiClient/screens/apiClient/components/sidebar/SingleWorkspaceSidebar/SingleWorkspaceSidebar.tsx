@@ -13,7 +13,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../../modals";
 import { getEmptyApiEntry } from "../../../utils";
 import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import "./singleWorkspaceSidebar.scss";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";

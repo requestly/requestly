@@ -57,7 +57,7 @@ import {
 import { useParentApiRecord } from "features/apiClient/hooks/useParentApiRecord.hook";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { renderVariables } from "backend/environment/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";

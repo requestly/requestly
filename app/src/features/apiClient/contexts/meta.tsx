@@ -42,3 +42,8 @@ export function useApiClientFeatureContext(): ApiClientFeatureContext {
     return context;
   }, [contextId]);
 }
+
+export function useApiClientRepository() {
+  const context = useApiClientFeatureContext();
+  return context.repositories;
+}

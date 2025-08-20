@@ -12,7 +12,7 @@ import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);

@@ -17,7 +17,7 @@ import Logger from "lib/logger";
 import "./postmanImporter.scss";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 

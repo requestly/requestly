@@ -10,7 +10,7 @@ import { useOutsideClick } from "hooks";
 import { useRBAC } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
 import "./collectionOverview.scss";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useCommand } from "features/apiClient/commands";
 
