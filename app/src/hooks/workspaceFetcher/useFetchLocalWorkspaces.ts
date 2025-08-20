@@ -42,7 +42,7 @@ export const useFetchLocalWorkspaces = () => {
             role: WorkspaceMemberRole.admin,
           },
         },
-        // appsumo: null,
+        appsumo: false,
         workspaceType: WorkspaceType.LOCAL,
         rootPath: partialWorkspace.path,
       };
