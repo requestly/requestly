@@ -26,7 +26,7 @@ export const useInitPopupConfig = () => {
     }
 
     const defaultConfig = {
-      session_replay: isSessionReplayEnabled,
+      session_replay: isSessionReplayEnabled ?? false,
     };
 
     await StorageService(appMode).saveRecord({
