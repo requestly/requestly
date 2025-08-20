@@ -37,6 +37,12 @@
   }
 }
 
+.select-workspace-group .select-workspace-group__option,
+.select-collection-group .select-collection-group__option {
+  color: var(--requestly-color-default);
+  font-size: var(--requestly-font-size-sm);
+}
+
 .move-to-collection-modal {
   .multi-view-mode-info {
     margin-top: 12px;
