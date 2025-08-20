@@ -25,6 +25,7 @@ import PATHS from "config/constants/sub/paths";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
 import "./workspacesOverlay.scss";
+import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
 
 interface WorkspacesOverlayProps {
   toggleDropdown: () => void;
@@ -232,17 +233,19 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
               }}
             />{" "}
           </>
-        ) : (
-          <>
-            {user.loggedIn ? <Divider /> : null}
-            <EmptyWorkspaceListView workspaceType={WorkspaceType.SHARED} toggleDropdown={toggleDropdown} />
-          </>
-        )}
-        {/* LOCAL WORKSPACE EMPTY VIEW WILL ALWAYS BE AT LAST */}
-        {!workspaceMap[WorkspaceType.LOCAL]?.length ? (
+        ) : null}
+
+        {!workspaceMap[WorkspaceType.LOCAL]?.length && !workspaceMap[WorkspaceType.SHARED]?.length ? (
+          <CommonEmptyView toggleDropdown={toggleDropdown} />
+        ) : !workspaceMap[WorkspaceType.LOCAL]?.length ? (
           <>
             <Divider />
             <EmptyWorkspaceListView workspaceType={WorkspaceType.LOCAL} toggleDropdown={toggleDropdown} />
+          </>
+        ) : !workspaceMap[WorkspaceType.SHARED]?.length ? (
+          <>
+            <Divider />
+            <EmptyWorkspaceListView workspaceType={WorkspaceType.SHARED} toggleDropdown={toggleDropdown} />
           </>
         ) : null}
 
