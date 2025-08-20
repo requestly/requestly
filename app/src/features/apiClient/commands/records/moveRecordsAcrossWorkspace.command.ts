@@ -1,7 +1,7 @@
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "features/apiClient/types";
 import { moveRecords } from "./moveRecords.command";
-import { getApiClientFeatureContext, getApiClientRecordsStore } from "../store.utils";
+import { getApiClientFeatureContext, getApiClientRecordsStore, saveBulkRecords } from "../store.utils";
 import { deleteRecords } from "./deleteRecords.command";
 import { NativeError } from "errors/NativeError";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
@@ -81,6 +81,8 @@ export async function moveRecordsAcrossWorkspace(
   const createdRecordsResult = await apiClientRecordsRepository.batchCreateRecordsWithExistingId(
     updatedRecordsWithNewIds
   );
+
+  saveBulkRecords(destinationContext, createdRecordsResult.data.records);
 
   if (!createdRecordsResult.success) {
     throw new NativeError("Failed to move across workspaces!");
