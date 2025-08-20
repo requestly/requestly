@@ -19,6 +19,7 @@ export const useFetchLocalWorkspaces = () => {
       return;
     }
 
+    // TODO: uid is needed as per current implementation, to be removed when logged out support is implemented
     if (!user.loggedIn) {
       return;
     }
