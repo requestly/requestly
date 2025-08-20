@@ -25,8 +25,7 @@ import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "../commands";
 import { useContextId } from "./contextId.context";
 import { useNewApiClientContext } from "../hooks/useNewApiClientContext";
-import { useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { useApiClientRepository } from "./meta";
+import { getApiClientFeatureContext, useApiClientRepository } from "./meta";
 
 interface ApiClientContextInterface {
   history: RQAPI.ApiEntry[];
@@ -116,13 +115,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
 
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
-  const getLastUsedContext = useApiClientFeatureContextProvider((s) => s.getLastUsedContext);
 
   const openDraftRequest = useCallback(
     (apiEntryType?: RQAPI.ApiEntryType) => {
-      openTab(new DraftRequestContainerTabSource({ apiEntryType, context: { id: getLastUsedContext().id } }));
+      openTab(
+        new DraftRequestContainerTabSource({ apiEntryType, context: { id: getApiClientFeatureContext(contextId).id } })
+      );
     },
-    [openTab, getLastUsedContext]
+    [openTab, contextId]
   );
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   title: newEnvironment.name,
                   focusBreadcrumb: true,
                   context: {
-                    id: contextId,
+                    id: getApiClientFeatureContext(contextId).id,
                   },
                 })
               );

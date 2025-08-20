@@ -1,46 +1,43 @@
 import {
+  apiClientMultiWorkspaceViewStore,
   ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
 } from "../store/multiWorkspaceView/multiWorkspaceView.store";
 import { useContextId } from "./contextId.context";
 import {
   ApiClientFeatureContext,
+  apiClientFeatureContextProviderStore,
   NoopContext,
   NoopContextId,
-  useApiClientFeatureContextProvider,
+  // useApiClientFeatureContextProvider,
 } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { useMemo } from "react";
 
-export function useApiClientFeatureContext(): ApiClientFeatureContext {
-  const getViewMode = useApiClientMultiWorkspaceView((s) => s.getViewMode);
-  const [getSingleViewContext, getContext, getLastUsedContext] = useApiClientFeatureContextProvider((s) => [
-    s.getSingleViewContext,
-    s.getContext,
-    s.getLastUsedContext,
-  ]);
-  const contextId = useContextId();
+export function getApiClientFeatureContext(contextId: string) {
+  const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
+  if (contextId === NoopContextId) {
+    return NoopContext;
+  }
+  const { viewMode } = apiClientMultiWorkspaceViewStore.getState();
+  if (viewMode === ApiClientViewMode.SINGLE) {
+    return getSingleViewContext();
+  }
+  if (!contextId) {
+    return getLastUsedContext();
+  }
+  return getContext(contextId);
+}
 
-  const context = (() => {
-    if (contextId === NoopContextId) {
-      return NoopContext;
-    }
-    const viewMode = getViewMode();
-    if (viewMode === ApiClientViewMode.SINGLE) {
-      return getSingleViewContext();
-    }
-    if (!contextId) {
-      return getLastUsedContext();
-    }
-    return getContext(contextId);
-  })();
+export function useApiClientFeatureContext(): ApiClientFeatureContext {
+  const contextId = useContextId();
+  const context = useMemo(() => {
+    return getApiClientFeatureContext(contextId);
+  }, [contextId]);
 
   if (!context) {
     throw new Error("No context found!");
   }
 
-  return useMemo(() => {
-    return context;
-  }, [contextId]);
+  return context;
 }
 
 export function useApiClientRepository() {
