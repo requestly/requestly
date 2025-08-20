@@ -19,8 +19,6 @@ export async function moveRecordsAcrossWorkspace(
 ) {
   const { recordsToMove, destination } = params;
 
-  console.log({ recordsToMove });
-
   // move in same context
   if (ctx.id === destination.contextId) {
     const result = await moveRecords(ctx, {
@@ -37,12 +35,11 @@ export async function moveRecordsAcrossWorkspace(
   const recordIds: string[] = [];
   const rootLevelRecords = new Set<string>();
 
-  // get all nested records
+  // get all nested records in dfs manner
   recordsToMove.forEach((record) => {
     rootLevelRecords.add(record.id);
 
     if (isApiCollection(record)) {
-      console.log({ collection: record });
       recordIds.push(...getAllRecords([record]).map((r) => r.id));
     } else {
       recordIds.push(record.id);
@@ -51,7 +48,6 @@ export async function moveRecordsAcrossWorkspace(
 
   const oldToNewIdMap: Map<string, string> = new Map();
   const recordIdToCollectionIdMap: Map<string, string> = new Map();
-
   const newToOldIdMap: Map<string, string> = new Map();
 
   const _allRecords = recordIds.map((id) => {
@@ -61,9 +57,16 @@ export async function moveRecordsAcrossWorkspace(
   });
 
   _allRecords.forEach((record) => {
+    let parentId = null;
+    if (rootLevelRecords.has(record.id)) {
+      parentId = destination.collectionId;
+    } else {
+      parentId = oldToNewIdMap.get(record.collectionId);
+    }
+
     const newId = isApiCollection(record)
-      ? apiClientRecordsRepository.generateCollectionId(record.name)
-      : apiClientRecordsRepository.generateApiRecordId();
+      ? apiClientRecordsRepository.generateCollectionId(record.name, parentId)
+      : apiClientRecordsRepository.generateApiRecordId(parentId);
 
     oldToNewIdMap.set(record.id, newId);
     newToOldIdMap.set(newId, record.id);
