@@ -196,6 +196,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       recordsSelectionHandler,
                       setShowSelection: handleShowSelection,
                     }}
+                    // TODO: just pass contextId
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );

@@ -153,6 +153,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return this.createRecordWithId(collection, id);
   }
 
+  // TODO: remove this
   async batchWriteApiEntities(
     batchSize: number,
     entities: RQAPI.ApiClientRecord[],

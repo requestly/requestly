@@ -54,13 +54,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           [incrementVersion, props.store]
         ),
 
-        setPreview: (preview: boolean) => {
+        setPreview: useCallback((preview: boolean) => {
           props.store.getState().setPreview(preview);
           if (!preview) {
             resetPreviewTab();
           }
           incrementVersion();
-        },
+        }, [props.store, incrementVersion, resetPreviewTab]),
 
         setUnsaved: useCallback(
           (unsaved: boolean) => {

@@ -88,17 +88,19 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
     }
   }, [activeTabSource]);
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: RQAPI.RecordType.API,
-    item: {
-      id: record.id,
-      type: record.type,
-      collectionId: record.collectionId,
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: RQAPI.RecordType.API,
+      item: {
+        record,
+        contextId,
+      },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
     }),
-  }));
+    [record, contextId]
+  );
 
   const handleDropdownVisibleChange = (isOpen: boolean) => {
     setIsDropdownVisible(isOpen);

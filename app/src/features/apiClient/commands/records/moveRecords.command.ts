@@ -29,7 +29,7 @@ export async function moveRecords(
     saveBulkRecords(context, result);
   }
 
-  forceRefreshRecords(context);
+  await forceRefreshRecords(context);
 
   return result;
 }
