@@ -113,7 +113,7 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
             overlayClassName="workspace-selector-tooltip"
             style={{ top: "35px" }}
             title={tooltipTitle}
-            placement={"bottomRight"}
+            placement={"right"}
             showArrow={false}
             mouseEnterDelay={0.5}
             color="#000"
