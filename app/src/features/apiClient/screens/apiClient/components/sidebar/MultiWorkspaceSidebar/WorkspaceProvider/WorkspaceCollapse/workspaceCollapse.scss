@@ -16,7 +16,7 @@
   .workspace-collapse-panel {
     width: 100%;
 
-    .ant-collapse-header {
+    .ant-collapse-header-collapsible-only.ant-collapse-header {
       display: flex;
       padding: var(--space-3, 6px);
       align-items: center;
@@ -37,29 +37,29 @@
           margin: 0;
         }
       }
-    }
 
-    .ant-collapse-header-text {
-      flex-grow: auto;
+      .ant-collapse-header-text {
+        flex: auto;
 
-      .workspace-name-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        user-select: none;
+        .workspace-name-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          user-select: none;
 
-        .workspace-name {
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-          line-clamp: 1;
-          -webkit-line-clamp: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          .workspace-name {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            line-clamp: 1;
+            -webkit-line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
-          color: var(--requestly-color-text-subtle);
-          font-size: var(--requestly-font-size-sm);
-          font-weight: var(--requestly-font-weight-medium);
-          line-height: 18px; /* 150% */
+            color: var(--requestly-color-text-subtle);
+            font-size: var(--requestly-font-size-sm);
+            font-weight: var(--requestly-font-weight-medium);
+            line-height: 18px; /* 150% */
+          }
         }
       }
     }
