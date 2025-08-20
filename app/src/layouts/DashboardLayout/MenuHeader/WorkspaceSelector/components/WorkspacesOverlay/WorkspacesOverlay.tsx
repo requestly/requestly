@@ -8,7 +8,7 @@ import { Invite, WorkspaceType } from "types";
 import { Divider, Modal } from "antd";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
-import { WorkspaceList } from "./components/WorkspaceList/WorkspaceListt";
+import { WorkspaceList } from "./components/WorkspaceList/WorkspaceList";
 import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { globalActions } from "store/slices/global/slice";
