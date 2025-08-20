@@ -1,6 +1,6 @@
 import React from "react";
 import { Popover, Row, Tag } from "antd";
-import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
 import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
@@ -65,8 +65,8 @@ function getSanitizedVariableValue(variable: VariableData) {
 
   return {
     syncValue: sanitize(variable.syncValue),
-    localValue: sanitize((variable as EnvironmentVariableValue).localValue),
-    isPersisted: makeRenderable((variable as RuntimeVariableValue).isPersisted),
+    localValue: sanitize(variable.localValue),
+    isPersisted: makeRenderable(variable.isPersisted),
   };
 }
 
