@@ -1,19 +1,14 @@
-import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
+import { EnvironmentVariableData, IVariableValues } from "features/apiClient/store/variables/types";
 
 // TODO: move all in types "features/apiClient"
 export type VariableValueType = string | number | boolean;
 
-export type EnvironmentVariableKey = VariableKey;
-export interface EnvironmentVariableValue extends VariableData {
-  localValue?: VariableValueType;
-}
-
-export type EnvironmentVariables = Record<EnvironmentVariableKey, EnvironmentVariableValue>;
+export type EnvironmentVariables = IVariableValues<EnvironmentVariableData>;
 
 export interface EnvironmentData {
   id: string;
   name: string;
-  variables: EnvironmentVariables;
+  variables: IVariableValues<EnvironmentVariableData>;
 }
 
 export type EnvironmentMap = Record<string, EnvironmentData>;
@@ -24,10 +19,6 @@ export enum EnvironmentVariableType {
   Boolean = "boolean",
   Secret = "secret",
 }
-
-export type VariableExport = EnvironmentVariableValue & {
-  key: EnvironmentVariableKey;
-};
 
 export enum VariableScope {
   RUNTIME = "runtime",

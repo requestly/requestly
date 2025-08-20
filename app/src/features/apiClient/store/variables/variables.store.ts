@@ -1,35 +1,48 @@
-import { EnvironmentVariables, EnvironmentVariableValue } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
-import { VariableData, VariableKey } from "./types";
+import { EnvironmentVariableData, VariableData, VariableValues, VariableKey } from "./types";
+import { PersistedVariables } from "../shared/variablePersistence";
+import { EnvironmentVariables } from "backend/environment/types";
 
-export type VariablesState<T extends VariableData> = {
-  // state
+type _VariablesState<T extends VariableData> = {
   data: Map<VariableKey, T>;
 
   reset: (data?: Map<VariableKey, T>) => void;
 
-  // actions
   delete: (key: VariableKey) => void;
   add: (key: VariableKey, variable: T) => void;
   update: (key: VariableKey, updates: Omit<T, "id">) => void;
   getVariable: (key: VariableKey) => T | undefined;
   getAll: () => Map<VariableKey, T>;
   search: (value: string) => Map<VariableKey, T>;
+
+  // Optional persistence - injected by stores that need it
+  _persistence?: PersistedVariables.Store;
 };
 
-export const parseVariables = (rawVariables: EnvironmentVariables): VariablesState<VariableData>["data"] => {
+export type EnvVariableState = _VariablesState<EnvironmentVariableData>;
+export type VariablesState = _VariablesState<VariableData>;
+
+export const parseVariables = (rawVariables: VariableValues): VariablesState["data"] => {
   return new Map(Object.entries(rawVariables));
 };
 
-export const createVariablesStore = ({ variables }: { variables: EnvironmentVariables }) => {
-  return create<VariablesState<EnvironmentVariableValue>>()((set, get) => ({
+export const parseEnvVariables = (rawVariables: EnvironmentVariables): EnvVariableState["data"] => {
+  return new Map(Object.entries(rawVariables));
+};
+
+export const createVariablesStore = (props?: { variables: VariableValues }) => {
+  const variables = props?.variables ?? {};
+  return create<VariablesState>()((set, get) => ({
     data: parseVariables(variables),
 
     reset(data) {
-      set({
-        data: data ?? new Map(),
-      });
+      const newData = data ?? new Map();
+      set({ data: newData });
+      const persistedDB = get()._persistence;
+      if (persistedDB?.loaded) {
+        persistedDB?.persist(newData);
+      }
     },
 
     delete(key) {
@@ -41,6 +54,7 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
 
       data.delete(key);
       set({ data });
+      get()._persistence?.delete(key);
     },
 
     add(key, variable) {
@@ -48,6 +62,10 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       const data = new Map(oldData);
       data.set(key, variable);
       set({ data });
+      const persistedDB = get()._persistence;
+      if (persistedDB?.loaded) {
+        persistedDB?.persist(data);
+      }
     },
 
     update(key, updates) {
@@ -63,6 +81,10 @@ export const createVariablesStore = ({ variables }: { variables: EnvironmentVari
       const updatedValue = { ...existingValue, ...updates };
       data.set(key, updatedValue);
       set({ data });
+      const persistedDB = get()._persistence;
+      if (persistedDB?.loaded) {
+        persistedDB?.persist(data);
+      }
     },
 
     getVariable(key) {

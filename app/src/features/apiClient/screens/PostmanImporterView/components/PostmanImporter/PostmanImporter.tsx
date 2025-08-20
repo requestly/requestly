@@ -3,7 +3,6 @@ import { FilePicker } from "components/common/FilePicker";
 import { getUploadedPostmanFileType, processPostmanCollectionData, processPostmanEnvironmentData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableValue } from "backend/environment/types";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
@@ -20,11 +19,12 @@ import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 type ProcessedData = {
-  environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
+  environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
   apiRecords: (RQAPI.CollectionRecord | RQAPI.ApiRecord)[];
-  variables: Record<string, EnvironmentVariableValue>;
+  variables: Record<string, EnvironmentVariableData>;
 };
 
 interface PostmanImporterProps {

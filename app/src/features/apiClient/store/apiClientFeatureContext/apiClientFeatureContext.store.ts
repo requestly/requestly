@@ -130,6 +130,7 @@ export const NoopContext: ApiClientFeatureContext = {
         name: "na",
         variables: {},
       },
+      contextId: NoopContextId,
     }),
     erroredRecords: createErroredRecordsStore({ apiErroredRecords: [], environmentErroredRecords: [] }),
   },
@@ -138,7 +139,7 @@ export const NoopContext: ApiClientFeatureContext = {
 
 export function setLastUsedContextId(id: string) {
   const context = apiClientFeatureContextProviderStore.getState().contexts.get(id);
-  if(!context) {
+  if (!context) {
     throw new Error("Could not find context!");
   }
   apiClientFeatureContextProviderStore.getState().setLastUsedContext(context);

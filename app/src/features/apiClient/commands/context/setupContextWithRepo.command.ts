@@ -32,6 +32,7 @@ export const setupContextWithRepo = async (
   const environmentStore = createEnvironmentsStore({
     environments: environments.nonGlobalEnvironments,
     globalEnvironment: environments.globalEnvironment,
+    contextId: workspaceId,
   });
   const apiRecordsStore = createApiRecordsStore(apiClientRecords);
   const errorStore = createErroredRecordsStore(erroredRecords);

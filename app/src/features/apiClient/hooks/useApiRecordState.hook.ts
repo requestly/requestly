@@ -4,9 +4,11 @@ import { useShallow } from "zustand/shallow";
 import { createRecordStore } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { RQAPI } from "features/apiClient/types";
 import { useState } from "react";
+import { useContextId } from "../contexts/contextId.context";
 
 export const useApiRecordState = (id: string) => {
-  const [noopStore] = useState(() => createRecordStore({} as RQAPI.ApiRecord));
+  const contextId = useContextId();
+  const [noopStore] = useState(() => createRecordStore({} as RQAPI.ApiRecord, contextId));
   const [getRecordStore] = useAPIRecords((s) => [s.getRecordStore]);
 
   const recordStore = getRecordStore(id);

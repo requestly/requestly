@@ -70,6 +70,7 @@ export type VariableEntity = Record<
     value: VariableValueType;
     type: EnvironmentVariableType;
     isSecret: boolean;
+    isPresisted: true;
   }
 >;
 
