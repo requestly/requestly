@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { WorkspaceItem } from "./components/WorkspaceItem/WorkspaceItem";
+import { WorkspaceItem } from "./components/WorkspaceListItem/WorkspaceListItem";
 import { Invite, WorkspaceType } from "types";
 import { Divider, Modal } from "antd";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
-import { WorkspaceList } from "./components/WorkspaceList/WorkspaceLIst";
+import { WorkspaceList } from "./components/WorkspaceList/WorkspaceListt";
 import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { globalActions } from "store/slices/global/slice";
@@ -24,8 +24,8 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 import PATHS from "config/constants/sub/paths";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
-import "./workspacesOverlay.scss";
 import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
+import "./workspacesOverlay.scss";
 
 interface WorkspacesOverlayProps {
   toggleDropdown: () => void;
@@ -54,6 +54,11 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   }, [availableWorkspaces]);
 
   const workspaceMap = useMemo(() => {
+    let map: { [key in WorkspaceType]: Workspace[] } = {
+      [WorkspaceType.LOCAL]: [],
+      [WorkspaceType.SHARED]: [],
+      [WorkspaceType.PERSONAL]: [],
+    };
     return sortedAvailableWorkspaces.reduce((acc, workspace) => {
       if (workspace.workspaceType) {
         const key = workspace.workspaceType as keyof typeof acc;
@@ -63,7 +68,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
         acc[key].push(workspace);
       }
       return acc;
-    }, {} as { [key in WorkspaceType]?: Workspace[] });
+    }, map);
   }, [sortedAvailableWorkspaces]);
 
   const redirects: Record<string, string> = useMemo(
@@ -104,10 +109,18 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
 
   const handleSwitchToPrivateWorkspace = useCallback(async () => {
     setIsLoadingModalOpen(true);
-    return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
-      setIsLoadingModalOpen(false);
-      showSwitchWorkspaceSuccessToast();
-    });
+    return clearCurrentlyActiveWorkspace(dispatch, appMode)
+      .then(() => {
+        showSwitchWorkspaceSuccessToast();
+      })
+      .catch(() => {
+        toast.error(
+          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+        );
+      })
+      .finally(() => {
+        setIsLoadingModalOpen(false);
+      });
   }, [appMode, dispatch]);
 
   const handleWorkspaceSwitch = async (workspace: Workspace) => {
@@ -237,7 +250,9 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
 
         {!workspaceMap[WorkspaceType.LOCAL]?.length && !workspaceMap[WorkspaceType.SHARED]?.length ? (
           <CommonEmptyView toggleDropdown={toggleDropdown} />
-        ) : !workspaceMap[WorkspaceType.LOCAL]?.length ? (
+        ) : !workspaceMap[WorkspaceType.LOCAL]?.length &&
+          isLocalSyncEnabled &&
+          appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <>
             <Divider />
             <EmptyWorkspaceListView workspaceType={WorkspaceType.LOCAL} toggleDropdown={toggleDropdown} />

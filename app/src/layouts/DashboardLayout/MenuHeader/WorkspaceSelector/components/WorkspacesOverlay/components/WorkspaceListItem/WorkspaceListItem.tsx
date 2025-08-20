@@ -10,8 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import { globalActions } from "store/slices/global/slice";
-import "./workspaceItem.scss";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
+import "./workspaceListItem.scss";
 
 type WorkspaceItemProps =
   | {
@@ -105,8 +105,11 @@ const LocalWorkspaceActions = ({
 export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   const getWorkspaceDetails = (workspace: Workspace) => {
     switch (workspace.workspaceType) {
-      case WorkspaceType.SHARED:
-        return `${Object.keys(workspace.members).length} members`;
+      case WorkspaceType.SHARED: {
+        const count =
+          (workspace.members ? Object.keys(workspace.members).length : undefined) ?? workspace.membersCount ?? 0;
+        return `${count} ${count === 1 ? "member" : "members"}`;
+      }
       case WorkspaceType.LOCAL:
         return workspace.rootPath;
     }
