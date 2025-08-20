@@ -1,7 +1,7 @@
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { partition } from "lodash";
 import { RQAPI } from "features/apiClient/types";
-import { getAllRecordsToDelete } from "../utils";
+import { getAllRecords } from "../utils";
 import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
 
 export async function deleteRecords(context: ApiClientFeatureContext, params: { records: RQAPI.ApiClientRecord[] }) {
@@ -9,7 +9,7 @@ export async function deleteRecords(context: ApiClientFeatureContext, params: { 
   const { apiClientRecordsRepository } = context.repositories;
   const apiRecordsStore = context.stores.records;
 
-  const recordsToBeDeleted = getAllRecordsToDelete(records);
+  const recordsToBeDeleted = getAllRecords(records);
 
   const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
   const apiRecordIds = apiRecords.map((record) => record.id);

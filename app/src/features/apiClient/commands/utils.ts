@@ -177,17 +177,17 @@ export const getCollectionOptionsToMoveIn = (contextId: string, recordsToMove: R
   return collections;
 };
 
-export function getAllRecordsToDelete(records: RQAPI.ApiClientRecord[]) {
-  const recordsToBeDeleted: RQAPI.ApiClientRecord[] = [];
+export function getAllRecords(records: RQAPI.ApiClientRecord[]): RQAPI.ApiClientRecord[] {
+  const result: RQAPI.ApiClientRecord[] = [];
   const stack: RQAPI.ApiClientRecord[] = [...records];
 
   while (stack.length) {
-    const record = stack.pop()!;
-    recordsToBeDeleted.push(record);
+    const record = stack.pop();
+    result.push(record);
     if (isApiCollection(record) && record.data.children) {
       stack.push(...record.data.children);
     }
   }
 
-  return recordsToBeDeleted;
+  return result;
 }
