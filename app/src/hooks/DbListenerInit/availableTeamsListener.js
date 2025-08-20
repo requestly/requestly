@@ -38,35 +38,6 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
     return onSnapshot(
       q,
       async (querySnapshot) => {
-        // let localRecords = [];
-        // if (isLocalSyncEnabled) {
-        // const allLocalWorkspacesResult = await getAllWorkspaces();
-        // const allLocalWorkspaces =
-        //   allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
-
-        // submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, allLocalWorkspaces.length);
-
-        // for (const partialWorkspace of allLocalWorkspaces) {
-        //   const localWorkspace = {
-        //     id: partialWorkspace.id,
-        //     name: partialWorkspace.name,
-        //     owner: uid,
-        //     accessCount: 1,
-        //     adminCount: 1,
-        //     members: {
-        //       [uid]: {
-        //         role: "admin",
-        //       },
-        //     },
-        //     appsumo: null,
-        //     workspaceType: WorkspaceType.LOCAL,
-        //     rootPath: partialWorkspace.path,
-        //   };
-
-        //   localRecords.push(localWorkspace);
-        // }
-        // }
-
         const records = querySnapshot.docs
           .map((team) => {
             const teamData = team.data();
@@ -110,6 +81,8 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
 
         if (!activeWorkspaceId) return;
 
+        //FIX ME: the following code's intention is unclear
+        //Showing an alert is unnecessary
         const found = records.find((team) => team.id === activeWorkspaceId);
 
         Logger.log("DBG: availableTeamsListener", {

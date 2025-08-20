@@ -19,11 +19,12 @@ export const useFetchTeamWorkspaces = () => {
   const unsubscribeAvailableTeams = useRef(null);
 
   // Listens to teams available to the user
-  // Also listens to changes to the currently active workspace /* TODO: THIS SHOULD BE DONE IN A SEPARATE USEEFFECT */
   useEffect(() => {
+    // This effect is triggered also on activeWorkspace changes, so do not subscribe again if listener is already active
     if (unsubscribeAvailableTeams.current) {
-      unsubscribeAvailableTeams.current();
-    } // Unsubscribe any existing listener
+      return;
+    }
+
     if (user?.loggedIn && user?.details?.profile?.uid) {
       unsubscribeAvailableTeams.current = availableTeamsListener(
         dispatch,
@@ -39,5 +40,9 @@ export const useFetchTeamWorkspaces = () => {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
     }
+
+    return () => {
+      unsubscribeAvailableTeams.current?.();
+    };
   }, [appMode, activeWorkspaceId, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
 };
