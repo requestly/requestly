@@ -28,13 +28,16 @@ export type RenderableWorkspaceState = {
 type ApiClientMultiWorkspaceViewState = {
   viewMode: ApiClientViewMode;
   selectedWorkspaces: StoreApi<RenderableWorkspaceState>[];
+  isLoaded: boolean,
 
+  setIsLoaded: (flag: boolean) => void,
   setViewMode(mode: ApiClientViewMode): void;
   addWorkspace(workspace: Omit<RenderableWorkspaceState, "setState" | "state">): void;
   removeWorkspace(id: RenderableWorkspaceState["id"]): void;
   getSelectedWorkspace(id: RenderableWorkspaceState["id"]): StoreApi<RenderableWorkspaceState> | null;
   setStateForSelectedWorkspace(id: RenderableWorkspaceState["id"], state: RenderableWorkspaceState["state"]): void;
   isSelected(id: RenderableWorkspaceState["id"]): boolean;
+  getViewMode: () => ApiClientViewMode;
 };
 
 function createRenderableWorkspaceStore(workspace: Omit<RenderableWorkspaceState, "setState" | "state">) {
@@ -58,10 +61,17 @@ function createApiClientMultiWorkspaceViewStore() {
     (set, get) => {
       return {
         viewMode: ApiClientViewMode.SINGLE,
+        isLoaded: false,
         selectedWorkspaces: [] as StoreApi<RenderableWorkspaceState>[],
 
         setViewMode(mode) {
           set({ viewMode: mode });
+        },
+
+        setIsLoaded(flag) {
+          set({
+            isLoaded: flag,
+          });
         },
 
         addWorkspace(workspace) {
@@ -97,6 +107,10 @@ function createApiClientMultiWorkspaceViewStore() {
 
         isSelected(id) {
           return get().selectedWorkspaces.some((w) => w.getState().id === id);
+        },
+
+        getViewMode() {
+          return get().viewMode;
         },
       };
     }, {
@@ -153,6 +167,7 @@ function createApiClientMultiWorkspaceViewStore() {
           state: {
             ...existingValue.state,
             viewMode,
+            isLoaded: false,
             selectedWorkspaces,
           }
         };

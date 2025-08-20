@@ -7,27 +7,27 @@ import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
+export function createRepository(workspace: Workspace, user: UserDetails) {
+  const workspaceId = workspace.id;
+  const workspaceType = workspace.workspaceType;
+
+  if (workspaceType === WorkspaceType.LOCAL) {
+    return new ApiClientLocalRepository({ rootPath: workspace.rootPath });
+  }
+
+  if (!user.loggedIn) {
+    return localStoreRepository;
+  }
+  const userId = user.uid;
+  return new ApiClientCloudRepository({ uid: userId, teamId: workspaceId });
+}
+
 export const setupContext = async (
   workspace: Workspace,
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
 
-  const workspaceId = workspace.id;
-  const workspaceType = workspace.workspaceType;
-
-  if (workspaceType === WorkspaceType.LOCAL) {
-    const localRepo = new ApiClientLocalRepository({ rootPath: workspace.rootPath });
-    const id = await setupContextWithRepo(workspaceId, localRepo);
-    return { id };
-  }
-
-  if (!user.loggedIn) {
-    const anonRepo = localStoreRepository;
-    const id = await setupContextWithRepo(workspace.id, anonRepo);
-    return { id };
-  }
-  const userId = user.uid;
-  const firebaseRepo = new ApiClientCloudRepository({ uid: userId, teamId: workspaceId });
-  const id = await setupContextWithRepo(workspaceId, firebaseRepo);
+  const repository = createRepository(workspace, user);
+  const id = await setupContextWithRepo(workspace.id,repository);
   return { id };
 };

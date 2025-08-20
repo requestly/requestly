@@ -5,6 +5,7 @@ import {
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 export const resetToSingleView = () => {
+  apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
   apiClientFeatureContextProviderStore.getState().clearAll();
 
   const selectedWorkspaces = apiClientMultiWorkspaceViewStore.getState().selectedWorkspaces;

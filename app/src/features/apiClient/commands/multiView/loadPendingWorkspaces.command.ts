@@ -30,5 +30,7 @@ export async function loadWorkspaces(userId?: string) {
     }
   });
 
-  return Promise.allSettled(tasks);
+  const result = await Promise.allSettled(tasks);
+  apiClientMultiWorkspaceViewStore.getState().setIsLoaded(true);
+  return result;
 }
