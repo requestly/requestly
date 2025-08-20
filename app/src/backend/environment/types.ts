@@ -1,12 +1,14 @@
-import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
+import { NewVariableData, VariableKey } from "features/apiClient/store/variables/types";
 
 // TODO: move all in types "features/apiClient"
 export type VariableValueType = string | number | boolean;
 
 export type EnvironmentVariableKey = VariableKey;
-export interface EnvironmentVariableValue extends VariableData {
-  localValue?: VariableValueType;
-}
+// export interface EnvironmentVariableValue extends VariableData {
+//   localValue?: VariableValueType;
+// }
+
+export type EnvironmentVariableValue = NewVariableData & {isPersisted: true}
 
 export type EnvironmentVariables = Record<EnvironmentVariableKey, EnvironmentVariableValue>;
 

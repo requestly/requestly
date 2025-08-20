@@ -4,6 +4,7 @@ import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
 import { createVariablesStore, parseVariables, VariablesState } from "../variables/variables.store";
 import { apiClientFileStore } from "../apiClientFilesStore";
+import { VariablePersistence } from "../shared/variablePersistence";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -22,6 +23,7 @@ export type CollectionRecordState = BaseRecordState & {
   type: RQAPI.RecordType.COLLECTION;
   record: RQAPI.CollectionRecord;
   collectionVariables: StoreApi<VariablesState>;
+  persistence: VariablePersistence.Store;
 };
 
 export type RecordState = ApiRecordState | CollectionRecordState;
@@ -113,7 +115,7 @@ function parseRecords(records: RQAPI.ApiClientRecord[]) {
   };
 }
 
-export const createRecordStore = (record: RQAPI.ApiClientRecord) => {
+export const createRecordStore = (record: RQAPI.ApiClientRecord, contextId: string = "private") => {
   return create<CollectionRecordState | ApiRecordState>()((set, get) => {
     const baseRecordState: BaseRecordState = {
       type: record.type,
@@ -134,13 +136,27 @@ export const createRecordStore = (record: RQAPI.ApiClientRecord) => {
       },
     };
 
-    //The following are verified casts, done to prevent redundant code.
     if (record.type === RQAPI.RecordType.API) {
       return baseRecordState as ApiRecordState;
     }
+    
+    const persistence = VariablePersistence.collectionStorePersistance(contextId, record.id);
+    const variablesStore = createVariablesStore({ variables: record.data?.variables ?? {} });
+
+    const setupFromPersistedData = async () => {
+      const hydrated = await persistence.hydrate(variablesStore.getState().data);
+      variablesStore.setState({
+        ...variablesStore.getState(),
+        data: hydrated,
+        _persistence: persistence,
+      })
+    };
+    setupFromPersistedData();
+
     return {
       ...baseRecordState,
-      collectionVariables: createVariablesStore({ variables: record.data?.variables ?? {} }),
+      collectionVariables: variablesStore,
+      persistence,
     } as CollectionRecordState;
   });
 };
