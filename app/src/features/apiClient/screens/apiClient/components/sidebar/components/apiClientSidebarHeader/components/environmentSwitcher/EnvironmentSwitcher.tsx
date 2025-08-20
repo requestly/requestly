@@ -66,14 +66,14 @@ export const EnvironmentSwitcher = () => {
                 title: environment.name,
                 context: {
                   id: contextId,
-                }
+                },
               })
             );
           }
           toast.success(`Switched to ${environment.name} environment`);
         },
       }));
-  }, [environments, activeEnvironment, setActiveEnvironment, location.pathname, openTab]);
+  }, [environments, activeEnvironment?.id, setActiveEnvironment, location.pathname, openTab, contextId]);
 
   if (environments.length === 0) {
     return (

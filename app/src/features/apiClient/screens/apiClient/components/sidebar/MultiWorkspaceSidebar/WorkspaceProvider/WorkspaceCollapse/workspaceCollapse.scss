@@ -63,6 +63,13 @@
         }
       }
     }
+
+    .workspace-header-continer {
+      .environment-switcher-button {
+        border-radius: 32px;
+        background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+      }
+    }
   }
 
   .ant-collapse-content.ant-collapse-content-active {

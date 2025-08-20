@@ -8,14 +8,16 @@ import { useRBAC } from "features/rbac";
 import { RQButton } from "lib/design-system-v2/components";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { EnvironmentSwitcher } from "../../../components/apiClientSidebarHeader/components/environmentSwitcher/EnvironmentSwitcher";
 import "./workspaceCollapse.scss";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
   children: React.ReactNode;
+  showEnvSwitcher: boolean;
 }
 
-export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceId, children }) => {
+export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceId, children, showEnvSwitcher }) => {
   const contextId = useContextId();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
@@ -83,7 +85,16 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
                 </div>
               </Conditional>
             </div>
-            <div> env switcher</div>
+
+            {showEnvSwitcher ? (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <EnvironmentSwitcher />
+              </div>
+            ) : null}
           </div>
         }
       >

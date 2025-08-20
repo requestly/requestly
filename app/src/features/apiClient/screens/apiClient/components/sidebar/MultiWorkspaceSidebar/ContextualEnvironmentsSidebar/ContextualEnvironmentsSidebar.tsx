@@ -22,7 +22,7 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
         const workspaceId = workspace.getState().id;
 
         return (
-          <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
+          <WorkspaceProvider key={workspaceId} workspaceId={workspaceId} showEnvSwitcher={false}>
             <ContextualEnvironmentsList searchValue={searchValue} />
           </WorkspaceProvider>
         );
