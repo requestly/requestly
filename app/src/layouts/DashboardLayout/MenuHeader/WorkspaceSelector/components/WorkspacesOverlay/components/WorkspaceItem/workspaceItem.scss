@@ -66,18 +66,6 @@
         color: var(--requestly-color-text-default);
       }
     }
-
-    .workspace-list-item-active-tag {
-      border-radius: 4px;
-      background: var(--requestly-color-success-darker, #104b2f);
-      border: none;
-      color: var(--requestly-color-success-text, #6fdaa6);
-      font-size: 9px;
-      font-weight: var(--requestly-font-weight-medium);
-      line-height: var(--line-height-2xs, 13px); /* 144.444% */
-      letter-spacing: 1px;
-      padding: var(--space-1, 2px) var(--space-2, 4px);
-    }
   }
 
   .shared-workspace-actions {

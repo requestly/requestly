@@ -2,13 +2,12 @@ import React from "react";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "types";
-import { Tag, Tooltip, Typography } from "antd";
+import { Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { useDispatch } from "react-redux";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import { globalActions } from "store/slices/global/slice";
 import "./workspaceItem.scss";
@@ -34,7 +33,6 @@ const ShareWorkspaceActions = ({
   workspaceId: string;
   toggleDropdown: () => void;
 }) => {
-  const activeWorkspace = useSelector(getActiveWorkspace);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -52,14 +50,22 @@ const ShareWorkspaceActions = ({
 
   return (
     <>
-      {activeWorkspace.id === workspaceId ? <Tag className="workspace-list-item-active-tag">CURRENT</Tag> : null}
       <div className="shared-workspace-actions">
-        <RQButton type="transparent" icon={<MdOutlinePersonAdd />} size="small" onClick={handleSendInvites} />
+        <RQButton
+          type="transparent"
+          icon={<MdOutlinePersonAdd />}
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSendInvites();
+          }}
+        />
         <RQButton
           type="transparent"
           icon={<MdOutlineSettings />}
           size="small"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             redirectToTeam(navigate, workspaceId);
             toggleDropdown();
           }}
@@ -85,7 +91,8 @@ const LocalWorkspaceActions = ({
           type="transparent"
           icon={<MdOutlineSettings />}
           size="small"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             redirectToTeam(navigate, workspaceId);
             toggleDropdown();
           }}
