@@ -3,6 +3,7 @@ import { EnvironmentVariableData, VariableData, IVariableValues } from "../varia
 import { createVariablesStore, EnvVariableState, VariablesState } from "../variables/variables.store";
 import { RuntimeVariableStore as ExternalRNStore } from "../runtimeVariables/runtimeVariables.store";
 import { StoreApi } from "zustand";
+import { EnvironmentVariableType } from "backend/environment/types";
 
 interface StoredVariable {
   id: string; // composite key: contextId + key for environments/collections, just key for runtime
@@ -15,7 +16,6 @@ const db = new Dexie("persistedVariables") as Dexie & {
   collectionVariables: EntityTable<StoredVariable, "id">;
 };
 
-// Static schema with 3 tables - no dynamic creation
 db.version(1).stores({
   runtime: "id, localValue",
   environments: "id, localValue",
@@ -86,9 +86,7 @@ export namespace PersistedVariables {
       variables: Map<string, { isPersisted?: boolean; localValue?: VariableData["localValue"] }>
     ): Promise<void>;
 
-    abstract hydrate<T extends { localValue?: VariableData["localValue"] }>(
-      initialVariables: Map<string, T>
-    ): Promise<Map<string, T>>;
+    abstract hydrate<T extends VariableData>(initialVariables: Map<string, T>): Promise<Map<string, VariableData>>;
   }
 
   class RuntimeStore extends Store {
@@ -96,21 +94,20 @@ export namespace PersistedVariables {
       super("runtime", "runtime");
     }
 
-    async hydrate<T extends { localValue?: VariableData["localValue"] }>(
-      initialVariables: Map<string, T>
-    ): Promise<Map<string, T>> {
+    async hydrate(): Promise<Map<string, VariableData>> {
       const persistedEntries = await this.getAllEntries();
-      const intialEntries = new Map(initialVariables);
-      const finalEntries = new Map();
+      const finalEntries = new Map<string, VariableData>();
 
+      let counter = 0;
       for (const [key, localValue] of persistedEntries) {
-        // @ts-ignore todo: fix this somehow
-        let entry: T = { localValue, isPersisted: true };
-        const existing = intialEntries.get(key);
-        if (existing) {
-          entry = { ...existing, localValue };
-        }
+        let entry: VariableData = {
+          localValue,
+          type: typeof localValue as EnvironmentVariableType,
+          id: counter,
+          isPersisted: true,
+        };
         finalEntries.set(key, entry);
+        counter++;
       }
 
       return finalEntries;
@@ -140,9 +137,9 @@ export namespace PersistedVariables {
   }
 
   class ContextStore extends Store {
-    async hydrate<T extends { localValue?: VariableData["localValue"] }>(
-      initialVariables: Map<string, T>
-    ): Promise<Map<string, T>> {
+    async hydrate<EnvironmentVariableData>(
+      initialVariables: Map<string, EnvironmentVariableData>
+    ): Promise<Map<string, EnvironmentVariableData>> {
       const persistedEntries = await this.getAllEntries();
       const intialEntries = new Map(initialVariables);
 
