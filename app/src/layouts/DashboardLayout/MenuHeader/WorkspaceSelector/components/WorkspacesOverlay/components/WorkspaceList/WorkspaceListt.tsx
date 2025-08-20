@@ -3,7 +3,7 @@ import { Workspace } from "features/workspaces/types";
 import { WorkspaceType } from "types";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
-import { WorkspaceItem } from "../WorkspaceItem/WorkspaceItem";
+import { WorkspaceItem } from "../WorkspaceListItem/WorkspaceListItem";
 import "./workspaceList.scss";
 
 interface WorkspaceListProps {

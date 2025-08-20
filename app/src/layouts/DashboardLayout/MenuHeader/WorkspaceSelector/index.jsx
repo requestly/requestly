@@ -16,7 +16,7 @@ import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { WorkspacesOverlay } from "./components/WorkspacesOverlay";
+import { WorkspacesOverlay } from "./components/WorkspacesOverlay/WorkspacesOverlay";
 import "./WorkSpaceSelector.css";
 
 export const isWorkspacesFeatureEnabled = (email) => {
