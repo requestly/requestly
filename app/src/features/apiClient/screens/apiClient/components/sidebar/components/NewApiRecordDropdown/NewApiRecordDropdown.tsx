@@ -9,6 +9,8 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import "./newApiRecordDropdown.scss";
 import { DropdownButtonProps } from "antd/lib/dropdown";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 type OnSelectParams =
   | { recordType: RQAPI.RecordType.API; entryType: RQAPI.ApiEntryType }
@@ -57,7 +59,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         key: NewRecordDropdownItemType.GRAPHQL,
         label: "GraphQL request",
         icon: <GrGraphQl />,
-        hidden: !isGraphQLSupportEnabled,
+        hidden: !isGraphQLSupportEnabled || !isFeatureCompatible(FEATURES.GRAPHQL_SUPPORT),
         onClick: () => {
           onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.GRAPHQL });
         },
