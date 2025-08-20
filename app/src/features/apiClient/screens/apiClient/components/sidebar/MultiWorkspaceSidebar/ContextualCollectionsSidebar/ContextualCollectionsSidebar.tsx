@@ -316,7 +316,6 @@ export const ContextualCollectionsSidebar: React.FC<{
 
             return (
               <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
-                <h3>Workspace: {workspace.getState().name}</h3>
                 <ContextualCollectionsList
                   isSelectAll={isSelectAll}
                   showSelection={showSelection}

@@ -4,6 +4,7 @@ import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiW
 import "./workspaceProvider.scss";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { WorkspaceCollapse } from "./WorkspaceCollapse/WorkspaceCollapse";
 
 export const WorkspaceProvider: React.FC<{ workspaceId: string; children: React.ReactNode }> = ({
   workspaceId,
@@ -24,5 +25,9 @@ export const WorkspaceProvider: React.FC<{ workspaceId: string; children: React.
     );
   }
 
-  return <ContextId id={getContext(workspaceId)?.id}>{children}</ContextId>;
+  return (
+    <ContextId id={getContext(workspaceId)?.id}>
+      <WorkspaceCollapse workspaceId={workspaceId}>{children}</WorkspaceCollapse>
+    </ContextId>
+  );
 };

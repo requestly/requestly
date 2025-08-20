@@ -1,0 +1,87 @@
+.workspace-collapse-container {
+  display: flex;
+  padding: var(--space-0, 0) var(--space-2, 4px);
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+
+  .workspace-collapse-expand-icon {
+    &.expanded {
+      transform: rotate(90deg);
+    }
+  }
+
+  .workspace-collapse-panel {
+    width: 100%;
+
+    .ant-collapse-header {
+      display: flex;
+      padding: var(--space-3, 6px);
+      align-items: center;
+      gap: var(--space-2, 4px);
+      align-self: stretch;
+
+      .ant-collapse-expand-icon {
+        height: 14px;
+        width: 14px;
+        align-self: flex-start;
+
+        color: var(--requestly-color-text-subtle);
+        text-align: center;
+        font-size: var(--requestly-font-size-sm);
+        margin-top: 3px;
+
+        svg {
+          margin: 0;
+        }
+      }
+    }
+
+    .ant-collapse-header-text {
+      flex-grow: 1;
+
+      .workspace-name-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+
+        .workspace-name {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          line-clamp: 1;
+          -webkit-line-clamp: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          color: var(--requestly-color-text-subtle);
+          font-size: var(--requestly-font-size-sm);
+          font-weight: var(--requestly-font-weight-medium);
+          line-height: 18px; /* 150% */
+        }
+      }
+    }
+  }
+
+  .ant-collapse-content.ant-collapse-content-active {
+    .ant-collapse-content-box {
+      padding-top: 0;
+
+      margin-left: 6px;
+      padding: 2px 0px 0px 6px;
+      border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+
+      .collections-list-container {
+        padding: 0;
+
+        .collections-list-content {
+          padding: 0;
+        }
+      }
+    }
+
+    .collection-name-container {
+      color: var(--requestly-color-text-default);
+    }
+  }
+}
