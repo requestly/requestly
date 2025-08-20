@@ -16,7 +16,7 @@ export class VariableScope {
         [key]:
           key in currentVariables
             ? { ...currentVariables[key], syncValue: value, isPersisted: !!options?.persist }
-            : { syncValue: value, type: typeof value, isPersisted: !!options?.persist },
+            : { localValue: value, type: typeof value, isPersisted: !!options?.persist },
       });
     } else {
       this.localScope.set(this.variableScopeName, {
