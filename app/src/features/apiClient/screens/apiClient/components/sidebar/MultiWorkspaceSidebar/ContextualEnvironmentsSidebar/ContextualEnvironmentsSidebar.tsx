@@ -23,7 +23,6 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
 
         return (
           <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
-            <h3>Workspace: {workspace.getState().name}</h3>
             <ContextualEnvironmentsList searchValue={searchValue} />
           </WorkspaceProvider>
         );
