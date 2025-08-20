@@ -2,14 +2,26 @@ import React, { useCallback } from "react";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import { Collapse, Dropdown, Typography } from "antd";
+import { Collapse, Dropdown, MenuProps, Typography } from "antd";
 import { Conditional } from "components/common/Conditional";
 import { useRBAC } from "features/rbac";
 import { RQButton } from "lib/design-system-v2/components";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import {
+  useApiClientMultiWorkspaceView,
+  useWorkspace,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { EnvironmentSwitcher } from "../../../components/apiClientSidebarHeader/components/environmentSwitcher/EnvironmentSwitcher";
 import "./workspaceCollapse.scss";
+import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
+import { FaRegEyeSlash } from "@react-icons/all-files/fa/FaRegEyeSlash";
+import { redirectToTeam } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
+import { removeWorkspaceFromView } from "features/apiClient/commands/multiView";
+import {
+  NewApiRecordDropdown,
+  NewRecordDropdownItemType,
+} from "../../../components/NewApiRecordDropdown/NewApiRecordDropdown";
+import { useApiClientContext } from "features/apiClient/contexts";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
@@ -18,14 +30,34 @@ interface WorkspaceCollapseProps {
 }
 
 export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceId, children, showEnvSwitcher }) => {
-  const contextId = useContextId();
+  const navigate = useNavigate();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [workspaceName] = useWorkspace(workspaceId, (s) => [s.name]);
-
+  const workspacesInView = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const { onNewClick } = useApiClientContext();
   const handleCollapseChange = useCallback((key: string) => {}, []);
 
-  console.log({ contextId });
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: "Manage Workspace",
+      icon: <MdOutlineSettings />,
+      onClick: () => {
+        redirectToTeam(navigate, workspaceId);
+      },
+    },
+    {
+      key: "2",
+      disabled: workspacesInView.length < 2,
+      label: "Hide from side panel",
+      icon: <FaRegEyeSlash />,
+      onClick: () => {
+        removeWorkspaceFromView(workspaceId);
+      },
+    },
+  ];
+
   return (
     <Collapse
       key={workspaceId}
@@ -64,12 +96,20 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
               <Conditional condition={isValidPermission}>
                 <div className="workspace-options">
                   {/* workspace add icon */}
-                  <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
+                  <NewApiRecordDropdown
+                    invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                    onSelect={(params) => {
+                      //FIXME: fix the analytics here
+                      onNewClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
+                    }}
+                  >
+                    <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
+                  </NewApiRecordDropdown>
                   {/* three dots icon */}
 
                   <Dropdown
+                    menu={{ items }}
                     trigger={["click"]}
-                    menu={{ items: [] }}
                     placement="bottomRight"
                     overlayClassName="collection-dropdown-menu"
                   >
