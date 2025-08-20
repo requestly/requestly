@@ -71,6 +71,18 @@ div.n-popup {
     }
   }
 
+  .variable-not-found-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+
+    .variable-info-header {
+      position: relative;
+      left: -3px;
+    }
+  }
+
   .variable-info-body {
     display: flex;
     max-width: 300px;
