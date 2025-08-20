@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/react";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { WorkspaceMemberRole } from "features/workspaces/types";
@@ -24,34 +25,38 @@ export const useFetchLocalWorkspaces = () => {
       return;
     }
 
-    const uid = user?.details?.profile?.uid;
+    try {
+      const uid = user.details.profile.uid;
 
-    const allLocalWorkspacesResult = await getAllWorkspaces();
-    const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+      const allLocalWorkspacesResult = await getAllWorkspaces();
+      const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
 
-    const localRecords = [];
+      const localRecords = [];
 
-    for (const partialWorkspace of allLocalWorkspaces) {
-      const localWorkspace = {
-        id: partialWorkspace.id,
-        name: partialWorkspace.name,
-        owner: uid,
-        accessCount: 1,
-        adminCount: 1,
-        members: {
-          [uid]: {
-            role: WorkspaceMemberRole.admin,
+      for (const partialWorkspace of allLocalWorkspaces) {
+        const localWorkspace = {
+          id: partialWorkspace.id,
+          name: partialWorkspace.name,
+          owner: uid,
+          accessCount: 1,
+          adminCount: 1,
+          members: {
+            [uid]: {
+              role: WorkspaceMemberRole.admin,
+            },
           },
-        },
-        appsumo: false,
-        workspaceType: WorkspaceType.LOCAL,
-        rootPath: partialWorkspace.path,
-      };
+          appsumo: false,
+          workspaceType: WorkspaceType.LOCAL,
+          rootPath: partialWorkspace.path,
+        };
 
-      localRecords.push(localWorkspace);
+        localRecords.push(localWorkspace);
+      }
+      dispatch(workspaceActions.upsertManyWorkspaces(localRecords));
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
+    } catch (e) {
+      captureException(e);
     }
-    dispatch(workspaceActions.upsertManyWorkspaces(localRecords));
-    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
   }, [dispatch, isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
 
   useEffect(() => {
