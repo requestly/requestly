@@ -1,0 +1,270 @@
+import React, { useCallback, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { WorkspaceItem } from "./components/WorkspaceItem/WorkspaceItem";
+import { Invite, WorkspaceType } from "types";
+import { Divider, Modal } from "antd";
+import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { Workspace } from "features/workspaces/types";
+import { WorkspaceList } from "./components/WorkspaceList/WorkspaceLIst";
+import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { globalActions } from "store/slices/global/slice";
+import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
+import LoadingModal from "../LoadingModal";
+import {
+  clearCurrentlyActiveWorkspace,
+  showSwitchWorkspaceSuccessToast,
+  switchWorkspace,
+} from "actions/TeamWorkspaceActions";
+import { toast } from "utils/Toast";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import PATHS from "config/constants/sub/paths";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
+import "./workspacesOverlay.scss";
+
+interface WorkspacesOverlayProps {
+  toggleDropdown: () => void;
+  teamInvites: Invite[];
+}
+
+export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDropdown, teamInvites }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
+  const availableWorkspaces = useSelector(getAllWorkspaces);
+  const { pathname } = useLocation();
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+
+  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
+
+  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
+
+  const sortedAvailableWorkspaces = useMemo(() => {
+    const filteredWorkspaces = (availableWorkspaces || []).filter(
+      (team) => !team.browserstackDetails && !team?.archived
+    );
+
+    return filteredWorkspaces;
+  }, [availableWorkspaces]);
+
+  const workspaceMap = useMemo(() => {
+    return sortedAvailableWorkspaces.reduce((acc, workspace) => {
+      if (workspace.workspaceType) {
+        const key = workspace.workspaceType as keyof typeof acc;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(workspace);
+      }
+      return acc;
+    }, {} as { [key in WorkspaceType]?: Workspace[] });
+  }, [sortedAvailableWorkspaces]);
+
+  const redirects: Record<string, string> = useMemo(
+    () => ({
+      rules: PATHS.RULES.MY_RULES.ABSOLUTE,
+      mock: PATHS.MOCK_SERVER_V2.ABSOLUTE,
+      files: PATHS.FILE_SERVER_V2.ABSOLUTE,
+      sessions: PATHS.SESSIONS.ABSOLUTE,
+      teams: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
+    }),
+    []
+  );
+
+  const path: string | undefined = useMemo(
+    () =>
+      Object.keys(redirects).find(
+        (path) =>
+          pathname.includes(path) &&
+          (pathname.includes("editor") ||
+            pathname.includes("viewer") ||
+            pathname.includes("saved") ||
+            pathname.includes("/teams/"))
+      ),
+    [redirects, pathname]
+  );
+
+  const handleJoinWorkspaceMenuItemClick = () => {
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "joinWorkspaceModal",
+        newValue: true,
+        newProps: { source: "workspaces_dropdown" },
+      })
+    );
+    toggleDropdown();
+    trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
+  };
+
+  const handleSwitchToPrivateWorkspace = useCallback(async () => {
+    setIsLoadingModalOpen(true);
+    return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
+      setIsLoadingModalOpen(false);
+      showSwitchWorkspaceSuccessToast();
+    });
+  }, [appMode, dispatch]);
+
+  const handleWorkspaceSwitch = async (workspace: Workspace) => {
+    setIsLoadingModalOpen(true);
+    switchWorkspace(
+      {
+        teamId: workspace.id,
+        teamName: workspace.name,
+        teamMembersCount: workspace.accessCount,
+        workspaceType: workspace.workspaceType,
+      },
+      dispatch,
+      {
+        isSyncEnabled: user?.details?.isSyncEnabled,
+        isWorkspaceMode: workspace.workspaceType === WorkspaceType.SHARED,
+      },
+      appMode,
+      undefined,
+      "workspaces_dropdown"
+    )
+      .then(() => {
+        if (!isLoadingModalOpen) showSwitchWorkspaceSuccessToast(workspace.name);
+        setIsLoadingModalOpen(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoadingModalOpen(false);
+        toast.error(
+          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+        );
+      });
+  };
+
+  const confirmWorkspaceSwitch = useCallback(
+    (callback = () => {}) => {
+      const handleCallback = () => {
+        dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(false));
+        callback();
+
+        if (path) {
+          navigate(redirects[path]);
+        }
+      };
+
+      if (!isCurrentlySelectedRuleHasUnsavedChanges || pathname.includes(PATHS.ACCOUNT.TEAMS.ABSOLUTE)) {
+        handleCallback();
+        return;
+      }
+
+      dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(true));
+      Modal.confirm({
+        title: "Discard changes?",
+        icon: <ExclamationCircleFilled />,
+        content: "Changes you made on a rule may not be saved.",
+        okText: "Switch",
+        onOk: handleCallback,
+        afterClose: () => dispatch(globalActions.updateIsWorkspaceSwitchConfirmationActive(false)),
+      });
+    },
+    [isCurrentlySelectedRuleHasUnsavedChanges, navigate, path, pathname, redirects, dispatch]
+  );
+
+  return (
+    <>
+      <div className="workspaces-overlay">
+        {user.loggedIn && (
+          <>
+            <div
+              style={{
+                margin: "0 4px",
+              }}
+            >
+              <WorkspaceItem
+                type={WorkspaceType.PERSONAL}
+                toggleDropdown={toggleDropdown}
+                onClick={() => confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace)}
+              />
+            </div>
+          </>
+        )}
+        {isLocalSyncEnabled &&
+        appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+        workspaceMap[WorkspaceType.LOCAL]?.length ? (
+          <>
+            <Divider />
+            <WorkspaceList
+              workspaces={workspaceMap[WorkspaceType.LOCAL]}
+              type={WorkspaceType.LOCAL}
+              toggleDropdown={toggleDropdown}
+              onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
+              onAddWorkspaceClick={() => {
+                dispatch(
+                  globalActions.toggleActiveModal({
+                    modalName: "createWorkspaceModal",
+                    newValue: true,
+                    newProps: {
+                      defaultWorkspaceType: WorkspaceType.LOCAL,
+                    },
+                  })
+                );
+              }}
+            />{" "}
+          </>
+        ) : null}
+        {workspaceMap[WorkspaceType.SHARED]?.length ? (
+          <>
+            <Divider />
+            <WorkspaceList
+              workspaces={workspaceMap[WorkspaceType.SHARED]}
+              type={WorkspaceType.SHARED}
+              toggleDropdown={toggleDropdown}
+              onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
+              onAddWorkspaceClick={() => {
+                dispatch(
+                  globalActions.toggleActiveModal({
+                    modalName: "createWorkspaceModal",
+                    newValue: true,
+                    newProps: {
+                      defaultWorkspaceType: WorkspaceType.SHARED,
+                    },
+                  })
+                );
+              }}
+            />{" "}
+          </>
+        ) : (
+          <>
+            {user.loggedIn ? <Divider /> : null}
+            <EmptyWorkspaceListView workspaceType={WorkspaceType.SHARED} toggleDropdown={toggleDropdown} />
+          </>
+        )}
+        {/* LOCAL WORKSPACE EMPTY VIEW WILL ALWAYS BE AT LAST */}
+        {!workspaceMap[WorkspaceType.LOCAL]?.length ? (
+          <>
+            <Divider />
+            <EmptyWorkspaceListView workspaceType={WorkspaceType.LOCAL} toggleDropdown={toggleDropdown} />
+          </>
+        ) : null}
+
+        {user.loggedIn ? (
+          <>
+            <Divider />
+            <div
+              className="workspace-overlay__list-item join-workspace-item"
+              onClick={handleJoinWorkspaceMenuItemClick}
+            >
+              <MdOutlineGroups />
+              <span className="workspace-list-item-name">
+                Join a workspace{" "}
+                {teamInvites.length ? <span className="join-workspace-item__badge">{teamInvites.length}</span> : null}
+              </span>
+            </div>
+          </>
+        ) : null}
+      </div>
+      {isLoadingModalOpen ? (
+        <LoadingModal isModalOpen={isLoadingModalOpen} closeModal={() => setIsLoadingModalOpen(false)} />
+      ) : null}
+    </>
+  );
+};
