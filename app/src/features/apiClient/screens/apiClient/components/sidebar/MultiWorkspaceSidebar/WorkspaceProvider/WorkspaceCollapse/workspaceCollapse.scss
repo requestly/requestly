@@ -6,6 +6,8 @@
   align-self: stretch;
 
   .workspace-collapse-expand-icon {
+    transition: transform 0.2s ease-out;
+
     &.expanded {
       transform: rotate(90deg);
     }
