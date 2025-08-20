@@ -12,7 +12,8 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 import { NativeError } from "errors/NativeError";
-import { CollectionsVariablesList, EnvironmentVariableTableRow } from "../CollectionsVariablesList";
+import { CollectionsVariablesList } from "../CollectionsVariablesList";
+import { VariableRow } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -31,7 +32,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const {
     api: { setCollectionVariables },
   } = useCommand();
-  const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
+  const pendingVariablesRef = useRef<VariableRow[]>([]);
 
   const [pendingVariables, setPendingVariables] = useState(mapToEnvironmentArray(variables) || []);
   const [searchValue, setSearchValue] = useState("");
@@ -56,7 +57,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     }
   }, [collection.id, collection?.data?.variables, variables, isSaving]);
 
-  const handleSetPendingVariables = (variables: EnvironmentVariableTableRow[]) => {
+  const handleSetPendingVariables = (variables: VariableRow[]) => {
     setPendingVariables(variables);
     pendingVariablesRef.current = variables;
   };

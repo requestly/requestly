@@ -1,7 +1,7 @@
 import { EnvironmentVariables } from "backend/environment/types";
 import { NativeError } from "errors/NativeError";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { parseVariables } from "features/apiClient/store/variables/variables.store";
+import { parseEnvVariables } from "features/apiClient/store/variables/variables.store";
 import { createOrderedVariableMap } from "../environments/utils";
 import { getApiClientCollectionVariablesStore } from "../store.utils";
 import { sanitizePatch } from "../utils";
@@ -19,7 +19,7 @@ export async function setCollectionVariables(
 
   const varMap = createOrderedVariableMap(params.variables);
 
-  const prunedPatch = sanitizePatch(varMap);
+  const prunedPatch = sanitizePatch(varMap) as EnvironmentVariables;
   await apiClientRecordsRepository.setCollectionVariables(params.collectionId, prunedPatch);
-  variableStore.getState().reset(parseVariables(prunedPatch));
+  variableStore.getState().reset(parseEnvVariables(prunedPatch));
 }

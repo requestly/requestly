@@ -72,7 +72,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [collectionsToExport, setCollectionsToExport] = useState([]);
-
+  
   const contextId = useContextId();
   const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.openTab,
