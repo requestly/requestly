@@ -73,6 +73,7 @@ import PATHS from "config/constants/sub/paths";
 import { ApiClientFilesContext } from "features/apiClient/store/ApiClientFilesContextProvider";
 import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
+import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -883,9 +884,11 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
-      <QueryParamsProvider entry={props.apiEntryDetails?.data}>
-        <Component {...props} />
-      </QueryParamsProvider>
+      <ErrorBoundary>
+        <QueryParamsProvider entry={props.apiEntryDetails?.data}>
+          <Component {...props} />
+        </QueryParamsProvider>
+      </ErrorBoundary>
     );
   };
 };
