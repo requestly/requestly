@@ -91,9 +91,14 @@ const WorkSpaceDropDown = ({ menu, hasNewInvites }) => {
     }
   };
 
+  console.log("active", activeWorkspace);
   const tooltipTitle =
     activeWorkspace?.workspaceType === WorkspaceType.LOCAL
-      ? activeWorkspace.rootPath
+      ? viewMode === ApiClientViewMode.SINGLE
+        ? activeWorkspace.rootPath
+        : null
+      : viewMode === ApiClientViewMode.MULTI
+      ? null
       : prettifyWorkspaceName(activeWorkspaceName);
 
   return (
