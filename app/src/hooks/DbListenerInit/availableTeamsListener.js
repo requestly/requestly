@@ -8,7 +8,6 @@ import firebaseApp from "../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { WorkspaceType } from "types";
-import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import * as Sentry from "@sentry/react";
 
@@ -39,34 +38,34 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
     return onSnapshot(
       q,
       async (querySnapshot) => {
-        let localRecords = [];
-        if (isLocalSyncEnabled) {
-          const allLocalWorkspacesResult = await getAllWorkspaces();
-          const allLocalWorkspaces =
-            allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
+        // let localRecords = [];
+        // if (isLocalSyncEnabled) {
+        // const allLocalWorkspacesResult = await getAllWorkspaces();
+        // const allLocalWorkspaces =
+        //   allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
 
-          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, allLocalWorkspaces.length);
+        // submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, allLocalWorkspaces.length);
 
-          for (const partialWorkspace of allLocalWorkspaces) {
-            const localWorkspace = {
-              id: partialWorkspace.id,
-              name: partialWorkspace.name,
-              owner: uid,
-              accessCount: 1,
-              adminCount: 1,
-              members: {
-                [uid]: {
-                  role: "admin",
-                },
-              },
-              appsumo: null,
-              workspaceType: WorkspaceType.LOCAL,
-              rootPath: partialWorkspace.path,
-            };
+        // for (const partialWorkspace of allLocalWorkspaces) {
+        //   const localWorkspace = {
+        //     id: partialWorkspace.id,
+        //     name: partialWorkspace.name,
+        //     owner: uid,
+        //     accessCount: 1,
+        //     adminCount: 1,
+        //     members: {
+        //       [uid]: {
+        //         role: "admin",
+        //       },
+        //     },
+        //     appsumo: null,
+        //     workspaceType: WorkspaceType.LOCAL,
+        //     rootPath: partialWorkspace.path,
+        //   };
 
-            localRecords.push(localWorkspace);
-          }
-        }
+        //   localRecords.push(localWorkspace);
+        // }
+        // }
 
         const records = querySnapshot.docs
           .map((team) => {
@@ -107,8 +106,7 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
             return formattedTeamData;
           })
           .filter(Boolean);
-        records.push(...localRecords);
-        dispatch(workspaceActions.setAllWorkspaces(records));
+        dispatch(workspaceActions.upsertManyWorkspaces(records));
 
         if (!activeWorkspaceId) return;
 
