@@ -39,12 +39,7 @@ export async function moveRecordsAcrossWorkspace(
   // get all nested records in dfs manner
   recordsToMove.forEach((record) => {
     rootLevelRecords.add(record.id);
-
-    if (isApiCollection(record)) {
-      recordIds.push(...getAllRecords([record]).map((r) => r.id));
-    } else {
-      recordIds.push(record.id);
-    }
+    recordIds.push(...getAllRecords([record]).map((r) => r.id));
   });
 
   const oldToNewIdMap: Map<string, string> = new Map();
