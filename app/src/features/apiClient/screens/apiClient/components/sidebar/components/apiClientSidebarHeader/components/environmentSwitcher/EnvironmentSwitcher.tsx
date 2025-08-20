@@ -3,8 +3,8 @@ import { Dropdown, Typography } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
-import { RiArrowDropDownLine } from "@react-icons/all-files/ri/RiArrowDropDownLine";
 import { MdOutlineCheckCircleOutline } from "@react-icons/all-files/md/MdOutlineCheckCircleOutline";
+import { MdOutlineExpandMore } from "@react-icons/all-files/md/MdOutlineExpandMore";
 import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
 import { trackEnvironmentSwitched } from "modules/analytics/events/features/apiClient";
@@ -66,14 +66,14 @@ export const EnvironmentSwitcher = () => {
                 title: environment.name,
                 context: {
                   id: contextId,
-                }
+                },
               })
             );
           }
           toast.success(`Switched to ${environment.name} environment`);
         },
       }));
-  }, [environments, activeEnvironment, setActiveEnvironment, location.pathname, openTab]);
+  }, [environments, activeEnvironment?.id, setActiveEnvironment, location.pathname, openTab, contextId]);
 
   if (environments.length === 0) {
     return (
@@ -86,8 +86,11 @@ export const EnvironmentSwitcher = () => {
   return (
     <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
       <RQButton className="environment-switcher-button" size="small">
+        <span className="environment-icon">
+          <MdHorizontalSplit />
+        </span>
         {activeEnvironment ? <SwitcherListItemLabel environmentId={activeEnvironment.id} /> : "No environment"}
-        {<RiArrowDropDownLine />}
+        {<MdOutlineExpandMore />}
       </RQButton>
     </Dropdown>
   );
