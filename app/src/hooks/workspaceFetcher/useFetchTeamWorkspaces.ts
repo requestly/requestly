@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
-// import { workspaceActions } from "store/slices/workspaces/slice";
+import { workspaceActions } from "store/slices/workspaces/slice";
 
 export const useFetchTeamWorkspaces = () => {
   const dispatch = useDispatch();
@@ -26,6 +26,7 @@ export const useFetchTeamWorkspaces = () => {
     }
 
     if (user?.loggedIn && user?.details?.profile?.uid) {
+      unsubscribeAvailableTeams.current?.();
       unsubscribeAvailableTeams.current = availableTeamsListener(
         dispatch,
         user?.details?.profile?.uid,
@@ -34,7 +35,7 @@ export const useFetchTeamWorkspaces = () => {
         isLocalSyncEnabled
       );
     } else {
-      // dispatch(workspaceActions.setAllWorkspaces([]));
+      dispatch(workspaceActions.setAllWorkspaces([]));
       // Very edge case
       if (activeWorkspaceId) {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
@@ -43,6 +44,7 @@ export const useFetchTeamWorkspaces = () => {
 
     return () => {
       unsubscribeAvailableTeams.current?.();
+      unsubscribeAvailableTeams.current = null;
     };
   }, [appMode, activeWorkspaceId, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
 };

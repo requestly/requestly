@@ -37,7 +37,8 @@ const slice = createSlice({
       workspacesEntityAdapter.upsertOne(state.allWorkspaces, action.payload);
     },
     upsertManyWorkspaces: (state: WorkspaceSliceState, action: PayloadAction<Workspace[]>) => {
-      workspacesEntityAdapter.upsertMany(state.allWorkspaces, action.payload);
+      // upsertMany does shallow update hence using set to replace the existing content
+      workspacesEntityAdapter.setMany(state.allWorkspaces, action.payload);
     },
 
     setWorkspacesUpdatedAt: (state: WorkspaceSliceState, action: PayloadAction<number>) => {
