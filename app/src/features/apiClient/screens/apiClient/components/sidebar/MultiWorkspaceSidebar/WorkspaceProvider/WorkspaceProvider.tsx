@@ -1,14 +1,16 @@
 import React from "react";
 import { Skeleton } from "antd";
 import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import "./workspaceProvider.scss";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { WorkspaceCollapse } from "./WorkspaceCollapse/WorkspaceCollapse";
+import "./workspaceProvider.scss";
 
-export const WorkspaceProvider: React.FC<{ workspaceId: string; children: React.ReactNode }> = ({
-  workspaceId,
-  children,
-}) => {
+export const WorkspaceProvider: React.FC<{
+  workspaceId: string;
+  showEnvSwitcher?: boolean;
+  children: React.ReactNode;
+}> = ({ workspaceId, showEnvSwitcher = true, children }) => {
   const state = useWorkspace(workspaceId, (s) => s.state);
   const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
@@ -24,5 +26,11 @@ export const WorkspaceProvider: React.FC<{ workspaceId: string; children: React.
     );
   }
 
-  return <ContextId id={getContext(workspaceId)?.id}>{children}</ContextId>;
+  return (
+    <ContextId id={getContext(workspaceId)?.id}>
+      <WorkspaceCollapse showEnvSwitcher={showEnvSwitcher} workspaceId={workspaceId}>
+        {children}
+      </WorkspaceCollapse>
+    </ContextId>
+  );
 };
