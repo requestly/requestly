@@ -81,7 +81,7 @@ export type ApiRecordsState = {
   updateCollectionVariables: (variables: CollectionVariableMap) => void;
 };
 
-export function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
+function getAllChildren(initalId: string, childParentMap: Map<string, string>) {
   const result: string[] = [];
   const getImmediateChildren = (id: string) =>
     Array.from(childParentMap.entries())
