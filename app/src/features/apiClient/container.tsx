@@ -22,16 +22,17 @@ const ApiClientFeatureContainer: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      if(viewMode === ApiClientViewMode.MULTI) {
+      if (viewMode === ApiClientViewMode.MULTI) {
         await loadWorkspaces();
         return;
       }
       const repository = createRepository(activeWorkspace, {
         loggedIn: user.loggedIn,
-        uid: user.details?.profile?.uid ?? "", 
-      })
+        uid: user.details?.profile?.uid ?? "",
+      });
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, activeWorkspace.id, viewMode]);
 
   if (!isLoaded) {

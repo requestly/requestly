@@ -19,7 +19,6 @@ import {
   trackExampleCollectionsImported,
   trackExampleCollectionsImportFailed,
 } from "modules/analytics/events/features/apiClient";
-import { EnvironmentData } from "backend/environment/types";
 import { useCommand } from "features/apiClient/commands";
 
 export const EXPANDED_RECORD_IDS_UPDATED = "expandedRecordIdsUpdated";
@@ -126,7 +125,7 @@ const createExampleCollectionsStore = () => {
 
               return markAsExample(r);
             });
-            proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r)) as EnvironmentData[];
+            proccessedData.environments = proccessedData.environments.map((r) => markAsExample(r));
 
             const recordsToImport = [...proccessedData.apis, ...proccessedData.collections];
 

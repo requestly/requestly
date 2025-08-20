@@ -1,11 +1,11 @@
 import { RQAPI } from "features/apiClient/types";
 import { isApiCollection, isApiRequest } from "../../../utils";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { EnvironmentVariables } from "backend/environment/types";
 
 export interface RQImportData {
   records: (RQAPI.ApiRecord | RQAPI.CollectionRecord)[];
-  environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
+  environments: { name: string; variables: EnvironmentVariables; isGlobal: boolean }[];
 }
 
 interface UpdatedApiRecordsToImport {

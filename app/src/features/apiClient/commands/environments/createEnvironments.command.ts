@@ -1,9 +1,9 @@
-import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariables } from "backend/environment/types";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export const createEnvironments = async (
   ctx: ApiClientFeatureContext,
-  params: { environmentsToCreate: { newEnvironmentName: string; variables?: EnvironmentVariables }[] }
+  params: { environmentsToCreate: { name: string; variables: EnvironmentVariables }[] }
 ) => {
   const {
     stores,
@@ -14,10 +14,7 @@ export const createEnvironments = async (
   if (environmentsToCreate.length === 0) {
     return [];
   }
-
-  const envsResult = await environmentVariablesRepository.createEnvironments(
-    (environmentsToCreate as unknown) as EnvironmentData[] // FIXME: fix type
-  );
+  const envsResult = await environmentVariablesRepository.createEnvironments(environmentsToCreate);
 
   stores.environments.getState().createEnvironments(envsResult);
   return envsResult;
