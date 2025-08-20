@@ -73,11 +73,15 @@ div.n-popup {
 
   .variable-info-body {
     display: flex;
+    max-width: 300px;
     min-width: 240px;
+    max-height: 480px;
     gap: 8px;
     flex-direction: column;
     align-items: flex-start;
     padding: 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .variable-info-property-container {
       display: flex;
@@ -116,13 +120,13 @@ div.n-popup {
     .variable-info-header-name {
       position: relative;
       left: -12px;
-      bottom: 1px;
+      top: 0.5px;
       overflow: hidden;
-      color: var(--alias-tokens-color-text-subtle, #bbb);
+      color: var(--requestly-color-text-subtle);
       text-overflow: ellipsis;
 
-      font-family: var(--font-family-default, Inter);
-      font-size: var(--font-size-xs, 12px);
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-xs);
       font-style: normal;
     }
 
