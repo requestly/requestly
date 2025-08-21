@@ -32,7 +32,7 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
     }, 0);
   }, [getContext, selectedWorkspaces]);
 
-  return (
+  return errorRecordsCount === 0 ? null : (
     <div className="multi-workspace-error-files-list-container">
       <Collapse
         ghost
