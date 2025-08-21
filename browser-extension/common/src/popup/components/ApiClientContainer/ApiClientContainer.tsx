@@ -19,7 +19,7 @@ export const ApiClientContainer: React.FC = () => {
           block
           className={"api-client-action-btn"}
           icon={<ApiRequest />}
-          onClick={() => window.open(`${config.WEB_URL}/api-client/request/new`, "_blank")}
+          onClick={() => window.open(`${config.WEB_URL}/api-client/request/new?source=popup`, "_blank")}
         >
           Send API request
         </PrimaryActionButton>
@@ -38,7 +38,7 @@ export const ApiClientContainer: React.FC = () => {
       <div
         className="view-more-options-link"
         onClick={() => {
-          window.open(`${config.WEB_URL}/api-client`, "_blank");
+          window.open(`${config.WEB_URL}/api-client?source=popup`, "_blank");
         }}
       >
         Open API Client <ExternalLinkIcon />

@@ -5,6 +5,7 @@ import { getAppMode, getPopupConfig } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { StorageService } from "init";
 import { globalActions } from "store/slices/global/slice";
+import { trackEvent } from "modules/analytics";
 
 const CONFIG_OPTIONS = [
   {
@@ -33,6 +34,9 @@ export const PopupConfig: React.FC = () => {
         popup_config: config,
       });
       dispatch(globalActions.updatePopupConfig(config));
+      trackEvent("popup_config_updated", {
+        config,
+      });
     },
     [appMode, dispatch]
   );
