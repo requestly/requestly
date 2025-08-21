@@ -9,7 +9,6 @@ import { HistoryList } from "../components/historyList/HistoryList";
 import { ApiClientSidebarHeader } from "../components/apiClientSidebarHeader/ApiClientSidebarHeader";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { ImportFromCurlModal } from "../../modals";
-import { ErrorFilesList } from "../components/ErrorFilesList/ErrorFileslist";
 import { ContextualCollectionsSidebar } from "./ContextualCollectionsSidebar/ContextualCollectionsSidebar";
 import { ContextualEnvironmentsSidebar } from "./ContextualEnvironmentsSidebar/ContextualEnvironmentsSidebar";
 import { getEmptyApiEntry } from "../../../utils";
@@ -22,6 +21,7 @@ import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpac
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
 import { useSelector } from "react-redux";
 import { getIsMiscTourCompleted } from "store/selectors";
+import { MultiWorkspaceErrorFilesList } from "./MultiWorkspaceErrorFilesList/MultiWorkspaceErrorFilesList";
 
 export enum ApiClientSidebarTabKey {
   HISTORY = "history",
@@ -236,7 +236,8 @@ export const MultiWorkspaceSidebar: React.FC = () => {
             onChange={handleActiveTabChange}
           />
         </div>
-        <ErrorFilesList />
+
+        <MultiWorkspaceErrorFilesList />
       </div>
 
       <ImportFromCurlModal

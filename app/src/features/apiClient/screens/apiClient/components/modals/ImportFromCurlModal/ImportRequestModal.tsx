@@ -19,8 +19,8 @@ interface Props {
   handleImportRequest: (request: RQAPI.Request) => void;
   onClose: () => void;
   initialCurlCommand?: string;
-  source: string;
-  pageURL: string;
+  source?: string; // temp fix
+  pageURL?: string; // temp fix
 }
 
 export const ImportFromCurlModal: React.FC<Props> = ({
@@ -29,8 +29,8 @@ export const ImportFromCurlModal: React.FC<Props> = ({
   onClose,
   isRequestLoading,
   initialCurlCommand,
-  source,
-  pageURL,
+  source = "",
+  pageURL = "",
 }) => {
   const [curlCommand, setCurlCommand] = useState("");
   const [error, setError] = useState<string | null>(null);
