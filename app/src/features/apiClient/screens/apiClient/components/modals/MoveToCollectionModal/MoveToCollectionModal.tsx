@@ -43,7 +43,11 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
   const [selectedWorkspace, setSelectedWorkspace] = useState<{
     label: string;
     value: string;
-  } | null>(() => workspacesOptions.find((w) => w.value === currentContextId));
+  } | null>(() =>
+    workspacesOptions.find((w) => {
+      return w.value === getContext(currentContextId).workspaceId;
+    })
+  );
 
   const context = useMemo(() => (selectedWorkspace ? getContext(selectedWorkspace.value) : null), [
     selectedWorkspace,
