@@ -69,58 +69,59 @@ export const useVariablesListColumns = ({
         options: ["string", "number", "boolean", "secret"],
       }),
     },
-    {
-      title: () => {
-        return container === "environments" ? (
-          <div className="variable-value-column-title">
-            Initial Value{" "}
-            <Tooltip
-              color="#000"
-              title="Initial values will be synced across the workspace. These values will be used by default if no user-defined Current value is set for the variable."
-            >
-              <span className="synced-tag">SYNCED</span>
-            </Tooltip>
-          </div>
-        ) : (
-          <div className="variable-value-column-title">Current Value</div>
-        );
-      },
-      editable: true,
-      onCell: (record) => ({
-        record,
-        editable: true,
-        dataIndex: "syncValue",
-        title: "Sync Value", // feels useless
-        handleVariableChange,
-        isReadOnly,
-        isSecret: checkIsSecretHidden(record.id),
-      }),
-    },
     container === "environments"
       ? {
-          title: (
-            <div className="variable-value-column-title">
-              Current Value{" "}
-              <Tooltip
-                color="#000"
-                title="Current values are user-defined entries that are not synced across the workspace. These values will override the defined Initial values."
-              >
-                <span className="local-tag">LOCAL</span>
-              </Tooltip>
-            </div>
-          ),
+          title: () => {
+            return (
+              <div className="variable-value-column-title">
+                Initial Value{" "}
+                <Tooltip
+                  color="#000"
+                  title="Initial values will be synced across the workspace. These values will be used by default if no user-defined Current value is set for the variable."
+                >
+                  <span className="synced-tag">SYNCED</span>
+                </Tooltip>
+              </div>
+            );
+          },
           editable: true,
           onCell: (record) => ({
             record,
             editable: true,
-            dataIndex: "localValue",
-            title: "Local Value",
+            dataIndex: "syncValue",
+            title: "Sync Value", // feels useless
             handleVariableChange,
-            isReadOnly: isReadOnly && recordsCount === 1 && !record.key,
+            isReadOnly,
             isSecret: checkIsSecretHidden(record.id),
           }),
         }
       : null,
+    {
+      title:
+        container === "environments" ? (
+          <div className="variable-value-column-title">
+            Current Value{" "}
+            <Tooltip
+              color="#000"
+              title="Current values are user-defined entries that are not synced across the workspace. These values will override the defined Initial values."
+            >
+              <span className="local-tag">LOCAL</span>
+            </Tooltip>
+          </div>
+        ) : (
+          <div className="variable-value-column-title">Current Value</div>
+        ),
+      editable: true,
+      onCell: (record) => ({
+        record,
+        editable: true,
+        dataIndex: "localValue",
+        title: "Local Value",
+        handleVariableChange,
+        isReadOnly: isReadOnly && recordsCount === 1 && !record.key,
+        isSecret: checkIsSecretHidden(record.id),
+      }),
+    },
     container === "runtime"
       ? {
           title: (

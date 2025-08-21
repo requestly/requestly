@@ -1,8 +1,14 @@
 import {
   ApiClientFeatureContext,
   apiClientFeatureContextProviderStore,
+  NoopContext,
+  NoopContextId,
 } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "../types";
+import {
+  apiClientMultiWorkspaceViewStore,
+  ApiClientViewMode,
+} from "../store/multiWorkspaceView/multiWorkspaceView.store";
 
 export function getStores(ctx: ApiClientFeatureContext) {
   return ctx.stores;
@@ -33,8 +39,19 @@ export function getApiClientCollectionVariablesStore(ctx: ApiClientFeatureContex
 }
 
 // Multiview
-export function getApiClientFeatureContext(contextId: string) {
-  return apiClientFeatureContextProviderStore.getState().getContext(contextId);
+export function getApiClientFeatureContext(contextId?: string) {
+  const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
+  if (contextId === NoopContextId) {
+    return NoopContext;
+  }
+  const { viewMode } = apiClientMultiWorkspaceViewStore.getState();
+  if (viewMode === ApiClientViewMode.SINGLE) {
+    return getSingleViewContext();
+  }
+  if (!contextId) {
+    return getLastUsedContext();
+  }
+  return getContext(contextId);
 }
 
 export function getChildParentMap(context: ApiClientFeatureContext) {

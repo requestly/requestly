@@ -336,6 +336,7 @@ export const ContextualCollectionsSidebar: React.FC<{
         // TODO: TBD on modals
         <ContextId id={recordsToMove[0]}>
           <MoveToCollectionModal
+            isBulkActionMode={showSelection}
             recordsToMove={recordsToMove[1]}
             isOpen={isMoveCollectionModalOpen}
             onClose={() => {

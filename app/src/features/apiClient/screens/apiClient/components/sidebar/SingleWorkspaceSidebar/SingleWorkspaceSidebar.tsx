@@ -26,7 +26,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { getIsMiscTourCompleted } from "store/selectors";
-import { ContextId } from "features/apiClient/contexts/contextId.context";
 
 interface Props {}
 
@@ -275,17 +274,15 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
             }
           />
 
-          <ContextId id={context.id}>
-            <Tabs
-              items={items}
-              size="small"
-              tabPosition="left"
-              className="api-client-sidebar-tabs"
-              activeKey={activeKey}
-              defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
-              onChange={handleActiveTabChange}
-            />
-          </ContextId>
+          <Tabs
+            items={items}
+            size="small"
+            tabPosition="left"
+            className="api-client-sidebar-tabs"
+            activeKey={activeKey}
+            defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
+            onChange={handleActiveTabChange}
+          />
         </div>
         <ErrorFilesList />
       </div>

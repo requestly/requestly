@@ -27,6 +27,7 @@ import { useContextId } from "./contextId.context";
 import { useNewApiClientContext } from "../hooks/useNewApiClientContext";
 import { useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { useApiClientRepository } from "./meta";
+import { getApiClientFeatureContext } from "../commands/store.utils";
 
 interface ApiClientContextInterface {
   history: RQAPI.ApiEntry[];
@@ -219,7 +220,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   title: newEnvironment.name,
                   focusBreadcrumb: true,
                   context: {
-                    id: contextId,
+                    id: getApiClientFeatureContext(contextId).id,
                   },
                 })
               );
