@@ -28,7 +28,9 @@ export const ApiClientContainer: React.FC = () => {
           block
           className={"api-client-action-btn"}
           icon={<ImportCurl />}
-          onClick={() => chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL })}
+          onClick={() =>
+            chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL, source: "popup" })
+          }
         >
           Import a cURL request
         </PrimaryActionButton>

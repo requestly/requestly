@@ -225,7 +225,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL:
-        triggerOpenCurlModalMessage();
+        triggerOpenCurlModalMessage({}, message.source);
         break;
     }
 
