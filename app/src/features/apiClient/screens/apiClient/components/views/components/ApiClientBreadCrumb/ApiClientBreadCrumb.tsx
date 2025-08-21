@@ -13,6 +13,7 @@ import { LuFolderCog } from "@react-icons/all-files/lu/LuFolderCog";
 import "./ApiClientBreadCrumb.scss";
 import { truncateString } from "features/apiClient/screens/apiClient/utils";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { Tooltip } from "antd";
 interface Props {
   id: string;
   openInModal?: boolean;
@@ -42,7 +43,9 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({
   const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
 
   const currentWorkspace = getSelectedWorkspace(getContext(contextId).workspaceId);
-  const localWsPath = truncateString(currentWorkspace.getState().rawWorkspace.rootPath, 40);
+
+  const localWsPath = currentWorkspace.getState().rawWorkspace.rootPath;
+  const truncatePath = truncateString(localWsPath, 40);
   const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
 
   const collections = getParentChain(id);
@@ -92,10 +95,12 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({
             {
               label: (
                 <div>
-                  <span className="api-client-local-workspace-path-breadcrumb">
-                    <LuFolderCog className="api-client-local-workspace-icon" />
-                    {localWsPath + "/" + currentWorkspace.getState().name}
-                  </span>
+                  <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
+                    <span className="api-client-local-workspace-path-breadcrumb">
+                      <LuFolderCog className="api-client-local-workspace-icon" />
+                      {truncatePath + "/" + currentWorkspace.getState().name}
+                    </span>
+                  </Tooltip>
                 </div>
               ),
               pathname: PATHS.API_CLIENT.INDEX,
