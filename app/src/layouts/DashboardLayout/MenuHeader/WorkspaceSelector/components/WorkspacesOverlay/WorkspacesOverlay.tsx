@@ -32,6 +32,59 @@ interface WorkspacesOverlayProps {
   teamInvites: Invite[];
 }
 
+interface WorkspaceListSectionProps {
+  workspaces: Workspace[];
+  workspaceType: WorkspaceType;
+  toggleDropdown: () => void;
+  onItemClick: (workspace: Workspace) => void;
+}
+
+const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
+  workspaces,
+  workspaceType,
+  toggleDropdown,
+  onItemClick,
+}: WorkspaceListSectionProps) => {
+  const dispatch = useDispatch();
+  return (
+    <>
+      <Divider />
+      <WorkspaceList
+        workspaces={workspaces}
+        type={workspaceType}
+        toggleDropdown={toggleDropdown}
+        onItemClick={onItemClick}
+        onAddWorkspaceClick={() => {
+          dispatch(
+            globalActions.toggleActiveModal({
+              modalName: "createWorkspaceModal",
+              newValue: true,
+              newProps: {
+                defaultWorkspaceType: workspaceType,
+              },
+            })
+          );
+        }}
+      />{" "}
+    </>
+  );
+};
+
+const EmptyWorkspaceListSection = ({
+  workspaceType,
+  toggleDropdown,
+}: {
+  workspaceType: WorkspaceType;
+  toggleDropdown: () => void;
+}) => {
+  return (
+    <>
+      <Divider />
+      <EmptyWorkspaceListView workspaceType={workspaceType} toggleDropdown={toggleDropdown} />
+    </>
+  );
+};
+
 export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDropdown, teamInvites }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -70,6 +123,9 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
       return acc;
     }, map);
   }, [sortedAvailableWorkspaces]);
+
+  const hasLocalWorkspaces = workspaceMap[WorkspaceType.LOCAL].length > 0;
+  const hasSharedWorkspaces = workspaceMap[WorkspaceType.SHARED].length;
 
   const redirects: Record<string, string> = useMemo(
     () => ({
@@ -201,67 +257,29 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
             </div>
           </>
         )}
-        {isLocalSyncEnabled &&
-        appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-        workspaceMap[WorkspaceType.LOCAL]?.length ? (
-          <>
-            <Divider />
-            <WorkspaceList
-              workspaces={workspaceMap[WorkspaceType.LOCAL]}
-              type={WorkspaceType.LOCAL}
-              toggleDropdown={toggleDropdown}
-              onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
-              onAddWorkspaceClick={() => {
-                dispatch(
-                  globalActions.toggleActiveModal({
-                    modalName: "createWorkspaceModal",
-                    newValue: true,
-                    newProps: {
-                      defaultWorkspaceType: WorkspaceType.LOCAL,
-                    },
-                  })
-                );
-              }}
-            />{" "}
-          </>
+        {isLocalSyncEnabled && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && hasLocalWorkspaces ? (
+          <WorkspaceListSection
+            workspaces={workspaceMap[WorkspaceType.LOCAL]}
+            workspaceType={WorkspaceType.LOCAL}
+            toggleDropdown={toggleDropdown}
+            onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
+          />
         ) : null}
-        {workspaceMap[WorkspaceType.SHARED]?.length ? (
-          <>
-            <Divider />
-            <WorkspaceList
-              workspaces={workspaceMap[WorkspaceType.SHARED]}
-              type={WorkspaceType.SHARED}
-              toggleDropdown={toggleDropdown}
-              onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
-              onAddWorkspaceClick={() => {
-                dispatch(
-                  globalActions.toggleActiveModal({
-                    modalName: "createWorkspaceModal",
-                    newValue: true,
-                    newProps: {
-                      defaultWorkspaceType: WorkspaceType.SHARED,
-                    },
-                  })
-                );
-              }}
-            />{" "}
-          </>
+        {hasSharedWorkspaces ? (
+          <WorkspaceListSection
+            workspaces={workspaceMap[WorkspaceType.SHARED]}
+            workspaceType={WorkspaceType.SHARED}
+            toggleDropdown={toggleDropdown}
+            onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
+          />
         ) : null}
 
-        {!workspaceMap[WorkspaceType.LOCAL]?.length && !workspaceMap[WorkspaceType.SHARED]?.length ? (
+        {!hasLocalWorkspaces && !hasSharedWorkspaces ? (
           <CommonEmptyView toggleDropdown={toggleDropdown} />
-        ) : !workspaceMap[WorkspaceType.LOCAL]?.length &&
-          isLocalSyncEnabled &&
-          appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-          <>
-            <Divider />
-            <EmptyWorkspaceListView workspaceType={WorkspaceType.LOCAL} toggleDropdown={toggleDropdown} />
-          </>
-        ) : !workspaceMap[WorkspaceType.SHARED]?.length ? (
-          <>
-            <Divider />
-            <EmptyWorkspaceListView workspaceType={WorkspaceType.SHARED} toggleDropdown={toggleDropdown} />
-          </>
+        ) : !hasLocalWorkspaces && isLocalSyncEnabled && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          <EmptyWorkspaceListSection workspaceType={WorkspaceType.LOCAL} toggleDropdown={toggleDropdown} />
+        ) : !hasSharedWorkspaces ? (
+          <EmptyWorkspaceListSection workspaceType={WorkspaceType.SHARED} toggleDropdown={toggleDropdown} />
         ) : null}
 
         {user.loggedIn ? (
