@@ -41,6 +41,25 @@
     line-height: 13px; /* 144.444% */
     letter-spacing: 1px;
     text-transform: uppercase;
+
+    .count {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-2, 4px);
+
+      min-width: 20px;
+      padding: var(--space-1, 2px) var(--space-2, 4px);
+      border-radius: 29px;
+      background: var(--requestly-color-color-surface-2, #383838);
+
+      color: var(--requestly-color-text-default, #fff);
+      text-align: center;
+      font-size: var(--requestly-font-size-2xs, 9px);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 13px; /* 144.444% */
+    }
   }
 
   .error-files-list-container {
@@ -86,6 +105,7 @@
         height: 12px;
         aspect-ratio: 1/1;
         margin-top: 1px;
+        color: var(--requestly-color-text-placeholder, #8f8f8f);
       }
 
       .file-item-title {
