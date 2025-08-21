@@ -35,6 +35,10 @@
   }
 
   .multi-workspace-error-files-list-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
     cursor: pointer;
     overflow: hidden;
     color: var(--requestly-color-text-subtle, #bbb);
@@ -48,7 +52,8 @@
 
     svg {
       color: var(--requestly-color-error);
-      width: 18px;
+      width: 12px;
+      height: 12px;
       flex-shrink: 0;
     }
 
