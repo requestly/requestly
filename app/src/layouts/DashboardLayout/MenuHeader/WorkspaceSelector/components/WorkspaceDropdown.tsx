@@ -1,36 +1,26 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import { DownOutlined } from "@ant-design/icons";
-import { Dropdown, Tooltip } from "antd";
-import { getLastSeenInviteTs } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import APP_CONSTANTS from "config/constants";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/common/teams";
-import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import { getPendingInvites } from "backend/workspace";
-import { getActiveWorkspace, getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "features/workspaces/types";
-import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
-import { RQButton } from "lib/design-system-v2/components";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { Dropdown, Tooltip } from "antd";
+import APP_CONSTANTS from "config/constants";
 import FEATURES from "config/constants/sub/features";
-import { WorkspacesOverlay } from "./components/WorkspacesOverlay/WorkspacesOverlay";
-import "./WorkSpaceSelector.css";
+import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { RQButton } from "lib/design-system-v2/components";
+import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { Invite, WorkspaceType } from "types";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
 
-export const isWorkspacesFeatureEnabled = (email) => {
-  if (!email) return false;
-  return true;
-};
-
-const prettifyWorkspaceName = (workspaceName) => {
+const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
   //   return "Private";
   return workspaceName || "Unknown";
 };
 
-const WorkSpaceDropDown = ({ teamInvites }) => {
+const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -45,14 +35,14 @@ const WorkSpaceDropDown = ({ teamInvites }) => {
       : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
     : "Workspaces";
 
-  const handleWorkspaceDropdownClick = (open) => {
+  const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
     if (open) {
       trackTopbarClicked("workspace");
     }
   };
 
-  const handleLocalSyncRefresh = (e) => {
+  const handleLocalSyncRefresh = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     window.dispatchEvent(new Event("local-sync-refresh"));
   };
@@ -109,7 +99,6 @@ const WorkSpaceDropDown = ({ teamInvites }) => {
             onClick={handleLocalSyncRefresh}
             className="local-sync-refresh-btn no-drag"
             size="small"
-            iconOnly
             icon={<MdOutlineRefresh />}
           />
         </Tooltip>
@@ -118,46 +107,4 @@ const WorkSpaceDropDown = ({ teamInvites }) => {
   );
 };
 
-const WorkspaceSelector = () => {
-  const user = useSelector(getUserAuthDetails);
-  const availableWorkspaces = useSelector(getAllWorkspaces);
-
-  const lastSeenInviteTs = useSelector(getLastSeenInviteTs);
-
-  const [teamInvites, setTeamInvites] = useState([]);
-
-  const hasNewInvites = useMemo(() => {
-    if (user?.loggedIn && teamInvites?.length) {
-      return teamInvites.some((invite) => invite.createdTs > lastSeenInviteTs);
-    }
-    return false;
-  }, [lastSeenInviteTs, teamInvites, user?.loggedIn]);
-
-  useEffect(() => {
-    if (hasNewInvites) trackWorkspaceInviteAnimationViewed();
-  }, [hasNewInvites]);
-
-  useEffect(() => {
-    if (!user.loggedIn) return;
-
-    getPendingInvites({ email: true, domain: true })
-      .then((res) => {
-        setTeamInvites(res?.pendingInvites ?? []);
-      })
-      .catch((e) => setTeamInvites([]));
-  }, [user.loggedIn]);
-
-  useEffect(() => {
-    if (availableWorkspaces?.length > 0) {
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_WORKSPACES, availableWorkspaces.length);
-    }
-  }, [availableWorkspaces?.length]);
-
-  return (
-    <>
-      <WorkSpaceDropDown teamInvites={teamInvites} />
-    </>
-  );
-};
-
-export default WorkspaceSelector;
+export default WorkSpaceDropDown;

@@ -6,7 +6,7 @@ import { getAppMode } from "store/selectors";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { redirectToRoot, redirectToSettings } from "utils/RedirectionUtils";
 import Settings from "assets/icons/settings.svg?react";
-import WorkspaceSelector from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
+import WorkspaceSelector from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 // import "layouts/DashboardLayout/MenuHeader/MenuHeader.css";
