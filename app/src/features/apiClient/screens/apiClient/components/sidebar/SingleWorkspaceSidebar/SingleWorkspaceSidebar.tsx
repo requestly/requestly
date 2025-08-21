@@ -264,18 +264,18 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         }}
       />
       <div className="api-client-sidebar">
-        <div className="api-client-sidebar-content">
-          <ApiClientSidebarHeader
-            activeTab={activeKey}
-            history={history}
-            onClearHistory={clearHistory}
-            onImportClick={onImportClick}
-            onNewClick={(recordType, entryType) =>
-              handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
-            }
-          />
+        <ContextId id={context.id}>
+          <div className="api-client-sidebar-content">
+            <ApiClientSidebarHeader
+              activeTab={activeKey}
+              history={history}
+              onClearHistory={clearHistory}
+              onImportClick={onImportClick}
+              onNewClick={(recordType, entryType) =>
+                handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
+              }
+            />
 
-          <ContextId id={context.id}>
             <Tabs
               items={items}
               size="small"
@@ -285,9 +285,10 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
               defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
               onChange={handleActiveTabChange}
             />
-          </ContextId>
-        </div>
-        <ErrorFilesList />
+          </div>
+
+          <ErrorFilesList />
+        </ContextId>
       </div>
 
       {isDeleteModalOpen ? (

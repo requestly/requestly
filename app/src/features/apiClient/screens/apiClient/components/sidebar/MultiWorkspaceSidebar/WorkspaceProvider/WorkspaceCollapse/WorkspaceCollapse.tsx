@@ -6,7 +6,6 @@ import { Collapse, Dropdown, Typography } from "antd";
 import { Conditional } from "components/common/Conditional";
 import { useRBAC } from "features/rbac";
 import { RQButton } from "lib/design-system-v2/components";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { EnvironmentSwitcher } from "../../../components/apiClientSidebarHeader/components/environmentSwitcher/EnvironmentSwitcher";
 import "./workspaceCollapse.scss";
@@ -18,14 +17,12 @@ interface WorkspaceCollapseProps {
 }
 
 export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceId, children, showEnvSwitcher }) => {
-  const contextId = useContextId();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [workspaceName] = useWorkspace(workspaceId, (s) => [s.name]);
 
   const handleCollapseChange = useCallback((key: string) => {}, []);
 
-  console.log({ contextId });
   return (
     <Collapse
       key={workspaceId}
