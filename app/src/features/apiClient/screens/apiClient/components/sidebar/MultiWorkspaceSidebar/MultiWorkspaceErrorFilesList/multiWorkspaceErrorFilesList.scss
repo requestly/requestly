@@ -46,6 +46,12 @@
     letter-spacing: 1px;
     text-transform: uppercase;
 
+    svg {
+      color: var(--requestly-color-error);
+      width: 18px;
+      flex-shrink: 0;
+    }
+
     .count {
       display: inline-flex;
       justify-content: center;
