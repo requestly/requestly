@@ -36,7 +36,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [workspaceName] = useWorkspace(workspaceId, (s) => [s.name]);
-  const workspacesInView = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const getAllSelectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.getAllSelectedWorkspaces);
   const { onNewClick } = useApiClientContext();
   const handleCollapseChange = useCallback((key: string) => {}, []);
   const contextId = useContextId();
@@ -52,7 +52,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
     },
     {
       key: "2",
-      disabled: workspacesInView.length < 2,
+      disabled: getAllSelectedWorkspaces().length < 2,
       label: "Hide from side panel",
       icon: <FaRegEyeSlash />,
       onClick: () => {
