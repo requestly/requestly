@@ -151,7 +151,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
     updateErrorRecordsCount?.(files.length);
 
     return () => {
-      return updateErrorRecordsCount?.(-files.length);
+      return updateErrorRecordsCount?.(-files.length); // decrement on unmount
     };
   }, [files.length, updateErrorRecordsCount]);
 
