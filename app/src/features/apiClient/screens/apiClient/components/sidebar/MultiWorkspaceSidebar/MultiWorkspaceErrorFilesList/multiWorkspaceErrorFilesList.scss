@@ -1,0 +1,118 @@
+.multi-workspace-error-files-list-container {
+  // margin-top: 8px;
+  border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+  .multi-workspace-error-files-collapse {
+    .ant-collapse-expand-icon .collapse-expand-icon {
+      cursor: pointer;
+      margin: 0;
+      width: 12px;
+      height: 12px;
+      color: var(--requestly-color-text-subtle);
+      transition: transform 0.2s ease-out;
+
+      &.expanded {
+        transform: rotate(90deg);
+      }
+    }
+
+    .multi-workspace-error-files-collapse-panel {
+      .ant-collapse-header {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        padding: 6px;
+      }
+
+      .ant-collapse-content-box {
+        padding: 0;
+      }
+    }
+  }
+
+  .multi-workspace-error-files-list-header {
+    cursor: pointer;
+    overflow: hidden;
+    color: var(--requestly-color-text-subtle, #bbb);
+    text-overflow: ellipsis;
+    font-size: var(--requestly-font-size-2xs, 9px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 13px; /* 144.444% */
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .error-files-list-container {
+    height: auto;
+    border: none;
+    padding: 0;
+
+    .error-files-list-body {
+      padding: 0;
+    }
+
+    &:last-child {
+      .error-file-item:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .error-file-item {
+    padding: 0;
+    height: auto;
+    display: flex;
+    padding: 4px 6px 6px 6px;
+    align-items: flex-start;
+    gap: var(--space-3, 6px);
+    align-self: stretch;
+    border-radius: 0;
+    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+    .error-file-item-actions {
+      align-self: center;
+    }
+
+    .file-item-title-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      flex: 1 0 0;
+
+      .error-file-icon {
+        flex-shrink: 0;
+        width: 12px;
+        height: 12px;
+        aspect-ratio: 1/1;
+        margin-top: 1px;
+      }
+
+      .file-item-title {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: var(--space-1, 2px);
+        flex: 1 0 0;
+        font-size: var(--requestly-font-size-xs, 11px);
+        line-height: 17px; /* 154.545% */
+
+        .workspace-name {
+          color: var(--requestly-color-text-placeholder, #8f8f8f);
+        }
+
+        .file-name {
+          align-self: stretch;
+
+          overflow: hidden;
+          color: var(--requestly-color-text-default, #fff);
+          text-overflow: ellipsis;
+          text-wrap: nowrap;
+          white-space: nowrap;
+          max-width: 243px;
+        }
+      }
+    }
+  }
+}

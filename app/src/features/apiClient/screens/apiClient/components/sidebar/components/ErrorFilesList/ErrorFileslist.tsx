@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
@@ -11,8 +11,14 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { forceRefreshRecords } from "features/apiClient/commands/records";
+import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
@@ -53,53 +59,119 @@ const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   );
 };
 
+const getFileIcon = (fileType: FileType) => {
+  if (fileType === FileType.ENVIRONMENT) {
+    return <CgStack className="error-file-icon" />;
+  }
+  return <MdOutlineSyncAlt className="error-file-icon" />;
+};
+
+const ErrorListHeader: React.FC = () => {
+  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode, s.getSelectedWorkspace]);
+
+  return getViewMode() === ApiClientViewMode.SINGLE ? (
+    <div className="error-files-list-header">
+      <MdWarningAmber />
+      ERROR FILES
+    </div>
+  ) : null;
+};
+
+const ErrorFileItemTitle: React.FC<{ contextId: string; file: ErroredRecord }> = ({ contextId, file }) => {
+  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
+  const [getViewMode, getSelectedWorkspace] = useApiClientMultiWorkspaceView((s) => [
+    s.getViewMode,
+    s.getSelectedWorkspace,
+  ]);
+
+  const workspaceId = getContext(contextId).workspaceId;
+  const workspace = useMemo(() => getSelectedWorkspace(workspaceId), [getSelectedWorkspace, workspaceId]);
+
+  return getViewMode() === ApiClientViewMode.SINGLE ? (
+    <>
+      {getFileIcon(file.type)}
+      <span>{file.name}</span>
+    </>
+  ) : (
+    <div className="file-item-title-container">
+      {getFileIcon(file.type)}
+
+      <div className="file-item-title">
+        <div className="workspace-name">{workspace.getState().name}</div>
+        <div className="file-name">{file.name}</div>
+      </div>
+    </div>
+  );
+};
+
+const ErrorFileItem: React.FC<{
+  contextId: string;
+  file: ErroredRecord;
+  openErrorFile: (file: ErroredRecord) => void;
+  deleteErrorFile(file: ErroredRecord): void;
+}> = ({ contextId, file, openErrorFile, deleteErrorFile }) => {
+  return (
+    <div key={file.path} className="error-file-item">
+      <ErrorFileItemTitle file={file} contextId={contextId} />
+
+      <div className="error-file-item-actions">
+        <Tooltip title="Edit file" color="var(--requestly-color-black)" placement="top">
+          <MdEdit className="error-file-item-action-icon" onClick={() => openErrorFile(file)} />
+        </Tooltip>
+        <DeleteErrorFileButton
+          onDelete={() => {
+            deleteErrorFile(file);
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const ErrorFilesList = () => {
+  const contextId = useContextId();
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
+  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
 
-  const { apiClientRecordsRepository } = useApiClientRepository();
   const [apiErroredRecords, environmentErroredRecords] = useErroredRecords((s) => [
     s.apiErroredRecords,
     s.environmentErroredRecords,
   ]);
-  const {
-    env: { forceRefreshEnvironments },
-    api: { forceRefreshRecords },
-  } = useCommand();
 
   const files = useMemo(() => [...apiErroredRecords, ...environmentErroredRecords], [
     apiErroredRecords,
     environmentErroredRecords,
   ]);
 
-  const handleDeleteErrorFile = async (errorFile: ErroredRecord) => {
-    const result = await apiClientRecordsRepository.deleteRecords([errorFile.path]);
-    if (result.success) {
-      if (errorFile.type === FileType.ENVIRONMENT) {
-        forceRefreshEnvironments();
+  const handleDeleteErrorFile = useCallback(
+    async (errorFile: ErroredRecord) => {
+      const context = getContext(contextId);
+      const { apiClientRecordsRepository } = context.repositories;
+      const result = await apiClientRecordsRepository.deleteRecords([errorFile.path]);
+
+      if (result.success) {
+        if (errorFile.type === FileType.ENVIRONMENT) {
+          forceRefreshEnvironments(context);
+        } else {
+          forceRefreshRecords(context);
+        }
+
+        toast.success("Error file deleted successfully");
       } else {
-        forceRefreshRecords();
+        notification.error({
+          message: "Failed to delete error file",
+          placement: "bottomRight",
+        });
       }
-      toast.success("Error file deleted successfully");
-    } else {
-      notification.error({
-        message: "Failed to delete error file",
-        placement: "bottomRight",
-      });
-    }
-  };
+    },
+    [contextId, getContext]
+  );
 
   const handleOpenErrorFile = (file: ErroredRecord) => {
     setErrorFileToView(file);
     setIsErrorFileViewerModalOpen(true);
   };
-
-  const renderFileIcon = useCallback((file: ErroredRecord) => {
-    if (file.type === FileType.ENVIRONMENT) {
-      return <CgStack className="error-file-icon" />;
-    }
-    return <MdOutlineSyncAlt className="error-file-icon" />;
-  }, []);
 
   if (!files.length) {
     return null;
@@ -119,27 +191,19 @@ export const ErrorFilesList = () => {
       )}
 
       <div className="error-files-list-container">
-        <div className="error-files-list-header">
-          <MdWarningAmber />
-          ERROR FILES
-        </div>
+        <ErrorListHeader />
         <div className="error-files-list-body">
-          {files.map((file) => (
-            <div key={file.path} className="error-file-item">
-              {renderFileIcon(file)}
-              <span>{file.name}</span>
-              <div className="error-file-item-actions">
-                <Tooltip title="Edit file" color="var(--requestly-color-black)" placement="top">
-                  <MdEdit className="error-file-item-action-icon" onClick={() => handleOpenErrorFile(file)} />
-                </Tooltip>
-                <DeleteErrorFileButton
-                  onDelete={() => {
-                    handleDeleteErrorFile(file);
-                  }}
-                />
-              </div>
-            </div>
-          ))}
+          {files.map((file) => {
+            return (
+              <ErrorFileItem
+                file={file}
+                key={file.path}
+                contextId={contextId}
+                openErrorFile={handleOpenErrorFile}
+                deleteErrorFile={handleDeleteErrorFile}
+              />
+            );
+          })}
         </div>
       </div>
     </>
