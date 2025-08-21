@@ -14,9 +14,10 @@ import {
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+
 import { createNewCollection, moveRecordsToCollection } from "./utils";
 import { RQTooltip } from "lib/design-system-v2/components";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 
 interface Props {
   recordsToMove: RQAPI.ApiClientRecord[];
@@ -28,7 +29,6 @@ interface Props {
 const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
   const currentContextId = useContextId();
   const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
-  const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState(null);
@@ -45,13 +45,12 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
     value: string;
   } | null>(() =>
     workspacesOptions.find((w) => {
-      return w.value === getContext(currentContextId).workspaceId;
+      return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
     })
   );
 
-  const context = useMemo(() => (selectedWorkspace ? getContext(selectedWorkspace.value) : null), [
+  const context = useMemo(() => (selectedWorkspace ? getApiClientFeatureContext(selectedWorkspace.value) : null), [
     selectedWorkspace,
-    getContext,
   ]);
 
   const collectionOptions = useMemo(() => {
@@ -186,7 +185,6 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
   isBulkActionMode = false,
 }) => {
   const contextId = useContextId();
-  const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
   const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
   const [selectedCollection, setSelectedCollection] = useState(null);
@@ -200,7 +198,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
     try {
       setIsLoading(true);
 
-      const context = getContext(contextId);
+      const context = getApiClientFeatureContext(contextId);
       const collectionId = selectedCollection?.__isNew__
         ? await createNewCollection(context, selectedCollection?.label)
         : selectedCollection.value;
@@ -234,7 +232,6 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
       onClose();
     }
   }, [
-    getContext,
     contextId,
     selectedCollection?.__isNew__,
     selectedCollection?.label,
