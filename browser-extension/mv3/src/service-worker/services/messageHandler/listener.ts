@@ -31,7 +31,7 @@ import {
   checkIfDesktopAppOpen,
 } from "../desktopApp/index";
 import { sendMessageToApp } from "./sender";
-import { updateExtensionStatus } from "../utils";
+import { triggerOpenCurlModalMessage, updateExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
 
 export const initExternalMessageListener = () => {
@@ -223,6 +223,10 @@ export const initMessageHandler = () => {
           }
         });
         return true;
+
+      case EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL:
+        triggerOpenCurlModalMessage();
+        break;
     }
 
     return false;

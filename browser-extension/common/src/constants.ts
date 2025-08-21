@@ -42,6 +42,7 @@ export const EXTENSION_MESSAGES = {
   DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
   DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
   IS_SESSION_REPLAY_ENABLED: "isSessionReplayEnabled",
+  TRIGGER_OPEN_CURL_MODAL: "triggerOpenCurlModal",
 };
 
 export const EXTENSION_EXTERNAL_MESSAGES = {
