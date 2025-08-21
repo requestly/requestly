@@ -1,7 +1,7 @@
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { StorageService } from "init";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
@@ -11,7 +11,10 @@ export const useInitPopupConfig = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
 
-  const isSessionReplayEnabled = useFeatureValue("is_session_replay_enabled", true); // mark default value as false after testing
+  const isSessionReplayEnabled = useFeatureValue("is_session_replay_enabled", false);
+  const shouldSetDefaultConfig = useMemo(() => isSessionReplayEnabled && isFeatureCompatible(FEATURES.POPUP_CONFIG), [
+    isSessionReplayEnabled,
+  ]);
 
   const fetchConfig = useCallback(async () => {
     const popupConfig = await StorageService(appMode).getRecord("popup_config");
@@ -25,25 +28,23 @@ export const useInitPopupConfig = () => {
       return;
     }
 
-    const defaultConfig = {
-      session_replay: isSessionReplayEnabled ?? false,
-    };
+    if (shouldSetDefaultConfig) {
+      const defaultConfig = {
+        session_replay: isSessionReplayEnabled ?? false,
+      };
 
-    await StorageService(appMode).saveRecord({
-      popup_config: defaultConfig,
-    });
-    dispatch(globalActions.updatePopupConfig(defaultConfig));
-  }, [appMode, dispatch, fetchConfig, isSessionReplayEnabled]);
+      await StorageService(appMode).saveRecord({
+        popup_config: defaultConfig,
+      });
+      dispatch(globalActions.updatePopupConfig(defaultConfig));
+    }
+  }, [appMode, dispatch, fetchConfig, isSessionReplayEnabled, shouldSetDefaultConfig]);
 
   useEffect(() => {
-    if (!isFeatureCompatible(FEATURES.POPUP_CONFIG)) {
-      return;
-    }
-
     if (appMode !== "EXTENSION") {
       return;
     }
 
     setDefaultConfig();
-  }, [appMode, isSessionReplayEnabled, setDefaultConfig]);
+  }, [appMode, setDefaultConfig, shouldSetDefaultConfig]);
 };
