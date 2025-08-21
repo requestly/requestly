@@ -16,7 +16,7 @@ export const WorkspaceProvider: React.FC<{
   const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
   if (state.errored) {
-    // TBD
+    return <div className="workspace-loader-container">{state.error}</div>;
   }
 
   if (state.loading) {
