@@ -29,6 +29,7 @@ import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrati
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { setRedirectMetadata } from "features/onboarding/utils";
+import { LoggedOutPopover } from "./LoggedOutPopover/LoggedOutPopover";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -199,6 +200,8 @@ export default function HeaderUser() {
             ) : null}
           </Col>
         </Row>
+      ) : appMode === "DESKTOP" ? (
+        <LoggedOutPopover />
       ) : (
         <div className="auth-button-group">
           <RQButton
