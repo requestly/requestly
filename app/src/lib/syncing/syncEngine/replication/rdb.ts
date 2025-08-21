@@ -137,22 +137,8 @@ class RDBReplication extends BaseReplication {
             return {};
         });
 
-        const documents: RuleDataSyncEntity[] = Object.entries(rulesData).map(([id, data]) => {
-            return {
-                id,
-                workspaceId: this.syncWorkspace._data.id,
-                type: SyncEntityType.RULE_DATA,
-                data: data as RuleDataSyncEntity["data"],
-                // @ts-ignore
-                createdAt: data?.creationDate,
-                // @ts-ignore
-                updatedAt: data?.modificationDate,
-                // @ts-ignore
-                createdBy: data?.createdBy,
-                // @ts-ignore
-                updatedBy: data?.lastModifiedBy,
-                _deleted: false,
-            };
+        const documents: RuleDataSyncEntity[] = Object.entries(rulesData).map(([id, data]: [string, any]) => {
+            return this.ruleDataSnapshotToRuleData({ id, ...data });
         });
 
         console.log("[RDBReplication.pullRuleDataHandler] Fetched documents:", documents);
@@ -175,26 +161,8 @@ class RDBReplication extends BaseReplication {
             return {};
         });
 
-        const documents: RuleMetadataSyncEntity[] = Object.entries(rulesData).map(([id, data]) => {
-            return {
-                id,
-                workspaceId: this.syncWorkspace._data.id,
-                type: SyncEntityType.RULE_METADATA,
-                data: {
-                    // @ts-ignore
-                    status: data?.status,
-                    // @ts-ignore
-                    isFavourite: data?.isFavourite,
-                } as RuleMetadataSyncEntity["data"],
-                // @ts-ignore
-                createdAt: data?.creationDate,
-                // @ts-ignore
-                updatedAt: data?.modificationDate,
-                // @ts-ignore
-                createdBy: data?.createdBy,
-                // @ts-ignore
-                updatedBy: data?.lastModifiedBy,
-            };
+        const documents: RuleMetadataSyncEntity[] = Object.entries(rulesData).map(([id, data]: [string, any]) => {
+            return this.ruleMetadataSnapshotToRuleMetadata({ id, ...data });
         });
 
         console.log("[RDBReplication.pullRuleMetadataHandler] Fetched documents:", documents);
@@ -228,22 +196,8 @@ class RDBReplication extends BaseReplication {
                 rulesData = snapshot.val();
             }
 
-            const documents: RuleDataSyncEntity[] = Object.entries(rulesData).map(([id, data]) => {
-                return {
-                    id,
-                    workspaceId: this.syncWorkspace._data.id,
-                    type: SyncEntityType.RULE_DATA,
-                    data: data as RuleDataSyncEntity["data"],
-                    // @ts-ignore
-                    createdAt: data?.creationDate,
-                    // @ts-ignore
-                    updatedAt: data?.modificationDate,
-                    // @ts-ignore
-                    createdBy: data?.createdBy,
-                    // @ts-ignore
-                    updatedBy: data?.lastModifiedBy,
-                    _deleted: false,
-                };
+            const documents: RuleDataSyncEntity[] = Object.entries(rulesData).map(([id, data]: [string, any]) => {
+                return this.ruleDataSnapshotToRuleData({ id, ...data });
             });
 
             console.log("[RDBReplication.pullStreamListener RuleData] Fetched documents:", documents);
@@ -262,32 +216,16 @@ class RDBReplication extends BaseReplication {
         const ruleMetadataRef = ref(db, this.getRuleMetadataPath());
 
         onValue(ruleMetadataRef, (snapshot) => {
-            let rulesData = {};
+            let rulesMetadata = {};
             if (snapshot.exists()) {
-                rulesData = snapshot.val();
+                rulesMetadata = snapshot.val();
             }
 
-            const documents: RuleMetadataSyncEntity[] = Object.entries(rulesData).map(([id, data]) => {
-                return {
-                    id,
-                    workspaceId: this.syncWorkspace._data.id,
-                    type: SyncEntityType.RULE_METADATA,
-                    data: {
-                        // @ts-ignore
-                        status: data?.status,
-                        // @ts-ignore
-                        isFavourite: data?.isFavourite,
-                    } as RuleMetadataSyncEntity["data"],
-                    // @ts-ignore
-                    createdAt: data?.creationDate,
-                    // @ts-ignore
-                    updatedAt: data?.modificationDate,
-                    // @ts-ignore
-                    createdBy: data?.createdBy,
-                    // @ts-ignore
-                    updatedBy: data?.lastModifiedBy,
-                };
-            });
+            const documents: RuleMetadataSyncEntity[] = Object.entries(rulesMetadata).map(
+                ([id, data]: [string, any]) => {
+                    return this.ruleMetadataSnapshotToRuleMetadata({ id, ...data });
+                }
+            );
 
             console.log("[RDBReplication.pullStreamListener RuleMetadata] Fetched documents:", documents);
 
@@ -330,6 +268,36 @@ class RDBReplication extends BaseReplication {
         }
 
         return refPath;
+    }
+
+    private ruleDataSnapshotToRuleData(snapshot: any): RuleDataSyncEntity {
+        return {
+            id: snapshot.id,
+            workspaceId: this.syncWorkspace._data.id,
+            type: SyncEntityType.RULE_DATA,
+            data: snapshot as RuleDataSyncEntity["data"],
+            createdAt: snapshot?.creationDate,
+            updatedAt: snapshot?.modificationDate,
+            createdBy: snapshot?.createdBy,
+            updatedBy: snapshot?.lastModifiedBy,
+            _deleted: false,
+        };
+    }
+
+    private ruleMetadataSnapshotToRuleMetadata(snapshot: any): RuleMetadataSyncEntity {
+        return {
+            id: snapshot.id,
+            workspaceId: this.syncWorkspace._data.id,
+            type: SyncEntityType.RULE_METADATA,
+            data: {
+                status: snapshot?.status,
+                isFavourite: snapshot?.isFavourite,
+            } as RuleMetadataSyncEntity["data"],
+            createdAt: snapshot?.creationDate,
+            updatedAt: snapshot?.modificationDate,
+            createdBy: snapshot?.createdBy,
+            updatedBy: snapshot?.lastModifiedBy,
+        };
     }
 }
 
