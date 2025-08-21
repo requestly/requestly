@@ -47,4 +47,14 @@
       gap: 16px;
     }
   }
+
+  .ant-alert {
+    padding: 8px;
+    margin-bottom: 8px;
+
+    &-message {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-warning-500);
+    }
+  }
 }
