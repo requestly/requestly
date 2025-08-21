@@ -5,7 +5,10 @@ import {
   NoopContextId,
 } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "../types";
-import { apiClientMultiWorkspaceViewStore, ApiClientViewMode } from "../store/multiWorkspaceView/multiWorkspaceView.store";
+import {
+  apiClientMultiWorkspaceViewStore,
+  ApiClientViewMode,
+} from "../store/multiWorkspaceView/multiWorkspaceView.store";
 
 export function getStores(ctx: ApiClientFeatureContext) {
   return ctx.stores;

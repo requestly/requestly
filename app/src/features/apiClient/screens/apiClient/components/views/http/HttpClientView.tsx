@@ -774,6 +774,7 @@ const HttpClientView: React.FC<Props> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
+              id={apiEntryDetails.id}
               openInModal={openInModal}
               name={apiEntryDetails?.name}
               OnRecordNameUpdate={setRequestName}

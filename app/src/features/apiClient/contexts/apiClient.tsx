@@ -26,7 +26,7 @@ import { useCommand } from "../commands";
 import { useContextId } from "./contextId.context";
 import { useNewApiClientContext } from "../hooks/useNewApiClientContext";
 import { useApiClientFeatureContextProvider } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import {  useApiClientRepository } from "./meta";
+import { useApiClientRepository } from "./meta";
 import { getApiClientFeatureContext } from "../commands/store.utils";
 
 interface ApiClientContextInterface {
