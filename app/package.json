@@ -1,6 +1,6 @@
 {
   "name": "@requestly/app",
-  "version": "24.5.16-12.26",
+  "version": "25.8.21",
   "private": true,
   "description": "Requestly - Lightweight Proxy to Intercept & Modify HTTP(s) requests",
   "main": "index.js",
