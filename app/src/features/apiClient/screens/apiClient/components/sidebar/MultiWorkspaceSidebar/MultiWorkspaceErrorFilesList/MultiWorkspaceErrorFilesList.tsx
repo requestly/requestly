@@ -18,13 +18,13 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
     <div className="multi-workspace-error-files-list-container">
       <Collapse
         ghost
-        destroyInactivePanel={false}
         className="multi-workspace-error-files-collapse"
         expandIcon={({ isActive }) => {
           return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
         }}
       >
         <Collapse.Panel
+          forceRender
           key="errorFiles"
           className="multi-workspace-error-files-collapse-panel"
           header={
