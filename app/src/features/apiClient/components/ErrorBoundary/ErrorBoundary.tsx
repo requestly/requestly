@@ -8,6 +8,8 @@ import { NativeError } from "errors/NativeError";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "types";
+import { isDesktopMode } from "utils/AppUtils";
+import { Alert } from "antd";
 
 interface Props {
   children: React.ReactNode;
@@ -143,6 +145,7 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
               </div>
             </div>
             {this.getCustomError(error)}
+            {isDesktopMode() ? <Alert type="warning" message="Try restarting the app to fix this issue." /> : null}
             <div className="error-boundary__contact">
               If the issue persists, contact <a href="mailto:contact@requestly.io">support</a>
             </div>
