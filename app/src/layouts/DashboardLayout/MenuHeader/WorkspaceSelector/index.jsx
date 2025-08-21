@@ -602,10 +602,10 @@ const WorkspaceSelector = () => {
             .map((team, index) => (
               <Menu.Item
                 key={team.id}
-                disabled={!!team.archived || isTeamCurrentlyActive(team.id)}
+                disabled={!!team.archived || (viewMode !== ApiClientViewMode.MULTI && isTeamCurrentlyActive(team.id))}
                 icon={<LocalWorkspaceAvatar size={28} workspace={team} />}
                 className={`workspace-menu-item ${
-                  team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
+                  (viewMode !== ApiClientViewMode.MULTI && team.id === activeWorkspaceId) ? "active-workspace-dropdownItem" : ""
                 }`}
                 onClick={(e) => {
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
