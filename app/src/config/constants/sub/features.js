@@ -100,4 +100,6 @@ FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
 FEATURES.COMPATIBLE_DESKTOP_APP = "compatible_desktop_app";
 FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
 
+FEATURES.GRAPHQL_SUPPORT = "graphql_support";
+
 export default FEATURES;
