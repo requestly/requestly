@@ -22,6 +22,8 @@ import {
   NewRecordDropdownItemType,
 } from "../../../components/NewApiRecordDropdown/NewApiRecordDropdown";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
@@ -37,6 +39,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
   const workspacesInView = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
   const { onNewClick } = useApiClientContext();
   const handleCollapseChange = useCallback((key: string) => {}, []);
+  const contextId = useContextId();
 
   const items: MenuProps["items"] = [
     {
@@ -99,6 +102,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
                   <NewApiRecordDropdown
                     invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
                     onSelect={(params) => {
+                      setLastUsedContextId(contextId);
                       //FIXME: fix the analytics here
                       onNewClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
                     }}
