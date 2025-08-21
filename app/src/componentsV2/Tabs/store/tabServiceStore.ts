@@ -43,6 +43,7 @@ type TabActions = {
   closeAllTabs: (skipUnsavedPrompt?: boolean) => void;
   closeTabById: (tabId: TabId, skipUnsavedPrompt?: boolean) => void;
   closeTabBySource: (sourceId: SourceId, sourceName: SourceName, skipUnsavedPrompt?: boolean) => void;
+  closeTabByContext: (contextId?: string, skipUnsavedPrompt?: boolean) => void;
   resetPreviewTab: () => void;
   setPreviewTab: (tabId: TabId) => void;
   setActiveTab: (tabId: TabId) => void;
@@ -207,6 +208,17 @@ const createTabServiceStore = () => {
           }
 
           closeTabById(tabId, skipUnsavedPrompt);
+        },
+
+        closeTabByContext(contextId, skipUnsavedPrompt) {
+          const { tabs, closeTabById } = get();
+          const tabsToClose = Array.from(tabs.values()).map(t => t.getState())
+            .filter(t => t.source.metadata.context.id === contextId);
+
+          tabsToClose.forEach(t => {
+            closeTabById(t.id, skipUnsavedPrompt);
+          });
+            
         },
 
         closeTabById(tabId, skipUnsavedPrompt) {

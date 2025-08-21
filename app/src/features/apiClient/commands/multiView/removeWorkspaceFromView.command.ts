@@ -1,3 +1,4 @@
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { apiClientFeatureContextProviderStore } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import {
   apiClientMultiWorkspaceViewStore,
@@ -17,6 +18,7 @@ export const removeWorkspaceFromView = (workspaceId: string) => {
       "Cannot remove the last workspace from view. Please add another workspace first, or switch to single view."
     );
   }
+  getTabServiceActions().closeTabsByContext(contextId);
   apiClientMultiWorkspaceViewStore.getState().removeWorkspace(contextId);
   apiClientFeatureContextProviderStore.getState().removeContext(contextId);
 };
