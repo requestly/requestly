@@ -37,19 +37,22 @@ export const ImportFromCurlModal: React.FC<Props> = ({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (!curlCommand && initialCurlCommand) {
+    if (isOpen && !curlCommand && initialCurlCommand) {
       setCurlCommand(initialCurlCommand);
     }
+    // exclude curlCommand to avoid re-firing while typing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialCurlCommand]);
 
+  useEffect(() => {
     if (isOpen) {
       trackCurlImportModalOpened({
         source,
         page_domain: getDomainFromURL(pageURL),
       });
-
       inputRef.current?.focus();
     }
-  }, [isOpen, source, pageURL, curlCommand, initialCurlCommand]);
+  }, [isOpen, source, pageURL]);
 
   const onImportClicked = useCallback(() => {
     if (!curlCommand) {

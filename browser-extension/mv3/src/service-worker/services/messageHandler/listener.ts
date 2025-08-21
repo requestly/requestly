@@ -215,13 +215,13 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED:
-        getPopupConfig().then((config) => {
-          if (config?.session_replay === true) {
-            sendResponse(true);
-          } else {
+        getPopupConfig()
+          .then((config) => {
+            sendResponse(config?.session_replay === true);
+          })
+          .catch(() => {
             sendResponse(false);
-          }
-        });
+          });
         return true;
 
       case EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL:
