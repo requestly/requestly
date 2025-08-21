@@ -263,7 +263,6 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         }}
       />
       <div className="api-client-sidebar">
-        <ContextId id={context.id}>
           <div className="api-client-sidebar-content">
             <ApiClientSidebarHeader
               activeTab={activeKey}
@@ -284,15 +283,8 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
               defaultActiveKey={ApiClientSidebarTabKey.COLLECTIONS}
               onChange={handleActiveTabChange}
             />
-<<<<<<< HEAD
         </div>
         <ErrorFilesList />
-=======
-          </div>
-
-          <ErrorFilesList />
-        </ContextId>
->>>>>>> phase-2-multi-workspace-view
       </div>
 
       {isDeleteModalOpen ? (
