@@ -29,6 +29,7 @@ import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientEx
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
+import { useApiClientContext } from "features/apiClient/contexts";
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -72,7 +73,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [collectionsToExport, setCollectionsToExport] = useState([]);
-  
+  const { onNewClickV2 } = useApiClientContext();
   const contextId = useContextId();
   const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.openTab,
@@ -433,7 +434,15 @@ export const CollectionRow: React.FC<Props> = ({
                       disabled={isReadOnly}
                       message="No requests created yet"
                       newRecordBtnText="New collection"
-                      onNewClick={onNewClick}
+                      onNewClick={(src, recordType, collectionId, entryType) =>
+                        onNewClickV2({
+                          contextId: contextId,
+                          analyticEventSource: src,
+                          recordType,
+                          collectionId,
+                          entryType,
+                        })
+                      }
                     />
                   ) : (
                     record.data.children?.map((apiRecord) => {

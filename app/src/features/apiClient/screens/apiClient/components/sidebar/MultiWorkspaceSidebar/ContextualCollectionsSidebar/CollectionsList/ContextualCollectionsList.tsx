@@ -55,7 +55,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
 
-  const { isRecordBeingCreated } = useApiClientContext();
+  const { isRecordBeingCreated, onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
   const [selectedRecords, setSelectedRecords] = useState<Set<RQAPI.ApiClientRecord["id"]>>(new Set());
   const [expandedRecordIds, setExpandedRecordIds] = useState(
@@ -237,7 +237,9 @@ export const ContextualCollectionsList: React.FC<Props> = ({
               disabled={!isValidPermission}
               newRecordBtnText="Create a collection"
               message={searchValue ? "No collection or request found" : "No content available yet"}
-              onNewClick={onNewClick}
+              onNewClick={(src, recordType, collectionId, entryType) =>
+                onNewClickV2({ contextId: context.id, analyticEventSource: src, recordType, collectionId, entryType })
+              }
             />
           )}
         </div>

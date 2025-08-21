@@ -12,7 +12,6 @@ import { toast } from "utils/Toast";
 import {
   ApiClientFeatureContext,
   apiClientFeatureContextProviderStore,
-  setLastUsedContextId,
 } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MoveToCollectionModal } from "../../../modals/MoveToCollectionModal/MoveToCollectionModal";
 import { getProcessedRecords } from "features/apiClient/commands/utils";
@@ -315,10 +314,6 @@ export const ContextualCollectionsSidebar: React.FC<{
           {selectedWorkspaces.map((workspace) => {
             const workspaceId = workspace.getState().id;
 
-            const contextualOnNewClick = useCallback(async (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => {
-              setLastUsedContextId(workspaceId);
-              onNewClick(src,recordType);
-            }, [setLastUsedContextId, onNewClick]);
             return (
               <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
                 <ContextualCollectionsList
@@ -326,7 +321,7 @@ export const ContextualCollectionsSidebar: React.FC<{
                   showSelection={showSelection}
                   handleShowSelection={handleShowSelection}
                   searchValue={searchValue}
-                  onNewClick={contextualOnNewClick}
+                  onNewClick={onNewClick}
                   recordTypeToBeCreated={recordTypeToBeCreated}
                   handleRecordSelection={handleRecordSelection}
                   handleRecordsToBeDeleted={handleRecordsToBeDeleted}

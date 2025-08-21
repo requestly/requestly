@@ -18,29 +18,34 @@ import { createRepository } from "./commands/context/setupContext.command";
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.isLoaded, s.getViewMode]);
+  const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [
+    s.viewMode,
+    s.isLoaded,
+    s.getViewMode,
+  ]);
 
   useEffect(() => {
     (async () => {
-      if (viewMode === ApiClientViewMode.MULTI) {
+      if (getViewMode() === ApiClientViewMode.MULTI) {
         await loadWorkspaces();
         return;
       }
     })();
-  }, [viewMode]);
+  }, [getViewMode]);
 
   useEffect(() => {
+    if (viewMode === ApiClientViewMode.MULTI) {
+      return;
+    }
+
     (async () => {
-      if(getViewMode() !== ApiClientViewMode.SINGLE) {
-        return;
-      }
       const repository = createRepository(activeWorkspace, {
         loggedIn: user.loggedIn,
         uid: user.details?.profile?.uid ?? "",
       });
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
-  }, [user, activeWorkspace.id]);
+  }, [user, activeWorkspace.id, viewMode]);
 
   if (!isLoaded) {
     return <ApiClientLoadingView />;

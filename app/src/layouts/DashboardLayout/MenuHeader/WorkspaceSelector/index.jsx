@@ -44,7 +44,7 @@ import {
   getAllWorkspaces,
   isActiveWorkspaceShared,
 } from "store/slices/workspaces/selectors";
-import { PrivateWorkspaceStub, WorkspaceType } from "features/workspaces/types";
+import { WorkspaceType } from "features/workspaces/types";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import LocalWorkspaceAvatar from "features/workspaces/components/LocalWorkspaceAvatar";
@@ -57,7 +57,7 @@ import {
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { MultiWorkspaceAvatarGroup } from "./MultiWorkspaceAvatarGroup";
-import { addWorkspaceToView, removeWorkspaceFromView, resetToSingleView } from "features/apiClient/commands/multiView";
+import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -389,18 +389,15 @@ const WorkspaceSelector = () => {
   );
 
   const handleSwitchToPrivateWorkspace = useCallback(async () => {
-    resetToSingleView();
     setIsModalOpen(true);
     return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast();
     });
-  }, [appMode, dispatch, user.details?.profile?.uid]);
+  }, [appMode, dispatch]);
 
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
-    resetToSingleView();
-
     switchWorkspace(
       {
         teamId: team.id,
@@ -558,9 +555,9 @@ const WorkspaceSelector = () => {
                     team.id === activeWorkspaceId ? "active-workspace-dropdownItem" : ""
                   }`}
                   onClick={(e) => {
+                    e?.stopPropagation?.();
                     confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
                     trackWorkspaceDropdownClicked("switch_workspace");
-                    e?.stopPropagation?.();
                   }}
                 >
                   <Tooltip
@@ -610,9 +607,9 @@ const WorkspaceSelector = () => {
                     : ""
                 }`}
                 onClick={(e) => {
+                  e?.stopPropagation?.();
                   confirmWorkspaceSwitch(() => handleWorkspaceSwitch(team));
                   trackWorkspaceDropdownClicked("switch_workspace");
-                  e?.stopPropagation?.();
                 }}
               >
                 <Tooltip
