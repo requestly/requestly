@@ -18,7 +18,7 @@ import { createRepository } from "./commands/context/setupContext.command";
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const [viewMode, isLoaded] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.isLoaded]);
+  const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.isLoaded, s.getViewMode]);
 
 
   useEffect(() => {
@@ -33,6 +33,9 @@ const ApiClientFeatureContainer: React.FC = () => {
 
   useEffect(() => {
     (async () => {
+      if(getViewMode() !== ApiClientViewMode.SINGLE) {
+        return;
+      }
       const repository = createRepository(activeWorkspace, {
         loggedIn: user.loggedIn,
         uid: user.details?.profile?.uid ?? "",
