@@ -52,14 +52,10 @@
     margin-bottom: 8px;
     padding: 10px;
 
-    &-message {
-      color: var(--requestly-color-warning);
-      font-size: var(--requestly-font-size-sm);
-    }
-
+    &-message,
     &-description {
-      font-size: var(--requestly-font-size-sm);
       color: var(--requestly-color-warning);
+      font-size: var(--requestly-font-size-sm);
     }
   }
 }

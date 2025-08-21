@@ -147,10 +147,7 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
     >
       <div className="postman-export-modal-content">
         {hasGraphQLRequests && (
-          <Alert
-            description="Some of your selected records contain GraphQL requests. GraphQL export support is currently in development and will be available soon."
-            type="warning"
-          />
+          <Alert description="GraphQL exports are not supported yet. Coming soon!" type="warning" />
         )}
         <div className="export-details-card">
           <div className="export-name">
