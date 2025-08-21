@@ -1,13 +1,11 @@
 .multi-workspace-error-files-list-container {
-  // margin-top: 8px;
   height: auto;
   max-height: 45%;
-  overflow: hidden;
   border-top: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
   .multi-workspace-error-files-collapse {
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
 
     .ant-collapse-expand-icon .collapse-expand-icon {
       cursor: pointer;
@@ -23,9 +21,6 @@
     }
 
     .multi-workspace-error-files-collapse-panel {
-      height: 100%;
-      overflow: hidden;
-
       .ant-collapse-header {
         display: flex;
         gap: 6px;
@@ -33,14 +28,8 @@
         padding: 6px;
       }
 
-      .ant-collapse-content {
-        height: 100%;
-      }
-
       .ant-collapse-content-box {
         padding: 0;
-        height: 100%;
-        overflow: auto;
       }
     }
   }
