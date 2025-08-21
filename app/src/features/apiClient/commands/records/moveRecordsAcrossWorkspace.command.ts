@@ -27,7 +27,7 @@ export async function moveRecordsAcrossWorkspace(
       collectionId: destination.collectionId,
     });
 
-    return { movedRecords: result };
+    return { oldContextRecords: recordsToMove, movedRecords: result };
   }
 
   const destinationContext = getApiClientFeatureContext(destination.contextId);

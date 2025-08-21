@@ -19,6 +19,7 @@ import { isArray } from "lodash";
 import { WorkspaceType } from "types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { resetToSingleView } from "features/apiClient/commands/multiView";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -101,6 +102,7 @@ export const switchWorkspace = async (
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
+  resetToSingleView();
   dispatch(
     teamsActions.setCurrentlyActiveWorkspace({
       id: teamId,

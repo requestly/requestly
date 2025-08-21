@@ -1,3 +1,4 @@
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { setupContext } from "../context/setupContext.command";
 import { NativeError } from "errors/NativeError";
 import {
@@ -14,6 +15,7 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
   const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
 
   if (viewMode !== ApiClientViewMode.MULTI) {
+    getTabServiceActions().resetTabs(true);
     apiClientMultiWorkspaceViewStore.getState().setViewMode(ApiClientViewMode.MULTI);
   }
 

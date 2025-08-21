@@ -37,7 +37,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
   const { isValidPermission } = validatePermission("api_client_request", "create");
   const [workspaceName] = useWorkspace(workspaceId, (s) => [s.name]);
   const getAllSelectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.getAllSelectedWorkspaces);
-  const { onNewClick } = useApiClientContext();
+  const { onNewClickV2 } = useApiClientContext();
   const handleCollapseChange = useCallback((key: string) => {}, []);
   const contextId = useContextId();
 
@@ -104,7 +104,13 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
                     onSelect={(params) => {
                       setLastUsedContextId(contextId);
                       //FIXME: fix the analytics here
-                      onNewClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
+                      onNewClickV2({
+                        contextId: contextId,
+                        analyticEventSource: "api_client_sidebar_header",
+                        recordType: params.recordType,
+                        collectionId: undefined,
+                        entryType: params.entryType,
+                      });
                     }}
                   >
                     <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
