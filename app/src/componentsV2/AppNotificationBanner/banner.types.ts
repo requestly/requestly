@@ -19,6 +19,7 @@ export enum BANNER_ACTIONS {
   CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
   SEE_PLANS = "see_plans",
   REDIRECT_TO_CHROME_STORE_REVIEWS = "redirect_to_chrome_store_reviews",
+  REDIRECT_TO_LINKEDIN_FORM = "redirect_to_linkedin_form",
 }
 
 export enum BANNER_ID {
@@ -29,6 +30,7 @@ export enum BANNER_ID {
   CONVERT_TO_ANNUAL_PLAN = "convert_to_annual_plan",
   BILLING_TEAM_PLAN_REMINDER = "billing_team_plan_reminder",
   CHROME_STORE_REVIEWS = "chrome_store_reviews",
+  SHARE_ON_LINKEDIN = "share_on_linkedin",
 }
 
 export interface Banner {
