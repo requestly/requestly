@@ -135,13 +135,18 @@
 
         .workspace-name {
           color: var(--requestly-color-text-placeholder, #8f8f8f);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-wrap: nowrap;
+          white-space: nowrap;
+          max-width: 243px;
         }
 
         .file-name {
           align-self: stretch;
 
-          overflow: hidden;
           color: var(--requestly-color-text-default, #fff);
+          overflow: hidden;
           text-overflow: ellipsis;
           text-wrap: nowrap;
           white-space: nowrap;
