@@ -544,7 +544,7 @@ const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
       <ErrorBoundary>
-        <GraphQLRecordProvider entry={props.apiEntryDetails.data}>
+        <GraphQLRecordProvider entry={props.apiEntryDetails.data} recordId={props.apiEntryDetails.id}>
           <Component {...props} />
         </GraphQLRecordProvider>
       </ErrorBoundary>
