@@ -5,6 +5,7 @@ import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { Collapse } from "antd";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
 import "./MultiWorkspaceErrorFilesList.scss";
+import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 
 export const MultiWorkspaceErrorFilesList: React.FC = () => {
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
@@ -29,7 +30,7 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
           className="multi-workspace-error-files-collapse-panel"
           header={
             <div className="multi-workspace-error-files-list-header">
-              Error files <span className="count">{errorRecordsCount}</span>
+              <MdWarningAmber /> Error files <span className="count">{errorRecordsCount}</span>
             </div>
           }
         >
