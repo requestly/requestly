@@ -400,6 +400,7 @@ const WorkspaceSelector = () => {
   const handleWorkspaceSwitch = async (team) => {
     setIsModalOpen(true);
     resetToSingleView();
+    
     switchWorkspace(
       {
         teamId: team.id,

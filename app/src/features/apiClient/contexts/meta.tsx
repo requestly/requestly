@@ -1,32 +1,10 @@
-import {
-  apiClientMultiWorkspaceViewStore,
-  ApiClientViewMode,
-} from "../store/multiWorkspaceView/multiWorkspaceView.store";
 import { useContextId } from "./contextId.context";
-import {
-  ApiClientFeatureContext,
-  apiClientFeatureContextProviderStore,
-  NoopContext,
-  NoopContextId,
-} from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import * as apiClientFeatureContextStore from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { useMemo } from "react";
+import { getApiClientFeatureContext } from "../commands/store.utils";
 
-export function getApiClientFeatureContext(contextId: string) {
-  const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
-  if (contextId === NoopContextId) {
-    return NoopContext;
-  }
-  const { viewMode } = apiClientMultiWorkspaceViewStore.getState();
-  if (viewMode === ApiClientViewMode.SINGLE) {
-    return getSingleViewContext();
-  }
-  if (!contextId) {
-    return getLastUsedContext();
-  }
-  return getContext(contextId);
-}
 
-export function useApiClientFeatureContext(): ApiClientFeatureContext {
+export function useApiClientFeatureContext(): apiClientFeatureContextStore.ApiClientFeatureContext {
   const contextId = useContextId();
   const context = useMemo(() => {
     return getApiClientFeatureContext(contextId);

@@ -47,6 +47,7 @@ function createApiClientFeatureContextProviderStore() {
       contexts: new Map(),
 
       addContext(context) {
+        
         const { contexts, setLastUsedContext } = get();
         contexts.set(context.id, context);
         set({ contexts });
@@ -54,6 +55,7 @@ function createApiClientFeatureContextProviderStore() {
       },
 
       removeContext(id) {
+        
         const { contexts, lastUsedContext, setLastUsedContext } = get();
         const context = contexts.get(id);
 
@@ -71,6 +73,7 @@ function createApiClientFeatureContextProviderStore() {
       },
 
       setLastUsedContext(context) {
+        
         set({
           lastUsedContext: context,
         });

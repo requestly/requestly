@@ -403,17 +403,14 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         />
       )}
       {isMoveCollectionModalOpen && (
-        // TODO: to be fix
-        <ContextId id={apiClientFeatureContextProviderStore.getState().getSingleViewContext()?.id}>
-          <MoveToCollectionModal
-            recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
-            isOpen={isMoveCollectionModalOpen}
-            onClose={() => {
-              setIsMoveCollectionModalOpen(false);
-            }}
-          />
-        </ContextId>
-      )}
+        <MoveToCollectionModal
+          recordsToMove={filterOutChildrenRecords(selectedRecords, childParentMap, updatedRecords.recordsMap)}
+          isOpen={isMoveCollectionModalOpen}
+          onClose={() => {
+            setIsMoveCollectionModalOpen(false);
+          }}
+        />
+    )}
     </DndProvider>
   );
 };
