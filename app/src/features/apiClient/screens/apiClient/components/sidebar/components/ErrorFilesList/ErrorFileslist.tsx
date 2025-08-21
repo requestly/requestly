@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
@@ -11,14 +11,12 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { forceRefreshRecords } from "features/apiClient/commands/records";
-import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
 import {
   ApiClientViewMode,
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useCommand } from "features/apiClient/commands";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
@@ -77,15 +75,14 @@ const ErrorListHeader: React.FC = () => {
   ) : null;
 };
 
-const ErrorFileItemTitle: React.FC<{ contextId: string; file: ErroredRecord }> = ({ contextId, file }) => {
-  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
+const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
   const [getViewMode, getSelectedWorkspace] = useApiClientMultiWorkspaceView((s) => [
     s.getViewMode,
     s.getSelectedWorkspace,
   ]);
 
-  const workspaceId = getContext(contextId).workspaceId;
-  const workspace = useMemo(() => getSelectedWorkspace(workspaceId), [getSelectedWorkspace, workspaceId]);
+  const ctx = useApiClientFeatureContext();
+  const workspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId), [getSelectedWorkspace, ctx.workspaceId]);
 
   return getViewMode() === ApiClientViewMode.SINGLE ? (
     <>
@@ -105,14 +102,13 @@ const ErrorFileItemTitle: React.FC<{ contextId: string; file: ErroredRecord }> =
 };
 
 const ErrorFileItem: React.FC<{
-  contextId: string;
   file: ErroredRecord;
   openErrorFile: (file: ErroredRecord) => void;
   deleteErrorFile(file: ErroredRecord): void;
-}> = ({ contextId, file, openErrorFile, deleteErrorFile }) => {
+}> = ({ file, openErrorFile, deleteErrorFile }) => {
   return (
     <div key={file.path} className="error-file-item">
-      <ErrorFileItemTitle file={file} contextId={contextId} />
+      <ErrorFileItemTitle file={file} />
 
       <div className="error-file-item-actions">
         <Tooltip title="Edit file" color="var(--requestly-color-black)" placement="top">
@@ -128,11 +124,18 @@ const ErrorFileItem: React.FC<{
   );
 };
 
-export const ErrorFilesList = () => {
-  const contextId = useContextId();
+export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number) => void }> = ({
+  updateErrorRecordsCount,
+}) => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
-  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
+
+  const {
+    env: { forceRefreshEnvironments },
+    api: { forceRefreshRecords },
+  } = useCommand();
+
+  const { apiClientRecordsRepository } = useApiClientRepository();
 
   const [apiErroredRecords, environmentErroredRecords] = useErroredRecords((s) => [
     s.apiErroredRecords,
@@ -144,17 +147,23 @@ export const ErrorFilesList = () => {
     environmentErroredRecords,
   ]);
 
+  useEffect(() => {
+    updateErrorRecordsCount?.(files.length);
+
+    return () => {
+      return updateErrorRecordsCount?.(-files.length);
+    };
+  }, [files.length, updateErrorRecordsCount]);
+
   const handleDeleteErrorFile = useCallback(
     async (errorFile: ErroredRecord) => {
-      const context = getContext(contextId);
-      const { apiClientRecordsRepository } = context.repositories;
       const result = await apiClientRecordsRepository.deleteRecords([errorFile.path]);
 
       if (result.success) {
         if (errorFile.type === FileType.ENVIRONMENT) {
-          forceRefreshEnvironments(context);
+          forceRefreshEnvironments();
         } else {
-          forceRefreshRecords(context);
+          forceRefreshRecords();
         }
 
         toast.success("Error file deleted successfully");
@@ -165,13 +174,18 @@ export const ErrorFilesList = () => {
         });
       }
     },
-    [contextId, getContext]
+    [apiClientRecordsRepository, forceRefreshEnvironments, forceRefreshRecords]
   );
 
   const handleOpenErrorFile = (file: ErroredRecord) => {
     setErrorFileToView(file);
     setIsErrorFileViewerModalOpen(true);
   };
+
+  const onCloseErrorFileViewerModalOpen = useCallback(() => {
+    setIsErrorFileViewerModalOpen(false);
+    setErrorFileToView(null);
+  }, []);
 
   if (!files.length) {
     return null;
@@ -181,12 +195,9 @@ export const ErrorFilesList = () => {
     <>
       {isErrorFileViewerModalOpen && (
         <ErrorFileViewerModal
-          isOpen={isErrorFileViewerModalOpen}
-          onClose={() => {
-            setIsErrorFileViewerModalOpen(false);
-            setErrorFileToView(null);
-          }}
           errorFile={errorFileToView}
+          isOpen={isErrorFileViewerModalOpen}
+          onClose={onCloseErrorFileViewerModalOpen}
         />
       )}
 
@@ -198,7 +209,6 @@ export const ErrorFilesList = () => {
               <ErrorFileItem
                 file={file}
                 key={file.path}
-                contextId={contextId}
                 openErrorFile={handleOpenErrorFile}
                 deleteErrorFile={handleDeleteErrorFile}
               />

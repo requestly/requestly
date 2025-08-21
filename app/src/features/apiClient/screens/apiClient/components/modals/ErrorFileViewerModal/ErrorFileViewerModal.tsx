@@ -6,11 +6,9 @@ import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useCommand } from "features/apiClient/commands";
 import "./errorFileViewerModal.scss";
-import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
-import { forceRefreshRecords } from "features/apiClient/commands/records";
-import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
 
 interface ErrorFileViewerModalProps {
   isOpen: boolean;
@@ -19,35 +17,34 @@ interface ErrorFileViewerModalProps {
 }
 
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
-  const contextId = useContextId();
-  const getContext = useApiClientFeatureContextProvider((s) => s.getContext);
-
   const [fileContent, setFileContent] = useState(null);
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const {
+    env: { forceRefreshEnvironments },
+    api: { forceRefreshRecords },
+  } = useCommand();
 
   useEffect(() => {
     const fetchErrorFileData = async () => {
-      const context = getContext(contextId);
-      const { apiClientRecordsRepository } = context.repositories;
       const result = await apiClientRecordsRepository.getRawFileData(errorFile.path);
       if (result.success) {
         setFileContent(result.data);
       }
     };
     fetchErrorFileData();
-  }, [contextId, getContext, errorFile.path]);
+  }, [apiClientRecordsRepository, errorFile.path]);
 
   const handlePostSuccessfulWrite = () => {
-    const context = getContext(contextId);
     if (
       errorFile.type === FileType.API ||
       errorFile.type === FileType.AUTH ||
       errorFile.type === FileType.COLLECTION_VARIABLES ||
       errorFile.type === FileType.DESCRIPTION
     ) {
-      forceRefreshRecords(context);
+      forceRefreshRecords();
     }
     if (errorFile.type === FileType.ENVIRONMENT) {
-      forceRefreshEnvironments(context);
+      forceRefreshEnvironments();
     }
     onClose();
     toast.success("File saved and included successfully");
@@ -55,8 +52,6 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
 
   const handleSave = async () => {
     try {
-      const context = getContext(contextId);
-      const { apiClientRecordsRepository } = context.repositories;
       const result = await apiClientRecordsRepository.writeToRawFile(errorFile.path, fileContent, errorFile.type);
       if (!result.success) {
         throw new Error(result.message || "Failed to save error file");
