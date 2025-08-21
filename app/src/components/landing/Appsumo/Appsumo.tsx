@@ -9,7 +9,7 @@ import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { FiXCircle } from "@react-icons/all-files/fi/FiXCircle";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
-import AppSumoWorkspaceDropdown from "components/landing/pricing/AppSumoWorkspaceDropdown/AppSumoWorkspaceDropdown";
+import AppSumoWorkspaceDropdown from "components/landing/Appsumo/AppSumoWorkspaceDropdown/AppSumoWorkspaceDropdown";
 import { doc, getDoc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
