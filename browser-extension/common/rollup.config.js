@@ -47,6 +47,10 @@ export default [
             dest: `${OUTPUT_DIR}/popup`,
             rename: "popup.html",
           },
+          {
+            src: "resources/images/apiclient-container-bg.png",
+            dest: `${OUTPUT_DIR}/popup`,
+          },
         ],
       }),
       nodeResolve(),

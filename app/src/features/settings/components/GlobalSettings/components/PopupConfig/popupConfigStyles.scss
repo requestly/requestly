@@ -1,0 +1,17 @@
+.popup-config-list {
+  padding: 1rem;
+  background: var(--requestly-color-surface-0);
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.popup-config-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+
+  .ant-checkbox-group-item span {
+    font-size: var(--requestly-font-size-sm, 13px);
+  }
+}
