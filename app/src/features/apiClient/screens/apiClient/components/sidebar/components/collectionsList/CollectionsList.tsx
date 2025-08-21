@@ -410,7 +410,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
             setIsMoveCollectionModalOpen(false);
           }}
         />
-    )}
+      )}
     </DndProvider>
   );
 };

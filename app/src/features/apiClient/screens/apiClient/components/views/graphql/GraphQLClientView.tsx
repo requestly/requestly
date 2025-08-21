@@ -458,6 +458,7 @@ const GraphQLClientView: React.FC<Props> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
+              id={record.id}
               openInModal={openInModal}
               name={record.name}
               OnRecordNameUpdate={() => {}}

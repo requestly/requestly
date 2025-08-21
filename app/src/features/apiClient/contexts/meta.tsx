@@ -3,7 +3,6 @@ import * as apiClientFeatureContextStore from "../store/apiClientFeatureContext/
 import { useMemo } from "react";
 import { getApiClientFeatureContext } from "../commands/store.utils";
 
-
 export function useApiClientFeatureContext(): apiClientFeatureContextStore.ApiClientFeatureContext {
   const contextId = useContextId();
   const context = useMemo(() => {

@@ -140,7 +140,7 @@ const createTabServiceStore = () => {
           const sourceName = source.getSourceName();
 
           const contextId = source.metadata.context.id;
-          if(contextId) {
+          if (contextId) {
             setLastUsedContextId(contextId);
           }
 
@@ -212,13 +212,13 @@ const createTabServiceStore = () => {
 
         closeTabByContext(contextId, skipUnsavedPrompt) {
           const { tabs, closeTabById } = get();
-          const tabsToClose = Array.from(tabs.values()).map(t => t.getState())
-            .filter(t => t.source.metadata.context.id === contextId);
+          const tabsToClose = Array.from(tabs.values())
+            .map((t) => t.getState())
+            .filter((t) => t.source.metadata.context.id === contextId);
 
-          tabsToClose.forEach(t => {
+          tabsToClose.forEach((t) => {
             closeTabById(t.id, skipUnsavedPrompt);
           });
-            
         },
 
         closeTabById(tabId, skipUnsavedPrompt) {
@@ -290,15 +290,14 @@ const createTabServiceStore = () => {
 
         setActiveTab(id: TabId) {
           const { tabs } = get();
-          const tab = tabs.get(id)          
+          const tab = tabs.get(id);
           if (tab) {
             const tabState = tab.getState();
             set({ activeTabId: id, activeTabSource: tabState.source });
             const contextId = tabState.source.metadata.context.id;
-            if(contextId) {
+            if (contextId) {
               setLastUsedContextId(contextId);
             }
-
           } else {
             set({
               activeTabId: undefined,

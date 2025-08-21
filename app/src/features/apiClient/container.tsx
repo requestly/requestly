@@ -20,7 +20,6 @@ const ApiClientFeatureContainer: React.FC = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.isLoaded, s.getViewMode]);
 
-
   useEffect(() => {
     (async () => {
       if (viewMode === ApiClientViewMode.MULTI) {
@@ -28,7 +27,6 @@ const ApiClientFeatureContainer: React.FC = () => {
         return;
       }
     })();
-
   }, [viewMode]);
 
   useEffect(() => {
@@ -39,12 +37,10 @@ const ApiClientFeatureContainer: React.FC = () => {
       const repository = createRepository(activeWorkspace, {
         loggedIn: user.loggedIn,
         uid: user.details?.profile?.uid ?? "",
-      })
+      });
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
-
   }, [user, activeWorkspace.id]);
-
 
   if (!isLoaded) {
     return <ApiClientLoadingView />;
