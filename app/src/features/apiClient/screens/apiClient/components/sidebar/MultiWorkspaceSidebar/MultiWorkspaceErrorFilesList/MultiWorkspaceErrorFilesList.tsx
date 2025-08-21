@@ -15,6 +15,10 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
     setErrorRecordsCount((prev) => prev + value);
   }, []);
 
+  if(!errorRecordsCount) {
+    return;
+  }
+
   return (
     <div className="multi-workspace-error-files-list-container">
       <Collapse
