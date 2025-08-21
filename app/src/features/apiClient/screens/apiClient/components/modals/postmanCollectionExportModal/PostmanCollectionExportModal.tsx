@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal } from "antd";
+import { Alert, Modal } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import "./postmanExportModal.scss";
 import fileDownload from "js-file-download";
 import { omit } from "lodash";
-import { isApiCollection } from "../../../utils";
+import { isApiCollection, isApiRequest } from "../../../utils";
 import {
   trackExportApiCollectionsFailed,
   trackExportCollectionsClicked,
@@ -15,12 +15,12 @@ import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { postmanCollectionExporter } from "@requestly/alternative-importers";
 
 interface PostmanExportModalProps {
-  recordsToBeExported: RQAPI.Record[];
+  recordsToBeExported: RQAPI.ApiClientRecord[];
   isOpen: boolean;
   onClose: () => void;
 }
 
-type ExportRecord = Omit<RQAPI.Record, "createdBy" | "updatedBy" | "ownerId" | "createdTs" | "updatedTs">;
+type ExportRecord = Omit<RQAPI.ApiClientRecord, "createdBy" | "updatedBy" | "ownerId" | "createdTs" | "updatedTs">;
 
 interface RequestlyExportData {
   schema_version: string;
@@ -31,6 +31,7 @@ const COLLECTIONS_SCHEMA_VERSION = "1.0.0";
 
 export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsToBeExported, isOpen, onClose }) => {
   const [isApiRecordsProcessed, setIsApiRecordsProcessed] = useState(false);
+  const [hasGraphQLRequests, setHasGraphQLRequests] = useState(false);
   const [exportData, setExportData] = useState<RequestlyExportData>({
     schema_version: COLLECTIONS_SCHEMA_VERSION,
     records: [],
@@ -74,13 +75,12 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
       trackExportCollectionsClicked();
       onClose();
     } catch (error) {
-      console.error("Error exporting to Postman format:", error);
       toast.error("Failed to export collections. Please try again.");
       trackExportApiCollectionsFailed(exportData.records?.length, 0);
     }
   }, [exportData, fileInfo.label, onClose]);
 
-  const sanitizeRecord = (record: RQAPI.Record): ExportRecord =>
+  const sanitizeRecord = (record: RQAPI.ApiClientRecord): ExportRecord =>
     omit(record, ["createdBy", "updatedBy", "ownerId", "createdTs", "updatedTs"]);
 
   const sanitizeRecords = useCallback((collection: RQAPI.CollectionRecord): ExportRecord[] => {
@@ -91,7 +91,7 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
 
     // Recursively process children
     if (collection.data.children) {
-      collection.data.children.forEach((record: RQAPI.Record) => {
+      collection.data.children.forEach((record: RQAPI.ApiClientRecord) => {
         if (record.type === RQAPI.RecordType.API) {
           records.push(sanitizeRecord(record) as ExportRecord);
         } else {
@@ -113,13 +113,23 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
         recordsToExport.push({ ...sanitizeRecord(record), collectionId: "" });
       }
     });
-
     setExportData({
       schema_version: COLLECTIONS_SCHEMA_VERSION,
       records: recordsToExport,
     });
     setIsApiRecordsProcessed(true);
   }, [isOpen, recordsToBeExported, isApiRecordsProcessed, sanitizeRecords]);
+
+  useEffect(() => {
+    if (exportData.records.length) {
+      const hasGraphQLRequest = exportData.records.some(
+        (record) =>
+          isApiRequest(record as RQAPI.ApiClientRecord) &&
+          (record.data as RQAPI.ApiEntry).type === RQAPI.ApiEntryType.GRAPHQL
+      );
+      setHasGraphQLRequests(hasGraphQLRequest);
+    }
+  }, [exportData.records]);
 
   return (
     <Modal
@@ -136,6 +146,9 @@ export const PostmanExportModal: React.FC<PostmanExportModalProps> = ({ recordsT
       okText="Export"
     >
       <div className="postman-export-modal-content">
+        {hasGraphQLRequests && (
+          <Alert description="GraphQL exports are not supported yet. Coming soon!" type="warning" />
+        )}
         <div className="export-details-card">
           <div className="export-name">
             Postman-{fileInfo.label}-{getFormattedDate("DD_MM_YYYY")}
