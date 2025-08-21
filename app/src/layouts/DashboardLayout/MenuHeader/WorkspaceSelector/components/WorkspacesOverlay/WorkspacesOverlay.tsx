@@ -275,7 +275,10 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
         ) : null}
 
         {!hasLocalWorkspaces && !hasSharedWorkspaces ? (
-          <CommonEmptyView toggleDropdown={toggleDropdown} />
+          <>
+            {user.loggedIn ? <Divider /> : null}
+            <CommonEmptyView toggleDropdown={toggleDropdown} />
+          </>
         ) : !hasLocalWorkspaces && isLocalSyncEnabled && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <EmptyWorkspaceListSection workspaceType={WorkspaceType.LOCAL} toggleDropdown={toggleDropdown} />
         ) : !hasSharedWorkspaces ? (
