@@ -200,7 +200,7 @@ export default function HeaderUser() {
             ) : null}
           </Col>
         </Row>
-      ) : appMode === "DESKTOP" ? (
+      ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
         <LoggedOutPopover />
       ) : (
         <div className="auth-button-group">
