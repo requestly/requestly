@@ -30,15 +30,23 @@ import { teamsActions } from "store/features/teams/slice";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import { SharedWorkspaceCreationView } from "./components/SharedWorkspaceCreationView/SharedWorkspaceCreationView";
+import { LocalWorkspaceCreationView } from "./components/LocalWorkspaceCreationView/LocalWorkspaceCreationView";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 
 interface Props {
   isOpen: boolean;
-  defaultWorkspaceType?: WorkspaceType;
+  workspaceType?: WorkspaceType;
   toggleModal: () => void;
   callback?: () => void;
 }
 
-export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspaceType, toggleModal, callback }) => {
+export const CreateWorkspaceModalV2: React.FC<Props> = ({
+  isOpen,
+  toggleModal,
+  callback,
+  workspaceType = WorkspaceType.SHARED,
+}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -46,217 +54,212 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspa
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceType, setWorkspaceType] = useState(
-    defaultWorkspaceType || (user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL)
-  );
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
-  const folderSelectCallback = (path: string) => {
-    setFolderPath(path);
-  };
+  // const folderSelectCallback = (path: string) => {
+  //   setFolderPath(path);
+  // };
 
-  const handlePostTeamCreationStep = useCallback(
-    (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-          workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode: isSharedWorkspaceMode,
-        },
-        appMode,
-        null,
-        "create_workspace_modal"
-      );
-      if (workspaceType === WorkspaceType.SHARED) {
-        redirectToTeam(navigate, teamId, {
-          state: {
-            isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
-          },
-        });
-      }
-    },
-    [
-      dispatch,
-      appMode,
-      isNotifyAllSelected,
-      isSharedWorkspaceMode,
-      navigate,
-      user?.details?.isSyncEnabled,
-      workspaceType,
-    ]
-  );
+  // const handlePostTeamCreationStep = useCallback(
+  //   (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
+  //     switchWorkspace(
+  //       {
+  //         teamId: teamId,
+  //         teamName: newTeamName,
+  //         teamMembersCount: 1,
+  //         workspaceType,
+  //       },
+  //       dispatch,
+  //       {
+  //         isSyncEnabled: user?.details?.isSyncEnabled,
+  //         isWorkspaceMode: isSharedWorkspaceMode,
+  //       },
+  //       appMode,
+  //       null,
+  //       "create_workspace_modal"
+  //     );
+  //     if (workspaceType === WorkspaceType.SHARED) {
+  //       redirectToTeam(navigate, teamId, {
+  //         state: {
+  //           isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
+  //         },
+  //       });
+  //     }
+  //   },
+  //   [
+  //     dispatch,
+  //     appMode,
+  //     isNotifyAllSelected,
+  //     isSharedWorkspaceMode,
+  //     navigate,
+  //     user?.details?.isSyncEnabled,
+  //     workspaceType,
+  //   ]
+  // );
 
-  const handleDomainInvitesCreation = useCallback(
-    async (
-      teamId: string,
-      domain: string,
-      billingTeams: any,
-      createOrgTeamInvite: any,
-      upsertTeamCommonInvite: any,
-      isNotifyAllSelected: boolean
-    ): Promise<boolean> => {
-      const inviteRes: any = await createOrgTeamInvite({ domain, teamId });
-      await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
+  // const handleDomainInvitesCreation = useCallback(
+  //   async (
+  //     teamId: string,
+  //     domain: string,
+  //     billingTeams: any,
+  //     createOrgTeamInvite: any,
+  //     upsertTeamCommonInvite: any,
+  //     isNotifyAllSelected: boolean
+  //   ): Promise<boolean> => {
+  //     const inviteRes: any = await createOrgTeamInvite({ domain, teamId });
+  //     await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
 
-      if (inviteRes.data.success) {
-        toast.success(`All users from ${domain} have been invited to join this workspace.`);
-        trackAddTeamMemberSuccess({
-          team_id: teamId,
-          email: user?.details?.profile?.email,
-          is_admin: true,
-          source: "notify_all_teammates",
-          num_users_added: 1,
-          workspace_type: isWorkspaceMappedToBillingTeam(teamId, billingTeams)
-            ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
-            : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
-        });
-        return true;
-      }
+  //     if (inviteRes.data.success) {
+  //       toast.success(`All users from ${domain} have been invited to join this workspace.`);
+  //       trackAddTeamMemberSuccess({
+  //         team_id: teamId,
+  //         email: user?.details?.profile?.email,
+  //         is_admin: true,
+  //         source: "notify_all_teammates",
+  //         num_users_added: 1,
+  //         workspace_type: isWorkspaceMappedToBillingTeam(teamId, billingTeams)
+  //           ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+  //           : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
+  //       });
+  //       return true;
+  //     }
 
-      if (inviteRes.data.errCode === "no-users-in-same-domain") {
-        return false;
-      }
+  //     if (inviteRes.data.errCode === "no-users-in-same-domain") {
+  //       return false;
+  //     }
 
-      toast.error(`Could not invite all users from ${domain}.`);
-      return true;
-    },
-    [user?.details?.profile?.email]
-  );
+  //     toast.error(`Could not invite all users from ${domain}.`);
+  //     return true;
+  //   },
+  //   [user?.details?.profile?.email]
+  // );
 
-  const handleTeamWorkspaceCreation = useCallback(async () => {
-    if (!workspaceName.length) return;
-    setIsLoading(true);
-    const functions = getFunctions();
-    const createTeam = httpsCallable<CreateTeamParams, { teamId: string }>(functions, "teams-createTeam");
-    const createOrgTeamInvite = httpsCallable(functions, "invites-createOrganizationTeamInvite");
-    const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
+  // const handleTeamWorkspaceCreation = useCallback(async () => {
+  //   if (!workspaceName.length) return;
+  //   setIsLoading(true);
+  //   const functions = getFunctions();
+  //   const createTeam = httpsCallable<CreateTeamParams, { teamId: string }>(functions, "teams-createTeam");
+  //   const createOrgTeamInvite = httpsCallable(functions, "invites-createOrganizationTeamInvite");
+  //   const upsertTeamCommonInvite = httpsCallable(functions, "invites-upsertTeamCommonInvite");
 
-    const config =
-      workspaceType === WorkspaceType.LOCAL
-        ? ({ type: WorkspaceType.LOCAL, rootPath: folderPath } as LocalWorkspaceConfig)
-        : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
+  //   const config =
+  //     workspaceType === WorkspaceType.LOCAL
+  //       ? ({ type: WorkspaceType.LOCAL, rootPath: folderPath } as LocalWorkspaceConfig)
+  //       : ({ type: WorkspaceType.SHARED } as SharedOrPrivateWorkspaceConfig);
 
-    try {
-      const teamId = await (async () => {
-        if (config.type === WorkspaceType.LOCAL) {
-          const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
-          if (workspaceCreationResult.type === "error") {
-            throw new Error(workspaceCreationResult.error.message);
-          }
-          const partialWorkspace = workspaceCreationResult.content;
-          const localWorkspace: Workspace = {
-            id: partialWorkspace.id,
-            name: partialWorkspace.name,
-            owner: user?.details?.profile?.uid,
-            accessCount: 1,
-            adminCount: 1,
-            members: {
-              [user?.details?.profile?.uid]: {
-                role: WorkspaceMemberRole.admin,
-              },
-            },
-            appsumo: null,
-            workspaceType: WorkspaceType.LOCAL,
-            rootPath: partialWorkspace.path,
-          };
-          dispatch(teamsActions.addToAvailableTeams(localWorkspace));
-          dispatch(workspaceActions.upsertWorkspace(localWorkspace));
-          return partialWorkspace.id;
-        } else {
-          const response: any = await createTeam({
-            teamName: workspaceName,
-            config,
-          });
-          return response.data.teamId;
-        }
-      })();
+  //   try {
+  //     const teamId = await (async () => {
+  //       if (config.type === WorkspaceType.LOCAL) {
+  //         const workspaceCreationResult = await createWorkspaceFolder(workspaceName, config.rootPath);
+  //         if (workspaceCreationResult.type === "error") {
+  //           throw new Error(workspaceCreationResult.error.message);
+  //         }
+  //         const partialWorkspace = workspaceCreationResult.content;
+  //         const localWorkspace: Workspace = {
+  //           id: partialWorkspace.id,
+  //           name: partialWorkspace.name,
+  //           owner: user?.details?.profile?.uid,
+  //           accessCount: 1,
+  //           adminCount: 1,
+  //           members: {
+  //             [user?.details?.profile?.uid]: {
+  //               role: WorkspaceMemberRole.admin,
+  //             },
+  //           },
+  //           appsumo: null,
+  //           workspaceType: WorkspaceType.LOCAL,
+  //           rootPath: partialWorkspace.path,
+  //         };
+  //         dispatch(teamsActions.addToAvailableTeams(localWorkspace));
+  //         dispatch(workspaceActions.upsertWorkspace(localWorkspace));
+  //         return partialWorkspace.id;
+  //       } else {
+  //         const response: any = await createTeam({
+  //           teamName: workspaceName,
+  //           config,
+  //         });
+  //         return response.data.teamId;
+  //       }
+  //     })();
 
-      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType);
-      toast.info("Workspace Created");
+  //     trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType);
+  //     toast.info("Workspace Created");
 
-      let hasMembersInSameDomain = true;
-      if (isNotifyAllSelected && workspaceType === WorkspaceType.SHARED) {
-        try {
-          const domain = getDomainFromEmail(user?.details?.profile?.email);
-          hasMembersInSameDomain = await handleDomainInvitesCreation(
-            teamId,
-            domain,
-            billingTeams,
-            createOrgTeamInvite,
-            upsertTeamCommonInvite,
-            isNotifyAllSelected
-          );
-        } catch (error) {
-          toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
-        }
-      }
+  //     let hasMembersInSameDomain = true;
+  //     if (isNotifyAllSelected && workspaceType === WorkspaceType.SHARED) {
+  //       try {
+  //         const domain = getDomainFromEmail(user?.details?.profile?.email);
+  //         hasMembersInSameDomain = await handleDomainInvitesCreation(
+  //           teamId,
+  //           domain,
+  //           billingTeams,
+  //           createOrgTeamInvite,
+  //           upsertTeamCommonInvite,
+  //           isNotifyAllSelected
+  //         );
+  //       } catch (error) {
+  //         toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
+  //       }
+  //     }
 
-      trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType, isNotifyAllSelected);
-      handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
+  //     trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType, isNotifyAllSelected);
+  //     handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
 
-      callback?.();
-      toggleModal();
-    } catch (err) {
-      toast.error(err?.message || "Unable to Create Team");
-      Sentry.captureException("Create Team Failure", {
-        extra: {
-          message: err.message,
-        },
-      });
-      trackNewTeamCreateFailure(workspaceName, workspaceType);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [
-    billingTeams,
-    callback,
-    dispatch,
-    isNotifyAllSelected,
-    toggleModal,
-    user?.details?.profile?.email,
-    workspaceName,
-    handlePostTeamCreationStep,
-    handleDomainInvitesCreation,
-    workspaceType,
-    folderPath,
-    user?.details?.profile?.uid,
-  ]);
+  //     callback?.();
+  //     toggleModal();
+  //   } catch (err) {
+  //     toast.error(err?.message || "Unable to Create Team");
+  //     Sentry.captureException("Create Team Failure", {
+  //       extra: {
+  //         message: err.message,
+  //       },
+  //     });
+  //     trackNewTeamCreateFailure(workspaceName, workspaceType);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [
+  //   billingTeams,
+  //   callback,
+  //   dispatch,
+  //   isNotifyAllSelected,
+  //   toggleModal,
+  //   user?.details?.profile?.email,
+  //   workspaceName,
+  //   handlePostTeamCreationStep,
+  //   handleDomainInvitesCreation,
+  //   workspaceType,
+  //   folderPath,
+  //   user?.details?.profile?.uid,
+  // ]);
 
   return (
     <Modal
-      width={640}
-      title={
-        <div className="modal-title-container">
-          <div className="title">Create a new workspace</div>
-          <div className="description">Workspaces are where your team collaborate on rules, variables, and mocks.</div>
-        </div>
-      }
+      width={workspaceType === WorkspaceType.SHARED ? 480 : 560}
       open={isOpen}
       onCancel={toggleModal}
       className="custom-rq-modal create-workspace-modal"
-      footer={
-        <>
-          <RQButton onClick={toggleModal}>Cancel</RQButton>
-          <RQButton
-            type="primary"
-            disabled={!workspaceName.length || (workspaceType === WorkspaceType.LOCAL && !folderPath.length)}
-            loading={isLoading}
-            onClick={handleTeamWorkspaceCreation}
-          >
-            Create workspace
-          </RQButton>
-        </>
-      }
+      footer={null}
+      closable={false}
+      // footer={
+      //   <>
+      //     <RQButton onClick={toggleModal}>Cancel</RQButton>
+      //     <RQButton
+      //       type="primary"
+      //       disabled={!workspaceName.length || (workspaceType === WorkspaceType.LOCAL && !folderPath.length)}
+      //       loading={isLoading}
+      //       onClick={()=>{}}
+      //     >
+      //       Create workspace
+      //     </RQButton>
+      //   </>
+      // }
     >
-      <label htmlFor="workspace-name" className="create-workspace-modal-label">
+      <MdClose className="create-workspace-modal__close-icon" onClick={toggleModal} />
+      {workspaceType === WorkspaceType.SHARED ? <SharedWorkspaceCreationView /> : <LocalWorkspaceCreationView />}
+      {/* <label htmlFor="workspace-name" className="create-workspace-modal-label">
         Workspace name
       </label>
       <Input
@@ -344,7 +347,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspa
             ]}
           ></Radio.Group>
         </div>
-      </div>
+      </div> */}
     </Modal>
   );
 };
