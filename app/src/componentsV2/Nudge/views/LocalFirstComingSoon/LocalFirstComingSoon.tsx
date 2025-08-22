@@ -28,7 +28,7 @@ export const LocalFirstComingSoon: React.FC<Props> = ({ featureName, featureDesc
           </RQButton>,
         ]}
       >
-        <div className="coming-soon-title">{featureName} are not supported in local workspaces</div>
+        <div className="coming-soon-title">Local workspaces don't support {featureName}</div>
         <div className="coming-soon-description">
           Currently, local workspaces do not support {featureName}.
           <br />
