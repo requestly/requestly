@@ -1,28 +1,19 @@
 .create-workspace-modal {
-  .ant-modal-header {
-    border-bottom: none;
-    padding: 8px 8px 0px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  background: var(--requestly-color-surface-0, #212121);
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.25);
+  padding-bottom: 0 !important;
+  padding: 8px 8px 0 16px !important;
+  position: relative;
 
-    .modal-title-container {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .title {
-        color: var(--requestly-color-text-default);
-        font-size: var(--requestly-font-size-md);
-        font-weight: var(--requestly-font-weight-medium);
-      }
-
-      .description {
-        color: var(--requestly-color-text-subtle);
-        font-size: var(--requestly-font-size-xs);
-      }
-    }
+  .ant-modal-content {
+    background: none;
+    box-shadow: none;
   }
 
   .ant-modal-body {
-    padding: 1rem;
+    padding: 0;
 
     .create-workspace-modal-label {
       color: var(--requestly-color-text-default);
@@ -143,5 +134,12 @@
 
   .ant-modal-footer {
     border-top: 0;
+  }
+
+  &__close-icon {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    cursor: pointer;
   }
 }
