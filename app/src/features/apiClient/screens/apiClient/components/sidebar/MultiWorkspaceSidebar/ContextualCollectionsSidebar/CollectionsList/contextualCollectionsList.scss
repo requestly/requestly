@@ -156,7 +156,7 @@
         }
 
         .collection-checkbox-container {
-          margin-left: 6px;
+          margin-left: 1px;
         }
 
         .ant-checkbox {
@@ -191,7 +191,7 @@
             user-select: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             color: var(--requestly-color-text-subtle);
 
             &-text {
@@ -204,6 +204,7 @@
 
             .ant-collapse-expand-icon {
               cursor: pointer;
+              flex-basis: fit-content;
 
               svg {
                 width: 18px;
@@ -211,6 +212,7 @@
                 padding: 3px;
                 color: inherit;
                 margin: 0;
+                margin-top: 2px;
                 flex-shrink: 0;
               }
 
