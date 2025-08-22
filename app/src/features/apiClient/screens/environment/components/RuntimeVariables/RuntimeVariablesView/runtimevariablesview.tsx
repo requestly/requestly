@@ -69,7 +69,7 @@ export const RuntimeVariablesView: React.FC = () => {
         variables.map((v) => [
           v.key,
           {
-            syncValue: v.syncValue,
+            localValue: v.localValue,
             isPersisted: v.isPersisted,
             type: v.type,
             id: v.id,
