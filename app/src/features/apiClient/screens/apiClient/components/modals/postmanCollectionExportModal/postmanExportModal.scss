@@ -47,4 +47,15 @@
       }
     }
   }
+
+  .ant-alert {
+    margin-bottom: 8px;
+    padding: 10px;
+
+    &-message,
+    &-description {
+      color: var(--requestly-color-warning);
+      font-size: var(--requestly-font-size-sm);
+    }
+  }
 }

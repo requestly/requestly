@@ -38,11 +38,16 @@ import { useCommand } from "features/apiClient/commands";
 import { SendQueryButton } from "./components/SendQueryButton/SendQueryButton";
 import { DEFAULT_REQUEST_NAME, INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
-import { trackRequestRenamed } from "modules/analytics/events/features/apiClient";
+import {
+  trackAPIRequestSent,
+  trackRequestRenamed,
+  trackRequestSaved,
+} from "modules/analytics/events/features/apiClient";
 import { extractOperationNames } from "./utils";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
+import { getRequestTypeForAnalyticEvent } from "../../../utils";
 
 interface Props {
   recordId: string;
@@ -205,6 +210,12 @@ const GraphQLClientView: React.FC<Props> = ({
       onSaveRecord({ ...(apiRecord ?? {}), ...result.data, data: { ...result.data.data, ...recordToSave.data } });
       onSaveCallback(result.data as RQAPI.GraphQLApiRecord);
       setHasUnsavedChanges(false);
+      trackRequestSaved({
+        src: "api_client_view",
+        has_scripts: Boolean(result.data.data.scripts?.preRequest),
+        auth_type: result.data.data.auth?.currentAuthType,
+        type: RQAPI.ApiEntryType.GRAPHQL,
+      });
       toast.success("Request saved!");
     } else {
       toast.error("Something went wrong while saving the request");
@@ -316,6 +327,12 @@ const GraphQLClientView: React.FC<Props> = ({
         updateEntryResponse(entryWithResponse.response);
         updateEntryTestResults(entryWithResponse.testResults ?? []);
         notifyApiRequestFinished(entryWithResponse);
+        trackAPIRequestSent({
+          has_scripts: Boolean(apiRecord.data?.scripts?.preRequest),
+          auth_type: apiRecord.data?.auth?.currentAuthType,
+          request_type: getRequestTypeForAnalyticEvent(apiRecord?.isExample, apiRecord.data?.request?.url),
+          type: RQAPI.ApiEntryType.GRAPHQL,
+        });
 
         if (apiClientExecutionResult.status === RQAPI.ExecutionStatus.SUCCESS) {
           if (apiClientExecutionResult.warning) {
@@ -544,7 +561,7 @@ const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
       <ErrorBoundary>
-        <GraphQLRecordProvider entry={props.apiEntryDetails.data}>
+        <GraphQLRecordProvider entry={props.apiEntryDetails.data} recordId={props.apiEntryDetails.id}>
           <Component {...props} />
         </GraphQLRecordProvider>
       </ErrorBoundary>
