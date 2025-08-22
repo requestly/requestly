@@ -104,21 +104,15 @@ export const ContextualCollectionsSidebar: React.FC<{
       }
 
       selectedRecordsAcrossWorkspaces.current[contextId].isAllRecordsSelected = isAllRecordsSelected;
+
       if (action === "select") {
         recordIds.forEach((id) => {
           selectedRecordsAcrossWorkspaces.current[contextId].recordIds.add(id);
         });
       } else {
-        if (isAllRecordsSelected) {
-          selectedRecordsAcrossWorkspaces.current[contextId] = {
-            recordIds: new Set(),
-            isAllRecordsSelected: false,
-          };
-        } else {
-          recordIds.forEach((id) => {
-            selectedRecordsAcrossWorkspaces.current[contextId].recordIds.delete(id);
-          });
-        }
+        recordIds.forEach((id) => {
+          selectedRecordsAcrossWorkspaces.current[contextId].recordIds.delete(id);
+        });
       }
 
       const isAll = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).every((value) => {

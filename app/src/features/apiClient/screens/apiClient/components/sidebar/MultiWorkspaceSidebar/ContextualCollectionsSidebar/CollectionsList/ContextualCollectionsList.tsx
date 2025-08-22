@@ -125,18 +125,20 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       }
 
       setSelectedRecords(newSelectedRecords);
+      const isAllRecordsSelected = newSelectedRecords.size === totalRecordsCount;
 
       handleRecordSelection({
         contextId: context.id,
         action: "select",
         recordIds: newSelectedRecords,
-        isAllRecordsSelected: newSelectedRecords.size === totalRecordsCount,
+        isAllRecordsSelected,
       });
 
       handleRecordSelection({
         contextId: context.id,
         action: "unselect",
         recordIds: unselectedRecords,
+        isAllRecordsSelected,
       });
     },
     [context?.id, selectedRecords, updatedRecords, childParentMap, handleRecordSelection]
@@ -156,8 +158,9 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   }, [showSelection]);
 
   useEffect(() => {
+    const result = selectAllRecords({ contextId: context?.id, searchValue });
+
     if (isSelectAll) {
-      const result = selectAllRecords({ contextId: context?.id, searchValue });
       setSelectedRecords(result);
       handleRecordSelection({
         contextId: context?.id,
@@ -170,7 +173,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       handleRecordSelection({
         contextId: context?.id,
         action: "unselect",
-        isAllRecordsSelected: true,
+        recordIds: result,
       });
     }
   }, [isSelectAll, handleRecordSelection, context?.id, searchValue]);
