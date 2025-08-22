@@ -25,6 +25,7 @@ const createNewVariable = (id: number, type: EnvironmentVariableType): VariableR
   key: "",
   type,
   syncValue: "",
+  localValue: "",
   isPersisted: true,
 });
 
