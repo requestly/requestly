@@ -26,7 +26,6 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { teamsActions } from "store/features/teams/slice";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
@@ -167,7 +166,6 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspa
             workspaceType: WorkspaceType.LOCAL,
             rootPath: partialWorkspace.path,
           };
-          dispatch(teamsActions.addToAvailableTeams(localWorkspace));
           dispatch(workspaceActions.upsertWorkspace(localWorkspace));
           return partialWorkspace.id;
         } else {
