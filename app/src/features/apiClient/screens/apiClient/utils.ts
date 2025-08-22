@@ -193,6 +193,10 @@ export const sanitizeKeyValuePairs = <T extends { key: string; isEnabled: boolea
   keyValuePairs: T[],
   removeDisabledKeys = true
 ): T[] => {
+  if (!keyValuePairs) {
+    return [];
+  }
+
   return keyValuePairs
     .map((pair) => ({
       ...pair,
