@@ -87,7 +87,7 @@ const VariableInfo: React.FC<{
       ? [
           { label: "Name", value: name },
           { label: "Type", value: capitalize(variable.type) },
-          { label: "Current Value", value: syncValue },
+          { label: "Current Value", value: localValue },
           { label: "Is persistent", value: isPersisted },
         ]
       : [
