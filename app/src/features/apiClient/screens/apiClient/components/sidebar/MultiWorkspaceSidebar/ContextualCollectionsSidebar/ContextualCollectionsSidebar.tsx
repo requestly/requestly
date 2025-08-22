@@ -53,11 +53,6 @@ export const ContextualCollectionsSidebar: React.FC<{
     setIsDeleteModalOpen(true);
   }, []);
 
-  const onDeleteModalClose = useCallback(() => {
-    setRecordsToBeDeleted(null);
-    setIsDeleteModalOpen(false);
-  }, []);
-
   const selectedRecordsAcrossWorkspaces = useRef<{
     [contextId: string]:
       | undefined
@@ -144,6 +139,12 @@ export const ContextualCollectionsSidebar: React.FC<{
       setIsSelectAll(true);
     }
   }, [isSelectAll, deselect]);
+
+  const onDeleteModalClose = useCallback(() => {
+    setRecordsToBeDeleted(null);
+    setIsDeleteModalOpen(false);
+    deselect();
+  }, [deselect]);
 
   const handleDuplicateRecords = useCallback(async () => {
     try {
