@@ -8,7 +8,7 @@ export const ViewOnlyModeBanner: React.FC<Props> = () => {
   // TODO: get admin email
 
   return (
-    <div className="view-only-mode-banner">
+    <div className="view-only-mode-banner no-drag">
       <div className="icon">
         <FiAlertOctagon />
       </div>

@@ -32,11 +32,12 @@ import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 
 interface Props {
   isOpen: boolean;
+  defaultWorkspaceType?: WorkspaceType;
   toggleModal: () => void;
   callback?: () => void;
 }
 
-export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, callback }) => {
+export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspaceType, toggleModal, callback }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -44,7 +45,9 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, c
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
+  const [workspaceType, setWorkspaceType] = useState(
+    defaultWorkspaceType || (user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL)
+  );
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
