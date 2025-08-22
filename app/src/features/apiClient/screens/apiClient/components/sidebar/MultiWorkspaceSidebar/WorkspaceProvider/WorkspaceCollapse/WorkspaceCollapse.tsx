@@ -98,7 +98,6 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
 
               <Conditional condition={isValidPermission}>
                 <div className="workspace-options">
-                  {/* workspace add icon */}
                   <NewApiRecordDropdown
                     invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
                     onSelect={(params) => {
@@ -115,7 +114,6 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
                   >
                     <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
                   </NewApiRecordDropdown>
-                  {/* three dots icon */}
 
                   <Dropdown
                     menu={{ items }}
