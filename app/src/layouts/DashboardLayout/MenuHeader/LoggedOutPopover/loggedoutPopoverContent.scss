@@ -1,0 +1,26 @@
+.logged-out-popover-overlay .ant-popover-inner-content {
+  padding: 0;
+  .logged-out-popover-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-8, 24px) var(--space-6, 16px);
+    width: 280px;
+    gap: var(--space-6, 16px);
+
+    .logged-out-popover-content {
+      font-size: var(--requestly-font-size-xs, 11px);
+      text-align: center;
+    }
+
+    .logged-out-popover-button {
+      margin-bottom: 8px;
+    }
+
+    .logged-out-popover-subtitle {
+      text-align: center;
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
+}
