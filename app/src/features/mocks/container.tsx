@@ -10,7 +10,12 @@ const MocksFeatureContainer: React.FC = () => {
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   if (isLocalSyncEnabled) {
-    return <LocalFirstComingSoon featureName="Mock Server" />;
+    return (
+      <LocalFirstComingSoon
+        featureName="Mock Server"
+        featureDescription="Mock Server is a powerful and open-source tool to modify & mock API responses superfast, allows you to build frontend faster without waiting for backend & much more."
+      />
+    );
   }
 
   return (
