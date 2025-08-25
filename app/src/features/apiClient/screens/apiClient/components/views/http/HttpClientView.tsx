@@ -73,6 +73,7 @@ import PATHS from "config/constants/sub/paths";
 import { ApiClientFilesContext } from "features/apiClient/store/ApiClientFilesContextProvider";
 import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
+import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -431,6 +432,7 @@ const HttpClientView: React.FC<Props> = ({
       auth_type: entry?.auth?.currentAuthType,
       request_type: getRequestTypeForAnalyticEvent(apiEntryDetails?.isExample, entry?.request?.url),
       request_body_type: entry?.request?.contentType,
+      type: RQAPI.ApiEntryType.HTTP,
     });
 
     try {
@@ -647,6 +649,7 @@ const HttpClientView: React.FC<Props> = ({
         src: "api_client_view",
         has_scripts: Boolean(entry.scripts?.preRequest),
         auth_type: entry?.auth?.currentAuthType,
+        type: RQAPI.ApiEntryType.HTTP,
       });
       if (isCreateMode) {
         onSaveCallback(httpApiEntry);
@@ -883,9 +886,11 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
-      <QueryParamsProvider entry={props.apiEntryDetails?.data}>
-        <Component {...props} />
-      </QueryParamsProvider>
+      <ErrorBoundary>
+        <QueryParamsProvider entry={props.apiEntryDetails?.data}>
+          <Component {...props} />
+        </QueryParamsProvider>
+      </ErrorBoundary>
     );
   };
 };

@@ -34,7 +34,7 @@ export function displayMultiFileSelector(callback, config = {}) {
 
   if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {
-      properties: ["openFile", "multiSelections"],
+      properties: ["openFile", "multiSelections", "openDirectory"],
     }).then((result) => {
       handleDialogPromise(result);
     });
