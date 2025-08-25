@@ -28,6 +28,7 @@ import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 import { SharedWorkspaceCreationView } from "./components/SharedWorkspaceCreationView/SharedWorkspaceCreationView";
 import { LocalWorkspaceCreationView } from "./components/LocalWorkspaceCreationView/LocalWorkspaceCreationView";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { globalActions } from "store/slices/global/slice";
 import "./createWorkspaceModal.scss";
 
 interface Props {
@@ -164,11 +165,10 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
                   role: WorkspaceMemberRole.admin,
                 },
               },
-              appsumo: null,
+              appsumo: undefined,
               workspaceType: WorkspaceType.LOCAL,
               rootPath: partialWorkspace.path,
             };
-            dispatch(workspaceActions.setAllWorkspaces([localWorkspace]));
             dispatch(workspaceActions.upsertWorkspace(localWorkspace));
             return partialWorkspace.id;
           } else {
@@ -180,7 +180,6 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
           }
         })();
 
-        trackNewTeamCreateSuccess(teamId, workspaceName, "create_workspace_modal", workspaceType);
         toast.info("Workspace Created");
 
         let hasMembersInSameDomain = true;
@@ -203,7 +202,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
             workspaceName,
             "create_workspace_modal",
             workspaceType,
-            args.isNotifyAllSelected
+            args.workspaceType === WorkspaceType.SHARED ? args.isNotifyAllSelected : false
           );
         }
 
@@ -213,9 +212,9 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
         toggleModal();
       } catch (err) {
         toast.error(err?.message || "Unable to Create Team");
-        Sentry.captureException("Create Team Failure", {
+        Sentry.captureException(err || "Create Team Failure", {
           extra: {
-            message: err.message,
+            message: err?.message,
           },
         });
         trackNewTeamCreateFailure(workspaceName, workspaceType);
@@ -235,6 +234,12 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
       user?.details?.profile?.uid,
     ]
   );
+
+  if (!user.loggedIn) {
+    dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+    toggleModal();
+    return null;
+  }
 
   return (
     <Modal
