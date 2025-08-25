@@ -7,7 +7,7 @@ import "./multiViewImportModalWorkspaceSelection.scss";
 
 interface MultiViewImportModalWorkspaceSelectionProps {
   isImporting: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onImportClick: () => void;
 }
 
@@ -35,9 +35,12 @@ export const MultiViewImportModalWorkspaceSelection: React.FC<MultiViewImportMod
       </label>
 
       <div className="actions">
-        <RQButton onClick={onClose} loading={isImporting}>
-          Cancel
-        </RQButton>
+        {onClose ? (
+          <RQButton onClick={onClose} loading={isImporting}>
+            Cancel
+          </RQButton>
+        ) : null}
+
         <RQButton type="primary" onClick={onImportClick} loading={isImporting}>
           Import
         </RQButton>
