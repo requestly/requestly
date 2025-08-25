@@ -19,6 +19,23 @@
     }
   }
 
+  &[data-disabled="true"] {
+    .local-workspace-actions__checkbox-btn {
+      display: none;
+    }
+    &:hover {
+      .local-workspace-actions__checkbox-btn {
+        display: flex;
+      }
+    }
+  }
+
+  &[data-disabled="false"] {
+    .local-workspace-actions__checkbox-btn {
+      display: flex;
+    }
+  }
+
   &--shared:hover {
     .workspace-overlay__list-item-actions {
       .workspace-list-item-active-tag {
@@ -75,6 +92,10 @@
   }
 
   .local-workspace-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+
     &__settings-btn {
       display: none;
     }

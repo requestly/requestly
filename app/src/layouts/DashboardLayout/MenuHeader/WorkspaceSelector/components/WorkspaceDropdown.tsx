@@ -114,10 +114,12 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
                   )}
                 </>
               )}
-              <span className="items-center active-workspace-name">
-                <span className="active-workspace-text">{prettifyWorkspaceName(activeWorkspaceName)}</span>
-                <DownOutlined className="active-workspace-name-down-icon" />
-              </span>
+              {viewMode === ApiClientViewMode.SINGLE && (
+                <span className="items-center active-workspace-name">
+                  <span className="active-workspace-text">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                  <DownOutlined className="active-workspace-name-down-icon" />
+                </span>
+              )}
             </div>
           </Tooltip>
         </div>
