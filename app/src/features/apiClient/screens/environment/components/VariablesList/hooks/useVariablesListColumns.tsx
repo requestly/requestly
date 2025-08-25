@@ -150,19 +150,22 @@ export const useVariablesListColumns = ({
           editable: true,
           render: (_, record) => {
             return (
-              <span>
+              <span className="variable-value-column-persist-section">
                 <Switch
+                  size="small"
+                  className="variable-value-column-switch"
                   disabled={!record.key && !record.syncValue}
-                  style={{
-                    padding: " 2px 14px 2px 2px",
-                    alignItems: "center",
-                    borderRadius: "16px",
-                  }}
                   checked={container === "runtime" && record.isPersisted}
                   onChange={(checked) => handleUpdatePersisted(record.id, checked)}
                 />
-                {"  "}
-                <span>{container === "runtime" && record.isPersisted ? "Yes" : "No"}</span>
+                <span
+                  style={{
+                    position: "relative",
+                    bottom: "2px",
+                  }}
+                >
+                  {container === "runtime" && record.isPersisted ? "Yes" : "No"}
+                </span>
               </span>
             );
           },
