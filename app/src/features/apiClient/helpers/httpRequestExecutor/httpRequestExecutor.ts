@@ -48,7 +48,6 @@ enum RequestErrorMessage {
 export class HttpRequestExecutor {
   private abortController: AbortController;
   private entryDetails: RQAPI.HttpApiEntry;
-  // private collectionId: RQAPI.ApiClientRecord["collectionId"];
   private internalFunctions: InternalFunctions;
   private renderedVariables: Record<string, unknown> = {};
   constructor(
