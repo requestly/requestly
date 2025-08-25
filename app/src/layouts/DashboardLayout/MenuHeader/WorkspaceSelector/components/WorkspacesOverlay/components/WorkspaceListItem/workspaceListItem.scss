@@ -6,16 +6,35 @@
   border-radius: 4px;
   cursor: pointer;
 
+  &.single-mode {
+    .local-workspace-actions__checkbox-btn {
+      display: none;
+    }
+  }
+
+  &.multi-mode {
+    .local-workspace-actions__checkbox-btn {
+      display: flex;
+    }
+  }
+
+  &:hover {
+    .local-workspace-actions__settings-btn {
+      display: flex;
+    }
+
+    .local-workspace-actions__checkbox-btn {
+      display: flex;
+
+      .ant-checkbox-inner {
+        border-color: var(--requestly-color-white-t-20);
+      }
+    }
+  }
+
   &--local {
     .ant-avatar {
       border-radius: 50%;
-    }
-  }
-  &:hover {
-    .local-workspace-actions {
-      &__settings-btn {
-        display: flex;
-      }
     }
   }
 
@@ -75,6 +94,10 @@
   }
 
   .local-workspace-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+
     &__settings-btn {
       display: none;
     }
