@@ -57,9 +57,12 @@ export const LocalWorkspaceCreationView = ({
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
     try {
-      const result: FolderPreviewResult = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-folder-preview", {
-        folderPath,
-      });
+      const result: FolderPreviewResult = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
+        "get-workspace-folder-preview",
+        {
+          folderPath,
+        }
+      );
       setFolderPreview(result);
     } catch (err) {
       Logger.log("Could not get workspace folder preview data", err);

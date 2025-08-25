@@ -22,7 +22,6 @@ import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { teamsActions } from "store/features/teams/slice";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
@@ -169,7 +168,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
               workspaceType: WorkspaceType.LOCAL,
               rootPath: partialWorkspace.path,
             };
-            dispatch(teamsActions.addToAvailableTeams(localWorkspace));
+            dispatch(workspaceActions.setAllWorkspaces([localWorkspace]));
             dispatch(workspaceActions.upsertWorkspace(localWorkspace));
             return partialWorkspace.id;
           } else {
@@ -245,19 +244,6 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
       className="custom-rq-modal create-workspace-modal"
       footer={null}
       closable={false}
-      // footer={
-      //   <>
-      //     <RQButton onClick={toggleModal}>Cancel</RQButton>
-      //     <RQButton
-      //       type="primary"
-      //       disabled={!workspaceName.length || (workspaceType === WorkspaceType.LOCAL && !folderPath.length)}
-      //       loading={isLoading}
-      //       onClick={()=>{}}
-      //     >
-      //       Create workspace
-      //     </RQButton>
-      //   </>
-      // }
     >
       <MdClose className="create-workspace-modal__close-icon" onClick={toggleModal} />
       {workspaceType === WorkspaceType.SHARED ? (
