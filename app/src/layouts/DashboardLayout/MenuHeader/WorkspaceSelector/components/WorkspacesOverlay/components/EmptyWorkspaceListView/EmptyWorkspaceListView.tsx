@@ -2,8 +2,10 @@ import React from "react";
 import { RQButton } from "lib/design-system/components";
 import { WorkspaceType } from "types";
 import "./emptyWorkspaceListView.scss";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import APP_CONSTANTS from "config/constants";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 interface EmptyWorkspaceListProps {
   workspaceType: WorkspaceType;
@@ -12,6 +14,8 @@ interface EmptyWorkspaceListProps {
 
 export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ workspaceType, toggleDropdown }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+
   return (
     <div className="empty-workspace-list-view">
       <div className="empty-workspace-list-view__title">
@@ -28,6 +32,20 @@ export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ work
           <RQButton
             size="small"
             onClick={() => {
+              if (!user.loggedIn && workspaceType === WorkspaceType.SHARED) {
+                dispatch(
+                  globalActions.toggleActiveModal({
+                    modalName: "authModal",
+                    newValue: true,
+                    newProps: {
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                    },
+                  })
+                );
+                toggleDropdown();
+                return;
+              }
+
               dispatch(
                 globalActions.toggleActiveModal({
                   modalName: "createWorkspaceModal",
