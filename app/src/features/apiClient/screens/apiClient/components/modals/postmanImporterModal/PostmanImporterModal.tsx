@@ -9,8 +9,8 @@ interface PostmanImporterModalProps {
 
 export const PostmanImporterModal: React.FC<PostmanImporterModalProps> = ({ isOpen, onClose }) => {
   return (
-    <Modal open={isOpen} onCancel={onClose} footer={null} width={600}>
-      <PostmanImporter onSuccess={onClose} />
+    <Modal open={isOpen} onCancel={onClose} footer={null} width={490}>
+      <PostmanImporter onSuccess={onClose} onCancel={onClose} />
     </Modal>
   );
 };
