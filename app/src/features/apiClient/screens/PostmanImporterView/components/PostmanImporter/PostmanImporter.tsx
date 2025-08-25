@@ -20,6 +20,11 @@ import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { MultiViewImportModalWorkspaceSelection } from "features/apiClient/screens/apiClient/components/modals/common/MultiViewImportModalWorkspaceSelection/MultiViewImportModalWorkspaceSelection";
 
 type ProcessedData = {
   environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
@@ -29,13 +34,16 @@ type ProcessedData = {
 
 interface PostmanImporterProps {
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 
 const BATCH_SIZE = 25;
 
-export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) => {
+export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess, onCancel }) => {
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState(null);
@@ -351,22 +359,30 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           </Row>
         </div>
       ) : processingStatus === "processed" ? (
-        <div className="postman-importer__post-parse-view postman-importer__post-parse-view--success">
-          <MdCheckCircleOutline />
-          <div>
-            Successfully processed{" "}
-            {collectionsCount.current > 0 &&
-              `${collectionsCount.current} collection${collectionsCount.current !== 1 ? "s" : ""}`}
-            {collectionsCount.current > 0 && processedFileData.environments.length > 0 && " and "}
-            {processedFileData.environments.length > 0 &&
-              `${processedFileData.environments.length} environment${
-                processedFileData.environments.length !== 1 ? "s" : ""
-              }`}
+        viewMode === ApiClientViewMode.SINGLE ? (
+          <div className="postman-importer__post-parse-view postman-importer__post-parse-view--success">
+            <MdCheckCircleOutline />
+            <div>
+              Successfully processed{" "}
+              {collectionsCount.current > 0 &&
+                `${collectionsCount.current} collection${collectionsCount.current !== 1 ? "s" : ""}`}
+              {collectionsCount.current > 0 && processedFileData.environments.length > 0 && " and "}
+              {processedFileData.environments.length > 0 &&
+                `${processedFileData.environments.length} environment${
+                  processedFileData.environments.length !== 1 ? "s" : ""
+                }`}
+            </div>
+            <RQButton type="primary" loading={isImporting} onClick={handleImportPostmanData}>
+              Import
+            </RQButton>
           </div>
-          <RQButton type="primary" loading={isImporting} onClick={handleImportPostmanData}>
-            Import
-          </RQButton>
-        </div>
+        ) : (
+          <MultiViewImportModalWorkspaceSelection
+            onClose={onCancel}
+            isImporting={isImporting}
+            onImportClick={handleImportPostmanData}
+          />
+        )
       ) : (
         <FilePicker
           maxFiles={1000}
