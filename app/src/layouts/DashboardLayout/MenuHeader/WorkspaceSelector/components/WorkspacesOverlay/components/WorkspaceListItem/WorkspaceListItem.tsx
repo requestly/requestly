@@ -85,10 +85,7 @@ const ShareWorkspaceActions = ({
 const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Workspace; toggleDropdown: () => void }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const [isSelected, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
-    s.isSelected,
-    s.getAllSelectedWorkspaces,
-  ]);
+  const [isSelected, selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.isSelected, s.selectedWorkspaces]);
 
   const handleMultiworkspaceAdder = useCallback(
     async (isChecked: boolean) => {
@@ -123,7 +120,7 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
       <div className="local-workspace-actions__checkbox-btn">
         <Checkbox
           onClick={(e) => e.stopPropagation()}
-          disabled={isSelected(workspace.id) && getAllSelectedWorkspaces().length === 1}
+          disabled={isSelected(workspace.id) && selectedWorkspaces.length === 1}
           onChange={(e) => {
             handleMultiworkspaceAdder(e.target.checked);
           }}
@@ -174,13 +171,13 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
 
   const { workspace } = props;
 
-  const isVisiblyActive = viewMode === ApiClientViewMode.SINGLE;
   return (
     <div
-      data-disabled={isVisiblyActive}
       className={`workspace-overlay__list-item ${
-        props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""
-      } ${props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""}`}
+        viewMode === ApiClientViewMode.SINGLE ? "single-mode" : "multi-mode"
+      } ${props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""} ${
+        props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""
+      }`}
       onClick={handleWorkspaceClick}
     >
       <WorkspaceAvatar workspace={workspace} size={32} />
