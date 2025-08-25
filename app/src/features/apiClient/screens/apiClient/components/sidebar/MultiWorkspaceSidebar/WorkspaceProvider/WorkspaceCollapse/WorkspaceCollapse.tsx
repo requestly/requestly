@@ -24,14 +24,21 @@ import {
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { RQAPI } from "features/apiClient/types";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
   children: React.ReactNode;
   showEnvSwitcher: boolean;
+  showEnvOption?: boolean;
 }
 
-export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceId, children, showEnvSwitcher }) => {
+export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
+  workspaceId,
+  children,
+  showEnvSwitcher,
+  showEnvOption,
+}) => {
   const navigate = useNavigate();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
@@ -98,22 +105,40 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
 
               <Conditional condition={isValidPermission}>
                 <div className="workspace-options">
-                  <NewApiRecordDropdown
-                    invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
-                    onSelect={(params) => {
-                      setLastUsedContextId(contextId);
-                      //FIXME: fix the analytics here
-                      onNewClickV2({
-                        contextId: contextId,
-                        analyticEventSource: "api_client_sidebar_header",
-                        recordType: params.recordType,
-                        collectionId: undefined,
-                        entryType: params.entryType,
-                      });
-                    }}
-                  >
-                    <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
-                  </NewApiRecordDropdown>
+                  {showEnvOption ? (
+                    <RQButton
+                      size="small"
+                      type="transparent"
+                      icon={<MdAdd />}
+                      onClick={(e) => {
+                        onNewClickV2({
+                          contextId: contextId,
+                          analyticEventSource: "api_client_sidebar_header",
+                          recordType: RQAPI.RecordType.ENVIRONMENT,
+                          collectionId: undefined,
+                        });
+                        e.stopPropagation();
+                      }}
+                      c
+                    />
+                  ) : (
+                    <NewApiRecordDropdown
+                      invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                      onSelect={(params) => {
+                        setLastUsedContextId(contextId);
+                        //FIXME: fix the analytics here
+                        onNewClickV2({
+                          contextId: contextId,
+                          analyticEventSource: "api_client_sidebar_header",
+                          recordType: params.recordType,
+                          collectionId: undefined,
+                          entryType: params.entryType,
+                        });
+                      }}
+                    >
+                      <RQButton size="small" type="transparent" icon={<MdAdd />} onClick={(e) => e.stopPropagation()} />
+                    </NewApiRecordDropdown>
+                  )}
 
                   <Dropdown
                     menu={{ items }}

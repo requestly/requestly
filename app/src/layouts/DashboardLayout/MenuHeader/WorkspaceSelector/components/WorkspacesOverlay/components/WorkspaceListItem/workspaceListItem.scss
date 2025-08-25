@@ -6,33 +6,35 @@
   border-radius: 4px;
   cursor: pointer;
 
-  &--local {
-    .ant-avatar {
-      border-radius: 50%;
-    }
-  }
-  &:hover {
-    .local-workspace-actions {
-      &__settings-btn {
-        display: flex;
-      }
-    }
-  }
-
-  &[data-disabled="true"] {
+  &.single-mode {
     .local-workspace-actions__checkbox-btn {
       display: none;
     }
-    &:hover {
-      .local-workspace-actions__checkbox-btn {
-        display: flex;
+  }
+
+  &.multi-mode {
+    .local-workspace-actions__checkbox-btn {
+      display: flex;
+    }
+  }
+
+  &:hover {
+    .local-workspace-actions__settings-btn {
+      display: flex;
+    }
+
+    .local-workspace-actions__checkbox-btn {
+      display: flex;
+
+      .ant-checkbox-inner {
+        border-color: var(--requestly-color-white-t-20);
       }
     }
   }
 
-  &[data-disabled="false"] {
-    .local-workspace-actions__checkbox-btn {
-      display: flex;
+  &--local {
+    .ant-avatar {
+      border-radius: 50%;
     }
   }
 
