@@ -13,6 +13,12 @@ import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/worksp
 import { Invite, WorkspaceType } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { MultiWorkspaceAvatarGroup } from "../MultiWorkspaceAvatarGroup";
+import LocalWorkspaceAvatar from "features/workspaces/components/LocalWorkspaceAvatar";
 
 const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
@@ -25,6 +31,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
 
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -53,7 +60,11 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
 
   const tooltipTitle =
     activeWorkspace?.workspaceType === WorkspaceType.LOCAL
-      ? activeWorkspace.rootPath
+      ? viewMode === ApiClientViewMode.SINGLE
+        ? activeWorkspace.rootPath
+        : null
+      : viewMode === ApiClientViewMode.MULTI
+      ? null
       : prettifyWorkspaceName(activeWorkspaceName);
 
   return (
@@ -70,28 +81,48 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
             overlayClassName="workspace-selector-tooltip"
             style={{ top: "35px" }}
             title={tooltipTitle}
-            placement={"bottomRight"}
+            placement="right"
             showArrow={false}
             mouseEnterDelay={0.5}
             color="#000"
           >
             <div className="cursor-pointer items-center">
-              <WorkspaceAvatar
-                size={28}
-                workspace={{
-                  ...activeWorkspace,
-                  name: user.loggedIn ? activeWorkspaceName : null,
-                  workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
-                }}
-              />
+              {viewMode === ApiClientViewMode.MULTI ? (
+                <MultiWorkspaceAvatarGroup />
+              ) : (
+                <>
+                  {activeWorkspace?.workspaceType === WorkspaceType.LOCAL ? (
+                    <>
+                      <LocalWorkspaceAvatar
+                        size={28}
+                        workspace={{
+                          ...activeWorkspace,
+                          name: user.loggedIn ? activeWorkspaceName : null,
+                          workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <WorkspaceAvatar
+                      size={28}
+                      workspace={{
+                        ...activeWorkspace,
+                        name: user.loggedIn ? activeWorkspaceName : null,
+                        workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+                      }}
+                    />
+                  )}
+                </>
+              )}
               <span className="items-center active-workspace-name">
-                <span className="active-workspace-name">{prettifyWorkspaceName(activeWorkspaceName)}</span>
+                <span className="active-workspace-text">{prettifyWorkspaceName(activeWorkspaceName)}</span>
                 <DownOutlined className="active-workspace-name-down-icon" />
               </span>
             </div>
           </Tooltip>
         </div>
       </Dropdown>
+
       {activeWorkspace?.workspaceType === WorkspaceType.LOCAL &&
       isFeatureCompatible(FEATURES.LOCAL_WORKSPACE_REFRESH) ? (
         <Tooltip title="Load latest changes from your local files" placement="bottom" color="#000">

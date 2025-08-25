@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { WorkspaceItem } from "./components/WorkspaceListItem/WorkspaceListItem";
 import { Invite, WorkspaceType } from "types";
 import { Divider, Modal } from "antd";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import { WorkspaceList } from "./components/WorkspaceList/WorkspaceList";
 import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
@@ -25,6 +25,10 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
 import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
 import "./workspacesOverlay.scss";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 interface WorkspacesOverlayProps {
   toggleDropdown: () => void;
@@ -94,6 +98,9 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode]);
+
   const { pathname } = useLocation();
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
 
@@ -183,6 +190,15 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   }, [appMode, dispatch]);
 
   const handleWorkspaceSwitch = async (workspace: Workspace) => {
+    const viewMode = getViewMode();
+
+    if (viewMode === ApiClientViewMode.SINGLE) {
+      if (activeWorkspace?.id === workspace.id) {
+        toast.info("Workspace already selected!");
+        return;
+      }
+    }
+
     setIsLoadingModalOpen(true);
     switchWorkspace(
       {
@@ -201,11 +217,13 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
       "workspaces_dropdown"
     )
       .then(() => {
-        if (!isLoadingModalOpen) showSwitchWorkspaceSuccessToast(workspace.name);
+        if (!isLoadingModalOpen) {
+          showSwitchWorkspaceSuccessToast(workspace.name);
+        }
+
         setIsLoadingModalOpen(false);
       })
       .catch((error) => {
-        console.error(error);
         setIsLoadingModalOpen(false);
         toast.error(
           "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
