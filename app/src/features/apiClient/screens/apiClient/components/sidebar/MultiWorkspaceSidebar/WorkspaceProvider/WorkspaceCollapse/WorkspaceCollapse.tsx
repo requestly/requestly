@@ -24,6 +24,7 @@ import {
 import { useApiClientContext } from "features/apiClient/contexts";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { trackManageWorkspaceClicked, trackMultiWorkspaceDeselected } from "modules/analytics/events/common/teams";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
@@ -47,6 +48,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
       label: "Manage Workspace",
       icon: <MdOutlineSettings />,
       onClick: () => {
+        trackManageWorkspaceClicked("sidebar_context_menu");
         redirectToTeam(navigate, workspaceId);
       },
     },
@@ -57,6 +59,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({ workspaceI
       icon: <FaRegEyeSlash />,
       onClick: () => {
         removeWorkspaceFromView(workspaceId);
+        trackMultiWorkspaceDeselected("sidebar_context_menu");
       },
     },
   ];
