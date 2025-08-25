@@ -92,9 +92,9 @@ const SessionRecordingView: React.FC = () => {
     );
 
   return (
-    <div className="session-view-content">
+    <div className="session-view-content popup-body-card">
       <Row align="middle" justify="space-between">
-        <div className="title">Record and share your browsing session</div>
+        <div className="title">Record session for sharing & debugging</div>
         <div className="configure-btn" onClick={handleConfigureBtnClick}>
           <SettingIcon /> Configure
         </div>
@@ -122,14 +122,16 @@ const SessionRecordingView: React.FC = () => {
           title={watchReplayBtnTooltipContent}
           overlayClassName="action-btn-tooltip watch-replay-btn"
         >
-          <PrimaryActionButton
-            block
-            icon={<ReplayLastFiveMinuteIcon />}
-            disabled={isRecordingInManualMode || !isRecordingSession}
-            onClick={viewRecordingOnClick}
-          >
-            Watch last 5 min replay
-          </PrimaryActionButton>
+          <span>
+            <PrimaryActionButton
+              block
+              icon={<ReplayLastFiveMinuteIcon />}
+              disabled={isRecordingInManualMode || !isRecordingSession}
+              onClick={viewRecordingOnClick}
+            >
+              Watch last 5 min replay
+            </PrimaryActionButton>
+          </span>
         </Tooltip>
       </Row>
       <div className="session-replay-security-msg">

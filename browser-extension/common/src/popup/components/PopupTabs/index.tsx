@@ -20,9 +20,7 @@ export enum PopupTabKey {
   EXECUTED_RULES = "executed_rules",
 }
 
-const PopupTabs: React.FC<{
-  isSessionReplayEnabled: boolean;
-}> = ({ isSessionReplayEnabled }) => {
+const PopupTabs: React.FC = () => {
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(false);
   const [executedRules, setExecutedRules] = useState<Rule[]>([]);
   const [activeTabKey, setActiveTabKey] = useState(PopupTabKey.PINNED_RULES);
@@ -174,12 +172,7 @@ const PopupTabs: React.FC<{
   );
 
   return (
-    <Col
-      className="popup-tabs-wrapper popup-body-card"
-      style={{
-        maxHeight: isSessionReplayEnabled ? "270px" : "290px",
-      }}
-    >
+    <Col className="popup-tabs-wrapper popup-body-card">
       <Row justify="space-between" align="middle" className="tabs-header">
         <Typography.Text strong>HTTP rules</Typography.Text>
         <Dropdown

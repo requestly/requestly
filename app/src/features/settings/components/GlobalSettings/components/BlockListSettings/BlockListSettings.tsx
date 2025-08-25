@@ -85,7 +85,7 @@ export const BlockList = () => {
   return (
     <SettingsItem
       isActive={true}
-      onChange={() => {}}
+      onChange={null}
       title="Blocked Sites"
       caption="HTTP rules and SessionBook won't work on these sites"
       settingsBody={

@@ -1,7 +1,7 @@
 .https-rule-options-container {
   padding: 12px 16px;
-  background: var(--surface-0);
-  border-radius: var(--border-radius-md);
+  background: var(--surface-1);
+  border-radius: var(--border-radius-sm);
 }
 
 .https-rule-options-container .title {
@@ -21,7 +21,7 @@
   display: inline-flex;
   align-items: center;
   column-gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.4px;
   cursor: pointer;

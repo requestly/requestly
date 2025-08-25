@@ -26,7 +26,6 @@ import { useCurrentWorkspaceUserRole } from "hooks";
 import { TeamRole } from "types";
 import { Conditional } from "components/common/Conditional";
 import { MenuHeader } from "./MenuHeader/MenuHeader";
-import { useInitPopupConfig } from "hooks/useInitPopupConfig";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -39,7 +38,6 @@ const DashboardLayout = () => {
   const isReadRole = role === TeamRole.read;
 
   useRootPathRedirector();
-  useInitPopupConfig();
   // initializeOneTap();
 
   // if (shouldShowOneTapPrompt()) {

@@ -4,7 +4,6 @@ import {
   graphQLEntryToHttpEntryAdapter,
   httpEntryToGraphQLEntryAdapter,
 } from "../../screens/apiClient/components/views/graphql/utils";
-import { sanitizeEntry } from "features/apiClient/screens/apiClient/utils";
 
 export class GraphQLRequestExecutor extends HttpRequestExecutor {
   /**
@@ -30,7 +29,7 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
     const httpRequestEntry = graphQLEntryToHttpEntryAdapter(graphQLRequestEntry);
 
     this.updateEntryDetails({
-      entry: sanitizeEntry(httpRequestEntry),
+      entry: httpRequestEntry,
       recordId: record.id,
       collectionId: record.collectionId,
     });

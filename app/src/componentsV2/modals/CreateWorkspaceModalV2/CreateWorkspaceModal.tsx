@@ -26,18 +26,18 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./createWorkspaceModal.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
+import { teamsActions } from "store/features/teams/slice";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 
 interface Props {
   isOpen: boolean;
-  defaultWorkspaceType?: WorkspaceType;
   toggleModal: () => void;
   callback?: () => void;
 }
 
-export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspaceType, toggleModal, callback }) => {
+export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, toggleModal, callback }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -45,9 +45,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspa
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceType, setWorkspaceType] = useState(
-    defaultWorkspaceType || (user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL)
-  );
+  const [workspaceType, setWorkspaceType] = useState(user.loggedIn ? WorkspaceType.SHARED : WorkspaceType.LOCAL);
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -166,6 +164,7 @@ export const CreateWorkspaceModalV2: React.FC<Props> = ({ isOpen, defaultWorkspa
             workspaceType: WorkspaceType.LOCAL,
             rootPath: partialWorkspace.path,
           };
+          dispatch(teamsActions.addToAvailableTeams(localWorkspace));
           dispatch(workspaceActions.upsertWorkspace(localWorkspace));
           return partialWorkspace.id;
         } else {

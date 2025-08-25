@@ -2,7 +2,6 @@ import { RQAPI } from "features/apiClient/types";
 
 export type BaseApiEntryStoreState<T extends RQAPI.ApiEntry = RQAPI.ApiEntry, TAdditionalData = {}> = {
   entry: T;
-  recordId: RQAPI.ApiRecord["id"];
   hasUnsavedChanges: boolean;
   updateEntryRequest: (patch: Partial<T["request"]>) => void;
   updateEntryResponse: (response: T["response"]) => void;
@@ -16,13 +15,11 @@ export type BaseApiEntryStoreState<T extends RQAPI.ApiEntry = RQAPI.ApiEntry, TA
 
 export const createBaseApiEntryState = <T extends RQAPI.ApiEntry>(
   entry: T,
-  recordId: RQAPI.ApiRecord["id"],
   set: any,
   get: any
 ): BaseApiEntryStoreState<T, {}> => {
   // type a = setType<T>;
   return {
-    recordId,
     entry,
     hasUnsavedChanges: false,
     updateEntryRequest: (patch: Partial<T["request"]>) => {

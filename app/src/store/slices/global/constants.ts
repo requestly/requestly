@@ -187,8 +187,6 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
 
   editorToast: {},
 
-  popupConfig: {},
-
   misc: {
     persist: {
       isOrgBannerDismissed: false,

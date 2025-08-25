@@ -5,16 +5,14 @@
   background-color: var(--component-background);
 }
 
-.ant-dropdown .ant-dropdown-menu,
-.ant-dropdown-menu .ant-dropdown-menu-sub {
+.ant-dropdown .ant-dropdown-menu {
   padding: 4px 0;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
   background-color: var(--component-dark-background);
 }
 
-.ant-dropdown-menu .ant-dropdown-menu-item,
-.ant-dropdown-menu-submenu .ant-dropdown-menu-submenu-title {
+.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
   padding: 8px;
   font-size: var(--requestly-font-size-sm, 13px);
   line-height: 14.06px;

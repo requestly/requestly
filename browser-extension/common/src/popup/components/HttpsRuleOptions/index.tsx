@@ -45,7 +45,7 @@ export const HttpsRuleOptions: React.FC = () => {
 
   return (
     <div className="https-rule-options-container popup-body-card">
-      <div className="title">Intercept and modify web traffic</div>
+      <div className="title">Intercept and modify HTTP(s) requests</div>
       <div className="options">
         {ruleList.map(({ icon, title, editorLink, tooltipTitle, ruleType }, index) => (
           <Tooltip
