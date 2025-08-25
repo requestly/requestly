@@ -19,9 +19,19 @@
   svg {
     position: relative;
     bottom: 0.5px;
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     color: var(--requestly-color-text-default);
+    flex-shrink: 0;
+  }
+
+  .environment-icon {
+    display: none;
+
+    svg {
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-md, 14px);
+    }
   }
 
   &:hover,

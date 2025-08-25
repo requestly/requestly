@@ -14,4 +14,7 @@ export const MISC_TOURS = {
   PRICING: {
     UPGRADE_WORKSPACE_MENU: "upgrade_workspace_menu",
   },
+  RUNTIME_VARIABLES: {
+    FIRST_TIME_RUNTIME_VARIABLES: "first_runtime_variables",
+  },
 };

@@ -16,7 +16,7 @@ interface Props {
   autoFocus?: boolean;
   defaultBreadcrumbs?: {
     pathname: string;
-    label: string;
+    label: React.ReactNode;
     disabled?: boolean;
     isEditable?: boolean;
   }[];

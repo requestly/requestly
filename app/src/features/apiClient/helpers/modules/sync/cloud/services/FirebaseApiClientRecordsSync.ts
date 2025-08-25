@@ -95,10 +95,10 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   ): Promise<{ success: boolean; data: unknown; message?: string }> {
     const record = await this.getCollection(id);
 
-    const variablesToSet = Object.fromEntries(
+    const variablesToSet: EnvironmentVariables = Object.fromEntries(
       Object.entries(variables).map(([key, value]) => [
         key,
-        { syncValue: value.syncValue, type: value.type, id: value.id },
+        { syncValue: value.syncValue, type: value.type, id: value.id, isPersisted: true },
       ])
     );
 
@@ -153,6 +153,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return this.createRecordWithId(collection, id);
   }
 
+  // TODO: remove this
   async batchWriteApiEntities(
     batchSize: number,
     entities: RQAPI.ApiClientRecord[],

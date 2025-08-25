@@ -524,6 +524,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
     const service = await this.getAdapter();
     const result: RQAPI.ApiClientRecord[] = [];
+
     for (const entity of entities) {
       const moveResult = await (async () => {
         if (entity.type === RQAPI.RecordType.API) {
@@ -537,15 +538,37 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         result.push(parsedCollection[0]);
       }
     }
+
     return result;
   }
 
-  async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
-    if (records.length === 0) {
+  async batchCreateRecordsWithExistingId(entities: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
+    if (entities.length === 0) {
       return {
         success: true,
         data: { records: [], erroredRecords: [] },
       };
     }
+
+    const result: RQAPI.ApiClientRecord[] = [];
+
+    for (const entity of entities) {
+      const createResult = await (async () => {
+        if (entity.type === RQAPI.RecordType.API) {
+          return this.createRecordWithId(entity, entity.id);
+        }
+
+        return this.createCollectionFromImport(entity, entity.id);
+      })();
+
+      if (createResult.success) {
+        result.push(createResult.data);
+      }
+    }
+
+    return {
+      success: true,
+      data: { records: result, erroredRecords: [] },
+    };
   }
 }

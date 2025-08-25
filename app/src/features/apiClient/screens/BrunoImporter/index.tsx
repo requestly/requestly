@@ -4,13 +4,11 @@ import { processBrunoCollectionData } from "./utils";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system-v2/components";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { notification, Row } from "antd";
 import Logger from "lib/logger";
 import "./brunoImporter.scss";
-import { EnvironmentVariableValue } from "backend/environment/types";
 import { useNavigate } from "react-router-dom";
 import { redirectToApiClient } from "utils/RedirectionUtils";
 import { RQModal } from "lib/design-system/components";
@@ -22,6 +20,9 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import * as Sentry from "@sentry/react";
 import { useCommand } from "features/apiClient/commands";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
@@ -39,11 +40,12 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     apis: Partial<RQAPI.ApiRecord>[];
     environments: Array<{
       name: string;
-      variables: Record<string, EnvironmentVariableValue>;
+      variables: Record<string, EnvironmentVariableData>;
     }>;
   }>({ collections: [], apis: [], environments: [] });
 
-  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const {
     env: { createEnvironment },
   } = useCommand();
@@ -98,7 +100,7 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
             apis: [] as Partial<RQAPI.ApiRecord>[],
             environments: [] as Array<{
               name: string;
-              variables: Record<string, EnvironmentVariableValue>;
+              variables: Record<string, EnvironmentVariableData>;
             }>,
           };
 

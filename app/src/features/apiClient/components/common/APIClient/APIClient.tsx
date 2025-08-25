@@ -13,13 +13,10 @@ import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import "./apiClient.scss";
 import { WindowsAndLinuxGatedHoc } from "componentsV2/WindowsAndLinuxGatedHoc";
-import { ApiRecordsProvider } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
-import {
-  ApiClientRepositoryContext,
-  useGetApiClientSyncRepo,
-} from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
+import { ContextId } from "features/apiClient/contexts/contextId.context";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -100,9 +97,6 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     return createDummyApiRecord(entry);
   }, [request]);
 
-  const repository = useGetApiClientSyncRepo();
-  const key = repository.constructor.name;
-
   if (!apiRecord.data) {
     return null;
   }
@@ -120,21 +114,17 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
         <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
-          <ApiClientRepositoryContext.Provider value={repository} key={key}>
-            <ApiRecordsProvider>
-              <AutogenerateProvider>
-                <div className="api-client-container-content">
-                  <ClientViewFactory
-                    isOpenInModal
-                    apiRecord={apiRecord}
-                    handleRequestFinished={() => {}}
-                    onSaveCallback={() => {}}
-                    isCreateMode={true}
-                  />
-                </div>
-              </AutogenerateProvider>
-            </ApiRecordsProvider>
-          </ApiClientRepositoryContext.Provider>
+          <ContextId id={NoopContextId}>
+            <AutogenerateProvider>
+              <ClientViewFactory
+                isOpenInModal
+                apiRecord={apiRecord}
+                handleRequestFinished={() => {}}
+                onSaveCallback={() => {}}
+                isCreateMode={true}
+              />
+            </AutogenerateProvider>
+          </ContextId>
         </BottomSheetProvider>
       </WindowsAndLinuxGatedHoc>
     </Modal>

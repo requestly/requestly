@@ -27,6 +27,6 @@ export class CollectionViewTabSource extends BaseTabSource {
       throw new Error("Collection id not found!");
     }
 
-    return new CollectionViewTabSource({ id: collectionId, title: "Collection" });
+    return new CollectionViewTabSource({ id: collectionId, title: "Collection", context: {} });
   }
 }

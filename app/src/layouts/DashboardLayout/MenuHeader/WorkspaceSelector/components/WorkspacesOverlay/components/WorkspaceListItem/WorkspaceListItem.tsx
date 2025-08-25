@@ -1,17 +1,24 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "types";
-import { Tooltip, Typography } from "antd";
+import { Checkbox, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import { globalActions } from "store/slices/global/slice";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./workspaceListItem.scss";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { toast } from "utils/Toast";
+import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 type WorkspaceItemProps =
   | {
@@ -75,14 +82,26 @@ const ShareWorkspaceActions = ({
   );
 };
 
-const LocalWorkspaceActions = ({
-  workspaceId,
-  toggleDropdown,
-}: {
-  workspaceId: string;
-  toggleDropdown: () => void;
-}) => {
+const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Workspace; toggleDropdown: () => void }) => {
   const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+  const [isSelected, selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.isSelected, s.selectedWorkspaces]);
+
+  const handleMultiworkspaceAdder = useCallback(
+    async (isChecked: boolean) => {
+      try {
+        if (isChecked) {
+          await addWorkspaceToView(workspace, user.details?.profile?.uid);
+        } else {
+          removeWorkspaceFromView(workspace.id);
+        }
+      } catch (e) {
+        toast.error(e.message);
+      }
+    },
+    [user.details?.profile?.uid, workspace]
+  );
+
   return (
     <div className="local-workspace-actions">
       <Tooltip title="Settings" color="#000">
@@ -93,16 +112,28 @@ const LocalWorkspaceActions = ({
           size="small"
           onClick={(e) => {
             e.stopPropagation();
-            redirectToTeam(navigate, workspaceId);
+            redirectToTeam(navigate, workspace.id);
             toggleDropdown();
           }}
         />
       </Tooltip>
+      <div className="local-workspace-actions__checkbox-btn">
+        <Checkbox
+          onClick={(e) => e.stopPropagation()}
+          disabled={isSelected(workspace.id) && selectedWorkspaces.length === 1}
+          onChange={(e) => {
+            handleMultiworkspaceAdder(e.target.checked);
+          }}
+          checked={isSelected(workspace.id)}
+        />
+      </div>
     </div>
   );
 };
 
 export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
   const getWorkspaceDetails = (workspace: Workspace) => {
     switch (workspace.workspaceType) {
       case WorkspaceType.SHARED: {
@@ -139,11 +170,14 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   }
 
   const { workspace } = props;
+
   return (
     <div
       className={`workspace-overlay__list-item ${
-        props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""
-      } ${props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""}`}
+        viewMode === ApiClientViewMode.SINGLE ? "single-mode" : "multi-mode"
+      } ${props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""} ${
+        props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""
+      }`}
       onClick={handleWorkspaceClick}
     >
       <WorkspaceAvatar workspace={workspace} size={32} />
@@ -169,7 +203,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
         {props.type === WorkspaceType.SHARED ? (
           <ShareWorkspaceActions workspaceId={workspace.id} toggleDropdown={props.toggleDropdown} />
         ) : props.type === WorkspaceType.LOCAL ? (
-          <LocalWorkspaceActions workspaceId={workspace.id} toggleDropdown={props.toggleDropdown} />
+          <LocalWorkspaceActions workspace={workspace} toggleDropdown={props.toggleDropdown} />
         ) : null}
       </div>
     </div>
