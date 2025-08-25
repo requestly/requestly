@@ -23,15 +23,23 @@ import { useCommand } from "features/apiClient/commands";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { MultiViewImportModalWorkspaceSelection } from "../apiClient/components/modals/common/MultiViewImportModalWorkspaceSelection/MultiViewImportModalWorkspaceSelection";
 
 interface BrunoImporterProps {
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 type ProcessingStatus = "idle" | "processing" | "processed";
 const BATCH_SIZE = 25;
 
-export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
+export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess, onCancel }) => {
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -291,13 +299,21 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
           </Row>
         </div>
       ) : processingStatus === "processed" ? (
-        <div className="bruno-importer__post-parse-view bruno-importer__post-parse-view--success">
-          <MdCheckCircleOutline />
-          <div>Successfully processed {collectionsCount.current} collection(s)</div>
-          <RQButton type="primary" loading={isImporting} onClick={handleImportBrunoData}>
-            Import
-          </RQButton>
-        </div>
+        viewMode === ApiClientViewMode.SINGLE ? (
+          <div className="bruno-importer__post-parse-view bruno-importer__post-parse-view--success">
+            <MdCheckCircleOutline />
+            <div>Successfully processed {collectionsCount.current} collection(s)</div>
+            <RQButton type="primary" loading={isImporting} onClick={handleImportBrunoData}>
+              Import
+            </RQButton>
+          </div>
+        ) : (
+          <MultiViewImportModalWorkspaceSelection
+            onClose={onCancel}
+            isImporting={isImporting}
+            onImportClick={handleImportBrunoData}
+          />
+        )
       ) : (
         <FilePicker
           maxFiles={1000}
@@ -330,8 +346,8 @@ interface BrunoImporterModalProps {
 
 export const BrunoImporterModal: React.FC<BrunoImporterModalProps> = ({ isOpen, onClose }) => {
   return (
-    <RQModal open={isOpen} onCancel={onClose} footer={null} width={600}>
-      <BrunoImporter onSuccess={onClose} />
+    <RQModal open={isOpen} onCancel={onClose} footer={null} width={490}>
+      <BrunoImporter onSuccess={onClose} onCancel={onClose} />
     </RQModal>
   );
 };
