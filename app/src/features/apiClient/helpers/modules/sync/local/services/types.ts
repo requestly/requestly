@@ -43,6 +43,7 @@ export type HTTPRequestDetails = {
 };
 
 export type BaseApiRequestDetails = {
+  name: string;
   url: string;
   auth: RQAPI.Auth;
   scripts: {
@@ -59,10 +60,7 @@ export type API = {
   type: "api";
   collectionId?: string;
   id: string;
-  data: {
-    name: string;
-    request: ApiRequestDetails;
-  };
+  request: ApiRequestDetails;
 };
 
 export type VariableEntity = Record<

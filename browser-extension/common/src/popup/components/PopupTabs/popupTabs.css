@@ -1,8 +1,9 @@
 .popup-tabs-wrapper {
   background: var(--surface-1);
   border-radius: var(--border-radius);
-  padding: 8px 12px;
-  overflow: hidden;
+  padding: 12px 1rem;
+  padding-bottom: 0;
+  max-height: 290px;
 }
 
 .tabs-header {
@@ -88,7 +89,7 @@
 }
 
 .popup-tabs-wrapper .empty-tab-view-container {
-  height: 190px;
+  height: 235px;
 }
 
 .empty-tab-view-title {

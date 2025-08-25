@@ -15,6 +15,7 @@ import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { workspaceActions } from "store/slices/workspaces/slice";
+import { teamsActions } from "store/features/teams/slice";
 import { getActiveWorkspaceId, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
@@ -105,6 +106,7 @@ const DBListeners = () => {
       );
     } else {
       dispatch(workspaceActions.setAllWorkspaces([]));
+      dispatch(teamsActions.setAvailableTeams(null));
       // Very edge case
       if (activeWorkspaceId) {
         clearCurrentlyActiveWorkspace(dispatch, appMode);

@@ -64,7 +64,6 @@ The following domains are eligible for the student programme:
     "student.su.se",
     "strayer.edu",
     "student.unsika.ac.id",
-    "purdueglobal.edu",
-    "njit.edu"
+    "purdueglobal.edu"
   ]
 }

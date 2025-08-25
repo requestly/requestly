@@ -74,6 +74,5 @@ export interface GlobalSliceState {
     };
   };
   userAttributes: any;
-  popupConfig: Record<string, boolean>;
   [key: string]: any;
 }

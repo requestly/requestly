@@ -147,8 +147,3 @@ export const onBlockListChange = (callback: () => void) => {
     }
   );
 };
-
-export const getPopupConfig = async () => {
-  const config = await getRecord<Record<string, any>>(STORAGE_KEYS.POPUP_CONFIG);
-  return config;
-};

@@ -163,8 +163,6 @@ const LINKS = {
   DOWNLOAD_CRX: "https://requestly.com/downloads/crx/",
 
   DOWNLOAD_CHROME_EXTENSION_ZIP: "https://rqst.ly/chrome/zip",
-
-  SHARE_ON_LINKEDIN_FORM: "https://app.formbricks.com/s/gsfvea1k3n53is5fit337ibp",
 };
 
 export default LINKS;

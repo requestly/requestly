@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Header } from "antd/lib/layout/layout";
-import WorkspaceSelector from "./WorkspaceSelector/WorkspaceSelector";
+import WorkspaceSelector from "./WorkspaceSelector";
 import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import LINKS from "config/constants/sub/links";

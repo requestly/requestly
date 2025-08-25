@@ -184,10 +184,7 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
   return newStatus;
 };
 
-export const triggerOpenCurlModalMessage = async (
-  defaultCurlConfig: { selectedText?: string; pageURL?: string },
-  source: string
-) => {
+export const triggerOpenCurlModalMessage = async (selectedText: string, pageURL: string) => {
   try {
     // Create a new tab with the web URL
     const newTab = await tabService.createAppTab();
@@ -199,9 +196,9 @@ export const triggerOpenCurlModalMessage = async (
     const message = {
       action: CLIENT_MESSAGES.OPEN_CURL_IMPORT_MODAL,
       payload: {
-        curlCommand: defaultCurlConfig.selectedText ?? "",
-        pageURL: defaultCurlConfig.pageURL,
-        source,
+        curlCommand: selectedText,
+        pageURL,
+        source: "context_menu",
       },
     };
 

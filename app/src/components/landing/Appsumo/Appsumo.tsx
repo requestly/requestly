@@ -9,7 +9,7 @@ import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { FiXCircle } from "@react-icons/all-files/fi/FiXCircle";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
-import AppSumoWorkspaceDropdown from "components/landing/Appsumo/AppSumoWorkspaceDropdown/AppSumoWorkspaceDropdown";
+import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
 import { doc, getDoc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
@@ -261,7 +261,7 @@ const AppSumoModal: React.FC = () => {
           </div>
           <div className="header mt-16">Please enter your AppSumo code</div>
           <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
-          <AppSumoWorkspaceDropdown
+          <WorkspaceDropdown
             isAppSumo
             disabled={isLoading}
             workspaceToUpgrade={workspaceToUpgrade}

@@ -54,7 +54,6 @@ FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
 FEATURES.FRAMELESS_DESKTOP_APP = "frameless-desktop-app";
 FEATURES.EXTENSION_STATUS_NOTIFICATION = "extension-status-notification";
 FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD = "request-rule-graphql-payload";
-FEATURES.POPUP_CONFIG = "popup_config";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";
@@ -99,7 +98,5 @@ FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
 
 FEATURES.COMPATIBLE_DESKTOP_APP = "compatible_desktop_app";
 FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
-
-FEATURES.GRAPHQL_SUPPORT = "graphql_support";
 
 export default FEATURES;

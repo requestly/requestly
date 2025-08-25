@@ -2,6 +2,7 @@ import { autoBatchEnhancer, configureStore } from "@reduxjs/toolkit";
 
 //FEATURES
 import { sessionRecordingReducer } from "./features/session-recording/slice";
+import { teamsReducer } from "./features/teams/slice";
 
 import { ReducerKeys } from "./constants";
 import { desktopTrafficTableReducerWithLocalSync } from "./features/desktop-traffic-table/slice";
@@ -18,6 +19,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.GLOBAL]: globalReducers,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
     [ReducerKeys.HAR_PREVIEW]: harPreviewReducer,
+    [ReducerKeys.TEAMS]: teamsReducer,
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducerWithLocalSync,
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,

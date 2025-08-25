@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Row } from "antd";
 import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { CheckCircleOutlined } from "@ant-design/icons";
@@ -9,10 +9,11 @@ import "./desktopAppProxy.scss";
 interface DesktopAppProxyProps {
   isProxyApplied: boolean;
   onProxyStatusChange: (newStatus: boolean) => void;
-  isDesktopAppOpen: boolean;
 }
 
-const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, onProxyStatusChange, isDesktopAppOpen }) => {
+const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, onProxyStatusChange }) => {
+  const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
+
   const connectToDesktopApp = useCallback(() => {
     chrome.runtime
       .sendMessage({ action: EXTENSION_MESSAGES.CONNECT_TO_DESKTOP_APP })
@@ -24,7 +25,12 @@ const DesktopAppProxy: React.FC<DesktopAppProxyProps> = ({ isProxyApplied, onPro
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.IS_PROXY_APPLIED }).then(onProxyStatusChange);
   }, []);
 
+  const checkIfDesktopAppOpen = useCallback(() => {
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN }).then(setIsDesktopAppOpen);
+  }, []);
+
   useEffect(() => {
+    checkIfDesktopAppOpen();
     checkIfProxyApplied();
   }, []);
 

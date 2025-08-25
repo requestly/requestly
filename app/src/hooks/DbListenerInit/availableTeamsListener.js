@@ -3,6 +3,7 @@ import { query } from "firebase/database";
 import { collection, getFirestore, onSnapshot, where } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
+import { teamsActions } from "store/features/teams/slice";
 import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
 import APP_CONSTANTS from "config/constants";
@@ -108,6 +109,7 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
           })
           .filter(Boolean);
         records.push(...localRecords);
+        dispatch(teamsActions.setAvailableTeams(records));
         dispatch(workspaceActions.setAllWorkspaces(records));
 
         if (!activeWorkspaceId) return;
@@ -141,7 +143,14 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
         } else {
           // Incase team name, members, or anything has changed
           // No need
-          dispatch(workspaceActions.setActiveWorkspaceIds(found.id ? [found.id] : []));
+          dispatch(
+            teamsActions.setCurrentlyActiveWorkspace({
+              id: found.id,
+              name: found.name,
+              membersCount: found.accessCount,
+              workspaceType: found.workspaceType,
+            })
+          );
 
           // Update details of all team members
           const functions = getFunctions();
@@ -157,6 +166,7 @@ const availableTeamsListener = (dispatch, uid, activeWorkspaceId, appMode, isLoc
                 response.users.forEach((user, index) => {
                   users[user.id] = response.users[index];
                 });
+                dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers(users));
                 dispatch(workspaceActions.setActiveWorkspacesMembers(users));
               } else {
                 throw new Error(response.message);

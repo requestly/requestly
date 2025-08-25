@@ -1,5 +1,6 @@
 :root {
   --border-radius: 4px;
+  --border-radius-md: 8px;
   --color-primary: #ffffff;
   --color-secondary: #b0b0b5;
   --color-success: #069d4f;
@@ -58,8 +59,6 @@
 
   /* Tokens */
   --white: var(--neutrals-white);
-  --white-t-10: #ffffff0f;
-  --white-t-20: #ffffff1f;
   --black: var(--neutrals-black);
 
   --primary-color: var(--blue-500);
@@ -67,7 +66,6 @@
   --success: var(--green-500);
   --disable: var(--neutrals-gray-500);
 
-  --surface-0: #212121;
   --surface-1: #282828;
   --surface-2: #383838;
   --surface-3: var(--neutrals-gray-600);
@@ -78,7 +76,6 @@
   --background: #1b1b1b;
 
   --border-radius-sm: 4px;
-  --border-radius-md: 8px;
 }
 
 /* reset */

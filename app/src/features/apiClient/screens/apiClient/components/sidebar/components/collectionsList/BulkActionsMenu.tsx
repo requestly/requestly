@@ -1,14 +1,12 @@
-import React, { useMemo } from "react";
 import { MdMoveDown } from "@react-icons/all-files/md/MdMoveDown";
 import { IoCloseSharp } from "@react-icons/all-files/io5/IoCloseSharp";
 import { CgTrash } from "@react-icons/all-files/cg/CgTrash";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { IoDuplicateOutline } from "@react-icons/all-files/io5/IoDuplicateOutline";
+import React, { useMemo } from "react";
 import { BulkActions } from "features/apiClient/types";
-import { Checkbox, Dropdown, TooltipProps } from "antd";
+import { Checkbox, TooltipProps } from "antd";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
-import RequestlyIcon from "assets/img/brand/rq_logo.svg";
-import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import "./bulkActionsMenu.scss";
 
 export interface ActionMenuProps {
@@ -26,28 +24,6 @@ const ActionMenu: React.FC<ActionMenuProps> = ({
   bulkActionsHandler,
   disabledActions,
 }) => {
-  const exportMenuItems = useMemo(() => {
-    return [
-      {
-        key: "title",
-        label: "Export As",
-        type: "group",
-      },
-      {
-        key: "requestly",
-        label: "Requestly",
-        icon: <img src={RequestlyIcon} alt="Requestly Icon" height="16px" width="16px" />,
-        onClick: () => bulkActionsHandler(BulkActions.EXPORT_REQUESTLY),
-      },
-      {
-        key: "postman",
-        label: "Postman (v2.1 format)",
-        icon: <img src={PostmanIcon} alt="Postman Icon" height="16px" width="16px" />,
-        onClick: () => bulkActionsHandler(BulkActions.EXPORT_POSTMAN),
-      },
-    ];
-  }, [bulkActionsHandler]);
-
   const actionsItems = useMemo(
     () => [
       {
@@ -68,8 +44,6 @@ const ActionMenu: React.FC<ActionMenuProps> = ({
         title: "Export",
         icon: <MdOutlineFileDownload />,
         onClick: () => bulkActionsHandler(BulkActions.EXPORT),
-        isDropdown: true,
-        dropdownItems: exportMenuItems,
         disable: disabledActions?.[BulkActions.EXPORT]?.value,
         disabledTooltipTitle: disabledActions?.[BulkActions.EXPORT]?.tooltip,
       },
@@ -86,7 +60,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({
         onClick: toggleSelection,
       },
     ],
-    [bulkActionsHandler, disabledActions, exportMenuItems, toggleSelection]
+    [bulkActionsHandler, disabledActions, toggleSelection]
   );
 
   return (
@@ -106,28 +80,15 @@ const ActionMenu: React.FC<ActionMenuProps> = ({
           return (
             <RQTooltip key={index} title={tooltipTitle} placement={tooltipPlacement}>
               <>
-                {item.isDropdown ? (
-                  <Dropdown
-                    disabled={disable}
-                    menu={{ items: item.dropdownItems }}
-                    trigger={["click"]}
-                    placement="bottomLeft"
-                  >
-                    <RQButton type="transparent" size="small" className="api-client-action-btn export-dropdown">
-                      {item.icon}
-                    </RQButton>
-                  </Dropdown>
-                ) : (
-                  <RQButton
-                    size="small"
-                    type="transparent"
-                    className="api-client-action-btn"
-                    disabled={disable}
-                    onClick={item.onClick}
-                  >
-                    {item.icon}
-                  </RQButton>
-                )}
+                <RQButton
+                  size="small"
+                  type="transparent"
+                  className="api-client-action-btn"
+                  disabled={disable}
+                  onClick={item.onClick}
+                >
+                  {item.icon}
+                </RQButton>
               </>
             </RQTooltip>
           );
