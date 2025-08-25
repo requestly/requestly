@@ -1,14 +1,12 @@
 import { DownOutlined } from "@ant-design/icons";
 import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
 import { Dropdown, Tooltip } from "antd";
-import APP_CONSTANTS from "config/constants";
 import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Invite, WorkspaceType } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -22,7 +20,6 @@ const prettifyWorkspaceName = (workspaceName: string) => {
 
 const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
-  const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
@@ -38,9 +35,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   //     ? activeWorkspace?.name
   //     : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
   //   : "Workspaces";
-  const activeWorkspaceName = isSharedWorkspaceMode
-    ? activeWorkspace?.name
-    : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE;
+  const activeWorkspaceName = isSharedWorkspaceMode ? activeWorkspace?.name : "Workspaces";
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
