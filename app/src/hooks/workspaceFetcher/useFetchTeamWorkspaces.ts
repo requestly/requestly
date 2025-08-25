@@ -1,5 +1,4 @@
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
@@ -35,8 +34,6 @@ export const useFetchTeamWorkspaces = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const appMode = useSelector(getAppMode);
   const allWorkspaces = useSelector(getAllWorkspaces);
-
-  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   const unsubscribeAvailableTeams = useRef<(() => void) | null>(null);
 
@@ -100,7 +97,7 @@ export const useFetchTeamWorkspaces = () => {
 
             //FIX ME: the following code's intention is unclear
             //Showing an alert is unnecessary
-            const found = records.find((team) => team.id === activeWorkspaceId);
+            const found = allWorkspaces.find((team) => team.id === activeWorkspaceId);
 
             Logger.log("DBG: availableTeamsListener", {
               teamFound: found,
