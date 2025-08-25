@@ -6,7 +6,7 @@ import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
@@ -26,14 +26,21 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
+  useEffect(() => {
+    console.log("!!!debug", "active", activeWorkspace);
+  }, [activeWorkspace]);
+
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeWorkspaceName = user.loggedIn
-    ? isSharedWorkspaceMode
-      ? activeWorkspace?.name
-      : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-    : "Workspaces";
+  // const activeWorkspaceName = user.loggedIn
+  //   ? isSharedWorkspaceMode
+  //     ? activeWorkspace?.name
+  //     : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+  //   : "Workspaces";
+  const activeWorkspaceName = isSharedWorkspaceMode
+    ? activeWorkspace?.name
+    : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE;
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
@@ -80,8 +87,8 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
                 size={28}
                 workspace={{
                   ...activeWorkspace,
-                  name: user.loggedIn ? activeWorkspaceName : null,
-                  workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+                  name: activeWorkspaceName ?? null,
+                  workspaceType: activeWorkspace?.workspaceType ?? null,
                 }}
               />
               <span className="items-center active-workspace-name">

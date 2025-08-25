@@ -17,13 +17,12 @@ export const useGetApiClientSyncRepo = () => {
   const isWorkspaceLocal: boolean = activeWorkspace?.workspaceType === WorkspaceType.LOCAL;
 
   const getRepository: () => ApiClientRepositoryInterface = useCallback(() => {
-    if (!user.loggedIn) {
-      return localStoreRepository;
-    }
     if (isWorkspaceLocal && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       return new ApiClientLocalRepository({
         rootPath: activeWorkspace?.rootPath,
       });
+    } else if (!user.loggedIn) {
+      return localStoreRepository;
     } else {
       return new ApiClientCloudRepository({ uid: user.details.profile.uid, teamId: activeWorkspace.id });
     }

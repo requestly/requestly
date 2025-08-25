@@ -19,7 +19,7 @@ export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown
   const user = useSelector(getUserAuthDetails);
 
   const handleCreateWorkspace = (type: WorkspaceType) => {
-    if (!user.loggedIn) {
+    if (!user.loggedIn && type === WorkspaceType.SHARED) {
       dispatch(
         globalActions.toggleActiveModal({
           modalName: "authModal",
@@ -47,7 +47,7 @@ export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown
   return (
     <div className="common-workspace-empty-view">
       <img src="/assets/media/common/empty-folder.svg" alt="empty folder" />
-      <div className="common-workspace-empty-view__title">You don’t have any workspaces yet.</div>
+      <div className="common-workspace-empty-view__title">You don't have any workspaces yet.</div>
       <div className="common-workspace-empty-view__description">
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
           ? "Create a local workspace to store files on your device or a team workspace to collaborate with teammates."

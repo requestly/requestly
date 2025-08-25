@@ -3,16 +3,14 @@ import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { WorkspaceMemberRole } from "features/workspaces/types";
 import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { WorkspaceType } from "types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const useFetchLocalWorkspaces = () => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   const fetchLocalWorkspaces = useCallback(async () => {
@@ -20,13 +18,8 @@ export const useFetchLocalWorkspaces = () => {
       return;
     }
 
-    // TODO: uid is needed as per current implementation, to be removed when logged out support is implemented
-    if (!user.loggedIn) {
-      return;
-    }
-
     try {
-      const uid = user.details.profile.uid;
+      const uid = "random_uid";
 
       const allLocalWorkspacesResult = await getAllWorkspaces();
       const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
@@ -57,7 +50,7 @@ export const useFetchLocalWorkspaces = () => {
     } catch (e) {
       captureException(e);
     }
-  }, [dispatch, isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
+  }, [dispatch, isLocalSyncEnabled]);
 
   useEffect(() => {
     fetchLocalWorkspaces();
