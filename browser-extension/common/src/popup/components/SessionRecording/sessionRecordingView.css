@@ -1,11 +1,13 @@
 .session-view-content {
-  padding: 12px 16px;
-  background: var(--surface-1);
-  border-radius: var(--border-radius-sm);
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid var(--white-t-10);
 }
 
 .session-view-content .title {
-  line-height: 20px;
+  line-height: 18px;
 }
 
 .session-view-content .configure-btn {
@@ -19,7 +21,6 @@
 }
 
 .session-view-content .action-btns {
-  margin: 8px 0;
   column-gap: 12px;
 }
 
@@ -40,7 +41,7 @@
 
 .session-view-content .session-replay-security-msg .msg {
   width: 100%;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 16px;
   letter-spacing: 0.4px;
 }
