@@ -65,10 +65,25 @@
     }
 
     .workspace-header-continer {
+      .workspace-options {
+        opacity: 0;
+      }
+
+      &:hover {
+        .workspace-options {
+          opacity: 1;
+        }
+      }
+      &:focus-within {
+        .workspace-options {
+          opacity: 1;
+        }
+      }
+
       .environment-switcher-button {
         border-radius: 32px;
         background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
-
+        max-width: fit-content;
         color: var(--requestly-color-text-placeholder);
         font-size: var(--requestly-font-size-xs, 11px);
         line-height: 17px; /* 154.545% */

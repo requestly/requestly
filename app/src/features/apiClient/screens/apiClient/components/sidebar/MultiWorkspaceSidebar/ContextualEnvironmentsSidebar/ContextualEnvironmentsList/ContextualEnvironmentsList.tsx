@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState, useMemo, useContext } from "react";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
 import { RQAPI } from "features/apiClient/types";
@@ -15,6 +15,7 @@ import {
 } from "features/apiClient/commands/environments/utils";
 import "./contextualEnvironmentsList.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 interface ContextualEnvironmentsListProps {
   searchValue: string;
@@ -29,7 +30,8 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
 
   const [environmentsToExport, setEnvironmentsToExport] = useState<EnvironmentData[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const { isRecordBeingCreated } = useApiClientContext();
+  const { isRecordBeingCreated, onNewClickContextId } = useApiClientContext();
+  const contextId = useContextId();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
 
@@ -81,7 +83,7 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
                 )
               )}
               <div className="mt-8">
-                {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
+                {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && onNewClickContextId === contextId && (
                   <SidebarPlaceholderItem name="New Environment" />
                 )}
               </div>
