@@ -133,6 +133,7 @@ export const LocalWorkspaceCreationView = ({
         onCancel={handleOnCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
+        disabled={!workspaceName.length || !folderPath.length}
       />
     </>
   );

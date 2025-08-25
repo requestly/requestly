@@ -46,6 +46,7 @@ export const SharedWorkspaceCreationView = ({
         onCancel={handleOnCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
+        disabled={!workspaceName.length}
       />
     </>
   );
