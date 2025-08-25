@@ -54,6 +54,7 @@ interface ApiClientContextInterface {
   }) => Promise<void>;
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
+  onNewClickContextId: string | null;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
@@ -76,6 +77,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   setIsImportModalOpen: () => {},
 
   apiClientWorkloadManager: new APIClientWorkloadManager(),
+  onNewClickContextId: null,
 });
 
 interface ApiClientProviderProps {
@@ -100,6 +102,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     state.updateRecords,
     state.getData,
   ]);
+  const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
@@ -152,6 +155,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
         return;
       }
 
+      setOnNewClickContextId(contextId);
       const context = getApiClientFeatureContext(contextId);
       const recordsRepository = context.repositories.apiClientRecordsRepository;
 
@@ -295,6 +299,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     onNewClick,
     onNewClickV2,
     apiClientWorkloadManager: workloadManager,
+    onNewClickContextId,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;
