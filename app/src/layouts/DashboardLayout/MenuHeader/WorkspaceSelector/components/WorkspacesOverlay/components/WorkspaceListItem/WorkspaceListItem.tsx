@@ -84,8 +84,11 @@ const ShareWorkspaceActions = ({
 
 const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Workspace; toggleDropdown: () => void }) => {
   const navigate = useNavigate();
-  const user = useSelector(getUserAuthDetails); // FIXME
-  const [isSelected] = useApiClientMultiWorkspaceView((s) => [s.isSelected]);
+  const user = useSelector(getUserAuthDetails);
+  const [isSelected, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
+    s.isSelected,
+    s.getAllSelectedWorkspaces,
+  ]);
 
   const handleMultiworkspaceAdder = useCallback(
     async (isChecked: boolean) => {
@@ -104,21 +107,6 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
 
   return (
     <div className="local-workspace-actions">
-      <div
-      // className={`workspace-checkbox-wrapper ${
-      //   // selectedWorkspaces.length === 0 ? "single-workspace-hover" : "multi-workspace-no-hover"
-      // }`}
-      >
-        <Checkbox
-          onClick={(e) => e.stopPropagation()}
-          // disabled={isSelected(team.id) && selectedWorkspaces.length === 1}
-          onChange={(e) => {
-            handleMultiworkspaceAdder(e.target.checked);
-          }}
-          checked={isSelected(workspace.id)}
-        />
-      </div>
-
       <Tooltip title="Settings" color="#000">
         <RQButton
           className="local-workspace-actions__settings-btn"
@@ -132,6 +120,16 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
           }}
         />
       </Tooltip>
+      <div className="local-workspace-actions__checkbox-btn">
+        <Checkbox
+          onClick={(e) => e.stopPropagation()}
+          disabled={isSelected(workspace.id) && getAllSelectedWorkspaces().length === 1}
+          onChange={(e) => {
+            handleMultiworkspaceAdder(e.target.checked);
+          }}
+          checked={isSelected(workspace.id)}
+        />
+      </div>
     </div>
   );
 };
@@ -179,7 +177,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   const isVisiblyActive = viewMode === ApiClientViewMode.SINGLE;
   return (
     <div
-      data-disabled={isVisiblyActive} // To be consumed in css
+      data-disabled={isVisiblyActive}
       className={`workspace-overlay__list-item ${
         props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""
       } ${props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""}`}
