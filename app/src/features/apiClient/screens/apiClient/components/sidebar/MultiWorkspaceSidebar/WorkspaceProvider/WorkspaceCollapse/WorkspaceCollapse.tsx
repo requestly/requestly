@@ -112,13 +112,13 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                       type="transparent"
                       icon={<MdAdd />}
                       onClick={(e) => {
+                        e.stopPropagation();
                         onNewClickV2({
                           contextId: contextId,
                           analyticEventSource: "api_client_sidebar_header",
                           recordType: RQAPI.RecordType.ENVIRONMENT,
                           collectionId: undefined,
                         });
-                        e.stopPropagation();
                       }}
                     />
                   ) : (
