@@ -10,7 +10,12 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import { globalActions } from "store/slices/global/slice";
-import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
+import {
+  trackInviteTeammatesClicked,
+  trackManageWorkspaceClicked,
+  trackMultiWorkspaceDeselected,
+  trackMultiWorkspaceSelected,
+} from "modules/analytics/events/common/teams";
 import "./workspaceListItem.scss";
 import {
   ApiClientViewMode,
@@ -92,8 +97,10 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
       try {
         if (isChecked) {
           await addWorkspaceToView(workspace, user.details?.profile?.uid);
+          trackMultiWorkspaceSelected("workspace_selector_dropdown");
         } else {
           removeWorkspaceFromView(workspace.id);
+          trackMultiWorkspaceDeselected("workspace_selector_dropdown");
         }
       } catch (e) {
         toast.error(e.message);
@@ -112,6 +119,7 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
           size="small"
           onClick={(e) => {
             e.stopPropagation();
+            trackManageWorkspaceClicked("workspace_selector_dropdown");
             redirectToTeam(navigate, workspace.id);
             toggleDropdown();
           }}
