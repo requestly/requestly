@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Modal } from "antd";
 import { FilePicker } from "components/common/FilePicker";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
@@ -7,6 +7,11 @@ import { MdErrorOutline } from "@react-icons/all-files/md/MdErrorOutline";
 import {} from "modules/analytics/events/features/apiClient";
 import "./apiClientImportModal.scss";
 import useApiClientFileImporter, { ImporterType } from "features/apiClient/hooks/useApiClientFileImporter";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { MultiViewImportModalWorkspaceSelection } from "../common/MultiViewImportModalWorkspaceSelection/MultiViewImportModalWorkspaceSelection";
 
 interface Props {
   isOpen: boolean;
@@ -14,6 +19,8 @@ interface Props {
 }
 
 export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
   const {
     isImporting,
     error,
@@ -27,17 +34,20 @@ export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     processFiles(files);
   };
 
+  const onModalClose = useCallback(() => {
+    onClose();
+    resetImportData();
+  }, [onClose, resetImportData]);
+
   return (
     <Modal
       className="import-collections-modal"
       open={isOpen}
-      onCancel={() => {
-        onClose();
-        resetImportData();
-      }}
-      title="Import collections & environments"
+      onCancel={onModalClose}
+      title="Import collections and environments"
       footer={null}
-      width={600}
+      width={490}
+      maskClosable={false}
     >
       {error ? (
         <div className="collections-parsed-container">
@@ -53,13 +63,21 @@ export const ApiClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </RQButton>
         </div>
       ) : processingStatus === "processed" ? (
-        <div className="collections-parsed-container">
-          <MdCheckCircleOutline className="collections-parse-result-icon success" />
-          <div className="collections-parse-result-text">Data parsed successfully</div>
-          <RQButton type="primary" onClick={() => handleImportData(onClose)} loading={isImporting}>
-            Import Data
-          </RQButton>
-        </div>
+        viewMode === ApiClientViewMode.SINGLE ? (
+          <div className="collections-parsed-container">
+            <MdCheckCircleOutline className="collections-parse-result-icon success" />
+            <div className="collections-parse-result-text">Data parsed successfully</div>
+            <RQButton type="primary" onClick={() => handleImportData(onClose)} loading={isImporting}>
+              Import Data
+            </RQButton>
+          </div>
+        ) : (
+          <MultiViewImportModalWorkspaceSelection
+            onClose={onModalClose}
+            isImporting={isImporting}
+            onImportClick={() => handleImportData(onModalClose)}
+          />
+        )
       ) : (
         <FilePicker
           maxFiles={1000}
