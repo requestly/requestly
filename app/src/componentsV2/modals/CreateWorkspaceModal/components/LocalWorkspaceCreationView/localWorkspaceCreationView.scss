@@ -80,6 +80,14 @@
       flex-direction: column;
       gap: 8px;
       margin-right: 4px;
+      position: relative;
+
+      .preview-info-icon {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        color: var(--requestly-color-success-text, #6fdaa6);
+      }
     }
   }
 
