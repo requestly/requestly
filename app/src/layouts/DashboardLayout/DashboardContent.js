@@ -12,7 +12,7 @@ import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-import { CreateWorkspaceModalV2 } from "componentsV2/modals/CreateWorkspaceModalV2/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "componentsV2/modals/CreateWorkspaceModal/CreateWorkspaceModal";
 import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
@@ -122,7 +122,7 @@ const DashboardContent = () => {
             />
           ) : null}
           {activeModals.createWorkspaceModal.isActive ? (
-            <CreateWorkspaceModalV2
+            <CreateWorkspaceModal
               isOpen={activeModals.createWorkspaceModal.isActive}
               toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
               {...activeModals.createWorkspaceModal.props}

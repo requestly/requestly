@@ -119,17 +119,6 @@
         }
       }
     }
-
-    .invite-all-domain-users-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .invite-all-domain-users-text {
-        color: var(--requestly-color-text-subtle);
-        font-size: var(--requestly-font-size-xs);
-      }
-    }
   }
 
   .ant-modal-footer {
