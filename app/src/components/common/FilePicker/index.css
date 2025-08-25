@@ -24,7 +24,7 @@
 
 .file-picker-wrapper .file-picker-icon-title,
 .file-picker-wrapper-active .file-picker-icon-title {
-  font-size: var(--requestly-font-size-lg);
+  font-size: var(--requestly-font-size-md);
 }
 
 .file-picker-wrapper .file-picker-icon-subtitle,
