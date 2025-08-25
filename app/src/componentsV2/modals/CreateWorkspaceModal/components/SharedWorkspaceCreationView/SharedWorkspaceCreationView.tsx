@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Checkbox } from "antd";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
@@ -7,6 +7,8 @@ import { globalActions } from "store/slices/global/slice";
 import { CreateWorkspaceArgs } from "../../CreateWorkspaceModal";
 import { WorkspaceType } from "types";
 import "./sharedWorkspaceCreationView.scss";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 
 export const SharedWorkspaceCreationView = ({
   onCreateWorkspaceClick,
@@ -16,6 +18,8 @@ export const SharedWorkspaceCreationView = ({
   isLoading: boolean;
 }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+
   const [workspaceName, setWorkspaceName] = useState("");
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
 
@@ -40,7 +44,9 @@ export const SharedWorkspaceCreationView = ({
       />
       <div className="invite-all-domain-users-container">
         <Checkbox checked={isNotifyAllSelected} onChange={() => setIsNotifyAllSelected(!isNotifyAllSelected)} />{" "}
-        <span className="invite-all-domain-users-text">Notify all requestly.io users to join this workspace.</span>
+        <span className="invite-all-domain-users-text">
+          Notify all {getDomainFromEmail(user.details?.profile?.email)} users to join this workspace.
+        </span>
       </div>
       <CreateWorkspaceFooter
         onCancel={handleOnCancel}
