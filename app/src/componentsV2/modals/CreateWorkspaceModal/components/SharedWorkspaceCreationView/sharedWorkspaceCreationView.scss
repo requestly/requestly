@@ -1,0 +1,11 @@
+.invite-all-domain-users-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+
+  .invite-all-domain-users-text {
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-sm);
+  }
+}

@@ -37,7 +37,7 @@ export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown
         modalName: "createWorkspaceModal",
         newValue: true,
         newProps: {
-          defaultWorkspaceType: type,
+          workspaceType: type,
         },
       })
     );

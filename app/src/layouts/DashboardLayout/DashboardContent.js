@@ -12,8 +12,7 @@ import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-import CreateWorkspaceModal from "componentsV2/modals/CreateWorkspaceModal";
-import { CreateWorkspaceModalV2 } from "componentsV2/modals/CreateWorkspaceModalV2/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "componentsV2/modals/CreateWorkspaceModal/CreateWorkspaceModal";
 import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
@@ -27,7 +26,6 @@ import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { RequestBot } from "features/requestBot";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 
@@ -38,7 +36,6 @@ const DashboardContent = () => {
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
@@ -125,19 +122,11 @@ const DashboardContent = () => {
             />
           ) : null}
           {activeModals.createWorkspaceModal.isActive ? (
-            isLocalSyncEnabled ? (
-              <CreateWorkspaceModalV2
-                isOpen={activeModals.createWorkspaceModal.isActive}
-                toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
-                {...activeModals.createWorkspaceModal.props}
-              />
-            ) : (
-              <CreateWorkspaceModal
-                isOpen={activeModals.createWorkspaceModal.isActive}
-                toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
-                {...activeModals.createWorkspaceModal.props}
-              />
-            )
+            <CreateWorkspaceModal
+              isOpen={activeModals.createWorkspaceModal.isActive}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
+              {...activeModals.createWorkspaceModal.props}
+            />
           ) : null}
 
           {activeModals.inviteMembersModal.isActive ? (

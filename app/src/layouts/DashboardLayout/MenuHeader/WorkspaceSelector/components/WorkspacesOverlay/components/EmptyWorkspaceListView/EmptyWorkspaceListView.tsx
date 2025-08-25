@@ -33,7 +33,7 @@ export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ work
                   modalName: "createWorkspaceModal",
                   newValue: true,
                   newProps: {
-                    defaultWorkspaceType: workspaceType,
+                    workspaceType,
                   },
                 })
               );

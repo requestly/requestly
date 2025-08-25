@@ -78,7 +78,7 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
               modalName: "createWorkspaceModal",
               newValue: true,
               newProps: {
-                defaultWorkspaceType: workspaceType,
+                workspaceType,
               },
             })
           );
