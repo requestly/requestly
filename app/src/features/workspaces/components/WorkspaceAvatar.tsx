@@ -2,14 +2,13 @@ import React from "react";
 import { Avatar, AvatarProps } from "antd";
 
 import { LockOutlined } from "@ant-design/icons";
-import { LuFolderSync } from "@react-icons/all-files/lu/LuFolderSync";
 
 import { isLocalFSWorkspace, isPersonalWorkspace } from "../utils";
 import { getColorFromString } from "utils/getColorFromString";
 import { Workspace } from "../types";
 
 interface Props {
-  workspace: Workspace;
+  workspace?: Workspace;
   size?: AvatarProps["size"];
 }
 
@@ -18,7 +17,7 @@ const getWorkspaceIcon = (workspace: Workspace) => {
 
   if (isPersonalWorkspace(workspace)) return <LockOutlined />;
 
-  if (isLocalFSWorkspace(workspace)) return <LuFolderSync />;
+  if (isLocalFSWorkspace(workspace)) return workspace.name[0].toUpperCase();
 
   return workspace?.name ? workspace?.name[0].toUpperCase() : "?";
 };
@@ -26,7 +25,7 @@ const getWorkspaceIcon = (workspace: Workspace) => {
 const getUniqueColorForWorkspace = (workspace: Workspace) => {
   if (!workspace?.name && !workspace?.id && !workspace?.workspaceType) return "#ffffff4d";
 
-  if (isPersonalWorkspace(workspace)) return "#1E69FF";
+  if (isPersonalWorkspace(workspace)) return "var(--requestly-color-primary)";
 
   if (isLocalFSWorkspace(workspace)) return "#FFFFFF33";
 

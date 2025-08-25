@@ -16,7 +16,7 @@ const getWorkspaceIcon = (workspaceName: string) => {
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-const WorkspaceDropdown: React.FC<{
+const AppSumoWorkspaceDropdown: React.FC<{
   isAppSumo?: boolean;
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
@@ -136,4 +136,4 @@ const WorkspaceDropdown: React.FC<{
   ) : null;
 };
 
-export default WorkspaceDropdown;
+export default AppSumoWorkspaceDropdown;
