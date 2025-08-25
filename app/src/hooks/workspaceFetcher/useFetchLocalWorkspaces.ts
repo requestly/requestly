@@ -1,7 +1,6 @@
 import { captureException } from "@sentry/react";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { WorkspaceMemberRole } from "features/workspaces/types";
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
@@ -19,8 +18,6 @@ export const useFetchLocalWorkspaces = () => {
     }
 
     try {
-      const uid = "random_uid";
-
       const allLocalWorkspacesResult = await getAllWorkspaces();
       const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
 
@@ -30,14 +27,10 @@ export const useFetchLocalWorkspaces = () => {
         const localWorkspace = {
           id: partialWorkspace.id,
           name: partialWorkspace.name,
-          owner: uid,
+          owner: "",
           accessCount: 1,
           adminCount: 1,
-          members: {
-            [uid]: {
-              role: WorkspaceMemberRole.admin,
-            },
-          },
+          members: {},
           appsumo: false,
           workspaceType: WorkspaceType.LOCAL,
           rootPath: partialWorkspace.path,
