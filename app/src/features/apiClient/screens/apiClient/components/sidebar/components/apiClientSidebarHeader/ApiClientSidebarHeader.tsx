@@ -120,9 +120,11 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   return (
     <>
       <div className="api-client-sidebar-header">
-        {activeTab === ApiClientSidebarTabKey.COLLECTIONS ||
-        activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ||
-        activeTab === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? (
+        {[
+          ApiClientSidebarTabKey.COLLECTIONS,
+          ApiClientSidebarTabKey.ENVIRONMENTS,
+          ApiClientSidebarTabKey.RUNTIME_VARIABLES,
+        ].includes(activeTab) ? (
           <RoleBasedComponent resource="api_client_request" permission="create">
             <div>
               <NewApiRecordDropdown
@@ -164,12 +166,14 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       {isImportModalOpen && (
         <ApiClientImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
       )}
+
       {isPostmanImporterModalOpen && (
         <PostmanImporterModal
           isOpen={isPostmanImporterModalOpen}
           onClose={() => setIsPostmanImporterModalOpen(false)}
         />
       )}
+
       {isBrunoImporterModalOpen && (
         <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
       )}
