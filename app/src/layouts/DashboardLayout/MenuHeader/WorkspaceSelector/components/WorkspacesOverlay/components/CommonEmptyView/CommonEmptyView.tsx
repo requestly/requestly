@@ -1,13 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { globalActions } from "store/slices/global/slice";
 import { WorkspaceType } from "types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./commonEmptyView.scss";
-import APP_CONSTANTS from "config/constants";
 
 interface CommonEmptyViewProps {
   toggleDropdown: () => void;
@@ -16,22 +14,8 @@ interface CommonEmptyViewProps {
 export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
 
   const handleCreateWorkspace = (type: WorkspaceType) => {
-    if (!user.loggedIn && type === WorkspaceType.SHARED) {
-      dispatch(
-        globalActions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-          },
-        })
-      );
-      toggleDropdown();
-      return;
-    }
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "createWorkspaceModal",

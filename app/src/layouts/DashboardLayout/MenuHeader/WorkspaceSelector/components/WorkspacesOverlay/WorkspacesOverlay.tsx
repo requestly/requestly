@@ -59,8 +59,6 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
   toggleDropdown,
   onItemClick,
 }: WorkspaceListSectionProps) => {
-  const dispatch = useDispatch();
-
   if (!workspaces.length) {
     return <EmptyWorkspaceListSection workspaceType={workspaceType} toggleDropdown={toggleDropdown} />;
   }
@@ -72,17 +70,6 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
         type={workspaceType}
         toggleDropdown={toggleDropdown}
         onItemClick={onItemClick}
-        onAddWorkspaceClick={() => {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "createWorkspaceModal",
-              newValue: true,
-              newProps: {
-                workspaceType,
-              },
-            })
-          );
-        }}
       />{" "}
     </div>
   );
