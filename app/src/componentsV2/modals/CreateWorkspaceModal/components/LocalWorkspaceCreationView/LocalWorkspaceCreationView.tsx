@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Typography } from "antd";
+import { Tooltip, Typography } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
@@ -13,6 +13,7 @@ import { globalActions } from "store/slices/global/slice";
 import "./localWorkspaceCreationView.scss";
 import { CreateWorkspaceArgs } from "../../CreateWorkspaceModal";
 import { WorkspaceType } from "types";
+import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 
 interface FolderItem {
   name: string;
@@ -119,6 +120,12 @@ export const LocalWorkspaceCreationView = ({
             </div>
             <div className="workspace-folder-preview-content">
               <div className="workspace-folder-preview-content__new-additions-section preview-folder-items">
+                <Tooltip
+                  title="This is a preview of the files that will be added to your selected workspace folder."
+                  color="#000"
+                >
+                  <MdOutlineInfo className="preview-info-icon" />
+                </Tooltip>
                 {folderPreview.newAdditions.map((item) => (
                   <PreviewItem key={item.path} item={item} isNewWorkspace={true} />
                 ))}
