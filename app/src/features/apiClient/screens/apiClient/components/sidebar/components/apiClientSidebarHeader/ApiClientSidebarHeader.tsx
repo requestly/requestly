@@ -21,6 +21,7 @@ import {
   ApiClientViewMode,
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { ImportModalContextProvider } from "./contexts/importModal.context";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -163,20 +164,24 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null}
       </div>
 
-      {isImportModalOpen && (
-        <ApiClientImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
-      )}
+      <ImportModalContextProvider>
+        <>
+          {isImportModalOpen && (
+            <ApiClientImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
+          )}
 
-      {isPostmanImporterModalOpen && (
-        <PostmanImporterModal
-          isOpen={isPostmanImporterModalOpen}
-          onClose={() => setIsPostmanImporterModalOpen(false)}
-        />
-      )}
+          {isPostmanImporterModalOpen && (
+            <PostmanImporterModal
+              isOpen={isPostmanImporterModalOpen}
+              onClose={() => setIsPostmanImporterModalOpen(false)}
+            />
+          )}
 
-      {isBrunoImporterModalOpen && (
-        <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
-      )}
+          {isBrunoImporterModalOpen && (
+            <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
+          )}
+        </>
+      </ImportModalContextProvider>
     </>
   );
 };
