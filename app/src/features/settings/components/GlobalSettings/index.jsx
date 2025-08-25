@@ -13,6 +13,7 @@ import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
 import "./index.scss";
 import { BlockList } from "./components/BlockListSettings/BlockListSettings";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { PopupConfig } from "./components/PopupConfig/PopupConfig";
 
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
@@ -47,6 +48,7 @@ export const GlobalSettings = () => {
           <ImplicitRuleTesting />
         ) : null}
         {isFeatureCompatible(APP_CONSTANTS.FEATURES.BLOCK_LIST) && <BlockList />}
+        {isFeatureCompatible(APP_CONSTANTS.FEATURES.POPUP_CONFIG) && <PopupConfig />}
       </div>
     </div>
   );

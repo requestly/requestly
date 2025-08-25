@@ -11,6 +11,7 @@ import DesktopAppProxy from "../DesktopAppProxy/DesktopAppProxy";
 import { ConnectedToDesktopView } from "../DesktopAppProxy/components/ConnectedToDesktopView/ConnectedToDesktopView";
 import "./popup.css";
 import { message } from "antd";
+import { ApiClientContainer } from "../ApiClientContainer/ApiClientContainer";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -18,6 +19,8 @@ const Popup: React.FC = () => {
   const [isBlockedOnTab, setIsBlockedOnTab] = useState<boolean>(false);
   const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab>(null);
   const [isProxyApplied, setIsProxyApplied] = useState<boolean>(false);
+  const [isDesktopAppOpen, setIsDesktopAppOpen] = useState(false);
+  const [isSessionReplayEnabled, setIsSessionReplayEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
@@ -44,6 +47,22 @@ const Popup: React.FC = () => {
       })
       ?.then(setIsBlockedOnTab);
   }, [currentTab]);
+
+  useEffect(() => {
+    chrome.runtime
+      .sendMessage({
+        action: EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED,
+      })
+      ?.then(setIsSessionReplayEnabled);
+  }, []);
+
+  const checkIfDesktopAppOpen = useCallback(() => {
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN }).then(setIsDesktopAppOpen);
+  }, []);
+
+  useEffect(() => {
+    checkIfDesktopAppOpen();
+  }, [checkIfDesktopAppOpen]);
 
   const handleToggleExtensionStatus = useCallback((newStatus: boolean) => {
     console.log("[Popup] handleToggleExtensionStatus", {
@@ -86,9 +105,18 @@ const Popup: React.FC = () => {
                 <>
                   {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
                   <div className="popup-content">
-                    {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
-                    <SessionRecordingView />
-                    <DesktopAppProxy isProxyApplied={isProxyApplied} onProxyStatusChange={setIsProxyApplied} />
+                    {ifNoRulesPresent || isProxyApplied || isDesktopAppOpen ? (
+                      <HttpsRuleOptions />
+                    ) : (
+                      <PopupTabs isSessionReplayEnabled={isSessionReplayEnabled} />
+                    )}
+                    <ApiClientContainer />
+                    {isSessionReplayEnabled && <SessionRecordingView />}
+                    <DesktopAppProxy
+                      isProxyApplied={isProxyApplied}
+                      onProxyStatusChange={setIsProxyApplied}
+                      isDesktopAppOpen={isDesktopAppOpen}
+                    />
                   </div>
                 </>
               )}
