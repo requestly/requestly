@@ -1,3 +1,4 @@
+import { NativeError } from "errors/NativeError";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 
@@ -25,4 +26,12 @@ export const ImportModalContextProvider: React.FC<{ children: React.ReactNode }>
   );
 };
 
-export const useImportModalContext = () => useContext(ImportModalContext);
+export const useImportModalContext = () => {
+  const ctx = useContext(ImportModalContext);
+
+  if (!ctx) {
+    throw new NativeError("useImportModalContext can only be use inside importModal context!");
+  }
+
+  return ctx;
+};
