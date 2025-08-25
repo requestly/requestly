@@ -15,22 +15,32 @@ import {
 } from "modules/analytics/events/features/apiClient";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { EnvironmentViewTabSource } from "../../../environmentView/EnvironmentViewTabSource";
+import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { useCommand } from "features/apiClient/commands";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 
+export enum ExportType {
+  REQUESTLY = "requestly",
+  POSTMAN = "postman",
+}
+
 interface EnvironmentsListItemProps {
   isReadOnly: boolean;
   environmentId: string;
-  onExportClick?: (environment: { id: string; name: string }) => void;
+  onExportClick?: (environment: { id: string; name: string }, exportType: ExportType) => void;
 }
 
 export enum EnvironmentMenuKey {
   RENAME = "rename",
   DUPLICATE = "duplicate",
-  DELETE = "delete",
   EXPORT = "export",
+  EXPORT_REQUESTLY = "export_requestly",
+  EXPORT_POSTMAN = "export_postman",
+  DELETE = "delete",
 }
 
 export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
@@ -125,7 +135,25 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
         onClick: () => setIsRenameInputVisible(true),
       },
       { key: EnvironmentMenuKey.DUPLICATE, label: "Duplicate", onClick: () => handleEnvironmentDuplicate() },
-      { key: EnvironmentMenuKey.EXPORT, label: "Export", onClick: () => onExportClick?.(environment) },
+      {
+        key: EnvironmentMenuKey.EXPORT,
+        expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
+        label: <span style={{ marginRight: 12 }}>Export as</span>,
+        children: [
+          {
+            key: EnvironmentMenuKey.EXPORT_REQUESTLY,
+            label: "Requestly",
+            icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+            onClick: () => onExportClick?.(environment, ExportType.REQUESTLY),
+          },
+          {
+            key: EnvironmentMenuKey.EXPORT_POSTMAN,
+            label: "Postman (v2.1 format)",
+            onClick: () => onExportClick?.(environment, ExportType.POSTMAN),
+            icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+          },
+        ],
+      },
       { key: EnvironmentMenuKey.DELETE, label: "Delete", danger: true, onClick: () => handleEnvironmentDelete() },
     ];
   }, [handleEnvironmentDuplicate, onExportClick, environment, handleEnvironmentDelete]);

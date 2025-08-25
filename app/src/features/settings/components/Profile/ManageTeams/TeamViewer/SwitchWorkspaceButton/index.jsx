@@ -1,7 +1,7 @@
 import { SyncOutlined } from "@ant-design/icons";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Button } from "antd";
-import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
+import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/WorkspaceSelector";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";

@@ -84,7 +84,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         const api: RQAPI.ApiRecord = {
           id: parseFsId(e.id),
           collectionId: e.collectionId,
-          name: e.request.name,
+          name: e.data.name,
           ownerId: this.meta.rootPath,
           deleted: false,
           createdBy: "local",
@@ -94,10 +94,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
           type: RQAPI.RecordType.API,
           data: {
-            type: e.request.type,
-            request: this.parseApiRequestDetails(e.request),
-            scripts: e.request.scripts,
-            auth: e.request.auth || {
+            type: e.data.request.type,
+            request: this.parseApiRequestDetails(e.data.request),
+            scripts: e.data.request.scripts,
+            auth: e.data.request.auth || {
               currentAuthType: Authorization.Type.NO_AUTH,
               authConfigStore: {},
             },
@@ -111,33 +111,37 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     });
   }
 
-  private parseApiRecordRequest(record: Partial<RQAPI.ApiRecord>): API["request"] {
+  private parseApiRecordRequest(record: Partial<RQAPI.ApiRecord>): API["data"] {
     switch (record.data.type) {
       case RQAPI.ApiEntryType.HTTP:
         return {
-          type: record.data.type,
           name: record.name || "Untitled Request",
-          url: record.data.request.url,
-          scripts: record.data.scripts,
-          method: record.data.request.method,
-          queryParams: record.data.request.queryParams,
-          headers: record.data.request.headers,
-          body: record.data.request?.body,
-          bodyContainer: record.data.request?.bodyContainer,
-          contentType: record.data.request?.contentType,
-          auth: record.data.auth,
+          request: {
+            type: record.data.type,
+            url: record.data.request.url,
+            scripts: record.data.scripts,
+            method: record.data.request.method,
+            queryParams: record.data.request.queryParams,
+            headers: record.data.request.headers,
+            body: record.data.request?.body,
+            bodyContainer: record.data.request?.bodyContainer,
+            contentType: record.data.request?.contentType,
+            auth: record.data.auth,
+          },
         };
       case RQAPI.ApiEntryType.GRAPHQL:
         return {
-          type: record.data.type,
           name: record.name || "Untitled Request",
-          url: record.data.request.url,
-          scripts: record.data.scripts,
-          operation: record.data.request.operation,
-          variables: record.data.request.variables,
-          operationName: record.data.request.operationName,
-          headers: record.data.request.headers,
-          auth: record.data.auth,
+          request: {
+            type: record.data.type,
+            url: record.data.request.url,
+            scripts: record.data.scripts,
+            operation: record.data.request.operation,
+            variables: record.data.request.variables,
+            operationName: record.data.request.operationName,
+            headers: record.data.request.headers,
+            auth: record.data.auth,
+          },
         };
     }
   }

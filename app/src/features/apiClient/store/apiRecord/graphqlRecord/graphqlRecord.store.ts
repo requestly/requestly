@@ -15,7 +15,7 @@ export type GraphQLRecordState = BaseApiEntryStoreState<RQAPI.GraphQLApiEntry> &
   updateOperationNames: (newNames: string[]) => void;
 };
 
-export function createGraphQLRecordStore(entry: RQAPI.GraphQLApiEntry) {
+export function createGraphQLRecordStore(entry: RQAPI.GraphQLApiEntry, recordId: RQAPI.ApiRecord["id"]) {
   return create<GraphQLRecordState>()((set, get) => ({
     operationNames: extractOperationNames(entry.request.operation),
     introspectionData: null,
@@ -25,6 +25,6 @@ export function createGraphQLRecordStore(entry: RQAPI.GraphQLApiEntry) {
     setHasIntrospectionFailed: (hasFailed: boolean) => set({ hasIntrospectionFailed: hasFailed }),
     setIntrospectionData: (data: any) => set({ introspectionData: data }),
     updateOperationNames: (newNames: string[]) => set({ operationNames: newNames }),
-    ...createBaseApiEntryState(entry, set, get),
+    ...createBaseApiEntryState(entry, recordId, set, get),
   }));
 }

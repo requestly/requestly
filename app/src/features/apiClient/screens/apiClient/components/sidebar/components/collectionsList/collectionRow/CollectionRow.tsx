@@ -9,6 +9,7 @@ import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState"
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
+import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
@@ -22,6 +23,8 @@ import { CollectionViewTabSource } from "../../../../views/components/Collection
 import { useDrag, useDrop } from "react-dnd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
@@ -30,6 +33,12 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { useApiClientContext } from "features/apiClient/contexts";
+import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+
+export enum ExportType {
+  REQUESTLY = "requestly",
+  POSTMAN = "postman",
+}
 
 interface Props {
   record: RQAPI.CollectionRecord;
@@ -39,6 +48,7 @@ interface Props {
     collectionId?: string,
     entryType?: RQAPI.ApiEntryType
   ) => Promise<void>;
+  onRequestlyExportClick: (collection: RQAPI.CollectionRecord, exportType: ExportType) => void;
   setExpandedRecordIds: (keys: RQAPI.ApiClientRecord["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
@@ -59,6 +69,7 @@ export type DraggableApiRecord = {
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
+  onRequestlyExportClick: onExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
@@ -71,7 +82,10 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
+
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
   const contextId = useContextId();
@@ -82,9 +96,19 @@ export const CollectionRow: React.FC<Props> = ({
   ]);
   const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord) => {
+  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
     setCollectionsToExport((prev) => [...prev, collection]);
-    setIsExportModalOpen(true);
+
+    switch (exportType) {
+      case ExportType.REQUESTLY:
+        setIsExportModalOpen(true);
+        break;
+      case ExportType.POSTMAN:
+        setIsPostmanExportModalOpen(true);
+        break;
+      default:
+        console.warn(`Unknown export type: ${exportType}`);
+    }
   }, []);
 
   const activeTabSourceId = useMemo(() => {
@@ -112,15 +136,32 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "1",
           label: (
-            <div>
+            <span>
               <MdOutlineIosShare style={{ marginRight: 8 }} />
-              Export
-            </div>
+              Export as
+            </span>
           ),
-          onClick: (itemInfo) => {
-            itemInfo.domEvent?.stopPropagation?.();
-            handleCollectionExport(record);
-          },
+          expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
+          children: [
+            {
+              key: "1-1",
+              label: "Requestly",
+              icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.REQUESTLY);
+              },
+            },
+            {
+              key: "1-2",
+              label: "Postman (v2.1 format)",
+              icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.POSTMAN);
+              },
+            },
+          ],
         },
         {
           key: "2",
@@ -274,6 +315,17 @@ export const CollectionRow: React.FC<Props> = ({
           }}
         />
       ) : null}
+
+      {isPostmanExportModalOpen && (
+        <PostmanExportModal
+          recordsToBeExported={collectionsToExport}
+          isOpen={isPostmanExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsPostmanExportModalOpen(false);
+          }}
+        />
+      )}
 
       {isEditMode ? (
         <NewRecordNameInput
@@ -463,6 +515,7 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             onNewClick={onNewClick}
+                            onRequestlyExportClick={onExportClick} // FIXME: this will break in multi-view
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}

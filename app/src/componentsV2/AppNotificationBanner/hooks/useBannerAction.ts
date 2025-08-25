@@ -62,6 +62,13 @@ export const useBannerAction = (
           dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
         },
       },
+      [BANNER_ACTIONS.REDIRECT_TO_LINKEDIN_FORM]: {
+        label: "Share Now",
+        type: "primary",
+        onClick: () => {
+          redirectToUrl(LINKS.SHARE_ON_LINKEDIN_FORM, true);
+        },
+      },
       [BANNER_ACTIONS.REDIRECT_TO_CHROME_STORE_REVIEWS]: {
         label: "Review Now",
         type: "primary",

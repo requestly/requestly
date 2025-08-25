@@ -71,7 +71,7 @@ export const initContextMenu = async () => {
       });
     } else if (info.menuItemId === MenuItem.RUN_CURL_REQUEST) {
       // Handle the cURL request action
-      await triggerOpenCurlModalMessage(info.selectionText, info.pageUrl);
+      await triggerOpenCurlModalMessage({ selectedText: info.selectionText, pageURL: info.pageUrl }, "context_menu");
     }
   });
 
