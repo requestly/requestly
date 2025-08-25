@@ -1,7 +1,7 @@
 import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
 import { RQAPI } from "features/apiClient/types";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
@@ -26,12 +26,17 @@ interface Props {
   onClose: () => void;
 }
 
-const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const currentContextId = useContextId();
-  const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
+interface MoveIntoWorkspaceSelectProps {
+  defaultSelectedWorkspace?: { label: string; value: string };
+  onWorkspaceSelect: (workspace: { label: string; value: string }) => void;
+}
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedCollection, setSelectedCollection] = useState(null);
+export const MoveIntoWorkspaceSelect: React.FC<MoveIntoWorkspaceSelectProps> = ({
+  defaultSelectedWorkspace,
+  onWorkspaceSelect,
+}) => {
+  const [defaultSelected] = useState(defaultSelectedWorkspace); // only react on initial mount
+  const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
 
   const workspacesOptions = useMemo(() => {
     return selectedWorkspaces.map((w) => ({
@@ -40,14 +45,59 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
     }));
   }, [selectedWorkspaces]);
 
+  const initialSelectedWorkspace = useMemo(() => defaultSelected ?? workspacesOptions[0], [
+    defaultSelected,
+    workspacesOptions,
+  ]);
+
+  useEffect(() => {
+    onWorkspaceSelect(initialSelectedWorkspace);
+  }, [onWorkspaceSelect, initialSelectedWorkspace]);
+
+  return (
+    <CreatableReactSelect
+      isMulti={false}
+      isValidNewOption={() => false} // dont allow workspace creation
+      className="select-workspace-group"
+      classNamePrefix="select-workspace-group"
+      options={workspacesOptions}
+      filterOption={(option, inputValue) => option.label.toLowerCase().includes(inputValue.toLowerCase())}
+      placeholder="Select workspace"
+      theme={(theme) => ({
+        ...theme,
+        borderRadius: 4,
+        colors: {
+          ...theme.colors,
+          primary: "#ffffff19",
+          primary25: "#282828",
+          neutral0: "#1a1a1a",
+        },
+      })}
+      defaultValue={initialSelectedWorkspace}
+      onChange={onWorkspaceSelect}
+    />
+  );
+};
+
+const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
+  const currentContextId = useContextId();
+  const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedCollection, setSelectedCollection] = useState(null);
+
+  const defaultSelectedWorkspace = useMemo(() => {
+    const workspace = selectedWorkspaces.find((w) => {
+      return w.getState().id === getApiClientFeatureContext(currentContextId).workspaceId;
+    });
+
+    return { label: workspace.getState().name, value: workspace.getState().id };
+  }, [currentContextId, selectedWorkspaces]);
+
   const [selectedWorkspace, setSelectedWorkspace] = useState<{
     label: string;
     value: string;
-  } | null>(() =>
-    workspacesOptions.find((w) => {
-      return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
-    })
-  );
+  } | null>(defaultSelectedWorkspace);
 
   const context = useMemo(() => (selectedWorkspace ? getApiClientFeatureContext(selectedWorkspace.value) : null), [
     selectedWorkspace,
@@ -123,27 +173,7 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
         </RQButton>
       }
     >
-      <CreatableReactSelect
-        isMulti={false}
-        isValidNewOption={() => false} // dont allow workspace creation
-        className="select-workspace-group"
-        classNamePrefix="select-workspace-group"
-        options={workspacesOptions}
-        filterOption={(option, inputValue) => option.label.toLowerCase().includes(inputValue.toLowerCase())}
-        placeholder="Select workspace"
-        theme={(theme) => ({
-          ...theme,
-          borderRadius: 4,
-          colors: {
-            ...theme.colors,
-            primary: "#ffffff19",
-            primary25: "#282828",
-            neutral0: "#1a1a1a",
-          },
-        })}
-        value={selectedWorkspace}
-        onChange={(newSelectedOption) => setSelectedWorkspace(newSelectedOption)}
-      />
+      <MoveIntoWorkspaceSelect defaultSelectedWorkspace={selectedWorkspace} onWorkspaceSelect={setSelectedWorkspace} />
 
       <RQTooltip
         showArrow={false}

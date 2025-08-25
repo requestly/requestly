@@ -18,6 +18,7 @@
 
     svg {
       font-size: 32px;
+      align-self: flex-start;
     }
 
     &--success {
@@ -26,6 +27,7 @@
 
     &--error {
       color: var(--error);
+      text-align: justify;
 
       &-text {
         display: flex;
