@@ -1,7 +1,7 @@
 import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
 import { RQAPI } from "features/apiClient/types";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
@@ -35,6 +35,7 @@ export const MoveIntoWorkspaceSelect: React.FC<MoveIntoWorkspaceSelectProps> = (
   defaultSelectedWorkspace,
   onWorkspaceSelect,
 }) => {
+  const [defaultSelected] = useState(defaultSelectedWorkspace); // only react on initial mount
   const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
 
   const workspacesOptions = useMemo(() => {
@@ -44,12 +45,14 @@ export const MoveIntoWorkspaceSelect: React.FC<MoveIntoWorkspaceSelectProps> = (
     }));
   }, [selectedWorkspaces]);
 
-  const [selectedWorkspace, setSelectedWorkspace] = useState<{
-    label: string;
-    value: string;
-  } | null>(
-    () => defaultSelectedWorkspace ?? workspacesOptions[0] // default first workspace is selected
-  );
+  const initialSelectedWorkspace = useMemo(() => defaultSelected ?? workspacesOptions[0], [
+    defaultSelected,
+    workspacesOptions,
+  ]);
+
+  useEffect(() => {
+    onWorkspaceSelect(initialSelectedWorkspace);
+  }, [onWorkspaceSelect, initialSelectedWorkspace]);
 
   return (
     <CreatableReactSelect
@@ -70,11 +73,8 @@ export const MoveIntoWorkspaceSelect: React.FC<MoveIntoWorkspaceSelectProps> = (
           neutral0: "#1a1a1a",
         },
       })}
-      value={selectedWorkspace}
-      onChange={(newSelectedOption) => {
-        setSelectedWorkspace(newSelectedOption);
-        onWorkspaceSelect(newSelectedOption);
-      }}
+      defaultValue={initialSelectedWorkspace}
+      onChange={onWorkspaceSelect}
     />
   );
 };
