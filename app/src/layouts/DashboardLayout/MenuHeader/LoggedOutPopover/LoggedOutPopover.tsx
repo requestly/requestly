@@ -19,7 +19,7 @@ export const LoggedOutPopover = () => {
             src={loggedOutAvatar}
             shape="square"
             className="cursor-pointer"
-            style={{ marginTop: 2 }}
+            style={{ marginTop: "-2px" }}
             alt="open sign in options"
           />
         </Popover>
