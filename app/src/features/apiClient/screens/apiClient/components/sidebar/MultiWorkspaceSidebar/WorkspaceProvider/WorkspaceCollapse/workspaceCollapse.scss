@@ -88,6 +88,10 @@
         font-size: var(--requestly-font-size-xs, 11px);
         line-height: 17px; /* 154.545% */
 
+        .ant-typography {
+          max-width: 150px;
+        }
+
         .environment-icon {
           display: inline-flex;
           align-items: center;

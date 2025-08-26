@@ -124,7 +124,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ||
         activeTab === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? (
           <RoleBasedComponent resource="api_client_request" permission="create">
-            <div>
+            <div className="actions">
               <NewApiRecordDropdown
                 onSelect={(params) => {
                   onNewClick(params.recordType, params.entryType);
