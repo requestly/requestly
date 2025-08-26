@@ -4,18 +4,20 @@ import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWo
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { ContextualEnvironmentsList } from "./ContextualEnvironmentsList/ContextualEnvironmentsList";
 import { ApiClientSidebarTabKey } from "../MultiWorkspaceSidebar";
+import { useApiClientContext } from "features/apiClient/contexts";
 
 export const ContextualEnvironmentsSidebar: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
+  const { onNewClick } = useApiClientContext();
 
   return (
     <div className="multiview-environments-sidebar-container">
       <SidebarListHeader
         onSearch={(value) => setSearchValue(value)}
         newRecordActionOptions={{
-          showNewRecordAction: false,
-          onNewRecordClick: () => Promise.resolve(),
+          showNewRecordAction: true,
+          onNewRecordClick: onNewClick,
         }}
       />
 
