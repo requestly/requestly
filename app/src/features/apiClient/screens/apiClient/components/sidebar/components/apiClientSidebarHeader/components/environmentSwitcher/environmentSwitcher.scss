@@ -11,6 +11,13 @@
   border: none;
   padding: 0.5em 1em;
 
+  .ant-typography {
+    max-width: 95px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
   & > span {
     position: relative;
     bottom: 0.5px;
