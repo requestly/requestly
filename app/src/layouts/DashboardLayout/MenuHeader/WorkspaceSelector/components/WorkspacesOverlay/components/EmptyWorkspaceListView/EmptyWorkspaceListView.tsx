@@ -32,20 +32,6 @@ export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ work
           <RQButton
             size="small"
             onClick={() => {
-              if (!user.loggedIn && workspaceType === WorkspaceType.SHARED) {
-                dispatch(
-                  globalActions.toggleActiveModal({
-                    modalName: "authModal",
-                    newValue: true,
-                    newProps: {
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                    },
-                  })
-                );
-                toggleDropdown();
-                return;
-              }
-
               dispatch(
                 globalActions.toggleActiveModal({
                   modalName: "createWorkspaceModal",
