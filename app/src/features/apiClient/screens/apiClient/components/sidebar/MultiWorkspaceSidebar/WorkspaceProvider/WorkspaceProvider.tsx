@@ -11,7 +11,8 @@ export const WorkspaceProvider: React.FC<{
   showEnvSwitcher?: boolean;
   children: React.ReactNode;
   collapsible?: boolean;
-}> = ({ workspaceId, showEnvSwitcher = true, children, collapsible = true }) => {
+  type?: string;
+}> = ({ workspaceId, showEnvSwitcher = true, children, type, collapsible = true }) => {
   const state = useWorkspace(workspaceId, (s) => s.state);
   const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
@@ -30,7 +31,7 @@ export const WorkspaceProvider: React.FC<{
   return (
     <ContextId id={getContext(workspaceId)?.id}>
       {collapsible ? (
-        <WorkspaceCollapse showEnvSwitcher={showEnvSwitcher} workspaceId={workspaceId}>
+        <WorkspaceCollapse showEnvSwitcher={showEnvSwitcher} workspaceId={workspaceId} type={type}>
           {children}
         </WorkspaceCollapse>
       ) : (
