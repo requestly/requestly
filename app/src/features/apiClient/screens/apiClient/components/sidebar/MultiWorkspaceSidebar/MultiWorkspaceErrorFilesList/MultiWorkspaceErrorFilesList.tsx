@@ -4,7 +4,7 @@ import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWo
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { Collapse } from "antd";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
-import "./MultiWorkspaceErrorFilesList.scss";
+import "./multiWorkspaceErrorFilesList.scss";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 
 export const MultiWorkspaceErrorFilesList: React.FC = () => {
