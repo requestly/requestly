@@ -17,33 +17,10 @@ export const workspacesEntityAdapter = createEntityAdapter<Workspace>({
   },
 });
 
-const getTeamSliceCurrentWorkspaceId = () => {
-  const teamsSlice = window.localStorage.getItem("persist:teams");
-  if (teamsSlice) {
-    try {
-      const teamsSliceObj = JSON.parse(teamsSlice);
-      const teamsSliceCurrentlyActiveWorkspace = teamsSliceObj?.currentlyActiveWorkspace
-        ? JSON.parse(teamsSliceObj?.currentlyActiveWorkspace)
-        : {};
-      // console.log("Migrated Successfully", { teamsSliceObj, teamsSliceCurrentlyActiveWorkspace });
-
-      // For backward compatibility in case of any issues. Uncomment when everything is working fine along with all the reducers usage of teams/slice.ts
-      // window.localStorage.removeItem("persist:teams");
-      return teamsSliceCurrentlyActiveWorkspace?.id ? [teamsSliceCurrentlyActiveWorkspace?.id] : [];
-    } catch (e) {
-      console.log("Error while migration teams slice to workspaces slice");
-      return [];
-    }
-  } else {
-    // console.log("Already Migrated or New User");
-    return [];
-  }
-};
-
 const initialState: WorkspaceSliceState = {
   allWorkspaces: workspacesEntityAdapter.getInitialState(),
   workspacesUpdatedAt: 0,
-  activeWorkspaceIds: getTeamSliceCurrentWorkspaceId(),
+  activeWorkspaceIds: [],
   activeWorkspacesMembers: {},
 };
 
@@ -59,6 +36,11 @@ const slice = createSlice({
     upsertWorkspace: (state: WorkspaceSliceState, action: PayloadAction<Workspace>) => {
       workspacesEntityAdapter.upsertOne(state.allWorkspaces, action.payload);
     },
+    upsertManyWorkspaces: (state: WorkspaceSliceState, action: PayloadAction<Workspace[]>) => {
+      // upsertMany does shallow update hence using set to replace the existing content
+      workspacesEntityAdapter.setMany(state.allWorkspaces, action.payload);
+    },
+
     setWorkspacesUpdatedAt: (state: WorkspaceSliceState, action: PayloadAction<number>) => {
       state.workspacesUpdatedAt = action.payload;
     },
