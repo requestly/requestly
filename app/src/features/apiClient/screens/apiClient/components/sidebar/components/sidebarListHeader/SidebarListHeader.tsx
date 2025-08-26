@@ -13,7 +13,7 @@ interface ListHeaderProps {
   newRecordActionOptions: {
     showNewRecordAction: boolean;
     onNewRecordClick: (
-      src: RQAPI.AnalyticsEventSource,
+      analyticEventSource: RQAPI.AnalyticsEventSource,
       recordType: RQAPI.RecordType,
       collectionId?: string,
       entryType?: RQAPI.ApiEntryType
