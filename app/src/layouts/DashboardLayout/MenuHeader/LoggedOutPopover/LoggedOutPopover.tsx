@@ -12,6 +12,7 @@ export const LoggedOutPopover = () => {
           content={<LoggedOutPopoverContent />}
           showArrow={false}
           className="logged-out-popover"
+          trigger={["click"]}
         >
           <Avatar
             size={28}
