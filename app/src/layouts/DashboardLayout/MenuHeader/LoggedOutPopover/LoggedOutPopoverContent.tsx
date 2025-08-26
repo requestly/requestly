@@ -6,22 +6,12 @@ import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/s
 import Link from "antd/lib/typography/Link";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { globalActions } from "store/slices/global/slice";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { useDispatch } from "react-redux";
 import APP_CONSTANTS from "config/constants";
-import { setRedirectMetadata } from "features/onboarding/utils";
-import { redirectToOAuthUrl } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
 
 export const LoggedOutPopoverContent = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-
-  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
 
   const handleAuthButtonClick = (authMode: string) => {
     getTabServiceActions().resetTabs(true);
@@ -38,23 +28,6 @@ export const LoggedOutPopoverContent = () => {
     );
   };
 
-  const handleSignupClick = () => {
-    getTabServiceActions().resetTabs(true);
-    trackSignUpButtonClicked(SOURCE.NAVBAR);
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
-      return;
-    }
-
-    if (isBrowserstackIntegrationOn) {
-      setRedirectMetadata({ source: SOURCE.NAVBAR, redirectURL: window.location.href });
-      redirectToOAuthUrl(navigate);
-      return;
-    } else {
-      handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
-    }
-  };
-
   return (
     <div className="logged-out-popover-container">
       <div className="logged-out-popover-icon">
@@ -65,7 +38,13 @@ export const LoggedOutPopoverContent = () => {
         org-level settings.
       </div>
       <div className="logged-out-popover-button">
-        <RQButton type="primary" onClick={handleSignupClick}>
+        <RQButton
+          type="primary"
+          onClick={() => {
+            handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
+            trackSignUpButtonClicked(SOURCE.NAVBAR);
+          }}
+        >
           Sign up
         </RQButton>
       </div>
@@ -73,8 +52,8 @@ export const LoggedOutPopoverContent = () => {
         Already have an account?{" "}
         <Link
           onClick={() => {
-            trackLoginButtonClicked(SOURCE.NAVBAR);
             handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
+            trackLoginButtonClicked(SOURCE.NAVBAR);
           }}
         >
           Sign in
