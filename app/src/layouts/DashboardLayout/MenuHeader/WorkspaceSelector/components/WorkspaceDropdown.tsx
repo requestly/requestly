@@ -5,7 +5,7 @@ import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Invite, WorkspaceType } from "types";
@@ -21,21 +21,12 @@ const prettifyWorkspaceName = (workspaceName: string) => {
 const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
-
-  useEffect(() => {
-    console.log("!!!debug", "active", activeWorkspace);
-  }, [activeWorkspace]);
+  const isActiveWorkspaceNotPrivate = useSelector(isActiveWorkspaceShared);
 
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // const activeWorkspaceName = user.loggedIn
-  //   ? isSharedWorkspaceMode
-  //     ? activeWorkspace?.name
-  //     : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-  //   : "Workspaces";
-  const activeWorkspaceName = isSharedWorkspaceMode ? activeWorkspace?.name : "Workspaces";
+  const activeWorkspaceName = isActiveWorkspaceNotPrivate ? activeWorkspace?.name : "Workspaces";
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
