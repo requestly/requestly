@@ -2,10 +2,8 @@ import React from "react";
 import { RQButton } from "lib/design-system/components";
 import { WorkspaceType } from "types";
 import "./emptyWorkspaceListView.scss";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 interface EmptyWorkspaceListProps {
   workspaceType: WorkspaceType;
@@ -14,7 +12,6 @@ interface EmptyWorkspaceListProps {
 
 export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ workspaceType, toggleDropdown }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
 
   return (
     <div className="empty-workspace-list-view">
