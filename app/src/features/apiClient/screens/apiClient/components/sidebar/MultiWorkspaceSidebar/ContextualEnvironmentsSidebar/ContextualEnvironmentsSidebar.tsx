@@ -19,20 +19,22 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
         }}
       />
 
-      {selectedWorkspaces.map((workspace) => {
-        const workspaceId = workspace.getState().id;
+      <div className="multiview-environments-sidebar-list-section">
+        {selectedWorkspaces.map((workspace) => {
+          const workspaceId = workspace.getState().id;
 
-        return (
-          <WorkspaceProvider
-            key={workspaceId}
-            workspaceId={workspaceId}
-            showEnvSwitcher={false}
-            type={ApiClientSidebarTabKey.ENVIRONMENTS}
-          >
-            <ContextualEnvironmentsList searchValue={searchValue} />
-          </WorkspaceProvider>
-        );
-      })}
+          return (
+            <WorkspaceProvider
+              key={workspaceId}
+              workspaceId={workspaceId}
+              showEnvSwitcher={false}
+              type={ApiClientSidebarTabKey.ENVIRONMENTS}
+            >
+              <ContextualEnvironmentsList searchValue={searchValue} />
+            </WorkspaceProvider>
+          );
+        })}
+      </div>
     </div>
   );
 };

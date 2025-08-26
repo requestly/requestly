@@ -1,4 +1,9 @@
 .multiview-environments-sidebar-container {
+  .multiview-environments-sidebar-list-section {
+    max-height: 650px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
   .environments-empty-state-wrapper {
     margin: 8px;
   }
@@ -8,6 +13,9 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 0px 0px 8px 0;
+    max-height: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   .environments-list {
