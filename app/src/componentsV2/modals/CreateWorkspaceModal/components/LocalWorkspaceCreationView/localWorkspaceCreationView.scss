@@ -12,6 +12,12 @@
   }
 }
 
+.workspace-folder-preview-description {
+  margin-top: 8px;
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm);
+}
+
 .workspace-folder-preview {
   margin-top: 16px;
   border-radius: 8px;
@@ -75,10 +81,7 @@
       border-radius: 4px;
       border: 1px dashed var(--requestly-color-success, #0baa60);
       background: rgba(11, 170, 96, 0.1);
-      display: flex;
       padding: var(--space-2, 4px) var(--space-4, 8px);
-      flex-direction: column;
-      gap: 8px;
       margin-right: 4px;
       position: relative;
 
@@ -92,6 +95,10 @@
   }
 
   .preview-folder-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
     &__item {
       .preview-folder-item-content {
         display: flex;
@@ -121,32 +128,4 @@
     flex-direction: column;
     gap: 8px;
   }
-
-  // .existing-contents-section {
-  //   .folder-item {
-  //     display: flex;
-  //     align-items: center;
-  //     gap: 8px;
-  //     margin-bottom: 8px;
-  //     padding: 4px 0;
-  //     transition: background-color 0.2s ease;
-
-  //     &:hover {
-  //       background-color: rgba(255, 255, 255, 0.05);
-  //       border-radius: 4px;
-  //       padding: 4px 8px;
-  //       margin: 0 -8px 8px -8px;
-  //     }
-
-  //     .folder-item-icon {
-  //       color: var(--requestly-color-text-secondary, #a0a0a0);
-  //       font-size: 16px;
-  //     }
-
-  //     .folder-item-name {
-  //       color: var(--requestly-color-text-default, #fff);
-  //       font-size: 13px;
-  //     }
-  //   }
-  // }
 }

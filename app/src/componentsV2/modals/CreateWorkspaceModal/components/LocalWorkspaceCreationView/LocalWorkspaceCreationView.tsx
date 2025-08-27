@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tooltip, Typography } from "antd";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineInsertDriveFile } from "@react-icons/all-files/md/MdOutlineInsertDriveFile";
@@ -23,9 +23,8 @@ interface FolderItem {
 interface FolderPreviewResult {
   success: boolean;
   folderPath: string;
-  workspaceName: string;
   existingContents: FolderItem[];
-  newAdditions: FolderItem[];
+  newAdditions: FolderItem;
 }
 
 const PreviewItem = ({ item, isNewWorkspace = false }: { item: FolderItem; isNewWorkspace?: boolean }) => {
@@ -78,6 +77,19 @@ export const LocalWorkspaceCreationView = ({
     });
   };
 
+  useEffect(() => {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
+      folderPath: "",
+    })
+      .then((result: FolderPreviewResult) => {
+        setFolderPreview(result);
+      })
+      .catch((err: unknown) => {
+        Logger.log("Could not get workspace folder preview data", err);
+        // No OP
+      });
+  }, []);
+
   return (
     <>
       <CreateWorkspaceHeader
@@ -105,34 +117,46 @@ export const LocalWorkspaceCreationView = ({
       </div>
 
       {folderPreview ? (
-        <div className="workspace-folder-preview">
-          <>
-            <div className="preview-header">
-              <div className="preview-title">PREVIEW:</div>
-              <div className="preview-path">
-                <PiFolderOpen /> {folderPreview.folderPath}
+        <>
+          <div className="workspace-folder-preview-description">
+            The selected folder will be used as the root of your workspace. Your APIs, variables and related metadata
+            will be stored in this.
+          </div>
+          <div className="workspace-folder-preview">
+            <>
+              <div className="preview-header">
+                <div className="preview-title">PREVIEW:</div>
+                <div className="preview-path">
+                  <PiFolderOpen /> {folderPreview.folderPath}
+                </div>
               </div>
-            </div>
-            <div className="workspace-folder-preview-content">
-              <div className="workspace-folder-preview-content__new-additions-section preview-folder-items">
-                <Tooltip
-                  title="This is a preview of the files that will be added to your selected workspace folder."
-                  color="#000"
-                >
-                  <MdOutlineInfo className="preview-info-icon" />
-                </Tooltip>
-                {folderPreview.newAdditions.map((item) => (
-                  <PreviewItem key={item.path} item={item} isNewWorkspace={true} />
-                ))}
+              <div className="workspace-folder-preview-content">
+                <div className="workspace-folder-preview-content__new-additions-section preview-folder-items">
+                  <Tooltip
+                    title="This is a preview of the files that will be added to your selected workspace folder."
+                    color="#000"
+                  >
+                    <MdOutlineInfo className="preview-info-icon" />
+                  </Tooltip>
+                  <PreviewItem
+                    item={{ name: workspaceName || "{{Your workspace name}}", path: folderPath, type: "directory" }}
+                    isNewWorkspace={true}
+                  />
+                  <div className="workspace-folder-preview-content preview-folder-items">
+                    {folderPreview.newAdditions.contents?.map((item) => (
+                      <PreviewItem key={item.path} item={item} isNewWorkspace={true} />
+                    ))}
+                  </div>
+                </div>
+                <div className="preview-folder-items existing-contents-section">
+                  {folderPreview.existingContents.map((item) => (
+                    <PreviewItem key={item.path} item={item} />
+                  ))}
+                </div>
               </div>
-              <div className="preview-folder-items existing-contents-section">
-                {folderPreview.existingContents.map((item) => (
-                  <PreviewItem key={item.path} item={item} />
-                ))}
-              </div>
-            </div>
-          </>
-        </div>
+            </>
+          </div>
+        </>
       ) : null}
       <CreateWorkspaceFooter
         onCancel={onCancel}
