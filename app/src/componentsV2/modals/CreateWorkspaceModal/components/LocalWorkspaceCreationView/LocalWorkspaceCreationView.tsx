@@ -8,10 +8,8 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
-import { useDispatch } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
 import "./localWorkspaceCreationView.scss";
-import { CreateWorkspaceArgs } from "../../CreateWorkspaceModal";
+import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
 import { WorkspaceType } from "types";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 
@@ -46,11 +44,12 @@ const PreviewItem = ({ item, isNewWorkspace = false }: { item: FolderItem; isNew
 export const LocalWorkspaceCreationView = ({
   onCreateWorkspaceClick,
   isLoading,
+  onCancel,
 }: {
   onCreateWorkspaceClick: (args: CreateWorkspaceArgs) => void;
   isLoading: boolean;
+  onCancel: () => void;
 }) => {
-  const dispatch = useDispatch();
   const [workspaceName, setWorkspaceName] = useState("");
   const [folderPath, setFolderPath] = useState("");
   const [folderPreview, setFolderPreview] = useState<FolderPreviewResult | null>(null);
@@ -71,10 +70,6 @@ export const LocalWorkspaceCreationView = ({
     }
   };
 
-  const handleOnCancel = () => {
-    dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: false }));
-  };
-
   const handleOnCreateWorkspaceClick = () => {
     onCreateWorkspaceClick({
       workspaceType: WorkspaceType.LOCAL,
@@ -87,7 +82,7 @@ export const LocalWorkspaceCreationView = ({
     <>
       <CreateWorkspaceHeader
         title="Create a new local workspace"
-        description="The selected folder will be used as the root of your workspace. Your APIs, variables and related metadata will be stored in this."
+        description=""
         onWorkspaceNameChange={setWorkspaceName}
       />
       <div className="workspace-folder-selector">
@@ -140,7 +135,7 @@ export const LocalWorkspaceCreationView = ({
         </div>
       ) : null}
       <CreateWorkspaceFooter
-        onCancel={handleOnCancel}
+        onCancel={onCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
         disabled={!workspaceName.length || !folderPath.length}

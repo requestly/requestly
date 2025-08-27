@@ -1,0 +1,104 @@
+.rq-desktop-onboarding-modal-wrapper {
+  .rq-desktop-onboarding-modal {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: unset;
+    margin: unset;
+    padding: 0;
+    inset: 0;
+
+    .ant-modal-content {
+      height: 100%;
+      width: 100%;
+      border-radius: 0;
+      background: url("/public/assets/media/onboarding/bgNoise.png"),
+        url("/public/assets/media/onboarding/violet-spotlight.svg"), #000;
+      background-repeat: repeat, no-repeat;
+      background-blend-mode: normal, normal, screen;
+      background-size: 50%, 100%;
+
+      .ant-modal-body {
+        padding: unset;
+        height: inherit;
+      }
+
+      .rq-desktop-onboarding-modal-content {
+        height: 100%;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: var(--space-10, 40px) 0;
+
+        &__card {
+          width: 480px;
+          border-radius: 16px;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%);
+          backdrop-filter: blur(4.199999809265137px);
+
+          &-header {
+            color: var(--requestly-color-text-default);
+            font-weight: var(--requestly-font-weight-medium);
+            font-size: var(--requestly-font-size-lg);
+          }
+
+          &-description {
+            color: var(--requestly-color-text-subtle);
+            font-size: var(--requestly-font-size-sm);
+            margin-top: 12px;
+          }
+
+          &.welcome-card {
+            padding: var(--space-12, 56px) var(--space-9, 32px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .welcome-options {
+              margin: 40px 0;
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+
+            .skip-footer {
+              color: var(--requestly-color-text-placeholder);
+              font-size: var(--requestly-font-size-sm);
+
+              .ant-btn {
+                text-decoration: underline;
+                color: var(--requestly-color-text-placeholder);
+                padding: 0;
+
+                &:hover {
+                  color: var(--requestly-color-text-placeholder);
+                }
+              }
+            }
+          }
+          &.local-workspace-card {
+            padding: var(--space-9, 32px);
+          }
+          &.auth-card {
+            padding: var(--space-9, 32px);
+          }
+        }
+      }
+    }
+  }
+
+  .skip-desktop-onboarding {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-placeholder);
+    text-align: center;
+    margin-top: 16px;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--requestly-color-text-placeholder);
+      text-decoration: underline;
+    }
+  }
+}
