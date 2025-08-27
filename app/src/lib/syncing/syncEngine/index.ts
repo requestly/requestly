@@ -67,7 +67,7 @@ class SyncEngine {
                     const syncEntities: SyncEntity[] = syncEntityDocs.map((doc) => {
                         return doc.toJSON() as SyncEntity;
                     });
-                    callback(syncEntities, syncWorkspace._data.id);
+                    callback(syncEntities, syncWorkspace._config.id);
                 }
             );
 

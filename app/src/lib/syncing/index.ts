@@ -1,2 +1,2 @@
-export * from "./syncStorageService/models/rule";
+export * from "./models/rule";
 export * from "./syncEngine";

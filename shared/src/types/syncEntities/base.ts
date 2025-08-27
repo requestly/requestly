@@ -1,18 +1,16 @@
 import { SyncEntityType } from ".";
 
 export interface BaseSyncEntity<T> {
-  id: string;
-  forkId?: string;
-  isGlobal?: boolean;
-  workspaceId: string;
+    id: string;
+    workspaceId: string;
 
-  type: SyncEntityType;
-  _deleted?: boolean;
+    type: SyncEntityType;
+    _deleted?: boolean;
 
-  data: T;
+    data: T;
 
-  createdAt: number;
-  updatedAt: number;
-  createdBy: string;
-  updatedBy: string;
+    createdAt?: number;
+    updatedAt?: number;
+    createdBy?: string;
+    updatedBy?: string;
 }
