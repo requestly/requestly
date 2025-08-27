@@ -1,16 +1,19 @@
-import { SyncEntityType } from "@requestly/shared/types/syncEntities";
+import { SyncEntityType, syncTypeToEntityMap } from "@requestly/shared/types/syncEntities";
 import SyncWorkspace from "../syncWorkspace";
 import { RxReplicationState } from "rxdb/plugins/replication";
+import { RxCollection } from "rxdb";
 
-abstract class BaseReplication {
+abstract class BaseReplication<T extends SyncEntityType> {
     syncWorkspace: SyncWorkspace;
-    syncEntityType: SyncEntityType;
-    replicationState!: RxReplicationState<unknown, unknown>;
+    syncEntityType: T;
+    replicationState!: RxReplicationState<any, any>;
+    isInitialized: boolean = false;
+    collection?: RxCollection<syncTypeToEntityMap[T]>;
 
-    constructor(syncWorkspace: SyncWorkspace, syncEntityType: SyncEntityType) {
+    constructor(syncWorkspace: SyncWorkspace, syncEntityType: T) {
         this.syncWorkspace = syncWorkspace;
         this.syncEntityType = syncEntityType;
-        // this.init();
+        this.collection = this.syncWorkspace.collections?.[this.syncEntityType];
     }
 
     abstract init(): Promise<void>;
