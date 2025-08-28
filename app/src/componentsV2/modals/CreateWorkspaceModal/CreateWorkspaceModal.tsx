@@ -27,6 +27,12 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
+  if (!user.loggedIn && workspaceType === WorkspaceType.SHARED) {
+    dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+    toggleModal();
+    return null;
+  }
+
   if (!isFeatureCompatible(FEATURES.LOCAL_FIRST_DESKTOP_APP)) {
     return (
       <CreateWorkspaceModalOld
@@ -36,12 +42,6 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
         defaultWorkspaceType={workspaceType}
       />
     );
-  }
-
-  if (!user.loggedIn && workspaceType === WorkspaceType.SHARED) {
-    dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
-    toggleModal();
-    return null;
   }
 
   return (
