@@ -14,7 +14,7 @@ import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "feat
 import { Conditional } from "components/common/Conditional";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { notification, Space } from "antd";
-import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
+import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
 import { useGenericState } from "hooks/useGenericState";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
@@ -481,6 +481,7 @@ const GraphQLClientView: React.FC<Props> = ({
               name={record.name}
               OnRecordNameUpdate={() => {}}
               onBlur={(newName) => handleRecordNameUpdate(newName)}
+              breadCrumbType={BreadcrumbType.API_REQUEST}
             />
 
             <ClientCodeButton

@@ -62,7 +62,7 @@ import { renderVariables } from "backend/environment/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
-import { ApiClientBreadCrumb } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
+import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
 import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
@@ -782,6 +782,7 @@ const HttpClientView: React.FC<Props> = ({
               name={apiEntryDetails?.name}
               OnRecordNameUpdate={setRequestName}
               onBlur={handleRecordNameUpdate}
+              breadCrumbType={BreadcrumbType.API_REQUEST}
             />
 
             <ClientCodeButton
