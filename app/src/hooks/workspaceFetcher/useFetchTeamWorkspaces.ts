@@ -97,7 +97,8 @@ export const useFetchTeamWorkspaces = () => {
 
             //FIX ME: the following code's intention is unclear
             //Showing an alert is unnecessary
-            const found = allWorkspaces.find((team) => team.id === activeWorkspaceId);
+            const found = [...allWorkspaces, ...records].find((team) => team.id === activeWorkspaceId);
+            // concating because allWorkspaces can be stale here after dispatch (just a prevention, data isn't found to be stale), this effect needs to be refactored to fix this
 
             Logger.log("DBG: availableTeamsListener", {
               teamFound: found,
