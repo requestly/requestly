@@ -17,6 +17,7 @@ export const useFetchLocalWorkspaces = () => {
 
   const fetchLocalWorkspaces = useCallback(async () => {
     if (!isLocalSyncEnabled) {
+      setLocalWorkspaces([]);
       return;
     }
 
@@ -27,7 +28,7 @@ export const useFetchLocalWorkspaces = () => {
     }
 
     try {
-      const uid = user.details.profile.uid;
+      const uid = user.details?.profile?.uid;
 
       const allLocalWorkspacesResult = await getAllWorkspaces();
       const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
