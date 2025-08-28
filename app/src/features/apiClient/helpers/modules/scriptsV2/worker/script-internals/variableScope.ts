@@ -15,7 +15,7 @@ export class VariableScope {
         ...currentVariables,
         [key]:
           key in currentVariables
-            ? { ...currentVariables[key], syncValue: value, isPersisted: !!options?.persist }
+            ? { ...currentVariables[key], localValue: value, isPersisted: !!options?.persist }
             : { localValue: value, type: typeof value, isPersisted: !!options?.persist },
       });
     } else {
