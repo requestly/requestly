@@ -12,10 +12,10 @@ import clientStorageSyncManager from "./clientStorageSyncManager";
 class WorkspaceManager {
     private _dispatch!: Dispatch<any>;
     private _userId?: string;
-    private _workspaceMap!: { [id: string]: Workspace };
-    private _activeWorkspaceMap: {
+    private _availableWorkspacesMap!: { [id: string]: Workspace };
+    private _activeWorkspacesMap: {
         [id: string]: {
-            disconnect: () => void;
+            deactivate: () => Promise<void>;
         };
     } = {};
 
@@ -24,10 +24,7 @@ class WorkspaceManager {
     init(dispatch: Dispatch<any>, workspaces: Workspace[], userId?: string) {
         this._dispatch = dispatch;
         this._userId = userId;
-        this._workspaceMap = {};
-        workspaces.forEach((workspace) => {
-            this._workspaceMap[workspace.id] = workspace;
-        });
+        this._availableWorkspacesMap = Object.fromEntries(workspaces.map((workspace) => [workspace.id, workspace]));
     }
 
     async initActiveWorkspaces(workspaceIds: Workspace["id"][]) {
@@ -37,10 +34,11 @@ class WorkspaceManager {
         }
         console.info("[WorkspaceManager.initActiveWorkspaces] Start", { workspaceIds });
 
+        this.initInProgress = true;
         this._dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: true }));
 
         await this.resetActiveWorkspaces();
-        await this.connectWorkspaces(workspaceIds);
+        await this.activateWorkspaces(workspaceIds);
         await clientStorageSyncManager.start(workspaceIds);
 
         this._dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }));
@@ -48,13 +46,13 @@ class WorkspaceManager {
         console.info("[WorkspaceManager.initActiveWorkspaces] End", { workspaceIds });
     }
 
-    private async connectWorkspaces(workspaceIds: Workspace["id"][]) {
+    private async activateWorkspaces(workspaceIds: Workspace["id"][]) {
         console.debug("[WorkspaceManager.connectWorkspaces]", { workspaceIds });
         const connectedWorkspaceIds: string[] = [];
 
         // FIXME-syncing: Can be made parallel
         const promises = workspaceIds.map(async (workspaceId) => {
-            const connected = await this.connectWorkspace(workspaceId);
+            const connected = await this.activateWorkspace(workspaceId);
             if (connected) {
                 connectedWorkspaceIds.push(workspaceId);
             }
@@ -62,31 +60,21 @@ class WorkspaceManager {
         await Promise.all(promises);
     }
 
-    private async connectWorkspace(workspaceId: Workspace["id"]): Promise<boolean> {
-        const workspace = this._workspaceMap[workspaceId];
+    private async activateWorkspace(workspaceId: Workspace["id"]): Promise<boolean> {
+        const workspace = this._availableWorkspacesMap[workspaceId];
         console.debug("[WorkspaceManager.connectWorkspace]", { workspaceId, workspace });
 
         if (!hasAccessToWorkspace(this._userId, workspace)) {
             console.info("[WorkspaceManager.connectWorkspace] Skipping connect. Unauthorized", { workspaceId });
-            this._dispatch(workspaceActions.removeActiveWorkspaceId(workspaceId));
             return false;
         }
 
         await syncEngine.init([workspace], this._userId);
 
-        this._activeWorkspaceMap[workspaceId] = {
-            disconnect: () => {
-                console.debug(`[WorkspaceManager] workspaceId=${workspaceId} disconnect`);
-                syncEngine.disconnectWorkspace(workspaceId);
-
-                delete this._activeWorkspaceMap[workspaceId];
-                this._dispatch(workspaceActions.removeActiveWorkspaceId(workspaceId));
-                window.activeWorkspaceIds = window.activeWorkspaceIds
-                    ? window.activeWorkspaceIds.filter((id: string) => id !== workspaceId)
-                    : [];
-            },
+        this._activeWorkspacesMap[workspaceId] = {
+            deactivate: this.deactivateWorkspace.bind(this, workspaceId),
         };
-        const connectedWorkspaceIds = Object.keys(this._activeWorkspaceMap);
+        const connectedWorkspaceIds = Object.keys(this._activeWorkspacesMap);
         window.activeWorkspaceIds = connectedWorkspaceIds;
         this._dispatch(workspaceActions.setActiveWorkspaceIds(connectedWorkspaceIds));
 
@@ -94,15 +82,32 @@ class WorkspaceManager {
         return true;
     }
 
+    private async deactivateWorkspace(workspaceId: Workspace["id"]): Promise<void> {
+        console.debug(`[WorkspaceManager.deactivateWorkspace] workspaceId=${workspaceId} deactivate`);
+        await syncEngine.disconnectWorkspace(workspaceId);
+        delete this._activeWorkspacesMap[workspaceId];
+        this._dispatch(workspaceActions.removeActiveWorkspaceId(workspaceId));
+        window.activeWorkspaceIds = window.activeWorkspaceIds
+            ? window.activeWorkspaceIds.filter((id: string) => id !== workspaceId)
+            : [];
+    }
+
     async resetActiveWorkspaces() {
         console.debug("[WorkspaceManager.resetActiveWorkspaces]", {
-            activeWorkspaces: clone(this._activeWorkspaceMap),
-        });
-        Object.values(this._activeWorkspaceMap).forEach((workspace) => {
-            workspace.disconnect();
+            activeWorkspaces: clone(this._activeWorkspacesMap),
         });
 
-        clientStorageSyncManager.stop();
+        const promises = Object.values(this._activeWorkspacesMap).map(async (workspace) => {
+            return workspace.deactivate();
+        });
+        await Promise.all(promises)
+            .then(() => {
+                console.log("[WorkspaceManager.resetActiveWorkspaces] All workspaces deactivated");
+            })
+            .catch((error) => {
+                console.error("[WorkspaceManager.resetActiveWorkspaces] Error deactivating workspaces", error);
+            });
+        await clientStorageSyncManager.stop();
         this._dispatch(workspaceActions.setActiveWorkspaceIds([]));
     }
 }
