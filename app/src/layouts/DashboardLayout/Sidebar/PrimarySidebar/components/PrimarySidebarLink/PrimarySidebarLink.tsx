@@ -7,13 +7,17 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
   path,
   icon,
   activeColor = "var(--primary)",
+  disabled,
 }) => (
   <NavLink
     to={path}
     className={({ isActive }) => `primary-sidebar-link ${isActive ? "primary-sidebar-active-link" : ""}`}
+    aria-disabled={disabled || undefined}
+    onClick={disabled ? (e) => e.preventDefault() : undefined}
     style={({ isActive }) => {
       return {
         borderLeftColor: isActive ? activeColor : null,
+        pointerEvents: disabled ? "none" : undefined,
       };
     }}
   >
