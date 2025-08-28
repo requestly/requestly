@@ -779,6 +779,7 @@ const HttpClientView: React.FC<Props> = ({
             <ApiClientBreadCrumb
               id={apiEntryDetails.id}
               openInModal={openInModal}
+              placeholder="Untitled request"
               name={apiEntryDetails?.name}
               onRecordNameUpdate={setRequestName}
               onBlur={handleRecordNameUpdate}

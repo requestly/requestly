@@ -477,6 +477,7 @@ const GraphQLClientView: React.FC<Props> = ({
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
               id={record.id}
+              placeholder="Untitled request"
               openInModal={openInModal}
               name={record.name}
               onBlur={(newName) => handleRecordNameUpdate(newName)}
