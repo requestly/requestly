@@ -76,7 +76,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
         },
         dispatch,
         {
-          isSyncEnabled: user?.details?.isSyncEnabled,
+          isSyncEnabled: user?.loggedIn ? user?.details?.isSyncEnabled : true,
           isWorkspaceMode: isSharedWorkspaceMode,
         },
         appMode,
@@ -91,7 +91,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
         });
       }
     },
-    [dispatch, appMode, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType]
+    [workspaceType, dispatch, user?.loggedIn, user?.details?.isSyncEnabled, isSharedWorkspaceMode, appMode, navigate]
   );
 
   const handleDomainInvitesCreation = useCallback(
