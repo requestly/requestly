@@ -27,6 +27,7 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import "./PrimarySidebar.css";
 import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
 import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
@@ -48,7 +49,7 @@ export const PrimarySidebar: React.FC = () => {
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
 
-    const items = [
+    const items: PrimarySidebarItem[] = [
       {
         id: 0,
         title: "Home",
@@ -80,6 +81,16 @@ export const PrimarySidebar: React.FC = () => {
           </SafariComingSoonTooltip>
         ),
         display: true,
+        tooltipContent: (
+          <>
+            Rules are conditions that automatically apply modifications to HTTP traffic, helping you customize and test
+            network behavior without manual steps.
+            <br />
+            <br />
+            They are currently not available in local workspaces. Switch to a private or team workspace to access Rules.
+          </>
+        ),
+        disabled: isLocalSyncEnabled,
       },
       {
         id: 4,
@@ -94,6 +105,16 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.MOCK_SERVER.INDEX,
         icon: <MockServerIcon />,
         display: true,
+        tooltipContent: (
+          <>
+            Files are not available in local workspaces yet. Switch to a private or team workspace to access them.
+            <br />
+            <br />
+            It's a powerful tool to modify & mock API responses, allowing you to build frontend faster without waiting
+            for backend.
+          </>
+        ),
+        disabled: isLocalSyncEnabled,
       },
       {
         id: 6,
@@ -130,7 +151,7 @@ export const PrimarySidebar: React.FC = () => {
       };
     }
     return items;
-  }, [appMode, isSavingNetworkSession, isDesktopSessionsCompatible]);
+  }, [appMode, isSavingNetworkSession, isLocalSyncEnabled, isDesktopSessionsCompatible]);
 
   return (
     <div className="primary-sidebar-container">
@@ -138,11 +159,19 @@ export const PrimarySidebar: React.FC = () => {
       <ul>
         {sidebarItems
           .filter((item) => item.display)
-          .map((item) => (
-            <li key={item.id}>
-              <PrimarySidebarLink {...item} />
-            </li>
-          ))}
+          .map((item) => {
+            return item.disabled ? (
+              <RQTooltip placement="rightTop" showArrow={false} title={item.tooltipContent} key={item.id}>
+                <li style={{ cursor: "not-allowed" }}>
+                  <PrimarySidebarLink {...item} />
+                </li>
+              </RQTooltip>
+            ) : (
+              <li key={item.id}>
+                <PrimarySidebarLink {...item} />
+              </li>
+            );
+          })}
       </ul>
       <div className="primary-sidebar-bottom-btns">
         {isSlackConnectFeatureEnabled && isSlackInviteVisible && <JoinSlackButton />}
