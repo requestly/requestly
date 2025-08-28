@@ -11,37 +11,40 @@ class SyncEngine {
         [workspaceId: string]: SyncWorkspace;
     } = {};
     initInProgress: boolean = false;
-    initialized: boolean = false;
     userId?: string = undefined;
 
+    get initialized() {
+        return Object.keys(this.syncWorkspacesMap).length > 0;
+    }
+
     async init(workspaces: Workspace[], userId?: string) {
-        if (this.initInProgress) {
-            return;
-        }
+        if (this.initInProgress) return;
+
+        console.log("[SyncEngine.init] Start", { workspaces });
+
         this.initInProgress = true;
         this.userId = userId;
 
-        console.log("[SyncEngine.init] Start", { workspaces });
         await Promise.all(
             workspaces.map(async (workspace: Workspace) => {
-                if (this.syncWorkspacesMap[workspace.id]) {
-                    console.log("[SyncEngine.init] Workspace Already Init", { workspaceId: workspace.id });
-                    return;
-                }
-                await this.initWorkspace(workspace);
+                await this.connectWorkspace(workspace);
             })
         );
+
         this.initInProgress = false;
-        this.initialized = true;
         console.log("[SyncEngine.init] Done");
     }
 
-    private async initWorkspace(workspace: Workspace) {
-        this.syncWorkspacesMap[workspace.id] = await SyncWorkspace.create(workspace, this.userId);
+    async connectWorkspace(workspace: Workspace) {
+        if (this.syncWorkspacesMap[workspace.id]) {
+            console.log("[SyncEngine.initWorkspace] Workspace Already Init", { workspaceId: workspace.id });
+            return;
+        } else {
+            this.syncWorkspacesMap[workspace.id] = await SyncWorkspace.create(workspace, this.userId);
+        }
     }
 
-    disconnectWorkspace(workspaceId: string) {
-        this.initialized = false;
+    async disconnectWorkspace(workspaceId: string) {
         this.syncWorkspacesMap[workspaceId]?.disconnect();
         delete this.syncWorkspacesMap[workspaceId];
     }
