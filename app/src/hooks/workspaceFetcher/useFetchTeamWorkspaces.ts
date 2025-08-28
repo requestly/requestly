@@ -1,5 +1,4 @@
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
@@ -13,7 +12,7 @@ import { WorkspaceType } from "types";
 import * as Sentry from "@sentry/react";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 
 const db = getFirestore(firebaseApp);
@@ -32,10 +31,9 @@ const splitMembersBasedOnRoles = (members: any) => {
 export const useFetchTeamWorkspaces = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const appMode = useSelector(getAppMode);
-
-  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
+  const allWorkspaces = useSelector(getAllWorkspaces);
 
   const unsubscribeAvailableTeams = useRef<(() => void) | null>(null);
 
@@ -46,6 +44,7 @@ export const useFetchTeamWorkspaces = () => {
       return;
     }
 
+    const activeWorkspaceId = activeWorkspace?.id;
     const uid = user?.details?.profile?.uid;
     if (user?.loggedIn && uid) {
       try {
@@ -98,7 +97,7 @@ export const useFetchTeamWorkspaces = () => {
 
             //FIX ME: the following code's intention is unclear
             //Showing an alert is unnecessary
-            const found = records.find((team) => team.id === activeWorkspaceId);
+            const found = allWorkspaces.find((team) => team.id === activeWorkspaceId);
 
             Logger.log("DBG: availableTeamsListener", {
               teamFound: found,
@@ -161,9 +160,11 @@ export const useFetchTeamWorkspaces = () => {
         unsubscribeAvailableTeams.current = null;
       }
     } else {
+      const localWorkspaces = allWorkspaces.filter((workspace) => workspace.workspaceType === WorkspaceType.LOCAL);
       dispatch(workspaceActions.setAllWorkspaces([]));
+      dispatch(workspaceActions.upsertManyWorkspaces(localWorkspaces));
       // Very edge case
-      if (activeWorkspaceId) {
+      if (activeWorkspaceId && activeWorkspace?.workspaceType === WorkspaceType.SHARED) {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
     }
@@ -172,5 +173,7 @@ export const useFetchTeamWorkspaces = () => {
       unsubscribeAvailableTeams.current?.();
       unsubscribeAvailableTeams.current = null;
     };
-  }, [appMode, activeWorkspaceId, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
+    // This useEffect shouldn't be triggered on any workspace change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
 };
