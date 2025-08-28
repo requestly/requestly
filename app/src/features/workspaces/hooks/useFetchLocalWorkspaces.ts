@@ -21,15 +21,14 @@ export const useFetchLocalWorkspaces = () => {
       return;
     }
 
+    const uid = user.details?.profile?.uid;
     // TODO: uid is needed as per current implementation, to be removed when logged out support is implemented
-    if (!user.loggedIn) {
+    if (!user.loggedIn || !uid) {
       setLocalWorkspaces([]); // TODO: to be removed when local first support is added
       return;
     }
 
     try {
-      const uid = user.details?.profile?.uid;
-
       const allLocalWorkspacesResult = await getAllWorkspaces();
       const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
 
