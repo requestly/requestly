@@ -1,19 +1,20 @@
 import { captureException } from "@sentry/react";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { Workspace } from "features/workspaces/types";
+import { useCallback, useEffect, useState } from "react";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
-import { workspaceActions } from "store/slices/workspaces/slice";
 import { WorkspaceType } from "types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const useFetchLocalWorkspaces = () => {
-  const dispatch = useDispatch();
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
+
+  const [localWorkspaces, setLocalWorkspaces] = useState<Workspace[]>([]);
 
   const fetchLocalWorkspaces = useCallback(async () => {
     if (!isLocalSyncEnabled) {
+      setLocalWorkspaces([]);
       return;
     }
 
@@ -38,14 +39,17 @@ export const useFetchLocalWorkspaces = () => {
 
         localRecords.push(localWorkspace);
       }
-      dispatch(workspaceActions.upsertManyWorkspaces(localRecords));
+      setLocalWorkspaces(localRecords);
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
     } catch (e) {
       captureException(e);
+      setLocalWorkspaces([]);
     }
-  }, [dispatch, isLocalSyncEnabled]);
+  }, [isLocalSyncEnabled]);
 
   useEffect(() => {
     fetchLocalWorkspaces();
   }, [fetchLocalWorkspaces]);
+
+  return { localWorkspaces };
 };
