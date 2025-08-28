@@ -1,16 +1,13 @@
 import { captureException } from "@sentry/react";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import { Workspace } from "features/workspaces/types";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { WorkspaceType } from "types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const useFetchLocalWorkspaces = () => {
-  const user = useSelector(getUserAuthDetails);
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   const [localWorkspaces, setLocalWorkspaces] = useState<Workspace[]>([]);
@@ -21,15 +18,7 @@ export const useFetchLocalWorkspaces = () => {
       return;
     }
 
-    // TODO: uid is needed as per current implementation, to be removed when logged out support is implemented
-    if (!user.loggedIn) {
-      setLocalWorkspaces([]); // TODO: to be removed when local first support is added
-      return;
-    }
-
     try {
-      const uid = user.details?.profile?.uid;
-
       const allLocalWorkspacesResult = await getAllWorkspaces();
       const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
 
@@ -39,14 +28,10 @@ export const useFetchLocalWorkspaces = () => {
         const localWorkspace = {
           id: partialWorkspace.id,
           name: partialWorkspace.name,
-          owner: uid,
+          owner: "",
           accessCount: 1,
           adminCount: 1,
-          members: {
-            [uid]: {
-              role: WorkspaceMemberRole.admin,
-            },
-          },
+          members: {},
           appsumo: false,
           workspaceType: WorkspaceType.LOCAL,
           rootPath: partialWorkspace.path,
@@ -60,7 +45,7 @@ export const useFetchLocalWorkspaces = () => {
       captureException(e);
       setLocalWorkspaces([]);
     }
-  }, [isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
+  }, [isLocalSyncEnabled]);
 
   useEffect(() => {
     fetchLocalWorkspaces();

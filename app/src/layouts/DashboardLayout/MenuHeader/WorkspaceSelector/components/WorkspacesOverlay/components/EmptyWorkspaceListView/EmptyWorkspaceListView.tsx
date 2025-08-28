@@ -12,6 +12,7 @@ interface EmptyWorkspaceListProps {
 
 export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ workspaceType, toggleDropdown }) => {
   const dispatch = useDispatch();
+
   return (
     <div className="empty-workspace-list-view">
       <div className="empty-workspace-list-view__title">

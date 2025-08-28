@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Checkbox } from "antd";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
-import { globalActions } from "store/slices/global/slice";
-import { CreateWorkspaceArgs } from "../../CreateWorkspaceModal";
+import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
 import { WorkspaceType } from "types";
 import "./sharedWorkspaceCreationView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -13,19 +12,16 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 export const SharedWorkspaceCreationView = ({
   onCreateWorkspaceClick,
   isLoading,
+  onCancel,
 }: {
   onCreateWorkspaceClick: (args: CreateWorkspaceArgs) => void;
   isLoading: boolean;
+  onCancel: () => void;
 }) => {
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
   const [workspaceName, setWorkspaceName] = useState("");
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
-
-  const handleOnCancel = () => {
-    dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal", newValue: false }));
-  };
 
   const handleOnCreateWorkspaceClick = () => {
     onCreateWorkspaceClick({
@@ -49,7 +45,7 @@ export const SharedWorkspaceCreationView = ({
         </span>
       </div>
       <CreateWorkspaceFooter
-        onCancel={handleOnCancel}
+        onCancel={onCancel}
         onCreateWorkspaceClick={handleOnCreateWorkspaceClick}
         isLoading={isLoading}
         disabled={!workspaceName.length}

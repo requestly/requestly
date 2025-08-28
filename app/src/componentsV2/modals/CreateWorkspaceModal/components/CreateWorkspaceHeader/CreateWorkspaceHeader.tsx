@@ -15,7 +15,7 @@ export const CreateWorkspaceHeader: React.FC<CreateWorkspaceHeaderProps> = ({
 }) => {
   return (
     <div className="create-workspace-header">
-      <div className="create-workspace__title">{title}</div>
+      <div className="create-workspace-header__title">{title}</div>
       <div className="create-workspace-header__description">{description}</div>
       <label htmlFor="workspace-name" className="create-workspace-header__label">
         Workspace name
