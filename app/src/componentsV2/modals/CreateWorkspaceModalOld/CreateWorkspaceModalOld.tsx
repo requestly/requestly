@@ -239,7 +239,7 @@ export const CreateWorkspaceModalOld: React.FC<Props> = ({ isOpen, defaultWorksp
       }
       open={isOpen}
       onCancel={toggleModal}
-      className="custom-rq-modal create-workspace-modal"
+      className="custom-rq-modal create-workspace-modal-old"
       footer={
         <>
           <RQButton onClick={toggleModal}>Cancel</RQButton>
