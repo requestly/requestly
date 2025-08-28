@@ -24,11 +24,11 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import "./createWorkspaceModalOld.scss";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import "./createOldWorkspaceModal.scss";
 
 interface Props {
   isOpen: boolean;
