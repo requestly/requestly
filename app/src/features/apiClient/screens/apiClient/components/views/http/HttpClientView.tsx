@@ -432,6 +432,7 @@ const HttpClientView: React.FC<Props> = ({
       auth_type: entry?.auth?.currentAuthType,
       request_type: getRequestTypeForAnalyticEvent(apiEntryDetails?.isExample, entry?.request?.url),
       request_body_type: entry?.request?.contentType,
+      type: RQAPI.ApiEntryType.HTTP,
     });
 
     try {
@@ -648,6 +649,7 @@ const HttpClientView: React.FC<Props> = ({
         src: "api_client_view",
         has_scripts: Boolean(entry.scripts?.preRequest),
         auth_type: entry?.auth?.currentAuthType,
+        type: RQAPI.ApiEntryType.HTTP,
       });
       if (isCreateMode) {
         onSaveCallback(httpApiEntry);
