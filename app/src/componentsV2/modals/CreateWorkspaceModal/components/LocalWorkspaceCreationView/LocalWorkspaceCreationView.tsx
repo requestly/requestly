@@ -13,14 +13,18 @@ import { WorkspaceType } from "types";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import "./localWorkspaceCreationView.scss";
 
-interface FolderItem {
+type FolderItem = {
   name: string;
   path: string;
-  type: "directory" | "file";
-  contents?: FolderItem[];
-}
+} & (
+  | {
+      type: "directory";
+      contents?: FolderItem[];
+    }
+  | { type: "file" }
+);
 
-interface FolderPreviewResult {
+interface FolderPreview {
   success: boolean;
   folderPath: string;
   existingContents: FolderItem[];
@@ -51,12 +55,12 @@ export const LocalWorkspaceCreationView = ({
 }) => {
   const [workspaceName, setWorkspaceName] = useState("");
   const [folderPath, setFolderPath] = useState("");
-  const [folderPreview, setFolderPreview] = useState<FolderPreviewResult | null>(null);
+  const [folderPreview, setFolderPreview] = useState<FolderPreview | null>(null);
 
   const folderSelectCallback = async (folderPath: string) => {
     setFolderPath(folderPath);
     try {
-      const result: FolderPreviewResult = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
+      const result: FolderPreview = await window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain(
         "get-workspace-folder-preview",
         {
           folderPath,
@@ -83,7 +87,7 @@ export const LocalWorkspaceCreationView = ({
     return items.map((item) => (
       <div key={item.path}>
         <PreviewItem item={item} isNewWorkspace={isNewAddition} />
-        {item.contents && item.contents.length > 0 && (
+        {item.type === "directory" && item.contents && item.contents.length > 0 && (
           <div className="workspace-folder-preview-content preview-folder-items">
             {renderPreviewItems(item.contents)}
           </div>
@@ -96,7 +100,7 @@ export const LocalWorkspaceCreationView = ({
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
       folderPath: "",
     })
-      .then((result: FolderPreviewResult) => {
+      .then((result: FolderPreview) => {
         if (result.success) {
           setFolderPreview(result);
           setFolderPath(result.folderPath);
@@ -161,7 +165,8 @@ export const LocalWorkspaceCreationView = ({
                     isNewWorkspace={true}
                   />
                   <div className="workspace-folder-preview-content preview-folder-items">
-                    {folderPreview.newAdditions.contents &&
+                    {folderPreview.newAdditions.type === "directory" &&
+                      folderPreview.newAdditions.contents &&
                       renderPreviewItems(folderPreview.newAdditions.contents, true)}
                   </div>
                 </div>
