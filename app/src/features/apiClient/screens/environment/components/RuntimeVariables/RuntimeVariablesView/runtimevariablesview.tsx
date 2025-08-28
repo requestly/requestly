@@ -13,7 +13,7 @@ import { VariableRow } from "../../VariablesList/VariablesList";
 
 export const RuntimeVariablesView: React.FC = () => {
   const [runtimeVariablesMap, resetVariables] = useRuntimeVariables((s) => [s.data, s.reset]);
-  const runtimeVariableData = Object.fromEntries(runtimeVariablesMap);
+  const runtimeVariableData = useMemo(() => Object.fromEntries(runtimeVariablesMap), [runtimeVariablesMap]);
 
   const pendingVariablesRef = useRef<VariableRow[]>([]);
   const [isSaving, setIsSaving] = useState<boolean>(false);
