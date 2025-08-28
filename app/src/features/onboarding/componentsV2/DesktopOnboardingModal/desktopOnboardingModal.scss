@@ -79,9 +79,28 @@
           }
           &.local-workspace-card {
             padding: var(--space-9, 32px);
+
+            .create-workspace-header__title {
+              display: none;
+            }
           }
           &.auth-card {
             padding: var(--space-9, 32px);
+          }
+        }
+
+        &__local-workspace-card-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--requestly-color-text-default);
+          font-size: var(--requestly-font-size-lg);
+          font-weight: var(--requestly-font-weight-medium);
+          margin-bottom: 16px;
+
+          svg {
+            cursor: pointer;
+            font-size: var(--requestly-font-size-lg);
           }
         }
       }

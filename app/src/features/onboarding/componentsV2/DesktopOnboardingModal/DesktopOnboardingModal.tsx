@@ -7,6 +7,7 @@ import { WelcomeCard } from "./components/WelcomeCard/WelcomeCard";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import "./desktopOnboardingModal.scss";
 
 export const DesktopOnboardingCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -44,6 +45,9 @@ export const DesktopOnboardingModal = () => {
           </DesktopOnboardingCard>
         ) : onboardingStep === OnboardingStep.API_CLIENT ? (
           <DesktopOnboardingCard className="local-workspace-card">
+            <div className="rq-desktop-onboarding-modal-content__local-workspace-card-header">
+              <IoMdArrowBack onClick={() => setOnboardingStep(OnboardingStep.WELCOME)} /> Create a new local workspace
+            </div>
             <WorkspaceCreationView
               workspaceType={WorkspaceType.LOCAL}
               onCancel={() => setOnboardingStep(OnboardingStep.WELCOME)}
