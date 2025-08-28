@@ -1,4 +1,4 @@
-import { notification, Result, Tabs } from "antd";
+import { notification, Result, Tabs, Tooltip } from "antd";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { RQAPI } from "features/apiClient/types";
@@ -14,8 +14,15 @@ import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { isEmpty } from "lodash";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useApiClientFeatureContext, useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { truncateString } from "features/apiClient/screens/apiClient/utils";
+import { LuFolderCog } from "@react-icons/all-files/lu/LuFolderCog";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -26,6 +33,78 @@ const TAB_KEYS = {
 interface CollectionViewProps {
   collectionId: string;
 }
+
+interface BreadcrumbProps {
+  collectionId: string;
+  collectionName: string;
+  handleCollectionNameChange: (name: string) => Promise<void>;
+  isNewCollection: boolean;
+}
+
+const MultiviewBreadCrumb: React.FC<BreadcrumbProps> = ({ ...props }) => {
+  const { collectionId, collectionName, handleCollectionNameChange, isNewCollection } = props;
+  const [getSelectedWorkspace] = useApiClientMultiWorkspaceView((s) => [s.getSelectedWorkspace]);
+
+  const ctx = useApiClientFeatureContext();
+
+  const currentWorkspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId), [
+    getSelectedWorkspace,
+    ctx.workspaceId,
+  ]);
+
+  const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
+
+  const localWsPath = currentWorkspace.getState().rawWorkspace.rootPath;
+  const truncatePath = truncateString(localWsPath, 40);
+
+  const parentCollectionNames = useMemo(() => {
+    const collections = getParentChain(collectionId);
+
+    const parentRecords = collections
+      .slice()
+      .reverse()
+      .map((id) => {
+        return {
+          label: getData(id).name,
+          pathname: "",
+          isEditable: false,
+        };
+      });
+
+    return parentRecords;
+  }, [collectionId, getData, getParentChain]);
+
+  return (
+    <RQBreadcrumb
+      placeholder="New Collection"
+      recordName={collectionName}
+      onBlur={(newName) => handleCollectionNameChange(newName)}
+      autoFocus={isNewCollection}
+      defaultBreadcrumbs={[
+        {
+          label: (
+            <div>
+              <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
+                <span className="api-client-local-workspace-path-breadcrumb">
+                  <LuFolderCog className="api-client-local-workspace-icon" />
+                  {truncatePath + "/" + currentWorkspace.getState().name}
+                </span>
+              </Tooltip>
+            </div>
+          ),
+          pathname: PATHS.API_CLIENT.INDEX,
+          isEditable: false,
+        },
+        ...parentCollectionNames,
+        {
+          isEditable: true,
+          pathname: window.location.pathname,
+          label: collectionName,
+        },
+      ]}
+    />
+  );
+};
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
@@ -41,6 +120,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   const isNewCollection = getIsNew();
 
   const collection = useApiRecord(collectionId) as RQAPI.CollectionRecord;
+  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode]);
 
   useEffect(() => {
     // To sync title for tabs opened from deeplinks
@@ -154,20 +234,29 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       ) : (
         <>
           <div className="collection-view-breadcrumb-container">
-            <RQBreadcrumb
-              placeholder="New Collection"
-              recordName={collectionName}
-              onBlur={(newName) => handleCollectionNameChange(newName)}
-              autoFocus={isNewCollection}
-              defaultBreadcrumbs={[
-                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-                {
-                  isEditable: true,
-                  pathname: window.location.pathname,
-                  label: collectionName,
-                },
-              ]}
-            />
+            {getViewMode() === ApiClientViewMode.SINGLE ? (
+              <RQBreadcrumb
+                placeholder="New Collection"
+                recordName={collectionName}
+                onBlur={(newName) => handleCollectionNameChange(newName)}
+                autoFocus={isNewCollection}
+                defaultBreadcrumbs={[
+                  { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
+                  {
+                    isEditable: true,
+                    pathname: window.location.pathname,
+                    label: collectionName,
+                  },
+                ]}
+              />
+            ) : (
+              <MultiviewBreadCrumb
+                collectionId={collectionId}
+                collectionName={collectionName}
+                handleCollectionNameChange={handleCollectionNameChange}
+                isNewCollection={isNewCollection}
+              />
+            )}
           </div>
           <div className="collection-view-content">
             <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />
