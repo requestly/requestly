@@ -40,6 +40,9 @@ export const switchWorkspace = async (
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
+
+    // isWorkspaceMode - true implies user is working on a team workspace - local or shared
+    // false implies user is working on a private workspace
     if (!isWorkspaceMode) {
       // User is currently on private workspace
       if (!isSyncEnabled) {
