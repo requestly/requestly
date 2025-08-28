@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 
 export type BaseSnapshot = {
   global: EnvironmentVariables;
-  collection: EnvironmentVariables;
+  collectionVariables: EnvironmentVariables;
   environment: EnvironmentVariables;
   variables: RuntimeVariables;
 };

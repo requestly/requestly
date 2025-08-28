@@ -109,7 +109,7 @@ export class HttpRequestExecutor {
     })();
     return {
       global: globalVariables,
-      collection: collectionVariables,
+      collectionVariables,
       environment: environmentVariables,
       variables,
     };
