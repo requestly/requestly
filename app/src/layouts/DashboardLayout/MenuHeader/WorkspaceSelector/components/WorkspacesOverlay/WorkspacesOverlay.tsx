@@ -24,8 +24,8 @@ import PATHS from "config/constants/sub/paths";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
 import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
-import "./workspacesOverlay.scss";
 import { isSharedWorkspace } from "features/workspaces/utils";
+import "./workspacesOverlay.scss";
 
 interface WorkspacesOverlayProps {
   toggleDropdown: () => void;
@@ -60,12 +60,13 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
   toggleDropdown,
   onItemClick,
 }: WorkspaceListSectionProps) => {
+  const user = useSelector(getUserAuthDetails);
   if (!workspaces.length) {
     return <EmptyWorkspaceListSection workspaceType={workspaceType} toggleDropdown={toggleDropdown} />;
   }
   return (
     <div>
-      <Divider />
+      {user.loggedIn ? <Divider /> : null}
       <WorkspaceList
         workspaces={workspaces}
         type={workspaceType}
