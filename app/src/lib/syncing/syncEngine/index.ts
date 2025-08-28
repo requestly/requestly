@@ -12,18 +12,16 @@ class SyncEngine {
     } = {};
     initInProgress: boolean = false;
     initialized: boolean = false;
-    authToken?: string = undefined;
     userId?: string = undefined;
 
-    async init(workspaces: Workspace[], userId?: string, authToken?: string) {
+    async init(workspaces: Workspace[], userId?: string) {
         if (this.initInProgress) {
             return;
         }
         this.initInProgress = true;
-        this.authToken = authToken;
         this.userId = userId;
 
-        console.log("[SyncEngine.init] Start", { workspaces, authToken });
+        console.log("[SyncEngine.init] Start", { workspaces });
         await Promise.all(
             workspaces.map(async (workspace: Workspace) => {
                 if (this.syncWorkspacesMap[workspace.id]) {
@@ -38,16 +36,8 @@ class SyncEngine {
         console.log("[SyncEngine.init] Done");
     }
 
-    async initAuthToken(authToken?: string) {
-        console.debug("[SyncEngine.initAuthToken]", { authToken });
-        this.authToken = authToken;
-        Object.values(this.syncWorkspacesMap).forEach((syncWorkspace) => {
-            syncWorkspace.initAuthToken(authToken);
-        });
-    }
-
-    async initWorkspace(workspace: Workspace) {
-        this.syncWorkspacesMap[workspace.id] = await SyncWorkspace.create(workspace, this.userId, this.authToken);
+    private async initWorkspace(workspace: Workspace) {
+        this.syncWorkspacesMap[workspace.id] = await SyncWorkspace.create(workspace, this.userId);
     }
 
     disconnectWorkspace(workspaceId: string) {

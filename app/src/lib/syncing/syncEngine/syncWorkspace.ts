@@ -46,6 +46,19 @@ class SyncWorkspace {
         console.log("[SyncWorkspace.init] Done");
     }
 
+    async connect() {
+        console.log("[SyncWorkspace.connect] Start", this._config.id);
+        await this._setupReplication();
+        console.log("[SyncWorkspace.connect] Done");
+    }
+
+    async disconnect() {
+        console.log("[SyncWorkspace.disconnect] Start", this._config.id);
+        await this._stopReplication();
+        await this.database.close();
+        console.log("[SyncWorkspace.disconnect] Done", this._config.id);
+    }
+
     private async initRxDB() {
         console.log("[SyncWorkspace.initRxDB] Start");
         // #region - Database Init
@@ -129,26 +142,12 @@ class SyncWorkspace {
                 console.log(`[SyncWorkspace.collections.${entityType}.preSave] Updated`, { plainData });
             }, false);
         });
-
         // #endregion
 
         console.log("[SyncWorkspace.initRxDB] Done", {
             database: this.database,
             collections: this.collections,
         });
-    }
-
-    async connect() {
-        console.log("[SyncWorkspace.connect] Start", this._config.id);
-        await this._setupReplication();
-        console.log("[SyncWorkspace.connect] Done");
-    }
-
-    async disconnect() {
-        console.log("[SyncWorkspace.disconnect] Start", this._config.id);
-        await this._stopReplication();
-        this.database.close();
-        console.log("[SyncWorkspace.disconnect] Done", this._config.id);
     }
 
     private async _setupReplication() {
@@ -161,15 +160,19 @@ class SyncWorkspace {
 
     private async _setupReplicationForEntity<K extends SyncEntityType>(entityType: K) {
         console.log("[SyncWorkspace._setupReplication] Start", { entityType });
-        const replication = new RDBReplication(this, entityType);
-        await replication.init();
-        await replication.start();
-        // @ts-ignore
-        this.replication[entityType] = replication;
+        if (!this.replication?.[entityType]) {
+            const replication = new RDBReplication(this, entityType);
+            await replication.init();
+            await replication.start();
+            // @ts-ignore
+            this.replication[entityType] = replication;
+        } else {
+            console.error("[SyncWorkspace._setupReplicationForEntity] Replication already exists", { entityType });
+        }
         console.log("[SyncWorkspace._setupReplication] End", { entityType });
     }
 
-    async _stopReplication() {
+    private async _stopReplication() {
         console.log("[SyncWorkspace.stopReplication]", this._config.id);
         this.replication[SyncEntityType.RULE_DATA]?.stop();
         this.replication[SyncEntityType.RULE_METADATA]?.stop();
