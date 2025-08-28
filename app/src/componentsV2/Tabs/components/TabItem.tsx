@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
@@ -22,45 +22,51 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
   return (
     <GenericStateContext.Provider
       value={{
-        close: () => {
+        close: useCallback(() => {
           closeTabById(props.store.getState().id);
-        },
+        }, [closeTabById, props.store]),
 
-        replace: (tabSource: TabState["source"]) => {
-          upsertTabSource(props.store.getState().id, tabSource);
-        },
+        replace: useCallback(
+          (tabSource: TabState["source"]) => {
+            upsertTabSource(props.store.getState().id, tabSource);
+          },
+          [props.store, upsertTabSource]
+        ),
 
-        getIsNew: () => {
+        getIsNew: useCallback(() => {
           return props.store.getState().source.getIsNewTab();
-        },
+        }, [props.store]),
 
-        getIsActive: () => {
+        getIsActive: useCallback(() => {
           return activeTabId === props.store.getState().id;
-        },
+        }, [activeTabId, props.store]),
 
-        setTitle: useMemo(
-          () => (title: string) => {
+        setTitle: useCallback(
+          (title: string) => {
             props.store.getState().setTitle(title);
             incrementVersion();
           },
           [incrementVersion, props.store]
         ),
 
-        setIcon: useMemo(
-          () => (icon: React.ReactNode) => {
+        setIcon: useCallback(
+          (icon: React.ReactNode) => {
             props.store.getState().setIcon(icon);
             incrementVersion();
           },
           [incrementVersion, props.store]
         ),
 
-        setPreview: useCallback((preview: boolean) => {
-          props.store.getState().setPreview(preview);
-          if (!preview) {
-            resetPreviewTab();
-          }
-          incrementVersion();
-        }, [props.store, incrementVersion, resetPreviewTab]),
+        setPreview: useCallback(
+          (preview: boolean) => {
+            props.store.getState().setPreview(preview);
+            if (!preview) {
+              resetPreviewTab();
+            }
+            incrementVersion();
+          },
+          [props.store, incrementVersion, resetPreviewTab]
+        ),
 
         setUnsaved: useCallback(
           (unsaved: boolean) => {
