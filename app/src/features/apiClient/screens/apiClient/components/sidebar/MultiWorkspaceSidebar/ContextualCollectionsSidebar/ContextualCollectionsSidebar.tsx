@@ -21,9 +21,8 @@ import { ApiClientExportModal } from "../../../modals/exportModal/ApiClientExpor
 import { captureException } from "backend/apiClient/utils";
 import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
+import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import "./contextualCollectionsSidebar.scss";
-
-export type RecordSelectionAction = "select" | "unselect";
 
 export const ContextualCollectionsSidebar: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -38,9 +37,14 @@ export const ContextualCollectionsSidebar: React.FC<{
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
   const [isSelectionAcrossWorkspaces, setIsSelectionAcrossWorkspaces] = useState(false);
 
-  const [isSelectAll, setIsSelectAll] = useState(false);
+  const [selectAll, setSelectAll] = useState({ value: false, takeAction: false });
   const [isMoveCollectionModalOpen, setIsMoveCollectionModalOpen] = useState(false);
+
+  const [selectedRecordsInSingleContext, setSelectedRecordsInSingleContext] = useState<
+    [string | undefined, RQAPI.ApiClientRecord[]]
+  >([undefined, []]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<{
     records: RQAPI.ApiClientRecord[];
@@ -79,13 +83,8 @@ export const ContextualCollectionsSidebar: React.FC<{
   }, [selectedWorkspaces]);
 
   const handleRecordSelection = useCallback(
-    (params: {
-      contextId: string;
-      action: RecordSelectionAction;
-      recordIds?: Set<string>;
-      isAllRecordsSelected?: boolean;
-    }) => {
-      const { contextId, action, recordIds = new Set(), isAllRecordsSelected = false } = params;
+    (params: { contextId: string; recordIds?: Set<string>; isAllRecordsSelected?: boolean }) => {
+      const { contextId, recordIds = new Set(), isAllRecordsSelected = false } = params;
 
       if (!selectedRecordsAcrossWorkspaces.current) {
         selectedRecordsAcrossWorkspaces.current = {};
@@ -100,21 +99,14 @@ export const ContextualCollectionsSidebar: React.FC<{
 
       selectedRecordsAcrossWorkspaces.current[contextId].isAllRecordsSelected = isAllRecordsSelected;
 
-      if (action === "select") {
-        recordIds.forEach((id) => {
-          selectedRecordsAcrossWorkspaces.current[contextId].recordIds.add(id);
-        });
-      } else {
-        recordIds.forEach((id) => {
-          selectedRecordsAcrossWorkspaces.current[contextId].recordIds.delete(id);
-        });
-      }
+      selectedRecordsAcrossWorkspaces.current[contextId].recordIds = recordIds;
 
       const isAll = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).every((value) => {
         return value.isAllRecordsSelected;
       });
 
       setIsAllRecordsSelected(isAll);
+      setSelectAll({ value: isAll, takeAction: false });
 
       const workspacesCountWithSelectedRecords = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
         (value) => value.recordIds.size > 0
@@ -127,24 +119,15 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   const deselect = useCallback(() => {
     selectedRecordsAcrossWorkspaces.current = null;
-    setIsSelectAll(false);
+    setSelectAll({ value: false, takeAction: true });
     setIsAllRecordsSelected(false);
     setIsSelectionAcrossWorkspaces(false);
   }, []);
 
-  const handleSelectToggle = useCallback(() => {
-    if (isSelectAll) {
-      deselect();
-    } else {
-      setIsSelectAll(true);
-    }
-  }, [isSelectAll, deselect]);
-
-  const onDeleteModalClose = useCallback(() => {
-    setRecordsToBeDeleted(null);
-    setIsDeleteModalOpen(false);
+  const handleSelectAllToggle = useCallback(() => {
     deselect();
-  }, [deselect]);
+    setSelectAll({ value: !selectAll.value, takeAction: true });
+  }, [selectAll, deselect]);
 
   const handleDuplicateRecords = useCallback(async () => {
     try {
@@ -165,6 +148,19 @@ export const ContextualCollectionsSidebar: React.FC<{
     setIsDeleteModalOpen(true);
   }, [setIsDeleteModalOpen]);
 
+  const getSelectedRecordsInSingleContext: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
+    const workspacesWithSelectedRecords = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
+      ([ctxId, value]) => value.recordIds.size > 0
+    );
+
+    if (workspacesWithSelectedRecords.length === 1) {
+      const [ctxId, value] = workspacesWithSelectedRecords[0];
+      return [ctxId, getProcessedRecords(ctxId, value.recordIds)];
+    }
+
+    return [undefined, []];
+  }, []);
+
   const onBulkActionClick = useCallback(
     (action: BulkActions) => {
       const isEmpty = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).every(
@@ -177,7 +173,7 @@ export const ContextualCollectionsSidebar: React.FC<{
       }
 
       if (action === BulkActions.SELECT_ALL) {
-        handleSelectToggle();
+        handleSelectAllToggle();
         return;
       }
 
@@ -192,26 +188,46 @@ export const ContextualCollectionsSidebar: React.FC<{
       }
 
       if (action === BulkActions.MOVE) {
+        setSelectedRecordsInSingleContext(getSelectedRecordsInSingleContext());
         setIsMoveCollectionModalOpen(true);
         return;
       }
 
-      if (action === BulkActions.EXPORT) {
+      if (action === BulkActions.EXPORT_REQUESTLY) {
+        setSelectedRecordsInSingleContext(getSelectedRecordsInSingleContext());
         setIsExportModalOpen(true);
         return;
       }
+
+      if (action === BulkActions.EXPORT_POSTMAN) {
+        setSelectedRecordsInSingleContext(getSelectedRecordsInSingleContext());
+        setIsPostmanExportModalOpen(true);
+        return;
+      }
     },
-    [handleSelectToggle, handleRecordsDelete, handleDuplicateRecords]
+    [handleSelectAllToggle, handleRecordsDelete, handleDuplicateRecords, getSelectedRecordsInSingleContext]
   );
 
   const toggleMultiSelect = useCallback(() => {
+    deselect();
+
     if (showSelection) {
-      deselect();
       setShowSelection(false);
     } else {
       setShowSelection(true);
     }
   }, [showSelection, deselect]);
+
+  const onExportModalClose = useCallback(() => {
+    deselect();
+    toggleMultiSelect();
+  }, [deselect, toggleMultiSelect]);
+
+  const onDeleteModalClose = useCallback(() => {
+    deselect();
+    setRecordsToBeDeleted(null);
+    setIsDeleteModalOpen(false);
+  }, [deselect]);
 
   const handleShowSelection = useCallback((value: boolean) => {
     setShowSelection(value);
@@ -223,35 +239,6 @@ export const ContextualCollectionsSidebar: React.FC<{
       showMultiSelect: isValidPermission,
     };
   }, [toggleMultiSelect, isValidPermission]);
-
-  const getRecordsBySingleContextSelection: () => [string | undefined, RQAPI.ApiClientRecord[]] = useCallback(() => {
-    const workspacesWithSelectedRecords = Object.entries(selectedRecordsAcrossWorkspaces.current ?? {}).filter(
-      ([ctxId, value]) => value.recordIds.size > 0
-    );
-
-    if (workspacesWithSelectedRecords.length === 1) {
-      const [ctxId, value] = workspacesWithSelectedRecords[0];
-      return [ctxId, getProcessedRecords(ctxId, value.recordIds)];
-    }
-
-    return [undefined, []];
-  }, []);
-
-  const recordsToMove: [string | undefined, RQAPI.ApiClientRecord[]] = useMemo(() => {
-    if (!isMoveCollectionModalOpen) {
-      return [undefined, []];
-    }
-
-    return getRecordsBySingleContextSelection();
-  }, [isMoveCollectionModalOpen, getRecordsBySingleContextSelection]);
-
-  const collectionsToExport: [string | undefined, RQAPI.ApiClientRecord[]] = useMemo(() => {
-    if (!isExportModalOpen) {
-      return [undefined, []];
-    }
-
-    return getRecordsBySingleContextSelection();
-  }, [isExportModalOpen, getRecordsBySingleContextSelection]);
 
   const getSelectedRecords = useCallback((): {
     context: ApiClientFeatureContext | undefined;
@@ -312,7 +299,7 @@ export const ContextualCollectionsSidebar: React.FC<{
             return (
               <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
                 <ContextualCollectionsList
-                  isSelectAll={isSelectAll}
+                  selectAll={selectAll}
                   showSelection={showSelection}
                   handleShowSelection={handleShowSelection}
                   searchValue={searchValue}
@@ -329,10 +316,10 @@ export const ContextualCollectionsSidebar: React.FC<{
 
       {isMoveCollectionModalOpen ? (
         // TODO: TBD on modals
-        <ContextId id={recordsToMove[0]}>
+        <ContextId id={selectedRecordsInSingleContext[0]}>
           <MoveToCollectionModal
             isBulkActionMode={showSelection}
-            recordsToMove={recordsToMove[1]}
+            recordsToMove={selectedRecordsInSingleContext[1]}
             isOpen={isMoveCollectionModalOpen}
             onClose={() => {
               setIsMoveCollectionModalOpen(false);
@@ -344,11 +331,22 @@ export const ContextualCollectionsSidebar: React.FC<{
       {isExportModalOpen ? (
         <ApiClientExportModal
           exportType="collection"
-          recordsToBeExported={collectionsToExport[1]}
+          recordsToBeExported={selectedRecordsInSingleContext[1]}
           isOpen={isExportModalOpen}
           onClose={() => {
-            deselect();
+            onExportModalClose();
             setIsExportModalOpen(false);
+          }}
+        />
+      ) : null}
+
+      {isPostmanExportModalOpen ? (
+        <PostmanExportModal
+          recordsToBeExported={selectedRecordsInSingleContext[1]}
+          isOpen={isPostmanExportModalOpen}
+          onClose={() => {
+            onExportModalClose();
+            setIsPostmanExportModalOpen(false);
           }}
         />
       ) : null}
