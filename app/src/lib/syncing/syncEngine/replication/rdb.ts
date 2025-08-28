@@ -8,7 +8,7 @@ import BaseReplication from "./base";
 import { replicateRxCollection } from "rxdb/plugins/replication";
 import { WorkspaceType } from "features/workspaces/types";
 import { ReplicationPullHandler, ReplicationPushHandler } from "rxdb";
-import { get, getDatabase, ref, update, onValue } from "firebase/database";
+import { get, getDatabase, ref, update, onValue, Unsubscribe } from "firebase/database";
 import firebaseApp from "firebase";
 import { Subject } from "rxjs";
 
@@ -43,6 +43,8 @@ type RuleMetadataRdbSchema = RuleMetadataSyncEntity["data"] & {
 };
 
 class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
+    unsubListener?: Unsubscribe = undefined;
+
     async init() {
         if (this.collection) {
             this.replicationState = replicateRxCollection({
@@ -74,6 +76,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
     async stop(): Promise<void> {
         if (this.isInitialized) {
             this.replicationState.cancel();
+            this.unsubListener?.();
         } else {
             console.error(`RDBReplication not initialized for entityType: ${this.syncEntityType}`);
         }
@@ -227,7 +230,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
 
         const ruleDataRef = ref(db, this.getRuleDataPath());
 
-        onValue(ruleDataRef, (snapshot) => {
+        this.unsubListener = onValue(ruleDataRef, (snapshot) => {
             let rulesData = {};
             if (snapshot.exists()) {
                 rulesData = snapshot.val();
@@ -252,7 +255,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
 
         const ruleMetadataRef = ref(db, this.getRuleMetadataPath());
 
-        onValue(ruleMetadataRef, (snapshot) => {
+        this.unsubListener = onValue(ruleMetadataRef, (snapshot) => {
             let rulesMetadata = {};
             if (snapshot.exists()) {
                 rulesMetadata = snapshot.val();
