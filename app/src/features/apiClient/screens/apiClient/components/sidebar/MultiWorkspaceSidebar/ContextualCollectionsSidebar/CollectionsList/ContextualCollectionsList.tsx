@@ -14,7 +14,7 @@ import { CollectionRow } from "../../../components/collectionsList/collectionRow
 import { SidebarPlaceholderItem } from "../../../components/SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { RequestRow } from "../../../components/collectionsList/requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../../../components/collectionsList/apiRecordEmptyState/ApiRecordEmptyState";
-import { RecordSelectionAction } from "../ContextualCollectionsSidebar";
+
 import {
   getRecordsToExpandBySearchValue,
   getRecordsToRender,
@@ -29,11 +29,10 @@ interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
   recordTypeToBeCreated: RQAPI.RecordType | null;
   showSelection: boolean;
-  isSelectAll: boolean;
+  selectAll: { value: boolean; takeAction: boolean };
   handleShowSelection: (value: boolean) => void;
   handleRecordSelection: (params: {
     contextId: string;
-    action: RecordSelectionAction;
     recordIds?: Set<string>;
     isAllRecordsSelected?: boolean;
   }) => void;
@@ -47,7 +46,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   showSelection,
   handleShowSelection,
   handleRecordSelection,
-  isSelectAll,
+  selectAll,
   handleRecordsToBeDeleted,
 }) => {
   const { collectionId, requestId } = useParams();
@@ -117,7 +116,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       };
 
       // Keeping track of selected records to auto check/uncheck select all checkbox in bulk action menu
-      let { newSelectedRecords, unselectedRecords } = updateRecordSelection(record, checked, selectedRecords);
+      let { newSelectedRecords } = updateRecordSelection(record, checked, selectedRecords);
       const totalRecordsCount = Object.keys(updatedRecords.recordsMap).length;
 
       if (record.collectionId) {
@@ -129,15 +128,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
 
       handleRecordSelection({
         contextId: context.id,
-        action: "select",
         recordIds: newSelectedRecords,
-        isAllRecordsSelected,
-      });
-
-      handleRecordSelection({
-        contextId: context.id,
-        action: "unselect",
-        recordIds: unselectedRecords,
         isAllRecordsSelected,
       });
     },
@@ -158,13 +149,15 @@ export const ContextualCollectionsList: React.FC<Props> = ({
   }, [showSelection]);
 
   useEffect(() => {
-    const result = selectAllRecords({ contextId: context?.id, searchValue });
+    if (!selectAll.takeAction) {
+      return;
+    }
 
-    if (isSelectAll) {
+    if (selectAll.value) {
+      const result = selectAllRecords({ contextId: context?.id, searchValue });
       setSelectedRecords(result);
       handleRecordSelection({
         contextId: context?.id,
-        action: "select",
         recordIds: result,
         isAllRecordsSelected: true,
       });
@@ -172,11 +165,10 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       setSelectedRecords(new Set());
       handleRecordSelection({
         contextId: context?.id,
-        action: "unselect",
-        recordIds: result,
+        recordIds: new Set(),
       });
     }
-  }, [isSelectAll, handleRecordSelection, context?.id, searchValue]);
+  }, [selectAll, handleRecordSelection, context?.id, searchValue]);
 
   return (
     <>
@@ -199,6 +191,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       recordsSelectionHandler,
                       setShowSelection: handleShowSelection,
                     }}
+                    onRequestlyExportClick={() => {}}
                     // TODO: just pass contextId
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
