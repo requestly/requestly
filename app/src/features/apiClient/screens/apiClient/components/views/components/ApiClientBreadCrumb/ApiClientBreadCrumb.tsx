@@ -19,7 +19,7 @@ interface Props {
   openInModal?: boolean;
   autoFocus?: boolean;
   name?: string;
-  OnRecordNameUpdate?: (name: string) => void;
+  onRecordNameUpdate?: (name: string) => void;
   onBlur: (name: string) => void;
   breadCrumbType: string;
 }
@@ -30,7 +30,7 @@ export const BreadcrumbType = {
 };
 
 export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
-  const { id, autoFocus, name, OnRecordNameUpdate, onBlur, breadCrumbType } = props;
+  const { id, autoFocus, name, onRecordNameUpdate, onBlur, breadCrumbType } = props;
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
@@ -69,7 +69,7 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
     <RQBreadcrumb
       placeholder={breadCrumbType === BreadcrumbType.API_REQUEST ? "Untitled request " : "New Collection"}
       recordName={name}
-      onRecordNameUpdate={OnRecordNameUpdate}
+      onRecordNameUpdate={onRecordNameUpdate}
       onBlur={onBlur}
       autoFocus={autoFocus}
       defaultBreadcrumbs={[
@@ -104,7 +104,7 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 };
 
 export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
-  const { openInModal, autoFocus, name, OnRecordNameUpdate, onBlur } = props;
+  const { openInModal, autoFocus, name, onRecordNameUpdate, onBlur } = props;
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
@@ -116,7 +116,7 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
         <RQBreadcrumb
           placeholder="Untitled request"
           recordName={name}
-          onRecordNameUpdate={OnRecordNameUpdate}
+          onRecordNameUpdate={onRecordNameUpdate}
           onBlur={onBlur}
           autoFocus={autoFocus}
           defaultBreadcrumbs={[

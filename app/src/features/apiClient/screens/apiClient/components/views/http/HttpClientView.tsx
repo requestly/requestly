@@ -780,7 +780,7 @@ const HttpClientView: React.FC<Props> = ({
               id={apiEntryDetails.id}
               openInModal={openInModal}
               name={apiEntryDetails?.name}
-              OnRecordNameUpdate={setRequestName}
+              onRecordNameUpdate={setRequestName}
               onBlur={handleRecordNameUpdate}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />

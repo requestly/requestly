@@ -479,7 +479,6 @@ const GraphQLClientView: React.FC<Props> = ({
               id={record.id}
               openInModal={openInModal}
               name={record.name}
-              OnRecordNameUpdate={() => {}}
               onBlur={(newName) => handleRecordNameUpdate(newName)}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />
