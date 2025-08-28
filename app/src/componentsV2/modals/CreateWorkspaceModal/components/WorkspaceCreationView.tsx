@@ -64,7 +64,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
         },
         dispatch,
         {
-          isSyncEnabled: user?.details?.isSyncEnabled,
+          isSyncEnabled: user.loggedIn ? user?.details?.isSyncEnabled : true,
           isWorkspaceMode: isSharedWorkspaceMode,
         },
         appMode,
@@ -79,7 +79,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
         });
       }
     },
-    [dispatch, appMode, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType]
+    [dispatch, appMode, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType, user?.loggedIn]
   );
 
   const handleDomainInvitesCreation = useCallback(
