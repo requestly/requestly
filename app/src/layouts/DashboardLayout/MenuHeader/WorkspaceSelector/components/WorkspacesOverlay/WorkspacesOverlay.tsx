@@ -182,7 +182,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
       },
       dispatch,
       {
-        isSyncEnabled: user?.details?.isSyncEnabled,
+        isSyncEnabled: workspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
         isWorkspaceMode: isSharedWorkspace,
       },
       appMode,
