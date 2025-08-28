@@ -3,15 +3,13 @@ import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { workspaceActions } from "store/slices/workspaces/slice";
 import { WorkspaceType } from "types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const useFetchLocalWorkspaces = () => {
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
@@ -55,14 +53,13 @@ export const useFetchLocalWorkspaces = () => {
 
         localRecords.push(localWorkspace);
       }
-      dispatch(workspaceActions.upsertManyWorkspaces(localRecords));
       setLocalWorkspaces(localRecords);
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
     } catch (e) {
       captureException(e);
       setLocalWorkspaces([]);
     }
-  }, [dispatch, isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
+  }, [isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
 
   useEffect(() => {
     fetchLocalWorkspaces();
