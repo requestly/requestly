@@ -1,19 +1,18 @@
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
-import firebaseApp from "../../firebase";
+import firebaseApp from "../../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { WorkspaceType } from "types";
 import * as Sentry from "@sentry/react";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { workspaceActions } from "store/slices/workspaces/slice";
+import { Workspace } from "features/workspaces/types";
+import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const db = getFirestore(firebaseApp);
 
@@ -31,20 +30,20 @@ const splitMembersBasedOnRoles = (members: any) => {
 export const useFetchTeamWorkspaces = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspace = useSelector(getActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const appMode = useSelector(getAppMode);
-  const allWorkspaces = useSelector(getAllWorkspaces);
+
+  const [sharedWorkspaces, setSharedWorkspaces] = useState<Workspace[]>([]);
 
   const unsubscribeAvailableTeams = useRef<(() => void) | null>(null);
 
   // Listens to teams available to the user
   useEffect(() => {
-    // This effect is triggered also on activeWorkspace changes, so do not subscribe again if listener is already active
+    // This effect is triggered also on activeWorkspace changes, so donot subscribe again if listener is already active
     if (unsubscribeAvailableTeams.current) {
       return;
     }
 
-    const activeWorkspaceId = activeWorkspace?.id;
     const uid = user?.details?.profile?.uid;
     if (user?.loggedIn && uid) {
       try {
@@ -91,14 +90,13 @@ export const useFetchTeamWorkspaces = () => {
                 return formattedTeamData;
               })
               .filter(Boolean);
-            dispatch(workspaceActions.upsertManyWorkspaces(records));
+            setSharedWorkspaces(records);
 
             if (!activeWorkspaceId) return;
 
             //FIX ME: the following code's intention is unclear
             //Showing an alert is unnecessary
-            const found = [...allWorkspaces, ...records].find((team) => team.id === activeWorkspaceId);
-            // concating because allWorkspaces can be stale here after dispatch (just a prevention, data isn't found to be stale), this effect needs to be refactored to fix this
+            const found = records.find((team) => team.id === activeWorkspaceId);
 
             Logger.log("DBG: availableTeamsListener", {
               teamFound: found,
@@ -124,31 +122,6 @@ export const useFetchTeamWorkspaces = () => {
               setTimeout(() => {
                 window.location.reload();
               }, 4000);
-            } else {
-              // Incase team name, members, or anything has changed
-              // No need
-              dispatch(workspaceActions.setActiveWorkspaceIds(found.id ? [found.id] : []));
-
-              // Update details of all team members
-              const functions = getFunctions();
-              const getTeamUsers = httpsCallable(functions, "teams-getTeamUsers");
-
-              getTeamUsers({
-                teamId: activeWorkspaceId,
-              })
-                .then((res) => {
-                  const response = res.data as any;
-                  if (response.success) {
-                    const users: any = {};
-                    response.users.forEach((user: any, index: number) => {
-                      users[user.id] = response.users[index];
-                    });
-                    dispatch(workspaceActions.setActiveWorkspacesMembers(users));
-                  } else {
-                    throw new Error(response.message);
-                  }
-                })
-                .catch((e) => Logger.error(e));
             }
           },
           (error) => {
@@ -161,20 +134,20 @@ export const useFetchTeamWorkspaces = () => {
         unsubscribeAvailableTeams.current = null;
       }
     } else {
-      const localWorkspaces = allWorkspaces.filter((workspace) => workspace.workspaceType === WorkspaceType.LOCAL);
-      dispatch(workspaceActions.setAllWorkspaces([]));
-      dispatch(workspaceActions.upsertManyWorkspaces(localWorkspaces));
-      // Very edge case
-      if (activeWorkspaceId && activeWorkspace?.workspaceType === WorkspaceType.SHARED) {
-        clearCurrentlyActiveWorkspace(dispatch, appMode);
-      }
+      setSharedWorkspaces([]);
     }
 
     return () => {
       unsubscribeAvailableTeams.current?.();
       unsubscribeAvailableTeams.current = null;
     };
-    // This useEffect shouldn't be triggered on any workspace change
+
+    // This effect shouldn't be triggered on change of activeWorkspaceId
+    // So we can safely ignore it in the dependency array
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appMode, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
+
+  return {
+    sharedWorkspaces,
+  };
 };
