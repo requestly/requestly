@@ -27,7 +27,7 @@ import { TeamRole } from "types";
 import { Conditional } from "components/common/Conditional";
 import { MenuHeader } from "./MenuHeader/MenuHeader";
 import { useInitPopupConfig } from "hooks/useInitPopupConfig";
-import { useWorkspaceFetcher } from "hooks/workspaceFetcher/useWorkspaceFetcher";
+import { useWorkspaceFetcher } from "features/workspaces/hooks/useWorkspaceFetcher";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();

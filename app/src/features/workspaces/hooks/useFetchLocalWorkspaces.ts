@@ -1,32 +1,34 @@
 import { captureException } from "@sentry/react";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { WorkspaceMemberRole } from "features/workspaces/types";
-import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { workspaceActions } from "store/slices/workspaces/slice";
 import { WorkspaceType } from "types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const useFetchLocalWorkspaces = () => {
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
+  const [localWorkspaces, setLocalWorkspaces] = useState<Workspace[]>([]);
+
   const fetchLocalWorkspaces = useCallback(async () => {
     if (!isLocalSyncEnabled) {
+      setLocalWorkspaces([]);
       return;
     }
 
     // TODO: uid is needed as per current implementation, to be removed when logged out support is implemented
     if (!user.loggedIn) {
+      setLocalWorkspaces([]); // TODO: to be removed when local first support is added
       return;
     }
 
     try {
-      const uid = user.details.profile.uid;
+      const uid = user.details?.profile?.uid;
 
       const allLocalWorkspacesResult = await getAllWorkspaces();
       const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
@@ -52,14 +54,17 @@ export const useFetchLocalWorkspaces = () => {
 
         localRecords.push(localWorkspace);
       }
-      dispatch(workspaceActions.upsertManyWorkspaces(localRecords));
+      setLocalWorkspaces(localRecords);
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
     } catch (e) {
       captureException(e);
+      setLocalWorkspaces([]);
     }
-  }, [dispatch, isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
+  }, [isLocalSyncEnabled, user?.details?.profile?.uid, user.loggedIn]);
 
   useEffect(() => {
     fetchLocalWorkspaces();
   }, [fetchLocalWorkspaces]);
+
+  return { localWorkspaces };
 };
