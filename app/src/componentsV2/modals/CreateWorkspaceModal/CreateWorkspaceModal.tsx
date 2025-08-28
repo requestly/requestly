@@ -24,7 +24,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
-  if (!user.loggedIn) {
+  if (!user.loggedIn && workspaceType === WorkspaceType.SHARED) {
     dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
     toggleModal();
     return null;

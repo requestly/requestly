@@ -2,10 +2,8 @@ import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getAuthInitialization } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
 import Logger from "lib/logger";
@@ -13,8 +11,6 @@ import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { workspaceActions } from "store/slices/workspaces/slice";
 import { getActiveWorkspaceId, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
@@ -27,11 +23,9 @@ const DBListeners = () => {
 
   const currentTeamMembers = useSelector(getActiveWorkspacesMembers);
   const hasAuthInitialized = useSelector(getAuthInitialization);
-  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
-  let unsubscribeAvailableTeams = useRef(null);
 
   const hasAuthStateChanged = useHasChanged(user?.loggedIn);
 
@@ -90,27 +84,6 @@ const DBListeners = () => {
     user?.details?.isSyncEnabled,
     hasAuthStateChanged,
   ]);
-
-  // Listens to teams available to the user
-  // Also listens to changes to the currently active workspace /* TODO: THIS SHOULD BE DONE IN A SEPARATE USEEFFECT */
-  useEffect(() => {
-    if (unsubscribeAvailableTeams.current) unsubscribeAvailableTeams.current(); // Unsubscribe any existing listener
-    if (user?.loggedIn && user?.details?.profile?.uid) {
-      unsubscribeAvailableTeams.current = availableTeamsListener(
-        dispatch,
-        user?.details?.profile?.uid,
-        activeWorkspaceId,
-        appMode,
-        isLocalSyncEnabled
-      );
-    } else {
-      dispatch(workspaceActions.setAllWorkspaces([]));
-      // Very edge case
-      if (activeWorkspaceId) {
-        clearCurrentlyActiveWorkspace(dispatch, appMode);
-      }
-    }
-  }, [appMode, activeWorkspaceId, dispatch, user?.details?.profile?.uid, user?.loggedIn, isLocalSyncEnabled]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {

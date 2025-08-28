@@ -33,13 +33,16 @@ export const switchWorkspace = async (
   setLoader,
   source
 ) => {
-  const { teamId, teamName, teamMembersCount, workspaceType } = newWorkspaceDetails;
+  const { teamId } = newWorkspaceDetails;
 
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
+
+    // isWorkspaceMode - true implies user is working on a team workspace - local or shared
+    // false implies user is working on a private workspace
     if (!isWorkspaceMode) {
       // User is currently on private workspace
       if (!isSyncEnabled) {

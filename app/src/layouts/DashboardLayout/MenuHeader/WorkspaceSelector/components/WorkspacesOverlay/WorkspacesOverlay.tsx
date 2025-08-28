@@ -25,6 +25,7 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
 import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
 import "./workspacesOverlay.scss";
+import { isSharedWorkspace } from "features/workspaces/utils";
 
 interface WorkspacesOverlayProps {
   toggleDropdown: () => void;
@@ -59,8 +60,6 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
   toggleDropdown,
   onItemClick,
 }: WorkspaceListSectionProps) => {
-  const dispatch = useDispatch();
-
   if (!workspaces.length) {
     return <EmptyWorkspaceListSection workspaceType={workspaceType} toggleDropdown={toggleDropdown} />;
   }
@@ -72,17 +71,6 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
         type={workspaceType}
         toggleDropdown={toggleDropdown}
         onItemClick={onItemClick}
-        onAddWorkspaceClick={() => {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "createWorkspaceModal",
-              newValue: true,
-              newProps: {
-                workspaceType,
-              },
-            })
-          );
-        }}
       />{" "}
     </div>
   );
@@ -194,7 +182,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
       dispatch,
       {
         isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode: workspace.workspaceType === WorkspaceType.SHARED,
+        isWorkspaceMode: isSharedWorkspace,
       },
       appMode,
       undefined,
