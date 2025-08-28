@@ -20,12 +20,6 @@ import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "store/slices/global/slice";
-import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
-import { getIsMiscTourCompleted } from "store/selectors";
 
 interface Props {}
 
@@ -42,9 +36,6 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useDispatch();
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const [showRuntimeVarTour, setShowRuntimeVarTour] = useState(false);
 
   const {
     history,
@@ -169,18 +160,12 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
       key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
       label: (
         <>
-          <Tooltip title={!showRuntimeVarTour ? "Runtime variables" : null} placement="right">
+          <Tooltip title="Runtime variables" placement="right">
             <div
-              data-tour-id={MISC_TOURS.RUNTIME_VARIABLES.FIRST_TIME_RUNTIME_VARIABLES}
               onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
               className={`api-client-tab-link ${
                 activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""
               }`}
-              onMouseEnter={() => {
-                if (!isMiscTourCompleted?.[SUB_TOUR_TYPES.RUNTIME_VARIABLES]) {
-                  setShowRuntimeVarTour(true);
-                }
-              }}
             >
               <MdOutlineSpaceDashboard />
             </div>
@@ -249,19 +234,6 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
 
   return (
     <>
-      <ProductWalkthrough
-        completeTourOnUnmount={false}
-        startWalkthrough={showRuntimeVarTour}
-        tourFor={MISC_TOURS.RUNTIME_VARIABLES.FIRST_TIME_RUNTIME_VARIABLES}
-        onTourComplete={() => {
-          dispatch(
-            globalActions.updateProductTourCompleted({
-              tour: TOUR_TYPES.MISCELLANEOUS,
-              subTour: SUB_TOUR_TYPES.RUNTIME_VARIABLES,
-            })
-          );
-        }}
-      />
       <div className="api-client-sidebar">
         <div className="api-client-sidebar-content">
           <ApiClientSidebarHeader
