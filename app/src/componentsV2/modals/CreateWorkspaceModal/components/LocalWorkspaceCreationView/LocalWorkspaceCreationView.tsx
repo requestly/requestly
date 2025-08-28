@@ -8,10 +8,10 @@ import { displayFolderSelector } from "components/mode-specific/desktop/misc/Fil
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
 import Logger from "lib/logger";
 import { RQButton } from "lib/design-system-v2/components";
-import "./localWorkspaceCreationView.scss";
 import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
 import { WorkspaceType } from "types";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import "./localWorkspaceCreationView.scss";
 
 interface FolderItem {
   name: string;
@@ -62,7 +62,9 @@ export const LocalWorkspaceCreationView = ({
           folderPath,
         }
       );
-      setFolderPreview(result);
+      if (result.success) {
+        setFolderPreview(result);
+      }
     } catch (err) {
       Logger.log("Could not get workspace folder preview data", err);
       // No OP
@@ -77,12 +79,28 @@ export const LocalWorkspaceCreationView = ({
     });
   };
 
+  const renderPreviewItems = (items: FolderItem[], isNewAddition = false) => {
+    return items.map((item) => (
+      <div key={item.path}>
+        <PreviewItem item={item} isNewWorkspace={isNewAddition} />
+        {item.contents && item.contents.length > 0 && (
+          <div className="workspace-folder-preview-content preview-folder-items">
+            {renderPreviewItems(item.contents)}
+          </div>
+        )}
+      </div>
+    ));
+  };
+
   useEffect(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("get-workspace-folder-preview", {
       folderPath: "",
     })
       .then((result: FolderPreviewResult) => {
-        setFolderPreview(result);
+        if (result.success) {
+          setFolderPreview(result);
+          setFolderPath(result.folderPath);
+        }
       })
       .catch((err: unknown) => {
         Logger.log("Could not get workspace folder preview data", err);
@@ -143,15 +161,12 @@ export const LocalWorkspaceCreationView = ({
                     isNewWorkspace={true}
                   />
                   <div className="workspace-folder-preview-content preview-folder-items">
-                    {folderPreview.newAdditions.contents?.map((item) => (
-                      <PreviewItem key={item.path} item={item} isNewWorkspace={true} />
-                    ))}
+                    {folderPreview.newAdditions.contents &&
+                      renderPreviewItems(folderPreview.newAdditions.contents, true)}
                   </div>
                 </div>
                 <div className="preview-folder-items existing-contents-section">
-                  {folderPreview.existingContents.map((item) => (
-                    <PreviewItem key={item.path} item={item} />
-                  ))}
+                  {renderPreviewItems(folderPreview.existingContents)}
                 </div>
               </div>
             </>
