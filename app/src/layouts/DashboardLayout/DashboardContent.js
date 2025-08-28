@@ -27,6 +27,8 @@ import { RequestBot } from "features/requestBot";
 import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DesktopOnboardingModal } from "features/onboarding/componentsV2/DesktopOnboardingModal/DesktopOnboardingModal";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -177,7 +179,7 @@ const DashboardContent = () => {
             />
           ) : null}
           {!isOnboardingCompleted ? (
-            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.LOCAL_FIRST_DESKTOP_APP) ? (
               <DesktopOnboardingModal />
             ) : (
               <OnboardingModal />

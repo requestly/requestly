@@ -19,7 +19,7 @@ type FolderItem = {
 } & (
   | {
       type: "directory";
-      contents?: FolderItem[];
+      contents: FolderItem[];
     }
   | { type: "file" }
 );
@@ -87,7 +87,7 @@ export const LocalWorkspaceCreationView = ({
     return items.map((item) => (
       <div key={item.path}>
         <PreviewItem item={item} isNewWorkspace={isNewAddition} />
-        {item.type === "directory" && item.contents && item.contents.length > 0 && (
+        {item.type === "directory" && item.contents.length > 0 && (
           <div className="workspace-folder-preview-content preview-folder-items">
             {renderPreviewItems(item.contents)}
           </div>
@@ -161,12 +161,16 @@ export const LocalWorkspaceCreationView = ({
                     <MdOutlineInfo className="preview-info-icon" />
                   </Tooltip>
                   <PreviewItem
-                    item={{ name: workspaceName || "{{Your workspace name}}", path: folderPath, type: "directory" }}
+                    item={{
+                      name: workspaceName || "{{Your workspace name}}",
+                      path: folderPath,
+                      type: "directory",
+                      contents: [],
+                    }}
                     isNewWorkspace={true}
                   />
                   <div className="workspace-folder-preview-content preview-folder-items">
                     {folderPreview.newAdditions.type === "directory" &&
-                      folderPreview.newAdditions.contents &&
                       renderPreviewItems(folderPreview.newAdditions.contents, true)}
                   </div>
                 </div>
