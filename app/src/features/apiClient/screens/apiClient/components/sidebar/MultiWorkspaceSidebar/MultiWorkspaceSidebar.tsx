@@ -15,12 +15,8 @@ import { getEmptyApiEntry } from "../../../utils";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import "./multiWorkspaceSidebar.scss";
-import { MISC_TOURS } from "components/misc/ProductWalkthrough/constants";
-import { SUB_TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
-import { useSelector } from "react-redux";
-import { getIsMiscTourCompleted } from "store/selectors";
 import { MultiWorkspaceErrorFilesList } from "./MultiWorkspaceErrorFilesList/MultiWorkspaceErrorFilesList";
 
 export enum ApiClientSidebarTabKey {
@@ -36,8 +32,6 @@ export const MultiWorkspaceSidebar: React.FC = () => {
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
   const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const [showRuntimeVarTour, setShowRuntimeVarTour] = useState(false);
 
   const {
     history,
@@ -142,18 +136,12 @@ export const MultiWorkspaceSidebar: React.FC = () => {
       key: ApiClientSidebarTabKey.RUNTIME_VARIABLES,
       label: (
         <>
-          <Tooltip title={!showRuntimeVarTour ? "Runtime variables" : null} placement="right">
+          <Tooltip title="Runtime variables" placement="right">
             <div
-              data-tour-id={MISC_TOURS.RUNTIME_VARIABLES.FIRST_TIME_RUNTIME_VARIABLES}
               onClick={() => setActiveKey(ApiClientSidebarTabKey.RUNTIME_VARIABLES)}
               className={`api-client-tab-link ${
                 activeKey === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? "active" : ""
               }`}
-              onMouseEnter={() => {
-                if (!isMiscTourCompleted?.[SUB_TOUR_TYPES.RUNTIME_VARIABLES]) {
-                  setShowRuntimeVarTour(true);
-                }
-              }}
             >
               <MdOutlineSpaceDashboard />
             </div>
