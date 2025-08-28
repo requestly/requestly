@@ -1,9 +1,7 @@
-import { notification, Result, Tabs } from "antd";
-import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { notification, Result, Tabs } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import PATHS from "config/constants/sub/paths";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { useGenericState } from "hooks/useGenericState";
@@ -16,6 +14,7 @@ import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -154,19 +153,13 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       ) : (
         <>
           <div className="collection-view-breadcrumb-container">
-            <RQBreadcrumb
+            <ApiClientBreadCrumb
+              id={collection.id}
               placeholder="New Collection"
-              recordName={collectionName}
+              name={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
               autoFocus={isNewCollection}
-              defaultBreadcrumbs={[
-                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-                {
-                  isEditable: true,
-                  pathname: window.location.pathname,
-                  label: collectionName,
-                },
-              ]}
+              breadCrumbType={BreadcrumbType.COLLECTION}
             />
           </div>
           <div className="collection-view-content">

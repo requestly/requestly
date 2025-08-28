@@ -42,7 +42,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   disabled = false,
   recordName,
   placeholder,
-  onRecordNameUpdate,
+  onRecordNameUpdate = () => {},
   autoFocus = false,
   defaultBreadcrumbs = [],
 }) => {
