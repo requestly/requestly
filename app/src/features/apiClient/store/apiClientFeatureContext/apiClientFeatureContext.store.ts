@@ -58,7 +58,7 @@ function createApiClientFeatureContextProviderStore() {
         const context = contexts.get(id);
 
         if (!context) {
-          throw new NativeError("Context not found!").addContext({ contextId: id });
+          return;
         }
 
         contexts.delete(id);
