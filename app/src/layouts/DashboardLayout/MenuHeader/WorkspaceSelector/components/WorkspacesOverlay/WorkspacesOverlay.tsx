@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { WorkspaceItem } from "./components/WorkspaceListItem/WorkspaceListItem";
 import { Invite, WorkspaceType } from "types";
 import { Divider, Modal } from "antd";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import { WorkspaceList } from "./components/WorkspaceList/WorkspaceList";
 import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
@@ -24,7 +24,6 @@ import PATHS from "config/constants/sub/paths";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
 import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
-import { isSharedWorkspace } from "features/workspaces/utils";
 import "./workspacesOverlay.scss";
 
 interface WorkspacesOverlayProps {
@@ -82,6 +81,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const isSharedWorkspace = useSelector(isActiveWorkspaceShared);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const { pathname } = useLocation();
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);

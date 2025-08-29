@@ -2,10 +2,10 @@ import React from "react";
 import { Button } from "antd";
 import RQOnlyLogo from "/assets/media/common/RQ-only-logo.svg";
 import { WelcomeCardOption } from "../WelcomeCardOption/WelcomeCardOption";
-import { OnboardingStep } from "../../DesktopOnboardingModal";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { trackDesktopOnboardingFeatureSelected, trackDesktopOnboardingStepSkipped } from "../../analytics";
+import { OnboardingStep } from "../../types";
 
 interface Props {
   onFeatureClick: (step: OnboardingStep) => void;
