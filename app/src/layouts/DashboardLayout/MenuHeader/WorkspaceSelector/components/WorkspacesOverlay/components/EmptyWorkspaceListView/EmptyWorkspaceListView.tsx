@@ -35,6 +35,7 @@ export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ work
                   newValue: true,
                   newProps: {
                     workspaceType,
+                    source: "workspace_dropdown",
                   },
                 })
               );

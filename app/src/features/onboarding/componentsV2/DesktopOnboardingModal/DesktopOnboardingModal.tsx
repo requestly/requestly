@@ -9,27 +9,32 @@ import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import "./desktopOnboardingModal.scss";
+import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
 
 export const DesktopOnboardingCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return <div className={`rq-desktop-onboarding-modal-content__card ${className}`}>{children}</div>;
 };
 
 export enum OnboardingStep {
-  WELCOME = "welcome",
-  API_CLIENT = "api-client",
+  FEATURE_SELECTION = "feature_selection",
+  FOLDER_SELECTION = "folder_selection",
   AUTH = "auth",
 }
 
 export const DesktopOnboardingModal = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(OnboardingStep.WELCOME);
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(OnboardingStep.FEATURE_SELECTION);
 
   useEffect(() => {
     if (user.loggedIn) {
       dispatch(globalActions.updateIsOnboardingCompleted(true));
     }
   }, [dispatch, user.loggedIn]);
+
+  useEffect(() => {
+    trackDesktopOnboardingViewed(onboardingStep);
+  }, [onboardingStep]);
   return (
     <Modal
       open={true}
@@ -39,30 +44,34 @@ export const DesktopOnboardingModal = () => {
       className="rq-desktop-onboarding-modal"
     >
       <div className="rq-desktop-onboarding-modal-content">
-        {onboardingStep === OnboardingStep.WELCOME ? (
+        {onboardingStep === OnboardingStep.FEATURE_SELECTION ? (
           <DesktopOnboardingCard className="welcome-card">
             <WelcomeCard onFeatureClick={(step: OnboardingStep) => setOnboardingStep(step)} />
           </DesktopOnboardingCard>
-        ) : onboardingStep === OnboardingStep.API_CLIENT ? (
+        ) : onboardingStep === OnboardingStep.FOLDER_SELECTION ? (
           <DesktopOnboardingCard className="local-workspace-card">
             <div className="rq-desktop-onboarding-modal-content__local-workspace-card-header">
-              <IoMdArrowBack onClick={() => setOnboardingStep(OnboardingStep.WELCOME)} /> Create a new local workspace
+              <IoMdArrowBack onClick={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)} /> Create a new local
+              workspace
             </div>
             <WorkspaceCreationView
               workspaceType={WorkspaceType.LOCAL}
-              onCancel={() => setOnboardingStep(OnboardingStep.WELCOME)}
+              onCancel={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)}
               callback={() => dispatch(globalActions.updateIsOnboardingCompleted(true))}
             />
           </DesktopOnboardingCard>
         ) : onboardingStep === OnboardingStep.AUTH ? (
           <>
             <DesktopOnboardingCard className="auth-card">
-              <AuthCard onBackClick={() => setOnboardingStep(OnboardingStep.WELCOME)} />
+              <AuthCard onBackClick={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)} />
             </DesktopOnboardingCard>
             <Button
               type="link"
               className="skip-desktop-onboarding"
-              onClick={() => dispatch(globalActions.updateIsOnboardingCompleted(true))}
+              onClick={() => {
+                trackDesktopOnboardingStepSkipped(OnboardingStep.AUTH);
+                dispatch(globalActions.updateIsOnboardingCompleted(true));
+              }}
             >
               Continue without sign in
             </Button>

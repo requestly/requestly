@@ -22,6 +22,7 @@ export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown
         newValue: true,
         newProps: {
           workspaceType: type,
+          source: "workspace_dropdown",
         },
       })
     );
