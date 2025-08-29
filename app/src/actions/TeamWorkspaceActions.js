@@ -34,7 +34,7 @@ export const switchWorkspace = async (
   setLoader,
   source
 ) => {
-  const { teamId, teamName, teamMembersCount, workspaceType } = newWorkspaceDetails;
+  const { teamId } = newWorkspaceDetails;
 
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
