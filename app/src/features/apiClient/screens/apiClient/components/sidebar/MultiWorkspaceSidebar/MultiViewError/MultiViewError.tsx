@@ -1,7 +1,7 @@
 import React from "react";
-import "./ErrorInSidePanel.scss";
+import "./multiViewError.scss";
 
-export const ErrorInSidePanel: React.FC = () => {
+export const MultiViewError: React.FC = () => {
   return (
     <div className="error-in-side-panel-container">
       <div className="error-in-side-panel-icon">
