@@ -20,6 +20,7 @@ export enum BANNER_ACTIONS {
   SEE_PLANS = "see_plans",
   REDIRECT_TO_CHROME_STORE_REVIEWS = "redirect_to_chrome_store_reviews",
   REDIRECT_TO_LINKEDIN_FORM = "redirect_to_linkedin_form",
+  REDIRECT_TO_NOTION_PAGE = "redirect_to_notion_page",
 }
 
 export enum BANNER_ID {
