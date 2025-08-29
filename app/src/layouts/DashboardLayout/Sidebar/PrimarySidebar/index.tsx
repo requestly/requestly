@@ -107,11 +107,12 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         tooltipContent: (
           <>
-            Files are not available in local workspaces yet. Switch to a private or team workspace to access them.
+            Quickly upload JSON, JS, or CSS files and serve them as mock API endpoints to test your frontend without any
+            backend changes.
             <br />
             <br />
-            It's a powerful tool to modify & mock API responses, allowing you to build frontend faster without waiting
-            for backend.
+            File Server is not available in local workspaces yet. Switch to a private or team workspace to access the
+            feature.
           </>
         ),
         disabled: isLocalSyncEnabled,

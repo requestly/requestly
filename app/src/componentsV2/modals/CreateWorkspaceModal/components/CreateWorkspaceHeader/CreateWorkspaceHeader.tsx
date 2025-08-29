@@ -1,5 +1,5 @@
-import React from "react";
-import { Input } from "antd";
+import React, { useEffect, useRef } from "react";
+import { Input, InputRef } from "antd";
 import "./createWorkspaceHeader.scss";
 
 interface CreateWorkspaceHeaderProps {
@@ -13,6 +13,14 @@ export const CreateWorkspaceHeader: React.FC<CreateWorkspaceHeaderProps> = ({
   description,
   onWorkspaceNameChange,
 }) => {
+  const inputRef = useRef<InputRef>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className="create-workspace-header">
       <div className="create-workspace-header__title">{title}</div>
@@ -21,6 +29,8 @@ export const CreateWorkspaceHeader: React.FC<CreateWorkspaceHeaderProps> = ({
         Workspace name
       </label>
       <Input
+        ref={inputRef}
+        autoFocus
         id="workspace-name"
         className="create-workspace-header__input"
         onChange={(e) => onWorkspaceNameChange(e.target.value)}

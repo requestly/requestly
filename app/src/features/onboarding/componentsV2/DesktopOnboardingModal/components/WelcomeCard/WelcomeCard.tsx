@@ -33,7 +33,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
           }}
         />
         <WelcomeCardOption
-          title="Intercept and modify web traffic"
+          title="Intercept and Modify Web Traffic"
           description="Capture and modify requests, responses, headers, and scripts in real time."
           iconSrc={"/assets/media/rules/rules-icon.svg"}
           onClick={() => {
