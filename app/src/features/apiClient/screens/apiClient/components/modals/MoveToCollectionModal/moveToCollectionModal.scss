@@ -12,12 +12,15 @@
       color: var(--requestly-color-default);
       font-size: var(--requestly-font-size-sm);
     }
+
+    .select-workspace-group__placeholder {
+      font-size: var(--requestly-font-size-sm);
+    }
   }
 }
 
 .select-collection-group {
   .select-collection-group__control {
-    background-color: inherit;
     border-color: var(--requestly-color-white-t-10);
 
     &:hover {
@@ -34,6 +37,10 @@
       color: var(--requestly-color-default);
       font-size: var(--requestly-font-size-sm);
     }
+
+    .select-collection-group__placeholder {
+      font-size: var(--requestly-font-size-sm);
+    }
   }
 }
 
@@ -41,6 +48,10 @@
 .select-collection-group .select-collection-group__option {
   color: var(--requestly-color-default);
   font-size: var(--requestly-font-size-sm);
+
+  &:active {
+    background-color: #ffffff19;
+  }
 }
 
 .move-to-collection-modal {
