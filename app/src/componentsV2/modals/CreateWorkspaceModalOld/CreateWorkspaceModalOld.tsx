@@ -67,7 +67,7 @@ export const CreateWorkspaceModalOld: React.FC<Props> = ({ isOpen, defaultWorksp
         },
         dispatch,
         {
-          isSyncEnabled: user?.details?.isSyncEnabled,
+          isSyncEnabled: workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
           isWorkspaceMode: isSharedWorkspaceMode,
         },
         appMode,
