@@ -55,11 +55,13 @@
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
     max-height: 498px;
-    overflow: scroll;
+    overflow-y: auto;
+    padding-left: 4px;
+    padding-right: 4px;
 
     li.ant-dropdown-menu-item {
       padding: 0;
-      margin-right: 0;
+      margin: 0;
 
       .ant-dropdown-menu-title-content {
         width: 100%;
@@ -86,8 +88,10 @@
       }
     }
 
-    .ant-dropdown-menu-item:not(:first-child) {
-      margin-top: 8px;
+    .ant-dropdown-menu-item {
+      &:not(:first-child) {
+        margin-top: 4px;
+      }
     }
   }
 }
