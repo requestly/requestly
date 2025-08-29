@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
@@ -27,7 +27,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const collectionRecordState = collectionRecord.getState() as CollectionRecordState;
 
   const variablesMap = useVariableStore(collectionRecordState.collectionVariables);
-  const variables = Object.fromEntries(variablesMap.data);
+  const variables = useMemo(() => Object.fromEntries(variablesMap.data), [variablesMap]);
 
   const {
     api: { setCollectionVariables },
