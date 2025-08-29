@@ -127,7 +127,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
           key={workspaceId}
           className="workspace-collapse-panel"
           header={
-            <div className="workspace-header-continer">
+            <div className="workspace-header-container">
               <div className="workspace-name-container">
                 <Typography.Text
                   ellipsis={{
