@@ -1,13 +1,13 @@
 import { SyncOutlined } from "@ant-design/icons";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Button } from "antd";
-import { WorkspaceType } from "features/workspaces/types";
 import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/WorkspaceSelector";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isTeamArchived = false }) => {
   const dispatch = useDispatch();
