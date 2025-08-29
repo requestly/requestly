@@ -87,10 +87,22 @@ const ShareWorkspaceActions = ({
   );
 };
 
-const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Workspace; toggleDropdown: () => void }) => {
+const LocalWorkspaceActions = ({
+  workspace,
+  toggleDropdown,
+  switchWorkspace,
+}: {
+  workspace: Workspace;
+  toggleDropdown: () => void;
+  switchWorkspace: () => void;
+}) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const [isSelected, selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.isSelected, s.selectedWorkspaces]);
+  const [isSelected, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
+    s.isSelected,
+    s.getViewMode,
+    s.getAllSelectedWorkspaces,
+  ]);
 
   const handleMultiworkspaceAdder = useCallback(
     async (isChecked: boolean) => {
@@ -99,14 +111,19 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
           await addWorkspaceToView(workspace, user.details?.profile?.uid);
           trackMultiWorkspaceSelected("workspace_selector_dropdown");
         } else {
-          removeWorkspaceFromView(workspace.id);
+          if (getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1) {
+            switchWorkspace();
+          } else {
+            removeWorkspaceFromView(workspace.id);
+          }
+
           trackMultiWorkspaceDeselected("workspace_selector_dropdown");
         }
       } catch (e) {
         toast.error(e.message);
       }
     },
-    [user.details?.profile?.uid, workspace]
+    [workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
   );
 
   return (
@@ -128,7 +145,6 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
       <div className="local-workspace-actions__checkbox-btn">
         <Checkbox
           onClick={(e) => e.stopPropagation()}
-          disabled={isSelected(workspace.id) && selectedWorkspaces.length === 1}
           onChange={(e) => {
             handleMultiworkspaceAdder(e.target.checked);
           }}
@@ -140,6 +156,8 @@ const LocalWorkspaceActions = ({ workspace, toggleDropdown }: { workspace: Works
 };
 
 export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
+  const { onClick, toggleDropdown } = props;
+
   const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
   const getWorkspaceDetails = (workspace: Workspace) => {
@@ -154,10 +172,10 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
     }
   };
 
-  const handleWorkspaceClick = () => {
-    props.onClick();
-    props.toggleDropdown();
-  };
+  const handleWorkspaceClick = useCallback(() => {
+    onClick();
+    toggleDropdown();
+  }, [onClick, toggleDropdown]);
 
   if (props.type === WorkspaceType.PERSONAL) {
     return (
@@ -211,7 +229,11 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
         {props.type === WorkspaceType.SHARED ? (
           <ShareWorkspaceActions workspaceId={workspace.id} toggleDropdown={props.toggleDropdown} />
         ) : props.type === WorkspaceType.LOCAL ? (
-          <LocalWorkspaceActions workspace={workspace} toggleDropdown={props.toggleDropdown} />
+          <LocalWorkspaceActions
+            workspace={workspace}
+            toggleDropdown={props.toggleDropdown}
+            switchWorkspace={handleWorkspaceClick}
+          />
         ) : null}
       </div>
     </div>
