@@ -104,19 +104,29 @@
     }
   }
 
-  .ant-collapse-content {
-    .ant-collapse-content-box {
-      padding-top: 0;
+  .ant-collapse-item {
+    .ant-collapse-content {
+      .ant-collapse-content-box {
+        margin-left: 6px;
+        padding-left: 6px;
+        padding-top: 0;
+        padding-bottom: 0;
+        border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
 
-      margin-left: 6px;
-      padding: 2px 0px 0px 6px;
-      border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
-
-      .collections-list-container {
-        padding: 0;
-
-        .collections-list-content {
+        .collections-list-container {
           padding: 0;
+
+          .collections-list-content {
+            padding: 0;
+          }
+        }
+
+        .environments-list-container {
+          padding: 0;
+
+          .environments-list {
+            padding: 0;
+          }
         }
       }
     }

@@ -64,7 +64,7 @@
       }
 
       &:not(:first-child) {
-        margin-top: var(--space-4, 8px);
+        margin-top: 4px;
       }
 
       &.active {
