@@ -34,7 +34,7 @@ export const WorkspaceProvider: React.FC<{
   if (state.loading) {
     return (
       <div className="workspace-loader-container">
-        <Skeleton paragraph={{ rows: 6 }} title={false} />
+        <Skeleton paragraph={{ rows: 5 }} title={false} />
       </div>
     );
   }

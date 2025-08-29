@@ -1,8 +1,11 @@
 .workspace-loader-container {
   padding: 8px;
 
-  li {
-    width: 100% !important;
-    height: 8px;
+  .ant-skeleton {
+    li {
+      width: 100% !important;
+      height: 12px;
+      margin-top: 8px;
+    }
   }
 }
