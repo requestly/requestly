@@ -10,7 +10,7 @@ import { globalActions } from "store/slices/global/slice";
 import { useDispatch } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 
-export const LoggedOutPopoverContent = () => {
+export const LoggedOutPopoverContent = ({ onAuthButtonClick }: { onAuthButtonClick: () => void }) => {
   const dispatch = useDispatch();
 
   const handleAuthButtonClick = (authMode: string) => {
@@ -43,6 +43,7 @@ export const LoggedOutPopoverContent = () => {
           onClick={() => {
             handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
             trackSignUpButtonClicked(SOURCE.NAVBAR);
+            onAuthButtonClick();
           }}
         >
           Sign up
@@ -54,6 +55,7 @@ export const LoggedOutPopoverContent = () => {
           onClick={() => {
             handleAuthButtonClick(APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN);
             trackLoginButtonClicked(SOURCE.NAVBAR);
+            onAuthButtonClick();
           }}
         >
           Sign in

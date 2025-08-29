@@ -56,7 +56,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
 
   return (
     <Modal
-      width={workspaceType === WorkspaceType.SHARED ? 480 : 560}
+      width={480}
       open={isOpen}
       onCancel={toggleModal}
       className="custom-rq-modal create-workspace-modal"
