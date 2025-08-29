@@ -44,6 +44,9 @@ const PreviewItem = ({ item, isNewWorkspace = false }: { item: FolderItem; isNew
   );
 };
 
+// eslint-disable-next-line no-control-regex
+const INVALID_FS_NAME_CHARACTERS = /[<>:"/\\|?*\x00-\x1f]/g;
+
 export const LocalWorkspaceCreationView = ({
   onCreateWorkspaceClick,
   isLoading,
@@ -117,7 +120,9 @@ export const LocalWorkspaceCreationView = ({
       <CreateWorkspaceHeader
         title="Create a new local workspace"
         description=""
-        onWorkspaceNameChange={setWorkspaceName}
+        onWorkspaceNameChange={(value) => {
+          setWorkspaceName(value.replace(INVALID_FS_NAME_CHARACTERS, "-"));
+        }}
       />
       <div className="workspace-folder-selector">
         <RQButton icon={<MdOutlineFolder />} onClick={() => displayFolderSelector(folderSelectCallback)}>
