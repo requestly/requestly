@@ -1,11 +1,31 @@
 import React, { useCallback, useState } from "react";
 import { ErrorFilesList } from "../../components/ErrorFilesList/ErrorFileslist";
-import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import {
+  useApiClientMultiWorkspaceView,
+  useWorkspace,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import { Collapse } from "antd";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
 import "./multiWorkspaceErrorFilesList.scss";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
+
+const WorkspaceErrorFilesList: React.FC<{ workspaceId: string; handleErrorRecordsCount: (v: number) => void }> = ({
+  workspaceId,
+  handleErrorRecordsCount,
+}) => {
+  const workspace = useWorkspace(workspaceId, (s) => s);
+
+  if (workspace.state.loading || workspace.state.errored) {
+    return null;
+  }
+
+  return (
+    <WorkspaceProvider key={workspaceId} workspaceId={workspaceId} collapsible={false}>
+      <ErrorFilesList updateErrorRecordsCount={handleErrorRecordsCount} />
+    </WorkspaceProvider>
+  );
+};
 
 export const MultiWorkspaceErrorFilesList: React.FC = () => {
   const selectedWorkspaces = useApiClientMultiWorkspaceView((s) => s.selectedWorkspaces);
@@ -39,19 +59,14 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
             </div>
           }
         >
-          {selectedWorkspaces
-            .filter((workspace) => {
-              return !workspace.getState().state.errored; // skip errored workspaces
-            })
-            .map((workspace) => {
-              const workspaceId = workspace.getState().id;
-
-              return (
-                <WorkspaceProvider key={workspaceId} workspaceId={workspaceId} collapsible={false}>
-                  <ErrorFilesList updateErrorRecordsCount={handleErrorRecordsCount} />
-                </WorkspaceProvider>
-              );
-            })}
+          {selectedWorkspaces.map((workspace) => {
+            return (
+              <WorkspaceErrorFilesList
+                workspaceId={workspace.getState().id}
+                handleErrorRecordsCount={handleErrorRecordsCount}
+              />
+            );
+          })}
         </Collapse.Panel>
       </Collapse>
     </div>
