@@ -101,5 +101,6 @@ FEATURES.COMPATIBLE_DESKTOP_APP = "compatible_desktop_app";
 FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
 
 FEATURES.GRAPHQL_SUPPORT = "graphql_support";
+FEATURES.LOCAL_FIRST_DESKTOP_APP = "local_first_desktop_app";
 
 export default FEATURES;

@@ -1,4 +1,4 @@
-import { WorkspaceMemberRole } from "features/workspaces/types";
+import { WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
@@ -13,6 +13,10 @@ export const useCurrentWorkspaceUserRole = (): { role: WorkspaceMemberRole | und
 
   // Private workspace
   if (!activeWorkspace?.id) {
+    return { role: WorkspaceMemberRole.admin };
+  }
+
+  if (activeWorkspace?.workspaceType === WorkspaceType.LOCAL) {
     return { role: WorkspaceMemberRole.admin };
   }
 

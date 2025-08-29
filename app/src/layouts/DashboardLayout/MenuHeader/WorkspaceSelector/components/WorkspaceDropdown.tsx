@@ -1,14 +1,12 @@
 import { DownOutlined } from "@ant-design/icons";
 import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
 import { Dropdown, Tooltip } from "antd";
-import APP_CONSTANTS from "config/constants";
 import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Invite, WorkspaceType } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -28,19 +26,14 @@ const prettifyWorkspaceName = (workspaceName: string) => {
 
 const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
-  const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
+  const isActiveWorkspaceNotPrivate = useSelector(isActiveWorkspaceShared);
 
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeWorkspaceName = user.loggedIn
-    ? isSharedWorkspaceMode
-      ? activeWorkspace?.name
-      : APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-    : "Workspaces";
+  const activeWorkspaceName = isActiveWorkspaceNotPrivate ? activeWorkspace?.name : "Workspaces";
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
@@ -97,8 +90,8 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
                         size={28}
                         workspace={{
                           ...activeWorkspace,
-                          name: user.loggedIn ? activeWorkspaceName : null,
-                          workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+                          name: activeWorkspaceName ?? null,
+                          workspaceType: activeWorkspace?.workspaceType ?? null,
                         }}
                       />
                     </>
@@ -107,8 +100,8 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
                       size={28}
                       workspace={{
                         ...activeWorkspace,
-                        name: user.loggedIn ? activeWorkspaceName : null,
-                        workspaceType: user.loggedIn ? activeWorkspace?.workspaceType : null,
+                        name: activeWorkspaceName ?? null,
+                        workspaceType: activeWorkspace?.workspaceType ?? null,
                       }}
                     />
                   )}
