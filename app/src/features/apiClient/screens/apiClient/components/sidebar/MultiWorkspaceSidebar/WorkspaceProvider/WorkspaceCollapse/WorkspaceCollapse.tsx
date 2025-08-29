@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
@@ -29,13 +29,7 @@ import { RQAPI } from "features/apiClient/types";
 import { ApiClientSidebarTabKey } from "../../MultiWorkspaceSidebar";
 import { trackManageWorkspaceClicked, trackMultiWorkspaceDeselected } from "modules/analytics/events/common/teams";
 import LoadingModal from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/components/LoadingModal";
-import { Workspace, WorkspaceType } from "features/workspaces/types";
-import { useDispatch, useSelector } from "react-redux";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { toast } from "utils/Toast";
-import { showSwitchWorkspaceSuccessToast, switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAppMode } from "store/selectors";
+import { useWorkspaceSwitcher } from "../useWorkspaceSwitcher";
 
 interface WorkspaceCollapseProps {
   workspaceId: string;
@@ -54,11 +48,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
   expanded = false,
   showNewRecordBtn = true,
 }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
-  const activeWorkspace = useSelector(getActiveWorkspace);
 
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
@@ -69,55 +59,15 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
     s.getAllSelectedWorkspaces,
   ]);
 
+  const {
+    handleWorkspaceSwitch,
+    confirmWorkspaceSwitch,
+    isWorkspaceLoading,
+    setIsWorkspaceLoading,
+  } = useWorkspaceSwitcher();
+
   const { onNewClickV2 } = useApiClientContext();
   const contextId = useContextId();
-
-  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
-
-  const handleWorkspaceSwitch = useCallback(
-    async (workspace: Workspace) => {
-      const viewMode = getViewMode();
-
-      if (viewMode === ApiClientViewMode.SINGLE) {
-        if (activeWorkspace?.id === workspace.id) {
-          toast.info("Workspace already selected!");
-          return;
-        }
-      }
-
-      setIsLoadingModalOpen(true);
-      switchWorkspace(
-        {
-          teamId: workspace.id,
-          teamName: workspace.name,
-          teamMembersCount: workspace.accessCount,
-          workspaceType: workspace.workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode: workspace.workspaceType === WorkspaceType.SHARED,
-        },
-        appMode,
-        undefined,
-        "workspaces_dropdown"
-      )
-        .then(() => {
-          if (!isLoadingModalOpen) {
-            showSwitchWorkspaceSuccessToast(workspace.name);
-          }
-
-          setIsLoadingModalOpen(false);
-        })
-        .catch((error) => {
-          setIsLoadingModalOpen(false);
-          toast.error(
-            "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
-          );
-        });
-    },
-    [activeWorkspace?.id, appMode, dispatch, getViewMode, isLoadingModalOpen, user?.details?.isSyncEnabled]
-  );
 
   const items: MenuProps["items"] = useMemo(() => {
     return [
@@ -136,7 +86,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
         icon: <FaRegEyeSlash />,
         onClick: () => {
           if (getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1) {
-            handleWorkspaceSwitch(rawWorkspace);
+            confirmWorkspaceSwitch(() => handleWorkspaceSwitch(rawWorkspace));
           } else {
             removeWorkspaceFromView(workspaceId);
           }
@@ -145,12 +95,20 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
         },
       },
     ];
-  }, [getAllSelectedWorkspaces, getViewMode, handleWorkspaceSwitch, navigate, rawWorkspace, workspaceId]);
+  }, [
+    confirmWorkspaceSwitch,
+    getAllSelectedWorkspaces,
+    getViewMode,
+    handleWorkspaceSwitch,
+    navigate,
+    rawWorkspace,
+    workspaceId,
+  ]);
 
   return (
     <>
-      {isLoadingModalOpen ? (
-        <LoadingModal isModalOpen={isLoadingModalOpen} closeModal={() => setIsLoadingModalOpen(false)} />
+      {isWorkspaceLoading ? (
+        <LoadingModal isModalOpen={isWorkspaceLoading} closeModal={() => setIsWorkspaceLoading(false)} />
       ) : null}
 
       <Collapse
