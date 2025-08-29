@@ -4,6 +4,7 @@ import { useWorkspace } from "features/apiClient/store/multiWorkspaceView/multiW
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientFeatureContextProvider } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { WorkspaceCollapse } from "./WorkspaceCollapse/WorkspaceCollapse";
+import { MultiViewError } from "../MultiViewError/MultiViewError";
 import "./workspaceProvider.scss";
 
 export const WorkspaceProvider: React.FC<{
@@ -17,7 +18,17 @@ export const WorkspaceProvider: React.FC<{
   const [getContext] = useApiClientFeatureContextProvider((s) => [s.getContext]);
 
   if (state.errored) {
-    return <div className="workspace-loader-container">{state.error}</div>;
+    return (
+      <WorkspaceCollapse
+        expanded
+        type={type}
+        showEnvSwitcher={false}
+        showNewRecordBtn={false}
+        workspaceId={workspaceId}
+      >
+        <MultiViewError />
+      </WorkspaceCollapse>
+    );
   }
 
   if (state.loading) {
