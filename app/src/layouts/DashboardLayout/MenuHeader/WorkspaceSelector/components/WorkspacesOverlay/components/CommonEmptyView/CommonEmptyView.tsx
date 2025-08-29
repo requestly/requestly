@@ -6,6 +6,8 @@ import { globalActions } from "store/slices/global/slice";
 import { WorkspaceType } from "types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./commonEmptyView.scss";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 interface CommonEmptyViewProps {
   toggleDropdown: () => void;
@@ -39,14 +41,20 @@ export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown
           : "Create a team workspace to collaborate with teammates."}
       </div>
       <div className="common-workspace-empty-view__actions">
-        <RQButton
-          type={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "primary" : "default"}
-          className="common-workspace-empty-view__actions-button"
-          size="small"
-          onClick={() => handleCreateWorkspace(WorkspaceType.SHARED)}
+        <AuthConfirmationPopover
+          placement="topRight"
+          title="You need to signup to create a team workspace"
+          source={SOURCE.WORKSPACE_DROPDOWN}
+          callback={() => handleCreateWorkspace(WorkspaceType.SHARED)}
         >
-          New team workspace
-        </RQButton>
+          <RQButton
+            type={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "primary" : "default"}
+            className="common-workspace-empty-view__actions-button"
+            size="small"
+          >
+            New team workspace
+          </RQButton>
+        </AuthConfirmationPopover>
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <RQButton size="small" type="primary" onClick={() => handleCreateWorkspace(WorkspaceType.LOCAL)}>
             New local workspace

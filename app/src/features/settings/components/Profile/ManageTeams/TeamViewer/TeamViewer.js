@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Row, Col, Tabs, Alert } from "antd";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
@@ -15,8 +15,10 @@ import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "features/workspaces/types";
 import { LocalWorkspaceSettings } from "./LocalWorkspaceSettings/LocalWorkspaceSettings";
 import "./TeamViewer.css";
+import { redirectTo404 } from "utils/RedirectionUtils";
 
 const TeamViewer = () => {
+  const navigate = useNavigate();
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
   const availableWorkspaces = useSelector(getAllWorkspaces);
@@ -68,6 +70,10 @@ const TeamViewer = () => {
     ],
     [teamId, teamOwnerId, isTeamArchived, isTeamAdmin, teamDetails, isAppSumoDeal]
   );
+
+  if (!teamDetails) {
+    redirectTo404(navigate);
+  }
 
   return (
     <Row className="manage-workspace-container">
