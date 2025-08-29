@@ -38,6 +38,12 @@ export const getActiveWorkspace = (state: RootState) => {
   return getWorkspaceById(activeWorkspaceId)(state);
 };
 
+/**
+ * This selector does not check if active workspace is shared or local rather it checks
+ * if the active workspace is private or not
+ * @param state
+ * @returns boolean
+ */
 export const isActiveWorkspaceShared = (state: RootState) => {
   // In future, we need to check workspaceType === WorkspaceType.SHARED
   return !!getActiveWorkspaceId(state);
