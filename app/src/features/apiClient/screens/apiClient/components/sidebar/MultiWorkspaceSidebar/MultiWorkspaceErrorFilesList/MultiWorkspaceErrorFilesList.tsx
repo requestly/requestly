@@ -62,6 +62,7 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
           {selectedWorkspaces.map((workspace) => {
             return (
               <WorkspaceErrorFilesList
+                key={workspace.getState().id}
                 workspaceId={workspace.getState().id}
                 handleErrorRecordsCount={handleErrorRecordsCount}
               />
