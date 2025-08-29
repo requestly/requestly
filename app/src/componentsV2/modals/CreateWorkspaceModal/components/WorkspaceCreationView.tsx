@@ -17,7 +17,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import { Workspace } from "features/workspaces/types";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { workspaceActions } from "store/slices/workspaces/slice";
@@ -145,14 +145,10 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
             const localWorkspace: Workspace = {
               id: partialWorkspace.id,
               name: partialWorkspace.name,
-              owner: user?.details?.profile?.uid,
+              owner: "",
               accessCount: 1,
               adminCount: 1,
-              members: {
-                [user?.details?.profile?.uid]: {
-                  role: WorkspaceMemberRole.admin,
-                },
-              },
+              members: {},
               appsumo: undefined,
               workspaceType: WorkspaceType.LOCAL,
               rootPath: partialWorkspace.path,
@@ -185,14 +181,15 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
           } catch (error) {
             toast.error(`Could not invite all users from ${getDomainFromEmail(user?.details?.profile?.email)}.`);
           }
-          trackNewTeamCreateSuccess(
-            teamId,
-            workspaceName,
-            "create_workspace_modal",
-            workspaceType,
-            args.workspaceType === WorkspaceType.SHARED ? args.isNotifyAllSelected : false
-          );
         }
+
+        trackNewTeamCreateSuccess(
+          teamId,
+          workspaceName,
+          "create_workspace_modal",
+          workspaceType,
+          args.workspaceType === WorkspaceType.SHARED ? args.isNotifyAllSelected : false
+        );
 
         handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
 
@@ -217,7 +214,6 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
       handlePostTeamCreationStep,
       handleDomainInvitesCreation,
       workspaceType,
-      user?.details?.profile?.uid,
     ]
   );
 
