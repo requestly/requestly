@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "types";
@@ -98,8 +98,8 @@ const LocalWorkspaceActions = ({
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const [isSelected, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
-    s.isSelected,
+  const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
+    s.selectedWorkspaces,
     s.getViewMode,
     s.getAllSelectedWorkspaces,
   ]);
@@ -126,8 +126,13 @@ const LocalWorkspaceActions = ({
     [workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
   );
 
+  const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.getState().id === workspace.id), [
+    selectedWorkspaces,
+    workspace.id,
+  ]);
+
   return (
-    <div className="local-workspace-actions">
+    <div className="local-workspace-actions" onClick={(e) => e.stopPropagation()}>
       <Tooltip title="Settings" color="#000">
         <RQButton
           className="local-workspace-actions__settings-btn"
@@ -142,15 +147,14 @@ const LocalWorkspaceActions = ({
           }}
         />
       </Tooltip>
-      <div className="local-workspace-actions__checkbox-btn">
-        <Checkbox
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => {
-            handleMultiworkspaceAdder(e.target.checked);
-          }}
-          checked={isSelected(workspace.id)}
-        />
-      </div>
+
+      <Checkbox
+        checked={isSelected}
+        className="local-workspace-actions__checkbox"
+        onChange={(e) => {
+          handleMultiworkspaceAdder(e.target.checked);
+        }}
+      />
     </div>
   );
 };
@@ -158,7 +162,7 @@ const LocalWorkspaceActions = ({
 export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   const { onClick, toggleDropdown } = props;
 
-  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+  const [viewMode, selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.viewMode, s.selectedWorkspaces]);
 
   const getWorkspaceDetails = (workspace: Workspace) => {
     switch (workspace.workspaceType) {
@@ -196,18 +200,27 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   }
 
   const { workspace } = props;
+  const isMultiView = viewMode === ApiClientViewMode.MULTI;
+  const isSelected = selectedWorkspaces.some((w) => w.getState().id === workspace.id);
+  const isWorkspaceSwitchDisabled = isMultiView && isSelected;
 
   return (
     <div
-      className={`workspace-overlay__list-item ${
-        viewMode === ApiClientViewMode.SINGLE ? "single-mode" : "multi-mode"
+      className={`workspace-overlay__list-item ${isWorkspaceSwitchDisabled ? "disabled" : ""}  ${
+        isMultiView ? "multi-mode" : "single-mode"
       } ${props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""} ${
         props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""
       }`}
-      onClick={handleWorkspaceClick}
+      onClick={() => {
+        if (isWorkspaceSwitchDisabled) {
+          return;
+        }
+
+        handleWorkspaceClick();
+      }}
     >
       <WorkspaceAvatar workspace={workspace} size={32} />
-      <div className="workspace-overlay__list-item-details">
+      <div className={`workspace-overlay__list-item-details ${isWorkspaceSwitchDisabled ? "disabled" : ""}`}>
         <div className="workspace-list-item-name">{workspace.name}</div>
         <Typography.Text
           className="workspace-list-item-info"
