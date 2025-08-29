@@ -10,16 +10,11 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import "./desktopOnboardingModal.scss";
 import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
+import { OnboardingStep } from "./types";
 
 export const DesktopOnboardingCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return <div className={`rq-desktop-onboarding-modal-content__card ${className}`}>{children}</div>;
 };
-
-export enum OnboardingStep {
-  FEATURE_SELECTION = "feature_selection",
-  FOLDER_SELECTION = "folder_selection",
-  AUTH = "auth",
-}
 
 export const DesktopOnboardingModal = () => {
   const dispatch = useDispatch();
