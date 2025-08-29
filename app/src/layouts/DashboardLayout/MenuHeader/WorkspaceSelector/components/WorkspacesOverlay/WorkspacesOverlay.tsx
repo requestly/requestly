@@ -14,8 +14,8 @@ import LoadingModal from "../LoadingModal";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { EmptyWorkspaceListView } from "./components/EmptyWorkspaceListView/EmptyWorkspaceListView";
 import { CommonEmptyView } from "./components/CommonEmptyView/CommonEmptyView";
-import "./workspacesOverlay.scss";
 import { useWorkspaceSwitcher } from "features/apiClient/screens/apiClient/components/sidebar/MultiWorkspaceSidebar/WorkspaceProvider/useWorkspaceSwitcher";
+import "./workspacesOverlay.scss";
 
 interface WorkspacesOverlayProps {
   toggleDropdown: () => void;
@@ -50,30 +50,18 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
   toggleDropdown,
   onItemClick,
 }: WorkspaceListSectionProps) => {
-  const dispatch = useDispatch();
-
+  const user = useSelector(getUserAuthDetails);
   if (!workspaces.length) {
     return <EmptyWorkspaceListSection workspaceType={workspaceType} toggleDropdown={toggleDropdown} />;
   }
   return (
     <div>
-      <Divider />
+      {user.loggedIn ? <Divider /> : null}
       <WorkspaceList
         workspaces={workspaces}
         type={workspaceType}
         toggleDropdown={toggleDropdown}
         onItemClick={onItemClick}
-        onAddWorkspaceClick={() => {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "createWorkspaceModal",
-              newValue: true,
-              newProps: {
-                defaultWorkspaceType: workspaceType,
-              },
-            })
-          );
-        }}
       />{" "}
     </div>
   );
@@ -195,6 +183,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
           </>
         ) : null}
       </div>
+
       {isWorkspaceLoading ? (
         <LoadingModal isModalOpen={isWorkspaceLoading} closeModal={() => setIsWorkspaceLoading(false)} />
       ) : null}
