@@ -51,6 +51,7 @@ const LocalWorkspaceSidebarOrder = [
 const defaultSidebarOrder = [
   SidebarItemKey.HOME,
   SidebarItemKey.NETWORK,
+  SidebarItemKey.NETWORK_INSPECTOR,
   SidebarItemKey.RULES,
   SidebarItemKey.APIs,
   SidebarItemKey.FILES,
