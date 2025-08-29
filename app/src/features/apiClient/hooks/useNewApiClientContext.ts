@@ -4,10 +4,10 @@ import { RQAPI } from "../types";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
 import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
-import { useContextId } from "../contexts/contextId.context";
+import { useApiClientFeatureContext } from "../contexts/meta";
 
 export function useNewApiClientContext() {
-  const contextId = useContextId();
+  const context = useApiClientFeatureContext();
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   const [addNewRecord, updateRecord, updateRecords, getData] = useAPIRecords((state) => [
@@ -44,7 +44,7 @@ export function useNewApiClientContext() {
               apiEntryDetails: apiClientRecord,
               title: apiClientRecord.name,
               context: {
-                id: contextId,
+                id: context.id,
               },
             })
           );
@@ -58,7 +58,7 @@ export function useNewApiClientContext() {
               title: apiClientRecord.name,
               focusBreadcrumb: !doesRecordExist,
               context: {
-                id: contextId,
+                id: context.id,
               },
             })
           );
@@ -66,7 +66,7 @@ export function useNewApiClientContext() {
         }
       }
     },
-    [getData, updateRecord, addNewRecord, openTab, contextId]
+    [getData, updateRecord, addNewRecord, openTab, context.id]
   );
 
   return {
