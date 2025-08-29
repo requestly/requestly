@@ -20,6 +20,7 @@ import { toast } from "utils/Toast";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
 
+//TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
   const [isWorkspaceLoading, setIsWorkspaceLoading] = useState(false);
   const dispatch = useDispatch();
