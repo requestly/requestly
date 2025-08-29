@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { WorkspaceItem } from "./components/WorkspaceListItem/WorkspaceListItem";
 import { Invite, WorkspaceType } from "types";
 import { Divider, Modal } from "antd";
-import { getAllWorkspaces } from "store/slices/workspaces/selectors";
+import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Workspace } from "features/workspaces/types";
 import { WorkspaceList } from "./components/WorkspaceList/WorkspaceList";
 import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
@@ -59,30 +59,18 @@ const WorkspaceListSection: React.FC<WorkspaceListSectionProps> = ({
   toggleDropdown,
   onItemClick,
 }: WorkspaceListSectionProps) => {
-  const dispatch = useDispatch();
-
+  const user = useSelector(getUserAuthDetails);
   if (!workspaces.length) {
     return <EmptyWorkspaceListSection workspaceType={workspaceType} toggleDropdown={toggleDropdown} />;
   }
   return (
     <div>
-      <Divider />
+      {user.loggedIn ? <Divider /> : null}
       <WorkspaceList
         workspaces={workspaces}
         type={workspaceType}
         toggleDropdown={toggleDropdown}
         onItemClick={onItemClick}
-        onAddWorkspaceClick={() => {
-          dispatch(
-            globalActions.toggleActiveModal({
-              modalName: "createWorkspaceModal",
-              newValue: true,
-              newProps: {
-                defaultWorkspaceType: workspaceType,
-              },
-            })
-          );
-        }}
       />{" "}
     </div>
   );
@@ -93,6 +81,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const isSharedWorkspace = useSelector(isActiveWorkspaceShared);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const { pathname } = useLocation();
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
@@ -193,8 +182,8 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
       },
       dispatch,
       {
-        isSyncEnabled: user?.details?.isSyncEnabled,
-        isWorkspaceMode: workspace.workspaceType === WorkspaceType.SHARED,
+        isSyncEnabled: workspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
+        isWorkspaceMode: isSharedWorkspace,
       },
       appMode,
       undefined,

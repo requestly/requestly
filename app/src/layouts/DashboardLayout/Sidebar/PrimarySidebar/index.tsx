@@ -24,10 +24,39 @@ import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlack
 import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import "./PrimarySidebar.css";
 import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
 import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 import { RQTooltip } from "lib/design-system-v2/components";
+import "./PrimarySidebar.css";
+
+enum SidebarItemKey {
+  HOME = "home",
+  NETWORK = "network",
+  NETWORK_INSPECTOR = "network_inspector",
+  RULES = "rules",
+  APIs = "apis",
+  FILES = "files",
+  SESSIONS = "sessions",
+}
+
+const LocalWorkspaceSidebarOrder = [
+  SidebarItemKey.HOME,
+  SidebarItemKey.NETWORK,
+  SidebarItemKey.APIs,
+  SidebarItemKey.SESSIONS,
+  SidebarItemKey.RULES,
+  SidebarItemKey.FILES,
+];
+
+const defaultSidebarOrder = [
+  SidebarItemKey.HOME,
+  SidebarItemKey.NETWORK,
+  SidebarItemKey.NETWORK_INSPECTOR,
+  SidebarItemKey.RULES,
+  SidebarItemKey.APIs,
+  SidebarItemKey.FILES,
+  SidebarItemKey.SESSIONS,
+];
 
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
@@ -46,32 +75,32 @@ export const PrimarySidebar: React.FC = () => {
     APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX,
   ].some((path) => pathname.includes(path));
 
-  const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
+  const sidebarItems = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
 
-    const items: PrimarySidebarItem[] = [
-      {
+    const itemsMap: Record<SidebarItemKey, PrimarySidebarItem> = {
+      [SidebarItemKey.HOME]: {
         id: 0,
         title: "Home",
         path: PATHS.HOME.RELATIVE,
         icon: <HomeOutlined />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
-      {
+      [SidebarItemKey.NETWORK]: {
         id: 1,
         title: "Network",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
         icon: <NetworkTrafficIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
-      {
+      [SidebarItemKey.NETWORK_INSPECTOR]: {
         id: 2,
         title: "Network",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
         icon: <NetworkTrafficInspectorIcon />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
-      {
+      [SidebarItemKey.RULES]: {
         id: 3,
         title: "Rules",
         path: PATHS.RULES.INDEX,
@@ -92,14 +121,14 @@ export const PrimarySidebar: React.FC = () => {
         ),
         disabled: isLocalSyncEnabled,
       },
-      {
+      [SidebarItemKey.APIs]: {
         id: 4,
         title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
         icon: <ApiOutlined />,
         display: true,
       },
-      {
+      [SidebarItemKey.FILES]: {
         id: 5,
         title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
@@ -107,16 +136,17 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         tooltipContent: (
           <>
-            Files are not available in local workspaces yet. Switch to a private or team workspace to access them.
+            Quickly upload JSON, JS, or CSS files and serve them as mock API endpoints to test your frontend without any
+            backend changes.
             <br />
             <br />
-            It's a powerful tool to modify & mock API responses, allowing you to build frontend faster without waiting
-            for backend.
+            File Server is not available in local workspaces yet. Switch to a private or team workspace to access the
+            feature.
           </>
         ),
         disabled: isLocalSyncEnabled,
       },
-      {
+      [SidebarItemKey.SESSIONS]: {
         id: 6,
         title: "Sessions",
         path: PATHS.SESSIONS.INDEX,
@@ -131,10 +161,10 @@ export const PrimarySidebar: React.FC = () => {
         ),
         display: true,
       },
-    ];
+    };
 
     if (isDesktopSessionsCompatible) {
-      items[6] = {
+      itemsMap[SidebarItemKey.SESSIONS] = {
         id: 6,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
@@ -150,28 +180,31 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
       };
     }
-    return items;
+    return itemsMap;
   }, [appMode, isSavingNetworkSession, isLocalSyncEnabled, isDesktopSessionsCompatible]);
+
+  const renderSidebarItems = (order: SidebarItemKey[]) => {
+    return order.map((item) => {
+      const sidebarItem = sidebarItems[item];
+      return sidebarItem.disabled ? (
+        <RQTooltip placement="rightTop" showArrow={false} title={sidebarItem.tooltipContent} key={sidebarItem.id}>
+          <li style={{ cursor: "not-allowed" }}>
+            <PrimarySidebarLink {...sidebarItem} />
+          </li>
+        </RQTooltip>
+      ) : sidebarItem.display ? (
+        <li key={sidebarItem.id}>
+          <PrimarySidebarLink {...sidebarItem} />
+        </li>
+      ) : null;
+    });
+  };
 
   return (
     <div className="primary-sidebar-container">
       {isSecondarySidebarCollapsed && isSecondarySidebarToggleAllowed && <SidebarToggleButton />}
       <ul>
-        {sidebarItems
-          .filter((item) => item.display)
-          .map((item) => {
-            return item.disabled ? (
-              <RQTooltip placement="rightTop" showArrow={false} title={item.tooltipContent} key={item.id}>
-                <li style={{ cursor: "not-allowed" }}>
-                  <PrimarySidebarLink {...item} />
-                </li>
-              </RQTooltip>
-            ) : (
-              <li key={item.id}>
-                <PrimarySidebarLink {...item} />
-              </li>
-            );
-          })}
+        {isLocalSyncEnabled ? renderSidebarItems(LocalWorkspaceSidebarOrder) : renderSidebarItems(defaultSidebarOrder)}
       </ul>
       <div className="primary-sidebar-bottom-btns">
         {isSlackConnectFeatureEnabled && isSlackInviteVisible && <JoinSlackButton />}

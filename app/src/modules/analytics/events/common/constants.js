@@ -137,6 +137,7 @@ export const SOURCE = {
   DESKTOP_ONBOARDING: "desktop_onboarding",
   PRICING_TABLE: "pricing_table",
   TEAM_WORKSPACE_BAD_INVITE_SCREEN: "team_workspace_bad_invite_screen",
+  WORKSPACE_DROPDOWN: "workspace_dropdown",
 };
 
 export const RULES = {

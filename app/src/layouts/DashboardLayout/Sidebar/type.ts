@@ -10,4 +10,5 @@ export interface PrimarySidebarItem extends Record<string, unknown> {
   activeColor?: string;
   tooltipContent?: React.ReactNode;
   disabled?: boolean;
+  order?: number;
 }
