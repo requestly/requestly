@@ -62,6 +62,13 @@ export const useBannerAction = (
           dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
         },
       },
+      [BANNER_ACTIONS.REDIRECT_TO_NOTION_PAGE]: {
+        label: "Share Now",
+        type: "primary",
+        onClick: () => {
+          redirectToUrl(LINKS.NOTION_PAGE_FOR_PROMOTION, true);
+        },
+      },
       [BANNER_ACTIONS.REDIRECT_TO_LINKEDIN_FORM]: {
         label: "Share Now",
         type: "primary",
