@@ -39,15 +39,19 @@ export const MultiWorkspaceErrorFilesList: React.FC = () => {
             </div>
           }
         >
-          {selectedWorkspaces.map((workspace) => {
-            const workspaceId = workspace.getState().id;
+          {selectedWorkspaces
+            .filter((workspace) => {
+              return !workspace.getState().state.errored; // skip errored workspaces
+            })
+            .map((workspace) => {
+              const workspaceId = workspace.getState().id;
 
-            return (
-              <WorkspaceProvider key={workspaceId} workspaceId={workspaceId} collapsible={false}>
-                <ErrorFilesList updateErrorRecordsCount={handleErrorRecordsCount} />
-              </WorkspaceProvider>
-            );
-          })}
+              return (
+                <WorkspaceProvider key={workspaceId} workspaceId={workspaceId} collapsible={false}>
+                  <ErrorFilesList updateErrorRecordsCount={handleErrorRecordsCount} />
+                </WorkspaceProvider>
+              );
+            })}
         </Collapse.Panel>
       </Collapse>
     </div>
