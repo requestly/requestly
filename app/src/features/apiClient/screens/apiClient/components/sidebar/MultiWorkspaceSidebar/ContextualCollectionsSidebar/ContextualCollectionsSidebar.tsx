@@ -23,6 +23,7 @@ import { DeleteApiRecordModal } from "../../../modals";
 import { ContextualCollectionsList } from "./CollectionsList/ContextualCollectionsList";
 import { PostmanExportModal } from "../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import "./contextualCollectionsSidebar.scss";
+import { ErrorInSidePanel } from "../ErrorInSidePanel/ErrorInSidePanel";
 
 export const ContextualCollectionsSidebar: React.FC<{
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -298,6 +299,7 @@ export const ContextualCollectionsSidebar: React.FC<{
 
             return (
               <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
+                <ErrorInSidePanel />
                 <ContextualCollectionsList
                   selectAll={selectAll}
                   showSelection={showSelection}
