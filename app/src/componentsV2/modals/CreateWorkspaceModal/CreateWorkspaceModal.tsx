@@ -5,17 +5,18 @@ import { WorkspaceType } from "types";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { WorkspaceCreationView } from "./components/WorkspaceCreationView";
-import "./createWorkspaceModal.scss";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { CreateWorkspaceModalOld } from "../CreateWorkspaceModalOld/CreateWorkspaceModalOld";
 import { globalActions } from "store/slices/global/slice";
+import "./createWorkspaceModal.scss";
 
 interface Props {
   isOpen: boolean;
   workspaceType?: WorkspaceType;
   toggleModal: () => void;
   callback?: () => void;
+  source?: string;
 }
 
 export const CreateWorkspaceModal: React.FC<Props> = ({
@@ -23,12 +24,21 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
   toggleModal,
   callback,
   workspaceType = WorkspaceType.SHARED,
+  source,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
   if (!user.loggedIn && workspaceType === WorkspaceType.SHARED) {
-    dispatch(globalActions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: true,
+        newProps: {
+          eventSource: source,
+        },
+      })
+    );
     toggleModal();
     return null;
   }

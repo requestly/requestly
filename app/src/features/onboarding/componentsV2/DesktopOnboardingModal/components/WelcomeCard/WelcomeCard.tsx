@@ -5,6 +5,7 @@ import { WelcomeCardOption } from "../WelcomeCardOption/WelcomeCardOption";
 import { OnboardingStep } from "../../DesktopOnboardingModal";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import { trackDesktopOnboardingFeatureSelected, trackDesktopOnboardingStepSkipped } from "../../analytics";
 
 interface Props {
   onFeatureClick: (step: OnboardingStep) => void;
@@ -26,17 +27,30 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
           title="Start using API Client"
           description="Create, manage, and test APIs with collections and reusable variables."
           iconSrc={"/assets/media/apiClient/api-client-icon.svg"}
-          onClick={() => onFeatureClick(OnboardingStep.API_CLIENT)}
+          onClick={() => {
+            trackDesktopOnboardingFeatureSelected(OnboardingStep.FOLDER_SELECTION);
+            onFeatureClick(OnboardingStep.FOLDER_SELECTION);
+          }}
         />
         <WelcomeCardOption
           title="Intercept and modify web traffic"
           description="Capture and modify requests, responses, headers, and scripts in real time."
           iconSrc={"/assets/media/rules/rules-icon.svg"}
-          onClick={() => onFeatureClick(OnboardingStep.AUTH)}
+          onClick={() => {
+            trackDesktopOnboardingFeatureSelected(OnboardingStep.AUTH);
+            onFeatureClick(OnboardingStep.AUTH);
+          }}
         />
       </div>
       <div className="skip-footer">
-        <Button type="link" size="small" onClick={() => dispatch(globalActions.updateIsOnboardingCompleted(true))}>
+        <Button
+          type="link"
+          size="small"
+          onClick={() => {
+            trackDesktopOnboardingStepSkipped(OnboardingStep.FEATURE_SELECTION);
+            dispatch(globalActions.updateIsOnboardingCompleted(true));
+          }}
+        >
           Skip
         </Button>{" "}
         this screen and quick start
