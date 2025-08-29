@@ -1,21 +1,38 @@
 import React, { useCallback, useEffect } from "react";
-import { reloadFsManager } from "services/fsManagerServiceAdapter";
 import { toast } from "utils/Toast";
-import { useApiClientRepository } from "./helpers/modules/sync/useApiClientSyncRepo";
-import { useCommand } from "./commands";
+import { refreshAllContexts } from "./commands/context/refreshAllContexts.command";
 
 export const LocalSyncRefreshHandler: React.FC = () => {
-  const { apiClientRecordsRepository } = useApiClientRepository();
-  const {
-    env: { forceRefreshEnvironments },
-    api: { forceRefreshRecords },
-  } = useCommand();
-
   const handleRefresh = useCallback(async () => {
-    await reloadFsManager(apiClientRecordsRepository.meta.rootPath);
-    await Promise.all([forceRefreshRecords(), forceRefreshEnvironments()]);
-    toast.success("Workspace refreshed successfully!");
-  }, [forceRefreshRecords, forceRefreshEnvironments, apiClientRecordsRepository]);
+    const result = await refreshAllContexts();
+    const message = (() => {
+      if (result.every((r) => r.status === "fulfilled")) {
+        return {
+          type: "success",
+          message: "Refreshed Successfully!",
+        } as const;
+      }
+      if (result.length === 1) {
+        return {
+          type: "error",
+          message: "Could not refresh!",
+        } as const;
+      }
+
+      return {
+        type: "warn",
+        message: "Some workspaces could not be refreshed!",
+      } as const;
+    })();
+    switch (message.type) {
+      case "success":
+        return toast.success(message.message);
+      case "error":
+        return toast.error(message.message);
+      case "warn":
+        return toast.warn(message.message);
+    }
+  }, []);
 
   useEffect(() => {
     window.addEventListener("local-sync-refresh", handleRefresh);

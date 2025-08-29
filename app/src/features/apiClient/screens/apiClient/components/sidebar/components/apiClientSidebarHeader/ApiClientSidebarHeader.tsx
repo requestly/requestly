@@ -4,7 +4,6 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
-import { ApiClientSidebarTabKey } from "../../APIClientSidebar";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
@@ -17,6 +16,11 @@ import { BrunoImporterModal } from "features/apiClient/screens/BrunoImporter";
 import { useLocation } from "react-router-dom";
 import { RoleBasedComponent } from "features/rbac";
 import { NewApiRecordDropdown } from "../NewApiRecordDropdown/NewApiRecordDropdown";
+import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -34,6 +38,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   history,
   onClearHistory,
 }) => {
+  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
   const { state } = useLocation();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
@@ -115,9 +120,11 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   return (
     <>
       <div className="api-client-sidebar-header">
-        {activeTab === ApiClientSidebarTabKey.COLLECTIONS || activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ? (
+        {activeTab === ApiClientSidebarTabKey.COLLECTIONS ||
+        activeTab === ApiClientSidebarTabKey.ENVIRONMENTS ||
+        activeTab === ApiClientSidebarTabKey.RUNTIME_VARIABLES ? (
           <RoleBasedComponent resource="api_client_request" permission="create">
-            <div>
+            <div className="actions">
               <NewApiRecordDropdown
                 onSelect={(params) => {
                   onNewClick(params.recordType, params.entryType);
@@ -151,7 +158,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           </RQButton>
         ) : null}
 
-        <EnvironmentSwitcher />
+        {viewMode === ApiClientViewMode.SINGLE ? <EnvironmentSwitcher /> : null}
       </div>
 
       {isImportModalOpen && (

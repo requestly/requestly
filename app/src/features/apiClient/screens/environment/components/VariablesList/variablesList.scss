@@ -134,6 +134,11 @@
     }
   }
 
+  .variable-value-column-persist-section {
+    display: flex;
+    gap: 6px;
+  }
+
   .delete-variable-btn.ant-btn.rq-custom-btn.ant-btn-sm.icon-only-btn {
     color: var(--requestly-color-text-subtle, #bbb);
     width: 30px;

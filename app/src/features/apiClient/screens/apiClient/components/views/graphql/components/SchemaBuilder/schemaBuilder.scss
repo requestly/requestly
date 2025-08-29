@@ -208,7 +208,7 @@
   div:nth-child(2) {
     min-height: unset !important;
     max-height: unset !important;
-    // overflow: hidden !important;
+    overflow: hidden !important;
   }
 
   & div[id^="query-"],

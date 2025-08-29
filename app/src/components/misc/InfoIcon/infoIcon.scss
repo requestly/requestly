@@ -3,6 +3,7 @@ body.dark {
     .ant-tooltip-inner,
     .ant-tooltip-arrow-content {
       display: flex;
+      flex-direction: column;
       padding: 8px 12px;
       align-items: flex-start;
       gap: 6px;

@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { useSelector } from "react-redux";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import {
@@ -12,15 +11,17 @@ import {
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
-import { EnvironmentVariableValue } from "backend/environment/types";
+
 import * as Sentry from "@sentry/react";
 import { useCommand } from "../commands";
-import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
+import { useNewApiClientContext } from "./useNewApiClientContext";
+import { EnvironmentVariableData } from "../store/variables/types";
+import { useApiClientRepository } from "../contexts/meta";
 
 const BATCH_SIZE = 25;
 
 type ProcessedData = {
-  environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
+  environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
   collections: RQAPI.CollectionRecord[];
   apis: RQAPI.ApiRecord[];
   recordsCount: number;
@@ -57,7 +58,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   } = useCommand();
 
   const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
-  const { onSaveRecord } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 

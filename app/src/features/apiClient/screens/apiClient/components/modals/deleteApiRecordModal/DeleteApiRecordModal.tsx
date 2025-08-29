@@ -1,87 +1,71 @@
-import React, { useState } from "react";
-import { toast } from "utils/Toast";
+import React, { useMemo, useState } from "react";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import { RQAPI } from "features/apiClient/types";
-import { isApiCollection, isApiRequest } from "../../../utils";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { trackCollectionDeleted } from "modules/analytics/events/features/apiClient";
 import "./deleteApiRecordModal.scss";
-import { isEmpty, partition } from "lodash";
-import * as Sentry from "@sentry/react";
+import { isEmpty } from "lodash";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { notification } from "antd";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { deleteRecords } from "features/apiClient/commands/records";
+import { toast } from "utils/Toast";
+import { isApiCollection } from "../../../utils";
+import * as Sentry from "@sentry/react";
 
 interface DeleteApiRecordModalProps {
   open: boolean;
-  records: RQAPI.ApiClientRecord[];
   onClose: () => void;
   onSuccess?: () => void;
+  getRecordsToDelete: () => {
+    context: ApiClientFeatureContext | undefined;
+    records: RQAPI.ApiClientRecord[];
+  }[];
 }
 
-export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open, records, onClose, onSuccess }) => {
-  const deleteRecords = useAPIRecords((state) => state.deleteRecords);
-  const { apiClientRecordsRepository } = useApiClientContext();
+export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
+  open,
+  getRecordsToDelete,
+  onClose,
+  onSuccess,
+}) => {
   const closeTabBySource = useTabServiceWithSelector((state) => state.closeTabBySource);
 
+  const recordsWithContext = useMemo(() => {
+    return getRecordsToDelete();
+  }, [getRecordsToDelete]);
+
+  const records = useMemo(() => {
+    return recordsWithContext.map(({ records }) => records).flat();
+  }, [recordsWithContext]);
+
   const [isDeleting, setIsDeleting] = useState(false);
+
   if (isEmpty(records)) {
     return null;
   }
 
   let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
 
-  const getAllRecordsToDelete = () => {
-    const recordsToBeDeleted: RQAPI.ApiClientRecord[] = [];
-    const stack: RQAPI.ApiClientRecord[] = [...records];
-
-    while (stack.length) {
-      const record = stack.pop()!;
-      recordsToBeDeleted.push(record);
-      if (isApiCollection(record) && record.data.children) {
-        stack.push(...record.data.children);
-      }
-    }
-
-    return recordsToBeDeleted;
-  };
-
   const handleDeleteApiRecord = async () => {
-    const recordsToBeDeleted = getAllRecordsToDelete();
-    if (!recordsToBeDeleted.length) {
-      notification.error({
-        message: `Could not delete records.`,
-        placement: "bottomRight",
-      });
-      return;
-    }
+    try {
+      recordsWithContext.forEach(async ({ context, records }) => {
+        const { deletedApiRecords, deletedCollectionRecords } = await deleteRecords(context, {
+          records,
+        });
 
-    setIsDeleting(true);
-    const [apiRecords, collectionRecords] = partition(recordsToBeDeleted, isApiRequest);
-    const apiRecordIds = apiRecords.map((record) => record.id);
-    const collectionRecordIds = collectionRecords.map((record) => record.id);
+        const isExampleCollection = deletedCollectionRecords.some((record) => !!record.isExample);
+        trackCollectionDeleted(isExampleCollection ? "example" : "");
 
-    // First delete records
-    const recordDeletionResult = await apiClientRecordsRepository.deleteRecords(apiRecordIds);
+        deletedApiRecords.forEach((r) => {
+          closeTabBySource(r.id, "request", true);
+        });
 
-    // Then delete collections
-    const collectionsDeletionResult = await apiClientRecordsRepository.deleteCollections(collectionRecordIds);
-
-    // Check if both deletions were successful
-    if (recordDeletionResult.success && collectionsDeletionResult.success) {
-      deleteRecords([...apiRecordIds, ...collectionRecordIds]);
-
-      const isExampleCollection = collectionRecords.some((record) => !!record.isExample);
-      trackCollectionDeleted(isExampleCollection ? "example" : "");
-
-      apiRecordIds.forEach((recordId) => {
-        closeTabBySource(recordId, "request", true);
+        deletedCollectionRecords.forEach((r) => {
+          closeTabBySource(r.id, "collection", true);
+        });
       });
 
-      collectionRecordIds.forEach((recordId) => {
-        closeTabBySource(recordId, "collection", true);
-      });
+      // First delete records
 
       toast.success(
         records.length === 1
@@ -92,25 +76,21 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({ open
       );
       onClose();
       onSuccess?.();
-
-      // TODO: add analytics
-    } else {
-      const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
-      notification.error({
-        message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
-        description: erroredResult?.message,
-        placement: "bottomRight",
-      });
+    } catch (error) {
+      // const erroredResult = !recordDeletionResult.success ? recordDeletionResult : collectionsDeletionResult;
+      // notification.error({
+      //   message: `Error deleting ${records.length === 1 ? "record" : "records"}`,
+      //   description: erroredResult?.message,
+      //   placement: "bottomRight",
+      // });
 
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_client_record_deletion");
-        Sentry.captureException(
-          erroredResult.message || `Error deleting ${records.length === 1 ? "record" : "records"}`
-        );
+        Sentry.captureException(`Error deleting ${records.length === 1 ? "record" : "records"}`);
       });
+    } finally {
+      setIsDeleting(false);
     }
-
-    setIsDeleting(false);
   };
 
   const header =

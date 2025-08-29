@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EnvironmentVariableTableRow, VariablesList } from "../VariablesList/VariablesList";
+// import { VariableRow, VariablesList } from "../VariablesList/VariablesList";
 import { VariablesListHeader } from "../VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -13,6 +13,8 @@ import { useCommand } from "features/apiClient/commands";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import "./environmentView.scss";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
+import { EnvironmentVariablesList } from "../VariablesList/EnvironmentVariablesList";
+import { VariableRow } from "../VariablesList/VariablesList";
 
 interface EnvironmentViewProps {
   envId: string;
@@ -28,7 +30,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     env: { setEnvironmentVariables },
   } = useCommand();
 
-  const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
+  const pendingVariablesRef = useRef<VariableRow[]>([]);
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -40,7 +42,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     return pendingVariablesRef.current.length > 0 ? pendingVariablesRef.current : variablesData;
   }, [variablesData]);
 
-  const [pendingVariables, setPendingVariables] = useState<EnvironmentVariableTableRow[]>(variables);
+  const [pendingVariables, setPendingVariables] = useState<VariableRow[]>(variables);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
@@ -69,7 +71,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
     }
   }, [variables, isSaving]);
 
-  const handleSetPendingVariables = useCallback((variables: EnvironmentVariableTableRow[]) => {
+  const handleSetPendingVariables = useCallback((variables: VariableRow[]) => {
     setPendingVariables(variables);
     pendingVariablesRef.current = variables;
   }, []);
@@ -114,10 +116,10 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
             onPostmanExportClick: () => setIsPostmanExportModalOpen(true),
           }}
         />
-        <VariablesList
+        <EnvironmentVariablesList
           searchValue={searchValue}
-          variables={pendingVariables}
-          onVariablesChange={handleSetPendingVariables}
+          pendingVariables={pendingVariables}
+          handleSetPendingVariables={handleSetPendingVariables}
         />
         {isExportModalOpen && (
           <ApiClientExportModal
