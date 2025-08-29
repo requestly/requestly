@@ -207,15 +207,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
                 </Conditional>
               </div>
 
-              {showEnvSwitcher ? (
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <EnvironmentSwitcher />
-                </div>
-              ) : null}
+              {showEnvSwitcher ? <EnvironmentSwitcher /> : null}
             </div>
           }
         >

@@ -74,6 +74,7 @@
           opacity: 1;
         }
       }
+
       &:focus-within {
         .workspace-options {
           opacity: 1;
@@ -81,8 +82,14 @@
       }
 
       .environment-switcher-button {
+        display: flex;
+        align-items: center;
+        padding: var(--space-0, 0) var(--space-1, 2px) var(--space-0, 0) var(--space-2, 4px);
+        height: 17px;
+        margin: 0;
+        margin-left: -4px;
+
         border-radius: 32px;
-        background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
         max-width: fit-content;
         color: var(--requestly-color-text-placeholder);
         font-size: var(--requestly-font-size-xs, 11px);
@@ -90,6 +97,7 @@
 
         .ant-typography {
           max-width: 150px;
+          color: var(--requestly-color-text-placeholder);
         }
 
         .environment-icon {
@@ -105,6 +113,12 @@
   }
 
   .ant-collapse-item {
+    &.ant-collapse-item-active {
+      .environment-switcher-button {
+        background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.12));
+      }
+    }
+
     .ant-collapse-content {
       .ant-collapse-content-box {
         margin-left: 6px;
