@@ -5,6 +5,11 @@
   gap: 12px;
   border-radius: 4px;
   cursor: pointer;
+  user-select: none;
+
+  &.disabled {
+    cursor: not-allowed;
+  }
 
   &--local {
     .ant-avatar {
@@ -53,6 +58,8 @@
   }
 
   .workspace-overlay__list-item-actions {
+    cursor: pointer;
+
     .ant-btn {
       color: var(--requestly-color-text-subtle);
       &:hover {
