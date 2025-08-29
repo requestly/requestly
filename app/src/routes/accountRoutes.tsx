@@ -13,11 +13,11 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 export const accountRoutes: RouteObject[] = [
   {
     path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
-    element: <ProtectedRoute component={MyTeams} />,
+    element: <MyTeams />,
   },
   {
     path: PATHS.ACCOUNT.TEAMS.RELATIVE + "/:teamId",
-    element: <ProtectedRoute component={TeamViewer} />,
+    element: <TeamViewer />,
   },
   {
     path: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
