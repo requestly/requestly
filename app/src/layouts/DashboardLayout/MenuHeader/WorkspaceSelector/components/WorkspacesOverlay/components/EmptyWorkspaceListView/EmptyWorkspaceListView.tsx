@@ -1,9 +1,12 @@
 import React from "react";
 import { RQButton } from "lib/design-system/components";
 import { WorkspaceType } from "types";
-import "./emptyWorkspaceListView.scss";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import "./emptyWorkspaceListView.scss";
 
 interface EmptyWorkspaceListProps {
   workspaceType: WorkspaceType;
@@ -12,6 +15,21 @@ interface EmptyWorkspaceListProps {
 
 export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ workspaceType, toggleDropdown }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+
+  const handleCreateWorkspace = (type: WorkspaceType) => {
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "createWorkspaceModal",
+        newValue: true,
+        newProps: {
+          workspaceType: type,
+          source: "workspace_dropdown",
+        },
+      })
+    );
+    toggleDropdown();
+  };
 
   return (
     <div className="empty-workspace-list-view">
@@ -26,24 +44,30 @@ export const EmptyWorkspaceListView: React.FC<EmptyWorkspaceListProps> = ({ work
               ? " Create or join team workspaces to collaborate with your teammates in real time. You'll need an account to get started."
               : "No local workspaces are available. Local workspaces store files on your device. Only API client files are supported."}
           </div>
-          <RQButton
-            size="small"
-            onClick={() => {
-              dispatch(
-                globalActions.toggleActiveModal({
-                  modalName: "createWorkspaceModal",
-                  newValue: true,
-                  newProps: {
-                    workspaceType,
-                    source: "workspace_dropdown",
-                  },
-                })
-              );
-              toggleDropdown();
-            }}
-          >
-            {workspaceType === WorkspaceType.SHARED ? "Create a team workspace" : "Create a local workspace"}
-          </RQButton>
+          {workspaceType === WorkspaceType.SHARED ? (
+            // TODO: Refactor AuthConfirmationPopover, still required to use onClick when method on children for loggedIn cases
+            <AuthConfirmationPopover
+              placement="topRight"
+              title="You need to signup to create a team workspace"
+              source={SOURCE.WORKSPACE_DROPDOWN}
+              callback={() => handleCreateWorkspace(WorkspaceType.SHARED)}
+            >
+              <RQButton
+                size="small"
+                onClick={() => {
+                  if (user.loggedIn) {
+                    handleCreateWorkspace(WorkspaceType.SHARED);
+                  }
+                }}
+              >
+                {workspaceType === WorkspaceType.SHARED ? "Create a team workspace" : "Create a local workspace"}
+              </RQButton>
+            </AuthConfirmationPopover>
+          ) : (
+            <RQButton size="small" onClick={() => handleCreateWorkspace(WorkspaceType.LOCAL)}>
+              Create a local workspace
+            </RQButton>
+          )}
         </div>
       </div>
     </div>
