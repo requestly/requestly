@@ -26,9 +26,9 @@ export const useWorkspaceFetcher = () => {
 
   useEffect(() => {
     if (!user.loggedIn) {
-      if (activeWorkspace?.id && activeWorkspace?.workspaceType === WorkspaceType.SHARED) {
+      if (!activeWorkspace || activeWorkspace?.workspaceType === WorkspaceType.SHARED) {
         clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
     }
-  }, [activeWorkspace?.id, activeWorkspace?.workspaceType, appMode, dispatch, user.loggedIn]);
+  }, [activeWorkspace, appMode, dispatch, user.loggedIn]);
 };
