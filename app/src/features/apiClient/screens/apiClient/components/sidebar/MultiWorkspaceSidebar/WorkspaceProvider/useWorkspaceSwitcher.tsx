@@ -15,7 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { toast } from "utils/Toast";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
@@ -30,6 +30,7 @@ export const useWorkspaceSwitcher = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
+  const isSharedWorkspace = useSelector(isActiveWorkspaceShared);
 
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
 
@@ -80,8 +81,8 @@ export const useWorkspaceSwitcher = () => {
         },
         dispatch,
         {
-          isSyncEnabled: user?.details?.isSyncEnabled,
-          isWorkspaceMode: workspace.workspaceType === WorkspaceType.SHARED,
+          isSyncEnabled: workspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
+          isWorkspaceMode: isSharedWorkspace,
         },
         appMode,
         undefined,
@@ -101,7 +102,15 @@ export const useWorkspaceSwitcher = () => {
           );
         });
     },
-    [activeWorkspace?.id, appMode, dispatch, getViewMode, isWorkspaceLoading, user?.details?.isSyncEnabled]
+    [
+      activeWorkspace?.id,
+      appMode,
+      dispatch,
+      getViewMode,
+      isSharedWorkspace,
+      isWorkspaceLoading,
+      user?.details?.isSyncEnabled,
+    ]
   );
 
   const confirmWorkspaceSwitch = useCallback(
