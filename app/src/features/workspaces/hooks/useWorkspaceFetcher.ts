@@ -16,13 +16,15 @@ export const useWorkspaceFetcher = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
   const appMode = useSelector(getAppMode);
 
-  const { localWorkspaces } = useFetchLocalWorkspaces();
+  const { fetchLocalWorkspaces } = useFetchLocalWorkspaces();
   const { sharedWorkspaces } = useFetchTeamWorkspaces();
   useActiveWorkspacesMembersListener();
 
   useEffect(() => {
-    dispatch(workspaceActions.setAllWorkspaces([...localWorkspaces, ...sharedWorkspaces]));
-  }, [dispatch, localWorkspaces, sharedWorkspaces]);
+    fetchLocalWorkspaces().then((allLocalWorkspaces) => {
+      dispatch(workspaceActions.setAllWorkspaces([...allLocalWorkspaces, ...sharedWorkspaces]));
+    });
+  }, [dispatch, fetchLocalWorkspaces, sharedWorkspaces]);
 
   useEffect(() => {
     if (!user.loggedIn) {
