@@ -4,16 +4,16 @@ import { ReducerKeys } from "store/constants";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 export interface WorkspaceSliceState {
-  allWorkspaces?: EntityState<Workspace>;
-  workspacesUpdatedAt?: number;
-  activeWorkspaceIds?: string[];
-  activeWorkspacesMembers?: Record<string, any>;
+  allWorkspaces: EntityState<Workspace>;
+  workspacesUpdatedAt: number;
+  activeWorkspaceIds: string[];
+  activeWorkspacesMembers: Record<string, any>;
 }
 
 export const workspacesEntityAdapter = createEntityAdapter<Workspace>({
   selectId: (workspace) => workspace.id,
   sortComparer: (a, b) => {
-    return a?.createdAt >= b?.createdAt ? 1 : -1;
+    return (a?.createdAt ?? 0) >= (b?.createdAt ?? 0) ? 1 : -1;
   },
 });
 

@@ -70,6 +70,10 @@ export const processRqImportData = (
   apis.forEach((api: RQAPI.ApiRecord) => {
     const apiToImport = { ...api };
     delete apiToImport.id;
+
+    const apiEntryType = apiToImport.data.type || RQAPI.ApiEntryType.HTTP;
+    apiToImport.data.type = apiEntryType;
+
     const newCollectionId = oldToNewIdMap[apiToImport.collectionId];
     const updatedApi = { ...apiToImport, collectionId: newCollectionId };
     updatedApiRecordsToImport.apis.push(updatedApi);
