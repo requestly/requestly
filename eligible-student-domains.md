@@ -59,6 +59,7 @@ The following domains are eligible for the student programme:
     "imt-atlantique.fr",
     "epita.fr",
     "epitech.eu",
+    "polytech-lille.net"
     "uni.au.dk",
     "student.aiuonline.edu",
     "student.su.se",
