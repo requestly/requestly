@@ -67,7 +67,8 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
 
     async start(): Promise<void> {
         if (this.isInitialized) {
-            this.replicationState.start();
+            await this.replicationState.start();
+            await this.replicationState.awaitInitialReplication();
         } else {
             console.error(`RDBReplication not initialized for entityType: ${this.syncEntityType}`);
         }
@@ -75,7 +76,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
 
     async stop(): Promise<void> {
         if (this.isInitialized) {
-            this.replicationState.cancel();
+            await this.replicationState.cancel();
             this.unsubListener?.();
         } else {
             console.error(`RDBReplication not initialized for entityType: ${this.syncEntityType}`);
@@ -95,15 +96,22 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
     };
 
     private pushRuleDataHandler: ReplicationPushHandler<RuleDataSyncEntity> = async (changedRows) => {
-        const finalUpdates: Record<string, RuleDataSyncEntity["data"] & { _deleted: boolean }> = {};
+        const conflicts = [];
+        const finalUpdates: Record<string, RuleDataSyncEntity["data"] & { _deleted?: boolean }> = {};
         changedRows.forEach((changedRow) => {
+            if (changedRow.assumedMasterState?._deleted && !changedRow.newDocumentState._deleted) {
+                console.log("[RDBReplication.pushRuleDataHandler] Conflict detected:", changedRow);
+                conflicts.push(changedRow.assumedMasterState);
+                return;
+            }
+
             finalUpdates[changedRow.newDocumentState.id] = {
                 ...changedRow.newDocumentState.data,
                 _deleted: changedRow.newDocumentState._deleted,
             };
         });
 
-        console.log("[`RDBReplication`.pushRuleDataHandler] Final updates:", finalUpdates);
+        console.log("[`RDBReplication`.pushRuleDataHandler] Final updates:", changedRows, finalUpdates);
 
         const updatedPromises = Object.entries(finalUpdates).map(([id, finalUpdate]) => {
             const updateRef = ref(db, `${this.getRuleDataPath()}/${id}`);
@@ -119,19 +127,25 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
                 console.error("[RDBReplication.pushRuleDataHandler] Error pushing rule data:", error);
             });
 
-        return []; // TODO-cleanup: Return if any conflicts or errors
+        return conflicts; // TODO-cleanup: Return if any conflicts or errors
     };
 
     private pushRuleMetadataHandler: ReplicationPushHandler<RuleMetadataSyncEntity> = async (changedRows) => {
-        const finalUpdates: Record<string, RuleMetadataRdbSchema> = {};
+        const conflicts = [];
+        const finalUpdates: Record<string, RuleMetadataSyncEntity["data"] & { _deleted?: boolean }> = {};
         changedRows.forEach((changedRow) => {
+            if (changedRow.assumedMasterState?._deleted && !changedRow.newDocumentState._deleted) {
+                console.log("[RDBReplication.pushRuleMetadataHandler] Conflict detected:", changedRow);
+                conflicts.push(changedRow.assumedMasterState);
+                return;
+            }
             finalUpdates[changedRow.newDocumentState.id] = {
                 ...changedRow.newDocumentState.data,
                 _deleted: changedRow.newDocumentState._deleted,
             };
         });
 
-        console.log("[RDBReplication.pushRuleMetadataHandler] Final updates:", finalUpdates);
+        console.log("[RDBReplication.pushRuleMetadataHandler] Final updates:", changedRows, finalUpdates);
 
         const updatePromises = Object.entries(finalUpdates).map(([id, finalUpdate]) => {
             const updateRef = ref(db, `${this.getRuleMetadataPath()}/${id}`);
@@ -147,7 +161,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
                 console.error("[RDBReplication.pushRuleDataHandler] Error pushing rule data:", error);
             });
 
-        return []; // TODO-cleanup: Return if any conflicts or errors
+        return conflicts; // TODO-cleanup: Return if any conflicts or errors
     };
 
     // #endregion
