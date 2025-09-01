@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { sendExtensionMessage } from "../app/messageHandler";
-import { ExtensionConstants } from "@requestly/shared/constants/";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 /**
  * Initializes the extension message listener to handle communication between the extension and client page.

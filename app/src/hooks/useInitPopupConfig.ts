@@ -1,4 +1,5 @@
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 import FEATURES from "config/constants/sub/features";
 import { StorageService } from "init";
 import { useCallback, useEffect, useMemo } from "react";
@@ -6,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import { ExtensionConstants } from "@requestly/shared/constants/";
 
 export const useInitPopupConfig = () => {
   const dispatch = useDispatch();
