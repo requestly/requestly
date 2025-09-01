@@ -23,6 +23,9 @@ export const ApiClientFilesProvider = ({
       if (record.type === RQAPI.RecordType.API) {
         if (isHttpApiRecord(record) && record.data.request.contentType === RequestContentType.MULTIPART_FORM) {
           const requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+          if(!requestBody) {
+            continue;
+          }
           for (const bodyEntry of requestBody) {
             const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
             if (Array.isArray(bodyValue)) {
