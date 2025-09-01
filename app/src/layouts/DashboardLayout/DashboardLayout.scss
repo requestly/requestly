@@ -1,12 +1,11 @@
 .app-layout {
-  --app-header-height: 48px;
-  --app-footer-height: 24px;
-  --app-sidebar-width: 80px;
+  --app-header-height: 40px;
+  --app-footer-height: 27px;
+  --app-sidebar-width: 64px;
 
   width: 100vw;
-  height: clamp(calc(100vh - 48px), 100vh, 100vh);
+  height: clamp(calc(100vh - var(--app-header-height)), 100vh, 100vh);
   display: grid;
-  background-color: var(--body-background);
 }
 
 .app-layout.app-dashboard-layout {
@@ -30,9 +29,7 @@
 
 .app-header {
   grid-area: header;
-  height: 100%;
-  max-height: var(--app-header-height);
-  background-color: var(--requestly-color-surface-0);
+  height: var(--app-header-height);
 
   &.app-mode-desktop {
     -webkit-app-region: drag;
@@ -61,15 +58,15 @@
   grid-area: sidebar;
   width: 100%;
   max-width: var(--app-sidebar-width);
-  background-color: var(--requestly-color-surface-0);
+  background-color: transparent;
 }
 
 .app-main-content {
   grid-area: main;
   overflow: auto !important;
-  background-color: var(--requestly-color-surface-1);
-  border: 1px solid var(--border-dark);
-  border-radius: 10px 0px 0px 10px;
+  background-color: var(--requestly-color-background);
+  border: 1px solid var(--requestly-color-white-t-10);
+  border-radius: 4px 0px 0px 4px;
 }
 
 .app-footer {
@@ -94,7 +91,7 @@
   align-items: center;
   padding: 0 2px;
   border-top: 1px solid var(--border-dark);
-  background-color: var(--body-background);
+  background: transparent;
 }
 
 @media screen and (max-width: 768px) {

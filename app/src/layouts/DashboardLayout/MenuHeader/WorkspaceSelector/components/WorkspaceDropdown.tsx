@@ -58,7 +58,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
         open={isDropdownOpen}
         onOpenChange={handleWorkspaceDropdownClick}
       >
-        <div className="workspace-selector-dropdown__content">
+        <div className="workspace-selector-dropdown__content" style={{ marginLeft: "8px" }}>
           <Tooltip
             overlayClassName="workspace-selector-tooltip"
             style={{ top: "35px" }}
@@ -70,7 +70,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
           >
             <div className="cursor-pointer items-center">
               <WorkspaceAvatar
-                size={28}
+                size={20}
                 workspace={{
                   ...activeWorkspace,
                   name: activeWorkspaceName ?? null,

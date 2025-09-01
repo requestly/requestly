@@ -1,9 +1,9 @@
 .rules-create-mode-sidebar-container {
   min-width: 208px;
   max-width: 208px;
-  height: max-content;
   padding: 16px 8px 16px 16px;
-  border-right: 1px solid var(--requestly-color-surface-1, #282828);
+  background: var(--requestly-color-surface-0);
+  border-right: 1px solid var(--requestly-color-white-t-10);
 
   .ask-ai-btn.ant-btn.ant-btn-default {
     margin-bottom: 4px;
