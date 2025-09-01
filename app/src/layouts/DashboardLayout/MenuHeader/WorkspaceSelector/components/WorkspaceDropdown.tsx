@@ -1,16 +1,18 @@
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { DownOutlined } from "@ant-design/icons";
 import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
+import { getAppMode } from "store/selectors";
 import { Dropdown, Tooltip } from "antd";
 import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { Invite, WorkspaceType } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
@@ -20,6 +22,7 @@ const prettifyWorkspaceName = (workspaceName: string) => {
 
 const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
+  const appMode = useSelector(getAppMode);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isActiveWorkspaceNotPrivate = useSelector(isActiveWorkspaceShared);
 
@@ -58,7 +61,10 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
         open={isDropdownOpen}
         onOpenChange={handleWorkspaceDropdownClick}
       >
-        <div className="workspace-selector-dropdown__content" style={{ marginLeft: "8px" }}>
+        <div
+          className="workspace-selector-dropdown__content"
+          style={{ marginLeft: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "16px" : "0px" }}
+        >
           <Tooltip
             overlayClassName="workspace-selector-tooltip"
             style={{ top: "35px" }}
