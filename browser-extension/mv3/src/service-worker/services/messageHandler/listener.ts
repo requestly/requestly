@@ -33,6 +33,7 @@ import {
 import { sendMessageToApp } from "./sender";
 import { triggerOpenCurlModalMessage, updateExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
+import { ExtensionConstants } from "@requestly/shared/constants/";
 
 export const initExternalMessageListener = () => {
   chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
@@ -214,7 +215,7 @@ export const initMessageHandler = () => {
         checkIfDesktopAppOpen().then(sendResponse);
         return true;
 
-      case EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED:
+      case ExtensionConstants.ExtensionMessages.IS_SESSION_REPLAY_ENABLED:
         getPopupConfig()
           .then((config) => {
             sendResponse(config?.session_replay === true);
@@ -224,7 +225,7 @@ export const initMessageHandler = () => {
           });
         return true;
 
-      case EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL:
+      case ExtensionConstants.ExtensionMessages.TRIGGER_OPEN_CURL_MODAL:
         triggerOpenCurlModalMessage({}, message.source);
         break;
     }

@@ -41,8 +41,6 @@ export const EXTENSION_MESSAGES = {
   CONNECT_TO_DESKTOP_APP: "connectToDesktopApp",
   DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
   DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
-  IS_SESSION_REPLAY_ENABLED: "isSessionReplayEnabled",
-  TRIGGER_OPEN_CURL_MODAL: "triggerOpenCurlModal",
 };
 
 export const EXTENSION_EXTERNAL_MESSAGES = {
@@ -71,7 +69,6 @@ export const CLIENT_MESSAGES = {
   NOTIFY_RULE_EXECUTED: "notifyRuleExecuted",
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
   NOTIFY_EXTENSION_STATUS_UPDATED: "notifyExtensionStatusUpdated",
-  OPEN_CURL_IMPORT_MODAL: "openCurlImportModal",
 };
 
 export const STORAGE_TYPE = "local";
