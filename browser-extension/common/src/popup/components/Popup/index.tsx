@@ -12,7 +12,7 @@ import { ConnectedToDesktopView } from "../DesktopAppProxy/components/ConnectedT
 import "./popup.css";
 import { message } from "antd";
 import { ApiClientContainer } from "../ApiClientContainer/ApiClientContainer";
-import { ExtensionConstants } from "@requestly/shared/constants/";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);

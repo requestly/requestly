@@ -5,7 +5,7 @@ import { CLIENT_MESSAGES } from "common/constants";
 import extensionIconManager from "./extensionIconManager";
 import { updateActivationStatus } from "./contextMenu";
 import { tabService } from "./tabService";
-import { ExtensionConstants } from "@requestly/shared/constants/";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (

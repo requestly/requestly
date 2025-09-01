@@ -33,7 +33,7 @@ import {
 import { sendMessageToApp } from "./sender";
 import { triggerOpenCurlModalMessage, updateExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
-import { ExtensionConstants } from "@requestly/shared/constants/";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 export const initExternalMessageListener = () => {
   chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {

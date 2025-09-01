@@ -47,7 +47,7 @@ import { trackHarFileOpened } from "modules/analytics/events/features/sessionRec
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { ApiClientImporterType } from "features/apiClient/types";
-import { ExtensionConstants } from "@requestly/shared/constants/";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 let hasAppModeBeenSet = false;
 /**

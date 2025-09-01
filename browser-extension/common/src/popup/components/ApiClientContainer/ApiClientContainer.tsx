@@ -6,7 +6,7 @@ import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ApiRequest from "../../../../resources/icons/api-request.svg";
 import ImportCurl from "../../../../resources/icons/curl-import.svg";
 import "./apiClientContainer.scss";
-import { ExtensionConstants } from "@requestly/shared/constants/";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 export const ApiClientContainer: React.FC = () => {
   return (
