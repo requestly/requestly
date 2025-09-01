@@ -1,6 +1,5 @@
 .workspace-selector-dropdown {
-  height: 36px;
-  padding: 4px 9px 4px 5px;
+  padding: var(--requestly-space-2, 4px);
   border-radius: var(--border-radius-sm);
 }
 
@@ -24,8 +23,9 @@
 }
 
 .active-workspace-name {
-  font-size: var(--requestly-font-size-sm, 13px);
-  font-weight: 500;
+  font-size: var(--requestly-font-size-sm);
+  font-weight: var(--requestly-font-weight-medium);
+  color: var(--requestly-color-text-default);
   max-width: 25ch;
   overflow: hidden;
   text-overflow: ellipsis;

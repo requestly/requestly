@@ -3,14 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { getAppMode, getIsSecondarySidebarCollapsed, getNetworkSessionSaveInProgress } from "store/selectors";
-import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
-import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
-import HttpRulesIcon from "assets/icons/http-rules.svg?react";
-import SessionIcon from "assets/icons/session.svg?react";
-import NetworkTrafficInspectorIcon from "assets/icons/network-traffic-inspector.svg?react";
-import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
+
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
-import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./components/InviteButton/InviteButton";
 import PATHS from "config/constants/sub/paths";
@@ -58,6 +52,10 @@ const defaultSidebarOrder = [
   SidebarItemKey.SESSIONS,
 ];
 
+export const PrimarySidebarItemIcon = ({ src, alt }: { src: string; alt: string }) => {
+  return <img src={src} alt={alt} width={20} height={20} />;
+};
+
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
@@ -83,21 +81,21 @@ export const PrimarySidebar: React.FC = () => {
         id: 0,
         title: "Home",
         path: PATHS.HOME.RELATIVE,
-        icon: <HomeOutlined />,
+        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_home.svg" alt="home" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       [SidebarItemKey.NETWORK]: {
         id: 1,
         title: "Network",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
-        icon: <NetworkTrafficIcon />,
+        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_network.svg" alt="network" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       [SidebarItemKey.NETWORK_INSPECTOR]: {
         id: 2,
         title: "Network",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficInspectorIcon />,
+        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_network.svg" alt="network" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       [SidebarItemKey.RULES]: {
@@ -106,7 +104,7 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.RULES.INDEX,
         icon: (
           <SafariComingSoonTooltip isVisible={isSafariExtension()}>
-            <HttpRulesIcon />
+            <PrimarySidebarItemIcon src="/assets/media/common/feature_rules.svg" alt="rules" />
           </SafariComingSoonTooltip>
         ),
         display: true,
@@ -125,14 +123,14 @@ export const PrimarySidebar: React.FC = () => {
         id: 4,
         title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
-        icon: <ApiOutlined />,
+        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_apis.svg" alt="apis" />,
         display: true,
       },
       [SidebarItemKey.FILES]: {
         id: 5,
         title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
-        icon: <MockServerIcon />,
+        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_files.svg" alt="files" />,
         display: true,
         tooltipContent: (
           <>
@@ -156,7 +154,7 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <SessionIcon />
+            <PrimarySidebarItemIcon src="/assets/media/common/feature_sessions.svg" alt="sessions" />
           </Tooltip>
         ),
         display: true,
@@ -174,7 +172,7 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <TbDeviceDesktopSearch />
+            <PrimarySidebarItemIcon src="/assets/media/common/feature_sessions.svg" alt="sessions" />
           </Tooltip>
         ),
         display: true,
