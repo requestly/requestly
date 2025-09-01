@@ -47,6 +47,7 @@ import { trackHarFileOpened } from "modules/analytics/events/features/sessionRec
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { ApiClientImporterType } from "features/apiClient/types";
+import { ExtensionConstants } from "@requestly/shared/constants/";
 
 let hasAppModeBeenSet = false;
 /**
@@ -364,7 +365,7 @@ const AppModeInitializer = () => {
         };
       });
 
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL, (message) => {
+      PSMH.addMessageListener(ExtensionConstants.ExtensionMessages.OPEN_CURL_IMPORT_MODAL, (message) => {
         const { curlCommand, pageURL, source } = message.payload;
 
         // Navigate to API Client with cURL import modal state

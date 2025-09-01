@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { ExtensionConstants } from "@requestly/shared/constants/";
 
 export const useInitPopupConfig = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ export const useInitPopupConfig = () => {
   ]);
 
   const fetchConfig = useCallback(async () => {
-    const popupConfig = await StorageService(appMode).getRecord("popup_config");
+    const popupConfig = await StorageService(appMode).getRecord(ExtensionConstants.StorageKeys.POPUP_CONFIG);
     return popupConfig;
   }, [appMode]);
 

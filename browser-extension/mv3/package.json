@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.44.1",
+    "@requestly/shared": "file:../../shared",
     "@requestly/web-sdk": "0.15.1",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",

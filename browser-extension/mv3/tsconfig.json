@@ -11,7 +11,7 @@
     "noEmit": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "esModuleInterop": true,

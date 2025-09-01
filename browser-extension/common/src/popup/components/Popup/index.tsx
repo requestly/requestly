@@ -12,6 +12,7 @@ import { ConnectedToDesktopView } from "../DesktopAppProxy/components/ConnectedT
 import "./popup.css";
 import { message } from "antd";
 import { ApiClientContainer } from "../ApiClientContainer/ApiClientContainer";
+import { ExtensionConstants } from "@requestly/shared/constants/";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
@@ -51,7 +52,7 @@ const Popup: React.FC = () => {
   useEffect(() => {
     chrome.runtime
       .sendMessage({
-        action: EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED,
+        action: ExtensionConstants.ExtensionMessages.IS_SESSION_REPLAY_ENABLED,
       })
       ?.then(setIsSessionReplayEnabled);
   }, []);
