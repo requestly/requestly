@@ -15,6 +15,7 @@ export const ContextualEnvironmentsSidebar: React.FC = () => {
     <div className="multiview-environments-sidebar-container">
       <SidebarListHeader
         onSearch={(value) => setSearchValue(value)}
+        listType={ApiClientSidebarTabKey.ENVIRONMENTS}
         newRecordActionOptions={{
           showNewRecordAction: true,
           onNewRecordClick: onNewClick,
