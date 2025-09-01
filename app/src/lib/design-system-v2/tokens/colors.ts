@@ -35,8 +35,7 @@ type AliasTokenKeys =
   | "primary"
   | "success"
   | "warning"
-  | "white"
-  | "bg-dark";
+  | "white";
 
 export type SeedTokens = {
   [key in SeedTokenKeys]: string;
@@ -181,7 +180,6 @@ const generateAliasTokens = (mapTokens: MapTokens) => {
     "warning-text": mapTokens["warning-200"],
     "success-darker": mapTokens["success-800"],
     "success-text": mapTokens["success-200"],
-    "bg-dark": mapTokens["neutral-1100"],
 
     // Hardcoded Colors
     white: "#FFFFFF",
