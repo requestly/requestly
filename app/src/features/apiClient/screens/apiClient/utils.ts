@@ -189,15 +189,17 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = tr
 /**
  * generic sanitization fx for keyValuePairs (form & multipartform)
  */
-export const sanitizeKeyValuePairs = <T extends { key: string; isEnabled: boolean }>(
-  keyValuePairs: T[],
-  removeDisabledKeys = true
-): T[] => {
+export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[], removeDisabledKeys = true): T[] => {
   if (!keyValuePairs) {
     return [];
   }
 
-  return keyValuePairs
+  // Hotfix for corrupted multipart requests
+  const formattedKeyValuePairs = Array.isArray(keyValuePairs)
+    ? keyValuePairs
+    : (generateKeyValuePairs(keyValuePairs) as T[]);
+
+  return formattedKeyValuePairs
     .map((pair) => ({
       ...pair,
       isEnabled: pair.isEnabled ?? true,
@@ -275,12 +277,17 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const contentType = getContentTypeFromRequestHeaders(headers);
   let body: RQAPI.RequestBody;
 
-  if (contentType === RequestContentType.JSON) {
-    body = JSON.stringify(requestJson.data);
-  } else if (contentType === RequestContentType.FORM) {
-    body = generateKeyValuePairs(requestJson.data);
-  } else {
-    body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
+  switch (contentType) {
+    case RequestContentType.JSON:
+      body = JSON.stringify(requestJson.data);
+      break;
+    case RequestContentType.FORM:
+    case RequestContentType.MULTIPART_FORM:
+      body = generateKeyValuePairs(requestJson.data);
+      break;
+    default:
+      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
+      break;
   }
 
   // remove query params from url
