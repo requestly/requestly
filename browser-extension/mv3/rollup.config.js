@@ -55,7 +55,7 @@ const processManifest = (content) => {
   return JSON.stringify(manifestJson, null, 2);
 };
 
-const commonPlugins = [typescript(), json()];
+const commonPlugins = [nodeResolve(), typescript(), json()];
 const commonConfig = {
   // https://github.com/vitejs/vite-plugin-react/pull/144
   onwarn(warning, defaultHandler) {
@@ -81,7 +81,6 @@ export default [
       format: "iife",
     },
     plugins: [
-      nodeResolve(),
       ...commonPlugins,
       copy({
         targets: [
