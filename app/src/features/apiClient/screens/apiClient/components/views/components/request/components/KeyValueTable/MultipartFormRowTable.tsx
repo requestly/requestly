@@ -4,13 +4,13 @@ import { Conditional } from "components/common/Conditional";
 import InfoIcon from "components/misc/InfoIcon";
 import { displayMultiFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
-import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFileStore.hook";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { FormDropDownOptions, RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import FileDropdown from "./FileDropdown";
 import * as Sentry from "@sentry/react";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 

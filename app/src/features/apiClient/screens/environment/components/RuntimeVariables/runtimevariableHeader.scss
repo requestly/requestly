@@ -1,0 +1,66 @@
+.runtime-variables-list-header {
+  display: flex;
+  width: auto;
+  padding: 8px 16px;
+  flex-direction: column;
+  gap: 12px;
+
+  .runtime-variables-header-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .header-title {
+      color: var(--requestly-color-text-default);
+      text-align: center;
+
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-sm);
+      font-style: normal;
+      font-weight: 500;
+      line-height: var(--requestly-font-line-height-sm);
+    }
+  }
+
+  .runtime-variables-list-action-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+
+    .runtime-variables-list-search-input {
+      display: flex;
+      width: 200px;
+      height: 32px;
+      padding: 6px 6px;
+      align-items: center;
+      gap: 6px;
+      border-radius: 4px;
+      border: 1px solid var(--requestly-color-white-t-20);
+      background-color: transparent;
+      color: var(--requestly-color-text-placeholder);
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-sm);
+      font-style: normal;
+      font-weight: 400;
+      line-height: var(--requestly-font-line-height-xs);
+    }
+
+    .runtime-variables-list-action-btn {
+      display: flex;
+      height: 24px;
+      padding: 0 8px;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      border-radius: 4px;
+    }
+    .runtime-variables-list-action-btn .delete-btn:hover {
+      background: var(--requestly-color-error-darker, #591a1a);
+      color: var(--requestly-color-error-text);
+      font-family: var(--requestly-font-family-default);
+      font-style: normal;
+      font-weight: 500;
+    }
+  }
+}

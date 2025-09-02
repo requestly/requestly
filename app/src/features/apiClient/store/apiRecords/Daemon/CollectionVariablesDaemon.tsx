@@ -1,7 +1,7 @@
 import { VariableScope } from "backend/environment/types";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 import React, { useEffect } from "react";
 import { useAPIRecordsStore } from "../ApiRecordsContextProvider";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 const CollectionVariablesDaemon: React.FC = () => {
   const recordsStore = useAPIRecordsStore();

@@ -12,7 +12,6 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
-    console.log("env entities", entities);
     const environmentsMap = entities.reduce((acc, cur) => {
       acc[cur.id] = {
         id: cur.id,
@@ -29,7 +28,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const environment: EnvironmentData = {
       id: entity.id,
       name: entity.name,
-      variables: entity.variables,
+      variables: parseEntityVariables(entity?.variables || {}),
     };
 
     return environment;
