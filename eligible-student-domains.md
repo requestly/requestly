@@ -45,6 +45,7 @@ The following domains are eligible for the student programme:
     "univ-lorraine.fr",
     "univ-nantes.fr",
     "etu.univ-amu.fr",
+    "iml.du.ac.bd",
     "duke.edu",
     "fau.de",
     "sch.gr",
@@ -63,6 +64,8 @@ The following domains are eligible for the student programme:
     "student.su.se",
     "strayer.edu",
     "student.unsika.ac.id",
-    "purdueglobal.edu"
+    "purdueglobal.edu",
+    "njit.edu",
+    "polytech-lille.net"
   ]
 }

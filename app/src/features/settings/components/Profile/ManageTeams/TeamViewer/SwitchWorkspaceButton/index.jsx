@@ -1,19 +1,20 @@
 import { SyncOutlined } from "@ant-design/icons";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Button } from "antd";
-import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
+import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/WorkspaceSelector";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isTeamArchived = false }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   // Global State
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
 
   let isButtonDisabled = true;
@@ -22,7 +23,7 @@ const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isT
     // Do offer user to switch the workspace
     isButtonDisabled = false;
   }
-  if (activeWorkspaceId && activeWorkspaceId !== selectedTeamId) {
+  if (activeWorkspace?.id && activeWorkspace?.id !== selectedTeamId) {
     // This means user has current selected a workspace that it different from what we're showing him rn on screen
     isButtonDisabled = false;
   }
@@ -40,7 +41,7 @@ const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isT
       },
       dispatch,
       {
-        isSyncEnabled: user?.details?.isSyncEnabled,
+        isSyncEnabled: activeWorkspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
         isWorkspaceMode: isSharedWorkspaceMode,
       },
       appMode

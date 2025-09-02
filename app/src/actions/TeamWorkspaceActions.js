@@ -1,4 +1,3 @@
-import { teamsActions } from "store/features/teams/slice";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
@@ -34,13 +33,16 @@ export const switchWorkspace = async (
   setLoader,
   source
 ) => {
-  const { teamId, teamName, teamMembersCount, workspaceType } = newWorkspaceDetails;
+  const { teamId } = newWorkspaceDetails;
 
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
+
+    // isWorkspaceMode - true implies user is working on a team workspace - local or shared
+    // false implies user is working on a private workspace
     if (!isWorkspaceMode) {
       // User is currently on private workspace
       if (!isSyncEnabled) {
@@ -97,18 +99,9 @@ export const switchWorkspace = async (
   if (teamId === null) {
     // We are switching to pvt workspace
     // Clear team members info
-    dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
-  dispatch(
-    teamsActions.setCurrentlyActiveWorkspace({
-      id: teamId,
-      name: teamName,
-      membersCount: teamMembersCount,
-      workspaceType: workspaceType,
-    })
-  );
   dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
 
   //Refresh Rules List

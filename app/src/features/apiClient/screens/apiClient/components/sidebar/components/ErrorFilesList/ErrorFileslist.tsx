@@ -4,15 +4,15 @@ import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { ErrorFileViewerModal } from "../../../modals/ErrorFileViewerModal/ErrorFileViewerModal";
-import { useApiClientContext } from "features/apiClient/contexts";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { toast } from "utils/Toast";
 import { notification, Popconfirm, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import "./errorFilesList.scss";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useErroredRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useCommand } from "features/apiClient/commands";
+import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
 
 const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
@@ -56,11 +56,21 @@ const DeleteErrorFileButton = ({ onDelete }: { onDelete: () => void }) => {
 export const ErrorFilesList = () => {
   const [errorFileToView, setErrorFileToView] = useState<ErroredRecord | null>(null);
   const [isErrorFileViewerModalOpen, setIsErrorFileViewerModalOpen] = useState(false);
-  const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments, errorEnvFiles } = useEnvironmentManager();
-  const errorFiles = useAPIRecords((state) => state.erroredRecords);
 
-  const files = useMemo(() => [...errorFiles, ...errorEnvFiles], [errorFiles, errorEnvFiles]);
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const [apiErroredRecords, environmentErroredRecords] = useErroredRecords((s) => [
+    s.apiErroredRecords,
+    s.environmentErroredRecords,
+  ]);
+  const {
+    env: { forceRefreshEnvironments },
+    api: { forceRefreshRecords },
+  } = useCommand();
+
+  const files = useMemo(() => [...apiErroredRecords, ...environmentErroredRecords], [
+    apiErroredRecords,
+    environmentErroredRecords,
+  ]);
 
   const handleDeleteErrorFile = async (errorFile: ErroredRecord) => {
     const result = await apiClientRecordsRepository.deleteRecords([errorFile.path]);
@@ -68,7 +78,7 @@ export const ErrorFilesList = () => {
       if (errorFile.type === FileType.ENVIRONMENT) {
         forceRefreshEnvironments();
       } else {
-        forceRefreshApiClientRecords();
+        forceRefreshRecords();
       }
       toast.success("Error file deleted successfully");
     } else {

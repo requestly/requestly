@@ -83,7 +83,12 @@ const RulesFeatureContainer = () => {
   }, [appMode]);
 
   if (isLocalSyncEnabled) {
-    return <LocalFirstComingSoon featureName="HTTP Rules" />;
+    return (
+      <LocalFirstComingSoon
+        featureName="HTTP Rules"
+        featureDescription="HTTP rules are powerful and open-source debugging tool to intercept & modify network requests, headers, API requests, inject scripts & much more—all in one place."
+      />
+    );
   }
 
   return (

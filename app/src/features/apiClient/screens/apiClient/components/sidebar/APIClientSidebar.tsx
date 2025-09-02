@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiClientImporterType, RQAPI } from "../../../../types";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { notification, Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
@@ -11,7 +11,7 @@ import { ApiClientSidebarHeader } from "./components/apiClientSidebarHeader/ApiC
 import { EnvironmentsList } from "../../../environment/components/environmentsList/EnvironmentsList";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { DeleteApiRecordModal, ImportFromCurlModal } from "../modals";
-import { getEmptyAPIEntry } from "../../utils";
+import { getEmptyApiEntry } from "../../utils";
 import "./apiClientSidebar.scss";
 import { ErrorFilesList } from "./components/ErrorFilesList/ErrorFileslist";
 
@@ -25,9 +25,10 @@ export enum ApiClientSidebarTabKey {
 
 const APIClientSidebar: React.FC<Props> = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const { requestId, collectionId } = useParams();
   const [activeKey, setActiveKey] = useState<ApiClientSidebarTabKey>(ApiClientSidebarTabKey.COLLECTIONS);
-  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType>();
+  const [recordTypeToBeCreated, setRecordTypeToBeCreated] = useState<RQAPI.RecordType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { isImportModalOpen, onImportRequestModalClose, onSaveRecord, setIsImportModalOpen } = useApiClientContext();
@@ -46,13 +47,13 @@ const APIClientSidebar: React.FC<Props> = () => {
   } = useApiClientContext();
 
   const handleNewRecordClick = useCallback(
-    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource) => {
+    (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
       setRecordTypeToBeCreated(recordType);
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
           setActiveKey(ApiClientSidebarTabKey.COLLECTIONS);
-          onNewClick(analyticEventSource, RQAPI.RecordType.API);
+          onNewClick(analyticEventSource, RQAPI.RecordType.API, "", entryType);
           return;
         }
 
@@ -141,7 +142,8 @@ const APIClientSidebar: React.FC<Props> = () => {
       setIsLoading(true);
 
       try {
-        const apiEntry = getEmptyAPIEntry(request);
+        // TODO: handle import for graphql requests
+        const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, request);
 
         const record: Partial<RQAPI.ApiRecord> = {
           type: RQAPI.RecordType.API,
@@ -154,6 +156,8 @@ const APIClientSidebar: React.FC<Props> = () => {
           onSaveRecord(result.data, "open");
 
           setIsImportModalOpen(false);
+          // Clear the navigation state after successful import
+          navigate(window.location.pathname, { replace: true });
         } else {
           throw new Error(result.message);
         }
@@ -170,7 +174,7 @@ const APIClientSidebar: React.FC<Props> = () => {
         setIsLoading(false);
       }
     },
-    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository]
+    [onSaveRecord, setIsImportModalOpen, apiClientRecordsRepository, navigate]
   );
 
   useEffect(() => {
@@ -178,6 +182,16 @@ const APIClientSidebar: React.FC<Props> = () => {
       setIsImportModalOpen(true);
     }
   }, [state?.modal, setIsImportModalOpen]);
+
+  // Get initial cURL command from state if available
+  const initialCurlCommand = state?.curlCommand || "";
+
+  // Handle modal close and clear navigation state
+  const handleImportRequestModalClose = useCallback(() => {
+    onImportRequestModalClose();
+    // Clear the navigation state when modal is closed
+    navigate(window.location.pathname, { replace: true });
+  }, [onImportRequestModalClose, navigate]);
 
   return (
     <>
@@ -188,7 +202,9 @@ const APIClientSidebar: React.FC<Props> = () => {
             history={history}
             onClearHistory={clearHistory}
             onImportClick={onImportClick}
-            onNewClick={(recordType) => handleNewRecordClick(recordType, "api_client_sidebar_header")}
+            onNewClick={(recordType, entryType) =>
+              handleNewRecordClick(recordType, "api_client_sidebar_header", entryType)
+            }
           />
 
           <Tabs
@@ -210,7 +226,10 @@ const APIClientSidebar: React.FC<Props> = () => {
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
-        onClose={onImportRequestModalClose}
+        onClose={handleImportRequestModalClose}
+        initialCurlCommand={initialCurlCommand}
+        source={state?.source ?? "sidebar"}
+        pageURL={state?.pageURL || ""}
       />
     </>
   );

@@ -30,11 +30,11 @@ export interface EnvironmentInterface<Meta extends Record<string, any>> {
 export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllRecords(): RQAPI.RecordsPromise;
-  getRecord(recordId: string): RQAPI.RecordPromise;
-  createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.RecordPromise;
-  createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.RecordPromise;
-  createRecordWithId(record: Partial<RQAPI.Record>, id: string): RQAPI.RecordPromise;
-  updateRecord(record: Partial<Omit<RQAPI.Record, "id">>, id: string): RQAPI.RecordPromise;
+  getRecord(recordId: string): RQAPI.ApiClientRecordPromise;
+  createRecord(record: Partial<RQAPI.ApiRecord>): RQAPI.ApiClientRecordPromise;
+  createCollection(record: Partial<RQAPI.CollectionRecord>): RQAPI.ApiClientRecordPromise;
+  createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise;
+  updateRecord(record: Partial<Omit<RQAPI.ApiClientRecord, "id">>, id: string): RQAPI.ApiClientRecordPromise;
   deleteRecords(recordIds: string[]): Promise<{ success: boolean; message?: string }>;
   deleteCollections(ids: string[]): Promise<{ success: boolean; data: unknown; message?: string }>;
   setCollectionVariables(
@@ -42,15 +42,15 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     variables: EnvironmentVariables
   ): Promise<{ success: boolean; data: unknown; message?: string }>;
 
-  getCollection(recordId: string): RQAPI.RecordPromise;
-  renameCollection(id: string, newName: string): RQAPI.RecordPromise;
+  getCollection(recordId: string): RQAPI.ApiClientRecordPromise;
+  renameCollection(id: string, newName: string): RQAPI.ApiClientRecordPromise;
   updateCollectionDescription(
     id: string,
     description: string
   ): Promise<{ success: boolean; data: string; message?: string }>;
   updateCollectionAuthData(
     collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }>;
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
   writeToRawFile(
@@ -62,17 +62,17 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
-  ): Promise<{ success: boolean; data: RQAPI.Record; message?: string }>;
+  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }>;
   generateCollectionId(name: string, parentId?: string): string;
   generateApiRecordId(parentId?: string): string;
   batchWriteApiEntities(
     batchSize: number,
-    entities: Partial<RQAPI.Record>[],
-    writeFunction: (entity: RQAPI.Record) => Promise<unknown>
+    entities: Partial<RQAPI.ApiClientRecord>[],
+    writeFunction: (entity: RQAPI.ApiClientRecord) => Promise<unknown>
   ): Promise<{ success: boolean; message?: string }>;
-  duplicateApiEntities(entities: Partial<RQAPI.Record>[]): Promise<RQAPI.Record[]>;
-  moveAPIEntities(entities: Partial<RQAPI.Record>[], newParentId: string): Promise<RQAPI.Record[]>;
-  batchCreateRecordsWithExistingId(records: RQAPI.Record[]): RQAPI.RecordsPromise;
+  duplicateApiEntities(entities: Partial<RQAPI.ApiClientRecord>[]): Promise<RQAPI.ApiClientRecord[]>;
+  moveAPIEntities(entities: Partial<RQAPI.ApiClientRecord>[], newParentId: string): Promise<RQAPI.ApiClientRecord[]>;
+  batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise;
 }
 
 export interface ApiClientRepositoryInterface {
