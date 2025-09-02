@@ -19,12 +19,12 @@ export class BaseTabSource implements AbstractTabSource {
   }
 
   render(): React.ReactNode {
-    const contextId = this.metadata.context.id;
-    if(contextId) {
+    const contextId = this.metadata.context?.id;
+    if (contextId) {
       return ContextId({
         children: this.component,
         id: contextId,
-      })
+      });
     }
     return this.component;
   }
