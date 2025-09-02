@@ -139,6 +139,7 @@
   overflow: hidden;
   height: 100%;
   border-top: 1px solid var(--requestly-color-white-t-10);
+  background-color: var(--requestly-color-surface-0);
 }
 
 /* table */

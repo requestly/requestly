@@ -53,6 +53,10 @@ const DashboardLayout = () => {
     [pathname]
   );
 
+  const isAppHeaderVisible = useMemo(() => {
+    return !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname));
+  }, [pathname]);
+
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
 
   useEffect(() => {
@@ -83,18 +87,20 @@ const DashboardLayout = () => {
       <PlanExpiredBanner />
 
       <div className={`app-layout app-dashboard-layout  ${isReadRole ? "read-role" : ""}`}>
-        <div
-          className={`app-header ${
-            isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
-              ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
-              : ""
-          }`}
-        >
-          {isPricingPage(pathname) ? null : <MenuHeader />}
-          <Conditional condition={isReadRole}>
-            <ViewOnlyModeBanner />
-          </Conditional>
-        </div>
+        {isAppHeaderVisible && (
+          <div
+            className={`app-header ${
+              isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
+                ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
+                : ""
+            }`}
+          >
+            <MenuHeader />
+            <Conditional condition={isReadRole}>
+              <ViewOnlyModeBanner />
+            </Conditional>
+          </div>
+        )}
 
         {isDesktopAppConnected ? (
           <ConnectedToDesktopView />
