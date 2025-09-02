@@ -21,6 +21,13 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
 import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 import { RQTooltip } from "lib/design-system-v2/components";
+import HomeIcon from "/assets/media/common/feature_home.svg";
+import NetworkIcon from "/assets/media/common/feature_network.svg";
+import RulesIcon from "/assets/media/common/feature_rules.svg";
+import ApiIcon from "/assets/media/common/feature_apis.svg";
+import FilesIcon from "/assets/media/common/feature_files.svg";
+import SessionsIcon from "/assets/media/common/feature_sessions.svg";
+
 import "./PrimarySidebar.css";
 
 enum SidebarItemKey {
@@ -52,10 +59,6 @@ const defaultSidebarOrder = [
   SidebarItemKey.SESSIONS,
 ];
 
-export const PrimarySidebarItemIcon = ({ src, alt }: { src: string; alt: string }) => {
-  return <img src={src} alt={alt} width={20} height={20} />;
-};
-
 export const PrimarySidebar: React.FC = () => {
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
@@ -81,21 +84,21 @@ export const PrimarySidebar: React.FC = () => {
         id: 0,
         title: "Home",
         path: PATHS.HOME.RELATIVE,
-        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_home.svg" alt="home" />,
+        icon: <img src={HomeIcon} alt="home" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       [SidebarItemKey.NETWORK]: {
         id: 1,
         title: "Network",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
-        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_network.svg" alt="network" />,
+        icon: <img src={NetworkIcon} alt="network" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       [SidebarItemKey.NETWORK_INSPECTOR]: {
         id: 2,
         title: "Network",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_network.svg" alt="network" />,
+        icon: <img src={NetworkIcon} alt="network" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       [SidebarItemKey.RULES]: {
@@ -104,7 +107,7 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.RULES.INDEX,
         icon: (
           <SafariComingSoonTooltip isVisible={isSafariExtension()}>
-            <PrimarySidebarItemIcon src="/assets/media/common/feature_rules.svg" alt="rules" />
+            <img src={RulesIcon} alt="rules" />
           </SafariComingSoonTooltip>
         ),
         display: true,
@@ -123,14 +126,14 @@ export const PrimarySidebar: React.FC = () => {
         id: 4,
         title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
-        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_apis.svg" alt="apis" />,
+        icon: <img src={ApiIcon} alt="apis" />,
         display: true,
       },
       [SidebarItemKey.FILES]: {
         id: 5,
         title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
-        icon: <PrimarySidebarItemIcon src="/assets/media/common/feature_files.svg" alt="files" />,
+        icon: <img src={FilesIcon} alt="files" />,
         display: true,
         tooltipContent: (
           <>
@@ -154,7 +157,7 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <PrimarySidebarItemIcon src="/assets/media/common/feature_sessions.svg" alt="sessions" />
+            <img src={SessionsIcon} alt="sessions" />
           </Tooltip>
         ),
         display: true,
@@ -172,7 +175,7 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <PrimarySidebarItemIcon src="/assets/media/common/feature_sessions.svg" alt="sessions" />
+            <img src={SessionsIcon} alt="Desktopsessions" />
           </Tooltip>
         ),
         display: true,

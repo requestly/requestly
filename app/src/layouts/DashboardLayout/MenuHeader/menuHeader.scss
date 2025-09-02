@@ -91,7 +91,9 @@
       align-items: center;
       gap: var(--requestly-space-2, 4px);
 
-      .ant-btn.rq-custom-btn.ant-btn-ghost {
+      .ant-btn.rq-custom-btn.ant-btn-ghost,
+      .ant-btn.rq-custom-btn.ant-btn-text,
+      .ant-btn.rq-custom-btn.rq-btn-transparent {
         color: var(--requestly-color-text-subtle);
 
         &:hover {
