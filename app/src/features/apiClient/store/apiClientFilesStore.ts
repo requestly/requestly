@@ -1,7 +1,7 @@
 import { create, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { RequestContentType, RQAPI } from "../types";
-import { isHttpApiRecord } from "../screens/apiClient/utils";
+import { generateKeyValuePairs, isHttpApiRecord } from "../screens/apiClient/utils";
 import { useShallow } from "zustand/shallow";
 
 function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
@@ -14,7 +14,18 @@ function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
   if (!canHaveFiles) {
     return;
   }
-  const requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+
+  let requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+
+  if (!requestBody) {
+    return;
+  }
+
+  // hotfix for existing requests
+  if (!Array.isArray(requestBody)) {
+    requestBody = generateKeyValuePairs(requestBody);
+  }
+
   for (const bodyEntry of requestBody) {
     const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
     if (Array.isArray(bodyValue)) {
@@ -133,6 +144,6 @@ const createApiClientFilesStore = (appMode: "desktop") => {
 
 export const apiClientFileStore = createApiClientFilesStore("desktop");
 
-export function useApiClientFileStore<T>(selector: (state: ApiClientFilesStore) => T ) {
+export function useApiClientFileStore<T>(selector: (state: ApiClientFilesStore) => T) {
   return useStore(apiClientFileStore, useShallow(selector));
 }
