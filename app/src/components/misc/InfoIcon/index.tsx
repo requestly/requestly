@@ -5,7 +5,7 @@ import { TooltipPlacement } from "antd/lib/tooltip";
 import "./infoIcon.scss";
 
 interface Props {
-  text: string;
+  text: React.ReactNode;
   tooltipPlacement?: TooltipPlacement;
   style?: CSSProperties;
   showArrow?: boolean;

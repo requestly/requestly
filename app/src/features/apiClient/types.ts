@@ -5,7 +5,7 @@ import {
   Authorization,
   BasicAuthAuthorizationConfig,
   BearerTokenAuthorizationConfig,
-} from "./screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+} from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
 
 export enum RequestMethod {
@@ -18,10 +18,16 @@ export enum RequestMethod {
   OPTIONS = "OPTIONS",
 }
 
+export enum FormDropDownOptions {
+  "FILE" = "file",
+  "TEXT" = "text",
+}
+
 export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  MULTIPART_FORM = "multipart/form-data",
   HTML = "text/html",
   XML = "application/xml",
   JAVASCRIPT = "application/javascript",
@@ -57,6 +63,8 @@ export enum BulkActions {
   DELETE = "DELETE",
   MOVE = "MOVE",
   EXPORT = "EXPORT",
+  EXPORT_REQUESTLY = "EXPORT_REQUESTLY",
+  EXPORT_POSTMAN = "EXPORT_POSTMAN",
   SELECT_ALL = "SELECT_ALL",
 }
 
@@ -88,17 +96,32 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
-  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody; // in case of form data, body will be key-value pairs
+  export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
   export type RequestHtmlBody = string;
   export type RequestJavascriptBody = string;
   export type RequestXmlBody = string;
   export type RequestFormBody = KeyValuePair[];
+  export type MultipartFormBody = FormDataKeyValuePair[];
+  // TODO:nafees will need to add discriminant based on contentType
+
+  export type FormDataKeyValuePair = KeyValuePair & {
+    value: string | MultipartFileValue[];
+  };
+
+  type MultipartFileValue = {
+    id: string; // file id for each multipart key value pair
+    name: string;
+    path: string;
+    size: number;
+    source: "extension" | "desktop";
+  };
 
   export type RequestBodyContainer = {
     text?: string;
     form?: KeyValuePair[];
+    multipartForm?: FormDataKeyValuePair[];
   };
 
   export type Auth = {
@@ -109,7 +132,8 @@ export namespace RQAPI {
       [Authorization.Type.BASIC_AUTH]?: BasicAuthAuthorizationConfig["config"];
     };
   };
-  export interface Request {
+
+  export type HttpRequest = {
     url: string;
     queryParams: KeyValuePair[];
     method: RequestMethod;
@@ -118,27 +142,74 @@ export namespace RQAPI {
     bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
     includeCredentials?: boolean;
-  }
+  };
 
-  export interface Response {
+  export type HttpResponse = {
     body: string;
     headers: KeyValuePair[];
     status: number;
     statusText: string;
     time: number;
     redirectedUrl: string;
-  }
+  };
 
-  export interface Entry {
-    request: Request;
-    response?: Response;
+  export type HttpSpec = {
+    request: HttpRequest;
+    response: HttpResponse;
+  };
+
+  export type GraphQLRequest = {
+    url: string;
+    headers: KeyValuePair[];
+    operation: string;
+    variables: string;
+    operationName?: string;
+  };
+
+  export type GraphQLResponse = {
+    type: "http" | "ws";
+    body: string;
+    headers: KeyValuePair[];
+    status: number;
+    statusText: string;
+    time: number;
+  };
+
+  export type ApiEntryMetaData = {
     testResults?: TestResult[];
     scripts?: {
       preRequest: string;
       postResponse: string;
     };
     auth: Auth;
+  };
+
+  export enum ApiEntryType {
+    HTTP = "http",
+    GRAPHQL = "graphql",
   }
+
+  export type ApiEntryMap<T extends ApiEntryType> = T extends ApiEntryType.HTTP
+    ? HttpApiEntry
+    : T extends ApiEntryType.GRAPHQL
+    ? GraphQLApiEntry
+    : never;
+
+  export type GraphQLApiEntry = {
+    request: GraphQLRequest;
+    response: GraphQLResponse;
+  } & ApiEntryMetaData & { type: ApiEntryType.GRAPHQL };
+
+  export type HttpApiEntry = {
+    request: HttpRequest;
+    response: HttpResponse;
+  } & ApiEntryMetaData & { type: ApiEntryType.HTTP };
+
+  export type ApiEntry = GraphQLApiEntry | HttpApiEntry;
+
+  export type Request = GraphQLRequest | HttpRequest;
+
+  export type Response = GraphQLResponse | HttpResponse;
 
   export enum ExecutionStatus {
     SUCCESS = "success",
@@ -161,12 +232,12 @@ export namespace RQAPI {
   export type ExecutionResult =
     | {
         status: ExecutionStatus.SUCCESS;
-        executedEntry: RQAPI.Entry;
+        executedEntry: ApiEntry;
         warning?: ExecutionWarning;
       }
     | {
         status: ExecutionStatus.ERROR;
-        executedEntry: RQAPI.Entry;
+        executedEntry: ApiEntry;
         error: ExecutionError;
       };
 
@@ -183,7 +254,7 @@ export namespace RQAPI {
       };
 
   export interface Collection {
-    children?: Record[];
+    children?: ApiClientRecord[];
     scripts?: {
       preRequest: string;
       postResponse: string;
@@ -192,7 +263,7 @@ export namespace RQAPI {
     auth: Auth;
   }
 
-  interface RecordMetadata {
+  export interface RecordMetadata {
     id: string;
     name: string;
     description?: string;
@@ -206,9 +277,8 @@ export namespace RQAPI {
     updatedTs: number;
   }
 
-  export interface ApiRecord extends RecordMetadata {
+  export interface BaseApiRecord extends RecordMetadata {
     type: RecordType.API;
-    data: Entry;
   }
 
   export interface CollectionRecord extends RecordMetadata {
@@ -216,13 +286,22 @@ export namespace RQAPI {
     data: Collection;
   }
 
-  export type Record = ApiRecord | CollectionRecord;
+  export type ApiRecord = {
+    type: RecordType.API;
+    data: ApiEntry;
+  } & BaseApiRecord;
 
-  export type RecordPromise = Promise<{ success: boolean; data: Record; message?: string }>;
+  export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
+
+  export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
+
+  export type ApiClientRecord = ApiRecord | CollectionRecord;
+
+  export type ApiClientRecordPromise = Promise<{ success: boolean; data: ApiClientRecord; message?: string }>;
 
   export type RecordsPromise = Promise<{
     success: boolean;
-    data: { records: Record[]; erroredRecords: ErroredRecord[] };
+    data: { records: ApiClientRecord[]; erroredRecords: ErroredRecord[] };
     message?: string;
   }>;
 
@@ -231,6 +310,7 @@ export namespace RQAPI {
     CORE = "core",
     ABORT = "abort",
     SCRIPT = "script",
+    MISSING_FILE = "missing_file",
   }
 }
 

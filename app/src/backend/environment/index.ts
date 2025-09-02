@@ -21,8 +21,7 @@ import {
   trackEnvironmentDeletedFromDB,
   trackEnvironmentUpdatedInDB,
 } from "features/apiClient/screens/environment/analytics";
-import { fetchLock } from "./fetch-lock";
-import { patchMissingIdInVariables } from "backend/apiClient/utils";
+import { captureException, patchMissingIdInVariables } from "backend/apiClient/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 
 const db = getFirestore(firebaseApp);
@@ -70,7 +69,7 @@ export const updateEnvironmentInDB = async (
     updates.variables = Object.fromEntries(
       Object.entries(updates.variables).map(([key, value]) => [
         key,
-        { syncValue: value.syncValue, type: value.type, id: value.id },
+        { syncValue: value.syncValue, type: value.type, id: value.id, isPersisted: true },
       ])
     );
   }
@@ -149,7 +148,6 @@ const createGlobalEnvironmentInDB = async (ownerId: string) => {
 };
 
 export const fetchAllEnvironmentDetails = async (ownerId: string) => {
-  const releaseLock = await fetchLock.acquire();
   try {
     if (!ownerId) {
       return {};
@@ -178,9 +176,7 @@ export const fetchAllEnvironmentDetails = async (ownerId: string) => {
 
     return environmentDetails;
   } catch (e) {
-    console.log("aaa", e);
-  } finally {
-    releaseLock();
+    captureException(e);
   }
 };
 

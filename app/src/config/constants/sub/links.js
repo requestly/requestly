@@ -96,7 +96,7 @@ const LINKS = {
   // Contact Us Page
   CONTACT_US_PAGE: getLinkWithMetadata("https://requestly.com/contact-us/"),
   // Book A Demo
-  BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
+  BOOK_A_DEMO: "https://www.browserstack.com/contact?utm_source=Requestly&utm_medium=redirect&utm_platform=external",
 
   /** SUPPORT */
 
@@ -144,8 +144,6 @@ const LINKS = {
 
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 
-  CALENDLY_LINK: "https://calendly.com/requestly/sagar",
-
   ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
 
   STUDENT_PROGRAM_DOC: "https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131",
@@ -165,6 +163,11 @@ const LINKS = {
   DOWNLOAD_CRX: "https://requestly.com/downloads/crx/",
 
   DOWNLOAD_CHROME_EXTENSION_ZIP: "https://rqst.ly/chrome/zip",
+
+  SHARE_ON_LINKEDIN_FORM: "https://app.formbricks.com/s/gsfvea1k3n53is5fit337ibp",
+
+  NOTION_PAGE_FOR_PROMOTION:
+    "https://requestly.notion.site/Help-Us-Grow-Requestly-Get-4-Months-Free-25cd193f3c998015ad1dfab733e8cfd2?source=copy_link",
 };
 
 export default LINKS;

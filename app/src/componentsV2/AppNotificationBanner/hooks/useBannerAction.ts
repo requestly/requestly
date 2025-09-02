@@ -38,7 +38,7 @@ export const useBannerAction = (
         label: "contact us",
         type: "default",
         onClick: () => {
-          redirectToUrl(LINKS.CALENDLY_LINK, true);
+          redirectToUrl(LINKS.BOOK_A_DEMO, true);
         },
       },
       [BANNER_ACTIONS.REQUEST_ACCESS]: {
@@ -60,6 +60,20 @@ export const useBannerAction = (
         type: "primary",
         onClick: () => {
           dispatch(globalActions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+        },
+      },
+      [BANNER_ACTIONS.REDIRECT_TO_NOTION_PAGE]: {
+        label: "Share Now",
+        type: "primary",
+        onClick: () => {
+          redirectToUrl(LINKS.NOTION_PAGE_FOR_PROMOTION, true);
+        },
+      },
+      [BANNER_ACTIONS.REDIRECT_TO_LINKEDIN_FORM]: {
+        label: "Share Now",
+        type: "primary",
+        onClick: () => {
+          redirectToUrl(LINKS.SHARE_ON_LINKEDIN_FORM, true);
         },
       },
       [BANNER_ACTIONS.REDIRECT_TO_CHROME_STORE_REVIEWS]: {

@@ -1,5 +1,6 @@
 import { EXTENSION_MESSAGES } from "common/constants";
 import { getAllSupportedWebURLs } from "../../utils";
+import config from "common/config";
 
 type TabId = chrome.tabs.Tab["id"];
 
@@ -97,6 +98,12 @@ class TabService {
     }
 
     return appTabs;
+  }
+
+  async createAppTab(): Promise<chrome.tabs.Tab> {
+    const webUrl = config.WEB_URL;
+
+    return chrome.tabs.create({ url: webUrl });
   }
 
   addOrUpdateTab(tab: TabData) {

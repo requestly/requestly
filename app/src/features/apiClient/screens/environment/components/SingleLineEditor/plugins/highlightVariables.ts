@@ -1,14 +1,12 @@
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 interface VariableSetters {
   setHoveredVariable: (token: string | null) => void;
   setPopupPosition: (position: { x: number; y: number }) => void;
 }
 
-export const highlightVariablesPlugin = (
-  setters: VariableSetters,
-  currentEnvironmentVariables: Record<string, any> = {}
-) => {
+export const highlightVariablesPlugin = (setters: VariableSetters, variables: ScopedVariables) => {
   return ViewPlugin.fromClass(
     class {
       decorations: DecorationSet;
@@ -51,7 +49,7 @@ export const highlightVariablesPlugin = (
 
           decorations.push(
             Decoration.mark({
-              class: `highlight-${variable in currentEnvironmentVariables ? "defined" : "undefined"}-variable`,
+              class: `highlight-${variables.has(variable) ? "defined" : "undefined"}-variable`,
             }).range(match.index, match.index + match[0].length)
           );
         }

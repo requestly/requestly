@@ -43,6 +43,9 @@ The following domains are eligible for the student programme:
     "utm.md",
     "fernuni-hagen.de",
     "univ-lorraine.fr",
+    "univ-nantes.fr",
+    "etu.univ-amu.fr",
+    "iml.du.ac.bd",
     "duke.edu",
     "fau.de",
     "sch.gr",
@@ -53,12 +56,16 @@ The following domains are eligible for the student programme:
     "yorku.ca",
     "torontomu.ca",
     "hunterschools.org",
+    "imt-atlantique.fr",
+    "epita.fr",
     "epitech.eu",
     "uni.au.dk",
     "student.aiuonline.edu",
     "student.su.se",
     "strayer.edu",
     "student.unsika.ac.id",
-    "purdueglobal.edu"
+    "purdueglobal.edu",
+    "njit.edu",
+    "polytech-lille.net"
   ]
 }

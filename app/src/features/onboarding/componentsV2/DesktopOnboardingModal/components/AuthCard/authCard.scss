@@ -1,0 +1,32 @@
+.auth-card {
+  .auth-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: var(--requestly-font-weight-medium);
+
+    svg {
+      cursor: pointer;
+    }
+  }
+
+  .auth-card-description {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+  }
+
+  .auth-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .auth-card-footer {
+    font-size: var(--requestly-font-size-xs);
+    margin-top: 16px;
+    color: var(--requestly-color-text-placeholder);
+  }
+}

@@ -5,10 +5,10 @@ import { ErroredRecord, FileType } from "features/apiClient/helpers/modules/sync
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RQButton } from "lib/design-system-v2/components";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { toast } from "utils/Toast";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useCommand } from "features/apiClient/commands";
 import "./errorFileViewerModal.scss";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 
 interface ErrorFileViewerModalProps {
   isOpen: boolean;
@@ -18,8 +18,11 @@ interface ErrorFileViewerModalProps {
 
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
   const [fileContent, setFileContent] = useState(null);
-  const { apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
-  const { forceRefreshEnvironments } = useEnvironmentManager({ initFetchers: false });
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const {
+    env: { forceRefreshEnvironments },
+    api: { forceRefreshRecords },
+  } = useCommand();
 
   useEffect(() => {
     const fetchErrorFileData = async () => {
@@ -38,7 +41,7 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
       errorFile.type === FileType.COLLECTION_VARIABLES ||
       errorFile.type === FileType.DESCRIPTION
     ) {
-      forceRefreshApiClientRecords();
+      forceRefreshRecords();
     }
     if (errorFile.type === FileType.ENVIRONMENT) {
       forceRefreshEnvironments();

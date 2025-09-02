@@ -92,7 +92,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   }, [records]);
 
   const contentTableAdaptedRecords = useMemo(() => {
-    const enhancedRecords = enhanceRecords(filteredRecords, allRecordsMap);
+    const enhancedRecords = enhanceRecords(filteredRecords, allRecordsMap).filter(Boolean);
     return recordsToContentTableDataAdapter(enhancedRecords);
   }, [filteredRecords, allRecordsMap]);
 

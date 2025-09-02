@@ -15,6 +15,7 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": false,
+    "strictNullChecks": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
@@ -23,7 +24,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-
   "exclude": ["node_modules", "build"],
   "include": ["./src/**/*"]
 }

@@ -9,6 +9,19 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.8.21",
+    logs: [
+      "[ENGG-4096] added default blocklist for extension (#3339)",
+      "[ENGG-4096] fix: updated default blocklist in storage (#3350)",
+      "[ENGG-4125] feat: User should be able to execute cURL from any website (#3394)",
+      "[ENGG-4120] added API client options in the extension popup and hide session replay in popup though popup configuration (#3398)",
+    ],
+  },
+  {
+    version: "25.7.21",
+    logs: ["chore: whitelist testing toolkit extension in manifest"],
+  },
+  {
     version: "25.7.1",
     logs: [
       "[ENGG-3727] fix(style): update font size as per design system",

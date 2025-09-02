@@ -10,6 +10,7 @@ import {
   getRecordsSyncPath,
 } from "utils/syncing/syncDataUtils";
 import { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";
+import { trackAttr } from "modules/analytics";
 
 // Broadcast channel setup
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
@@ -68,6 +69,7 @@ const ActiveWorkspace = () => {
   }
 
   useEffect(() => {
+    trackAttr("active_workspace_id", activeWorkspace?.id || "NONE");
     window.currentlyActiveWorkspaceTeamRole = role;
     window.currentlyActiveWorkspaceTeamId = activeWorkspace?.id;
     window.currentlyActiveWorkspaceType = activeWorkspace?.workspaceType;

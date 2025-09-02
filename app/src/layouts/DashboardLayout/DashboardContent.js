@@ -4,7 +4,7 @@ import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
 import { globalActions } from "store/slices/global/slice";
 //UTILS
-import { getAppOnboardingDetails, getIsOnboardingCompleted, getRequestBot } from "store/selectors";
+import { getAppMode, getIsOnboardingCompleted, getRequestBot } from "store/selectors";
 import { getActiveModals } from "store/slices/global/modals/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -12,8 +12,7 @@ import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-import CreateWorkspaceModal from "componentsV2/modals/CreateWorkspaceModal";
-import { CreateWorkspaceModalV2 } from "componentsV2/modals/CreateWorkspaceModalV2/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "componentsV2/modals/CreateWorkspaceModal/CreateWorkspaceModal";
 import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
@@ -23,13 +22,13 @@ import { SharingModal } from "components/common/SharingModal";
 import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 import { isPricingPage } from "utils/PathUtils";
-import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { RequestBot } from "features/requestBot";
-import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { OnboardingModal, PersonaSurveyModal } from "features/onboarding";
-import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { DesktopOnboardingModal } from "features/onboarding/componentsV2/DesktopOnboardingModal/DesktopOnboardingModal";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -37,15 +36,12 @@ const DashboardContent = () => {
   //Global state
   const dispatch = useDispatch();
   const activeModals = useSelector(getActiveModals);
-  const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
   const requestBotDetails = useSelector(getRequestBot);
-  const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isRequestBotVisible = requestBotDetails?.isActive;
   const isOnboardingCompleted = useSelector(getIsOnboardingCompleted);
+  const appMode = useSelector(getAppMode);
 
   const toggleSpinnerModal = () => {
     dispatch(globalActions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -125,19 +121,11 @@ const DashboardContent = () => {
             />
           ) : null}
           {activeModals.createWorkspaceModal.isActive ? (
-            isLocalSyncEnabled ? (
-              <CreateWorkspaceModalV2
-                isOpen={activeModals.createWorkspaceModal.isActive}
-                toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
-                {...activeModals.createWorkspaceModal.props}
-              />
-            ) : (
-              <CreateWorkspaceModal
-                isOpen={activeModals.createWorkspaceModal.isActive}
-                toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
-                {...activeModals.createWorkspaceModal.props}
-              />
-            )
+            <CreateWorkspaceModal
+              isOpen={activeModals.createWorkspaceModal.isActive}
+              toggleModal={() => dispatch(globalActions.toggleActiveModal({ modalName: "createWorkspaceModal" }))}
+              {...activeModals.createWorkspaceModal.props}
+            />
           ) : null}
 
           {activeModals.inviteMembersModal.isActive ? (
@@ -190,21 +178,14 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
-          {isBrowserstackIntegrationOn ? (
-            <>
-              {!isOnboardingCompleted ? <OnboardingModal /> : null}
-              <PersonaSurveyModal />
-              {/* <AcquisitionAnnouncementModal /> */}
-            </>
-          ) : (
-            <>
-              {onboardingVariation !== "variant1" &&
-                shouldShowOnboarding() &&
-                !appOnboardingDetails.isOnboardingCompleted && (
-                  <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
-                )}{" "}
-            </>
-          )}
+          {!isOnboardingCompleted ? (
+            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.LOCAL_FIRST_DESKTOP_APP) ? (
+              <DesktopOnboardingModal />
+            ) : (
+              <OnboardingModal />
+            )
+          ) : null}
+          <PersonaSurveyModal />
 
           <RequestBillingTeamAccessReminder />
 

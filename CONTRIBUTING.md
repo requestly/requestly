@@ -33,7 +33,7 @@ All submissions require code review from team. So, please be patient. In case yo
 Requestly is composed of multiple modules:
 - [Browser extension](./browser-extension)
 - [UI application](./app)
-- [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Linux, Windows)
+- [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Windows)
 - [Mobile SDK](https://github.com/requestly/requestly-android-sdk) (to debug mobile apps)
 - [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates SessionBook)
 - [Mock Server](https://github.com/requestly/requestly-mock-server)

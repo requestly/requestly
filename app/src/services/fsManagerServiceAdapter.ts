@@ -61,17 +61,17 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async createRecord(record: API["request"], collectionId?: string) {
+  async createRecord(record: API["data"], collectionId?: string) {
     return this.invokeProcedureInBG("createRecord", record, collectionId) as Promise<FileSystemResult<API>>;
   }
 
   @FsErrorHandler
-  async createRecordWithId(record: API["request"], id: string) {
+  async createRecordWithId(record: API["data"], id: string) {
     return this.invokeProcedureInBG("createRecordWithId", record, id) as Promise<FileSystemResult<API>>;
   }
 
   @FsErrorHandler
-  async updateRecord(patch: Partial<API["request"]>, id: string) {
+  async updateRecord(patch: Partial<API["data"]>, id: string) {
     return this.invokeProcedureInBG("updateRecord", patch, id) as Promise<FileSystemResult<API>>;
   }
 
@@ -159,18 +159,20 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   @FsErrorHandler
   async createCollectionFromCompleteRecord(collection: RQAPI.CollectionRecord, id: string) {
     return this.invokeProcedureInBG("createCollectionFromCompleteRecord", collection, id) as Promise<
-      FileSystemResult<RQAPI.Record>
+      FileSystemResult<RQAPI.ApiClientRecord>
     >;
   }
 
   @FsErrorHandler
   async moveRecord(id: string, newParentId: string) {
-    return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+    return this.invokeProcedureInBG("moveRecord", id, newParentId) as Promise<FileSystemResult<RQAPI.ApiClientRecord>>;
   }
 
   @FsErrorHandler
   async moveCollection(id: string, newParentId: string) {
-    return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<FileSystemResult<RQAPI.Record>>;
+    return this.invokeProcedureInBG("moveCollection", id, newParentId) as Promise<
+      FileSystemResult<RQAPI.ApiClientRecord>
+    >;
   }
 }
 
