@@ -6,9 +6,9 @@ import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
-import "./errorFileViewerModal.scss";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useCommand } from "features/apiClient/commands";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import "./errorFileViewerModal.scss";
 
 interface ErrorFileViewerModalProps {
   isOpen: boolean;
@@ -18,7 +18,6 @@ interface ErrorFileViewerModalProps {
 
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
   const [fileContent, setFileContent] = useState(null);
-
   const { apiClientRecordsRepository } = useApiClientRepository();
   const {
     env: { forceRefreshEnvironments },

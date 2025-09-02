@@ -69,7 +69,7 @@ export const updateEnvironmentInDB = async (
     updates.variables = Object.fromEntries(
       Object.entries(updates.variables).map(([key, value]) => [
         key,
-        { syncValue: value.syncValue, type: value.type, id: value.id },
+        { syncValue: value.syncValue, type: value.type, id: value.id, isPersisted: true },
       ])
     );
   }
