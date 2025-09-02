@@ -1,9 +1,9 @@
 import { Form, FormInstance, Input, InputNumber, Select, Tooltip } from "antd";
 import React, { useCallback, useContext, useRef, useEffect } from "react";
-import { EnvironmentVariableTableRow } from "../../VariablesList";
 import { EnvironmentVariableType } from "backend/environment/types";
 import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import { VariableRow } from "../../VariablesList";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -16,9 +16,9 @@ interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
   children: React.ReactNode;
-  dataIndex: keyof EnvironmentVariableTableRow;
-  record: EnvironmentVariableTableRow;
-  handleVariableChange: (record: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => void;
+  dataIndex: keyof VariableRow;
+  record: VariableRow;
+  handleVariableChange: (record: VariableRow, fieldChanged: keyof VariableRow) => void;
   isSecret?: boolean;
   options?: string[];
   duplicateKeyIndices?: Set<number>;
