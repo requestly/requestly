@@ -282,12 +282,12 @@ export class HttpRequestExecutor {
   }
 
   async execute(): Promise<RQAPI.ExecutionResult> {
-    //clear the response before execution
-    this.entryDetails.response = null;
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPART_FORM) {
       const { invalidFiles } = await this.validateMultipartFormBodyFiles();
       const isInvalid = invalidFiles.length > 0;
       if (isInvalid) {
+        //clear the response before execution
+        this.entryDetails.response = null;
         trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
 
         return {
