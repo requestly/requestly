@@ -1,9 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
-import {
-  EnvironmentVariableTableRow,
-  VariablesList,
-} from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 import { VariablesListHeader } from "features/apiClient/screens/environment/components/VariablesListHeader/VariablesListHeader";
 import { toast } from "utils/Toast";
 import { useHasUnsavedChanges } from "hooks";
@@ -16,6 +12,8 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useVariableStore } from "features/apiClient/hooks/useVariable.hook";
 import { NativeError } from "errors/NativeError";
+import { CollectionsVariablesList } from "../CollectionsVariablesList";
+import { VariableRow } from "features/apiClient/screens/environment/components/VariablesList/VariablesList";
 
 interface CollectionsVariablesViewProps {
   collection: RQAPI.CollectionRecord;
@@ -29,12 +27,12 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
   const collectionRecordState = collectionRecord.getState() as CollectionRecordState;
 
   const variablesMap = useVariableStore(collectionRecordState.collectionVariables);
-  const variables = Object.fromEntries(variablesMap.data);
+  const variables = useMemo(() => Object.fromEntries(variablesMap.data), [variablesMap]);
 
   const {
     api: { setCollectionVariables },
   } = useCommand();
-  const pendingVariablesRef = useRef<EnvironmentVariableTableRow[]>([]);
+  const pendingVariablesRef = useRef<VariableRow[]>([]);
 
   const [pendingVariables, setPendingVariables] = useState(mapToEnvironmentArray(variables) || []);
   const [searchValue, setSearchValue] = useState("");
@@ -59,7 +57,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
     }
   }, [collection.id, collection?.data?.variables, variables, isSaving]);
 
-  const handleSetPendingVariables = (variables: EnvironmentVariableTableRow[]) => {
+  const handleSetPendingVariables = (variables: VariableRow[]) => {
     setPendingVariables(variables);
     pendingVariablesRef.current = variables;
   };
@@ -102,7 +100,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         hasUnsavedChanges={hasUnsavedChanges}
         isSaving={isSaving}
       />
-      <VariablesList
+      <CollectionsVariablesList
         variables={pendingVariables}
         onVariablesChange={handleSetPendingVariables}
         searchValue={searchValue}

@@ -1,10 +1,12 @@
 import { EnvironmentVariables } from "backend/environment/types";
+import { RuntimeVariables } from "features/apiClient/store/runtimeVariables/utils";
 import { RQAPI } from "features/apiClient/types";
 
 export type BaseSnapshot = {
   global: EnvironmentVariables;
-  collection: EnvironmentVariables;
+  collectionVariables: EnvironmentVariables;
   environment: EnvironmentVariables;
+  variables: RuntimeVariables;
 };
 
 export type SnapshotForPreRequest = BaseSnapshot & {

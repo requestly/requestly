@@ -42,6 +42,10 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-dark);
+
+    .actions {
+      flex-shrink: 0;
+    }
   }
 
   .api-client-sidebar-content {

@@ -5,5 +5,9 @@ export const getTabServiceActions = () => {
     tabServiceStore.getState().reset(ignorePath);
   };
 
-  return { resetTabs };
+  function closeTabsByContext(contextId?: string, skipUnsavedPrompt?: boolean) {
+    tabServiceStore.getState().closeTabByContext(contextId, skipUnsavedPrompt);
+  }
+
+  return { resetTabs, closeTabsByContext };
 };

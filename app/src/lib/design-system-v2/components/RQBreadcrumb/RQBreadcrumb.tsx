@@ -16,7 +16,7 @@ interface Props {
   autoFocus?: boolean;
   defaultBreadcrumbs?: {
     pathname: string;
-    label: string;
+    label: React.ReactNode;
     disabled?: boolean;
     isEditable?: boolean;
   }[];
@@ -42,7 +42,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   disabled = false,
   recordName,
   placeholder,
-  onRecordNameUpdate,
+  onRecordNameUpdate = () => {},
   autoFocus = false,
   defaultBreadcrumbs = [],
 }) => {
@@ -133,7 +133,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     }}
                   />
                 ) : (
-                  <div className="rq-breadcrumb-record-name" title={name || placeholder}>
+                  <div key={index} className="rq-breadcrumb-record-name" title={name || placeholder}>
                     <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                       {name || placeholder}
                     </Typography.Text>
@@ -157,7 +157,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
               )}
 
               {index < breadcrumbs.length - 1 ? (
-                <span className="rq-breadcrumb-separator">
+                <span key={index} className="rq-breadcrumb-separator">
                   <MdOutlineChevronRight />
                 </span>
               ) : null}
