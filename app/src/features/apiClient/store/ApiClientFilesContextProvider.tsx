@@ -2,7 +2,7 @@ import { StoreApi } from "zustand";
 import { ApiClientFile, ApiClientFilesStore, createApiClientFilesStore, FileId } from "./apiClientFilesStore";
 import { createContext, ReactNode, useMemo } from "react";
 import { RequestContentType, RQAPI } from "../types";
-import { isHttpApiRecord } from "../screens/apiClient/utils";
+import { generateKeyValuePairs, isHttpApiRecord } from "../screens/apiClient/utils";
 
 export const ApiClientFilesContext = createContext<StoreApi<ApiClientFilesStore>>(null);
 
@@ -22,9 +22,15 @@ export const ApiClientFilesProvider = ({
     for (const record of records) {
       if (record.type === RQAPI.RecordType.API) {
         if (isHttpApiRecord(record) && record.data.request.contentType === RequestContentType.MULTIPART_FORM) {
-          const requestBody = record.data.request.body as RQAPI.MultipartFormBody;
-          if(!requestBody) {
+          let requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+
+          if (!requestBody) {
             continue;
+          }
+
+          // hotfix for existing requests
+          if (!Array.isArray(requestBody)) {
+            requestBody = generateKeyValuePairs(requestBody);
           }
           for (const bodyEntry of requestBody) {
             const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
