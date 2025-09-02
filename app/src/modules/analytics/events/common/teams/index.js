@@ -1,5 +1,6 @@
 import { trackEvent } from "modules/analytics";
 import { TEAMS } from "../constants";
+import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 export const trackWorkspaceSwitched = (source) => {
   const params = { source };
@@ -90,4 +91,26 @@ export const trackTeamPlanBannerViewed = () => {
 
 export const trackTeamPlanBannerClicked = (action, source) => {
   trackEvent(TEAMS.GET_TEAM_PLAN_BANNER_CLICKED, { action, source });
+};
+
+export const trackMultiWorkspaceSelected = (source) => {
+  const { viewMode, selectedWorkspaces } = apiClientMultiWorkspaceViewStore.getState();
+  trackEvent(TEAMS.MULTI_WORKSPACE_SELECTED, {
+    view_mode: viewMode,
+    final_workspace_count: selectedWorkspaces.length,
+    source,
+  });
+};
+
+export const trackMultiWorkspaceDeselected = (source) => {
+  const { viewMode, selectedWorkspaces } = apiClientMultiWorkspaceViewStore.getState();
+  trackEvent(TEAMS.MULTI_WORKSPACE_DESELECTED, {
+    view_mode: viewMode,
+    final_workspace_count: selectedWorkspaces.length,
+    source,
+  });
+};
+
+export const trackManageWorkspaceClicked = (source) => {
+  trackEvent(TEAMS.MANAGE_WORKSPACE_CLICKED, { source });
 };

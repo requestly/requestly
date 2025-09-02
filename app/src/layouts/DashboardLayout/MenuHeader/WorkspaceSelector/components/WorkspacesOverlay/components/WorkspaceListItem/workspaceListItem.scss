@@ -5,17 +5,15 @@
   gap: 12px;
   border-radius: 4px;
   cursor: pointer;
+  user-select: none;
+
+  &.disabled {
+    cursor: not-allowed;
+  }
 
   &--local {
     .ant-avatar {
       border-radius: 50%;
-    }
-  }
-  &:hover {
-    .local-workspace-actions {
-      &__settings-btn {
-        display: flex;
-      }
     }
   }
 
@@ -60,6 +58,8 @@
   }
 
   .workspace-overlay__list-item-actions {
+    cursor: pointer;
+
     .ant-btn {
       color: var(--requestly-color-text-subtle);
       &:hover {
@@ -75,8 +75,46 @@
   }
 
   .local-workspace-actions {
-    &__settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+
+    .local-workspace-actions__checkbox {
+      width: 100%;
+      min-width: 28px;
+      max-width: 28px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      .ant-checkbox {
+        top: 0;
+      }
+    }
+
+    .local-workspace-actions__checkbox,
+    .local-workspace-actions__settings-btn {
       display: none;
+    }
+  }
+
+  &.multi-mode {
+    .local-workspace-actions__checkbox {
+      display: inline-flex;
+    }
+  }
+
+  &:hover {
+    .local-workspace-actions__checkbox,
+    .local-workspace-actions__settings-btn {
+      display: inline-flex;
+    }
+
+    .local-workspace-actions__checkbox.ant-checkbox-wrapper {
+      .ant-checkbox-inner {
+        border-color: var(--requestly-color-white-t-20);
+      }
     }
   }
 }
