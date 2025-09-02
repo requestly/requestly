@@ -6,7 +6,7 @@ import { RQButton } from "lib/design-system/components";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
-import { PrimarySidebarItemIcon } from "../..";
+import inviteIcon from "/assets/media/common/feature_invite.svg";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -57,7 +57,7 @@ const InviteButton: React.FC = () => {
         }}
         className="primary-sidebar-link w-full"
       >
-        <PrimarySidebarItemIcon src="/assets/media/common/feature_invite.svg" alt="invite" />
+        <img src={inviteIcon} alt="invite" />
         <span className="link-title">{"Invite"}</span>
       </RQButton>
     </>

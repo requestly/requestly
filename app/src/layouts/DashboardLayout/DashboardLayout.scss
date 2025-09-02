@@ -4,7 +4,7 @@
   --app-sidebar-width: 64px;
 
   width: 100vw;
-  height: clamp(calc(100vh - var(--app-header-height)), 100vh, 100vh);
+  height: 100vh;
   display: grid;
 }
 
@@ -19,10 +19,10 @@
 
 .app-layout.app-dashboard-layout {
   &.read-role {
-    --view-only-banner-height: 32px;
+    --view-only-banner-height: 28px;
 
     .app-header {
-      max-height: calc(var(--app-header-height) + var(--view-only-banner-height));
+      min-height: calc(var(--app-header-height) + var(--view-only-banner-height));
     }
   }
 }
