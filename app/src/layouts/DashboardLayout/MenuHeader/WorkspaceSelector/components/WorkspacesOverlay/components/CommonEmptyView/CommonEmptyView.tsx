@@ -5,9 +5,10 @@ import { RQButton } from "lib/design-system/components";
 import { globalActions } from "store/slices/global/slice";
 import { WorkspaceType } from "types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./commonEmptyView.scss";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import "./commonEmptyView.scss";
 
 interface CommonEmptyViewProps {
   toggleDropdown: () => void;
@@ -16,6 +17,7 @@ interface CommonEmptyViewProps {
 export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
 
   const handleCreateWorkspace = (type: WorkspaceType) => {
     dispatch(
@@ -51,6 +53,9 @@ export const CommonEmptyView: React.FC<CommonEmptyViewProps> = ({ toggleDropdown
             type={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "primary" : "default"}
             className="common-workspace-empty-view__actions-button"
             size="small"
+            onClick={() => {
+              if (user.loggedIn) handleCreateWorkspace(WorkspaceType.SHARED);
+            }}
           >
             New team workspace
           </RQButton>
