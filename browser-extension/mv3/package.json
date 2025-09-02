@@ -44,7 +44,7 @@
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.0.0",
+    "@rollup/plugin-typescript": "^12.1.4",
     "@types/chrome": "^0.0.266",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",

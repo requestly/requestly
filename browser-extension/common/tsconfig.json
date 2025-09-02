@@ -18,10 +18,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "@requestly/shared/*": ["../../shared/dist/*"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["node_modules", "dist"],
   "include": ["./src/**/*"]
