@@ -19,11 +19,9 @@ class SyncWorkspace {
     _config: Workspace;
     userId: string | undefined;
     database!: RxDatabase;
-    collections: Partial<
-        {
-            [key in SyncEntityType]: RxCollection<syncTypeToEntityMap[key]>;
-        }
-    >;
+    collections: {
+        [key in SyncEntityType]: RxCollection<syncTypeToEntityMap[key]>;
+    };
     replication: Partial<Record<SyncEntityType, BaseReplication<SyncEntityType>>>;
 
     // Don't use this constructor to instantiate. Use static create method instead.

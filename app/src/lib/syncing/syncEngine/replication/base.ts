@@ -8,7 +8,7 @@ abstract class BaseReplication<T extends SyncEntityType> {
     syncEntityType: T;
     replicationState!: RxReplicationState<any, any>;
     isInitialized: boolean = false;
-    collection?: RxCollection<syncTypeToEntityMap[T]>;
+    collection: RxCollection<syncTypeToEntityMap[T]>;
 
     constructor(syncWorkspace: SyncWorkspace, syncEntityType: T) {
         this.syncWorkspace = syncWorkspace;

@@ -7,15 +7,15 @@ import {
 import BaseReplication from "./base";
 import { replicateRxCollection } from "rxdb/plugins/replication";
 import { WorkspaceType } from "features/workspaces/types";
-import { ReplicationPullHandler, ReplicationPushHandler } from "rxdb";
-import { get, getDatabase, ref, update, onValue, Unsubscribe } from "firebase/database";
+import { ReplicationPullHandler, ReplicationPushHandler, WithDeletedAndAttachments } from "rxdb";
+import { get, getDatabase, ref, update, onValue, Unsubscribe, remove } from "firebase/database";
 import firebaseApp from "firebase";
-import { Subject } from "rxjs";
+import { Subject, Subscription } from "rxjs";
+import { RecordStatus } from "@requestly/shared/types/entities/rules";
 
 const db = getDatabase(firebaseApp);
 
 type RuleDataRdbSchema = RuleDataSyncEntity["data"] & {
-    _deleted: boolean;
     // Old Properties
     creationDate?: number;
     modificationDate?: number;
@@ -29,7 +29,6 @@ type RuleDataRdbSchema = RuleDataSyncEntity["data"] & {
 };
 
 type RuleMetadataRdbSchema = RuleMetadataSyncEntity["data"] & {
-    _deleted: boolean;
     // Old Properties from RuleData
     creationDate?: number;
     modificationDate?: number;
@@ -45,6 +44,9 @@ type RuleMetadataRdbSchema = RuleMetadataSyncEntity["data"] & {
 class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
     unsubListener?: Unsubscribe = undefined;
 
+    public localEntityIds: Set<string> = new Set();
+    collectionSubscription: Subscription | undefined = undefined;
+
     async init() {
         if (this.collection) {
             this.replicationState = replicateRxCollection({
@@ -59,11 +61,19 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
                     stream$: this.pullStreamListener(),
                 },
             });
+            await this.initAvailableEntityIdsListener();
             this.isInitialized = true;
         } else {
             throw new Error(`No collection for Replication entityType: ${this.syncEntityType}`);
         }
     }
+
+    private initAvailableEntityIdsListener = async () => {
+        this.collectionSubscription = this.collection.find().$.subscribe((docs) => {
+            this.localEntityIds = new Set(docs.map((doc) => doc.id));
+            console.log("[RDBReplication.initAvailableEntityIdsListener] currentEntityIds:", this.localEntityIds);
+        });
+    };
 
     async start(): Promise<void> {
         if (this.isInitialized) {
@@ -96,60 +106,30 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
     };
 
     private pushRuleDataHandler: ReplicationPushHandler<RuleDataSyncEntity> = async (changedRows) => {
-        const conflicts = [];
-        const finalUpdates: Record<string, RuleDataSyncEntity["data"] & { _deleted?: boolean }> = {};
+        const conflicts: WithDeletedAndAttachments<RuleDataSyncEntity>[] = [];
+        const updatedEntities: WithDeletedAndAttachments<RuleDataSyncEntity>[] = [];
+
         changedRows.forEach((changedRow) => {
             if (changedRow.assumedMasterState?._deleted && !changedRow.newDocumentState._deleted) {
                 console.log("[RDBReplication.pushRuleDataHandler] Conflict detected:", changedRow);
                 conflicts.push(changedRow.assumedMasterState);
-                return;
+            } else {
+                updatedEntities.push(changedRow.newDocumentState);
             }
-
-            finalUpdates[changedRow.newDocumentState.id] = {
-                ...changedRow.newDocumentState.data,
-                _deleted: changedRow.newDocumentState._deleted,
-            };
+        });
+        console.log("[`RDBReplication`.pushRuleDataHandler] Final updates:", {
+            changedRows,
+            updatedEntities,
         });
 
-        console.log("[`RDBReplication`.pushRuleDataHandler] Final updates:", changedRows, finalUpdates);
-
-        const updatedPromises = Object.entries(finalUpdates).map(([id, finalUpdate]) => {
-            const updateRef = ref(db, `${this.getRuleDataPath()}/${id}`);
-            return update(updateRef, finalUpdate);
-        });
-
-        // TODO-cleanup: Should this be allSettled?
-        await Promise.allSettled(updatedPromises)
-            .then((results) => {
-                console.log("[RDBReplication.pushRuleDataHandler] Push results:", results);
-            })
-            .catch((error) => {
-                console.error("[RDBReplication.pushRuleDataHandler] Error pushing rule data:", error);
-            });
-
-        return conflicts; // TODO-cleanup: Return if any conflicts or errors
-    };
-
-    private pushRuleMetadataHandler: ReplicationPushHandler<RuleMetadataSyncEntity> = async (changedRows) => {
-        const conflicts = [];
-        const finalUpdates: Record<string, RuleMetadataSyncEntity["data"] & { _deleted?: boolean }> = {};
-        changedRows.forEach((changedRow) => {
-            if (changedRow.assumedMasterState?._deleted && !changedRow.newDocumentState._deleted) {
-                console.log("[RDBReplication.pushRuleMetadataHandler] Conflict detected:", changedRow);
-                conflicts.push(changedRow.assumedMasterState);
-                return;
+        const updatePromises = updatedEntities.map((updatedEntity) => {
+            if (updatedEntity._deleted) {
+                const deleteRef = ref(db, `${this.getRuleDataPath()}/${updatedEntity.id}`);
+                return remove(deleteRef);
+            } else {
+                const updateRef = ref(db, `${this.getRuleDataPath()}/${updatedEntity.id}`);
+                return update(updateRef, updatedEntity.data);
             }
-            finalUpdates[changedRow.newDocumentState.id] = {
-                ...changedRow.newDocumentState.data,
-                _deleted: changedRow.newDocumentState._deleted,
-            };
-        });
-
-        console.log("[RDBReplication.pushRuleMetadataHandler] Final updates:", changedRows, finalUpdates);
-
-        const updatePromises = Object.entries(finalUpdates).map(([id, finalUpdate]) => {
-            const updateRef = ref(db, `${this.getRuleMetadataPath()}/${id}`);
-            return update(updateRef, finalUpdate);
         });
 
         // TODO-cleanup: Should this be allSettled?
@@ -164,6 +144,43 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
         return conflicts; // TODO-cleanup: Return if any conflicts or errors
     };
 
+    private pushRuleMetadataHandler: ReplicationPushHandler<RuleMetadataSyncEntity> = async (changedRows) => {
+        const conflicts: WithDeletedAndAttachments<RuleMetadataSyncEntity>[] = [];
+        const updatedEntities: WithDeletedAndAttachments<RuleMetadataSyncEntity>[] = [];
+        changedRows.forEach((changedRow) => {
+            if (changedRow.assumedMasterState?._deleted && !changedRow.newDocumentState._deleted) {
+                console.log("[RDBReplication.pushRuleMetadataHandler] Conflict detected:", changedRow);
+                conflicts.push(changedRow.assumedMasterState);
+            } else {
+                updatedEntities.push(changedRow.newDocumentState);
+            }
+        });
+        console.log("[`RDBReplication`.pushRuleMetadataHandler] Final updates:", {
+            changedRows,
+            updatedEntities,
+        });
+
+        const updatePromises = updatedEntities.map((updatedEntity) => {
+            if (updatedEntity._deleted) {
+                const deleteRef = ref(db, `${this.getRuleMetadataPath()}/${updatedEntity.id}`);
+                return remove(deleteRef);
+            } else {
+                const updateRef = ref(db, `${this.getRuleMetadataPath()}/${updatedEntity.id}`);
+                return update(updateRef, updatedEntity.data);
+            }
+        });
+
+        // TODO-cleanup: Should this be allSettled?
+        await Promise.allSettled(updatePromises)
+            .then((results) => {
+                console.log("[RDBReplication.pushRuleMetadataHandler] Push results:", results);
+            })
+            .catch((error) => {
+                console.error("[RDBReplication.pushRuleMetadataHandler] Error pushing rule data:", error);
+            });
+
+        return conflicts; // TODO-cleanup: Return if any conflicts or errors
+    };
     // #endregion
 
     // #region - Pull
@@ -191,12 +208,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
             return {};
         });
 
-        const documents: RuleDataSyncEntity[] = Object.entries(rulesData).map(([id, data]: [string, any]) => {
-            return this.ruleDataSnapshotToRuleData(data, id);
-        });
-
-        console.log("[RDBReplication.pullRuleDataHandler] Fetched documents:", rulesData, documents);
-
+        const documents = this.prepareRuleDataDocumentsFromSnapshot(rulesData);
         return {
             documents,
             checkpoint: null,
@@ -215,12 +227,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
             return {};
         });
 
-        const documents: RuleMetadataSyncEntity[] = Object.entries(rulesMetadata).map(([id, data]: [string, any]) => {
-            return this.ruleMetadataSnapshotToRuleMetadata(data, id);
-        });
-
-        console.log("[RDBReplication.pullRuleMetadataHandler] Fetched documents:", rulesMetadata, documents);
-
+        const documents = this.prepareRuleMetadataDocumentsFromSnapshot(rulesMetadata);
         return {
             documents,
             checkpoint: 0,
@@ -250,11 +257,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
                 rulesData = snapshot.val();
             }
 
-            const documents: RuleDataSyncEntity[] = Object.entries(rulesData).map(([id, data]: [string, any]) => {
-                return this.ruleDataSnapshotToRuleData(data, id);
-            });
-
-            console.log("[RDBReplication.pullStreamListener RuleData] Fetched documents:", rulesData, documents);
+            const documents = this.prepareRuleDataDocumentsFromSnapshot(rulesData);
             subject.next({
                 documents,
                 checkpoint: 0, // TODO Placeholder for checkpoint, can be updated based on your logic
@@ -275,18 +278,7 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
                 rulesMetadata = snapshot.val();
             }
 
-            const documents: RuleMetadataSyncEntity[] = Object.entries(rulesMetadata).map(
-                ([id, data]: [string, any]) => {
-                    return this.ruleMetadataSnapshotToRuleMetadata(data, id);
-                }
-            );
-
-            console.log(
-                "[RDBReplication.pullStreamListener RuleMetadata] Fetched documents:",
-                rulesMetadata,
-                documents
-            );
-
+            const documents = this.prepareRuleMetadataDocumentsFromSnapshot(rulesMetadata);
             subject.next({
                 documents,
                 checkpoint: null, // TODO Placeholder for checkpoint, can be updated based on your logic
@@ -326,34 +318,80 @@ class RDBReplication<T extends SyncEntityType> extends BaseReplication<T> {
         return refPath;
     }
 
-    private ruleDataSnapshotToRuleData(snapshot: RuleDataRdbSchema, id: string): RuleDataSyncEntity {
+    private prepareRuleDataDocumentsFromSnapshot(snapshot: Record<string, RuleDataRdbSchema>): RuleDataSyncEntity[] {
+        const finalDocs: RuleDataSyncEntity[] = [];
+        const masterEntityIds: Set<string> = new Set(Object.keys(snapshot));
+
+        // Undeleted Docs
+        Object.entries(snapshot).forEach(([id, data]: [string, RuleDataRdbSchema]) => {
+            finalDocs.push(this.ruleDataRdbToRuleDataDoc(id, data));
+        });
+        console.log("[RDBReplication.prepareRuleDataDocumentsFromSnapshot] masterEntityIds:", masterEntityIds);
+
+        // Deleted Docs = this.localEntityIds - masterEntityIds
+        const localDeletedEntityIds = Array.from(this.localEntityIds).filter((id) => !masterEntityIds.has(id));
+        localDeletedEntityIds.forEach((id) => {
+            if (!masterEntityIds.has(id)) {
+                console.log("[RDBReplication.prepareRuleDataDocumentsFromSnapshot] Deleted Doc id:", id);
+                finalDocs.push({
+                    id,
+                    workspaceId: this.syncWorkspace._config.id,
+                    type: SyncEntityType.RULE_DATA,
+                    data: {} as RuleDataSyncEntity["data"],
+                    _deleted: true,
+                    createdAt: undefined,
+                    updatedAt: Date.now(),
+                    createdBy: undefined,
+                    updatedBy: undefined,
+                });
+            }
+        });
+        console.log(
+            "[RDBReplication.prepareRuleDataDocumentsFromSnapshot] localDeletedEntityIds:",
+            localDeletedEntityIds
+        );
+        console.log("[RDBReplication.prepareRuleDataDocumentsFromSnapshot] finalDocs:", { snapshot, finalDocs });
+        return finalDocs;
+    }
+
+    private prepareRuleMetadataDocumentsFromSnapshot(
+        snapshot: Record<string, RuleMetadataRdbSchema>
+    ): RuleMetadataSyncEntity[] {
+        const finalDocs: RuleMetadataSyncEntity[] = [];
+        Object.entries(snapshot).forEach(([id, data]: [string, RuleMetadataRdbSchema]) => {
+            finalDocs.push(this.ruleMetadataRdbToRuleMetadataDoc(id, snapshot?.[id]));
+        });
+
+        console.log("[RDBReplication.prepareRuleMetadataDocumentsFromSnapshot]:", { snapshot, finalDocs });
+        return finalDocs;
+    }
+
+    private ruleDataRdbToRuleDataDoc(id: string, data: RuleDataRdbSchema): RuleDataSyncEntity {
         return {
             id,
             workspaceId: this.syncWorkspace._config.id,
             type: SyncEntityType.RULE_DATA,
-            data: snapshot as RuleDataSyncEntity["data"],
-            _deleted: snapshot?._deleted || false,
-            createdAt: snapshot?.creationDate || snapshot?.createdAt,
-            updatedAt: snapshot?.modificationDate || snapshot?.updatedAt,
-            createdBy: snapshot?.createdBy || snapshot?.createdBy,
-            updatedBy: snapshot?.lastModifiedBy || snapshot?.updatedBy,
+            data: data as RuleDataSyncEntity["data"],
+            createdAt: data?.creationDate || data?.createdAt,
+            updatedAt: data?.modificationDate || data?.updatedAt,
+            createdBy: data?.createdBy || data?.createdBy,
+            updatedBy: data?.lastModifiedBy || data?.updatedBy,
         };
     }
 
-    private ruleMetadataSnapshotToRuleMetadata(snapshot: RuleMetadataRdbSchema, id: string): RuleMetadataSyncEntity {
+    private ruleMetadataRdbToRuleMetadataDoc(id: string, data?: RuleMetadataRdbSchema): RuleMetadataSyncEntity {
         return {
             id,
             workspaceId: this.syncWorkspace._config.id,
             type: SyncEntityType.RULE_METADATA,
             data: {
-                status: snapshot?.status,
-                isFavourite: snapshot?.isFavourite,
+                status: data?.status || RecordStatus.INACTIVE,
+                isFavourite: data?.isFavourite || false,
             } as RuleMetadataSyncEntity["data"],
-            _deleted: snapshot?._deleted || false,
-            createdAt: snapshot?.creationDate || snapshot?.createdAt,
-            updatedAt: snapshot?.modificationDate || snapshot?.updatedAt,
-            createdBy: snapshot?.createdBy || snapshot?.createdBy,
-            updatedBy: snapshot?.lastModifiedBy || snapshot?.updatedBy,
+            createdAt: data?.creationDate || data?.createdAt,
+            updatedAt: data?.modificationDate || data?.updatedAt,
+            createdBy: data?.createdBy || data?.createdBy,
+            updatedBy: data?.lastModifiedBy || data?.updatedBy,
         };
     }
 }

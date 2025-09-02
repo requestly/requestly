@@ -2,7 +2,7 @@ import { RuleDataSyncEntity, RuleMetadataSyncEntity } from "@requestly/shared/ty
 import { StorageModel } from ".";
 import { RuleDataSyncModel } from "../syncEngine/models/ruleData";
 import { RuleMetadataSyncModel } from "../syncEngine/models/ruleMetadata";
-import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import { RecordStatus, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { SyncEntityType } from "@requestly/shared/types/syncEntities";
 
 export class RuleStorageModel extends StorageModel<StorageRecord> {
@@ -87,6 +87,23 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
                 ruleDataSyncModel.entity.id,
                 ruleDataSyncModel.entity.workspaceId
             );
+            // Bypassing ruleMetadata for now due to RDB replication
+            if (!ruleMetadataSyncModel) {
+                ruleMetadataSyncModel = new RuleMetadataSyncModel({
+                    id: ruleDataSyncModel.entity.id,
+                    workspaceId: ruleDataSyncModel.entity.workspaceId,
+                    type: SyncEntityType.RULE_METADATA,
+                    data: {
+                        status: RecordStatus.INACTIVE,
+                        isFavourite: false,
+                    },
+
+                    createdAt: ruleDataSyncModel.entity.createdAt || 0,
+                    updatedAt: ruleDataSyncModel.entity.updatedAt || 0,
+                    createdBy: ruleDataSyncModel.entity.createdBy || "",
+                    updatedBy: ruleDataSyncModel.entity.updatedBy || "",
+                });
+            }
         }
 
         if (!ruleDataSyncModel || !ruleMetadataSyncModel) {
