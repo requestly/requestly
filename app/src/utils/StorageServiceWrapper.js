@@ -45,10 +45,6 @@ class StorageServiceWrapper {
     this.transactionLedger.clear();
   }
 
-  getAllRecords() {
-    return this.StorageHelper.getStorageSuperObject();
-  }
-
   hasPrimaryKey(record) {
     if (typeof record === "object" && !Array.isArray(record) && record !== null) {
       for (let index = 0; index < this.primaryKeys.length; index++) {
