@@ -1,7 +1,7 @@
 .auth-screen-back-btn.sso-screen-back-btn {
   left: -20px;
   top: 0;
-  color: var(--text-subtle);
+  color: var(--requestly-color-text-subtle);
 }
 
 .sso-screen-continue-btn.ant-btn {
@@ -44,7 +44,7 @@
 
 .sso-form-footer {
   font-weight: 500;
-  color: var(--text-subtle);
+  color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-sm, 12px);
   margin-top: 1rem;
 }

@@ -30,7 +30,7 @@
 }
 
 .remove-user-menu-item-text.ant-typography.ant-typography-danger {
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }
 
 .member-role-dropdown-trigger {

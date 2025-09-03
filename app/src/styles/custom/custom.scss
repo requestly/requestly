@@ -380,10 +380,10 @@ input[id^="react-select-"] {
   padding: 3px 5px;
   font-size: 10px;
   line-height: 10px;
-  color: var(--success);
+  color: var(--requestly-color-success);
   background-color: transparent;
   border-radius: var(--border-radius-sm);
-  border: 1px solid var(--success);
+  border: 1px solid var(--requestly-color-success);
 }
 
 /* spinner & skeleton */
@@ -502,7 +502,7 @@ input[id^="react-select-"] {
 }
 
 .ant-dropdown-menu.ant-dropdown-menu-root .ant-dropdown-menu-item.ant-dropdown-menu-item-active {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 /* react multi email */
@@ -519,12 +519,12 @@ div.react-multi-email:hover {
 }
 
 div.react-multi-email > input {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: var(--component-dark-background);
 }
 
 div.react-multi-email.focused {
-  border: 1px solid var(--primary);
+  border: 1px solid var(--requestly-color-primary);
   box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
   background-color: var(--component-dark-background);
 }
@@ -533,7 +533,7 @@ div.react-multi-email .multi-email-tag {
   font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 400;
   padding: 4px 8px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
   background-color: var(--component-background);
@@ -548,7 +548,7 @@ div.react-multi-email .multi-email-tag {
 
 .ant-btn.ant-btn-default:focus:not(.ant-btn-icon-only),
 .ant-btn.ant-btn-default:hover:not(.ant-btn-icon-only) {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border: 1px solid #343434;
   background-color: var(--hover-color);
 }
@@ -583,7 +583,7 @@ div.react-multi-email .multi-email-tag {
       & .ant-modal-header {
         background: var(--surface-0_5);
         & .ant-modal-title {
-          color: var(--text-default);
+          color: var(--requestly-color-text-default);
         }
       }
       & .ant-modal-footer {
@@ -594,7 +594,7 @@ div.react-multi-email .multi-email-tag {
 }
 
 .ant-message .ant-message-notice-content {
-  background: var(--neutrals-black);
+  background: var(--requestly-color-black);
 }
 
 // TEMPORARY: To be removed after TOOLTIP component is added in design system

@@ -1,12 +1,12 @@
 .download-desktop-app-link {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-flex;
   align-items: center;
 }
 
 .download-desktop-app-link:hover {
   opacity: 0.7;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .download-desktop-app-link svg {
@@ -25,7 +25,7 @@
 
 .resource-types-container .subtitle {
   padding: 1rem 1.25rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-md);
   font-weight: var(--requestly-font-weight-medium);
   border-top-left-radius: inherit;

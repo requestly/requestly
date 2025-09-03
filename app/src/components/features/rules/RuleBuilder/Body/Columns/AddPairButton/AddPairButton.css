@@ -2,7 +2,7 @@
   height: 44px;
   padding: 0.5rem;
   margin-bottom: 1rem;
-  border-color: var(--primary);
+  border-color: var(--requestly-color-primary);
   border-radius: var(--border-radius-md);
   background-color: rgba(31, 105, 255, 0.102);
 }

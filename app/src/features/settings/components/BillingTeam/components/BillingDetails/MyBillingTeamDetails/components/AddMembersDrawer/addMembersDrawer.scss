@@ -21,13 +21,13 @@
     border-bottom: 1px solid var(--surface-2);
 
     &_title {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       font-weight: 500;
       font-size: 1rem;
     }
 
     & svg {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       font-size: 1.125rem;
       cursor: pointer;
       align-self: center;

@@ -1,19 +1,19 @@
 .team-plan-status-badge {
   padding: 4px 6px;
   border-radius: 32px;
-  border: 1px solid var(--success);
+  border: 1px solid var(--requestly-color-success);
   gap: 6px;
 
   &-dot {
     width: 10px;
     height: 10px;
-    background: var(--success);
+    background: var(--requestly-color-success);
     border-radius: 50%;
   }
 
   &-text {
     font-size: var(--requestly-font-size-xs, 11px);
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     font-weight: 500;
     line-height: 14px;
     letter-spacing: 0.4px;
@@ -26,11 +26,11 @@
 }
 
 .plan-status-expired-badge {
-  border: 1px solid var(--danger);
+  border: 1px solid var(--requestly-color-error);
 }
 
 .plan-status-active-badge {
-  border: 1px solid var(--success);
+  border: 1px solid var(--requestly-color-success);
 }
 
 .plan-status-warning-dot {
@@ -38,11 +38,11 @@
 }
 
 .plan-status-expired-dot {
-  background: var(--danger);
+  background: var(--requestly-color-error);
 }
 
 .plan-status-active-dot {
-  background: var(--success);
+  background: var(--requestly-color-success);
 }
 
 .team-plan-status-badge-text {

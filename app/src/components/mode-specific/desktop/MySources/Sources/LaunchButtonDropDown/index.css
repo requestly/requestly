@@ -33,7 +33,7 @@
 }
 
 .launch-options-menu-item-active.ant-dropdown-menu-item span {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 .launch-options-menu-item.ant-dropdown-menu-item:not(.launch-options-menu-item-active) {
   background-color: transparent;
@@ -46,7 +46,7 @@
 
 .launch-options-menu-item.ant-dropdown-menu-item-danger span {
   user-select: none;
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }
 
 .launch-options-menu-item.ant-dropdown-menu-item-danger.ant-dropdown-menu-item-disabled {
@@ -61,7 +61,7 @@
   white-space: nowrap;
   max-width: 24ch;
   text-overflow: ellipsis;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .launch-options-menu-item .ant-dropdown-menu-title-content span {
@@ -79,7 +79,7 @@
   width: 250px;
   max-height: 400px;
   position: relative;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .launch-button {

@@ -151,9 +151,9 @@
       }
       .ant-input {
         &:focus {
-          border-bottom: 1px solid var(--primary);
+          border-bottom: 1px solid var(--requestly-color-primary);
         }
-        color: var(--white);
+        color: var(--requestly-color-text-default);
         font-size: 1.25rem;
         font-weight: 500;
       }
@@ -161,7 +161,7 @@
         display: flex;
         gap: 4px;
         width: 460px;
-        color: var(--white);
+        color: var(--requestly-color-text-default);
         font-size: 1.25rem;
         font-weight: 500;
 
@@ -353,7 +353,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--primary);
+    background: var(--requestly-color-primary);
     border-radius: var(--border-radius-sm);
     margin-bottom: 1rem;
     padding: 12px 16px;
@@ -371,7 +371,7 @@
       }
     }
     &-message {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
 
       > p {
         margin-bottom: 0;
@@ -392,14 +392,14 @@
         height: 16px;
       }
       &:hover {
-        color: var(--white);
+        color: var(--requestly-color-text-default);
       }
     }
     &-settings-link {
       display: flex;
       align-items: center;
       gap: 4px;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       font-weight: 500;
 
       & span:not(.anticon) {
@@ -543,7 +543,7 @@ body.dark {
     }
 
     .ant-input-number-group-addon {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       border-color: #313a46;
       background-color: #313a46;
     }

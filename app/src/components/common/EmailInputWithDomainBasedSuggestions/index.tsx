@@ -97,8 +97,8 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
           primary25: "var(--surface-2)",
           neutral0: "var(--surface-1)",
           neutral10: "var(--surface-3)", // tag background color
-          neutral80: "var(--text-default)", // tag text color
-          danger: "var(--text-default)", // tag cancel icon color
+          neutral80: "var(--requestly-color-text-default)", // tag text color
+          danger: "var(--requestly-color-text-default)", // tag cancel icon color
           dangerLight: "var(--surface-3)", // tag cancel background color
         },
       })}

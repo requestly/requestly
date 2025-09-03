@@ -30,7 +30,7 @@
   width: 13rem;
   max-height: 19.5rem;
   position: relative;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .show-group-input.editor-group-dropdown-menu.ant-dropdown-menu {
@@ -47,7 +47,7 @@
 }
 
 .editor-group-menu-item-active.ant-dropdown-menu-item span {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .editor-group-menu-name-container {
@@ -70,7 +70,7 @@
 
 .editor-group-menu-item.ant-dropdown-menu-item-danger span {
   user-select: none;
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }
 
 .editor-group-menu-item.ant-dropdown-menu-item-danger.ant-dropdown-menu-item-disabled {
@@ -85,7 +85,7 @@
   white-space: nowrap;
   max-width: 24ch;
   text-overflow: ellipsis;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .editor-group-menu-item .ant-dropdown-menu-title-content span {

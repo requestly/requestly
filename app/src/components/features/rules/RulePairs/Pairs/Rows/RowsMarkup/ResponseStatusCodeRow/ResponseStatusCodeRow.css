@@ -24,7 +24,7 @@
 label.response-status-code-label {
   font-weight: 500;
   margin-bottom: 12px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-block;
   font-size: var(--requestly-font-size-sm);
 }

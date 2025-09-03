@@ -32,7 +32,7 @@
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only:hover svg {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn {

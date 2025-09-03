@@ -12,7 +12,7 @@
 }
 
 .ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-header {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   padding: 1.5rem 1.25rem 8px 1.25rem;
 }
 
@@ -29,10 +29,7 @@
   background-color: var(--component-background);
 }
 
-.ant-collapse.custom-collapse
-  .ant-collapse-item
-  .ant-collapse-content
-  .ant-collapse-content-box {
+.ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
   padding-top: 0;
   padding-bottom: 8px;
 }
@@ -43,8 +40,6 @@
 }
 
 .custom-collapse.ant-collapse > .ant-collapse-item:last-child,
-.custom-collapse.ant-collapse
-  > .ant-collapse-item:last-child
-  > .ant-collapse-header {
+.custom-collapse.ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
   border-radius: var(--border-radius-md);
 }

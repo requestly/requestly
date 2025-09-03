@@ -1,7 +1,7 @@
 .homepage-teams-list-title {
   font-size: var(--requestly-font-size-md);
   font-weight: var(--requestly-font-weight-medium);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .homepage-teams-list-subtitle {
@@ -20,7 +20,7 @@
 }
 
 .homepage-teams-list-create-workspace-btn.ant-btn.ant-btn-default {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   position: absolute;
   bottom: 0;
   left: 0;
@@ -33,7 +33,7 @@
 
   &:hover,
   &:focus {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     border: none;
     border-radius: 0;
     border-top: 1px solid var(--surface-2);

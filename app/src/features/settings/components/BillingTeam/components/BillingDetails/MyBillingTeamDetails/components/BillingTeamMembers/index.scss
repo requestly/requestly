@@ -9,7 +9,7 @@
   border-bottom: 1px solid var(--surface-2);
 
   &-title {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     font-weight: 500;
   }
 
@@ -27,13 +27,13 @@
   &:focus,
   &:active {
     background: var(--surface-2);
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 }
 
 .billing-table tbody tr:hover .remove-member-btn.ant-btn,
 .billing-table tbody tr:hover .members-table-dropdown-btn.ant-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .billing-team-members-table-dropdown .ant-dropdown-menu-item-disabled,

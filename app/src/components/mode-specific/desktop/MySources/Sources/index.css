@@ -17,7 +17,7 @@
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn,
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn:hover,
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .source-tabs-container .ant-tabs-nav .ant-tabs-nav-wrap {
@@ -75,12 +75,12 @@
   margin-left: auto;
 }
 .connected-apps-modal .source-modal-footer-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 
 .connected-apps-modal .system-wide-check-icon {
-  color: var(--success);
+  color: var(--requestly-color-success);
 }
 
 .setup-instructions-back-btn.ant-row {
@@ -119,7 +119,7 @@
 }
 
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-container .ant-steps-icon {
-  color: var(--brand-color);
+  color: var(--requestly-color-primary);
   font-size: 2.25rem;
 }
 
@@ -145,7 +145,7 @@
 
 .connected-apps-secondary-link,
 .connected-apps-secondary-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 

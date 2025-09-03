@@ -7,7 +7,7 @@
     padding-bottom: 0;
 
     h4.ant-typography {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
   .ant-divider {
@@ -42,10 +42,10 @@
       margin-right: 8px;
     }
     span.danger {
-      color: var(--danger);
+      color: var(--requestly-color-error);
     }
     span.success {
-      color: var(--success);
+      color: var(--requestly-color-success);
     }
     .result-text {
       margin: 0 4px;

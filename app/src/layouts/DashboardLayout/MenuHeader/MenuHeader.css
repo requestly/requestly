@@ -35,12 +35,12 @@
   font-size: var(--requestly-font-size-sm, 13px);
   line-height: 22px;
   padding: 4px 11px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border-radius: var(--border-radius-sm);
 }
 
 .header-left-section a:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: var(--hover-color);
 }
 
@@ -106,7 +106,7 @@
 }
 
 .profile-menu-items:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .header-upgrade-btn.ant-btn {
@@ -137,7 +137,7 @@
 
 .ant-btn.header-icon-btn:hover svg,
 .ant-btn.header-icon-btn:focus svg {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .ant-btn.header-icon-btn:hover,

@@ -30,12 +30,12 @@
     .user-plan-date {
       font-size: 20px;
       font-weight: 500;
-      color: var(--text-default);
+      color: var(--requestly-color-text-default);
     }
 
     .user-plan-card-plan-name {
       font-size: 20px;
-      color: var(--text-default);
+      color: var(--requestly-color-text-default);
       letter-spacing: 0.15px;
       line-height: 30px;
       display: flex;
@@ -90,7 +90,7 @@
   &:focus,
   &:active {
     background: var(--surface-2);
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 }
 

@@ -3,7 +3,7 @@
 }
 
 .btn-default.ant-btn-default:not(.btn-icon-only) {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border: 1px solid var(--border);
   background-color: var(--component-background);
 }
@@ -11,7 +11,7 @@
 .btn-default.ant-btn-default:hover,
 .btn-default.ant-btn-default:focus {
   box-shadow: none;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: var(--hover-color);
 }
 
@@ -29,6 +29,6 @@
 .btn-icon-only.ant-btn:hover,
 .btn-icon-only.ant-btn:focus {
   border: none;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: var(--hover-color);
 }

@@ -75,7 +75,7 @@ div[cmdk-dialog] {
 }
 .dialog [cmdk-item][aria-selected="true"] {
   background: var(--cmdk-gray0);
-  border-left: 3px solid var(--primary);
+  border-left: 3px solid var(--requestly-color-primary);
   color: #fff;
 }
 

@@ -16,7 +16,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .page-source-row .action-btns-container {

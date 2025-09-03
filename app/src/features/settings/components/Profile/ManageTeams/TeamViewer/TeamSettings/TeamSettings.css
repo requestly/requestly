@@ -34,7 +34,7 @@ div.team-delete-title {
   font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-block;
 }
 
@@ -65,13 +65,13 @@ div.team-delete-title {
 
 .delete-team-btn.ant-btn {
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: rgba(250, 40, 40, 0.2);
   border: 1px solid rgba(250, 40, 40, 0.6);
 }
 
 .delete-team-btn.ant-btn:hover,
 .delete-team-btn.ant-btn:focus {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: rgba(250, 40, 40, 0.5);
 }

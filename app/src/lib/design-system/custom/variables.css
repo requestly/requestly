@@ -1,40 +1,7 @@
 :root {
-  /* new colors -- Primitives */
-  --red-red-100: #ffc7c7;
-  --red-red-200: #ffa7a7;
-  --red-red-300: #ff8080;
-  --red-red-400: #f95e5e;
-  --red-red-500: #e43434;
-  --red-red-600: #cf2a2a;
-  --red-red-700: #a41f1f;
-  --red-red-800: #591a1a;
-  --red-red-900: #271111;
-
-  --green-green-100: #a6e9c8;
-  --green-green-200: #6fdaa6;
-  --green-green-300: #4dcc8f;
-  --green-green-400: #28c07a;
-  --green-green-500: #0baa60;
-  --green-green-600: #0a9c55;
-  --green-green-700: #0c7844;
-  --green-green-800: #104b2f;
-  --green-green-900: #0d1f11;
-
-  --blue-blue-100: #cbe2fe;
-  --blue-blue-200: #97c3fd;
-  --blue-blue-300: #639ff9;
-  --blue-blue-400: #3c7ff3;
-  --blue-blue-500: #004eeb;
-  --blue-blue-600: #003cca;
-  --blue-blue-700: #002ca9;
-  --blue-blue-800: #001f88;
-  --blue-blue-900: #001670;
-
-  --neutrals-gray-100: #e8e8e9;
   --neutrals-gray-200: #d0d1d3;
   --neutrals-gray-300: #b9babe;
   --neutrals-gray-400: #8b8d92;
-  --neutrals-gray-500: #73767c;
   --neutrals-gray-600: #555963;
   --neutrals-gray-700: #3b404e;
   --neutrals-gray-800: #262b37;
@@ -44,27 +11,7 @@
   --neutrals-yellow-600: #d07d00;
   --neutrals-yellow-800: #5c3111;
 
-  --neutrals-white: #ffffff;
-  --neutrals-black: #000000;
-
-  /* New Color Scheme tokens */
-  /* --danger: var(--red-red-500);
-  --success: var(--green-green-500);
-  --surface-3: var(--neutrals-gray-600);
-  --text-default: var(--neutrals-white);
-  --text-light: var(--neutrals-gray-200);
-  --surface-2: var(--neutrals-gray-700);
-  --surface-1: var(--neutrals-gray-800);
-  --background: var(--neutrals-gray-900);
-  --brand-color: var(--blue-blue-500);
-  --black: var(--neutrals-black);
-  --white: var(--neutrals-white); */
-
   /* Old Color scheme but new tokens */
-  --danger: var(--red-red-500);
-  --success: var(--green-green-500);
-  --text-default: var(--neutrals-white);
-  --text-subtle: #bbbbbb;
   --warning: #e09400;
   --text-light: #b0b0b5b3;
   --surface-0: #1b1b1b;
@@ -73,9 +20,6 @@
   --surface-2: #383838;
   --surface-3: var(--neutrals-gray-600);
   --background: #1b1b1b;
-  --brand-color: var(--blue-blue-500);
-  --black: var(--neutrals-black);
-  --white: var(--neutrals-white);
   --highlight-dark-bg: #111a2c;
   --primary-light: #3c7ff3;
 
@@ -87,7 +31,6 @@
   --border: #4f5053;
   --border-dark: #303030;
   --danger-rgb: 252, 95, 95;
-  --primary: var(--brand-color);
   --link-color: #3ba0ff;
   --background-dark: var(--background);
   --body-background: #212121;
@@ -108,11 +51,4 @@
 
   /* shadows */
   --input-box-shadow: inset 0px -1px 2px #4f5154, inset 0px 0px 4px rgba(0, 0, 0, 0.15);
-
-  /*feature specific colors*/
-  --http-rules: #537ed2;
-  --api-client: #ca6199;
-  --mock-server: #84bb4f;
-  --session-recording: #ddb651cc;
-  --desktop-sessions: #b851ddcc;
 }

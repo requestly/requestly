@@ -43,5 +43,5 @@
 
 .editor-rule-options-danger-menu-item .ant-btn-text,
 .editor-rule-options-danger-menu-item:hover .ant-btn-text {
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }

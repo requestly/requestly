@@ -39,7 +39,7 @@
 }
 
 .my-billing-team-title {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: 0.15px;
@@ -115,7 +115,7 @@
 
   &-link {
     display: block;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     padding: 6px 8px;
     margin-top: 4px;
     border-radius: 4px;
@@ -126,19 +126,19 @@
     &:hover {
       background: var(--surface-1);
       border-radius: 4px;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
 
   &-active-link {
     background: var(--surface-2);
     border-radius: 4px;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
 
     &:hover {
       background: var(--surface-2);
       border-radius: 4px;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
 }

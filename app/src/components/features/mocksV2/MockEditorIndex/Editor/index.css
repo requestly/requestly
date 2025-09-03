@@ -59,7 +59,7 @@
 }
 
 .meta-data-option .meta-data-option-label {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm);
   font-weight: var(--requestly-font-weight-medium);
 }
@@ -70,7 +70,7 @@
   background: var(--component-dark-background);
   border-radius: var(--border-radius-sm);
   box-shadow: var(--input-box-shadow);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm);
 }
 
@@ -107,7 +107,7 @@
 }
 
 .mock-editor-body .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .mock-editor-body .ant-tabs-nav-wrap {

@@ -76,7 +76,7 @@
 }
 
 .pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text span.header-text {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-arrow {
@@ -132,7 +132,7 @@
 .pin-extension-popup .action-btns .ant-btn {
   padding: 0;
   height: 16px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-md, 14px);
   line-height: 16px;
   display: inline-flex;

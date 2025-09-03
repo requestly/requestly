@@ -92,7 +92,12 @@ export const SessionViewerTitle: React.FC<SessionViewerTitleProps> = ({
                     <CopyToClipboard text={`${window.location.origin}/sessions/saved/${recordingId}`}>
                       <Tooltip title={sessionLinkCopyText} placement="left">
                         <CopyOutlined
-                          style={{ color: sessionLinkCopyText === "Link copied" ? "var(--success)" : "var(--white)" }}
+                          style={{
+                            color:
+                              sessionLinkCopyText === "Link copied"
+                                ? "var(--requestly-color-success)"
+                                : "var(--requestly-color-text-default)",
+                          }}
                           onClick={() => {
                             setSessionLinkCopyText("Link copied");
                             trackSessionRecordingShareLinkCopied("embed");

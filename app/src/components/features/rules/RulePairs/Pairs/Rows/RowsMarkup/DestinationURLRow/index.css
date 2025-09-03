@@ -49,7 +49,7 @@
 
 .tooltip-link,
 .tooltip-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 

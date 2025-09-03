@@ -12,7 +12,7 @@
   gap: 8px;
   font-weight: 500;
   font-size: 1rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   padding: 1rem;
   padding-bottom: 0;
 }
@@ -48,7 +48,7 @@
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab .ant-tabs-tab-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-weight: 500;
   font-size: var(--requestly-font-size-sm, 13px);
 }

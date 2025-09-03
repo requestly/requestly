@@ -1,6 +1,6 @@
 label.graphql-operation-label {
   margin-bottom: 12px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-flex;
   align-items: center;
   column-gap: 6px;

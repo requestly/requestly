@@ -57,18 +57,18 @@
 .invoice-url-link {
   padding: 0;
   text-align: left;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-weight: bold;
 }
 
 .invoice-url-link:hover,
 .invoice-url-link:focus {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .invoice-url-link:hover span,
 .invoice-url-link:focus span {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline !important;
   text-underline-offset: 4px;
 }

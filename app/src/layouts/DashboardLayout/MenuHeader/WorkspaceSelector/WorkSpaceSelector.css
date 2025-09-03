@@ -36,7 +36,7 @@
   width: 10px;
   height: 10px;
   top: 5px;
-  background: var(--primary);
+  background: var(--requestly-color-primary);
   animation: blink 2.5s infinite;
 }
 @keyframes blink {

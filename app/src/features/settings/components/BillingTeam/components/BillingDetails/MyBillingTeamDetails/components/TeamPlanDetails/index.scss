@@ -12,12 +12,12 @@
     &-cancel.ant-btn:focus,
     &-cancel.ant-btn:active {
       background: var(--surface-2);
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
 
     & .ant-btn {
       font-weight: 500 !important;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       gap: 8px;
     }
   }
@@ -39,7 +39,7 @@
         font-size: 20px;
         line-height: 30px;
         letter-spacing: 0.15px;
-        color: var(--white);
+        color: var(--requestly-color-text-default);
       }
 
       & .team-plan-details-btn.ant-btn {
@@ -53,13 +53,13 @@
         &:focus,
         &:active {
           background: var(--surface-2);
-          color: var(--white);
+          color: var(--requestly-color-text-default);
         }
       }
 
       &__team-name {
         font-size: 20px;
-        color: var(--white);
+        color: var(--requestly-color-text-default);
       }
 
       &__team-details {
@@ -109,7 +109,7 @@
     top: 12px;
     right: 10px;
     font-size: 1rem;
-    color: var(--text-default);
+    color: var(--requestly-color-text-default);
     cursor: pointer;
   }
   .team-plan-popover-feature {
