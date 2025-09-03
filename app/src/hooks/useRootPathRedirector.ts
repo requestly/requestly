@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
