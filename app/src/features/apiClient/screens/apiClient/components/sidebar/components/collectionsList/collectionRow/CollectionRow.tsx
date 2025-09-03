@@ -34,6 +34,7 @@ import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records"
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -94,22 +95,31 @@ export const CollectionRow: React.FC<Props> = ({
     state.activeTabSource,
     state.closeTabBySource,
   ]);
-  const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
+  const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
+  const handleCollectionExport = useCallback(
+    (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+      const collectionRecordState = getRecordStore(record.id).getState() as CollectionRecordState;
+      const collectionVariables = collectionRecordState.collectionVariables.getState().data;
+      const exportData: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection.data, variables: Object.fromEntries(collectionVariables.entries()) },
+      };
+      setCollectionsToExport((prev) => [...prev, exportData]);
 
-    switch (exportType) {
-      case ExportType.REQUESTLY:
-        setIsExportModalOpen(true);
-        break;
-      case ExportType.POSTMAN:
-        setIsPostmanExportModalOpen(true);
-        break;
-      default:
-        console.warn(`Unknown export type: ${exportType}`);
-    }
-  }, []);
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
+    },
+    [getRecordStore, record.id]
+  );
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
