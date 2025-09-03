@@ -2,7 +2,6 @@ import React from "react";
 import { FaAngleDown } from "@react-icons/all-files/fa/FaAngleDown";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { Dropdown } from "antd";
-import { useApiClientFileStore } from "features/apiClient/hooks/useApiClientFileStore.hook";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { FaRegFileLines } from "@react-icons/all-files/fa6/FaRegFileLines";
 import { BiError } from "@react-icons/all-files/bi/BiError";
@@ -11,6 +10,7 @@ import { formatBytes, getFileExtension, truncateString } from "features/apiClien
 import InfoIcon from "components/misc/InfoIcon";
 import { RQAPI } from "features/apiClient/types";
 import { LARGE_FILE_SIZE } from "features/apiClient/constants";
+import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 
 interface FileDropdownProps {
   MultipartFormEntry: RQAPI.FormDataKeyValuePair;

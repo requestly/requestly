@@ -1,13 +1,14 @@
-.api-client-sidebar {
-  width: 280px;
+.multi-workspace-api-client-sidebar {
+  width: 320px;
   flex: 0 0 auto;
+  border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
   overflow: hidden;
-  border-right: 1px solid var(--requestly-color-white-t-10);
-  background-color: var(--requestly-color-surface-0);
+  border-right: 1px solid var(--border-dark);
+  background-color: var(--requestly-color-background);
 
   .storage-communication-note {
     display: flex;
@@ -40,7 +41,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--requestly-color-white-t-10);
+    border-bottom: 1px solid var(--border-dark);
+
+    .actions {
+      flex-shrink: 0;
+    }
   }
 
   .api-client-sidebar-content {
@@ -53,6 +58,7 @@
   .api-client-sidebar-tabs {
     flex: 1;
     overflow: hidden;
+    background-color: var(--requestly-color-background);
 
     .api-client-sidebar-placeholder {
       height: 100%;

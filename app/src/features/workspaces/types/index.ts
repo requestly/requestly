@@ -40,3 +40,9 @@ export enum WorkspaceMemberRole {
   write = "write",
   read = "read",
 }
+
+export const PrivateWorkspaceStub: Workspace = {
+  id: null,
+  name: "private", // to find
+  workspaceType: WorkspaceType.PERSONAL,
+};

@@ -7,13 +7,14 @@ import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../NewApiRecord
 import { RQAPI } from "features/apiClient/types";
 import "./sidebarListHeader.scss";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
+import { ApiClientSidebarTabKey } from "../../SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 
 interface ListHeaderProps {
   onSearch: (value: string) => void;
   newRecordActionOptions: {
     showNewRecordAction: boolean;
     onNewRecordClick: (
-      src: RQAPI.AnalyticsEventSource,
+      analyticEventSource: RQAPI.AnalyticsEventSource,
       recordType: RQAPI.RecordType,
       collectionId?: string,
       entryType?: RQAPI.ApiEntryType
@@ -23,12 +24,14 @@ interface ListHeaderProps {
     showMultiSelect: boolean;
     toggleMultiSelect: () => void;
   };
+  listType?: ApiClientSidebarTabKey;
 }
 
 export const SidebarListHeader: React.FC<ListHeaderProps> = ({
   onSearch,
   multiSelectOptions,
   newRecordActionOptions,
+  listType,
 }) => {
   const { showMultiSelect = false, toggleMultiSelect } = multiSelectOptions || {};
   const { showNewRecordAction, onNewRecordClick } = newRecordActionOptions || {};
@@ -49,15 +52,31 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
         onChange={(e) => onSearch(e.target.value)}
         className="sidebar-list-header-search"
       />
-      {showNewRecordAction && (
-        <NewApiRecordDropdown
-          invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
-          onSelect={(params) => {
-            onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
-          }}
-        >
-          <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
-        </NewApiRecordDropdown>
+
+      {listType ? (
+        listType === ApiClientSidebarTabKey.ENVIRONMENTS ? (
+          <RQButton
+            size="small"
+            type="transparent"
+            icon={<MdAdd />}
+            title="Create new environment"
+            className="sidebar-list-header-button"
+            onClick={() => {
+              onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
+            }}
+          />
+        ) : null
+      ) : (
+        showNewRecordAction && (
+          <NewApiRecordDropdown
+            invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+            onSelect={(params) => {
+              onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
+            }}
+          >
+            <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+          </NewApiRecordDropdown>
+        )
       )}
     </div>
   );

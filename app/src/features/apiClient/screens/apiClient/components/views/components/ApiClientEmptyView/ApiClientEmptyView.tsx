@@ -1,4 +1,3 @@
-import { useApiClientContext } from "features/apiClient/contexts";
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { useDispatch } from "react-redux";
 import { RQAPI } from "features/apiClient/types";
@@ -13,12 +12,15 @@ import {
   NewRecordDropdownItemType,
 } from "../../../sidebar/components/NewApiRecordDropdown/NewApiRecordDropdown";
 import "./apiClientEmptyView.scss";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
 
   const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
-  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const { onSaveRecord } = useNewApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
 
