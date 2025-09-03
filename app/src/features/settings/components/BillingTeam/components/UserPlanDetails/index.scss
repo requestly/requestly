@@ -1,7 +1,7 @@
 .user-plan-detail-card {
   .user-plan-card-header {
     padding: 8px 1rem;
-    border-bottom: 1px solid var(--surface-2);
+    border-bottom: 1px solid var(--requestly-color-surface-2);
     margin: 0 !important;
     width: 100%;
     justify-content: space-between;
@@ -10,15 +10,15 @@
   .user-plan-card-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 1px solid var(--surface-2);
+    border-bottom: 1px solid var(--requestly-color-surface-2);
 
     .user-plan-card-grid-item {
       padding: 1rem;
     }
 
     & .user-plan-card-grid-item:nth-child(2) {
-      border-left: 1px solid var(--surface-2);
-      border-right: 1px solid var(--surface-2);
+      border-left: 1px solid var(--requestly-color-surface-2);
+      border-right: 1px solid var(--requestly-color-surface-2);
     }
 
     .user-plan-card-grid-item-label {
@@ -89,7 +89,7 @@
   &:hover,
   &:focus,
   &:active {
-    background: var(--surface-2);
+    background: var(--requestly-color-surface-2);
     color: var(--requestly-color-text-default);
   }
 }

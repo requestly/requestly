@@ -44,7 +44,7 @@
 .mock-editor-body {
   padding: 1.25rem;
   border: 1px solid var(--border);
-  background: var(--component-background);
+  background: var(--requestly-color-surface-1);
   border-radius: var(--border-radius-md);
 }
 
@@ -67,7 +67,7 @@
 .meta-data-option .ant-select-selector,
 .meta-data-option .ant-input-group-wrapper .ant-input-group,
 .meta-data-option .ant-input-number-group .ant-input-number-input {
-  background: var(--component-dark-background);
+  background: var(--requestly-color-surface-0);
   border-radius: var(--border-radius-sm);
   box-shadow: var(--input-box-shadow);
   color: var(--requestly-color-text-default);

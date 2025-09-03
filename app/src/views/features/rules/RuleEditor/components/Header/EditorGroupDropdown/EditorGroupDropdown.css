@@ -8,7 +8,7 @@
   user-select: none;
   padding: 7px 8px 6px 8px;
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
   border: 1px solid transparent;
   transition: border 0.3s;
 }
@@ -65,7 +65,7 @@
 
 .editor-group-menu-item.ant-dropdown-menu-item:not(.editor-group-menu-item-active):hover,
 .editor-group-menu-item-active.ant-dropdown-menu-item {
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .editor-group-menu-item.ant-dropdown-menu-item-danger span {
@@ -115,7 +115,7 @@
 }
 
 .editor-dropdown-add-new-group.ant-btn:hover {
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .editor-dropdown-add-new-group.ant-btn .anticon-plus {

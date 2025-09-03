@@ -7,21 +7,11 @@
   --neutrals-gray-800: #262b37;
   --neutrals-gray-900: #161a25;
 
-  --neutrals-yellow-300: #fdba0f;
-  --neutrals-yellow-600: #d07d00;
-  --neutrals-yellow-800: #5c3111;
-
   /* Old Color scheme but new tokens */
-  --warning: #e09400;
   --text-light: #b0b0b5b3;
   --surface-0: #1b1b1b;
-  --surface-0_5: #212121;
-  --surface-1: #282828;
-  --surface-2: #383838;
   --surface-3: var(--neutrals-gray-600);
   --background: #1b1b1b;
-  --highlight-dark-bg: #111a2c;
-  --primary-light: #3c7ff3;
 
   /* old tokens */
   --text-gray: var(--text-light);
@@ -33,19 +23,13 @@
   --danger-rgb: 252, 95, 95;
   --link-color: #3ba0ff;
   --background-dark: var(--background);
-  --body-background: #212121;
-  --component-background: var(--surface-1);
-  --component-dark-background: #212121;
-  --input-background: var(--surface-1);
   --component-header-background: #2d2d2d;
-  --hover-color: var(--surface-2);
   --dropdown-active-border-color: #0361ff;
   --input-hover-border-color: #2051b4;
   --input-focus-border-color: #1e69ff;
   --input-focus-box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
 
   /* utils */
-  --space: 2px;
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
 

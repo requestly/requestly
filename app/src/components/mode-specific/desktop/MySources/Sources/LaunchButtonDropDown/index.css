@@ -41,7 +41,7 @@
 
 .launch-options-menu-item.ant-dropdown-menu-item:not(.launch-options-menu-item-active):hover,
 .launch-options-menu-item-active.ant-dropdown-menu-item {
-  background-color: var(--surface-2);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .launch-options-menu-item.ant-dropdown-menu-item-danger span {

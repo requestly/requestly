@@ -2,7 +2,7 @@
   padding: 1rem;
   margin-bottom: 10px;
   border-radius: var(--border-radius-md);
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .page-source-row:nth-last-child(2) {

@@ -21,8 +21,8 @@
 }
 
 .plan-status-warning-badge {
-  color: var(--warning);
-  border: 1px solid var(--warning);
+  color: var(--requestly-color-warning);
+  border: 1px solid var(--requestly-color-warning);
 }
 
 .plan-status-expired-badge {
@@ -34,7 +34,7 @@
 }
 
 .plan-status-warning-dot {
-  background: var(--warning);
+  background: var(--requestly-color-warning);
 }
 
 .plan-status-expired-dot {

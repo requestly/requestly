@@ -41,7 +41,7 @@
 
 .header-left-section a:hover {
   color: var(--requestly-color-text-default);
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .header-left-section .desktop-app-promo-btn.ant-btn {
@@ -51,7 +51,7 @@
 
 .header-left-section .desktop-app-promo-btn.ant-btn:hover {
   transition: none;
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .header-middle-section {
@@ -80,7 +80,7 @@
 .notification-dropdown {
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .profile-dropdown {
@@ -142,7 +142,7 @@
 
 .ant-btn.header-icon-btn:hover,
 .ant-btn.header-icon-btn:focus {
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .header-help-menu-divider.ant-divider {

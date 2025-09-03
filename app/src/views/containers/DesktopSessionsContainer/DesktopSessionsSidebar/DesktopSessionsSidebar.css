@@ -1,6 +1,6 @@
 .desktop-sidebar-container {
   height: 100%;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .desktop-sidebar-container ul {

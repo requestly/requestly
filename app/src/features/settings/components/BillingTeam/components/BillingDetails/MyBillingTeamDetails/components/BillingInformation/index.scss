@@ -15,7 +15,7 @@
         &:hover,
         &:focus,
         &:active {
-          background: var(--surface-2);
+          background: var(--requestly-color-surface-2);
         }
 
         &:hover .team-billing-info-btn-text,
@@ -36,6 +36,6 @@
   }
 
   .team-billing-info-section:first-child {
-    border-right: 1px solid var(--surface-2);
+    border-right: 1px solid var(--requestly-color-surface-2);
   }
 }

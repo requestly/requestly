@@ -1,7 +1,7 @@
 .team-plan-details-card {
   &-header {
     padding: 8px 1rem;
-    border-bottom: 1px solid var(--surface-2, #383838);
+    border-bottom: 1px solid var(--requestly-color-surface-2, #383838);
   }
 
   &-actions {
@@ -11,7 +11,7 @@
     &-cancel.ant-btn:hover,
     &-cancel.ant-btn:focus,
     &-cancel.ant-btn:active {
-      background: var(--surface-2);
+      background: var(--requestly-color-surface-2);
       color: var(--requestly-color-text-default);
     }
 
@@ -52,7 +52,7 @@
         &:hover,
         &:focus,
         &:active {
-          background: var(--surface-2);
+          background: var(--requestly-color-surface-2);
           color: var(--requestly-color-text-default);
         }
       }
@@ -77,11 +77,11 @@
     }
 
     & .team-plan-details-section:nth-child(2) {
-      border-left: 1px solid var(--surface-2);
+      border-left: 1px solid var(--requestly-color-surface-2);
     }
 
     & .team-plan-details-section:nth-child(3) {
-      border-left: 1px solid var(--surface-2);
+      border-left: 1px solid var(--requestly-color-surface-2);
     }
   }
 }
@@ -101,7 +101,6 @@
   .team-plan-popover-header,
   .team-plan-popover-body {
     padding: 1rem !important;
-    // border-bottom: 1px solid var(--surface-2);
   }
 
   .team-plan-popover-close-icon {
@@ -130,7 +129,7 @@
     grid-template-columns: 1fr 1fr;
 
     &-section:first-child {
-      border-right: 1px solid var(--surface-2);
+      border-right: 1px solid var(--requestly-color-surface-2);
     }
 
     &-section {

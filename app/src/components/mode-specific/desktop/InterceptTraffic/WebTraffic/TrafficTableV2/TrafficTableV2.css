@@ -49,7 +49,7 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item.ant-menu-item-selected {
   color: var(--requestly-color-primary);
   border: 1px solid var(--requestly-color-primary);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-submenu:not(:last-child) {
@@ -78,7 +78,7 @@
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:hover,
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:focus {
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content {

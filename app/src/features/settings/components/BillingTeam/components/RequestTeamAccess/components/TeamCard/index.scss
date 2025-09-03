@@ -1,6 +1,6 @@
 .billing-team-card {
-  background: var(--surface-1);
-  border: 1px solid var(--surface-2);
+  background: var(--requestly-color-surface-1);
+  border: 1px solid var(--requestly-color-surface-2);
   border-bottom: none;
   padding: 15px 1rem;
   display: grid;
@@ -14,7 +14,7 @@
   &:last-child {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border-bottom: 1px solid var(--surface-2);
+    border-bottom: 1px solid var(--requestly-color-surface-2);
   }
 
   &-request-btn-wrapper {

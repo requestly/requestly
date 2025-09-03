@@ -37,7 +37,7 @@
   padding: 1.25rem;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .resource-types-radio-group .ant-radio-group {
@@ -45,7 +45,7 @@
   padding: 1.25rem;
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .resource-types-radio-group .ant-radio-group .ant-radio-wrapper {

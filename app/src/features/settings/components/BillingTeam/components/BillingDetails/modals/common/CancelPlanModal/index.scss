@@ -1,7 +1,7 @@
 .cancel-plan-modal {
   .ant-modal-header,
   .ant-modal-content {
-    background-color: var(--surface-0_5);
+    background-color: var(--requestly-color-surface-0);
   }
 
   .ant-modal-title {
@@ -24,6 +24,6 @@
 
   .cancel-plan-modal-footer {
     padding: 1rem;
-    border-top: 1px solid var(--surface-2, #383838);
+    border-top: 1px solid var(--requestly-color-surface-2, #383838);
   }
 }

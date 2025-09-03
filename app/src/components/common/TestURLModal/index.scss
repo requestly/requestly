@@ -1,6 +1,6 @@
 .test-url-modal {
   .ant-modal-body {
-    background: var(--component-background);
+    background: var(--requestly-color-surface-1);
   }
   &-header {
     padding: 20px 30px;
@@ -21,7 +21,7 @@
     .test-url-modal-section .ant-input {
       box-shadow: var(--input-box-shadow);
       border-radius: var(--border-radius-sm);
-      background-color: var(--component-dark-background);
+      background-color: var(--requestly-color-surface-0);
     }
   }
   &-section {

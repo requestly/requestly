@@ -8,7 +8,7 @@
   border-radius: inherit;
   padding: 0 0 1rem 0;
   border: 1px solid var(--border-dark);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-header {
@@ -26,7 +26,7 @@
   padding: 0 1.25rem;
   color: var(--text-gray);
   border-radius: inherit;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {

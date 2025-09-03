@@ -54,11 +54,11 @@
   display: block;
   font-size: var(--requestly-font-size-sm, 13px);
   border-radius: var(--border-radius-md);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .automatic-recording-radio-group.ant-radio-group > *:not(:last-child) {
-  border-bottom: 1px solid var(--body-background);
+  border-bottom: 1px solid var(--requestly-color-surface-0);
 }
 
 .automatic-recording-radio-group .learn-more-link {

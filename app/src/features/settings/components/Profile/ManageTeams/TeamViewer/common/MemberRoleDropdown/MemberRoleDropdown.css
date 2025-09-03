@@ -41,7 +41,7 @@
 }
 
 .member-role-dropdown-trigger:hover {
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .member-role-dropdown-trigger span.ant-typography {

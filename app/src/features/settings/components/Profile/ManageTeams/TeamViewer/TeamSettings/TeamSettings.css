@@ -56,7 +56,7 @@ div.team-delete-title {
 .delete-team-input.ant-input {
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .delete-team-cancel-btn {

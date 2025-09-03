@@ -22,7 +22,7 @@ label.graphql-operation-label {
 .graphql-operation-key-input.ant-input,
 .graphql-operation-name-input.ant-input {
   font-size: var(--requestly-font-size-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .graphql-operation-filter-operator {

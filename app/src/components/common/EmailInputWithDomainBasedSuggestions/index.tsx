@@ -93,9 +93,9 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
         border: "none",
         colors: {
           ...theme.colors,
-          primary: "var(--surface-1)",
-          primary25: "var(--surface-2)",
-          neutral0: "var(--surface-1)",
+          primary: "var(--requestly-color-surface-1)",
+          primary25: "var(--requestly-color-surface-2)",
+          neutral0: "var(--requestly-color-surface-1)",
           neutral10: "var(--surface-3)", // tag background color
           neutral80: "var(--requestly-color-text-default)", // tag text color
           danger: "var(--requestly-color-text-default)", // tag cancel icon color

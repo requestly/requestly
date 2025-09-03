@@ -14,7 +14,7 @@
   padding: 1rem;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .pin-extension-popup .title {
@@ -41,7 +41,7 @@
   object-fit: cover;
   object-position: top;
   user-select: none;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .pin-extension-popup .pin-extension-gif {

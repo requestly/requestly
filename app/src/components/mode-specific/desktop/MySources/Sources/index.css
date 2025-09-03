@@ -1,6 +1,6 @@
 .connected-apps-modal .connected-apps-modal-content {
   padding: 20px;
-  background: var(--body-background);
+  background: var(--requestly-color-surface-0);
   min-height: 450px;
   max-height: 700px;
   overflow: auto;

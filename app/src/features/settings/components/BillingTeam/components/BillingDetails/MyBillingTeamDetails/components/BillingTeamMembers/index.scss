@@ -6,7 +6,7 @@
 
 .billing-team-members-section-header {
   padding: 8px 1rem;
-  border-bottom: 1px solid var(--surface-2);
+  border-bottom: 1px solid var(--requestly-color-surface-2);
 
   &-title {
     color: var(--requestly-color-text-default);
@@ -26,7 +26,7 @@
   &:hover,
   &:focus,
   &:active {
-    background: var(--surface-2);
+    background: var(--requestly-color-surface-2);
     color: var(--requestly-color-text-default);
   }
 }
