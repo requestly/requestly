@@ -65,6 +65,7 @@ The following domains are eligible for the student programme:
     "strayer.edu",
     "student.unsika.ac.id",
     "purdueglobal.edu",
-    "njit.edu"
+    "njit.edu",
+    "polytech-lille.net"
   ]
 }

@@ -3,7 +3,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { ExampleCollectionsImportStatus, useExampleCollections } from "features/apiClient/exampleCollections/store";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { toast } from "utils/Toast";
 import "./exampleCollectionsNudge.scss";
