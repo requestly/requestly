@@ -355,7 +355,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
 };
 
 const updateLastSyncedTS = async (appMode) => {
-  return StorageService(appMode).saveRecord({
+  return clientStorageService.saveStorageObject({
     [APP_CONSTANTS.LAST_SYNCED_TS]: Date.now(),
   });
 };
@@ -415,7 +415,7 @@ export const handleLocalConflicts = (firebaseRecords, localRecords) => {
 
 export const saveSessionRecordingPageConfigLocallyWithoutSync = async (object, appMode) => {
   Logger.log("Writing storage in saveSessionRecordingPageConfigLocallyWithoutSync");
-  await StorageService(appMode).saveRecord({ sessionRecordingConfig: object });
+  await clientSessionRecordingStorageService.saveSessionRecordingConfig(object);
 };
 
 export const getSyncedSessionRecordingPageConfig = (uid) => {

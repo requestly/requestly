@@ -19,7 +19,6 @@ import {
   getTeamUserRuleAllConfigsPath,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
-import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
@@ -63,9 +62,7 @@ const setLastSyncTarget = async (
   team_id: string
 ): Promise<void> => {
   const desiredValue: string = syncTarget === "teamSync" ? team_id : uid;
-
-  const storageService = StorageService(appMode);
-  await storageService.saveRecord({
+  await clientStorageService.saveStorageObject({
     [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
   });
 };
