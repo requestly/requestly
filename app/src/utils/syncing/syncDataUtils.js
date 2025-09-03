@@ -12,6 +12,8 @@ import APP_CONSTANTS from "config/constants";
 import { compressRecords } from "utils/Compression";
 import { growthbook } from "utils/feature-flag/growthbook";
 import FEATURES from "config/constants/sub/features";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
+import { clientStorageService } from "services/clientStorageService";
 const _ = require("lodash");
 
 const defaultSyncValue = "Inactive";
@@ -361,8 +363,8 @@ const updateLastSyncedTS = async (appMode) => {
 // Checks if last-synced-ts is later than last-updated-ts - the ideal case
 // last updated-ts will be ahead only if updates are performed directly by extension popup
 export const checkIfNoUpdateHasBeenPerformedSinceLastSync = async (appMode) => {
-  const lastSyncedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_SYNCED_TS);
-  const lastUpdatedTS = await StorageService(appMode).getRecord(APP_CONSTANTS.LAST_UPDATED_TS);
+  const lastSyncedTS = await clientStorageService.getStorageObject(APP_CONSTANTS.LAST_SYNCED_TS);
+  const lastUpdatedTS = await clientStorageService.getStorageObject(APP_CONSTANTS.LAST_UPDATED_TS);
   if (!lastSyncedTS || !lastUpdatedTS) return true; // assumption
   return lastSyncedTS > lastUpdatedTS;
 };
@@ -429,9 +431,7 @@ export const getSyncedSessionRecordingPageConfig = (uid) => {
 export const getLocalSessionRecordingPageConfig = (appMode) => {
   Logger.log("Reading storage in getLocalSessionRecordingPageConfig");
   return new Promise((resolve) => {
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
-      .then((savedConfig) => resolve(savedConfig || {}));
+    clientSessionRecordingStorageService.getSessionRecordingConfig().then((savedConfig) => resolve(savedConfig || {}));
   });
 };
 

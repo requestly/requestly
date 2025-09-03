@@ -15,7 +15,6 @@ class StorageServiceWrapper {
 
     this.saveRecordWithID = this.saveRecordWithID.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
-    this.getRecord = this.getRecord.bind(this);
     this.getRecords = this.getRecords.bind(this);
 
     this.transactionQueue = new Set(); // promises of transactions that are still pending
@@ -138,10 +137,6 @@ class StorageServiceWrapper {
    */
   async saveRecordWithID(object) {
     await this.StorageHelper.saveStorageObject({ [object.id]: object });
-  }
-
-  getRecord(key) {
-    return this.StorageHelper.getStorageObject(key);
   }
 
   async removeRecord(key) {

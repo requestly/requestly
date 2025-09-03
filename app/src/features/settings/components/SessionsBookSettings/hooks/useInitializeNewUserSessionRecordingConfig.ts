@@ -6,6 +6,7 @@ import { defaultSessionRecordingConfig } from "..";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled, isExtensionVersionCompatible } from "actions/ExtensionActions";
+import { clientStorageService } from "services/clientStorageService";
 
 export const useInitializeNewUserSessionRecordingConfig = () => {
   const appMode = useSelector(getAppMode);
@@ -17,21 +18,19 @@ export const useInitializeNewUserSessionRecordingConfig = () => {
 
     if (!isExtensionVersionCompatible("23.10.22")) return;
 
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
-      .then((config) => {
-        if (!config || Object.keys(config).length === 0) {
-          const newUserRecordingConfig: SessionRecordingConfig = {
-            ...defaultSessionRecordingConfig,
-            autoRecording: {
-              ...defaultSessionRecordingConfig.autoRecording,
-              isActive: true,
-              mode: AutoRecordingMode.ALL_PAGES,
-            },
-          };
+    clientStorageService.getStorageObject(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG).then((config) => {
+      if (!config || Object.keys(config).length === 0) {
+        const newUserRecordingConfig: SessionRecordingConfig = {
+          ...defaultSessionRecordingConfig,
+          autoRecording: {
+            ...defaultSessionRecordingConfig.autoRecording,
+            isActive: true,
+            mode: AutoRecordingMode.ALL_PAGES,
+          },
+        };
 
-          StorageService(appMode).saveSessionRecordingPageConfig(newUserRecordingConfig);
-        }
-      });
+        StorageService(appMode).saveSessionRecordingPageConfig(newUserRecordingConfig);
+      }
+    });
   }, [appMode]);
 };

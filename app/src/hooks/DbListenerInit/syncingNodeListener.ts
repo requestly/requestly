@@ -27,6 +27,8 @@ import { SyncType } from "utils/syncing/SyncUtils";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { decompressRecords } from "../../utils/Compression";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
+import { clientStorageService } from "services/clientStorageService";
 
 type NodeRef = DatabaseReference;
 type Snapshot = DataSnapshot;
@@ -159,8 +161,7 @@ export const doSync = async (
     return;
   }
   // Consistency check. Merge records if inconsistent
-  const storageService = StorageService(appMode);
-  const lastSyncTarget: string = await storageService.getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
+  const lastSyncTarget: string = await clientStorageService.getStorageObject(APP_CONSTANTS.LAST_SYNC_TARGET);
 
   let consistencyCheckPassed: boolean =
     (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
@@ -195,9 +196,7 @@ export const doSync = async (
   // Fetch Session Recording
   if (appMode === "EXTENSION") {
     const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
-    const localSessionRecordingConfig = await StorageService(appMode).getRecord(
-      GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
-    );
+    const localSessionRecordingConfig = await clientSessionRecordingStorageService.getSessionRecordingConfig();
     saveSessionRecordingPageConfigLocallyWithoutSync(
       sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
       appMode
