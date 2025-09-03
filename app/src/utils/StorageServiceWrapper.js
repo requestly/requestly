@@ -11,9 +11,7 @@ class StorageServiceWrapper {
   constructor(options) {
     this.appMode = options.appMode || GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     this.StorageHelper = clientStorageService;
-    this.primaryKeys = options.primaryKeys || ["objectType", "ruleType"];
 
-    this.saveRecordWithID = this.saveRecordWithID.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
 
     this.transactionQueue = new Set(); // promises of transactions that are still pending
@@ -91,15 +89,6 @@ class StorageServiceWrapper {
     return this.saveRecord({ sessionRecordingConfig: config });
   }
 
-  /**
-   * Saves the object which contains ID so that we do not need to specify id as the key and whole object as value
-   * @param object
-   * @returns {Promise<any>}
-   */
-  async saveRecordWithID(object) {
-    await this.StorageHelper.saveStorageObject({ [object.id]: object });
-  }
-
   async removeRecord(key) {
     try {
       const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
@@ -126,21 +115,8 @@ class StorageServiceWrapper {
     return this.StorageHelper.removeStorageObjects(array);
   }
 
-  printRecords() {
-    this.StorageHelper.getStorageSuperObject().then(function (superObject) {
-      console.log(superObject);
-    });
-  }
-
   async clearDB() {
     await this.StorageHelper.clearStorage();
-  }
-
-  saveConsoleLoggerState(state) {
-    const consoleLoggerState = {
-      [GLOBAL_CONSTANTS.CONSOLE_LOGGER_ENABLED]: state,
-    };
-    this.StorageHelper.saveStorageObject(consoleLoggerState);
   }
 }
 
