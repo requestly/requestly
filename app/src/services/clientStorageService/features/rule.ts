@@ -16,7 +16,7 @@ class ClientRuleStorageService {
   }
 
   async saveMultipleRulesOrGroups(array: any[], options = {}) {
-    console.log("[ClientRuleStorageService]", "saveMultipleRulesOrGroups", array);
+    Logger.log("[ClientRuleStorageService]", "saveMultipleRulesOrGroups", array);
     const formattedObject: any = {};
     array.forEach((object) => {
       if (object && object.id) formattedObject[object.id] = object;
@@ -26,12 +26,12 @@ class ClientRuleStorageService {
   }
 
   async deleteRuleOrGroup(ruleOrGroup: any, options = {}) {
-    console.log("[ClientRuleStorageService] deleteRuleOrGroup", ruleOrGroup);
+    Logger.log("[ClientRuleStorageService] deleteRuleOrGroup", ruleOrGroup);
     clientStorageService.removeStorageObject(ruleOrGroup.id);
   }
 
   async deleteMultipleRulesOrGroups(array: any[], options = {}) {
-    console.log("[ClientRuleStorageService] deleteMultipleRulesOrGroups", array);
+    Logger.log("[ClientRuleStorageService] deleteMultipleRulesOrGroups", array);
     array.forEach((object) => {
       this.deleteRuleOrGroup(object);
     });
@@ -39,7 +39,7 @@ class ClientRuleStorageService {
 
   async resetRulesAndGroups() {
     return clientStorageService.getStorageSuperObject().then(async (superObject: Record<string, any>) => {
-      console.log("[ClientRuleStorageService] resetRulesAndGroups", { superObject });
+      Logger.log("[ClientRuleStorageService] resetRulesAndGroups", { superObject });
       await clientStorageService.clearStorage();
 
       const newSuperObject: Record<string, any> = {};
@@ -51,13 +51,13 @@ class ClientRuleStorageService {
         newSuperObject[key] = superObject[key];
       }
 
-      console.log("[ClientRuleStorageService] resetRulesAndGroups", { newSuperObject });
+      Logger.log("[ClientRuleStorageService] resetRulesAndGroups", { newSuperObject });
       await clientStorageService.saveStorageObject(newSuperObject);
     });
   }
 
   getAllRulesAndGroups = async (): Promise<Record<string, any>> => {
-    console.log("[ClientRuleStorageService] getAllRulesAndGroups");
+    Logger.log("[ClientRuleStorageService] getAllRulesAndGroups");
     const superObject = await clientStorageService.getStorageSuperObject();
     const rulesSuperObject: Record<string, any> = {};
 
@@ -71,12 +71,12 @@ class ClientRuleStorageService {
       }
     }
 
-    console.log("[ClientRuleStorageService] getAllRulesAndGroups", { superObject, rulesSuperObject });
+    Logger.log("[ClientRuleStorageService] getAllRulesAndGroups", { superObject, rulesSuperObject });
     return rulesSuperObject;
   };
 
   getRecordsByObjectType = async (objectType: string): Promise<any> => {
-    console.log("[ClientRuleStorageService] getRecordsByObjectType", objectType);
+    Logger.log("[ClientRuleStorageService] getRecordsByObjectType", objectType);
     const superObject = await clientStorageService.getStorageSuperObject();
     const records: any[] = [];
 
@@ -91,12 +91,12 @@ class ClientRuleStorageService {
     }
 
     const filteredRecords = records.filter((record) => record.objectType === objectType);
-    console.log("[ClientRuleStorageService] getRecordsByObjectType", { filteredRecords });
+    Logger.log("[ClientRuleStorageService] getRecordsByObjectType", { filteredRecords, superObject });
     return filteredRecords;
   };
 
   getRecordById = async (id: string): Promise<any> => {
-    console.log("[ClientRuleStorageService] getRecordById", id);
+    Logger.log("[ClientRuleStorageService] getRecordById", id);
     const record = await clientStorageService.getStorageObject(id);
     return record;
   };
