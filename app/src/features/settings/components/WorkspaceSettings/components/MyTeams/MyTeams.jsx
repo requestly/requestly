@@ -3,13 +3,12 @@ import { Card } from "reactstrap";
 import ManageTeams from "../../../Profile/ManageTeams";
 import TeamWideAnimation from "components/misc/LottieAnimation/TeamWideAnimation";
 import { Col } from "antd";
-import { ManageBillingTeamAlert } from "../ManageBillingTeamAlert/ManageBillingTeamAlert";
 import "./index.scss";
 
 const MyTeams = () => {
   return (
     <div className="workspace-settings-page">
-      <ManageBillingTeamAlert />
+      {/* <ManageBillingTeamAlert /> */}
       <Col className="workspace-settings-container">
         {/* Page content */}
         <Card className="mt-4">
