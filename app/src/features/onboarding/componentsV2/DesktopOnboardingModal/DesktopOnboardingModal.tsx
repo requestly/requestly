@@ -53,6 +53,7 @@ export const DesktopOnboardingModal = () => {
               workspaceType={WorkspaceType.LOCAL}
               onCancel={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)}
               callback={() => dispatch(globalActions.updateIsOnboardingCompleted(true))}
+              analyticEventSource="desktop_onboarding_modal"
             />
           </DesktopOnboardingCard>
         ) : onboardingStep === OnboardingStep.AUTH ? (

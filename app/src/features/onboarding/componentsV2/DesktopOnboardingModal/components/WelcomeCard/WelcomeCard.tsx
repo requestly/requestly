@@ -28,7 +28,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
           description="Create, manage, and test APIs with collections and reusable variables."
           iconSrc={"/assets/media/apiClient/api-client-icon.svg"}
           onClick={() => {
-            trackDesktopOnboardingFeatureSelected(OnboardingStep.FOLDER_SELECTION);
+            trackDesktopOnboardingFeatureSelected("api_client");
             onFeatureClick(OnboardingStep.FOLDER_SELECTION);
           }}
         />
@@ -37,7 +37,7 @@ export const WelcomeCard: React.FC<Props> = ({ onFeatureClick }) => {
           description="Capture and modify requests, responses, headers, and scripts in real time."
           iconSrc={"/assets/media/rules/rules-icon.svg"}
           onClick={() => {
-            trackDesktopOnboardingFeatureSelected(OnboardingStep.AUTH);
+            trackDesktopOnboardingFeatureSelected("rules");
             onFeatureClick(OnboardingStep.AUTH);
           }}
         />
