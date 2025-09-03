@@ -15,7 +15,6 @@ class StorageServiceWrapper {
 
     this.saveRecordWithID = this.saveRecordWithID.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
-    this.getRecords = this.getRecords.bind(this);
 
     this.transactionQueue = new Set(); // promises of transactions that are still pending
     this.transactionLedger = new Map(); // optional: helpful only in putting console logs
@@ -42,44 +41,6 @@ class StorageServiceWrapper {
     await Promise.allSettled([...this.transactionQueue]);
     this.transactionQueue.clear();
     this.transactionLedger.clear();
-  }
-
-  hasPrimaryKey(record) {
-    if (typeof record === "object" && !Array.isArray(record) && record !== null) {
-      for (let index = 0; index < this.primaryKeys.length; index++) {
-        if (typeof record[this.primaryKeys[index]] !== "undefined") {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  getRecords(objectType) {
-    const self = this;
-    return new Promise((resolve) => {
-      this.StorageHelper.getStorageSuperObject().then((superObject) => {
-        const myArr = [];
-        for (let key in superObject) {
-          // clear out everything that is not an object with a primary key - eventually allows only rules & groups
-          if (self.hasPrimaryKey(superObject[key])) {
-            myArr.push(superObject[key]);
-          }
-        }
-        resolve(self.filterRecordsByType(myArr, objectType));
-      });
-    });
-  }
-
-  filterRecordsByType(records, requestedObjectType) {
-    if (!requestedObjectType) {
-      return records;
-    }
-
-    return records.filter((record) => {
-      let objectType = record.objectType || GLOBAL_CONSTANTS.OBJECT_TYPES.RULE;
-      return objectType === requestedObjectType;
-    });
   }
 
   async saveRecord(object) {
