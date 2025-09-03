@@ -149,23 +149,37 @@ class SyncWorkspace {
     }
 
     private async _setupReplication() {
-        await Promise.all(
-            Object.values(SyncEntityType).map(async (entityType) => {
-                await this._setupReplicationForEntity(entityType);
-            })
-        );
+        if (this._config.isSyncEnabled) {
+            await Promise.all(
+                Object.values(SyncEntityType).map(async (entityType) => {
+                    await this._setupReplicationForEntity(entityType);
+                })
+            );
+        } else {
+            console.log("[SyncWorkspace._setupReplication] Sync is disabled for workspace", {
+                workspaceId: this._config.id,
+                workspaceType: this._config.workspaceType,
+            });
+        }
     }
 
     private async _setupReplicationForEntity<K extends SyncEntityType>(entityType: K) {
         console.log("[SyncWorkspace._setupReplication] Start", { entityType });
-        if (!this.replication?.[entityType]) {
-            const replication = new RDBReplication(this, entityType);
-            await replication.init();
-            await replication.start();
-            // @ts-ignore
-            this.replication[entityType] = replication;
+        if (this._config.isSyncEnabled) {
+            if (!this.replication?.[entityType]) {
+                const replication = new RDBReplication(this, entityType);
+                await replication.init();
+                await replication.start();
+                // @ts-ignore
+                this.replication[entityType] = replication;
+            } else {
+                console.error("[SyncWorkspace._setupReplicationForEntity] Replication already exists", { entityType });
+            }
         } else {
-            console.error("[SyncWorkspace._setupReplicationForEntity] Replication already exists", { entityType });
+            console.log("[SyncWorkspace._setupReplicationForEntity] Sync is disabled for workspace", {
+                workspaceId: this._config.id,
+                workspaceType: this._config.workspaceType,
+            });
         }
         console.log("[SyncWorkspace._setupReplication] End", { entityType });
     }
