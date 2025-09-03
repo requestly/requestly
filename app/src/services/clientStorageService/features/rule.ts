@@ -1,5 +1,6 @@
 import Logger from "lib/logger";
 import { clientStorageService } from "..";
+import { RecordType } from "@requestly/shared/types/entities/rules";
 
 class ClientRuleStorageService {
   async saveRuleOrGroup(ruleOrGroup: any, options = {}) {
@@ -43,7 +44,7 @@ class ClientRuleStorageService {
 
       const newSuperObject: Record<string, any> = {};
       for (let key in superObject) {
-        if (superObject[key]?.objectType === "rule" || superObject[key]?.objectType === "group") {
+        if (superObject[key]?.objectType === RecordType.RULE || superObject[key]?.objectType === RecordType.GROUP) {
           continue;
         }
 
@@ -65,12 +66,12 @@ class ClientRuleStorageService {
     }
 
     for (let key in superObject) {
-      if (superObject[key]?.objectType === "rule" || superObject[key]?.objectType === "group") {
+      if (superObject[key]?.objectType === RecordType.RULE || superObject[key]?.objectType === RecordType.GROUP) {
         rulesSuperObject[key] = superObject[key];
       }
     }
 
-    console.log("[ClientRuleStorageService] getAllRulesAndGroups", { rulesSuperObject });
+    console.log("[ClientRuleStorageService] getAllRulesAndGroups", { superObject, rulesSuperObject });
     return rulesSuperObject;
   };
 
@@ -80,7 +81,7 @@ class ClientRuleStorageService {
     const records: any[] = [];
 
     for (let key in superObject) {
-      if (superObject[key]?.objectType === "rule" || superObject[key]?.objectType === "group") {
+      if (superObject[key]?.objectType === RecordType.RULE || superObject[key]?.objectType === RecordType.GROUP) {
         records.push(superObject[key]);
       }
     }
