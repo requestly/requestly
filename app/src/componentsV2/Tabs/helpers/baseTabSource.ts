@@ -1,6 +1,7 @@
 import React from "react";
 import { AbstractTabSource } from "./tabSource";
 import { TabSourceMetadata } from "../types";
+import { ContextId } from "features/apiClient/contexts/contextId.context";
 
 export class BaseTabSource implements AbstractTabSource {
   component: NonNullable<React.ReactNode>;
@@ -18,6 +19,13 @@ export class BaseTabSource implements AbstractTabSource {
   }
 
   render(): React.ReactNode {
+    const contextId = this.metadata.context?.id;
+    if (contextId) {
+      return ContextId({
+        children: this.component,
+        id: contextId,
+      });
+    }
     return this.component;
   }
 

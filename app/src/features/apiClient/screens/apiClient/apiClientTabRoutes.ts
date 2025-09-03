@@ -5,6 +5,7 @@ import { RequestViewTabSource } from "./components/views/components/RequestView/
 import { CollectionViewTabSource } from "./components/views/components/Collection/collectionViewTabSource";
 import { EnvironmentViewTabSource } from "../environment/components/environmentView/EnvironmentViewTabSource";
 import { HistoryViewTabSource } from "./components/views/components/request/HistoryView/historyViewTabSource";
+import { RuntimeVariablesViewTabSource } from "../environment/components/RuntimeVariables/runtimevariablesTabSource";
 
 export const apiClientTabRoutes: TabRoute[] = [
   {
@@ -26,5 +27,9 @@ export const apiClientTabRoutes: TabRoute[] = [
   {
     path: PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE,
     tabSourceFactory: EnvironmentViewTabSource.create,
+  },
+  {
+    path: `${PATHS.API_CLIENT.VARIABLES.ABSOLUTE}/runtime`,
+    tabSourceFactory: RuntimeVariablesViewTabSource.create,
   },
 ];

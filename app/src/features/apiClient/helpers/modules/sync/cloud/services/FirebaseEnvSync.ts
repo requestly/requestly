@@ -26,6 +26,17 @@ export class FirebaseEnvSync implements EnvironmentInterface<ApiClientCloudMeta>
 
   async getAllEnvironments() {
     const result = await fetchAllEnvironmentDetails(this.getPrimaryId());
+
+    if (!result) {
+      return {
+        success: false,
+        data: {
+          environments: {},
+          erroredRecords: [] as ErroredRecord[],
+        },
+      };
+    }
+
     return {
       success: true,
       data: {

@@ -1,10 +1,7 @@
-import { notification, Result, Tabs } from "antd";
-import { useApiClientContext } from "features/apiClient/contexts";
-import { RQBreadcrumb } from "lib/design-system-v2/components";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { notification, Result, Tabs } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
-import PATHS from "config/constants/sub/paths";
 import { CollectionsVariablesView } from "./components/CollectionsVariablesView/CollectionsVariablesView";
 import CollectionAuthorizationView from "./components/CollectionAuthorizationView/CollectionAuthorizationView";
 import { useGenericState } from "hooks/useGenericState";
@@ -13,6 +10,11 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { CollectionViewTabSource } from "./collectionViewTabSource";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { isEmpty } from "lodash";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useCommand } from "features/apiClient/commands";
+import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
+import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -25,7 +27,12 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
-  const { onSaveRecord, apiClientRecordsRepository, forceRefreshApiClientRecords } = useApiClientContext();
+  const { apiClientRecordsRepository } = useApiClientRepository();
+  const { onSaveRecord } = useNewApiClientContext();
+  const {
+    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+  } = useCommand();
+  const contextId = useContextId();
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -121,13 +128,16 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             new CollectionViewTabSource({
               id: record.id,
               title: "",
+              context: {
+                id: contextId,
+              },
             })
           );
         }
         setTitle(result.data.name);
       });
     },
-    [collection, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
+    [collection, contextId, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
   );
 
   const collectionName = collection?.name || "New Collection";
@@ -143,19 +153,13 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       ) : (
         <>
           <div className="collection-view-breadcrumb-container">
-            <RQBreadcrumb
+            <ApiClientBreadCrumb
+              id={collection.id}
               placeholder="New Collection"
-              recordName={collectionName}
+              name={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
               autoFocus={isNewCollection}
-              defaultBreadcrumbs={[
-                { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-                {
-                  isEditable: true,
-                  pathname: window.location.pathname,
-                  label: collectionName,
-                },
-              ]}
+              breadCrumbType={BreadcrumbType.COLLECTION}
             />
           </div>
           <div className="collection-view-content">

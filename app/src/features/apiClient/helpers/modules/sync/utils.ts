@@ -9,6 +9,7 @@ export const parseEntityVariables = (variables: VariableEntity) => {
       id: variables[key].id,
       type: variables[key].isSecret ? EnvironmentVariableType.Secret : variables[key].type,
       syncValue: variables[key].value,
+      isPersisted: true,
     };
   });
 

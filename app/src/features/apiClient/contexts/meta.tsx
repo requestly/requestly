@@ -1,22 +1,22 @@
-import { useContext, useMemo } from "react";
-import { ApiClientRepositoryInterface } from "../helpers/modules/sync/interfaces";
-import { useApiClientRepository } from "../helpers/modules/sync/useApiClientSyncRepo";
-import { AllApiClientStores, ApiRecordsStoreContext } from "../store/apiRecords/ApiRecordsContextProvider";
-import { NativeError } from "errors/NativeError";
+import { useContextId } from "./contextId.context";
+import * as apiClientFeatureContextStore from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { useMemo } from "react";
+import { getApiClientFeatureContext } from "../commands/store.utils";
 
-export type ApiClientFeatureContext = {
-  stores: AllApiClientStores;
-  repositories: ApiClientRepositoryInterface;
-};
+export function useApiClientFeatureContext(): apiClientFeatureContextStore.ApiClientFeatureContext {
+  const contextId = useContextId();
+  const context = useMemo(() => {
+    return getApiClientFeatureContext(contextId);
+  }, [contextId]);
 
-export function useApiClientFeatureContext(): ApiClientFeatureContext {
-  const stores = useContext(ApiRecordsStoreContext);
-  if (!stores) {
-    throw new NativeError("Command can't be called before stores are initialized");
+  if (!context) {
+    throw new Error("No context found!");
   }
-  const repositories = useApiClientRepository();
 
-  return useMemo(() => {
-    return { stores, repositories };
-  }, [stores, repositories]);
+  return context;
+}
+
+export function useApiClientRepository() {
+  const context = useApiClientFeatureContext();
+  return context.repositories;
 }

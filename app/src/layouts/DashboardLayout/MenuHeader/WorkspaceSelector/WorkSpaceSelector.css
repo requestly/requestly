@@ -7,6 +7,28 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  font-size: var(--requestly-font-size-sm);
+}
+
+.workspace-selector-dropdown__content .cursor-pointer.items-center .active-workspace-name .active-workspace-text {
+  color: var(--requestly-color-text-default);
+  font-family: var(--requestly-font-family-default);
+  font-size: var(--requestly-font-size-sm);
+  font-style: normal;
+  font-weight: 500;
+  line-height: var(--requestly-font-line-height-sm);
+}
+
+.workspace-selector-dropdown__content .local-workspace-avatar {
+  border-radius: 39px;
+  border: 1px solid var(--requestly-color-white-t-20);
+  background: var(--requestly-color-surface-2);
+  box-shadow: -2px 0 4px 1px rgba(0, 0, 0, 0.16);
+  display: flex;
+  padding: 3.2px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .local-sync-refresh-btn.ant-btn {
@@ -30,6 +52,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-left: 2px;
 }
 
 .active-workspace-name .ant-badge .ant-badge-dot {
@@ -53,8 +76,15 @@
 
 .active-workspace-name-down-icon.anticon {
   font-size: var(--requestly-font-size-2xs, 9px);
-  margin-top: 1px;
+  margin-bottom: 3px;
   margin-left: 10px;
+}
+.active-workspace-name-down-icon.anticon svg {
+  width: 8px;
+  height: 8px;
+  margin-top: 3px;
+  stroke: white;
+  stroke-width: 80px;
 }
 
 .workspace-divider.ant-divider {
@@ -74,7 +104,7 @@
 }
 
 .workspaces-menu.ant-dropdown-menu {
-  width: 280px;
+  width: 290px;
   background-color: var(--component-dark-background);
 }
 
@@ -99,7 +129,19 @@
   justify-content: space-between;
   flex-wrap: nowrap;
 }
-
+.workspace-item-wrapper .tag-current {
+  margin-left: 20px;
+}
+.workspace-item-wrapper .workspace-checkbox-wrapper.single-workspace-hover .ant-checkbox-wrapper .ant-checkbox {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.workspace-item-wrapper .workspace-checkbox-wrapper.single-workspace-hover:hover .ant-checkbox-wrapper .ant-checkbox {
+  opacity: 1;
+}
+.workspace-item-wrapper .workspace-checkbox-wrapper.multi-workspace-no-hover .ant-checkbox-wrapper .ant-checkbox {
+  opacity: 1;
+}
 .workspace-item-wrapper span.ant-tag.ant-tag-gold {
   flex-shrink: 0;
   font-size: var(--requestly-font-size-sm, 12px);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { EnvironmentVariableValue, EnvironmentVariableType } from "backend/environment/types";
+import { EnvironmentVariableType } from "backend/environment/types";
 import { useVariablesListColumns } from "./hooks/useVariablesListColumns";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -7,23 +7,37 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { EditableCell, EditableRow } from "./components/customTableRow/CustomTableRow";
 import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../types";
 import { trackAddVariableClicked } from "../../analytics";
-import { useRBAC } from "features/rbac";
 import "./variablesList.scss";
+import { VariableData } from "features/apiClient/store/variables/types";
 
 interface VariablesListProps {
-  variables: EnvironmentVariableTableRow[];
+  variables: VariableRow[];
   searchValue?: string;
-  onVariablesChange: (variables: EnvironmentVariableTableRow[]) => void;
+  onVariablesChange: (variables: VariableRow[]) => void;
+  isReadOnly?: boolean;
+  container: "environments" | "runtime";
 }
 
-export type EnvironmentVariableTableRow = EnvironmentVariableValue & { key: string };
+export type VariableRow = VariableData & { key: string };
 
-export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", variables, onVariablesChange }) => {
+const createNewVariable = (id: number, type: EnvironmentVariableType): VariableRow => ({
+  id,
+  key: "",
+  type,
+  syncValue: "",
+  localValue: "",
+  isPersisted: true,
+});
+
+export const VariablesList: React.FC<VariablesListProps> = ({
+  searchValue = "",
+  variables,
+  onVariablesChange,
+  isReadOnly = false,
+  container = "environments",
+}) => {
   const [dataSource, setDataSource] = useState([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
-  const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission("api_client_environment", "create");
-
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
     [dataSource, searchValue]
@@ -58,12 +72,12 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
   }, [dataSource]);
 
   const handleVariableChange = useCallback(
-    (row: EnvironmentVariableTableRow, fieldChanged: keyof EnvironmentVariableTableRow) => {
+    (row: VariableRow, fieldChanged: keyof VariableRow) => {
       const variableRows = [...dataSource];
       const index = variableRows.findIndex((variable) => row.id === variable.id);
       const item = variableRows[index];
 
-      if (row.key) {
+      if (row.key !== undefined && row.key !== null) {
         const updatedRow = { ...item, ...row };
         variableRows.splice(index, 1, updatedRow);
         setDataSource(variableRows);
@@ -74,16 +88,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     [dataSource, onVariablesChange]
   );
 
-  const handleAddNewRow = useCallback((dataSource: EnvironmentVariableTableRow[]) => {
-    const newData = {
-      id: dataSource.length,
-      key: "",
-      type: EnvironmentVariableType.String,
-      localValue: "",
-      syncValue: "",
-    };
-    setDataSource([...dataSource, newData]);
-  }, []);
+  const handleAddNewRow = useCallback(
+    (dataSource: VariableRow[]) => {
+      const newVariable = createNewVariable(dataSource.length, EnvironmentVariableType.String);
+      const newDataSource = [...dataSource, newVariable];
+      setDataSource(newDataSource);
+      if (container === "runtime") {
+        onVariablesChange(newDataSource);
+      }
+    },
+    [container, onVariablesChange]
+  );
 
   const handleDeleteVariable = useCallback(
     async (id: number) => {
@@ -114,13 +129,33 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
     [visibleSecretsRowIds]
   );
 
+  const handleUpdatePersisted = useCallback(
+    (id: number, isPersisted: boolean) => {
+      const variableRows = [...dataSource];
+      const index = variableRows.findIndex((variable) => variable.id === id);
+      const item = variableRows[index];
+
+      if (item) {
+        const updatedRow = { ...item, isPersisted };
+        variableRows.splice(index, 1, updatedRow);
+        setDataSource(variableRows);
+
+        onVariablesChange(variableRows);
+      }
+    },
+    [dataSource, onVariablesChange]
+  );
+
   const columns = useVariablesListColumns({
     handleVariableChange,
     handleDeleteVariable,
+    handleUpdatePersisted,
     visibleSecretsRowIds,
     updateVisibleSecretsRowIds: handleUpdateVisibleSecretsRowIds,
     recordsCount: dataSource.length,
     duplicateKeyIndices,
+    isReadOnly,
+    container,
   });
 
   useEffect(() => {
@@ -130,17 +165,11 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       });
 
       if (formattedDataSource.length === 0) {
-        formattedDataSource.push({
-          id: 0,
-          key: "",
-          type: EnvironmentVariableType.String,
-          localValue: "",
-          syncValue: "",
-        });
+        formattedDataSource.push(createNewVariable(0, EnvironmentVariableType.String));
       }
       setDataSource(formattedDataSource);
     }
-  }, [variables]);
+  }, [variables, container]);
 
   const handleAddVariable = () => {
     trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
@@ -164,7 +193,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({ searchValue = "", 
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        !isValidPermission
+        isReadOnly
           ? null
           : () => (
               <div className="variables-list-footer">

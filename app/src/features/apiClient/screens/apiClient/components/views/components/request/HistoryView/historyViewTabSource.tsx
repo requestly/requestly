@@ -12,6 +12,7 @@ export class HistoryViewTabSource extends BaseTabSource {
       id: "history",
       name: "history",
       title: "History",
+      context: {},
     };
     this.urlPath = `${PATHS.API_CLIENT.ABSOLUTE}/${this.metadata.name}`;
     this.icon = <MdOutlineHistory />;
