@@ -38,6 +38,10 @@ const ApiClientFeatureContainer: React.FC = () => {
       return;
     }
 
+    if (!activeWorkspace) {
+      return;
+    }
+
     (async () => {
       const repository = createRepository(activeWorkspace, {
         loggedIn: user.loggedIn,
@@ -45,7 +49,7 @@ const ApiClientFeatureContainer: React.FC = () => {
       });
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
-  }, [user, activeWorkspace.id, viewMode]);
+  }, [user, activeWorkspace?.id, viewMode]);
 
   if (!isLoaded) {
     return <ApiClientLoadingView />;
