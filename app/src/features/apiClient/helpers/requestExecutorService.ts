@@ -24,14 +24,18 @@ enum RequestErrorMessage {
 }
 
 export class RequestExecutorService {
+  public requestPreparer: RequestPreparationService;
+
   constructor(
-    private requestPreparer: RequestPreparationService,
+    requestPreparer: RequestPreparationService,
     private requestValidator: RequestValidationService,
     private scriptExecutor: ScriptExecutionService,
     private abortController: AbortController,
     private postScriptExecutionCallback: (state: any) => Promise<void>,
     private appMode: string
-  ) {}
+  ) {
+    this.requestPreparer = requestPreparer;
+  }
 
   private getEmptyRenderedVariables(renderedVariables: Record<string, any>): string[] {
     if (isEmpty(renderedVariables)) {

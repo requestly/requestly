@@ -2,14 +2,13 @@ import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
-import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
 import { RQAPI } from "features/apiClient/types";
 import { RequestExecutorService } from "features/apiClient/helpers/requestExecutorService";
 
 interface Props {
   entry: RQAPI.HttpApiEntry;
   recordId: string;
-  apiClientExecutor: RequestExecutorService | GraphQLRequestExecutor;
+  apiClientExecutor: RequestExecutorService;
 }
 
 export const ClientCodeButton: React.FC<Props> = ({ entry, recordId, apiClientExecutor }) => {
@@ -29,7 +28,7 @@ export const ClientCodeButton: React.FC<Props> = ({ entry, recordId, apiClientEx
       </RQButton>
       {isSnippetModalVisible ? (
         <ApiClientSnippetModal
-          apiRequest={apiClientExecutor.prepareRequest(recordId, entry).preparedEntry}
+          apiRequest={apiClientExecutor.requestPreparer.prepareRequest(recordId, entry)?.preparedEntry?.request}
           open={isSnippetModalVisible}
           onClose={() => setIsSnippetModalVisible(false)}
         />
