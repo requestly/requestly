@@ -17,6 +17,11 @@
   font-style: normal;
   font-weight: 500;
   line-height: var(--requestly-font-line-height-sm);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .workspace-selector-dropdown__content .local-workspace-avatar {
@@ -50,8 +55,6 @@
   color: var(--requestly-color-text-default);
   max-width: 25ch;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   margin-left: 2px;
 }
 
