@@ -3,6 +3,7 @@ import { EnvironmentView } from "./EnvironmentView";
 import PATHS from "config/constants/sub/paths";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
+import { getApiClientEnvironmentsStore } from "features/apiClient/commands/store.utils";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
   focusBreadcrumb?: boolean;
@@ -28,5 +29,12 @@ export class EnvironmentViewTabSource extends BaseTabSource {
     }
 
     return new EnvironmentViewTabSource({ id: envId, title: "Environment", context: {} });
+  }
+
+  getIsValidTab(): boolean {
+    const context = this.getTabContext();
+    const store = getApiClientEnvironmentsStore(context);
+    const isExist = store.getState().getEnvironment(this.metadata.id);
+    return !!isExist;
   }
 }

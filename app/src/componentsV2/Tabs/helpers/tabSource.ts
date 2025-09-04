@@ -1,5 +1,6 @@
 import React from "react";
 import { TabSourceMetadata } from "../types";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export abstract class AbstractTabSource {
   abstract component: NonNullable<React.ReactNode>;
@@ -15,4 +16,6 @@ export abstract class AbstractTabSource {
   abstract getUrlPath(): string;
   abstract getIcon(): React.ReactNode;
   abstract getIsNewTab(): boolean;
+  abstract getIsValidTab(): boolean;
+  abstract getTabContext(): ApiClientFeatureContext;
 }
