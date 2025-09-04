@@ -8,6 +8,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //ACTIONS
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 export const createNewGroup = (appMode, newGroupName, callback, user, status = GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE) => {
   const newGroupId = `Group_${generateObjectId()}`;
@@ -39,21 +40,19 @@ export const updateGroupOfSelectedRules = (appMode, selectedRuleIds, newGroupId,
 
     Logger.log("Reading storage in updateGroupOfSelectedRules");
     // Fetch all records to get rule data
-    StorageService(appMode)
-      .getAllRecords()
-      .then((allRecords) => {
-        //Update Rules
-        const newRules = [];
-        selectedRuleIds.forEach(async (selectedRuleId) => {
-          const newRule = {
-            ...allRecords[selectedRuleId],
-            groupId: newGroupId,
-          };
-          newRules.push(newRule);
-        });
-        StorageService(appMode)
-          .saveMultipleRulesOrGroups(newRules)
-          .then(() => resolve());
+    clientRuleStorageService.getAllRulesAndGroups().then((allRecords) => {
+      //Update Rules
+      const newRules = [];
+      selectedRuleIds.forEach(async (selectedRuleId) => {
+        const newRule = {
+          ...allRecords[selectedRuleId],
+          groupId: newGroupId,
+        };
+        newRules.push(newRule);
       });
+      StorageService(appMode)
+        .saveMultipleRulesOrGroups(newRules)
+        .then(() => resolve());
+    });
   });
 };
