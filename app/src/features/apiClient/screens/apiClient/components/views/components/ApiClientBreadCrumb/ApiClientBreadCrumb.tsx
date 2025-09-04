@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Conditional } from "components/common/Conditional";
 import PATHS from "config/constants/sub/paths";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
@@ -13,6 +13,10 @@ import { truncateString } from "features/apiClient/screens/apiClient/utils";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Tooltip } from "antd";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import { useSelector } from "react-redux";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "types";
 
 interface Props {
   id: string;
@@ -29,42 +33,63 @@ export const BreadcrumbType = {
   COLLECTION: "collection",
   API_REQUEST: "api_request",
 };
-
 export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
   const { id, autoFocus, name, onRecordNameUpdate, placeholder, onBlur, breadCrumbType } = props;
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
-  const [getSelectedWorkspace] = useApiClientMultiWorkspaceView((s) => [s.getSelectedWorkspace]);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const [getSelectedWorkspace, getViewMode] = useApiClientMultiWorkspaceView((s) => [
+    s.getSelectedWorkspace,
+    s.getViewMode,
+  ]);
 
   const ctx = useApiClientFeatureContext();
 
-  const currentWorkspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId), [
-    getSelectedWorkspace,
-    ctx.workspaceId,
-  ]);
+  const currentWorkspacePath = useMemo(
+    () =>
+      getViewMode() === ApiClientViewMode.SINGLE
+        ? activeWorkspace.rootPath
+        : getSelectedWorkspace(ctx.workspaceId)?.getState().rawWorkspace.rootPath,
+    [getSelectedWorkspace, ctx.workspaceId, getViewMode, activeWorkspace]
+  );
 
   const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
 
-  const localWsPath = currentWorkspace.getState().rawWorkspace.rootPath;
-  const truncatePath = truncateString(localWsPath, 40);
+  const truncatePath = truncateString(currentWorkspacePath, 40);
+
+  const parentCollections = useMemo(() => getParentChain(id).map((item) => getData(item)), [
+    getParentChain,
+    getData,
+    id,
+  ]);
+
+  const handleBreadcrumbLabelClick = useCallback(
+    (index: number) => {
+      const pathItems = [currentWorkspacePath, ...parentCollections.map((item) => item.name)];
+      const pathToOpen = pathItems.slice(0, index + 1).join("/");
+      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-path-in-file-manager", {
+        path: pathToOpen,
+      });
+    },
+    [currentWorkspacePath, parentCollections]
+  );
 
   const parentCollectionNames = useMemo(() => {
-    const collections = getParentChain(id);
-
-    const parentRecords = collections
+    const parentRecords = parentCollections
       .slice()
       .reverse()
       .map((id) => {
         return {
-          label: getData(id).name,
+          label: id.name,
           pathname: "",
           isEditable: false,
+          onClick: handleBreadcrumbLabelClick,
         };
       });
 
     return parentRecords;
-  }, [getData, getParentChain, id]);
+  }, [parentCollections, handleBreadcrumbLabelClick]);
 
   return (
     <RQBreadcrumb
@@ -77,16 +102,22 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
         {
           label: (
             <div>
-              <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
+              <Tooltip
+                trigger="hover"
+                title={currentWorkspacePath}
+                color="var(--requestly-color-black)"
+                placement="bottom"
+              >
                 <span className="api-client-local-workspace-path-breadcrumb">
                   <LuFolderCog className="api-client-local-workspace-icon" />
-                  {truncatePath + "/" + currentWorkspace.getState().name}
+                  {truncatePath}
                 </span>
               </Tooltip>
             </div>
           ),
           pathname: PATHS.API_CLIENT.INDEX,
           isEditable: false,
+          onClick: handleBreadcrumbLabelClick,
         },
         ...parentCollectionNames,
         {
@@ -109,11 +140,15 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
-  const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode]);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
   return (
     <Conditional condition={!openInModal}>
-      {getViewMode() === ApiClientViewMode.SINGLE ? (
+      {/* TODO: Need To decouple workspace type check from checkLocalSyncSupport hook */}
+      {isLocalSyncEnabled && activeWorkspace?.workspaceType === WorkspaceType.LOCAL ? (
+        <MultiViewBreadCrumb {...props} />
+      ) : (
         <RQBreadcrumb
           placeholder={placeholder}
           recordName={name}
@@ -129,8 +164,6 @@ export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
             },
           ]}
         />
-      ) : (
-        <MultiViewBreadCrumb {...props} />
       )}
     </Conditional>
   );
