@@ -58,11 +58,13 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const truncatePath = truncateString(currentWorkspacePath, 40);
 
-  const parentCollections = useMemo(() => getParentChain(id).map((item) => getData(item)), [
-    getParentChain,
-    getData,
-    id,
-  ]);
+  const parentCollections = useMemo(
+    () =>
+      getParentChain(id)
+        .map((item) => getData(item))
+        .reverse(),
+    [getParentChain, getData, id]
+  );
 
   const handleBreadcrumbLabelClick = useCallback(
     (index: number) => {
@@ -76,17 +78,14 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
   );
 
   const parentCollectionNames = useMemo(() => {
-    const parentRecords = parentCollections
-      .slice()
-      .reverse()
-      .map((id) => {
-        return {
-          label: id.name,
-          pathname: "",
-          isEditable: false,
-          onClick: handleBreadcrumbLabelClick,
-        };
-      });
+    const parentRecords = parentCollections.slice().map((id) => {
+      return {
+        label: id.name,
+        pathname: "",
+        isEditable: false,
+        onClick: handleBreadcrumbLabelClick,
+      };
+    });
 
     return parentRecords;
   }, [parentCollections, handleBreadcrumbLabelClick]);
