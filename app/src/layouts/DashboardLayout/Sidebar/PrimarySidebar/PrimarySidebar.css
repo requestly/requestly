@@ -76,7 +76,7 @@
 }
 
 .primary-sidebar-container .primary-sidebar-active-link {
-  border-left-color: var(--primary);
+  border-left-color: var(--requestly-color-primary);
 }
 
 .primary-sidebar-link svg {
