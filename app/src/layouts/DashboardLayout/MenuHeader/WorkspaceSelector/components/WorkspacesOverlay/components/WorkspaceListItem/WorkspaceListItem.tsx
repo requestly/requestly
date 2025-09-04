@@ -49,6 +49,7 @@ const ShareWorkspaceActions = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const activeWorkspace = useSelector(getActiveWorkspace);
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
   const handleSendInvites = () => {
     dispatch(
@@ -64,7 +65,9 @@ const ShareWorkspaceActions = ({
 
   return (
     <>
-      {activeWorkspace.id === workspaceId ? <Tag className="workspace-list-item-active-tag">CURRENT</Tag> : null}
+      {activeWorkspace.id === workspaceId && viewMode === ApiClientViewMode.SINGLE ? (
+        <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
+      ) : null}
       <div className="shared-workspace-actions">
         <RQButton
           type="transparent"
