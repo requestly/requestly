@@ -1,5 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { sendExtensionMessage } from "../app/messageHandler";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 /**
  * Initializes the extension message listener to handle communication between the extension and client page.
@@ -18,7 +19,7 @@ export const initExtensionMessageListener = () => {
       case EXTENSION_MESSAGES.RULE_SAVE_ERROR:
       case EXTENSION_MESSAGES.DESKTOP_APP_CONNECTION_STATUS_UPDATED:
       case CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED:
-      case CLIENT_MESSAGES.OPEN_CURL_IMPORT_MODAL:
+      case ExtensionConstants.ExtensionMessages.OPEN_CURL_IMPORT_MODAL:
         sendExtensionMessage(message);
         break;
     }

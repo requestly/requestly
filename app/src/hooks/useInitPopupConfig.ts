@@ -1,4 +1,5 @@
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 import FEATURES from "config/constants/sub/features";
 import { StorageService } from "init";
 import { useCallback, useEffect, useMemo } from "react";
@@ -17,7 +18,7 @@ export const useInitPopupConfig = () => {
   ]);
 
   const fetchConfig = useCallback(async () => {
-    const popupConfig = await StorageService(appMode).getRecord("popup_config");
+    const popupConfig = await StorageService(appMode).getRecord(ExtensionConstants.StorageKeys.POPUP_CONFIG);
     return popupConfig;
   }, [appMode]);
 

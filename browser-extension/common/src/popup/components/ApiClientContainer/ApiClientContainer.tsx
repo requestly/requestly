@@ -6,7 +6,7 @@ import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ApiRequest from "../../../../resources/icons/api-request.svg";
 import ImportCurl from "../../../../resources/icons/curl-import.svg";
 import "./apiClientContainer.scss";
-import { EXTENSION_MESSAGES } from "src/constants";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 export const ApiClientContainer: React.FC = () => {
   return (
@@ -29,7 +29,10 @@ export const ApiClientContainer: React.FC = () => {
           className={"api-client-action-btn"}
           icon={<ImportCurl />}
           onClick={() =>
-            chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL, source: "popup" })
+            chrome.runtime.sendMessage({
+              action: ExtensionConstants.ExtensionMessages.TRIGGER_OPEN_CURL_MODAL,
+              source: "popup",
+            })
           }
         >
           Import a cURL request

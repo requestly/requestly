@@ -5,6 +5,7 @@ import { CLIENT_MESSAGES } from "common/constants";
 import extensionIconManager from "./extensionIconManager";
 import { updateActivationStatus } from "./contextMenu";
 import { tabService } from "./tabService";
+import { ExtensionConstants } from "@requestly/shared/types/common";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -197,7 +198,7 @@ export const triggerOpenCurlModalMessage = async (
 
     // Send message to the new tab to open cURL import modal with pre-filled text
     const message = {
-      action: CLIENT_MESSAGES.OPEN_CURL_IMPORT_MODAL,
+      action: ExtensionConstants.ExtensionMessages.OPEN_CURL_IMPORT_MODAL,
       payload: {
         curlCommand: defaultCurlConfig.selectedText ?? "",
         pageURL: defaultCurlConfig.pageURL,
