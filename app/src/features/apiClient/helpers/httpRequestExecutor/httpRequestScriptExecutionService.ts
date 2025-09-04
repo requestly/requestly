@@ -1,21 +1,21 @@
 import { NativeError } from "errors/NativeError";
-import { parseEnvironmentState } from "../commands/environments/utils";
+import { parseEnvironmentState } from "../../commands/environments/utils";
 import {
   getApiClientEnvironmentsStore,
   getApiClientRecordsStore,
   getApiClientRecordStore,
-} from "../commands/store.utils";
-import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { getParsedRuntimeVariables } from "../store/runtimeVariables/utils";
-import { RQAPI } from "../types";
-import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./httpRequestExecutor/snapshotTypes";
-import { APIClientWorkloadManager } from "./modules/scriptsV2/workloadManager/APIClientWorkloadManager";
+} from "../../commands/store.utils";
+import { ApiClientFeatureContext } from "../../store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { getParsedRuntimeVariables } from "../../store/runtimeVariables/utils";
+import { RQAPI } from "../../types";
+import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
+import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
-} from "./modules/scriptsV2/workload-manager/workLoadTypes";
+} from "../modules/scriptsV2/workload-manager/workLoadTypes";
 
-export class ScriptExecutionService {
+export class HttpRequestScriptExecutionService {
   constructor(
     private ctx: ApiClientFeatureContext,
     private workloadManager: APIClientWorkloadManager,

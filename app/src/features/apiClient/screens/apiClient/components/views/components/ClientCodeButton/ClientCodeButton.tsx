@@ -3,12 +3,12 @@ import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RQAPI } from "features/apiClient/types";
-import { RequestExecutorService } from "features/apiClient/helpers/requestExecutorService";
+import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
 
 interface Props {
   entry: RQAPI.HttpApiEntry;
   recordId: string;
-  apiClientExecutor: RequestExecutorService;
+  apiClientExecutor: HttpRequestExecutor;
 }
 
 export const ClientCodeButton: React.FC<Props> = ({ entry, recordId, apiClientExecutor }) => {

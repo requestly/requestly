@@ -1,8 +1,8 @@
 import { isValidUrl } from "utils/FormattingHelper";
-import { FormDropDownOptions, RequestContentType, RequestMethod, RQAPI } from "../types";
-import { apiClientFileStore } from "../store/apiClientFilesStore";
+import { FormDropDownOptions, RequestContentType, RequestMethod, RQAPI } from "../../types";
+import { apiClientFileStore } from "../../store/apiClientFilesStore";
 
-export class RequestValidationService {
+export class HttpRequestValidationService {
   validateRequest(entryDetails: RQAPI.HttpApiEntry) {
     /*
         Header is checked if it is unresolved at this step
