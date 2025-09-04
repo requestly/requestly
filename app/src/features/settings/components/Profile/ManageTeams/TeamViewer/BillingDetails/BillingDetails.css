@@ -1,6 +1,6 @@
 .billing-title {
   margin-top: 4px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .billing-subscription-info {
@@ -26,14 +26,14 @@
 
 /* subscription actions */
 .billing-cancel-plan-btn.ant-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: rgba(250, 40, 40, 0.2);
   border: 1px solid rgba(250, 40, 40, 0.6);
 }
 
 .billing-cancel-plan-btn.ant-btn:hover,
 .billing-cancel-plan-btn.ant-btn:focus {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: rgba(250, 40, 40, 0.5);
 }
 

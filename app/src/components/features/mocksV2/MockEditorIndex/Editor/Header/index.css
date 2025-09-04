@@ -32,7 +32,7 @@
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only:hover svg {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn {
@@ -48,7 +48,7 @@
   user-select: none;
   padding: 7px 8px 6px 8px;
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
   border: 1px solid transparent;
   transition: border 0.3s;
 }

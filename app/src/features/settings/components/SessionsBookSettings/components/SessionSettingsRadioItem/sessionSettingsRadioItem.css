@@ -21,7 +21,7 @@
 .session-settings-radio-item.ant-radio-wrapper .info .title {
   font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   line-height: unset;
 }
 

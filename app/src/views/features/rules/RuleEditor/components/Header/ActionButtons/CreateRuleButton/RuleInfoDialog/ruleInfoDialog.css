@@ -25,7 +25,7 @@
 
 .rule-info-dialog-box.ant-notification-notice {
   padding: 20px;
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-surface-0);
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
 }

@@ -67,7 +67,7 @@
 
 .editor-title-name .ant-input:focus,
 .editor-title-description .ant-input:focus {
-  border-bottom: 1px solid var(--primary);
+  border-bottom: 1px solid var(--requestly-color-primary);
 }
 .editor-title-name .editor-title {
   display: flex;
@@ -84,7 +84,7 @@
 }
 .editor-title-name .ant-input,
 .editor-title-name .editor-title {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-md);
   font-weight: var(--requestly-font-weight-medium);
 }

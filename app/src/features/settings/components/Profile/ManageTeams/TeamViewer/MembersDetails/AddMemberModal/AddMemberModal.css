@@ -1,5 +1,5 @@
 .add-member-modal .rq-modal-content {
-  background-color: var(--surface-1) !important;
+  background-color: var(--requestly-color-surface-1) !important;
 }
 
 .add-member-modal-header {
@@ -16,7 +16,7 @@
 }
 
 .emails-input-wrapper {
-  background: var(--component-dark-background);
+  background: var(--requestly-color-surface-0);
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
   display: flex;

@@ -11,7 +11,7 @@
   font-size: 20px;
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .onboarding-auth-mode-switch-wrapper {
@@ -61,7 +61,7 @@
 }
 .onboarding-auth-form-divider .ant-divider-inner-text {
   font-size: 1rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .why-work-email {
@@ -102,7 +102,7 @@
   }
 
   & a:hover {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     text-decoration: underline;
   }
 }
@@ -125,13 +125,13 @@
 
 .auth-screen-forgot-password-btn.ant-btn {
   text-decoration: underline;
-  color: var(--text-default);
+  color: var(--requestly-color-text-default);
   padding: 0;
 
   &:hover,
   &:active,
   &:focus {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     text-decoration: underline;
   }
 }

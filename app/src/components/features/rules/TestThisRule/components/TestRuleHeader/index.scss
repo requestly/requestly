@@ -13,14 +13,14 @@
 
 .test-rule-checkbox.ant-checkbox-wrapper {
   margin-top: 8px;
-  color: var(--text-default);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm, 13px);
   letter-spacing: 0.25px;
   line-height: 18px;
 }
 
 .test-rule-error-message {
-  color: var(--warning);
+  color: var(--requestly-color-warning);
   display: flex;
   align-items: center;
   gap: 8px;

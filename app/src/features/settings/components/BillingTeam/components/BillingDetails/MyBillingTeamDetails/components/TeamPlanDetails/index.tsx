@@ -128,7 +128,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
                   overlayClassName="team-plan-details-popover"
                   showArrow={false}
                   open={isPlanDetailsPopoverVisible}
-                  color="var(--surface-1)"
+                  color="var(--requestly-color-surface-1)"
                   onOpenChange={(open) => setIsPlanDetailsPopoverVisible(open)}
                 >
                   <RQButton

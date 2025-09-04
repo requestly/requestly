@@ -4,7 +4,7 @@
 }
 
 .teams-list-item-title {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .teams-list-actions-wrapper {
@@ -14,7 +14,7 @@
 }
 
 .teams-list-joined-tag {
-  color: var(--success);
+  color: var(--requestly-color-success);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -31,7 +31,7 @@
 
 .teams-list-join-btn-loader {
   font-size: 1rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .ant-btn.teams-list-join-btn-dark-bg {
@@ -41,7 +41,7 @@
 }
 
 .teams-list-item-setting-btn.btn-icon-only.ant-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   margin-right: 4px;
   padding: auto 8px;
   width: 30px;
@@ -64,7 +64,7 @@
   & .ant-skeleton-header .ant-skeleton-avatar-lg {
     width: 24px;
     height: 24px;
-    border: 1px solid var(--white);
+    border: 1px solid var(--requestly-color-white);
     background: var(--surface-3);
   }
 }

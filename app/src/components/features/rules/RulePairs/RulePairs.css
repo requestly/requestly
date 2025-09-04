@@ -46,7 +46,7 @@
 
 .rule-pairs-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-content {
   border: none;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
   border-bottom-left-radius: var(--border-radius-md);
   border-bottom-right-radius: var(--border-radius-md);
 }
@@ -71,7 +71,7 @@
 .headers-rule-pair-card .ant-card-body {
   width: 100%;
   padding: 1rem 0 0 0;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .rule-pairs-collapse .ant-input-wrapper.ant-input-group .ant-input,

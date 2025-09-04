@@ -4,7 +4,7 @@
   justify-content: space-between;
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
   border-radius: var(--border-radius-sm);
   padding: 8px;
   margin-top: 4px;

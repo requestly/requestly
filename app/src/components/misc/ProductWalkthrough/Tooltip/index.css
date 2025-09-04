@@ -1,7 +1,7 @@
 .tour-tooltip-container {
   max-width: 400px;
   padding: 20px;
-  background: var(--body-background);
+  background: var(--requestly-color-surface-0);
   border-radius: var(--border-radius-md);
   position: relative;
   box-shadow: 0px 3px 27px rgba(0, 0, 0, 0.1);

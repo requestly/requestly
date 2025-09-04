@@ -17,7 +17,7 @@
   overflow: hidden;
 
   .team-card-team-name {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     font-size: var(--requestly-font-size-sm, 13px);
     font-weight: 500;
     max-width: 190px;
@@ -43,7 +43,7 @@
 
   .team-card-join-btn-loader {
     font-size: 1rem;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 
   .ant-btn.team-card-join-btn-dark-bg {
@@ -54,7 +54,7 @@
 }
 
 .team-card-joined-tag {
-  color: var(--success);
+  color: var(--requestly-color-success);
   display: flex;
   align-items: center;
   gap: 4px;

@@ -30,7 +30,7 @@
   font-size: var(--requestly-font-size-md, 14px);
   font-weight: 500;
   margin-bottom: 5px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .automatic-recording-details .caption {
@@ -54,11 +54,11 @@
   display: block;
   font-size: var(--requestly-font-size-sm, 13px);
   border-radius: var(--border-radius-md);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .automatic-recording-radio-group.ant-radio-group > *:not(:last-child) {
-  border-bottom: 1px solid var(--body-background);
+  border-bottom: 1px solid var(--requestly-color-surface-0);
 }
 
 .automatic-recording-radio-group .learn-more-link {
@@ -85,8 +85,8 @@
   padding: 11px;
   font-size: var(--requestly-font-size-sm, 12px);
   height: auto;
-  color: var(--white);
-  border: 1px dashed var(--primary);
+  color: var(--requestly-color-text-default);
+  border: 1px dashed var(--requestly-color-primary);
   border-radius: var(--border-radius-md);
   background: rgba(30, 105, 255, 0.1);
 }

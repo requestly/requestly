@@ -109,7 +109,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, workspace }) => {
               maxCount={MAX_MEMBERS_TO_SHOW}
               size="small"
               maxPopoverTrigger="click"
-              maxStyle={{ cursor: "pointer", background: "var(--white)", color: "#000" }}
+              maxStyle={{ cursor: "pointer", background: "var(--requestly-color-text-default)", color: "#000" }}
               style={{ marginRight: inviteId ? "14px" : "10px" }}
             >
               {members?.map((member: any) => (

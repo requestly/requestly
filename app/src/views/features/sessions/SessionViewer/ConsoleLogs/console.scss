@@ -20,7 +20,7 @@
   }
 
   &.recent-log-border {
-    border-left: 2px solid var(--white);
+    border-left: 2px solid var(--requestly-color-white);
     border-radius: 2px;
   }
 
@@ -33,7 +33,7 @@
   }
 
   .right-info a:hover {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 
   .trace-logs-wrapper {
@@ -51,7 +51,7 @@
   }
 
   .recent-log-pointer {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     font-size: 1rem;
   }
 

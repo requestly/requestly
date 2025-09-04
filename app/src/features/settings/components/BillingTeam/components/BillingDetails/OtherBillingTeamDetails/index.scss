@@ -1,7 +1,7 @@
 .other-team-members-table-header {
   width: 100%;
   padding: 8px 1rem;
-  border-bottom: 1px solid var(--surface-2);
+  border-bottom: 1px solid var(--requestly-color-surface-2);
   margin: 0 !important;
 
   & .view-team-details-btn.ant-btn {
@@ -9,8 +9,8 @@
     &:hover,
     &:focus,
     &:active {
-      color: var(--white) !important;
-      background: var(--surface-2);
+      color: var(--requestly-color-text-default) !important;
+      background: var(--requestly-color-surface-2);
     }
   }
 }
@@ -21,7 +21,7 @@
     padding-top: 0;
   }
   .ant-popover-inner {
-    background: var(--surface-1);
+    background: var(--requestly-color-surface-1);
   }
 }
 

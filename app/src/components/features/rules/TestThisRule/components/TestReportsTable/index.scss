@@ -1,6 +1,6 @@
 .test-reports-table {
   border-radius: 4px;
-  border: 1px solid var(--surface-2);
+  border: 1px solid var(--requestly-color-surface-2);
 
   & .ant-table-thead > tr > th {
     padding: 10px;
@@ -9,7 +9,7 @@
   & thead th {
     font-weight: 500;
     background: transparent;
-    color: var(--text-subtle);
+    color: var(--requestly-color-text-subtle);
   }
   & thead th::before {
     display: none;
@@ -21,7 +21,7 @@
 
   td {
     font-size: var(--requestly-font-size-sm, 12px);
-    color: var(--text-subtle);
+    color: var(--requestly-color-text-subtle);
   }
 
   .test-report-status {
@@ -37,19 +37,19 @@
     }
 
     &-success {
-      color: var(--success);
+      color: var(--requestly-color-success);
     }
 
     &-fail {
-      color: var(--danger);
+      color: var(--requestly-color-error);
     }
 
     & .test-report-status-success-text {
-      color: var(--success);
+      color: var(--requestly-color-success);
     }
 
     & .test-report-status-fail-text {
-      color: var(--danger);
+      color: var(--requestly-color-error);
     }
   }
 
@@ -61,14 +61,14 @@
   }
 
   & .watch-test-session-btn.ant-btn {
-    color: var(--text-default);
+    color: var(--requestly-color-text-default);
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
   & .test-report-delete-btn.ant-btn {
-    color: var(--text-default);
+    color: var(--requestly-color-text-default);
 
     & svg {
       font-size: var(--requestly-font-size-md, 14px);
@@ -83,20 +83,20 @@
 }
 
 .saving-test-session-status {
-  color: var(--text-subtle);
+  color: var(--requestly-color-text-subtle);
 
   & .saving-test-session-spinner {
     font-size: var(--requestly-font-size-md, 14px);
-    color: var(--text-default);
+    color: var(--requestly-color-text-default);
   }
 }
 
 .test-report-delete-popconfirm {
   & .ant-popover-inner {
-    background-color: var(--neutrals-black);
+    background-color: var(--requestly-color-black);
   }
 
   & .ant-popover-arrow-content::before {
-    background-color: var(--neutrals-black);
+    background-color: var(--requestly-color-black);
   }
 }

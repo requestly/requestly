@@ -1,7 +1,7 @@
 .help-card-title {
   font-size: var(--requestly-font-size-md);
   font-weight: var(--requestly-font-weight-medium);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .help-card-link {
@@ -12,7 +12,7 @@
   cursor: pointer;
   width: fit-content;
   transition: 0.2s ease-in-out;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration-color: #ffffff00;
   font-size: var(--requestly-font-size-sm);
 
@@ -23,19 +23,19 @@
   }
 
   & .help-card-link-title {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 
   &:hover {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     text-decoration: underline;
-    text-decoration-color: var(--white);
+    text-decoration-color: var(--requestly-color-text-default);
     text-decoration-thickness: 1px;
     text-underline-offset: 5px;
   }
 
   &:hover .help-card-react-icon {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 }
 
@@ -46,6 +46,6 @@
 
   &:hover,
   &:focus {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 }

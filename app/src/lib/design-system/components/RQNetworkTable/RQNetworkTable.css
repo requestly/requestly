@@ -14,7 +14,7 @@
 }
 
 .rq-network-table-container .rq-resource-table-container {
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .rq-network-table-container .rq-resource-table-container .empty-text.ant-typography {
@@ -70,7 +70,7 @@
 
 .rq-network-table-container .ant-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
   padding: 8px;
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .rq-network-table-container .network-container {
