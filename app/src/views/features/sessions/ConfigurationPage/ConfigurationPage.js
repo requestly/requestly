@@ -22,6 +22,7 @@ import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -78,10 +79,10 @@ const ConfigurationPage = () => {
 
   useEffect(() => {
     Logger.log("Reading storage in SessionsIndexPage");
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+    clientSessionRecordingStorageService
+      .getSessionRecordingConfig()
       .then((savedConfig) => setConfig(savedConfig || {}));
-  }, [appMode]);
+  }, []);
 
   useEffect(() => {
     if (!isSharedWorkspaceMode) {
