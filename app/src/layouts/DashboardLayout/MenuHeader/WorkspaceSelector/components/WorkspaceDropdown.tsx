@@ -19,6 +19,7 @@ import {
 import { MultiWorkspaceAvatarGroup } from "../MultiWorkspaceAvatarGroup";
 import LocalWorkspaceAvatar from "features/workspaces/components/LocalWorkspaceAvatar";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
@@ -29,6 +30,7 @@ const prettifyWorkspaceName = (workspaceName: string) => {
 const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
   const isActiveWorkspaceNotPrivate = useSelector(isActiveWorkspaceShared);
@@ -36,7 +38,11 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeWorkspaceName = isActiveWorkspaceNotPrivate ? activeWorkspace?.name : "Workspaces";
+  const activeWorkspaceName = isActiveWorkspaceNotPrivate
+    ? activeWorkspace?.name
+    : user.loggedIn
+    ? "Private Workspace"
+    : "Workspaces";
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
