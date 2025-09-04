@@ -85,17 +85,17 @@ export class RequestExecutorService {
   }
 
   async executeRequest(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
-    const { entryDetails, renderedVariables } = this.requestPreparer.prepareRequest(entry, recordId);
-    entryDetails.request.url = addUrlSchemeIfMissing(entryDetails.request.url);
+    const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
+    preparedEntry.request.url = addUrlSchemeIfMissing(preparedEntry.request.url);
 
-    if (entryDetails.request.contentType === RequestContentType.MULTIPART_FORM) {
-      const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(entryDetails);
+    if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
+      const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
       const isInvalid = invalidFiles.length > 0;
       if (isInvalid) {
         trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
 
         return {
-          executedEntry: { ...entryDetails },
+          executedEntry: { ...preparedEntry },
           status: RQAPI.ExecutionStatus.ERROR,
           error: {
             name: "Error",
@@ -112,11 +112,11 @@ export class RequestExecutorService {
     }
 
     try {
-      this.requestValidator.validateRequest(entryDetails);
+      this.requestValidator.validateRequest(preparedEntry);
     } catch (err) {
       const error = this.buildExecutionErrorObject(err, "request", RQAPI.ApiClientErrorType.PRE_VALIDATION);
       return {
-        executedEntry: { ...entryDetails },
+        executedEntry: { ...preparedEntry },
         status: RQAPI.ExecutionStatus.ERROR,
         error,
       };
@@ -125,13 +125,13 @@ export class RequestExecutorService {
     let responseScriptResult;
 
     if (
-      entryDetails.scripts.preRequest.length &&
-      entryDetails.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest
+      preparedEntry.scripts.preRequest.length &&
+      preparedEntry.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
       preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
-        entryDetails,
         recordId,
+        preparedEntry,
         this.postScriptExecutionCallback
       ); //revist record passing
 
@@ -149,7 +149,7 @@ export class RequestExecutorService {
 
         return {
           executedEntry: {
-            ...entryDetails,
+            ...preparedEntry,
           },
           status: RQAPI.ExecutionStatus.ERROR,
           error,
@@ -158,21 +158,21 @@ export class RequestExecutorService {
     }
 
     try {
-      const response = await makeRequest(this.appMode, entryDetails.request, this.abortController.signal);
-      entryDetails.response = response;
+      const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
+      preparedEntry.response = response;
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
         return {
           status: RQAPI.ExecutionStatus.ERROR,
-          executedEntry: { ...entryDetails, response: null },
+          executedEntry: { ...preparedEntry, response: null },
           error: this.buildErrorObjectFromHeader(rqErrorHeader),
         };
       }
     } catch (err) {
       return {
         status: RQAPI.ExecutionStatus.ERROR,
-        executedEntry: { ...entryDetails, response: null },
+        executedEntry: { ...preparedEntry, response: null },
         error: this.buildExecutionErrorObject(
           {
             ...err,
@@ -188,13 +188,13 @@ export class RequestExecutorService {
     }
 
     if (
-      entryDetails.scripts.postResponse.length &&
-      entryDetails.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.postResponse
+      preparedEntry.scripts.postResponse.length &&
+      preparedEntry.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.postResponse
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
       responseScriptResult = await this.scriptExecutor.executePostResponseScript(
-        entryDetails,
         recordId,
+        preparedEntry,
         this.postScriptExecutionCallback
       );
 
@@ -216,7 +216,7 @@ export class RequestExecutorService {
 
         return {
           status: RQAPI.ExecutionStatus.ERROR,
-          executedEntry: entryDetails,
+          executedEntry: preparedEntry,
           error,
         };
       }
@@ -225,7 +225,7 @@ export class RequestExecutorService {
     const executionResult: RQAPI.ExecutionResult = {
       status: RQAPI.ExecutionStatus.SUCCESS,
       executedEntry: {
-        ...entryDetails,
+        ...preparedEntry,
         testResults: [
           ...(preRequestScriptResult ? preRequestScriptResult.testExecutionResults : []),
           ...(responseScriptResult ? responseScriptResult.testExecutionResults : []),
@@ -245,12 +245,8 @@ export class RequestExecutorService {
     return executionResult;
   }
 
-  async rerun(record: RQAPI.HttpApiRecord): Promise<RQAPI.RerunResult> {
-    const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
-      record.data,
-      record.id,
-      async () => {}
-    );
+  async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
+    const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(recordId, entry, async () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       const error = this.buildExecutionErrorObject(
         preRequestScriptResult.error,
@@ -263,11 +259,7 @@ export class RequestExecutorService {
       };
     }
 
-    const responseScriptResult = await this.scriptExecutor.executePostResponseScript(
-      record.data,
-      record.id,
-      async () => {}
-    );
+    const responseScriptResult = await this.scriptExecutor.executePostResponseScript(recordId, entry, async () => {});
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       const error = this.buildExecutionErrorObject(

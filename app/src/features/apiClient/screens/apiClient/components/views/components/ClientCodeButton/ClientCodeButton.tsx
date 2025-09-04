@@ -3,14 +3,16 @@ import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
-import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
+import { RQAPI } from "features/apiClient/types";
+import { RequestExecutorService } from "features/apiClient/helpers/requestExecutorService";
 
 interface Props {
-  apiClientExecutor: GraphQLRequestExecutor | HttpRequestExecutor;
-  handleOnClick?: () => void;
+  entry: RQAPI.HttpApiEntry;
+  recordId: string;
+  apiClientExecutor: RequestExecutorService | GraphQLRequestExecutor;
 }
 
-export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor, handleOnClick }) => {
+export const ClientCodeButton: React.FC<Props> = ({ entry, recordId, apiClientExecutor }) => {
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
   return (
     <>
@@ -20,7 +22,6 @@ export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor, handleOnC
         size="small"
         className="api-client-view_get-code-btn"
         onClick={() => {
-          handleOnClick?.();
           setIsSnippetModalVisible(true);
         }}
       >
@@ -28,7 +29,7 @@ export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor, handleOnC
       </RQButton>
       {isSnippetModalVisible ? (
         <ApiClientSnippetModal
-          apiRequest={apiClientExecutor?.prepareRequest()}
+          apiRequest={apiClientExecutor.prepareRequest(recordId, entry).preparedEntry}
           open={isSnippetModalVisible}
           onClose={() => setIsSnippetModalVisible(false)}
         />
