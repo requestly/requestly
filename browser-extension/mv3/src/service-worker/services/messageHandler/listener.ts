@@ -187,7 +187,7 @@ export const initMessageHandler = () => {
       }
 
       case EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
-        sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
+        sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED, payload: message?.payload });
         break;
 
       case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
