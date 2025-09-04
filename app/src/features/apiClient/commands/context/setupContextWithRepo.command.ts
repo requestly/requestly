@@ -64,8 +64,6 @@ export async function setupContextWithRepo(
   repoForWorkspace: ApiClientRepositoryInterface
 ) {
   const result = await _setupContextWithRepo(workspaceId, repoForWorkspace);
-
   markWorkspaceLoaded();
-
   return result;
 }
