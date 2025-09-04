@@ -7,6 +7,7 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { ReactNode } from "react";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -47,8 +48,7 @@ export class RequestViewTabSource extends BaseTabSource {
     }
   }
 
-  getIsValidTab(): boolean {
-    const context = this.getTabContext();
+  getIsValidTab(context: ApiClientFeatureContext): boolean {
     const store = getApiClientRecordsStore(context);
     const isExist = store.getState().getData(this.metadata.id);
     return !!isExist;

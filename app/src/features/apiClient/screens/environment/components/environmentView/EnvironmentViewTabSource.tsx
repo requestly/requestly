@@ -4,6 +4,7 @@ import PATHS from "config/constants/sub/paths";
 import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { getApiClientEnvironmentsStore } from "features/apiClient/commands/store.utils";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
   focusBreadcrumb?: boolean;
@@ -31,8 +32,7 @@ export class EnvironmentViewTabSource extends BaseTabSource {
     return new EnvironmentViewTabSource({ id: envId, title: "Environment", context: {} });
   }
 
-  getIsValidTab(): boolean {
-    const context = this.getTabContext();
+  getIsValidTab(context: ApiClientFeatureContext): boolean {
     const store = getApiClientEnvironmentsStore(context);
     const isExist = store.getState().getEnvironment(this.metadata.id);
     return !!isExist;

@@ -1,5 +1,7 @@
 import { tabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
 import * as Sentry from "@sentry/react";
+import { getApiClientFeatureContext } from "../store.utils";
+import { NativeError } from "errors/NativeError";
 
 export function closeCorruptedTabs() {
   try {
@@ -7,7 +9,15 @@ export function closeCorruptedTabs() {
 
     tabs.forEach((tab) => {
       const { source } = tab.getState();
-      const isValid = source.getIsValidTab();
+
+      const contextId = source.metadata.context?.id;
+      const context = getApiClientFeatureContext(contextId);
+
+      if (!context) {
+        throw new NativeError("Tab context does not exist!").addContext({ metadata: source.metadata });
+      }
+
+      const isValid = source.getIsValidTab(context);
 
       if (!isValid) {
         const sourceId = source.getSourceId();
