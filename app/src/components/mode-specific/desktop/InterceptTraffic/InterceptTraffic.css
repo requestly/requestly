@@ -3,6 +3,11 @@
 }
 
 .web-traffic-pro-card.ant-pro-card,
+.web-traffic-pro-card .ant-pro-card {
+  background: transparent;
+}
+
+.web-traffic-pro-card.ant-pro-card,
 .web-traffic-pro-card.ant-pro-card .ant-pro-card-body {
   padding-bottom: 0px;
 }

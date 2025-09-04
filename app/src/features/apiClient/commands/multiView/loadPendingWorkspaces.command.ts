@@ -2,9 +2,9 @@ import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multi
 import { setupContext } from "../context";
 
 export async function loadWorkspaces(userId?: string) {
-
-  const workspacesToLoad = apiClientMultiWorkspaceViewStore.getState().selectedWorkspaces
-    .filter(w => !w.getState().state.loading);
+  const workspacesToLoad = apiClientMultiWorkspaceViewStore
+    .getState()
+    .selectedWorkspaces.filter((w) => !w.getState().state.loading);
 
   const tasks = workspacesToLoad.map(async (workspaceState) => {
     const workspace = workspaceState.getState();
