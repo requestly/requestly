@@ -8,7 +8,7 @@ export const MultiWorkspaceAvatarGroup: React.FC = () => {
   return (
     <div className="workspace-selector-dropdown__content">
       <Avatar.Group
-        size={28}
+        size={20}
         maxCount={2}
         maxStyle={{
           backgroundColor: "var(--requestly-color-surface-2)",
@@ -21,6 +21,7 @@ export const MultiWorkspaceAvatarGroup: React.FC = () => {
           const workspace = w.getState();
           return (
             <Avatar
+              size={20}
               key={workspace.id}
               className="local-workspace-avatar"
               style={{

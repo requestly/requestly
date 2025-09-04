@@ -1,7 +1,6 @@
 .empty-traffic-table-container {
   height: 100%;
   align-content: center;
-  background: var(--component-dark-background);
 }
 
 .empty-traffic-table-container .rq-btn.danger-btn {

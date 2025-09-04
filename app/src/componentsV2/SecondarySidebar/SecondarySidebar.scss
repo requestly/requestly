@@ -1,11 +1,14 @@
 .secondary-sidebar-container {
   height: 100%;
   flex-shrink: 0;
-  width: 217px;
+  width: 200px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  background-color: var(--requestly-color-surface-0);
+  padding: var(--requestly-space-4, 8px);
+  border-right: 1px solid var(--requestly-color-white-t-10);
 }
 
 .secondary-sidebar-container:hover .secondary-sidebar-toggle-btn {
@@ -16,4 +19,7 @@
 .secondary-sidebar-container ul {
   padding: 0px 10px 1.25rem 0px;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--requestly-space-4, 8px);
 }

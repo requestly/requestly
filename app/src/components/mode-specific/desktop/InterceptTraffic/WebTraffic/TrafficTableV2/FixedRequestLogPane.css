@@ -9,7 +9,6 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background-color: var(--body-background);
 }
 .request-log-pane-header .request-method {
   font-size: 10px;

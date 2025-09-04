@@ -13,15 +13,14 @@ const Daemon: React.FC = () => {
     <ContextId id={contextId}>
       <EnvironmentDaemon />
       <CollectionVariablesDaemon />
-      {!isMulti ? <>
-                <ExampleCollectionsDaemon />
-      <AutoSyncLocalStoreDaemon />
-
-        </> : null}
+      {!isMulti ? (
+        <>
+          <ExampleCollectionsDaemon />
+          <AutoSyncLocalStoreDaemon />
+        </>
+      ) : null}
     </ContextId>
   ));
-
-  
 
   return daemons;
 };

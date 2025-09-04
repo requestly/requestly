@@ -26,8 +26,7 @@ export const setupContext = async (
   workspace: Workspace,
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
-
   const repository = createRepository(workspace, user);
-  const id = await setupContextWithRepo(workspace.id,repository);
+  const id = await setupContextWithRepo(workspace.id, repository);
   return { id };
 };
