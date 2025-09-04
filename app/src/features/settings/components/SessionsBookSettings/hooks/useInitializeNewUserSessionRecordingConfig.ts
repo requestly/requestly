@@ -6,7 +6,7 @@ import { defaultSessionRecordingConfig } from "..";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled, isExtensionVersionCompatible } from "actions/ExtensionActions";
-import { clientStorageService } from "services/clientStorageService";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 
 export const useInitializeNewUserSessionRecordingConfig = () => {
   const appMode = useSelector(getAppMode);
@@ -18,7 +18,7 @@ export const useInitializeNewUserSessionRecordingConfig = () => {
 
     if (!isExtensionVersionCompatible("23.10.22")) return;
 
-    clientStorageService.getStorageObject(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG).then((config) => {
+    clientSessionRecordingStorageService.getSessionRecordingConfig().then((config) => {
       if (!config || Object.keys(config).length === 0) {
         const newUserRecordingConfig: SessionRecordingConfig = {
           ...defaultSessionRecordingConfig,

@@ -82,7 +82,7 @@ const ConfigurationPage = () => {
     clientSessionRecordingStorageService
       .getSessionRecordingConfig()
       .then((savedConfig) => setConfig(savedConfig || {}));
-  }, [appMode]);
+  }, []);
 
   useEffect(() => {
     if (!isSharedWorkspaceMode) {
