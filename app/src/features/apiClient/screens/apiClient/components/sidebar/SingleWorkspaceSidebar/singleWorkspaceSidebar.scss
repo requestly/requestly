@@ -167,6 +167,10 @@
 
         &.ant-tabs-tab-active {
           background-color: var(--requestly-color-white-t-20);
+
+          svg {
+            color: var(--requestly-color-text-default);
+          }
         }
 
         .ant-tabs-tab-btn,
