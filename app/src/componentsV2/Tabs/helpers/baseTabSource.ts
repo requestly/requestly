@@ -48,7 +48,7 @@ export class BaseTabSource implements AbstractTabSource {
   }
 
   getIsValidTab(): boolean {
-    throw new NativeError("getIsValidTab not implemented!");
+    throw new NativeError("getIsValidTab is not implemented!");
   }
 
   getTabContext() {
