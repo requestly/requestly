@@ -8,7 +8,7 @@ type _VariablesState<T extends VariableData> = {
   data: Map<VariableKey, T>;
 
   reset: (data?: Map<VariableKey, T>) => void;
-  resetSyncValues: (data?: Map<VariableKey, T>) => void;
+  resetSyncValues: (data: Map<VariableKey, T>) => void;
 
   delete: (key: VariableKey) => void;
   add: (key: VariableKey, variable: T) => void;
@@ -46,7 +46,8 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
       }
     },
 
-    resetSyncValues(newData) {
+    resetSyncValues(data) {
+      const newData = data ? new Map(data) : new Map();
       const { data: currentData, reset } = get();
 
       newData.forEach((val, key) => {
