@@ -22,7 +22,6 @@ import {
   initiateBlankCurrentlySelectedRule,
 } from "components/features/rules/RuleBuilder/actions";
 import { RULE_EDITOR_FIELD_SELECTOR } from "./dom-selectors";
-import { StorageService } from "init";
 import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
@@ -31,6 +30,7 @@ import { RecordStatus, Rule, ResponseRule, RuleType, RuleSourceOperator } from "
 import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import "./RuleEditorModal.css";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 enum EditorMode {
   EDIT = "edit",
@@ -74,8 +74,8 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     if (mode === EditorMode.CREATE || !ruleId) return;
 
     setIsLoading(true);
-    StorageService(appMode)
-      .getRecord(ruleId)
+    clientRuleStorageService
+      .getRecordById(ruleId)
       .then((rule) => {
         if (rule === undefined) {
           setIsRuleNotFound(true);

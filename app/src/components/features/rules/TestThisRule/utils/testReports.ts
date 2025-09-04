@@ -1,10 +1,10 @@
-import { StorageService } from "init";
 import { TestReport } from "../types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { clientStorageService } from "services/clientStorageService";
 
 const getAllTestReports = async (appMode: string): Promise<Record<string, TestReport>> => {
-  const allTestReports = await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS);
+  const allTestReports = await clientStorageService.getStorageObject(GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS);
   return allTestReports ?? {};
 };
 
@@ -28,7 +28,7 @@ export const saveTestReport = async (appMode: string, testReportId: string, data
   const allTestReports = await getAllTestReports(appMode);
   allTestReports[testReportId] = data;
 
-  StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
+  await clientStorageService.saveStorageObject({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
 };
 
 export const deleteTestReportByRuleId = async (appMode: string, ruleIdsToDelete: string[]): Promise<void> => {
@@ -39,12 +39,12 @@ export const deleteTestReportByRuleId = async (appMode: string, ruleIdsToDelete:
     }
   }
 
-  StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
+  await clientStorageService.saveStorageObject({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
 };
 
 export const deleteTestReport = async (appMode: string, testReportId: string): Promise<void> => {
   const allTestReports = await getAllTestReports(appMode);
   delete allTestReports[testReportId];
 
-  await StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
+  await clientStorageService.saveStorageObject({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
 };
