@@ -25,6 +25,7 @@ import { toast } from "utils/Toast";
 import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { workspaceActions } from "store/slices/workspaces/slice";
 
 type WorkspaceItemProps =
   | {
@@ -105,6 +106,7 @@ const LocalWorkspaceActions = ({
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
+  const dispatch = useDispatch();
 
   const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
     s.selectedWorkspaces,
@@ -116,6 +118,9 @@ const LocalWorkspaceActions = ({
     async (isChecked: boolean) => {
       try {
         if (isChecked) {
+          if (getViewMode() === ApiClientViewMode.SINGLE) {
+            dispatch(workspaceActions.setActiveWorkspaceIds([workspace.id]));
+          }
           await addWorkspaceToView(workspace, user.details?.profile?.uid);
           trackMultiWorkspaceSelected("workspace_selector_dropdown");
         } else {
@@ -131,7 +136,7 @@ const LocalWorkspaceActions = ({
         toast.error(e.message);
       }
     },
-    [workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
+    [dispatch, workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
   );
 
   const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.getState().id === workspace.id), [
