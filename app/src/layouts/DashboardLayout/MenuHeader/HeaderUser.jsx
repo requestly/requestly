@@ -78,7 +78,7 @@ export default function HeaderUser() {
         onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
       },
       {
-        label: "Manage Workspaces",
+        label: "Manage team workspaces",
         onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
       },
       {
