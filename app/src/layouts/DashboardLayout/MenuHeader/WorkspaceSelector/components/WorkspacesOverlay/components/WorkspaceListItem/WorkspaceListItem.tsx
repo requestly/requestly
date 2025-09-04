@@ -114,7 +114,7 @@ const LocalWorkspaceActions = ({
     s.getAllSelectedWorkspaces,
   ]);
 
-  const handleMultiworkspaceCheckbox = useCallback(
+  const handleMultiWorkspaceCheckbox = useCallback(
     async (isChecked: boolean) => {
       const handleWorkspaceSelection = async () => {
         const isFirstSelectedWorkspace = getViewMode() === ApiClientViewMode.SINGLE;
@@ -182,7 +182,7 @@ const LocalWorkspaceActions = ({
           checked={isSelected}
           className="local-workspace-actions__checkbox"
           onChange={(e) => {
-            handleMultiworkspaceCheckbox(e.target.checked);
+            handleMultiWorkspaceCheckbox(e.target.checked);
           }}
         />
       </div>
