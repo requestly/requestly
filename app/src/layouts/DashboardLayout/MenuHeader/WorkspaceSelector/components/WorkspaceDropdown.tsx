@@ -74,7 +74,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
       >
         <div
           className="workspace-selector-dropdown__content"
-          style={{ marginLeft: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "16px" : "0px" }}
+          style={{ marginLeft: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? "8px" : "0px" }}
         >
           <Tooltip
             overlayClassName="workspace-selector-tooltip"
