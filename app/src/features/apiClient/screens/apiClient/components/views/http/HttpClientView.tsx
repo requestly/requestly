@@ -147,7 +147,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const { setPreview, setUnsaved, setTitle, getIsActive, setIcon } = useGenericState();
 
-  const httpExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
+  const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -377,7 +377,7 @@ const HttpClientView: React.FC<Props> = ({
 
     try {
       // const apiClientExecutionResult = await apiClientExecutorRef.current?.execute();
-      const apiClientExecutionResult = await httpExecutor.executeRequest(
+      const apiClientExecutionResult = await httpRequestExecutor.executeRequest(
         apiEntryDetails?.id,
         sanitizeEntry(requestToSend)
       );
@@ -456,7 +456,7 @@ const HttpClientView: React.FC<Props> = ({
     apiEntryDetails?.isExample,
     apiEntryDetails?.id,
     dispatch,
-    httpExecutor,
+    httpRequestExecutor,
     notifyApiRequestFinished,
   ]);
 
@@ -619,10 +619,10 @@ const HttpClientView: React.FC<Props> = ({
   ]);
 
   const handleCancelRequest = useCallback(() => {
-    httpExecutor.abort();
+    httpRequestExecutor.abort();
     trackAPIRequestCancelled();
     setIsRequestCancelled(true);
-  }, [httpExecutor]);
+  }, [httpRequestExecutor]);
 
   const handleAuthChange = useCallback(
     (newAuth: RQAPI.Auth) => {
@@ -656,7 +656,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
-      const result = await httpExecutor.rerun(apiEntryDetails?.id, apiEntryDetails.data);
+      const result = await httpRequestExecutor.rerun(apiEntryDetails?.id, apiEntryDetails.data);
       if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
         setEntry((entry) => ({
           ...entry,
@@ -668,7 +668,7 @@ const HttpClientView: React.FC<Props> = ({
     } catch (error) {
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [httpExecutor, apiEntryDetails?.id, apiEntryDetails?.data]);
+  }, [httpRequestExecutor, apiEntryDetails?.id, apiEntryDetails?.data]);
 
   const handleRevertChanges = () => {
     setEntry(apiEntryDetails?.data);
@@ -712,9 +712,10 @@ const HttpClientView: React.FC<Props> = ({
             />
 
             <ClientCodeButton
-              entry={apiEntryDetails?.data}
-              recordId={apiEntryDetails?.id}
-              apiClientExecutor={httpExecutor}
+              requestPreparer={() =>
+                httpRequestExecutor.requestPreparer.prepareRequest(apiEntryDetails?.id, apiEntryDetails.data)
+                  .preparedEntry.request
+              }
             />
           </div>
 

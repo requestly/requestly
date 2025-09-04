@@ -3,16 +3,15 @@ import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RQAPI } from "features/apiClient/types";
-import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
 
 interface Props {
-  entry: RQAPI.HttpApiEntry;
-  recordId: string;
-  apiClientExecutor: HttpRequestExecutor;
+  requestPreparer: () => RQAPI.HttpRequest;
 }
 
-export const ClientCodeButton: React.FC<Props> = ({ entry, recordId, apiClientExecutor }) => {
+export const ClientCodeButton: React.FC<Props> = ({ requestPreparer }) => {
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
+  const [preparedRequest, setPreparedRequest] = useState<RQAPI.HttpRequest | null>(null);
+
   return (
     <>
       <RQButton
@@ -21,14 +20,16 @@ export const ClientCodeButton: React.FC<Props> = ({ entry, recordId, apiClientEx
         size="small"
         className="api-client-view_get-code-btn"
         onClick={() => {
+          const request = requestPreparer();
+          setPreparedRequest(request);
           setIsSnippetModalVisible(true);
         }}
       >
         Get client code
       </RQButton>
-      {isSnippetModalVisible ? (
+      {isSnippetModalVisible && preparedRequest ? (
         <ApiClientSnippetModal
-          apiRequest={apiClientExecutor.requestPreparer.prepareRequest(recordId, entry)?.preparedEntry?.request}
+          apiRequest={preparedRequest}
           open={isSnippetModalVisible}
           onClose={() => setIsSnippetModalVisible(false)}
         />
