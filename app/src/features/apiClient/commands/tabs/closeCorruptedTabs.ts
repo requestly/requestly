@@ -4,9 +4,9 @@ import { getApiClientFeatureContext } from "../store.utils";
 import { NativeError } from "errors/NativeError";
 
 export function closeCorruptedTabs() {
-  try {
-    const { tabs, closeTabBySource, setIgnorePath } = tabServiceStore.getState();
+  const { tabs, closeTabBySource, setIgnorePath } = tabServiceStore.getState();
 
+  try {
     tabs.forEach((tab) => {
       const { source } = tab.getState();
 
@@ -29,5 +29,7 @@ export function closeCorruptedTabs() {
     });
   } catch (e) {
     Sentry.captureException(e);
+  } finally {
+    setIgnorePath(false);
   }
 }
