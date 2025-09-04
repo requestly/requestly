@@ -114,25 +114,38 @@ const LocalWorkspaceActions = ({
     s.getAllSelectedWorkspaces,
   ]);
 
-  const handleMultiworkspaceAdder = useCallback(
+  const handleMultiworkspaceCheckbox = useCallback(
     async (isChecked: boolean) => {
+      const handleWorkspaceSelection = async () => {
+        const isFirstSelectedWorkspace = getViewMode() === ApiClientViewMode.SINGLE;
+        if (isFirstSelectedWorkspace) {
+          dispatch(workspaceActions.setActiveWorkspaceIds([workspace.id]));
+        }
+        await addWorkspaceToView(workspace, user.details?.profile?.uid);
+        trackMultiWorkspaceSelected("workspace_selector_dropdown");
+      };
+
+      const handleWorkspaceDeselection = () => {
+        const isLastSelectedWorkspace =
+          getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1;
+
+        if (isLastSelectedWorkspace) {
+          switchWorkspace();
+        } else {
+          removeWorkspaceFromView(workspace.id);
+        }
+
+        trackMultiWorkspaceDeselected("workspace_selector_dropdown");
+      };
+
       try {
         if (isChecked) {
-          if (getViewMode() === ApiClientViewMode.SINGLE) {
-            dispatch(workspaceActions.setActiveWorkspaceIds([workspace.id]));
-          }
-          await addWorkspaceToView(workspace, user.details?.profile?.uid);
-          trackMultiWorkspaceSelected("workspace_selector_dropdown");
+          await handleWorkspaceSelection();
         } else {
-          if (getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1) {
-            switchWorkspace();
-          } else {
-            removeWorkspaceFromView(workspace.id);
-          }
-
-          trackMultiWorkspaceDeselected("workspace_selector_dropdown");
+          handleWorkspaceDeselection();
         }
       } catch (e) {
+        // fixme: error should be observed in some way
         toast.error(e.message);
       }
     },
@@ -169,7 +182,7 @@ const LocalWorkspaceActions = ({
           checked={isSelected}
           className="local-workspace-actions__checkbox"
           onChange={(e) => {
-            handleMultiworkspaceAdder(e.target.checked);
+            handleMultiworkspaceCheckbox(e.target.checked);
           }}
         />
       </div>
