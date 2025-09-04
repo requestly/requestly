@@ -54,15 +54,6 @@ export const MenuHeader = () => {
         >
           Tutorials
         </a>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={LINKS.REQUESTLY_LANDING_HOME}
-          onClick={() => trackTopbarClicked("tutorials")}
-          className="no-drag app-primary-header-link"
-        >
-          Website
-        </a>
       </div>
       <div className="app-primary-header-section app-primary-header__mid no-drag">
         <DesktopAppProxyInfo />
@@ -90,16 +81,21 @@ export const MenuHeader = () => {
             <div className="search-shortcut-annotation">⌘+K</div>
           </RQButton> */}
         </div>
-        <div>{gitHubStarButton}</div>
-        <RQButton
-          type="transparent"
-          icon={<BotIcon />}
-          onClick={() => dispatch(globalActions.updateRequestBot({ isActive: true, modelType: "app" }))}
-        >
-          Ask AI
-        </RQButton>
-        <RQButton type="transparent" icon={<Settings />} onClick={() => redirectToSettings(navigate)} />
-        <HeaderUser />
+        <div className="app-primary-header__right-section">
+          <div>{gitHubStarButton}</div>
+          <RQButton
+            type="transparent"
+            icon={<BotIcon />}
+            onClick={() => dispatch(globalActions.updateRequestBot({ isActive: true, modelType: "app" }))}
+          >
+            Ask AI
+          </RQButton>
+        </div>
+
+        <div className="app-primary-header__right-section">
+          <RQButton type="transparent" icon={<Settings />} onClick={() => redirectToSettings(navigate)} />
+          <HeaderUser />
+        </div>
       </div>
     </Header>
   );

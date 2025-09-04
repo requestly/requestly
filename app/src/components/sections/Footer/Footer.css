@@ -12,7 +12,8 @@
   column-gap: 3px;
   align-items: center;
   display: inline-flex;
-  color: var(--gray-light);
+  color: var(--requestly-color-text-subtle);
+  cursor: pointer;
 }
 
 .app-footer-links .ant-typography:last-child {
@@ -52,5 +53,5 @@
 }
 
 .app-layout-footer .extension-version {
-  color: var(--requestly-color-neutral-400);
+  color: var(--requestly-color-text-subtle);
 }

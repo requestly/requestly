@@ -35,7 +35,7 @@ export class RequestViewTabSource extends BaseTabSource {
     return new RequestViewTabSource({ id: requestId, title: "Request", context: {} });
   }
 
-    private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
+  private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
     switch (type) {
       case RQAPI.ApiEntryType.HTTP:
         return <MdOutlineSyncAlt />;
