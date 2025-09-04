@@ -29,7 +29,5 @@ export function closeCorruptedTabs() {
     });
   } catch (e) {
     Sentry.captureException(e);
-  } finally {
-    setIgnorePath(false);
   }
 }
