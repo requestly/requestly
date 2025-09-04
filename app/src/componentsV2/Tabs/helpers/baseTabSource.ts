@@ -2,6 +2,8 @@ import React from "react";
 import { AbstractTabSource } from "./tabSource";
 import { TabSourceMetadata } from "../types";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
+import { NativeError } from "errors/NativeError";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 
 export class BaseTabSource implements AbstractTabSource {
   component: NonNullable<React.ReactNode>;
@@ -43,5 +45,20 @@ export class BaseTabSource implements AbstractTabSource {
 
   getIsNewTab(): boolean {
     return this.metadata.isNewTab ?? false;
+  }
+
+  getIsValidTab(): boolean {
+    throw new NativeError("getIsValidTab not implemented!");
+  }
+
+  getTabContext() {
+    const contextId = this.metadata.context?.id;
+    const context = getApiClientFeatureContext(contextId);
+
+    if (!context) {
+      throw new NativeError("Tab context does not exist!").addContext({ metadata: this.metadata });
+    }
+
+    return context;
   }
 }
