@@ -143,6 +143,14 @@ export const useWorkspaceSwitcher = () => {
   );
 
   const handleSwitchToPrivateWorkspace = useCallback(async () => {
+    const viewMode = getViewMode();
+
+    if (viewMode === ApiClientViewMode.SINGLE) {
+      if (activeWorkspace?.id === null) {
+        toast.info("Workspace already selected!");
+        return;
+      }
+    }
     setIsWorkspaceLoading(true);
     return clearCurrentlyActiveWorkspace(dispatch, appMode)
       .then(() => {
@@ -156,7 +164,7 @@ export const useWorkspaceSwitcher = () => {
       .finally(() => {
         setIsWorkspaceLoading(false);
       });
-  }, [appMode, dispatch]);
+  }, [appMode, dispatch, activeWorkspace?.id, getViewMode]);
 
   return {
     handleWorkspaceSwitch,
