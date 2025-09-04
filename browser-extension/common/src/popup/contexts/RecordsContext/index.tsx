@@ -47,6 +47,7 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
     updateLastUpdatedTS();
     chrome.runtime.sendMessage({
       action: EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP,
+      payload: updatedRule,
     });
   }, []);
 
@@ -63,6 +64,7 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
     updateLastUpdatedTS();
     chrome.runtime.sendMessage({
       action: EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP,
+      payload: updatedGroup,
     });
   }, []);
 

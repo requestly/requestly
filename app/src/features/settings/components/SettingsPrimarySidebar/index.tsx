@@ -83,12 +83,12 @@ export const SettingsPrimarySidebar: React.FC = () => {
           },
           {
             id: "workspaces",
-            name: "Workspaces",
+            name: "Team workspaces",
             path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
           },
           {
             id: "my-plan",
-            name: "My Plan",
+            name: "My plan",
             path: PATHS.SETTINGS.MY_PLAN.RELATIVE,
             ishidden: !user.loggedIn,
           },

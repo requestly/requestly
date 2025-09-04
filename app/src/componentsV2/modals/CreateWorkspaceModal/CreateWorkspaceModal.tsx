@@ -71,6 +71,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
           toggleModal();
           callback?.();
         }}
+        analyticEventSource="create_workspace_modal"
       />
     </Modal>
   );

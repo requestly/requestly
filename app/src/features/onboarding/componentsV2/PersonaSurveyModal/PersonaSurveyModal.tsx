@@ -12,6 +12,8 @@ import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackPersonaSurveyCompleted, trackPersonaSurveyViewed } from "features/onboarding/analytics";
 import { snakeCase } from "lodash";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
 
 const PersonaSurvey = () => {
   const dispatch = useDispatch();
@@ -35,6 +37,7 @@ const PersonaSurvey = () => {
 
   const handleContinue = () => {
     dispatch(globalActions.updateNewUserPersona(selectedPersona));
+    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, selectedPersona);
     trackPersonaSurveyCompleted(snakeCase(selectedPersona));
     dispatch(globalActions.updateIsNewUser(false));
   };
