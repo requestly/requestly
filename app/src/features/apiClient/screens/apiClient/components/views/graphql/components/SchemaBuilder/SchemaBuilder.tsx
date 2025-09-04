@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Explorer from "graphiql-explorer";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { buildClientSchema, parse } from "graphql";
 import "@graphiql/plugin-explorer/style.css";
-import { Checkbox, Tooltip } from "antd";
+import { Checkbox } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
@@ -24,7 +24,7 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
 
   const { introspectAndSaveSchema } = useGraphQLIntrospection();
 
-  const [hasParsedSuccessfully, setHasParsedSuccessfully] = useState(false);
+  const hasParsedSuccessfully = useRef(false);
 
   /*
    * This effect is added due to Explorer component's internal query caching logic.
@@ -41,17 +41,16 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
    * we prevent the Explorer from caching invalid queries and reduce the likelihood of
    * shared state issues between different instances.
    */
-
   useEffect(() => {
-    if (!hasParsedSuccessfully) {
+    if (!hasParsedSuccessfully.current) {
       try {
         parse(query);
-        setHasParsedSuccessfully(true);
+        hasParsedSuccessfully.current = true;
       } catch (e) {
         // NO OP
       }
     }
-  }, [query, hasParsedSuccessfully]);
+  }, [query]);
 
   const handleEdit = (query: string) => {
     updateEntryRequest({ operation: query });
@@ -63,32 +62,26 @@ export const SchemaBuilder: React.FC<Props> = ({ setIsSchemaBuilderOpen }) => {
         <div className="schema-builder__header-container">
           <div className="schema-builder__header-container__title">SCHEMA</div>
           <div className="schema-builder__header-container__actions">
-            <Tooltip title="Refresh" placement="top" color="#000">
-              <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
-            </Tooltip>
-            <Tooltip title="Hide schema panel" placement="top" color="#000">
-              <RQButton
-                size="small"
-                type="transparent"
-                icon={<MdClose />}
-                onClick={() => setIsSchemaBuilderOpen(false)}
-              />
-            </Tooltip>
+            <RQButton size="small" type="transparent" onClick={introspectAndSaveSchema} icon={<IoMdRefresh />} />
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdClose />}
+              onClick={() => setIsSchemaBuilderOpen(false)}
+            />
           </div>
         </div>
         {introspectionData ? (
           <div className="schema-builder__content">
             <Explorer
               schema={introspectionData ? buildClientSchema(introspectionData) : {}}
-              query={hasParsedSuccessfully ? query : ""}
+              query={hasParsedSuccessfully.current ? query : ""}
               explorerIsOpen={true}
               arrowClosed={<Checkbox checked={false} className="schema-builder__checkbox" />}
               arrowOpen={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxChecked={<Checkbox checked={true} className="schema-builder__checkbox" />}
               checkboxUnchecked={<Checkbox checked={false} className="schema-builder__checkbox" />}
-              onEdit={(query: string) => {
-                handleEdit(query);
-              }}
+              onEdit={(query: string) => handleEdit(query)}
               colors={{
                 keyword: "#E29C6D",
                 property: "var(--requestly-color-text-default)",
