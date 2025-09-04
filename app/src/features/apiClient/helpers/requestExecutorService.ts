@@ -1,22 +1,7 @@
-import { NativeError } from "errors/NativeError";
-import { parseEnvironmentState } from "../commands/environments/utils";
-import {
-  getApiClientEnvironmentsStore,
-  getApiClientRecordsStore,
-  getApiClientRecordStore,
-} from "../commands/store.utils";
-import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { getParsedRuntimeVariables } from "../store/runtimeVariables/utils";
 import { AbortReason, KeyValuePair, RequestContentType, RQAPI } from "../types";
 import { RequestPreparationService } from "./requestPreparationService";
 import { RequestValidationService } from "./requestValidationService";
-import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./httpRequestExecutor/snapshotTypes";
-import { APIClientWorkloadManager } from "./modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import {
-  PostResponseScriptWorkload,
-  PreRequestScriptWorkload,
-  WorkResultType,
-} from "./modules/scriptsV2/workload-manager/workLoadTypes";
+import { WorkResultType } from "./modules/scriptsV2/workload-manager/workLoadTypes";
 import { UserAbortError } from "../errors/UserAbortError/UserAbortError";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
 import { addUrlSchemeIfMissing, makeRequest } from "../screens/apiClient/utils";
@@ -28,6 +13,7 @@ import {
 } from "./modules/scriptsV2/analytics";
 import { isEmpty } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { ScriptExecutionService } from "./scriptExecutionService";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -41,81 +27,11 @@ export class RequestExecutorService {
   constructor(
     private requestPreparer: RequestPreparationService,
     private requestValidator: RequestValidationService,
-    private ctx: ApiClientFeatureContext,
-    private workloadManager: APIClientWorkloadManager,
+    private scriptExecutor: ScriptExecutionService,
     private abortController: AbortController,
     private postScriptExecutionCallback: (state: any) => Promise<void>,
     private appMode: string
   ) {}
-
-  private buildBaseSnapshot(entry: RQAPI.HttpApiEntry, recordId: string): BaseSnapshot {
-    const { activeEnvironment, globalEnvironment } = getApiClientEnvironmentsStore(this.ctx).getState();
-    const globalEnvironmentState = globalEnvironment.getState();
-    const globalVariables = parseEnvironmentState(globalEnvironmentState).variables;
-    const environmentVariables = activeEnvironment ? parseEnvironmentState(activeEnvironment.getState()).variables : {};
-    const variables = getParsedRuntimeVariables();
-    const collectionVariables = (() => {
-      const parent = getApiClientRecordsStore(this.ctx).getState().getParent(recordId);
-      if (!parent) {
-        return {};
-      }
-      const recordState = getApiClientRecordStore(this.ctx, parent)?.getState();
-      if (!recordState || recordState.type !== RQAPI.RecordType.COLLECTION) {
-        throw new NativeError("Expected value to be present and be a collection!").addContext({
-          recordId: parent,
-        });
-      }
-
-      return Object.fromEntries(recordState.collectionVariables.getState().getAll());
-    })();
-    return {
-      global: globalVariables,
-      collectionVariables,
-      environment: environmentVariables,
-      variables,
-    };
-  }
-
-  private buildPreRequestSnapshot(entry: RQAPI.HttpApiEntry, recordId: string): SnapshotForPreRequest {
-    return {
-      ...this.buildBaseSnapshot(entry, recordId),
-      request: entry.request,
-    };
-  }
-
-  private buildPostResponseSnapshot(entry: RQAPI.HttpApiEntry, recordId: string): SnapshotForPostResponse {
-    const response = entry.response;
-    if (!response) {
-      throw new Error("Can not build post response snapshot without response!");
-    }
-    return {
-      ...this.buildBaseSnapshot(entry, recordId),
-      request: entry.request,
-      response,
-    };
-  }
-
-  async executePreRequestScript(entry: RQAPI.HttpApiEntry, recordId: string, callback: (state: any) => Promise<void>) {
-    return this.workloadManager.execute(
-      new PreRequestScriptWorkload(entry.scripts.preRequest, this.buildPreRequestSnapshot(entry, recordId), callback),
-      this.abortController.signal
-    );
-  }
-
-  async executePostResponseScript(
-    entry: RQAPI.HttpApiEntry,
-    recordId: string,
-    callback: (state: any) => Promise<void>
-  ) {
-    return this.workloadManager.execute(
-      new PostResponseScriptWorkload(
-        entry.scripts.postResponse,
-        this.buildPostResponseSnapshot(entry, recordId),
-        callback
-      ),
-      this.abortController.signal
-    );
-  }
 
   private getEmptyRenderedVariables(renderedVariables: Record<string, any>): string[] {
     if (isEmpty(renderedVariables)) {
@@ -168,16 +84,18 @@ export class RequestExecutorService {
     }
   }
 
-  async _execute(record: RQAPI.HttpApiRecord): Promise<RQAPI.ExecutionResult> {
-    const unpreparedEntryDetails = record.data;
-    if (unpreparedEntryDetails.request.contentType === RequestContentType.MULTIPART_FORM) {
-      const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(unpreparedEntryDetails);
+  async executeRequest(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
+    const { entryDetails, renderedVariables } = this.requestPreparer.prepareRequest(entry, recordId);
+    entryDetails.request.url = addUrlSchemeIfMissing(entryDetails.request.url);
+
+    if (entryDetails.request.contentType === RequestContentType.MULTIPART_FORM) {
+      const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(entryDetails);
       const isInvalid = invalidFiles.length > 0;
       if (isInvalid) {
         trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
 
         return {
-          executedEntry: { ...unpreparedEntryDetails },
+          executedEntry: { ...entryDetails },
           status: RQAPI.ExecutionStatus.ERROR,
           error: {
             name: "Error",
@@ -192,9 +110,6 @@ export class RequestExecutorService {
         };
       }
     }
-
-    const { entryDetails, renderedVariables } = this.requestPreparer.prepareRequest(unpreparedEntryDetails, record.id);
-    entryDetails.request.url = addUrlSchemeIfMissing(entryDetails.request.url);
 
     try {
       this.requestValidator.validateRequest(entryDetails);
@@ -214,9 +129,9 @@ export class RequestExecutorService {
       entryDetails.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
-      preRequestScriptResult = await this.executePreRequestScript(
+      preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
         entryDetails,
-        record.id,
+        recordId,
         this.postScriptExecutionCallback
       ); //revist record passing
 
@@ -277,9 +192,9 @@ export class RequestExecutorService {
       entryDetails.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.postResponse
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
-      responseScriptResult = await this.executePostResponseScript(
+      responseScriptResult = await this.scriptExecutor.executePostResponseScript(
         entryDetails,
-        record.id,
+        recordId,
         this.postScriptExecutionCallback
       );
 
@@ -331,7 +246,11 @@ export class RequestExecutorService {
   }
 
   async rerun(record: RQAPI.HttpApiRecord): Promise<RQAPI.RerunResult> {
-    const preRequestScriptResult = await this.executePreRequestScript(record.data, record.id, async () => {});
+    const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
+      record.data,
+      record.id,
+      async () => {}
+    );
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       const error = this.buildExecutionErrorObject(
         preRequestScriptResult.error,
@@ -344,7 +263,11 @@ export class RequestExecutorService {
       };
     }
 
-    const responseScriptResult = await this.executePostResponseScript(record.data, record.id, async () => {});
+    const responseScriptResult = await this.scriptExecutor.executePostResponseScript(
+      record.data,
+      record.id,
+      async () => {}
+    );
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       const error = this.buildExecutionErrorObject(
