@@ -85,25 +85,6 @@ export class HttpRequestExecutor {
   }
 
   async execute(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
-    const results = [];
-    for await (const result of this.executeBatches([{ recordId, entry }])) {
-      results.push(result); // Had to push otherwise ts was complaining if return is used directly
-    }
-    return results[0];
-  }
-
-  async *executeBatches(
-    batchedEntryDetails: {
-      recordId: string;
-      entry: RQAPI.HttpApiEntry;
-    }[]
-  ) {
-    for (const { recordId, entry } of batchedEntryDetails) {
-      yield this.executeRequest(recordId, entry);
-    }
-  }
-
-  private async executeRequest(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
     this.abortController = new AbortController();
 
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);

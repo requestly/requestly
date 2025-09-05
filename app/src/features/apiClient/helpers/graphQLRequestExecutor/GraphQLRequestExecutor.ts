@@ -8,7 +8,6 @@ import { HttpRequestExecutor } from "../httpRequestExecutor/httpRequestExecutor"
 export class GraphQLRequestExecutor extends HttpRequestExecutor {
   /**
    * Executes a GraphQL request by converting it to HTTP format and using the parent's execute method
-   * @param record - The GraphQL API record to execute
    * @returns Promise<RQAPI.ExecutionResult>
    */
   async executeGraphQLRequest(recordId: string, entry: RQAPI.GraphQLApiEntry): Promise<RQAPI.ExecutionResult> {
