@@ -17,6 +17,8 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "types";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface Props {
   id: string;
@@ -48,7 +50,7 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const currentWorkspacePath = useMemo(
     () =>
-      getViewMode() === ApiClientViewMode.SINGLE
+      getViewMode() === ApiClientViewMode.SINGLE && activeWorkspace?.workspaceType === WorkspaceType.LOCAL
         ? activeWorkspace.rootPath
         : getSelectedWorkspace(ctx.workspaceId)?.getState().rawWorkspace.rootPath,
     [getSelectedWorkspace, ctx.workspaceId, getViewMode, activeWorkspace]
@@ -68,19 +70,23 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const handleBreadcrumbLabelClick = useCallback(
     (index: number) => {
-      const pathItems = [currentWorkspacePath, ...parentCollections.map((item) => item.name)];
-      const pathToOpen = pathItems.slice(0, index + 1).join("/");
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-path-in-file-manager", {
-        path: pathToOpen,
-      });
+      if (isFeatureCompatible(FEATURES.OPEN_PATH_IN_FILE_MANAGER)) {
+        const pathItems = [currentWorkspacePath, ...parentCollections.map((item) => item.name)];
+        const pathToOpen = pathItems.slice(0, index + 1).join("/");
+        if (pathToOpen) {
+          window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-path-in-file-manager", {
+            path: pathToOpen,
+          });
+        }
+      }
     },
     [currentWorkspacePath, parentCollections]
   );
 
   const parentCollectionNames = useMemo(() => {
-    const parentRecords = parentCollections.slice().map((id) => {
+    const parentRecords = parentCollections.slice().map((collection) => {
       return {
-        label: id.name,
+        label: collection.name,
         pathname: "",
         isEditable: false,
         onClick: handleBreadcrumbLabelClick,
