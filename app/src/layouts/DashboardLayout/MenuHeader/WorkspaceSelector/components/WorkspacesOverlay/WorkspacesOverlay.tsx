@@ -26,7 +26,7 @@ interface WorkspaceListSectionProps {
   workspaces: Workspace[];
   workspaceType: WorkspaceType;
   toggleDropdown: () => void;
-  onItemClick: (workspace: Workspace) => void;
+  onItemClick: (workspace: Workspace, addWorkspaceToView?: boolean) => void;
 }
 
 const EmptyWorkspaceListSection = ({
@@ -154,7 +154,9 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
                 workspaces={workspaceMap[WorkspaceType.LOCAL]}
                 workspaceType={WorkspaceType.LOCAL}
                 toggleDropdown={toggleDropdown}
-                onItemClick={(workspace) => confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace))}
+                onItemClick={(workspace, addWorkspaceToView) =>
+                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspace, addWorkspaceToView))
+                }
               />
             ) : null}
 

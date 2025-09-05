@@ -19,6 +19,7 @@ import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/worksp
 import { toast } from "utils/Toast";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
+import { addWorkspaceToView as addWorkspaceToViewCmd } from "features/apiClient/commands/multiView";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -61,7 +62,7 @@ export const useWorkspaceSwitcher = () => {
   const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode, s.getAllSelectedWorkspaces]);
 
   const handleWorkspaceSwitch = useCallback(
-    async (workspace: Workspace) => {
+    async (workspace: Workspace, addWorkspaceToView?: boolean) => {
       const viewMode = getViewMode();
 
       if (viewMode === ApiClientViewMode.SINGLE) {
@@ -86,11 +87,15 @@ export const useWorkspaceSwitcher = () => {
         },
         appMode,
         undefined,
-        "workspaces_dropdown"
+        "workspaces_dropdown",
+        addWorkspaceToView ? !addWorkspaceToView : undefined
       )
         .then(() => {
           if (!isWorkspaceLoading) {
             showSwitchWorkspaceSuccessToast(workspace.name);
+          }
+          if (addWorkspaceToView) {
+            addWorkspaceToViewCmd(workspace, user.details?.profile?.uid);
           }
 
           setIsWorkspaceLoading(false);
@@ -110,6 +115,7 @@ export const useWorkspaceSwitcher = () => {
       isSharedWorkspace,
       isWorkspaceLoading,
       user?.details?.isSyncEnabled,
+      user.details?.profile?.uid,
     ]
   );
 

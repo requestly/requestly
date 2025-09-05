@@ -12,7 +12,7 @@ interface WorkspaceListProps {
   workspaces: Workspace[];
   type: WorkspaceType;
   toggleDropdown: () => void;
-  onItemClick: (workspace: Workspace) => void;
+  onItemClick: (workspace: Workspace, addWorkspaceToView?: boolean) => void;
 }
 
 export const WorkspaceList: React.FC<WorkspaceListProps> = ({ workspaces, type, toggleDropdown, onItemClick }) => {
@@ -55,7 +55,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({ workspaces, type, 
             workspace={workspace}
             type={type}
             toggleDropdown={toggleDropdown}
-            onClick={() => onItemClick(workspace)}
+            onClick={(addWorkspaceToView) => onItemClick(workspace, addWorkspaceToView)}
           />
         ))}
       </div>
