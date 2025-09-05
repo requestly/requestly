@@ -42,7 +42,7 @@ export const useHttpRequestExecutor = (collectionId: string) => {
         }
         if (key === "collectionVariables") {
           if (!collectionId) {
-            return;
+            continue;
           }
 
           await patchCollectionVariables({

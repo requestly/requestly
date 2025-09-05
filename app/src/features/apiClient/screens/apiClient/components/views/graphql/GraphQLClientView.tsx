@@ -422,7 +422,7 @@ const GraphQLClientView: React.FC<Props> = ({
 
             <ClientCodeButton
               requestPreparer={() => {
-                return graphQLRequestExecutor.prepareGraphQLRequest(recordId, record.data).preparedEntry.request;
+                return graphQLRequestExecutor.prepareGraphQLRequest(recordId, getEntry()).preparedEntry.request;
               }}
             />
           </div>
