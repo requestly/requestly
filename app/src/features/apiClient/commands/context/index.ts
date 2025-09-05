@@ -1,3 +1,3 @@
 export { refreshContext } from "./refreshContext.command";
-export { setupContext } from "./setupContext.command";
-export { setupContextWithRepo } from "./setupContextWithRepo.command";
+export { setupContext, setupContextWithoutMarkingLoaded } from "./setupContext.command";
+export { setupContextWithRepo, setupContextWithRepoWithoutMarkingLoaded } from "./setupContextWithRepo.command";
