@@ -14,7 +14,7 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
    */
   async executeGraphQLRequest(recordId: string, entry: RQAPI.GraphQLApiEntry): Promise<RQAPI.ExecutionResult> {
     const httpPreparedEntry = this.prepareGraphQLRequest(recordId, entry);
-    const apiClientExecutionResult = await this.executeRequest(recordId, httpPreparedEntry.preparedEntry);
+    const apiClientExecutionResult = await this.execute(recordId, httpPreparedEntry.preparedEntry);
     const graphQLEntryWithResponse: RQAPI.GraphQLApiEntry = httpEntryToGraphQLEntryAdapter(
       apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry
     );

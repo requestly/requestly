@@ -88,7 +88,24 @@ export class HttpRequestExecutor {
     }
   }
 
-  async executeRequest(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
+  async execute(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
+    for await (const result of this.executeBatches([{ recordId, entry }])) {
+      return result;
+    }
+  }
+
+  async *executeBatches(
+    batchedEntryDetails: {
+      recordId: string;
+      entry: RQAPI.HttpApiEntry;
+    }[]
+  ) {
+    for (const { recordId, entry } of batchedEntryDetails) {
+      yield this.executeRequest(recordId, entry);
+    }
+  }
+
+  private async executeRequest(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
     preparedEntry.request.url = addUrlSchemeIfMissing(preparedEntry.request.url);
 
