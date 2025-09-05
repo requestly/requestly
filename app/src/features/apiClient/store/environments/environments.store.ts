@@ -196,7 +196,7 @@ export const createEnvironmentsStore = ({
           existingEnvironment.update({
             name: environment.name,
           });
-          existingEnvironment.data.variables.getState().reset(new Map(Object.entries(environment.variables)));
+          existingEnvironment.data.variables.getState().resetSyncValues(new Map(Object.entries(environment.variables)));
         }
       }
 
