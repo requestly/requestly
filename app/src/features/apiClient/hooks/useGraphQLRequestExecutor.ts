@@ -3,7 +3,7 @@ import { useApiClientFeatureContext, useApiClientRepository } from "../contexts/
 import { useSelector } from "react-redux";
 import { useApiClientContext } from "../contexts";
 import { AutogenerateStoreContext } from "../store/autogenerateContextProvider";
-import { useCallback, useContext, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { HttpRequestPreparationService } from "../helpers/httpRequestExecutor/httpRequestPreparationService";
 import { HttpRequestValidationService } from "../helpers/httpRequestExecutor/httpRequestValidationService";
 import { HttpRequestScriptExecutionService } from "../helpers/httpRequestExecutor/httpRequestScriptExecutionService";
