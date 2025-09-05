@@ -22,6 +22,7 @@ export class HttpRequestPreparationService {
     entry.testResults = [];
     entry.request.url = queryParamsToURLString(entry.request.queryParams, entry.request.url);
     entry.request.queryParams = [];
+    entry.response = null;
 
     const { renderedVariables, result } = this.renderVariables(entry, recordId, this.ctx);
 

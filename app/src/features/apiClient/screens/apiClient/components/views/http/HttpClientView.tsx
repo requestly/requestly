@@ -147,10 +147,9 @@ const HttpClientView: React.FC<Props> = ({
 
   const { setPreview, setUnsaved, setTitle, getIsActive, setIcon } = useGenericState();
 
-  const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
-
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
+  const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(
     sanitizeEntry({ ...entryWithoutResponse, response: null })
@@ -656,7 +655,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const handleTestResultRefresh = useCallback(async () => {
     try {
-      const result = await httpRequestExecutor.rerun(apiEntryDetails?.id, apiEntryDetails.data);
+      const result = await httpRequestExecutor.rerun(apiEntryDetails?.id, entry);
       if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
         setEntry((entry) => ({
           ...entry,
@@ -666,9 +665,10 @@ const HttpClientView: React.FC<Props> = ({
         setError(result.error);
       }
     } catch (error) {
+      console.log("!!!debug", "error", error);
       toast.error("Something went wrong while refreshing test results");
     }
-  }, [httpRequestExecutor, apiEntryDetails?.id, apiEntryDetails?.data]);
+  }, [httpRequestExecutor, apiEntryDetails?.id, entry]);
 
   const handleRevertChanges = () => {
     setEntry(apiEntryDetails?.data);
@@ -713,8 +713,7 @@ const HttpClientView: React.FC<Props> = ({
 
             <ClientCodeButton
               requestPreparer={() =>
-                httpRequestExecutor.requestPreparer.prepareRequest(apiEntryDetails?.id, apiEntryDetails.data)
-                  .preparedEntry.request
+                httpRequestExecutor.requestPreparer.prepareRequest(apiEntryDetails?.id, entry).preparedEntry.request
               }
             />
           </div>
