@@ -96,5 +96,6 @@ export class HttpRequestValidationService {
 
       return { invalidFiles };
     }
+    return { invalidFiles: [] };
   }
 }

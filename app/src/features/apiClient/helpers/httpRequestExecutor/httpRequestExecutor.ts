@@ -89,9 +89,11 @@ export class HttpRequestExecutor {
   }
 
   async execute(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
+    const results = [];
     for await (const result of this.executeBatches([{ recordId, entry }])) {
-      return result;
+      results.push(result); // Had to push otherwise ts was complaining if return is used directly
     }
+    return results[0];
   }
 
   async *executeBatches(
@@ -146,8 +148,8 @@ export class HttpRequestExecutor {
     let responseScriptResult;
 
     if (
-      preparedEntry.scripts.preRequest.length &&
-      preparedEntry.scripts.preRequest !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST]
+      preparedEntry.scripts?.preRequest.length &&
+      preparedEntry.scripts?.preRequest !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
       preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
@@ -209,8 +211,8 @@ export class HttpRequestExecutor {
     }
 
     if (
-      preparedEntry.scripts.postResponse.length &&
-      preparedEntry.scripts.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
+      preparedEntry.scripts?.postResponse?.length &&
+      preparedEntry.scripts?.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
       responseScriptResult = await this.scriptExecutor.executePostResponseScript(

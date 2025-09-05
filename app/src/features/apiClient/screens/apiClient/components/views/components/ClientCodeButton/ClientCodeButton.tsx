@@ -3,6 +3,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
 import { RQAPI } from "features/apiClient/types";
+import { toast } from "utils/Toast";
 
 interface Props {
   requestPreparer: () => RQAPI.HttpRequest;
@@ -20,9 +21,15 @@ export const ClientCodeButton: React.FC<Props> = ({ requestPreparer }) => {
         size="small"
         className="api-client-view_get-code-btn"
         onClick={() => {
-          const request = requestPreparer();
-          setPreparedRequest(request);
-          setIsSnippetModalVisible(true);
+          try {
+            const request = requestPreparer();
+            if (request) {
+              setPreparedRequest(request);
+              setIsSnippetModalVisible(true);
+            }
+          } catch (error) {
+            toast.error("Error preparing code snippet");
+          }
         }}
       >
         Get client code

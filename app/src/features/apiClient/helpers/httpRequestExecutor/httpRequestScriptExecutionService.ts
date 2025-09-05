@@ -71,7 +71,7 @@ export class HttpRequestScriptExecutionService {
 
   async executePreRequestScript(recordId: string, entry: RQAPI.HttpApiEntry, callback: (state: any) => Promise<void>) {
     return this.workloadManager.execute(
-      new PreRequestScriptWorkload(entry.scripts.preRequest, this.buildPreRequestSnapshot(recordId, entry), callback),
+      new PreRequestScriptWorkload(entry.scripts?.preRequest, this.buildPreRequestSnapshot(recordId, entry), callback),
       this.abortController.signal
     );
   }
@@ -83,7 +83,7 @@ export class HttpRequestScriptExecutionService {
   ) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
-        entry.scripts.postResponse,
+        entry.scripts?.postResponse,
         this.buildPostResponseSnapshot(recordId, entry),
         callback
       ),
