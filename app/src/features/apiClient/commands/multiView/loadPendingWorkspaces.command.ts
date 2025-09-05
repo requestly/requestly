@@ -1,5 +1,5 @@
 import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { _setupContext } from "../context";
+import { setupContextWithoutMarkingLoaded } from "../context";
 import { markWorkspaceLoaded } from "./markWorkspaceLoaded.command";
 
 export async function loadWorkspaces(userId?: string) {
@@ -13,7 +13,7 @@ export async function loadWorkspaces(userId?: string) {
       .getState()
       .setStateForSelectedWorkspace(workspace.id, { loading: true, errored: false });
     try {
-      await _setupContext(workspace.rawWorkspace, {
+      await setupContextWithoutMarkingLoaded(workspace.rawWorkspace, {
         loggedIn: !!userId,
         uid: userId ?? "",
       });

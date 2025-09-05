@@ -22,7 +22,7 @@ export type ContextSetupData = {
   erroredRecords: { apiErroredRecords: ErroredRecord[]; environmentErroredRecords: ErroredRecord[] };
 };
 
-export const _setupContextWithRepo = async (
+export const setupContextWithRepoWithoutMarkingLoaded = async (
   workspaceId: ApiClientFeatureContext["workspaceId"],
   repoForWorkspace: ApiClientRepositoryInterface
 ) => {
@@ -63,7 +63,7 @@ export async function setupContextWithRepo(
   workspaceId: ApiClientFeatureContext["workspaceId"],
   repoForWorkspace: ApiClientRepositoryInterface
 ) {
-  const result = await _setupContextWithRepo(workspaceId, repoForWorkspace);
+  const result = await setupContextWithRepoWithoutMarkingLoaded(workspaceId, repoForWorkspace);
   markWorkspaceLoaded();
   return result;
 }
