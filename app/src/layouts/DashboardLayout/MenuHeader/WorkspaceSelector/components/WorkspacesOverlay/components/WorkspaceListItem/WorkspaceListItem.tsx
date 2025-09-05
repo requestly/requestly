@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "types";
@@ -25,7 +25,7 @@ import { toast } from "utils/Toast";
 import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { workspaceActions } from "store/slices/workspaces/slice";
+import { usePrevious } from "hooks";
 
 type WorkspaceItemProps =
   | {
@@ -106,7 +106,20 @@ const LocalWorkspaceActions = ({
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const dispatch = useDispatch();
+
+  /*
+   * since switchWorkspace is not then-able here,
+   * need to create a state workflow around it to switch on firstWorkspace selection
+   * */
+  const prevActiveWorkspace = usePrevious(activeWorkspace);
+  const [firstWorkspaceSelectedFlag, setFirstWorkspaceSelectedFlag] = useState(false);
+
+  useEffect(() => {
+    if (firstWorkspaceSelectedFlag && prevActiveWorkspace.id !== activeWorkspace.id) {
+      addWorkspaceToView(workspace, user.details?.profile?.uid);
+      setFirstWorkspaceSelectedFlag(false);
+    }
+  }, [user.details?.profile?.uid, firstWorkspaceSelectedFlag, workspace, activeWorkspace.id, prevActiveWorkspace.id]);
 
   const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
     s.selectedWorkspaces,
@@ -117,11 +130,13 @@ const LocalWorkspaceActions = ({
   const handleMultiWorkspaceCheckbox = useCallback(
     async (isChecked: boolean) => {
       const handleWorkspaceSelection = async () => {
-        const isFirstSelectedWorkspace = getViewMode() === ApiClientViewMode.SINGLE;
+        const isFirstSelectedWorkspace = getAllSelectedWorkspaces().length === 0 && workspace.id !== activeWorkspace.id;
         if (isFirstSelectedWorkspace) {
-          dispatch(workspaceActions.setActiveWorkspaceIds([workspace.id]));
+          switchWorkspace();
+          setFirstWorkspaceSelectedFlag(true);
+        } else {
+          await addWorkspaceToView(workspace, user.details?.profile?.uid);
         }
-        await addWorkspaceToView(workspace, user.details?.profile?.uid);
         trackMultiWorkspaceSelected("workspace_selector_dropdown");
       };
 
@@ -149,7 +164,7 @@ const LocalWorkspaceActions = ({
         toast.error(e.message);
       }
     },
-    [dispatch, workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
+    [getAllSelectedWorkspaces, workspace, activeWorkspace.id, switchWorkspace, user.details?.profile?.uid, getViewMode]
   );
 
   const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.getState().id === workspace.id), [
