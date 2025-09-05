@@ -3,7 +3,6 @@ import {
   graphQLEntryToHttpEntryAdapter,
   httpEntryToGraphQLEntryAdapter,
 } from "../../screens/apiClient/components/views/graphql/utils";
-import { sanitizeEntry } from "features/apiClient/screens/apiClient/utils";
 import { HttpRequestExecutor } from "../httpRequestExecutor/httpRequestExecutor";
 
 export class GraphQLRequestExecutor extends HttpRequestExecutor {
@@ -29,6 +28,6 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
     const graphQLRequestEntry = entry;
     const httpRequestEntry = graphQLEntryToHttpEntryAdapter(graphQLRequestEntry);
 
-    return this.requestPreparer.prepareRequest(recordId, sanitizeEntry(httpRequestEntry));
+    return this.requestPreparer.prepareRequest(recordId, httpRequestEntry);
   }
 }

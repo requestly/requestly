@@ -147,7 +147,7 @@ export class HttpRequestExecutor {
 
     if (
       preparedEntry.scripts.preRequest.length &&
-      preparedEntry.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest
+      preparedEntry.scripts.preRequest !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
       preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
@@ -210,7 +210,7 @@ export class HttpRequestExecutor {
 
     if (
       preparedEntry.scripts.postResponse.length &&
-      preparedEntry.scripts.preRequest !== DEFAULT_SCRIPT_VALUES.postResponse
+      preparedEntry.scripts.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
       responseScriptResult = await this.scriptExecutor.executePostResponseScript(
