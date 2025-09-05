@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Workspace } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { WorkspaceType } from "types";
@@ -25,19 +25,18 @@ import { toast } from "utils/Toast";
 import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { usePrevious } from "hooks";
 
 type WorkspaceItemProps =
   | {
       type: WorkspaceType.PERSONAL;
       toggleDropdown: () => void;
-      onClick: () => void;
+      onClick: (addToMultiView?: boolean) => void;
     }
   | {
       type: WorkspaceType.SHARED | WorkspaceType.LOCAL;
       workspace: Workspace;
       toggleDropdown: () => void;
-      onClick: () => void;
+      onClick: (addToMultiView?: boolean) => void;
     };
 
 const ShareWorkspaceActions = ({
@@ -101,25 +100,11 @@ const LocalWorkspaceActions = ({
 }: {
   workspace: Workspace;
   toggleDropdown: () => void;
-  switchWorkspace: () => void;
+  switchWorkspace: (addToMultiView?: boolean) => void;
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-
-  /*
-   * since switchWorkspace is not then-able here,
-   * need to create a state workflow around it to switch on firstWorkspace selection
-   * */
-  const prevActiveWorkspace = usePrevious(activeWorkspace);
-  const [firstWorkspaceSelectedFlag, setFirstWorkspaceSelectedFlag] = useState(false);
-
-  useEffect(() => {
-    if (firstWorkspaceSelectedFlag && prevActiveWorkspace.id !== activeWorkspace.id) {
-      addWorkspaceToView(workspace, user.details?.profile?.uid);
-      setFirstWorkspaceSelectedFlag(false);
-    }
-  }, [user.details?.profile?.uid, firstWorkspaceSelectedFlag, workspace, activeWorkspace.id, prevActiveWorkspace.id]);
 
   const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
     s.selectedWorkspaces,
@@ -132,8 +117,7 @@ const LocalWorkspaceActions = ({
       const handleWorkspaceSelection = async () => {
         const isFirstSelectedWorkspace = getAllSelectedWorkspaces().length === 0 && workspace.id !== activeWorkspace.id;
         if (isFirstSelectedWorkspace) {
-          switchWorkspace();
-          setFirstWorkspaceSelectedFlag(true);
+          switchWorkspace(true);
         } else {
           await addWorkspaceToView(workspace, user.details?.profile?.uid);
         }
@@ -222,14 +206,17 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
     }
   };
 
-  const handleWorkspaceClick = useCallback(() => {
-    onClick();
-    toggleDropdown();
-  }, [onClick, toggleDropdown]);
+  const handleWorkspaceClick = useCallback(
+    (addToMultiView?: boolean) => {
+      onClick(addToMultiView);
+      toggleDropdown();
+    },
+    [onClick, toggleDropdown]
+  );
 
   if (props.type === WorkspaceType.PERSONAL) {
     return (
-      <div className="workspace-overlay__list-item" onClick={handleWorkspaceClick}>
+      <div className="workspace-overlay__list-item" onClick={() => handleWorkspaceClick()}>
         <WorkspaceAvatar
           size={32}
           workspace={{
