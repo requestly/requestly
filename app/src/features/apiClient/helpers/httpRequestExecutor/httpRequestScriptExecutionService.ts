@@ -16,11 +16,7 @@ import {
 } from "../modules/scriptsV2/workload-manager/workLoadTypes";
 
 export class HttpRequestScriptExecutionService {
-  constructor(
-    private ctx: ApiClientFeatureContext,
-    private workloadManager: APIClientWorkloadManager,
-    private abortController: AbortController
-  ) {}
+  constructor(private ctx: ApiClientFeatureContext, private workloadManager: APIClientWorkloadManager) {}
 
   private buildBaseSnapshot(recordId: string): BaseSnapshot {
     const { activeEnvironment, globalEnvironment } = getApiClientEnvironmentsStore(this.ctx).getState();
@@ -69,17 +65,23 @@ export class HttpRequestScriptExecutionService {
     };
   }
 
-  async executePreRequestScript(recordId: string, entry: RQAPI.HttpApiEntry, callback: (state: any) => Promise<void>) {
+  async executePreRequestScript(
+    recordId: string,
+    entry: RQAPI.HttpApiEntry,
+    callback: (state: any) => Promise<void>,
+    abortController: AbortController
+  ) {
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(entry.scripts?.preRequest, this.buildPreRequestSnapshot(recordId, entry), callback),
-      this.abortController.signal
+      abortController.signal
     );
   }
 
   async executePostResponseScript(
     recordId: string,
     entry: RQAPI.HttpApiEntry,
-    callback: (state: any) => Promise<void>
+    callback: (state: any) => Promise<void>,
+    abortController: AbortController
   ) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
@@ -87,7 +89,7 @@ export class HttpRequestScriptExecutionService {
         this.buildPostResponseSnapshot(recordId, entry),
         callback
       ),
-      this.abortController.signal
+      abortController.signal
     );
   }
 }
