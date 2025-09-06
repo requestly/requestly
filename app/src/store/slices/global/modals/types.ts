@@ -21,4 +21,5 @@ export interface GlobalModals {
   sharingModal: GlobalModalState;
   emailLoginLinkPopup: GlobalModalState;
   pricingModal: GlobalModalState;
+  workspaceLoadingModal: GlobalModalState;
 }

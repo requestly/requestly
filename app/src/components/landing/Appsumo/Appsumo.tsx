@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
@@ -18,11 +17,11 @@ import { useDebounce } from "hooks/useDebounce";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "types";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface AppSumoCode {
   error: string;
@@ -39,7 +38,6 @@ const DEFAULT_APPSUMO_INPUT: AppSumoCode = {
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
@@ -48,6 +46,7 @@ const AppSumoModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
   const [showMaxCodesExeceededError, setShowMaxCodesExeceededError] = useState(false);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const db = getFirestore(firebaseApp);
 
@@ -133,27 +132,14 @@ const AppSumoModal: React.FC = () => {
     try {
       const response: any = await createTeam({ teamName: newTeamName });
       trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo", WorkspaceType.SHARED);
-      switchWorkspace(
-        {
-          teamId: response?.data?.teamId,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        {
-          isWorkspaceMode: false,
-          isSyncEnabled: true,
-        },
-        appMode,
-        null,
-        "appsumo"
-      );
+      switchWorkspace(response?.data?.teamId, "appsumo");
 
       setIsLoading(false);
       return response?.data?.teamId;
     } catch (error) {
       // do nothing
     }
-  }, [appMode, dispatch]);
+  }, [switchWorkspace]);
 
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || emailValidationError) {

@@ -39,15 +39,16 @@ export const useFetchLocalWorkspaces = () => {
         localRecords.push(localWorkspace);
       }
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
-      return localRecords;
+
+      setLocalWorkspaces(localRecords);
     } catch (e) {
       captureException(e);
-      return [];
+      setLocalWorkspaces([]);
     }
   }, [isLocalSyncEnabled]);
 
   useEffect(() => {
-    fetchLocalWorkspaces().then(setLocalWorkspaces);
+    fetchLocalWorkspaces();
   }, [fetchLocalWorkspaces]);
 
   return { localWorkspaces, fetchLocalWorkspaces };

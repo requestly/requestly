@@ -8,7 +8,7 @@ import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { Invite, WorkspaceType } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
@@ -19,7 +19,6 @@ import {
 import { MultiWorkspaceAvatarGroup } from "../MultiWorkspaceAvatarGroup";
 import LocalWorkspaceAvatar from "features/workspaces/components/LocalWorkspaceAvatar";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
@@ -30,19 +29,13 @@ const prettifyWorkspaceName = (workspaceName: string) => {
 const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Global State
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
-  const isActiveWorkspaceNotPrivate = useSelector(isActiveWorkspaceShared);
 
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeWorkspaceName = isActiveWorkspaceNotPrivate
-    ? activeWorkspace?.name
-    : user.loggedIn
-    ? "Private Workspace"
-    : "Workspaces";
+  const activeWorkspaceName = activeWorkspace.name || "Workspaces";
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);

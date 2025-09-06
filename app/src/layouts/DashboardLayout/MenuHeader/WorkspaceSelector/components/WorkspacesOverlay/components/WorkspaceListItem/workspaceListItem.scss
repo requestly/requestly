@@ -11,6 +11,20 @@
     cursor: not-allowed;
   }
 
+  &--personal {
+    &:hover {
+      .workspace-overlay__list-item-actions {
+        .workspace-list-item-active-tag {
+          display: none;
+        }
+
+        .personal-workspace-actions {
+          display: flex;
+        }
+      }
+    }
+  }
+
   &--local {
     .ant-avatar {
       border-radius: 50%;
@@ -84,6 +98,12 @@
     line-height: var(--line-height-2xs, 13px); /* 144.444% */
     letter-spacing: 1px;
     padding: var(--space-1, 2px) var(--space-2, 4px);
+  }
+
+  .personal-workspace-actions {
+    display: none;
+    align-items: center;
+    gap: 8px;
   }
 
   .shared-workspace-actions {

@@ -27,7 +27,7 @@ import { TeamRole } from "types";
 import { Conditional } from "components/common/Conditional";
 import { MenuHeader } from "./MenuHeader/MenuHeader";
 import { useInitPopupConfig } from "hooks/useInitPopupConfig";
-import { useWorkspaceFetcher } from "features/workspaces/hooks/useWorkspaceFetcher";
+import { useWorkspaceManager } from "features/workspaces/hooks/useWorkspaceManager";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -41,12 +41,7 @@ const DashboardLayout = () => {
 
   useRootPathRedirector();
   useInitPopupConfig();
-  useWorkspaceFetcher();
-  // initializeOneTap();
-
-  // if (shouldShowOneTapPrompt()) {
-  //   promptOneTap();
-  // }
+  useWorkspaceManager();
 
   const isSidebarVisible = useMemo(
     () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),

@@ -1,21 +1,18 @@
 import { SyncOutlined } from "@ant-design/icons";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { Button } from "antd";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 import { isWorkspacesFeatureEnabled } from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector/WorkspaceSelector";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
 
 const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isTeamArchived = false }) => {
-  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
   // Global State
   const activeWorkspace = useSelector(getActiveWorkspace);
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   let isButtonDisabled = true;
   if (!isSharedWorkspaceMode) {
@@ -33,19 +30,7 @@ const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isT
   }
 
   const handleSwitchWorkspace = () => {
-    switchWorkspace(
-      {
-        teamId: selectedTeamId,
-        teamName,
-        teamMembersCount,
-      },
-      dispatch,
-      {
-        isSyncEnabled: activeWorkspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
-        isWorkspaceMode: isSharedWorkspaceMode,
-      },
-      appMode
-    );
+    switchWorkspace(selectedTeamId);
   };
 
   return (

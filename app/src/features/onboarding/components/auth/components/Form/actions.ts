@@ -22,7 +22,6 @@ import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils"
 import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 
 const showError = (err: string) => {
   toast.error(err, 3);
