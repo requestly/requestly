@@ -4,6 +4,7 @@ import RQAuthModal from "components/authentication/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import WorkspaceLoadingModal from "features/workspaces/modals/WorkspaceLoadingModal";
 
 export const GlobalModals = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,15 @@ export const GlobalModals = () => {
             />
           )}
         </>
+      ) : null}
+      {activeModals.workspaceLoadingModal.isActive ? (
+        <WorkspaceLoadingModal
+          isOpen={activeModals.workspaceLoadingModal.isActive}
+          close={() =>
+            dispatch(globalActions.toggleActiveModal({ modalName: "workspaceLoadingModal", newValue: false }))
+          }
+          {...activeModals.workspaceLoadingModal.props}
+        />
       ) : null}
     </>
   );

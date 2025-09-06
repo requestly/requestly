@@ -26,18 +26,44 @@ import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 
-type WorkspaceItemProps =
-  | {
-      type: WorkspaceType.PERSONAL;
-      toggleDropdown: () => void;
-      onClick: () => void;
-    }
-  | {
-      type: WorkspaceType.SHARED | WorkspaceType.LOCAL;
-      workspace: Workspace;
-      toggleDropdown: () => void;
-      onClick: () => void;
-    };
+type WorkspaceItemProps = {
+  type: WorkspaceType;
+  workspace: Workspace;
+  toggleDropdown: () => void;
+  onClick: () => void;
+};
+
+const PersonalWorkspaceActions = ({
+  workspaceId,
+  toggleDropdown,
+}: {
+  workspaceId: string;
+  toggleDropdown: () => void;
+}) => {
+  const navigate = useNavigate();
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
+  return (
+    <>
+      {activeWorkspace.id === workspaceId && viewMode === ApiClientViewMode.SINGLE ? (
+        <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
+      ) : null}
+      <div className="personal-workspace-actions">
+        <RQButton
+          type="transparent"
+          icon={<MdOutlineSettings />}
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            redirectToTeam(navigate, workspaceId);
+            toggleDropdown();
+          }}
+        />
+      </div>
+    </>
+  );
+};
 
 const ShareWorkspaceActions = ({
   workspaceId,
@@ -194,24 +220,6 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
     toggleDropdown();
   }, [onClick, toggleDropdown]);
 
-  if (props.type === WorkspaceType.PERSONAL) {
-    return (
-      <div className="workspace-overlay__list-item" onClick={handleWorkspaceClick}>
-        <WorkspaceAvatar
-          size={32}
-          workspace={{
-            id: "private",
-            name: "",
-            workspaceType: WorkspaceType.PERSONAL,
-          }}
-        />
-        <div className="workspace-overlay__list-item-details">
-          <div className="workspace-list-item-name">Private Workspace</div>
-        </div>
-      </div>
-    );
-  }
-
   const { workspace } = props;
   const isMultiView = viewMode === ApiClientViewMode.MULTI;
   const isSelected = selectedWorkspaces.some((w) => w.getState().id === workspace.id);
@@ -221,9 +229,7 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
     <div
       className={`workspace-overlay__list-item ${isWorkspaceSwitchDisabled ? "disabled" : ""}  ${
         isMultiView ? "multi-mode" : "single-mode"
-      } ${props.type === WorkspaceType.SHARED ? "workspace-overlay__list-item--shared" : ""} ${
-        props.type === WorkspaceType.LOCAL ? "workspace-overlay__list-item--local" : ""
-      }`}
+      }  workspace-overlay__list-item--${props.type?.toLowerCase()}`}
       onClick={() => {
         if (isWorkspaceSwitchDisabled) {
           return;
@@ -235,21 +241,23 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
       <WorkspaceAvatar workspace={workspace} size={32} />
       <div className={`workspace-overlay__list-item-details ${isWorkspaceSwitchDisabled ? "disabled" : ""}`}>
         <div className="workspace-list-item-name">{workspace.name}</div>
-        <Typography.Text
-          className="workspace-list-item-info"
-          type="secondary"
-          ellipsis={{
-            //TODO: add ellipsis in middle
-            tooltip: {
-              title: getWorkspaceDetails(workspace),
-              color: "#000",
-              placement: "right",
-              mouseEnterDelay: 0.5,
-            },
-          }}
-        >
-          {getWorkspaceDetails(workspace)}
-        </Typography.Text>
+        {props.type !== WorkspaceType.PERSONAL && (
+          <Typography.Text
+            className="workspace-list-item-info"
+            type="secondary"
+            ellipsis={{
+              //TODO: add ellipsis in middle
+              tooltip: {
+                title: getWorkspaceDetails(workspace),
+                color: "#000",
+                placement: "right",
+                mouseEnterDelay: 0.5,
+              },
+            }}
+          >
+            {getWorkspaceDetails(workspace)}
+          </Typography.Text>
+        )}
       </div>
       <div className="workspace-overlay__list-item-actions">
         {props.type === WorkspaceType.SHARED ? (
@@ -260,6 +268,8 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
             toggleDropdown={props.toggleDropdown}
             switchWorkspace={handleWorkspaceClick}
           />
+        ) : props.type === WorkspaceType.PERSONAL ? (
+          <PersonalWorkspaceActions workspaceId={workspace.id} toggleDropdown={props.toggleDropdown} />
         ) : null}
       </div>
     </div>

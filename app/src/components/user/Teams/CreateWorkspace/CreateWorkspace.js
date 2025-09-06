@@ -10,22 +10,13 @@ import * as Sentry from "@sentry/react";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { useDispatch } from "react-redux";
-import { getAppMode } from "store/selectors";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { useSelector } from "react-redux";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "types";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   // Component State
   const [isSubmitProcess, setIsSubmitProcess] = useState(false);
@@ -45,19 +36,7 @@ const CreateWorkspace = () => {
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);
-        switchWorkspace(
-          {
-            teamId,
-            teamName: newTeamName,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isSyncEnabled: user?.details?.isSyncEnabled,
-            isWorkspaceMode: isSharedWorkspaceMode,
-          },
-          appMode
-        );
+        switchWorkspace(teamId);
         redirectToTeam(navigate, teamId, {
           state: {
             isNewTeam: true,

@@ -14,7 +14,6 @@ import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sourc
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import { CreateWorkspaceModal } from "componentsV2/modals/CreateWorkspaceModal/CreateWorkspaceModal";
 import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
-import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "componentsV2/modals/JoinWorkspaceModal";
 import { isAppOpenedInIframe } from "utils/AppUtils";
@@ -29,6 +28,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { DesktopOnboardingModal } from "features/onboarding/componentsV2/DesktopOnboardingModal/DesktopOnboardingModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import SwitchWorkspaceModal from "features/workspaces/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 
 const DashboardContent = () => {
   const location = useLocation();
