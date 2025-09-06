@@ -1,20 +1,18 @@
-import { HttpRequestExecutor } from "../httpRequestExecutor/httpRequestExecutor";
 import { RQAPI } from "../../types";
 import {
   graphQLEntryToHttpEntryAdapter,
   httpEntryToGraphQLEntryAdapter,
 } from "../../screens/apiClient/components/views/graphql/utils";
-import { sanitizeEntry } from "features/apiClient/screens/apiClient/utils";
+import { HttpRequestExecutor } from "../httpRequestExecutor/httpRequestExecutor";
 
 export class GraphQLRequestExecutor extends HttpRequestExecutor {
   /**
    * Executes a GraphQL request by converting it to HTTP format and using the parent's execute method
-   * @param record - The GraphQL API record to execute
    * @returns Promise<RQAPI.ExecutionResult>
    */
-  async executeGraphQLRequest(record: RQAPI.GraphQLApiRecord): Promise<RQAPI.ExecutionResult> {
-    this.prepareGraphQLRequest(record);
-    const apiClientExecutionResult = await this.execute();
+  async executeGraphQLRequest(recordId: string, entry: RQAPI.GraphQLApiEntry): Promise<RQAPI.ExecutionResult> {
+    const httpPreparedEntry = this.prepareGraphQLRequest(recordId, entry);
+    const apiClientExecutionResult = await this.execute(recordId, httpPreparedEntry.preparedEntry);
     const graphQLEntryWithResponse: RQAPI.GraphQLApiEntry = httpEntryToGraphQLEntryAdapter(
       apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry
     );
@@ -25,16 +23,10 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
     };
   }
 
-  prepareGraphQLRequest(record: RQAPI.GraphQLApiRecord) {
-    const graphQLRequestEntry = record.data as RQAPI.GraphQLApiEntry;
+  prepareGraphQLRequest(recordId: string, entry: RQAPI.GraphQLApiEntry) {
+    const graphQLRequestEntry = entry;
     const httpRequestEntry = graphQLEntryToHttpEntryAdapter(graphQLRequestEntry);
 
-    this.updateEntryDetails({
-      entry: sanitizeEntry(httpRequestEntry),
-      recordId: record.id,
-      collectionId: record.collectionId,
-    });
-
-    return super.prepareRequest();
+    return this.requestPreparer.prepareRequest(recordId, httpRequestEntry);
   }
 }
