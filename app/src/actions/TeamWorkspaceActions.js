@@ -15,10 +15,10 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { WorkspaceType } from "types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { resetToSingleView } from "features/apiClient/commands/multiView";
+import { WorkspaceType } from "features/workspaces/types";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
