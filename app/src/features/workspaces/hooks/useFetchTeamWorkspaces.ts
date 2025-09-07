@@ -7,11 +7,10 @@ import { toast } from "utils/Toast";
 import firebaseApp from "../../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { WorkspaceType } from "types";
 import * as Sentry from "@sentry/react";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const db = getFirestore(firebaseApp);
