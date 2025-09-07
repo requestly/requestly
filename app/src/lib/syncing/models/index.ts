@@ -43,6 +43,10 @@ export class StorageModel<T extends StorageEntity> {
     this.initSyncModels(data, workspaceId);
   }
 
+  async getById(id: string): Promise<SyncModel<any> | undefined> {
+    return undefined;
+  }
+
   /** Can have multiple syncModels too as params*/
   /** Override **/
   static createFromSyncModels(syncModel: SyncModel<any>) {
