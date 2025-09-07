@@ -11,10 +11,12 @@ export const useFetchLocalWorkspaces = () => {
   const isLocalSyncEnabled = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
 
   const [localWorkspaces, setLocalWorkspaces] = useState<Workspace[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const fetchLocalWorkspaces = useCallback(async () => {
     if (!isLocalSyncEnabled) {
-      return [];
+      setIsInitialized(true);
+      setLocalWorkspaces([]);
     }
 
     try {
@@ -40,16 +42,23 @@ export const useFetchLocalWorkspaces = () => {
       }
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_LOCAL_WORKSPACES, localRecords.length);
 
+      setIsInitialized(true);
       setLocalWorkspaces(localRecords);
     } catch (e) {
       captureException(e);
+      setIsInitialized(true);
       setLocalWorkspaces([]);
     }
   }, [isLocalSyncEnabled]);
 
   useEffect(() => {
     fetchLocalWorkspaces();
+
+    return () => {
+      setLocalWorkspaces([]);
+      setIsInitialized(false);
+    };
   }, [fetchLocalWorkspaces]);
 
-  return { localWorkspaces, fetchLocalWorkspaces };
+  return { localWorkspaces, fetchLocalWorkspaces, isInitialized };
 };

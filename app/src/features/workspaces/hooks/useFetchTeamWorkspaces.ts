@@ -9,7 +9,6 @@ import { WorkspaceType } from "types";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Workspace } from "features/workspaces/types";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const db = getFirestore(firebaseApp);
 
@@ -27,10 +26,10 @@ const splitMembersBasedOnRoles = (members: any) => {
 export const useFetchTeamWorkspaces = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const [sharedWorkspaces, setSharedWorkspaces] = useState<Workspace[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const unsubscribeAvailableTeams = useRef<(() => void) | null>(null);
 
@@ -89,23 +88,11 @@ export const useFetchTeamWorkspaces = () => {
                 return formattedTeamData;
               })
               .filter(Boolean);
+            setIsInitialized(true);
             setSharedWorkspaces(records);
-
-            if (!activeWorkspaceId) return;
-
-            //FIX ME: the following code's intention is unclear
-            //Showing an alert is unnecessary
-            const found = records.find((team) => team.id === activeWorkspaceId);
-
-            Logger.log("DBG: availableTeamsListener", {
-              teamFound: found,
-              fetchedRecords: records,
-              activeWorkspaceId,
-              hasUserRemovedHimselfRecently: (window as any).hasUserRemovedHimselfRecently,
-            });
           },
           (error) => {
-            console.log("DBG: availableTeams Query -> error", error);
+            console.log("[Debug]: availableTeams Query -> error", error);
             Logger.error(error);
           }
         );
@@ -114,10 +101,12 @@ export const useFetchTeamWorkspaces = () => {
         unsubscribeAvailableTeams.current = null;
       }
     } else {
+      setIsInitialized(true);
       setSharedWorkspaces([]);
     }
 
     return () => {
+      setIsInitialized(false);
       setSharedWorkspaces([]);
       unsubscribeAvailableTeams.current?.();
       unsubscribeAvailableTeams.current = null;
@@ -130,5 +119,6 @@ export const useFetchTeamWorkspaces = () => {
 
   return {
     sharedWorkspaces,
+    isInitialized,
   };
 };
