@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { globalActions } from "store/slices/global/slice";
-import { WorkspaceType } from "types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./commonEmptyView.scss";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface CommonEmptyViewProps {
   toggleDropdown: () => void;

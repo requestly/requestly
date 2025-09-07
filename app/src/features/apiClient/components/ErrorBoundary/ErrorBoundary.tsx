@@ -7,10 +7,10 @@ import "./errorboundary.scss";
 import { NativeError } from "errors/NativeError";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
 import { isDesktopMode } from "utils/AppUtils";
 import { Alert } from "antd";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   children: React.ReactNode;
