@@ -63,12 +63,18 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
   async save() {
     await this.ruleDataSyncModel.save();
     await this.ruleMetadataSyncModel.save();
+    await super.save();
     console.log("[RuleStorageModel.save] after saving", {
       ruleDataSyncModel: this.ruleDataSyncModel,
       ruleMetadataSyncModel: this.ruleMetadataSyncModel,
       data: this.data,
     });
-    await super.save();
+  }
+
+  static async getById(id: string): Promise<RuleStorageModel | undefined> {
+    const ruleDataSyncModel = await RuleDataSyncModel.get(id, window.activeWorkspaceIds?.[0]);
+    const ruleMetadataSyncModel = await RuleMetadataSyncModel.get(id, window.activeWorkspaceIds?.[0]);
+    return RuleStorageModel.createFromSyncModels(ruleDataSyncModel, ruleMetadataSyncModel);
   }
 
   static async createFromSyncModels(
