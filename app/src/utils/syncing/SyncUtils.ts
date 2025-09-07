@@ -12,9 +12,9 @@ import {
   trackSyncTriggered,
 } from "modules/analytics/events/features/syncing";
 import { SYNC_CONSTANTS } from "./syncConstants";
-import { StorageService } from "init";
 import Logger from "lib/logger";
 import APP_CONSTANTS from "config/constants";
+import { clientStorageService } from "services/clientStorageService";
 
 declare global {
   interface Window {
@@ -89,7 +89,7 @@ export const setSyncState = async (uid: string, state: boolean, appMode: AppMode
     updateValueAsPromise(["users", uid, "profile"], { isSyncEnabled: state })
       .then(async () => {
         // If state is false, remove records without syncing
-        if (!state) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
+        if (!state) await clientStorageService.removeStorageObjects([APP_CONSTANTS.LAST_SYNC_TARGET]);
 
         // Track the event of toggling synchronization
         // trackSyncToggled(uid, state);
