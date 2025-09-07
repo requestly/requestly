@@ -31,22 +31,17 @@ export const useWorkspaceManager = () => {
   useActiveWorkspacesMembersListener();
 
   useEffect(() => {
-    console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId });
+    console.log("[useWorkspaceManager] workspaceManager updater", { workspaces, userId, workspacesUpdatedAt });
     _userId.current = userId;
+    _workspacesUpdatedAt.current = workspacesUpdatedAt;
+    _workspaces.current = workspaces;
     workspaceManager.init(dispatch, workspaces, userId);
-    console.log("[useWorkspaceManager] workspaceManager updater userid set", { userId });
   }, [dispatch, workspaces, userId, workspacesUpdatedAt]);
 
   useEffect(() => {
     console.log("[useWorkspaceManager] workspaceManager updater activeWorkspaceIds", { activeWorkspaceIds });
     _activeWorkspaceIds.current = activeWorkspaceIds;
   }, [activeWorkspaceIds]);
-
-  useEffect(() => {
-    console.log("[useWorkspaceManager] workspaceManager updater workspacesUpdatedAt", { workspacesUpdatedAt });
-    _workspacesUpdatedAt.current = workspacesUpdatedAt;
-    _workspaces.current = workspaces;
-  }, [workspaces, workspacesUpdatedAt]);
 
   // Updates workspaceManager with latest data about workspace
   const fetchUnattemptedWorkspaceId = useCallback(() => {
