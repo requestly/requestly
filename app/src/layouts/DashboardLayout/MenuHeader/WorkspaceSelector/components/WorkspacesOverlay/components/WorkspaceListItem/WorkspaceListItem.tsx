@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from "react";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
-import { WorkspaceType } from "types";
 import { Checkbox, Tag, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";

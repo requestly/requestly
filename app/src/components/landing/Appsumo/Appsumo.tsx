@@ -22,7 +22,7 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface AppSumoCode {
   error: string;
