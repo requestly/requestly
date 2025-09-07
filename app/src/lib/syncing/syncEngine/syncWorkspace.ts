@@ -64,7 +64,8 @@ class SyncWorkspace {
       name: `sync-db${this.userId ? "-" + this.userId : ""}-${this._config.id}`,
       storage: getRxStorageDexie(),
       cleanupPolicy: {
-        minimumDeletedTime: 7 * 24 * 60 * 60 * 1000, // 7 days
+        // minimumDeletedTime: 1 * 24 * 60 * 60 * 1000, // 7 days
+        minimumDeletedTime: 1 * 60 * 1000, // 7 days
         runEach: 1000 * 60 * 5, // 5 minutes
       },
     });
@@ -88,6 +89,10 @@ class SyncWorkspace {
       },
     });
     // #endregion
+
+    // Auto Cleanups weren't working
+    await this.collections[SyncEntityType.RULE_DATA].cleanup();
+    await this.collections[SyncEntityType.RULE_METADATA].cleanup();
 
     // #region - PreInsert and PreSave Hooks
     Object.values(SyncEntityType).forEach((entityType) => {
