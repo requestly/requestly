@@ -1,12 +1,12 @@
 import React from "react";
 import { RQButton } from "lib/design-system/components";
-import { WorkspaceType } from "types";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import "./emptyWorkspaceListView.scss";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface EmptyWorkspaceListProps {
   workspaceType: WorkspaceType;

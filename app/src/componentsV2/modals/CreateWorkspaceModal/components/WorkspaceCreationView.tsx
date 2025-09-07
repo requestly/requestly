@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
+import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { SharedWorkspaceCreationView } from "./SharedWorkspaceCreationView/SharedWorkspaceCreationView";
 import { LocalWorkspaceCreationView } from "./LocalWorkspaceCreationView/LocalWorkspaceCreationView";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +14,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { workspaceActions } from "store/slices/workspaces/slice";

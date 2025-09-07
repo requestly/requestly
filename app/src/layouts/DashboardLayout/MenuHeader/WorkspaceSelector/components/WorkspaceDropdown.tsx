@@ -9,7 +9,7 @@ import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { Invite, WorkspaceType } from "types";
+import { Invite } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
 import {
@@ -19,6 +19,7 @@ import {
 import { MultiWorkspaceAvatarGroup } from "../MultiWorkspaceAvatarGroup";
 import LocalWorkspaceAvatar from "features/workspaces/components/LocalWorkspaceAvatar";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { WorkspaceType } from "features/workspaces/types";
 
 const prettifyWorkspaceName = (workspaceName: string) => {
   // if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE)
