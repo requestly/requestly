@@ -12,8 +12,12 @@ export const useWorkspaceFetcher = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
-  const { fetchLocalWorkspaces, localWorkspaces } = useFetchLocalWorkspaces();
-  const { sharedWorkspaces } = useFetchTeamWorkspaces();
+  const {
+    fetchLocalWorkspaces,
+    localWorkspaces,
+    isInitialized: isLocalWorkspacesInitialized,
+  } = useFetchLocalWorkspaces();
+  const { sharedWorkspaces, isInitialized: isSharedWorkspacesInitialized } = useFetchTeamWorkspaces();
   useActiveWorkspacesMembersListener();
 
   useEffect(() => {
@@ -21,17 +25,28 @@ export const useWorkspaceFetcher = () => {
   }, [sharedWorkspaces, fetchLocalWorkspaces]);
 
   useEffect(() => {
-    if (!user.loggedIn) {
-      dispatch(workspaceActions.setAllWorkspaces([LoggedOutWorkspace, ...localWorkspaces]));
-      dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
+    // Don't override until we've fetched both local and shared workspaces
+    if (!isLocalWorkspacesInitialized || !isSharedWorkspacesInitialized) {
+      // Do nothing
     } else {
-      dispatch(workspaceActions.setAllWorkspaces([...localWorkspaces, ...sharedWorkspaces]));
-      dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
+      if (!user.loggedIn) {
+        dispatch(workspaceActions.setAllWorkspaces([LoggedOutWorkspace, ...localWorkspaces]));
+        dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
+      } else {
+        dispatch(workspaceActions.setAllWorkspaces([...localWorkspaces, ...sharedWorkspaces]));
+        dispatch(workspaceActions.setWorkspacesUpdatedAt(Date.now()));
+      }
     }
 
     return () => {
-      dispatch(workspaceActions.setAllWorkspaces([]));
       dispatch(workspaceActions.setWorkspacesUpdatedAt(0));
     };
-  }, [dispatch, sharedWorkspaces, localWorkspaces, user.loggedIn]);
+  }, [
+    dispatch,
+    sharedWorkspaces,
+    localWorkspaces,
+    user.loggedIn,
+    isLocalWorkspacesInitialized,
+    isSharedWorkspacesInitialized,
+  ]);
 };

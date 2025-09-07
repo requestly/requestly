@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { getActiveWorkspaceIds, getAllWorkspaces, getWorkspacesUpdatedAt } from "store/slices/workspaces/selectors";
 import { useWorkspaceFetcher } from "./useWorkspaceFetcher";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
