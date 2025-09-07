@@ -2,7 +2,7 @@
 import Logger from "lib/logger";
 import { getExecutionLogsId } from "../../../../../utils/rules/misc";
 import syncingHelper from "lib/syncing/helpers/syncingHelper";
-import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { clientStorageService } from "services/clientStorageService";
 
 export const deleteRulesFromStorage = async (appMode, rulesToDelete, callback) => {
   try {
@@ -11,7 +11,7 @@ export const deleteRulesFromStorage = async (appMode, rulesToDelete, callback) =
     Logger.log("Removing from storage in deleteRulesFromStorage");
     await syncingHelper.removeRecords(rulesToDelete);
     Logger.log("Removing from storage in deleteRulesFromStorage");
-    await clientRuleStorageService.deleteMultipleRulesOrGroups(executionLogsToDelete);
+    await clientStorageService.removeStorageObjects(executionLogsToDelete);
 
     return callback?.();
   } catch (e) {
