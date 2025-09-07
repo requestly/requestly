@@ -3,26 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { Col } from "antd";
 import { Modal } from "antd";
 import CreatableReactSelect from "react-select/creatable";
-//SERVICES
-import { StorageService } from "../../../../init";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // REDUCER ACTIONS
 import { globalActions } from "store/slices/global/slice";
-import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
+import { getIsRefreshRulesPending } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //FUNCTIONS
 import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { trackGroupCreatedEvent } from "features/rules/analytics";
 import Logger from "lib/logger";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const CreateNewRuleGroupModal = (props) => {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const appMode = useSelector(getAppMode);
 
   //Component State
   const [currentValueForReactSelect, setCurrentValueForReactSelect] = useState([]);
@@ -49,19 +47,17 @@ const CreateNewRuleGroupModal = (props) => {
       lastModifiedBy,
     };
     Logger.log("Writing storage in createNewGroup");
-    StorageService(appMode)
-      .saveRuleOrGroup(newGroup)
-      .then(async () => {
-        trackGroupCreatedEvent("rules_table");
+    syncingHelper.saveRuleOrGroup(newGroup).then(async () => {
+      trackGroupCreatedEvent("rules_table");
 
-        dispatch(
-          globalActions.updateRefreshPendingStatus({
-            type: "rules",
-            newValue: !isRulesListRefreshPending,
-          })
-        );
-        props.toggle();
-      });
+      dispatch(
+        globalActions.updateRefreshPendingStatus({
+          type: "rules",
+          newValue: !isRulesListRefreshPending,
+        })
+      );
+      props.toggle();
+    });
   };
 
   return (

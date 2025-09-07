@@ -1,4 +1,3 @@
-import { showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import PATHS from "config/constants/sub/paths";
 import {
   ApiClientViewMode,
@@ -69,7 +68,7 @@ export const useWorkspaceSwitcher = () => {
       switchWorkspace(workspace.id)
         .then(() => {
           if (!isWorkspaceLoading) {
-            showSwitchWorkspaceSuccessToast(workspace.name);
+            toast.info(`Switched to workspace: ${workspace.name}`);
           }
 
           setIsWorkspaceLoading(false);

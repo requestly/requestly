@@ -35,7 +35,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeWorkspaceName = activeWorkspace.name || "Workspaces";
+  const activeWorkspaceName = activeWorkspace?.name || "Workspaces";
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);

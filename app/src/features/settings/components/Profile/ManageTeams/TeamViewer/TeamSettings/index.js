@@ -6,7 +6,6 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import SpinnerColumn from "../../../../../../../components/misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { redirectToRules, redirectToWorkspaceSettings } from "../../../../../../../utils/RedirectionUtils";
-import { showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
 import LoadingModal from "../../../../../../../layouts/DashboardLayout/MenuHeader/WorkspaceSelector/components/LoadingModal";
@@ -48,7 +47,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
     setIsTeamSwitchModalActive(true);
     return switchToPersonalWorkspace().then(() => {
       setIsTeamSwitchModalActive(false);
-      showSwitchWorkspaceSuccessToast();
+      toast.info(`Switched workspace successfully`);
     });
   };
 

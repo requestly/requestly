@@ -8,7 +8,6 @@ import { reduxStore } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
 import { HotkeysProvider } from "react-hotkeys-hook";
 
-import "./init";
 import "./assets/less/index.less";
 import "./styles/custom/custom.scss";
 

@@ -231,19 +231,20 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     },
     {
       title: "Updated on",
-      key: "modificationDate",
+      key: "updatedAt",
       width: 152,
       responsive: ["lg"],
       render: (record: RuleTableRecord) => {
         if (isGroup(record)) {
           return null;
         }
-        const dateToDisplay = record.modificationDate ? record.modificationDate : record.creationDate;
-        const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
+        // TODO-syncing: FIX Types
+        const dateToDisplay = record.updatedAt ? record.updatedAt : record.createdAt;
+        const beautifiedDate = `${moment(dateToDisplay).format("MMM DD, YYYY HH:mm:ss")}`;
         if (activeWorkspaceId && !options?.hideLastModifiedBy) {
           return (
             <span className="rule-updated-on-cell">
-              {beautifiedDate} <UserAvatar uid={record.lastModifiedBy} />
+              {beautifiedDate} <UserAvatar uid={record.updatedBy} />
             </span>
           );
         } else return <span className="rule-updated-on-cell">{beautifiedDate}</span>;
@@ -253,15 +254,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       showSorterTooltip: false,
       sorter: {
         compare: (a, b) => {
-          const recordAModificationDate = a.modificationDate ? a.modificationDate : a.creationDate;
-          const recordBModificationDate = b.modificationDate ? b.modificationDate : b.creationDate;
+          const recordAUpdatedAt = a.updatedAt ? a.updatedAt : a.createdAt;
+          const recordBUpdatedAt = b.updatedAt ? b.updatedAt : b.createdAt;
 
           if (isGroup(a) && !isGroup(b)) {
             return -1;
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return recordAModificationDate < recordBModificationDate ? -1 : 1;
+            return recordAUpdatedAt < recordBUpdatedAt ? -1 : 1;
           }
         },
       },

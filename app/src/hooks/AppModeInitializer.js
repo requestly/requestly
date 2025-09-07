@@ -30,7 +30,6 @@ import {
 } from "modules/analytics/events/desktopApp";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
-import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
@@ -342,22 +341,6 @@ const AppModeInitializer = () => {
         const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
         return {
           ackIds: batchIdsToAcknowledge,
-          received: true,
-        };
-      });
-
-      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED, (_message) => {
-        window.skipSyncListenerForNextOneTime = false;
-        toast.loading("Just a sec, fetching updated rules..", 2, true);
-        invokeSyncingIfRequired({
-          dispatch,
-          uid: user?.details?.profile?.uid,
-          team_id: activeWorkspaceId,
-          appMode,
-          isSyncEnabled: user?.details?.isSyncEnabled,
-        });
-
-        return {
           received: true,
         };
       });

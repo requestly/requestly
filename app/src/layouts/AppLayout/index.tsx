@@ -16,7 +16,6 @@ import AppModeInitializer from "hooks/AppModeInitializer";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 // import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
-import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/notices/ExtensionContextInvalidationNotice";
 import AutomationNotAllowedNotice from "components/misc/notices/AutomationNotAllowedNotice";
@@ -81,8 +80,6 @@ const App: React.FC = () => {
       <GrowthBookProvider growthbook={growthbook}>
         <DBListeners />
         {/* <RuleExecutionsSyncer /> */}
-        {/* @ts-ignore */}
-        <ActiveWorkspace />
         {/* @ts-ignore */}
         <ThirdPartyIntegrationsHandler />
         <ThemeProvider>

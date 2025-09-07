@@ -22,8 +22,8 @@ import {
 import { useSelector } from "react-redux";
 import { getSessionId, getSessionName } from "store/features/network-sessions/selectors";
 import { getAppMode } from "store/selectors";
-import { StorageService } from "init";
 import Logger from "lib/logger";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 const DEFAULT_PAIR_VALUE: GraphQLFilterPair = {
   key: "",
@@ -127,8 +127,8 @@ const CreateMocksModeBanner: React.FC<Props> = ({
       });
     });
 
-    return StorageService(appMode)
-      .saveMultipleRulesOrGroups(newRules)
+    return syncingHelper
+      .saveMultipleRulesOrGroups(newRules as any)
       .then(() => {
         setIsRulesCreated(true);
         setCreatedGroupName(newSessionGroupName);
