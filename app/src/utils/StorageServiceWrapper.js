@@ -79,11 +79,6 @@ class StorageServiceWrapper {
     return promise;
   }
 
-  saveRulesOrGroupsWithoutSyncing(array) {
-    const formattedObject = processRecordsArrayIntoObject(array);
-    return this.saveRecord(formattedObject);
-  }
-
   async saveSessionRecordingPageConfig(config) {
     await doSyncRecords(config, SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG, this.appMode);
     return this.saveRecord({ sessionRecordingConfig: config });
@@ -109,14 +104,6 @@ class StorageServiceWrapper {
       console.error("Error removing record:", error);
       throw error;
     }
-  }
-
-  removeRecordsWithoutSyncing(array) {
-    return this.StorageHelper.removeStorageObjects(array);
-  }
-
-  async clearDB() {
-    await this.StorageHelper.clearStorage();
   }
 }
 
