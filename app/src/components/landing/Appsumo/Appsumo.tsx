@@ -20,8 +20,8 @@ import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface AppSumoCode {
   error: string;

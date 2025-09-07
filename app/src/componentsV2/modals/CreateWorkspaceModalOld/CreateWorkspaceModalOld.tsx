@@ -5,7 +5,7 @@ import * as Sentry from "@sentry/react";
 
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system-v2/components";
-import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
+import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { displayFolderSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
-import { Workspace, WorkspaceMemberRole } from "features/workspaces/types";
+import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
 import "./createOldWorkspaceModal.scss";
 import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
