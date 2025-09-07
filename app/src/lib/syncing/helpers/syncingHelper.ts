@@ -1,13 +1,14 @@
 import { RuleStorageModel } from "../models/rule";
+import { StorageRecord } from "@requestly/shared/types/entities/rules";
 
 class SyncingHelper {
-  async saveRuleOrGroup(ruleOrGroup: any, options = {}) {
-    const workspaceId = window.activeWorkspaceIds?.[0];
+  async saveRuleOrGroup(ruleOrGroup: StorageRecord, options = {}) {
+    const workspaceId = window.activeWorkspaceIds?.[0]; // Temporary. This should ideally come as a param
     console.log("[SyncingV2][debug]saveRuleOrGroup", { ruleOrGroup, workspaceId });
     return await RuleStorageModel.create(ruleOrGroup, workspaceId).save();
   }
 
-  async saveMultipleRulesOrGroups(array: any, options = {}) {
+  async saveMultipleRulesOrGroups(array: StorageRecord[], options = {}) {
     console.log("[SyncingV2][debug]saveMultipleRulesOrGroups");
     // TODO-Syncing: [P1] Support bulk updates to RuleStorageModel.
     const promises = array.map((ruleOrGroup: any) => {
@@ -16,7 +17,7 @@ class SyncingHelper {
     return Promise.all(promises);
   }
 
-  async removeRecord(key: any) {
+  async removeRecord(key: string) {
     try {
       console.log("[StorageServiceWrapper]removeRecord", { key });
       // TODO-syncing: Temporary fix to remove record from RuleStorageModel
@@ -27,7 +28,7 @@ class SyncingHelper {
     }
   }
 
-  async removeRecords(array: any) {
+  async removeRecords(array: string[]) {
     try {
       console.log("[StorageServiceWrapper]removeRecords", { array });
       const promises = array?.map((key: any) => {

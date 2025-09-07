@@ -173,22 +173,22 @@ export class RuleStorageModel extends StorageModel<StorageRecord> {
       // Reduces no of queries on rxdb
       // FIXME: Can be improved
       const allRuleData = await RuleDataSyncModel.getAll(ruleMetadataSyncModels?.[0]?.entity.workspaceId);
-      const allRuleDataMap: Record<string, RuleDataSyncModel> = {};
-      allRuleData.forEach((ruleData) => {
-        allRuleDataMap[ruleData.entity.id] = ruleData;
+      const ruleMetadataSyncModelMap: Record<string, RuleMetadataSyncModel> = {};
+      ruleMetadataSyncModels.forEach((ruleMetadata) => {
+        ruleMetadataSyncModelMap[ruleMetadata.entity.id] = ruleMetadata;
       });
       //
 
       console.log("[RuleStorageModel.subscribe] RuleMetadataSyncModel", {
         allRuleData,
-        allRuleDataMap,
+        ruleMetadataSyncModelMap,
         ruleMetadataSyncModels,
       });
 
-      const ruleStorageModelPromises = ruleMetadataSyncModels.map(async (ruleMetadataSyncModel) => {
+      const ruleStorageModelPromises = allRuleData.map(async (ruleDataSyncModel) => {
         return await RuleStorageModel.createFromSyncModels(
-          allRuleDataMap[ruleMetadataSyncModel.entity.id] || undefined,
-          ruleMetadataSyncModel
+          ruleDataSyncModel,
+          ruleMetadataSyncModelMap[ruleDataSyncModel.entity.id]
         );
       });
 

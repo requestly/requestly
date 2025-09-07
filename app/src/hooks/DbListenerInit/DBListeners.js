@@ -1,15 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getAuthInitialization } from "../../store/selectors";
+import { getAppMode } from "../../store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
 import Logger from "lib/logger";
-import { globalActions } from "store/slices/global/slice";
-import { isArray } from "lodash";
-import { useHasChanged } from "hooks/useHasChanged";
 import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
 import { getActiveWorkspaceId, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
@@ -22,12 +18,9 @@ const DBListeners = () => {
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
   const currentTeamMembers = useSelector(getActiveWorkspacesMembers);
-  const hasAuthInitialized = useSelector(getAuthInitialization);
 
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
-
-  const hasAuthStateChanged = useHasChanged(user?.loggedIn);
 
   // Listens to /users/{id} changes
   useEffect(() => {
@@ -38,52 +31,6 @@ const DBListeners = () => {
       userSubscriptionDocListener(dispatch, user?.details?.profile.uid);
     }
   }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
-
-  // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
-  useEffect(() => {
-    if (!hasAuthInitialized) return;
-    if (hasAuthStateChanged || !window.isFirstSyncComplete) {
-      dispatch(globalActions.updateIsRulesListLoading(true));
-    }
-
-    // Unsubscribe any existing listener
-    if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
-      window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
-        removeFirebaseListener && removeFirebaseListener();
-      });
-    }
-
-    if (user?.loggedIn && user?.details?.profile?.uid) {
-      if (activeWorkspaceId || user?.details?.isSyncEnabled) {
-        // This is a team or individual sync
-        // Set the db node listener
-        window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
-          dispatch,
-          user?.details?.profile.uid,
-          activeWorkspaceId,
-          appMode,
-          user?.details?.isSyncEnabled
-        );
-      } else {
-        // Do it here if syncing is not enabled. Else syncing would have triggered this.
-        window.isFirstSyncComplete = true;
-        dispatch(globalActions.updateIsRulesListLoading(false));
-      }
-    } else {
-      // Do it here if syncing is not enabled. Else syncing would have triggered this.
-      window.isFirstSyncComplete = true;
-      dispatch(globalActions.updateIsRulesListLoading(false));
-    }
-  }, [
-    hasAuthInitialized,
-    appMode,
-    activeWorkspaceId,
-    dispatch,
-    user?.loggedIn,
-    user?.details?.profile.uid,
-    user?.details?.isSyncEnabled,
-    hasAuthStateChanged,
-  ]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {
