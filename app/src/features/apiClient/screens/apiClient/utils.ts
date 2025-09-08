@@ -204,7 +204,7 @@ export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[]
       ...pair,
       isEnabled: pair.isEnabled ?? true,
     }))
-    .filter((pair) => pair.key?.length > 0 && (!removeDisabledKeys || pair.isEnabled));
+    .filter((pair) => !removeDisabledKeys || pair.isEnabled);
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
@@ -427,7 +427,6 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
 
   const queryString = enabledParams
     .map(({ key, value }) => {
-      if (!key) return "";
       if (value === undefined || value === "") {
         return key;
       } else {
