@@ -1,6 +1,5 @@
 .workspace-selector-dropdown {
-  height: 36px;
-  padding: 4px 9px 4px 5px;
+  padding: var(--requestly-space-2, 4px);
   border-radius: var(--border-radius-sm);
 }
 
@@ -18,6 +17,11 @@
   font-style: normal;
   font-weight: 500;
   line-height: var(--requestly-font-line-height-sm);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .workspace-selector-dropdown__content .local-workspace-avatar {
@@ -46,12 +50,11 @@
 }
 
 .active-workspace-name {
-  font-size: var(--requestly-font-size-sm, 13px);
-  font-weight: 500;
+  font-size: var(--requestly-font-size-sm);
+  font-weight: var(--requestly-font-weight-medium);
+  color: var(--requestly-color-text-default);
   max-width: 25ch;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   margin-left: 2px;
 }
 

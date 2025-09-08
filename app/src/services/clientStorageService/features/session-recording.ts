@@ -8,10 +8,9 @@ class ClientSessionRecordingStorageService {
     return clientStorageService.saveStorageObject({ sessionRecordingConfig: config });
   }
 
-  async getSessionRecordingConfig(): Promise<SessionRecordingConfig> {
+  async getSessionRecordingConfig(): Promise<SessionRecordingConfig | undefined> {
     Logger.log("[ClientSessionRecordingStorageService] getSessionRecordingConfig");
-    const superObject = await clientStorageService.getStorageSuperObject();
-    const config = superObject?.["sessionRecordingConfig"];
+    const config = await clientStorageService.getStorageObject("sessionRecordingConfig");
     Logger.log("[ClientSessionRecordingStorageService] getSessionRecordingConfig", { config });
     return config;
   }

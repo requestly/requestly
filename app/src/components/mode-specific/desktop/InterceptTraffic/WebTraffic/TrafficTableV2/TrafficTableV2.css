@@ -5,14 +5,15 @@
 .traffic-table-sidebar {
   overflow: auto;
   padding-bottom: 1rem;
-  border-right: 1px solid var(--border-dark);
+  border-right: 1px solid var(--requestly-color-white-t-10);
+  background-color: var(--requestly-color-surface-0);
   height: calc(100vh - 4.5rem);
 }
 
 .traffic-table-sidebar,
 .traffic-table-sidebar .ant-menu.ant-menu-dark,
 .traffic-table-sidebar .ant-menu.ant-menu-dark ul.ant-menu-sub {
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-root:not(.filter-applied) > .ant-menu-item:first-child {
@@ -138,6 +139,7 @@
   overflow: hidden;
   height: 100%;
   border-top: 1px solid var(--requestly-color-white-t-10);
+  background-color: var(--requestly-color-surface-0);
 }
 
 /* table */

@@ -3,14 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { getAppMode, getIsSecondarySidebarCollapsed, getNetworkSessionSaveInProgress } from "store/selectors";
-import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
-import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
-import HttpRulesIcon from "assets/icons/http-rules.svg?react";
-import SessionIcon from "assets/icons/session.svg?react";
-import NetworkTrafficInspectorIcon from "assets/icons/network-traffic-inspector.svg?react";
-import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
+
 import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
-import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./components/InviteButton/InviteButton";
 import PATHS from "config/constants/sub/paths";
@@ -27,6 +21,13 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 import { isSafariBrowser, isSafariExtension } from "actions/ExtensionActions";
 import { SafariComingSoonTooltip } from "componentsV2/SafariExtension/SafariComingSoonTooltip";
 import { RQTooltip } from "lib/design-system-v2/components";
+import HomeIcon from "/assets/media/common/feature_home.svg";
+import NetworkIcon from "/assets/media/common/feature_network.svg";
+import RulesIcon from "/assets/media/common/feature_rules.svg";
+import ApiIcon from "/assets/media/common/feature_apis.svg";
+import FilesIcon from "/assets/media/common/feature_files.svg";
+import SessionsIcon from "/assets/media/common/feature_sessions.svg";
+
 import "./PrimarySidebar.css";
 
 enum SidebarItemKey {
@@ -83,21 +84,21 @@ export const PrimarySidebar: React.FC = () => {
         id: 0,
         title: "Home",
         path: PATHS.HOME.RELATIVE,
-        icon: <HomeOutlined />,
+        icon: <img src={HomeIcon} alt="home" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       [SidebarItemKey.NETWORK]: {
         id: 1,
         title: "Network",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,
-        icon: <NetworkTrafficIcon />,
+        icon: <img src={NetworkIcon} alt="network" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       [SidebarItemKey.NETWORK_INSPECTOR]: {
         id: 2,
         title: "Network",
         path: PATHS.NETWORK_INSPECTOR.RELATIVE,
-        icon: <NetworkTrafficInspectorIcon />,
+        icon: <img src={NetworkIcon} alt="network" />,
         display: appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isSafariBrowser(),
       },
       [SidebarItemKey.RULES]: {
@@ -106,7 +107,7 @@ export const PrimarySidebar: React.FC = () => {
         path: PATHS.RULES.INDEX,
         icon: (
           <SafariComingSoonTooltip isVisible={isSafariExtension()}>
-            <HttpRulesIcon />
+            <img src={RulesIcon} alt="rules" />
           </SafariComingSoonTooltip>
         ),
         display: true,
@@ -125,14 +126,14 @@ export const PrimarySidebar: React.FC = () => {
         id: 4,
         title: "APIs",
         path: PATHS.API_CLIENT.INDEX,
-        icon: <ApiOutlined />,
+        icon: <img src={ApiIcon} alt="apis" />,
         display: true,
       },
       [SidebarItemKey.FILES]: {
         id: 5,
         title: "Files",
         path: PATHS.MOCK_SERVER.INDEX,
-        icon: <MockServerIcon />,
+        icon: <img src={FilesIcon} alt="files" />,
         display: true,
         tooltipContent: (
           <>
@@ -156,7 +157,7 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <SessionIcon />
+            <img src={SessionsIcon} alt="sessions" />
           </Tooltip>
         ),
         display: true,
@@ -174,7 +175,7 @@ export const PrimarySidebar: React.FC = () => {
             open={isSavingNetworkSession}
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
-            <TbDeviceDesktopSearch />
+            <img src={SessionsIcon} alt="Desktopsessions" />
           </Tooltip>
         ),
         display: true,

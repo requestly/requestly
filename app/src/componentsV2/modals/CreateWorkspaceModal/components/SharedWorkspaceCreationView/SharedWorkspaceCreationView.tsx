@@ -4,10 +4,10 @@ import { Checkbox } from "antd";
 import { CreateWorkspaceHeader } from "../CreateWorkspaceHeader/CreateWorkspaceHeader";
 import { CreateWorkspaceFooter } from "../CreateWorkspaceFooter/CreateWorkspaceFooter";
 import { CreateWorkspaceArgs } from "../WorkspaceCreationView";
-import { WorkspaceType } from "types";
 import "./sharedWorkspaceCreationView.scss";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
+import { WorkspaceType } from "features/workspaces/types";
 
 export const SharedWorkspaceCreationView = ({
   onCreateWorkspaceClick,

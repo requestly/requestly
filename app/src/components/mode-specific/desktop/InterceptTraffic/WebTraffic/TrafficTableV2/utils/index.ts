@@ -5,6 +5,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { cloneDeep } from "lodash";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
+import { RecordType } from "@requestly/shared/types/entities/rules";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 export const getRequestDomain = (log: any) => {
   const domain = log?.request?.host;
@@ -76,8 +78,7 @@ export const getOrCreateSessionGroup = async (
     throw new Error("Session ID is required to create a session group");
   }
 
-  const allGroups = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
-
+  const allGroups = await clientRuleStorageService.getRecordsByObjectType(RecordType.GROUP);
   let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
 
   if (!sessionGroup) {

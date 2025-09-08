@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import InviteIcon from "assets/icons/invite.svg?react";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -7,6 +6,7 @@ import { RQButton } from "lib/design-system/components";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllWorkspaces, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import inviteIcon from "/assets/media/common/feature_invite.svg";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -57,7 +57,7 @@ const InviteButton: React.FC = () => {
         }}
         className="primary-sidebar-link w-full"
       >
-        <InviteIcon />
+        <img src={inviteIcon} alt="invite" />
         <span className="link-title">{"Invite"}</span>
       </RQButton>
     </>

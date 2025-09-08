@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "antd";
-import { WorkspaceType } from "types";
 import { WorkspaceCreationView } from "componentsV2/modals/CreateWorkspaceModal/components/WorkspaceCreationView";
 import { AuthCard } from "./components/AuthCard/AuthCard";
 import { WelcomeCard } from "./components/WelcomeCard/WelcomeCard";
@@ -11,6 +10,7 @@ import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import "./desktopOnboardingModal.scss";
 import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
 import { OnboardingStep } from "./types";
+import { WorkspaceType } from "features/workspaces/types";
 
 export const DesktopOnboardingCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return <div className={`rq-desktop-onboarding-modal-content__card ${className}`}>{children}</div>;

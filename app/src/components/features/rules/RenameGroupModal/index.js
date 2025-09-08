@@ -14,6 +14,7 @@ import Logger from "lib/logger";
 import { trackGroupRenamed } from "features/rules/analytics";
 
 import "./index.scss";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   //Load props
@@ -104,16 +105,14 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
 
   useEffect(() => {
     Logger.log("Writing to storage in RenameGroupModal useEffect");
-    StorageService(appMode)
-      .getRecord(groupIdFromProps)
-      .then((group) => {
-        if (group && group.name) {
-          setOriginalGroup(group);
-          setGroupName(group.name);
-          setIsLoading(false);
-        }
-      });
-  }, [groupIdFromProps, appMode]);
+    clientRuleStorageService.getRecordById(groupIdFromProps).then((group) => {
+      if (group && group.name) {
+        setOriginalGroup(group);
+        setGroupName(group.name);
+        setIsLoading(false);
+      }
+    });
+  }, [groupIdFromProps]);
 
   return (
     <Modal
