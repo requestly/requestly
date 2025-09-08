@@ -21,4 +21,8 @@ export class RuntimeVariablesViewTabSource extends BaseTabSource {
   static create(matchedPath: MatchedTabSource["matchedPath"]): RuntimeVariablesViewTabSource {
     return new RuntimeVariablesViewTabSource();
   }
+
+  getIsValidTab(): boolean {
+    return true;
+  }
 }
