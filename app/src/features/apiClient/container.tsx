@@ -5,7 +5,7 @@ import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextPro
 import { LocalSyncRefreshHandler } from "./LocalSyncRefreshHandler";
 import "./container.scss";
 import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
-import { setupContextWithRepo } from "./commands/context";
+import { clearStaleContextsOnAuthChange, setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import {
@@ -18,7 +18,6 @@ import { ApiClientProvider } from "./contexts";
 import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.command";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createRepository } from "./commands/context/setupContext.command";
-import { clearStaleWorkspacesOnAuthChange } from "./commands/multiView";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -50,7 +49,7 @@ const ApiClientFeatureContainer: React.FC = () => {
     (async () => {
       apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
 
-      clearStaleWorkspacesOnAuthChange({
+      clearStaleContextsOnAuthChange({
         user: { loggedIn: user.loggedIn },
         workspaceType: activeWorkspace.workspaceType,
       });
