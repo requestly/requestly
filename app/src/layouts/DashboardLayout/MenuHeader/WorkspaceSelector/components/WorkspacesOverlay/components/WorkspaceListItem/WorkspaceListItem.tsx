@@ -50,6 +50,8 @@ const ShareWorkspaceActions = ({
   const activeWorkspace = useSelector(getActiveWorkspace);
   const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
+  const isPrivateWorkspace = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL || workspaceId === null;
+
   const handleSendInvites = () => {
     dispatch(
       globalActions.toggleActiveModal({
@@ -64,7 +66,7 @@ const ShareWorkspaceActions = ({
 
   return (
     <>
-      {activeWorkspace.id === workspaceId && viewMode === ApiClientViewMode.SINGLE ? (
+      {!isPrivateWorkspace && activeWorkspace.id === workspaceId && viewMode === ApiClientViewMode.SINGLE ? (
         <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
       ) : null}
       <div className="shared-workspace-actions">
