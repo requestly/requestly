@@ -18,6 +18,8 @@ import { getConnectedAppsCount } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getUserOS } from "utils/osUtils";
 
 const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const dispatch = useDispatch();
@@ -26,7 +28,11 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const { appsList } = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const systemWideSource = appsList["system-wide"];
+  const platformsForSystemWideProxy = useFeatureValue("show_systemwide_source", {
+    whitelist: ["Windows"],
+  });
 
+  const isSystemWideSourceVisible = platformsForSystemWideProxy.whitelist?.includes(getUserOS());
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
   useEffect(() => {
@@ -170,7 +176,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
         <RQButton type="primary" onClick={openConnectedAppsModal}>
           Connect apps
         </RQButton>
-        {systemWideSource.isAvailable ? (
+        {systemWideSource.isAvailable && isSystemWideSourceVisible ? (
           <>
             <Typography.Text>Or</Typography.Text>
             <Typography.Text>Capture all the requests from this device</Typography.Text>
@@ -182,6 +188,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
       </>
     );
   }, [
+    isSystemWideSourceVisible,
     connectSystemWide,
     disconnectSystemWide,
     isStaticPreview,
