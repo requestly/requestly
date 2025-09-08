@@ -8,12 +8,17 @@ import { ApiClientLoadingView } from "./screens/apiClient/components/views/compo
 import { setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { ApiClientViewMode, useApiClientMultiWorkspaceView } from "./store/multiWorkspaceView/multiWorkspaceView.store";
+import {
+  apiClientMultiWorkspaceViewStore,
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "./store/multiWorkspaceView/multiWorkspaceView.store";
 import Daemon from "./store/apiRecords/Daemon";
 import { ApiClientProvider } from "./contexts";
 import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.command";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createRepository } from "./commands/context/setupContext.command";
+import { clearStaleWorkspacesOnAuthChange } from "./commands/multiView";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -43,10 +48,18 @@ const ApiClientFeatureContainer: React.FC = () => {
     }
 
     (async () => {
+      apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
+
+      clearStaleWorkspacesOnAuthChange({
+        user: { loggedIn: user.loggedIn },
+        workspaceType: activeWorkspace.workspaceType,
+      });
+
       const repository = createRepository(activeWorkspace, {
         loggedIn: user.loggedIn,
         uid: user.details?.profile?.uid ?? "",
       });
+
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
   }, [user, activeWorkspace?.id, viewMode]);
