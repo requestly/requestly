@@ -20,6 +20,7 @@ import {
   sendSignInLinkToEmail,
   SAMLAuthProvider,
   OAuthProvider,
+  GithubAuthProvider,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -530,6 +531,65 @@ export async function appleSignIn(source, callback) {
     .catch((err) => {
       trackLoginFailedEvent({
         auth_provider: AUTH_PROVIDERS.APPLE,
+        error_message: err.message,
+        source,
+      });
+    });
+}
+
+export async function githubSignIn(callback, source) {
+  const provider = new GithubAuthProvider();
+  const auth = getAuth(firebaseApp);
+  return signInWithPopup(auth, provider)
+    .then(async (result) => {
+      let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
+      let uid = result?.user?.uid || null;
+      let email = result?.user?.email || null;
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+
+      const emailType = await getEmailType(email);
+      if (is_new_user) {
+        trackSignUpAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.GITHUB,
+          source,
+        });
+        trackSignupSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.GITHUB,
+          email,
+          uid,
+          email_type: emailType,
+          domain: email.split("@")[1],
+          source,
+        });
+        setSignupDate(uid);
+        setEmailVerified(uid, true);
+      } else {
+        trackLoginAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.GITHUB,
+          source,
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.GITHUB,
+          uid,
+          email,
+          email_type: emailType,
+          domain: email.split("@")[1],
+          source,
+        });
+      }
+
+      const authData = getAuthData(result.user);
+      const database = getDatabase();
+      update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+      callback && callback.call(null, true);
+
+      return { ...authData, isNewUser: is_new_user, accessToken: token };
+    })
+    .catch((err) => {
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.GITHUB,
         error_message: err.message,
         source,
       });

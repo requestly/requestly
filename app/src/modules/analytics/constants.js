@@ -17,4 +17,5 @@ export const AUTH_PROVIDERS = {
   EMAIL_LINK: "email_link",
   SSO: "sso",
   BROWSERSTACK: "browserstack",
+  GITHUB: "github",
 };

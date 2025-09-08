@@ -209,32 +209,33 @@ export const UserPlanDetails = () => {
                       </Row>
                     </Space>
                   </div>
-                  {!user?.details?.planDetails?.subscription?.isBrowserstackSubscription && (
-                    <>
-                      <div className="user-plan-card-grid-item">
-                        <Space direction="vertical" size={8}>
-                          <div className="user-plan-card-grid-item-label">
-                            {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} start date
-                          </div>
-                          <div className="user-plan-date">
-                            {getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.startDate))}
-                          </div>
-                        </Space>
-                      </div>
-                      <div className="user-plan-card-grid-item">
-                        <Space direction="vertical" size={8}>
-                          <div className="user-plan-card-grid-item-label">
-                            {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
-                          </div>
-                          <div className="user-plan-date">
-                            {hasAppSumoSubscription || hasProfessionalStudentPlan
-                              ? "Lifetime access"
-                              : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
-                          </div>
-                        </Space>
-                      </div>
-                    </>
-                  )}
+                  {!user?.details?.planDetails?.subscription?.isBrowserstackSubscription &&
+                    user?.details?.planDetails?.type !== PlanType.STUDENT && (
+                      <>
+                        <div className="user-plan-card-grid-item">
+                          <Space direction="vertical" size={8}>
+                            <div className="user-plan-card-grid-item-label">
+                              {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} start date
+                            </div>
+                            <div className="user-plan-date">
+                              {getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.startDate))}
+                            </div>
+                          </Space>
+                        </div>
+                        <div className="user-plan-card-grid-item">
+                          <Space direction="vertical" size={8}>
+                            <div className="user-plan-card-grid-item-label">
+                              {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
+                            </div>
+                            <div className="user-plan-date">
+                              {hasAppSumoSubscription || hasProfessionalStudentPlan
+                                ? "Lifetime access"
+                                : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
+                            </div>
+                          </Space>
+                        </div>
+                      </>
+                    )}
                 </Col>
               </>
             ) : null}
