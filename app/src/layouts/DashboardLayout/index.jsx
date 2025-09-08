@@ -14,7 +14,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
-import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
+import { getShouldShowDesktopConnected, useDesktopAppConnection } from "hooks/useDesktopAppConnection";
 import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
 import { getUserOS } from "utils/osUtils";
@@ -58,7 +58,9 @@ const DashboardLayout = () => {
   }, [pathname]);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
-
+  const shouldShowDesktopAppConnectedScreen = useMemo(() => {
+    return getShouldShowDesktopConnected(pathname);
+  }, [pathname]);
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -102,7 +104,7 @@ const DashboardLayout = () => {
           </div>
         )}
 
-        {isDesktopAppConnected ? (
+        {isDesktopAppConnected && shouldShowDesktopAppConnectedScreen ? (
           <ConnectedToDesktopView />
         ) : (
           <>
