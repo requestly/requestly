@@ -386,7 +386,7 @@ export const createBlankApiRecord = (
     newRecord.type = RQAPI.RecordType.COLLECTION;
     newRecord.data = {
       variables: {},
-      auth: getDefaultAuth(false),
+      auth: getDefaultAuth(!collectionId),
     };
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
