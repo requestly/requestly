@@ -48,5 +48,9 @@ export const KEYBOARD_SHORTCUTS: Record<Feature, Record<string, KEYBOARD_SHORTCU
       hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
       description: "Save collection",
     },
+    SAVE_RUNTIME_VARIABLES: {
+      hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
+      description: "Save runtime variables",
+    },
   },
 };

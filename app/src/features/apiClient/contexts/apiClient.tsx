@@ -1,5 +1,4 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
 import { RQAPI } from "../types";
 import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
 import {
@@ -9,35 +8,26 @@ import {
   trackNewCollectionClicked,
   trackNewRequestClicked,
 } from "modules/analytics/events/features/apiClient";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { createBlankApiRecord, isApiCollection } from "../screens/apiClient/utils";
 import { APIClientWorkloadManager } from "../helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
-import { ApiClientRecordsInterface } from "../helpers/modules/sync/interfaces";
 import { notification } from "antd";
 import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { debounce } from "lodash";
-import { variablesActions } from "store/features/variables/slice";
 import { RBAC, useRBAC } from "features/rbac";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { DraftRequestContainerTabSource } from "../screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RequestViewTabSource } from "../screens/apiClient/components/clientView/components/RequestView/requestViewTabSource";
-import { CollectionViewTabSource } from "../screens/apiClient/components/clientView/components/Collection/collectionViewTabSource";
+import { DraftRequestContainerTabSource } from "../screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { EnvironmentViewTabSource } from "../screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIRecords } from "../store/apiRecords/ApiRecordsContextProvider";
+import { getApiClientFeatureContext, saveOrUpdateRecord } from "../commands/store.utils";
+import { RequestViewTabSource } from "../screens/apiClient/components/views/components/RequestView/requestViewTabSource";
+import { CollectionViewTabSource } from "../screens/apiClient/components/views/components/Collection/collectionViewTabSource";
+import { createEnvironment as _createEnvironment } from "../commands/environments";
 
 interface ApiClientContextInterface {
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => void;
-  onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => void;
-  recordsToBeDeleted: RQAPI.Record[];
-  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.Record[]) => void;
-  isDeleteModalOpen: boolean;
-  setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onDeleteModalClose: () => void;
-
-  history: RQAPI.Entry[];
-  addToHistory: (apiEntry: RQAPI.Entry) => void;
+  history: RQAPI.ApiEntry[];
+  addToHistory: (apiEntry: RQAPI.ApiEntry) => void;
   clearHistory: () => void;
 
   isRecordBeingCreated: RQAPI.RecordType | null;
@@ -49,148 +39,86 @@ interface ApiClientContextInterface {
   setCurrentHistoryIndex: (index: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise<void>;
-
+  onNewClick: (
+    analyticEventSource: RQAPI.AnalyticsEventSource,
+    recordType: RQAPI.RecordType,
+    collectionId?: string,
+    entryType?: RQAPI.ApiEntryType
+  ) => Promise<void>;
+  onNewClickV2: (params: {
+    contextId: string;
+    analyticEventSource: RQAPI.AnalyticsEventSource;
+    recordType: RQAPI.RecordType;
+    collectionId?: string;
+    entryType?: RQAPI.ApiEntryType;
+  }) => Promise<void>;
   setIsImportModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   apiClientWorkloadManager: APIClientWorkloadManager;
-  apiClientRecordsRepository: ApiClientRecordsInterface<Record<any, any>>;
-
-  forceRefreshApiClientRecords: () => Promise<boolean>;
+  onNewClickContextId: string | null;
 }
 
 const ApiClientContext = createContext<ApiClientContextInterface>({
-  onSaveRecord: (apiClientRecord: RQAPI.Record, onSaveTabAction?: "open") => {},
-  onSaveBulkRecords: (apiClientRecords: RQAPI.Record[]) => {},
-  recordsToBeDeleted: null,
-  updateRecordsToBeDeleted: (apiClientRecord: RQAPI.Record[]) => {},
-  isDeleteModalOpen: false,
-  setIsDeleteModalOpen: () => {},
-  onDeleteModalClose: () => {},
   history: [],
-  addToHistory: (apiEntry: RQAPI.Entry) => {},
+  addToHistory: () => {},
   clearHistory: () => {},
 
   isRecordBeingCreated: null,
-  setIsRecordBeingCreated: (recordType: RQAPI.RecordType | null) => {},
+  setIsRecordBeingCreated: () => {},
 
   isImportModalOpen: false,
 
   selectedHistoryIndex: 0,
-  setCurrentHistoryIndex: (index: number) => {},
+  setCurrentHistoryIndex: () => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
-  onNewClick: (analyticEventSource: RQAPI.AnalyticsEventSource, recordType?: RQAPI.RecordType) => Promise.resolve(),
+  onNewClick: () => Promise.resolve(),
+  onNewClickV2: () => Promise.resolve(),
 
   setIsImportModalOpen: () => {},
 
   apiClientWorkloadManager: new APIClientWorkloadManager(),
-  apiClientRecordsRepository: null,
-
-  forceRefreshApiClientRecords: async () => false,
+  onNewClickContextId: null,
 });
 
 interface ApiClientProviderProps {
   children: ReactNode;
-  repository: ApiClientRecordsInterface<Record<any, any>>;
 }
 
-const trackUserProperties = (records: RQAPI.Record[]) => {
+const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
   const totalCollections = records.filter((record) => isApiCollection(record)).length;
   const totalRequests = records.length - totalCollections;
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_COLLECTIONS, totalCollections);
   submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_REQUESTS, totalRequests);
 };
 
-export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, repository }) => {
-  const dispatch = useDispatch();
+// suggestion: could be renamed to ApiClientStoreEnabler
+export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, addNewRecord, updateRecord, updateRecords, refreshRecords, setErroredRecords, getData] =
-    useAPIRecords((state) => [
-      state.apiClientRecords,
-      state.addNewRecord,
-      state.updateRecord,
-      state.updateRecords,
-      state.refresh,
-      state.setErroredRecords,
-      state.getData,
-    ]);
+  const [apiClientRecords] = useAPIRecords((state) => [
+    state.apiClientRecords,
+    state.addNewRecord,
+    state.updateRecord,
+    state.updateRecords,
+    state.getData,
+  ]);
+  const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
-  const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<RQAPI.Record[]>();
-  const [history, setHistory] = useState<RQAPI.Entry[]>(getHistoryFromStore());
+  const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
-  const { addNewEnvironment } = useEnvironmentManager();
 
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
-
-  const openDraftRequest = useCallback(() => {
-    openTab(new DraftRequestContainerTabSource());
-  }, [openTab]);
-
-  // TODO: Create modal context
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     debouncedTrackUserProperties();
   }, [apiClientRecords, debouncedTrackUserProperties]);
 
-  const onSaveBulkRecords = useCallback(
-    (records: RQAPI.Record[]) => {
-      updateRecords(records);
-    },
-    [updateRecords]
-  );
-
-  const onSaveRecord: ApiClientContextInterface["onSaveRecord"] = useCallback(
-    (apiClientRecord, onSaveTabAction) => {
-      const recordId = apiClientRecord.id;
-
-      const doesRecordExist = !!getData(recordId);
-
-      if (doesRecordExist) {
-        updateRecord(apiClientRecord);
-      } else {
-        addNewRecord(apiClientRecord);
-      }
-
-      if (onSaveTabAction === "open") {
-        if (apiClientRecord.type === RQAPI.RecordType.API) {
-          openTab(
-            new RequestViewTabSource({ id: recordId, apiEntryDetails: apiClientRecord, title: apiClientRecord.name })
-          );
-          return;
-        }
-
-        if (apiClientRecord.type === RQAPI.RecordType.COLLECTION) {
-          openTab(
-            new CollectionViewTabSource({
-              id: recordId,
-              title: apiClientRecord.name,
-              focusBreadcrumb: !doesRecordExist,
-            })
-          );
-          return;
-        }
-      }
-    },
-    [getData, updateRecord, addNewRecord, openTab]
-  );
-
-  const updateRecordsToBeDeleted = useCallback((record: RQAPI.Record[]) => {
-    setRecordsToBeDeleted(record);
-  }, []);
-
-  const onDeleteModalClose = useCallback(() => {
-    setIsDeleteModalOpen(false);
-    setRecordsToBeDeleted(null);
-  }, []);
-
-  const addToHistory = useCallback((apiEntry: RQAPI.Entry) => {
+  const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     setHistory((history) => [...history, apiEntry]);
     addToHistoryInStore(apiEntry);
   }, []);
@@ -212,40 +140,74 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
 
   const onImportRequestModalClose = useCallback(() => setIsImportModalOpen(false), []);
 
-  const onNewClick = useCallback(
-    async (analyticEventSource: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId = "") => {
+  const onNewClickV2 = useCallback(
+    async (params: {
+      contextId: string;
+      analyticEventSource: RQAPI.AnalyticsEventSource;
+      recordType: RQAPI.RecordType;
+      collectionId?: string;
+      entryType?: RQAPI.ApiEntryType;
+    }) => {
+      const { contextId, analyticEventSource, recordType, collectionId = "", entryType } = params;
+
       if (!isValidPermission) {
         toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
         return;
       }
+
+      setOnNewClickContextId(contextId);
+      const context = getApiClientFeatureContext(contextId);
+      const recordsRepository = context.repositories.apiClientRecordsRepository;
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
 
           if (["api_client_sidebar_header", "home_screen"].includes(analyticEventSource)) {
-            openDraftRequest();
+            openTab(new DraftRequestContainerTabSource({ apiEntryType: entryType, context: { id: context.id } }));
             return;
           }
 
           setIsRecordBeingCreated(recordType);
-          return createBlankApiRecord(recordType, collectionId, repository).then((result) => {
+          return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType).then((result) => {
             setIsRecordBeingCreated(null);
-            onSaveRecord(result.data, "open");
+            saveOrUpdateRecord(context, result.data);
+
+            openTab(
+              new RequestViewTabSource({
+                id: result.data.id,
+                apiEntryDetails: result.data as RQAPI.ApiRecord,
+                title: result.data.name,
+                context: {
+                  id: context.id,
+                },
+              })
+            );
+            return;
           });
         }
 
         case RQAPI.RecordType.COLLECTION: {
           setIsRecordBeingCreated(recordType);
           trackNewCollectionClicked(analyticEventSource);
-          return createBlankApiRecord(recordType, collectionId, repository)
+          return createBlankApiRecord(recordType, collectionId, recordsRepository)
             .then((result) => {
               setIsRecordBeingCreated(null);
               if (result.success) {
-                onSaveRecord(result.data, "open");
-                dispatch(variablesActions.updateCollectionVariables({ collectionId: result.data.id, variables: {} }));
+                saveOrUpdateRecord(context, result.data);
+                openTab(
+                  new CollectionViewTabSource({
+                    id: result.data.id,
+                    title: result.data.name,
+                    focusBreadcrumb: false,
+                    context: {
+                      id: context.id,
+                    },
+                  })
+                );
               } else {
                 toast.error(result.message || "Could not create collection.", 5);
+
                 notification.error({
                   message: "Could not create collection!",
                   description: result?.message,
@@ -266,7 +228,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
           trackNewEnvironmentClicked();
-          return addNewEnvironment("New Environment")
+          return _createEnvironment(context, { newEnvironmentName: "New Environment" })
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
               openTab(
@@ -274,6 +236,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
                   id: newEnvironment.id,
                   title: newEnvironment.name,
                   focusBreadcrumb: true,
+                  context: {
+                    id: context.id,
+                  },
                 })
               );
             })
@@ -287,38 +252,36 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
         }
       }
     },
-    [
-      repository,
-      openDraftRequest,
-      onSaveRecord,
-      dispatch,
-      addNewEnvironment,
-      openTab,
-      getRBACValidationFailureErrorMessage,
-      isValidPermission,
-    ]
+    [isValidPermission, getRBACValidationFailureErrorMessage, openTab]
   );
 
-  const forceRefreshApiClientRecords = useCallback(async () => {
-    const recordsToRefresh = await repository.getRecordsForForceRefresh();
-    if (!recordsToRefresh || !recordsToRefresh.success) {
-      return false;
-    }
-    refreshRecords(recordsToRefresh.data.records);
-    setErroredRecords(recordsToRefresh.data.erroredRecords);
-    return true;
-  }, [repository, refreshRecords, setErroredRecords]);
+  const onNewClick = useCallback(
+    async (
+      analyticEventSource: RQAPI.AnalyticsEventSource,
+      recordType: RQAPI.RecordType,
+      collectionId = "",
+      entryType?: RQAPI.ApiEntryType
+    ) => {
+      if (!isValidPermission) {
+        toast.warn(getRBACValidationFailureErrorMessage(RBAC.Permission.create, recordType), 5);
+        return;
+      }
+
+      const context = getApiClientFeatureContext();
+      return onNewClickV2({
+        contextId: context.id,
+        analyticEventSource,
+        recordType,
+        collectionId,
+        entryType,
+      });
+    },
+    [isValidPermission, onNewClickV2, getRBACValidationFailureErrorMessage]
+  );
 
   const workloadManager = useMemo(() => new APIClientWorkloadManager(), []);
 
   const value = {
-    onSaveRecord,
-    onSaveBulkRecords,
-    recordsToBeDeleted,
-    updateRecordsToBeDeleted,
-    isDeleteModalOpen,
-    setIsDeleteModalOpen,
-    onDeleteModalClose,
     history,
     addToHistory,
     clearHistory,
@@ -334,9 +297,9 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children, 
     onImportClick,
     onImportRequestModalClose,
     onNewClick,
+    onNewClickV2,
     apiClientWorkloadManager: workloadManager,
-    apiClientRecordsRepository: repository,
-    forceRefreshApiClientRecords,
+    onNewClickContextId,
   };
 
   return <ApiClientContext.Provider value={value}>{children}</ApiClientContext.Provider>;

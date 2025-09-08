@@ -29,6 +29,7 @@ import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrati
 import { trackLoginButtonClicked } from "modules/analytics/events/common/auth/login";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { setRedirectMetadata } from "features/onboarding/utils";
+import { LoggedOutPopover } from "./LoggedOutPopover/LoggedOutPopover";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export default function HeaderUser() {
         onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
       },
       {
-        label: "Manage Workspaces",
+        label: "Manage team workspaces",
         onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
       },
       {
@@ -199,6 +200,8 @@ export default function HeaderUser() {
             ) : null}
           </Col>
         </Row>
+      ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+        <LoggedOutPopover />
       ) : (
         <div className="auth-button-group">
           <RQButton

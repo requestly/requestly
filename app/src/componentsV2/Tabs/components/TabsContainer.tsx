@@ -4,7 +4,7 @@ import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
-import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/clientView/components/DraftRequestContainer/draftRequestContainerTabSource";
+import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
@@ -72,7 +72,7 @@ export const TabsContainer: React.FC = () => {
     if (activeTabSource) {
       const newPath = activeTabSource.getUrlPath();
 
-      if (newPath !== window.location.pathname) {
+      if (newPath !== window.location.pathname + window.location.search) {
         setUrl(newPath, isInitialLoadRef.current);
       }
 
@@ -102,7 +102,7 @@ export const TabsContainer: React.FC = () => {
             }}
           >
             <div className="tab-title">
-              {<div className="icon">{tabState.source.getIcon()}</div>}
+              {<div className="icon">{tabState.icon}</div>}
               <Typography.Text
                 ellipsis={{
                   tooltip: {

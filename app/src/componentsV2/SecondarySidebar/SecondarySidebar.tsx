@@ -25,8 +25,8 @@ const SecondarySidebar: React.FC<SecondarySidebarProps> = ({ items }) => {
     <AnimatePresence>
       {isSecondarySidebarCollapsed ? null : (
         <m.div
-          initial={{ width: "217px" }} // TODO: Change this to 0 once shared and templates use same container
-          animate={{ width: "217px" }}
+          initial={{ width: "200px" }} // TODO: Change this to 0 once shared and templates use same container
+          animate={{ width: "200px" }}
           exit={{ width: "0" }}
           transition={{
             ease: "easeInOut",

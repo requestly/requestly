@@ -9,7 +9,7 @@ import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { FiXCircle } from "@react-icons/all-files/fi/FiXCircle";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
-import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
+import AppSumoWorkspaceDropdown from "components/landing/Appsumo/AppSumoWorkspaceDropdown/AppSumoWorkspaceDropdown";
 import { doc, getDoc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
@@ -22,7 +22,7 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { globalActions } from "store/slices/global/slice";
 import "./index.scss";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface AppSumoCode {
   error: string;
@@ -261,7 +261,7 @@ const AppSumoModal: React.FC = () => {
           </div>
           <div className="header mt-16">Please enter your AppSumo code</div>
           <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
-          <WorkspaceDropdown
+          <AppSumoWorkspaceDropdown
             isAppSumo
             disabled={isLoading}
             workspaceToUpgrade={workspaceToUpgrade}

@@ -1,9 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
-import useEnvironmentManager from "backend/environment/hooks/useEnvironmentManager";
 import { useSelector } from "react-redux";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import {
@@ -13,13 +11,17 @@ import {
   trackImportSuccess,
 } from "modules/analytics/events/features/apiClient";
 import { processRqImportData } from "features/apiClient/screens/apiClient/components/modals/importModal/utils";
-import { EnvironmentVariableValue } from "backend/environment/types";
+
 import * as Sentry from "@sentry/react";
+import { useCommand } from "../commands";
+import { useNewApiClientContext } from "./useNewApiClientContext";
+import { EnvironmentVariableData } from "../store/variables/types";
+import { useApiClientRepository } from "../contexts/meta";
 
 const BATCH_SIZE = 25;
 
 type ProcessedData = {
-  environments: { name: string; variables: Record<string, EnvironmentVariableValue>; isGlobal: boolean }[];
+  environments: { name: string; variables: Record<string, EnvironmentVariableData>; isGlobal: boolean }[];
   collections: RQAPI.CollectionRecord[];
   apis: RQAPI.ApiRecord[];
   recordsCount: number;
@@ -51,8 +53,12 @@ const useApiClientFileImporter = (importer: ImporterType) => {
   const [error, setError] = useState<string | null>(null);
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
 
-  const { addNewEnvironment, setVariables, getEnvironmentVariables } = useEnvironmentManager({ initFetchers: false });
-  const { onSaveRecord, apiClientRecordsRepository } = useApiClientContext();
+  const {
+    env: { createEnvironment, patchEnvironmentVariables },
+  } = useCommand();
+
+  const { apiClientRecordsRepository, environmentVariablesRepository } = useApiClientRepository();
+  const { onSaveRecord } = useNewApiClientContext();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
@@ -135,19 +141,21 @@ const useApiClientFileImporter = (importer: ImporterType) => {
     [processors, importer, uid, apiClientRecordsRepository]
   );
 
+  const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
   const handleImportEnvironments = useCallback(async (): Promise<number> => {
     try {
       const importPromises = environments.map(async (env) => {
         if (env.isGlobal) {
-          const globalEnvVariables = getEnvironmentVariables("global");
-          await setVariables("global", { ...globalEnvVariables, ...env.variables });
+          await patchEnvironmentVariables({
+            environmentId: globalEnvId,
+            variables: env.variables,
+          });
           return true;
         } else {
-          const newEnvironment = await addNewEnvironment(env.name);
-          if (newEnvironment) {
-            await setVariables(newEnvironment.id, env.variables);
-            return true;
-          }
+          await createEnvironment({
+            newEnvironmentName: env.name,
+            variables: env.variables,
+          });
         }
         return false;
       });
@@ -158,7 +166,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
       Logger.error("Data import failed:", error);
       throw error;
     }
-  }, [environments, getEnvironmentVariables, addNewEnvironment, setVariables]);
+  }, [createEnvironment, environments, patchEnvironmentVariables, globalEnvId]);
 
   const handleImportCollectionsAndApis = useCallback(async () => {
     let importedCollectionsCount = 0;

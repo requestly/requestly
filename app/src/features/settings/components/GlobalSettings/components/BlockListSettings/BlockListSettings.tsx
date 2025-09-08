@@ -4,7 +4,6 @@ import { Col, Row } from "antd";
 import SettingsItem from "../SettingsItem";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -13,6 +12,7 @@ import "./blocklist.scss";
 import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 import { debounce } from "lodash";
 import { trackBlockListUpdated } from "modules/analytics/events/misc/settings";
+import { clientStorageService } from "services/clientStorageService";
 
 export const BlockList = () => {
   const [searchParams] = useSearchParams();
@@ -39,8 +39,8 @@ export const BlockList = () => {
       const newBlockedDomains = [...blockedDomains, inputUrl.host];
 
       setBlockedDomains(newBlockedDomains);
-      StorageService(appMode)
-        .saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.BLOCKED_DOMAINS]: newBlockedDomains })
+      clientStorageService
+        .saveStorageObject({ [GLOBAL_CONSTANTS.STORAGE_KEYS.BLOCKED_DOMAINS]: newBlockedDomains })
         .then(() => {
           toast.success("Successfully added.");
           setInputValue("");
@@ -60,8 +60,8 @@ export const BlockList = () => {
     const domainToRemove = blockedDomains[index];
     const newBlockedDomains = blockedDomains.filter((_, i) => i !== index);
     setBlockedDomains(newBlockedDomains);
-    StorageService(appMode)
-      .saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.BLOCKED_DOMAINS]: newBlockedDomains })
+    clientStorageService
+      .saveStorageObject({ [GLOBAL_CONSTANTS.STORAGE_KEYS.BLOCKED_DOMAINS]: newBlockedDomains })
       .then(() => {
         toast.success("Successfully removed.");
         setInputValue("");
@@ -75,17 +75,15 @@ export const BlockList = () => {
   };
 
   useEffect(() => {
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.BLOCKED_DOMAINS)
-      .then((blockedDomains) => {
-        setBlockedDomains(blockedDomains ?? []);
-      });
+    clientStorageService.getStorageObject(GLOBAL_CONSTANTS.STORAGE_KEYS.BLOCKED_DOMAINS).then((blockedDomains) => {
+      setBlockedDomains(blockedDomains ?? []);
+    });
   }, [appMode]);
 
   return (
     <SettingsItem
       isActive={true}
-      onChange={null}
+      onChange={() => {}}
       title="Blocked Sites"
       caption="HTTP rules and SessionBook won't work on these sites"
       settingsBody={

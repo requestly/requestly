@@ -1,7 +1,11 @@
 import { compile } from "handlebars";
-import { EnvironmentVariables, EnvironmentVariableValue } from "./types";
+import { EnvironmentVariables } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { getScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
+import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -9,9 +13,28 @@ interface RenderResult<T> {
   usedVariables: Record<string, unknown>;
 }
 
+export function renderVariables<T extends string | Record<string, any>>(
+  template: T,
+  recordId: string,
+  ctx: ApiClientFeatureContext
+): {
+  renderedVariables?: Record<string, unknown>;
+  result: T;
+} {
+  const parents = getApiClientRecordsStore(ctx).getState().getParentChain(recordId);
+  const variables = Object.fromEntries(
+    Array.from(getScopedVariables(parents, ctx.stores)).map(([key, [variable, _]]) => {
+      return [key, variable];
+    })
+  );
+
+  const { renderedTemplate, renderedVariables } = renderTemplate(template, variables);
+  return { renderedVariables, result: renderedTemplate };
+}
+
 export const renderTemplate = <T extends string | Record<string, T>>(
   template: T,
-  variables: Record<string, EnvironmentVariableValue> = {}
+  variables: Record<string, VariableData> = {}
 ): {
   renderedVariables?: Record<string, unknown>;
   renderedTemplate: T;
@@ -146,7 +169,8 @@ export const mergeLocalAndSyncVariables = (
         localValue: value.localValue ?? prevValue?.localValue,
         syncValue: value.syncValue ?? prevValue?.syncValue,
         type: value.type,
-      };
+        isPersisted: true,
+      } as EnvironmentVariableData;
 
       /*
       Commented the code belowe as this merge logic removes the localValue if it doesn't exist which leads to tabs showing unsaved changes because of the localValue missing from variable object

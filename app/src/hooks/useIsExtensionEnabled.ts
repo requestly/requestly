@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
-import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
 import { globalActions } from "store/slices/global/slice";
 import { getExtensionVersion, isExtensionEnabled, isExtensionManifestVersion3 } from "actions/ExtensionActions";
@@ -12,6 +11,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { captureException } from "@sentry/react";
 import { trackExtensionStatusUpdated } from "modules/analytics/events/extension";
+import { clientStorageService } from "services/clientStorageService";
 
 export const useIsExtensionEnabled = () => {
   const dispatch = useDispatch();
@@ -48,27 +48,23 @@ export const useIsExtensionEnabled = () => {
             }
           );
         } else {
-          StorageService(appMode)
-            .getRecord("rq_var_isExtensionEnabled")
-            .then((value) => {
-              if (value !== undefined) {
-                dispatch(globalActions.updateIsExtensionEnabled(value));
-              } else {
-                dispatch(globalActions.updateIsExtensionEnabled(true));
-              }
-            });
-        }
-      } else {
-        //TODO @nafees87n: cleanup reading settings from storage
-        StorageService(appMode)
-          .getRecord(APP_CONSTANTS.RQ_SETTINGS)
-          .then((value) => {
-            if (value) {
-              dispatch(globalActions.updateIsExtensionEnabled(value.isExtensionEnabled));
+          clientStorageService.getStorageObject("rq_var_isExtensionEnabled").then((value) => {
+            if (value !== undefined) {
+              dispatch(globalActions.updateIsExtensionEnabled(value));
             } else {
               dispatch(globalActions.updateIsExtensionEnabled(true));
             }
           });
+        }
+      } else {
+        //TODO @nafees87n: cleanup reading settings from storage
+        clientStorageService.getStorageObject(APP_CONSTANTS.RQ_SETTINGS).then((value) => {
+          if (value) {
+            dispatch(globalActions.updateIsExtensionEnabled(value.isExtensionEnabled));
+          } else {
+            dispatch(globalActions.updateIsExtensionEnabled(true));
+          }
+        });
       }
     }
 

@@ -1,138 +1,252 @@
 import { Modal, notification } from "antd";
 import CreatableReactSelect from "react-select/creatable";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { RQAPI } from "features/apiClient/types";
 import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackMoveRequestToCollectionFailed, trackRequestMoved } from "modules/analytics/events/features/apiClient";
 import "./moveToCollectionModal.scss";
-import { isApiCollection } from "../../../utils";
-import { head, isEmpty, omit } from "lodash";
-import { Authorization } from "../../clientView/components/request/components/AuthorizationView/types/AuthConfig";
 import * as Sentry from "@sentry/react";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { getCollectionOptionsToMoveIn } from "features/apiClient/commands/utils";
+import {
+  ApiClientViewMode,
+  useApiClientMultiWorkspaceView,
+} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+
+import { createNewCollection, moveRecordsToCollection } from "./utils";
+import { RQTooltip } from "lib/design-system-v2/components";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 
 interface Props {
-  recordsToMove: RQAPI.Record[];
+  recordsToMove: RQAPI.ApiClientRecord[];
   isOpen: boolean;
+  isBulkActionMode?: boolean;
   onClose: () => void;
 }
 
-export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
-  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
-  const {
-    onSaveRecord,
-    onSaveBulkRecords,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
-  const [selectedCollection, setSelectedCollection] = useState(null);
+const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
+  const currentContextId = useContextId();
+  const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCollection, setSelectedCollection] = useState(null);
 
-  const collectionOptions = useMemo(() => {
-    const exclusions = new Set();
+  const workspacesOptions = useMemo(() => {
+    return selectedWorkspaces.map((w) => ({
+      label: w.getState().name,
+      value: w.getState().id,
+    }));
+  }, [selectedWorkspaces]);
 
-    for (const record of recordsToMove) {
-      const stack = [record];
-      record.collectionId && exclusions.add(record.collectionId);
-      while (stack.length) {
-        const current = stack.pop();
-        exclusions.add(current.id);
-
-        if (isApiCollection(current) && !isEmpty(current.data?.children)) {
-          stack.push(...current.data.children);
-        }
-      }
-    }
-
-    return apiClientRecords
-      .filter((record) => isApiCollection(record) && !exclusions.has(record.id))
-      .map((record) => ({
-        label: record.name,
-        value: record.id,
-      }));
-  }, [apiClientRecords, recordsToMove]);
-
-  const createNewCollection = useCallback(async () => {
-    const collectionToBeCreated: Partial<RQAPI.CollectionRecord> = {
-      collectionId: "",
-      name: selectedCollection?.label,
-      type: RQAPI.RecordType.COLLECTION,
-      deleted: false,
-      data: {
-        variables: {},
-        auth: {
-          currentAuthType: Authorization.Type.NO_AUTH,
-          authConfigStore: {},
-        },
-      },
-    };
-    const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
-    if (newCollection.success) {
-      onSaveRecord(newCollection.data, "open");
-      return newCollection.data.id;
-    } else {
-      throw new Error("Failed to create a new collection");
-    }
-  }, [onSaveRecord, selectedCollection?.label, apiClientRecordsRepository]);
-
-  const moveRecordsToCollection = useCallback(
-    async (collectionId: string, isNewCollection: boolean) => {
-      const updatedRequests = recordsToMove.map((record) =>
-        isApiCollection(record)
-          ? { ...record, collectionId, data: omit(record.data, "children") }
-          : { ...record, collectionId }
-      );
-
-      // TODO: use apiClient interface
-      try {
-        const result = await apiClientRecordsRepository.moveAPIEntities(updatedRequests, collectionId);
-
-        trackRequestMoved(isNewCollection ? "new_collection" : "existing_collection");
-        toast.success("Requests moved to collection successfully");
-        result.length === 1 ? onSaveRecord(head(result), "open") : onSaveBulkRecords(result);
-        forceRefreshApiClientRecords();
-      } catch (error) {
-        console.error("Error moving records: ", error);
-        throw new Error("Failed to move some requests to collection");
-      }
-    },
-    [onSaveRecord, recordsToMove, onSaveBulkRecords, apiClientRecordsRepository, forceRefreshApiClientRecords]
+  const [selectedWorkspace, setSelectedWorkspace] = useState<{
+    label: string;
+    value: string;
+  } | null>(() =>
+    workspacesOptions.find((w) => {
+      return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
+    })
   );
 
+  const context = useMemo(() => (selectedWorkspace ? getApiClientFeatureContext(selectedWorkspace.value) : null), [
+    selectedWorkspace,
+  ]);
+
+  const collectionOptions = useMemo(() => {
+    if (!context) {
+      return [];
+    }
+
+    return getCollectionOptionsToMoveIn(context.id, recordsToMove);
+  }, [context, recordsToMove]);
+
   const handleRecordMove = useCallback(async () => {
+    if (!context) {
+      return;
+    }
+
     try {
       setIsLoading(true);
-      const collectionId = selectedCollection?.__isNew__ ? await createNewCollection() : selectedCollection.value;
+      const collectionId = selectedCollection?.__isNew__
+        ? await createNewCollection(context, selectedCollection?.label)
+        : selectedCollection.value;
 
       if (collectionId) {
-        await moveRecordsToCollection(collectionId, selectedCollection?.__isNew__);
+        await moveRecordsToCollection({
+          contextId: currentContextId,
+          recordsToMove,
+          collectionId,
+          destinationContextId: context?.id,
+        });
       }
+
+      trackRequestMoved(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
+      toast.success("Requests moved to collection successfully");
     } catch (error) {
-      console.error("Error moving request to collection:", error);
       notification.error({
         message: `Error moving records to collection`,
         description: error?.message,
         placement: "bottomRight",
       });
+
       Sentry.withScope((scope) => {
         scope.setTag("error_type", "api_client_move_to_collection");
         Sentry.captureException(error);
       });
+
       trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
     } finally {
       setIsLoading(false);
       onClose();
     }
-  }, [selectedCollection, onClose, createNewCollection, moveRecordsToCollection]);
+  }, [
+    context,
+    selectedCollection?.__isNew__,
+    selectedCollection?.label,
+    selectedCollection?.value,
+    currentContextId,
+    recordsToMove,
+    onClose,
+  ]);
 
   return (
     <Modal
       open={isOpen}
+      destroyOnClose
       onCancel={onClose}
       title="Move to Collection"
-      className="custom-rq-modal"
+      className="custom-rq-modal move-to-collection-modal"
+      footer={
+        <RQButton type="primary" disabled={!selectedCollection} loading={isLoading} onClick={handleRecordMove}>
+          {selectedCollection?.__isNew__ ? "Create collection and Move" : "Move"}
+        </RQButton>
+      }
+    >
+      <CreatableReactSelect
+        isMulti={false}
+        isValidNewOption={() => false} // dont allow workspace creation
+        className="select-workspace-group"
+        classNamePrefix="select-workspace-group"
+        options={workspacesOptions}
+        filterOption={(option, inputValue) => option.label.toLowerCase().includes(inputValue.toLowerCase())}
+        placeholder="Select workspace"
+        theme={(theme) => ({
+          ...theme,
+          borderRadius: 4,
+          colors: {
+            ...theme.colors,
+            primary: "#ffffff19",
+            primary25: "#282828",
+            neutral0: "#1a1a1a",
+          },
+        })}
+        value={selectedWorkspace}
+        onChange={(newSelectedOption) => setSelectedWorkspace(newSelectedOption)}
+      />
+
+      <RQTooltip
+        showArrow={false}
+        title={selectedWorkspace ? null : "Please select workspace first"}
+        placement="bottom"
+      >
+        <>
+          <CreatableReactSelect
+            isDisabled={!selectedWorkspace}
+            isMulti={false}
+            className="select-collection-group"
+            classNamePrefix="select-collection-group"
+            options={collectionOptions}
+            filterOption={(option, inputValue) => option.label.toLowerCase().includes(inputValue.toLowerCase())}
+            placeholder="Select or type collection name"
+            theme={(theme) => ({
+              ...theme,
+              borderRadius: 4,
+              colors: {
+                ...theme.colors,
+                primary: "#ffffff19",
+                primary25: "#282828",
+                neutral0: "#1a1a1a",
+              },
+            })}
+            value={selectedCollection}
+            onChange={(newSelectedOption) => setSelectedCollection(newSelectedOption)}
+          />
+        </>
+      </RQTooltip>
+    </Modal>
+  );
+};
+
+const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  recordsToMove,
+  isBulkActionMode = false,
+}) => {
+  const contextId = useContextId();
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
+  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const collectionOptions = useMemo(() => {
+    return getCollectionOptionsToMoveIn(contextId, recordsToMove);
+  }, [contextId, recordsToMove]);
+
+  const handleRecordMove = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      const context = getApiClientFeatureContext(contextId);
+      const collectionId = selectedCollection?.__isNew__
+        ? await createNewCollection(context, selectedCollection?.label)
+        : selectedCollection.value;
+
+      if (collectionId) {
+        await moveRecordsToCollection({
+          contextId,
+          recordsToMove,
+          collectionId,
+          destinationContextId: contextId,
+        });
+      }
+
+      trackRequestMoved(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
+      toast.success("Requests moved to collection successfully");
+    } catch (error) {
+      notification.error({
+        message: `Error moving records to collection`,
+        description: error?.message,
+        placement: "bottomRight",
+      });
+
+      Sentry.withScope((scope) => {
+        scope.setTag("error_type", "api_client_move_to_collection");
+        Sentry.captureException(error);
+      });
+
+      trackMoveRequestToCollectionFailed(selectedCollection?.__isNew__ ? "new_collection" : "existing_collection");
+    } finally {
+      setIsLoading(false);
+      onClose();
+    }
+  }, [
+    contextId,
+    selectedCollection?.__isNew__,
+    selectedCollection?.label,
+    selectedCollection?.value,
+    recordsToMove,
+    onClose,
+  ]);
+
+  return (
+    <Modal
+      open={isOpen}
+      destroyOnClose
+      onCancel={onClose}
+      title="Move to Collection"
+      className="custom-rq-modal move-to-collection-modal"
       footer={
         <RQButton type="primary" disabled={!selectedCollection} loading={isLoading} onClick={handleRecordMove}>
           {selectedCollection?.__isNew__ ? "Create collection and Move" : "Move"}
@@ -159,6 +273,26 @@ export const MoveToCollectionModal: React.FC<Props> = ({ isOpen, onClose, record
         value={selectedCollection}
         onChange={(newSelectedOption) => setSelectedCollection(newSelectedOption)}
       />
+
+      {viewMode === ApiClientViewMode.MULTI && isBulkActionMode ? (
+        <div className="multi-view-mode-info">
+          <MdInfoOutline />
+          <div className="info">
+            Moving requests between workspaces isn't supported yet. However, you can move the request files manually on
+            your system, and they'll reflect here after a refresh.
+          </div>
+        </div>
+      ) : null}
     </Modal>
   );
+};
+
+export const MoveToCollectionModal: React.FC<Props> = ({ ...props }) => {
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
+  if (viewMode === ApiClientViewMode.MULTI && !props.isBulkActionMode) {
+    return <MoveRecordAcrossWorkspaceModal {...props} />;
+  } else {
+    return <MoveRecordInSameWorkspaceModal {...props} />;
+  }
 };

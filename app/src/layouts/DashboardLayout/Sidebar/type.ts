@@ -8,4 +8,7 @@ export interface PrimarySidebarItem extends Record<string, unknown> {
   display?: boolean;
   feature?: string;
   activeColor?: string;
+  tooltipContent?: React.ReactNode;
+  disabled?: boolean;
+  order?: number;
 }

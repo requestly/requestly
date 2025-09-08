@@ -1,0 +1,36 @@
+# Cursor Rules for Requestly Project
+
+## Project Context
+This is the Requestly project - a browser extension and web application for request interception and modification.
+
+## Code Organization
+- `app/` - Main web application
+- `browser-extension/` - Browser extension code
+- `shared/` - Shared utilities and components
+- `common/` - Common code used across different parts
+- `ee/` - Enterprise features
+- `public/` - Static assets
+
+## Dead Code Areas
+- `dist/` - Build output directory (contains generated files, avoid editing)
+- `node_modules/` - Dependencies (never edit directly)
+- `browser-extension/sessionbear`
+
+## Coding Guidelines
+- Follow existing code style and patterns
+- Use TypeScript where applicable
+- Maintain backward compatibility for browser extension APIs
+- Follow the existing file structure and naming conventions
+
+## Special Instructions
+- When working with browser extension code, consider cross-browser compatibility
+- Shared utilities should be placed in `shared/` directory
+- Enterprise features should be isolated in `ee/` directory
+- Always test changes across different browsers for extension code
+- Communication between Web app and Browser Extension happens through Message Handling
+
+## Dead Code Warnings
+⚠️ The following directories contain generated/dead code:
+- `dist/` - Build artifacts, do not edit
+- `node_modules/` - Dependencies, do not edit
+- Any `.min.js` files are minified and should not be edited directly

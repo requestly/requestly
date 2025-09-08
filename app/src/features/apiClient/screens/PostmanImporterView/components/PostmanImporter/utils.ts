@@ -1,13 +1,14 @@
-import { EnvironmentVariableType, EnvironmentVariableValue } from "backend/environment/types";
+import { EnvironmentVariableType } from "backend/environment/types";
 import { KeyValuePair, PostmanBodyMode, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { POSTMAN_AUTH_TYPES_MAPPING, PostmanAuth } from "features/apiClient/constants";
-import { Authorization } from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/types/AuthConfig";
+import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { isEmpty } from "lodash";
 import {
   getDefaultAuth,
   getDefaultAuthType,
-} from "features/apiClient/screens/apiClient/components/clientView/components/request/components/AuthorizationView/defaults";
+} from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
+import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 
 interface PostmanCollectionExport {
   info: {
@@ -49,7 +50,7 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
   const isGlobalEnvironment = fileContent?._postman_variable_scope === "globals";
 
   const variables = fileContent.values.reduce(
-    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+    (acc: Record<string, EnvironmentVariableData>, variable: any, index: number) => {
       // dont add variables with empty key
       if (!variable.key) {
         return acc;
@@ -57,6 +58,7 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
 
       acc[variable.key] = {
         id: index,
+        isPersisted: true,
         syncValue: variable.value,
         type:
           variable.type === EnvironmentVariableType.Secret
@@ -243,7 +245,7 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     const contentType = RequestContentType.JSON;
     const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
     return {
-      requestBody: "",
+      requestBody: JSON.stringify(graphql),
       contentType,
       headers: updatedHeaders,
     };
@@ -301,6 +303,7 @@ const createApiRecord = (
     type: RQAPI.RecordType.API,
     deleted: false,
     data: {
+      type: RQAPI.ApiEntryType.HTTP,
       request: {
         url: typeof request.url === "string" ? request.url : request.url?.raw ?? "",
         method: request.method || RequestMethod.GET,
@@ -309,10 +312,11 @@ const createApiRecord = (
         body: requestBody,
         contentType,
       },
+      response: null,
       auth: processAuthorizationOptions(request.auth, parentCollectionId),
       scripts: processScripts(item),
     },
-  };
+  } as RQAPI.HttpApiRecord;
 };
 
 const createCollectionRecord = (
@@ -323,12 +327,13 @@ const createCollectionRecord = (
   auth?: any,
   parentCollectionId?: string
 ): Partial<RQAPI.CollectionRecord> => {
-  const collectionVariables: Record<string, EnvironmentVariableValue> = {};
+  const collectionVariables: Record<string, EnvironmentVariableData> = {};
   if (variables) {
     variables.forEach((variable: any, index: number) => {
       collectionVariables[variable.key] = {
         id: index,
         syncValue: variable.value,
+        isPersisted: true,
         type:
           variable.type === EnvironmentVariableType.Secret
             ? EnvironmentVariableType.Secret
@@ -409,16 +414,17 @@ export const processPostmanCollectionData = (
 
 export const processPostmanVariablesData = (
   fileContent: PostmanCollectionExport
-): Record<string, EnvironmentVariableValue> | null => {
+): Record<string, EnvironmentVariableData> | null => {
   if (!fileContent?.variable?.length) {
     return null;
   }
 
   const variables = fileContent.variable.reduce(
-    (acc: Record<string, EnvironmentVariableValue>, variable: any, index: number) => {
+    (acc: Record<string, EnvironmentVariableData>, variable: any, index: number) => {
       acc[variable.key] = {
         id: index,
         syncValue: variable.value,
+        isPersisted: true,
         type:
           variable.type === EnvironmentVariableType.Secret
             ? EnvironmentVariableType.Secret

@@ -1,4 +1,3 @@
-import { teamsActions } from "store/features/teams/slice";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
@@ -16,9 +15,11 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { WorkspaceType } from "types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { resetToSingleView } from "features/apiClient/commands/multiView";
+import { WorkspaceType } from "features/workspaces/types";
+import { clientStorageService } from "services/clientStorageService";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -34,13 +35,16 @@ export const switchWorkspace = async (
   setLoader,
   source
 ) => {
-  const { teamId, teamName, teamMembersCount, workspaceType } = newWorkspaceDetails;
+  const { teamId } = newWorkspaceDetails;
 
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
+
+    // isWorkspaceMode - true implies user is working on a team workspace - local or shared
+    // false implies user is working on a private workspace
     if (!isWorkspaceMode) {
       // User is currently on private workspace
       if (!isSyncEnabled) {
@@ -85,10 +89,10 @@ export const switchWorkspace = async (
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
-    await StorageService(appMode).clearDB();
+    await clientStorageService.clearStorage();
   }
 
-  getTabServiceActions().resetTabs();
+  getTabServiceActions().resetTabs(true);
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
@@ -97,18 +101,10 @@ export const switchWorkspace = async (
   if (teamId === null) {
     // We are switching to pvt workspace
     // Clear team members info
-    dispatch(teamsActions.setCurrentlyActiveWorkspaceMembers({}));
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
-  dispatch(
-    teamsActions.setCurrentlyActiveWorkspace({
-      id: teamId,
-      name: teamName,
-      membersCount: teamMembersCount,
-      workspaceType: workspaceType,
-    })
-  );
+  resetToSingleView();
   dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
 
   //Refresh Rules List

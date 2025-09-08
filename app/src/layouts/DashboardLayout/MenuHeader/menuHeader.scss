@@ -1,10 +1,10 @@
 .app-primary-header {
   &.ant-layout-header {
-    height: 52px;
+    height: inherit;
     line-height: unset;
-    padding: var(--space-2, 4px) var(--space-4, 8px);
-    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-    background: var(--requestly-color-surface-0, #212121);
+    padding: var(--requestly-space-1, 2px) var(--requestly-space-4, 8px) var(--requestly-space-1, 2px)
+      var(--requestly-space-4, 8px);
+    background: transparent;
   }
 
   .github-star-button {
@@ -38,10 +38,15 @@
     }
   }
 
+  &__mid {
+    position: absolute;
+    left: 50%;
+  }
+
   &__right {
     display: flex;
     align-items: center;
-    gap: var(--space-2, 4px);
+    gap: var(--requestly-space-4, 16px);
 
     .header-proxy-server-status-icon {
       img {
@@ -63,7 +68,7 @@
       .header-search-btn-content {
         display: flex;
         align-items: center;
-        gap: var(--space-2, 4px);
+        gap: var(--requestly-space-2, 4px);
       }
 
       &:hover {
@@ -83,6 +88,22 @@
 
       .ant-btn {
         font-weight: var(--requestly-font-weight-medium);
+      }
+    }
+
+    &-section {
+      display: flex;
+      align-items: center;
+      gap: var(--requestly-space-2, 4px);
+
+      .ant-btn.rq-custom-btn.ant-btn-ghost,
+      .ant-btn.rq-custom-btn.ant-btn-text,
+      .ant-btn.rq-custom-btn.rq-btn-transparent {
+        color: var(--requestly-color-text-subtle);
+
+        &:hover {
+          color: var(--requestly-color-text-default);
+        }
       }
     }
   }

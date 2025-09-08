@@ -5,6 +5,7 @@
   align-items: center;
   gap: 8px;
   border-radius: var(--space-4, 8px);
+  background-color: var(--requestly-color-surface-0);
 
   .empty-message {
     text-align: center;
@@ -16,18 +17,22 @@
     margin: 0;
   }
   .empty-state-actions {
-    padding: 16px 0 16px 0;
+    padding: 12px 0 12px 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 
-    .new-request-link {
+    .new-collection-link {
       font-family: var(--requestly-font-family-default);
       font-size: var(--requestly-font-size-xs);
       font-style: normal;
       font-weight: 400;
       line-height: 17px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   }
 }

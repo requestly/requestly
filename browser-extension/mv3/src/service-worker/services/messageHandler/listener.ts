@@ -22,7 +22,7 @@ import {
   saveTestRuleResult,
 } from "../testThisRuleHandler";
 import ruleExecutionHandler from "../ruleExecutionHandler";
-import { isExtensionEnabled, isUrlInBlockList } from "../../../utils";
+import { getPopupConfig, isExtensionEnabled, isUrlInBlockList } from "../../../utils";
 import { globalStateManager } from "../globalStateManager";
 import { isProxyApplied } from "../proxy";
 import {
@@ -31,7 +31,7 @@ import {
   checkIfDesktopAppOpen,
 } from "../desktopApp/index";
 import { sendMessageToApp } from "./sender";
-import { updateExtensionStatus } from "../utils";
+import { triggerOpenCurlModalMessage, updateExtensionStatus } from "../utils";
 import extensionIconManager from "../extensionIconManager";
 
 export const initExternalMessageListener = () => {
@@ -187,7 +187,7 @@ export const initMessageHandler = () => {
       }
 
       case EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
-        sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
+        sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED, payload: message?.payload });
         break;
 
       case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
@@ -213,6 +213,20 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CHECK_IF_DESKTOP_APP_OPEN:
         checkIfDesktopAppOpen().then(sendResponse);
         return true;
+
+      case EXTENSION_MESSAGES.IS_SESSION_REPLAY_ENABLED:
+        getPopupConfig()
+          .then((config) => {
+            sendResponse(config?.session_replay === true);
+          })
+          .catch(() => {
+            sendResponse(false);
+          });
+        return true;
+
+      case EXTENSION_MESSAGES.TRIGGER_OPEN_CURL_MODAL:
+        triggerOpenCurlModalMessage({}, message.source);
+        break;
     }
 
     return false;

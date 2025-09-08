@@ -367,3 +367,7 @@ export const getIsOnboardingCompleted = (state) => {
 export const getIsAcquisitionAnnouncementModalVisible = (state) => {
   return getGlobalState(state).onboarding.isAcquisitionAnnouncementModalVisible;
 };
+
+export const getPopupConfig = (state) => {
+  return getGlobalState(state).popupConfig;
+};

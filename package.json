@@ -26,6 +26,10 @@
     "url": "https://requestly.com/"
   },
   "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
   "bugs": {
     "url": "https://github.com/requestly/requestly/issues"
   },

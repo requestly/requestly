@@ -1,16 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
-import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Tooltip, Typography, notification } from "antd";
+import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
-import { useApiClientContext } from "features/apiClient/contexts";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineFolderSpecial } from "@react-icons/all-files/md/MdOutlineFolderSpecial";
 import { PiFolderOpen } from "@react-icons/all-files/pi/PiFolderOpen";
-import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { IoChevronForward } from "@react-icons/all-files/io5/IoChevronForward";
 import { SidebarPlaceholderItem } from "../../SidebarPlaceholderItem/SidebarPlaceholderItem";
 import { isEmpty } from "lodash";
 import { sessionStorage } from "utils/sessionStorage";
@@ -20,34 +19,62 @@ import { MdOutlineDelete } from "@react-icons/all-files/md/MdOutlineDelete";
 import { MdOutlineIosShare } from "@react-icons/all-files/md/MdOutlineIosShare";
 import { Conditional } from "components/common/Conditional";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { CollectionViewTabSource } from "../../../../clientView/components/Collection/collectionViewTabSource";
+import { CollectionViewTabSource } from "../../../../views/components/Collection/collectionViewTabSource";
 import { useDrag, useDrop } from "react-dnd";
-import "./CollectionRow.scss";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import RequestlyIcon from "assets/img/brand/rq_logo.svg";
+import PostmanIcon from "assets/img/brand/postman-icon.svg";
+import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
+import "./CollectionRow.scss";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
+import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
+import { useApiClientContext } from "features/apiClient/contexts";
+import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+
+export enum ExportType {
+  REQUESTLY = "requestly",
+  POSTMAN = "postman",
+}
 
 interface Props {
   record: RQAPI.CollectionRecord;
-  onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType, collectionId?: string) => Promise<void>;
-  onExportClick: (collection: RQAPI.CollectionRecord) => void;
-  setExpandedRecordIds: (keys: RQAPI.Record["id"][]) => void;
+  onNewClick: (
+    src: RQAPI.AnalyticsEventSource,
+    recordType: RQAPI.RecordType,
+    collectionId?: string,
+    entryType?: RQAPI.ApiEntryType
+  ) => Promise<void>;
+  onRequestlyExportClick: (collection: RQAPI.CollectionRecord, exportType: ExportType) => void;
+  setExpandedRecordIds: (keys: RQAPI.ApiClientRecord["id"][]) => void;
   expandedRecordIds: string[];
   isReadOnly: boolean;
   bulkActionOptions: {
     showSelection: boolean;
-    selectedRecords: Set<RQAPI.Record["id"]>;
-    recordsSelectionHandler: (record: RQAPI.Record, event: React.ChangeEvent<HTMLInputElement>) => void;
+    selectedRecords: Set<RQAPI.ApiClientRecord["id"]>;
+    recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
+
+export type DraggableApiRecord = {
+  record: RQAPI.ApiClientRecord;
+  contextId: ApiClientFeatureContext["id"];
+};
 
 export const CollectionRow: React.FC<Props> = ({
   record,
   onNewClick,
-  onExportClick,
+  onRequestlyExportClick: onExportClick,
   expandedRecordIds,
   setExpandedRecordIds,
   bulkActionOptions,
   isReadOnly,
+  handleRecordsToBeDeleted,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -55,27 +82,40 @@ export const CollectionRow: React.FC<Props> = ({
   const [createNewField, setCreateNewField] = useState(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
-  const {
-    updateRecordsToBeDeleted,
-    setIsDeleteModalOpen,
-    onSaveRecord,
-    apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
-  } = useApiClientContext();
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
-  const [getParentChain, getRecordDataFromId] = useAPIRecords((state) => [state.getParentChain, state.getData]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
+
+  const [collectionsToExport, setCollectionsToExport] = useState([]);
+  const { onNewClickV2 } = useApiClientContext();
+  const contextId = useContextId();
+  const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
+    state.openTab,
+    state.activeTabSource,
+    state.closeTabBySource,
+  ]);
+  const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
+
+  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+    setCollectionsToExport((prev) => [...prev, collection]);
+
+    switch (exportType) {
+      case ExportType.REQUESTLY:
+        setIsExportModalOpen(true);
+        break;
+      case ExportType.POSTMAN:
+        setIsPostmanExportModalOpen(true);
+        break;
+      default:
+        console.warn(`Unknown export type: ${exportType}`);
+    }
+  }, []);
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
       return activeTabSource.getSourceId();
     }
   }, [activeTabSource]);
-
-  const handleDropdownVisibleChange = (isOpen: boolean) => {
-    setIsDropdownVisible(isOpen);
-  };
 
   const getCollectionOptions = useCallback(
     (record: RQAPI.CollectionRecord) => {
@@ -96,15 +136,32 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "1",
           label: (
-            <div>
+            <span>
               <MdOutlineIosShare style={{ marginRight: 8 }} />
-              Export
-            </div>
+              Export as
+            </span>
           ),
-          onClick: (itemInfo) => {
-            itemInfo.domEvent?.stopPropagation?.();
-            onExportClick(record);
-          },
+          expandIcon: <IoChevronForward style={{ position: "absolute", right: 12 }} />,
+          children: [
+            {
+              key: "1-1",
+              label: "Requestly",
+              icon: <img src={RequestlyIcon} alt="Requestly Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.REQUESTLY);
+              },
+            },
+            {
+              key: "1-2",
+              label: "Postman (v2.1 format)",
+              icon: <img src={PostmanIcon} alt="Postman Icon" style={{ width: 16, height: 16, marginRight: 8 }} />,
+              onClick: (itemInfo) => {
+                itemInfo.domEvent?.stopPropagation?.();
+                handleCollectionExport(record, ExportType.POSTMAN);
+              },
+            },
+          ],
         },
         {
           key: "2",
@@ -117,19 +174,18 @@ export const CollectionRow: React.FC<Props> = ({
           danger: true,
           onClick: (itemInfo) => {
             itemInfo.domEvent?.stopPropagation?.();
-            updateRecordsToBeDeleted([record]);
-            setIsDeleteModalOpen(true);
+            handleRecordsToBeDeleted([record]);
           },
         },
       ];
 
       return items;
     },
-    [setIsDeleteModalOpen, updateRecordsToBeDeleted, onExportClick]
+    [handleRecordsToBeDeleted, handleCollectionExport]
   );
 
   const collapseChangeHandler = useCallback(
-    (keys: RQAPI.Record["id"][]) => {
+    (keys: RQAPI.ApiClientRecord["id"][]) => {
       let activeKeysCopy = [...expandedRecordIds];
       if (isEmpty(keys)) {
         activeKeysCopy = activeKeysCopy.filter((key) => key !== record.id);
@@ -155,21 +211,30 @@ export const CollectionRow: React.FC<Props> = ({
   }, []);
 
   const handleRecordDrop = useCallback(
-    async (item: Partial<RQAPI.Record>) => {
+    async (item: DraggableApiRecord, dropContextId: string) => {
       try {
-        const entryToMove = getRecordDataFromId(item.id);
-        const result = await apiClientRecordsRepository.moveAPIEntities([entryToMove], record.id);
-        onSaveRecord(result[0]);
-        forceRefreshApiClientRecords();
+        const sourceContext = getApiClientFeatureContext(item.contextId);
 
-        // Expand the collection after successful drop
+        const destination = {
+          contextId: dropContextId,
+          collectionId: record.id,
+        };
+
+        const { oldContextRecords } = await moveRecordsAcrossWorkspace(sourceContext, {
+          recordsToMove: [item.record],
+          destination,
+        });
+
+        oldContextRecords?.forEach((r) => {
+          closeTabBySource(r.id, "request", true);
+        });
+
         if (!expandedRecordIds.includes(record.id)) {
-          const newExpandedRecordIds = [...expandedRecordIds, record.id];
+          const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
           setExpandedRecordIds(newExpandedRecordIds);
           sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
         }
       } catch (error) {
-        console.log("error DBG", error);
         notification.error({
           message: "Error moving item",
           description: error?.message || "Failed to move item. Please try again.",
@@ -179,31 +244,23 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [
-      record.id,
-      apiClientRecordsRepository,
-      onSaveRecord,
-      forceRefreshApiClientRecords,
-      expandedRecordIds,
-      setExpandedRecordIds,
-      getRecordDataFromId,
-    ]
+    [record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
-    (item: Partial<RQAPI.Record>): boolean => {
-      if (item.id === record.id) {
+    (item: DraggableApiRecord): boolean => {
+      if (item.record.id === record.id) {
         return false;
       }
 
-      if (item.collectionId === record.id) {
+      if (item.record.collectionId === record.id) {
         return false;
       }
 
       // For collections, check for circular reference (parent-child relationship)
-      if (item.type === RQAPI.RecordType.COLLECTION) {
+      if (item.record.type === RQAPI.RecordType.COLLECTION) {
         const parentIds = getParentChain(record.id);
-        const wouldCreateCircularReference = parentIds.includes(item.id);
+        const wouldCreateCircularReference = parentIds.includes(item.record.id);
         return !wouldCreateCircularReference;
       }
 
@@ -215,35 +272,61 @@ export const CollectionRow: React.FC<Props> = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: RQAPI.RecordType.COLLECTION,
-      item: { id: record.id, type: record.type, collectionId: record.collectionId },
+      item: {
+        record,
+        contextId,
+      },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record.id, record.type]
+    [record, contextId]
   );
 
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: Partial<RQAPI.Record>, monitor) => {
+      drop: (item: DraggableApiRecord, monitor) => {
         const isOverCurrent = monitor.isOver({ shallow: true });
         if (!isOverCurrent) return;
 
-        if (item.id === record.id) return;
+        if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item);
+        handleRecordDrop(item, contextId);
       },
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem]
+    [handleRecordDrop, checkCanDropItem, contextId]
   );
 
   return (
     <>
+      {isExportModalOpen ? (
+        <ApiClientExportModal
+          exportType="collection"
+          recordsToBeExported={collectionsToExport}
+          isOpen={isExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsExportModalOpen(false);
+          }}
+        />
+      ) : null}
+
+      {isPostmanExportModalOpen && (
+        <PostmanExportModal
+          recordsToBeExported={collectionsToExport}
+          isOpen={isPostmanExportModalOpen}
+          onClose={() => {
+            setCollectionsToExport([]);
+            setIsPostmanExportModalOpen(false);
+          }}
+        />
+      )}
+
       {isEditMode ? (
         <NewRecordNameInput
           analyticEventSource="collection_row"
@@ -299,12 +382,17 @@ export const CollectionRow: React.FC<Props> = ({
                   onClick={(e) => {
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
-
                     if (!isExpanded) {
                       // Collection is collapsed - open tab and expand
                       if (!isAlreadyActive) {
                         openTab(
-                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          new CollectionViewTabSource({
+                            id: record.id,
+                            title: record.name || "New Collection",
+                            context: {
+                              id: contextId,
+                            },
+                          }),
                           { preview: true }
                         );
                       }
@@ -315,7 +403,13 @@ export const CollectionRow: React.FC<Props> = ({
                         // First click - make tab active and prevent collapse
                         e.stopPropagation();
                         openTab(
-                          new CollectionViewTabSource({ id: record.id, title: record.name || "New Collection" }),
+                          new CollectionViewTabSource({
+                            id: record.id,
+                            title: record.name || "New Collection",
+                            context: {
+                              id: contextId,
+                            },
+                          }),
                           { preview: true }
                         );
                       }
@@ -341,47 +435,29 @@ export const CollectionRow: React.FC<Props> = ({
                   </Typography.Text>
 
                   <Conditional condition={!isReadOnly}>
-                    <div
-                      className={`collection-options ${hoveredId === record.id || isDropdownVisible ? "active" : " "}`}
-                    >
-                      <Tooltip title={"Add Request"}>
+                    <div className={`collection-options ${hoveredId === record.id ? "active" : " "}`}>
+                      <NewApiRecordDropdown
+                        invalidActions={[NewRecordDropdownItemType.ENVIRONMENT]}
+                        onSelect={(params) => {
+                          setActiveKey(record.id);
+                          setCreateNewField(params.recordType);
+                          onNewClick("collection_row", params.recordType, record.id, params.entryType).then(() => {
+                            setCreateNewField(null);
+                          });
+                        }}
+                      >
                         <RQButton
                           size="small"
                           type="transparent"
-                          icon={<FileAddOutlined />}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveKey(record.id);
-                            setCreateNewField(RQAPI.RecordType.API);
-                            onNewClick("collection_row", RQAPI.RecordType.API, record.id).then(() => {
-                              setCreateNewField(null);
-                            });
-                          }}
+                          icon={<MdAdd />}
+                          onClick={(e) => e.stopPropagation()}
                         />
-                      </Tooltip>
-                      <Tooltip title={"Add Collection"}>
-                        <RQButton
-                          size="small"
-                          type="transparent"
-                          icon={<FolderAddOutlined />}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveKey(record.id);
-                            setCreateNewField(RQAPI.RecordType.COLLECTION);
-                            onNewClick("collection_row", RQAPI.RecordType.COLLECTION, record.id).then(() => {
-                              setCreateNewField(null);
-                            });
-                          }}
-                        />
-                      </Tooltip>
-
+                      </NewApiRecordDropdown>
                       <Dropdown
                         trigger={["click"]}
                         menu={{ items: getCollectionOptions(record) }}
                         placement="bottomRight"
                         overlayClassName="collection-dropdown-menu"
-                        open={isDropdownVisible}
-                        onOpenChange={handleDropdownVisibleChange}
                       >
                         <RQButton
                           onClick={(e) => {
@@ -408,10 +484,17 @@ export const CollectionRow: React.FC<Props> = ({
                     <ApiRecordEmptyState
                       record={record}
                       disabled={isReadOnly}
-                      analyticEventSource="collection_row"
                       message="No requests created yet"
                       newRecordBtnText="New collection"
-                      onNewClick={onNewClick}
+                      onNewClick={(src, recordType, collectionId, entryType) =>
+                        onNewClickV2({
+                          contextId: contextId,
+                          analyticEventSource: src,
+                          recordType,
+                          collectionId,
+                          entryType,
+                        })
+                      }
                     />
                   ) : (
                     record.data.children?.map((apiRecord) => {
@@ -422,6 +505,7 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             bulkActionOptions={bulkActionOptions}
+                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                           />
                         );
                       } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -431,10 +515,11 @@ export const CollectionRow: React.FC<Props> = ({
                             key={apiRecord.id}
                             record={apiRecord}
                             onNewClick={onNewClick}
-                            onExportClick={onExportClick}
+                            onRequestlyExportClick={onExportClick} // FIXME: this will break in multi-view
                             expandedRecordIds={expandedRecordIds}
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
+                            handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                           />
                         );
                       }

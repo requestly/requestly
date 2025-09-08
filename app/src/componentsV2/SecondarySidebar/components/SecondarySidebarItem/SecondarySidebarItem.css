@@ -6,22 +6,23 @@
   column-gap: 15px;
   font-size: var(--requestly-font-size-sm);
   line-height: 16px;
+  color: var(--requestly-color-text-default);
   padding: 7px 18px;
-  color: var(--gray-light);
   border-radius: var(--border-radius-sm);
 }
 
 .rq-secondary-sidebar-item .icon__wrapper svg {
+  color: var(--requestly-color-text-subtle);
   width: 17px;
   height: 15px;
 }
 
 .rq-secondary-sidebar-active-item {
-  color: white;
-  background-color: var(--gray-dark);
+  color: var(--requestly-color-text-default);
+  background-color: var(--requestly-color-white-t-20);
 }
 
 .rq-secondary-sidebar-item:hover {
-  color: white;
-  background-color: var(--hover-color);
+  color: var(--requestly-color-text-default);
+  background-color: var(--requestly-color-white-t-10);
 }

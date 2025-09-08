@@ -4,6 +4,7 @@ import { sendMessageToApp } from "./messageHandler/sender";
 import { CLIENT_MESSAGES } from "common/constants";
 import extensionIconManager from "./extensionIconManager";
 import { updateActivationStatus } from "./contextMenu";
+import { tabService } from "./tabService";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -181,4 +182,32 @@ export const updateExtensionStatus = async (newStatus: boolean) => {
   });
 
   return newStatus;
+};
+
+export const triggerOpenCurlModalMessage = async (
+  defaultCurlConfig: { selectedText?: string; pageURL?: string },
+  source: string
+) => {
+  try {
+    // Create a new tab with the web URL
+    const newTab = await tabService.createAppTab();
+
+    // Wait for the tab to load completely
+    await tabService.ensureTabLoadingComplete(newTab.id);
+
+    // Send message to the new tab to open cURL import modal with pre-filled text
+    const message = {
+      action: CLIENT_MESSAGES.OPEN_CURL_IMPORT_MODAL,
+      payload: {
+        curlCommand: defaultCurlConfig.selectedText ?? "",
+        pageURL: defaultCurlConfig.pageURL,
+        source,
+      },
+    };
+
+    // Send message without expecting a response (one-way notification)
+    chrome.tabs.sendMessage(newTab.id, message);
+  } catch (error) {
+    console.error(`[triggerOpenCurlModalMessage] Error:`, error);
+  }
 };

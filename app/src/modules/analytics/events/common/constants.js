@@ -137,6 +137,7 @@ export const SOURCE = {
   DESKTOP_ONBOARDING: "desktop_onboarding",
   PRICING_TABLE: "pricing_table",
   TEAM_WORKSPACE_BAD_INVITE_SCREEN: "team_workspace_bad_invite_screen",
+  WORKSPACE_DROPDOWN: "workspace_dropdown",
 };
 
 export const RULES = {
@@ -236,6 +237,10 @@ export const TEAMS = {
   WORKSPACE_INVITE_ANIMATION_VIEWED: "workspace_invite_animation_viewed",
   GET_TEAM_PLAN_BANNER_VIEWED: "get_team_plan_banner_viewed",
   GET_TEAM_PLAN_BANNER_CLICKED: "get_team_plan_banner_clicked",
+
+  MULTI_WORKSPACE_SELECTED: "multi_workspace_selected",
+  MULTI_WORKSPACE_DESELECTED: "multi_workspace_deselected",
+  MANAGE_WORKSPACE_CLICKED: "manage_workspace_clicked",
 };
 
 export const TRAFFIC_TABLE = {

@@ -28,7 +28,6 @@ import {
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
-import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
@@ -46,8 +45,21 @@ import FEATURES from "config/constants/sub/features";
 import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { ApiClientImporterType } from "features/apiClient/types";
+import { clientStorageService } from "services/clientStorageService";
 
 let hasAppModeBeenSet = false;
+/**
+ * AppModeInitializer is a React component responsible for initializing and handling
+ * side effects based on the current application mode (Desktop, Extension, etc.).
+ *
+ * It sets up background processes, message handlers, authentication listeners,
+ * and navigation logic for different app modes. It also manages communication
+ * with browser extensions and desktop services, and ensures that the application
+ * state is correctly synchronized with user authentication and workspace context.
+ *
+ * This component does not render any UI and returns null.
+ */
 
 const AppModeInitializer = () => {
   const navigate = useNavigate();
@@ -324,9 +336,7 @@ const AppModeInitializer = () => {
     hasMessageHandlersBeenSet.current = true;
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      StorageService(appMode)
-        .saveRecord(getEventsEngineFlag)
-        .then(() => notifyAppLoadedToExtension());
+      clientStorageService.saveStorageObject(getEventsEngineFlag).then(() => notifyAppLoadedToExtension());
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
         const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
@@ -351,8 +361,26 @@ const AppModeInitializer = () => {
           received: true,
         };
       });
+
+      PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL, (message) => {
+        const { curlCommand, pageURL, source } = message.payload;
+
+        // Navigate to API Client with cURL import modal state
+        const navigationState = {
+          modal: ApiClientImporterType.CURL,
+          curlCommand,
+          pageURL,
+          source,
+        };
+
+        navigate(PATHS.API_CLIENT.ABSOLUTE, { state: navigationState });
+
+        return {
+          received: true,
+        };
+      });
     }
-  }, [appMode, activeWorkspaceId, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid]);
+  }, [appMode, activeWorkspaceId, dispatch, user?.details?.isSyncEnabled, user?.details?.profile?.uid, navigate]);
 
   return null;
 };

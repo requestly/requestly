@@ -1,99 +1,61 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { StoreApi, useStore } from "zustand";
-import { ApiRecordsState, createApiRecordsStore } from "./apiRecords.store";
+import { ApiRecordsState } from "./apiRecords.store";
+import { EnvironmentsState } from "../environments/environments.store";
+import { ErroredRecordsState } from "../erroredRecords/erroredRecords.store";
 import { useShallow } from "zustand/shallow";
-import { useApiClientRepository } from "features/apiClient/helpers/modules/sync/useApiClientSyncRepo";
-import { ApiClientProvider } from "features/apiClient/contexts/apiClient";
-import { notification } from "antd";
-import { RQAPI } from "features/apiClient/types";
-import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
-import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { ApiClientLoadingView } from "features/apiClient/screens/apiClient/components/clientView/components/ApiClientLoadingView/ApiClientLoadingView";
-import { AutoSyncLocalStoreDaemon } from "features/apiClient/helpers/modules/sync/localStore/components/AutoSyncLocalStoreDaemon";
-import { ExampleCollectionsDaemon } from "features/apiClient/exampleCollections/components/ExampleCollectionsDaemon";
-import { ApiClientFilesProvider } from "../ApiClientFilesContextProvider";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
-export const ApiRecordsStoreContext = createContext<StoreApi<ApiRecordsState> | null>(null);
-
-export const ApiRecordsProvider = ({ children }: { children: ReactNode }) => {
-  const { apiClientRecordsRepository } = useApiClientRepository();
-  const [data, setData] = useState<{ records: RQAPI.Record[]; erroredRecords: ErroredRecord[] } | null>(null);
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(true);
-    apiClientRecordsRepository
-      .getAllRecords()
-      .then((result) => {
-        if (!result.success) {
-          notification.error({
-            message: "Could not fetch records!",
-            description: result?.message,
-            placement: "bottomRight",
-          });
-          return;
-        }
-        setData(result.data);
-      })
-      .catch((e) => {
-        notification.error({
-          message: "Could not fetch records!",
-          description: e.message,
-          placement: "bottomRight",
-        });
-        return;
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [apiClientRecordsRepository]);
-
-  if (isLoading) return <ApiClientLoadingView />;
-
-  return (
-    <RecordsProvider data={data!} repository={apiClientRecordsRepository}>
-      {children}
-    </RecordsProvider>
-  );
-};
-
-const RecordsProvider = ({
-  children,
-  data,
-  repository,
-}: {
-  children: ReactNode;
-  data: { records: RQAPI.Record[]; erroredRecords: ErroredRecord[] };
-  repository: ApiClientRecordsInterface<Record<string, any>>;
-}) => {
-  const store = useMemo(() => createApiRecordsStore(data), [data]);
-
-  return (
-    <ApiRecordsStoreContext.Provider value={store}>
-      <ExampleCollectionsDaemon store={store} />
-      <AutoSyncLocalStoreDaemon />
-      <ApiClientFilesProvider records={data.records}>
-        <ApiClientProvider repository={repository}>{children}</ApiClientProvider>
-      </ApiClientFilesProvider>
-    </ApiRecordsStoreContext.Provider>
-  );
+export type AllApiClientStores = {
+  records: StoreApi<ApiRecordsState>;
+  environments: StoreApi<EnvironmentsState>;
+  erroredRecords: StoreApi<ErroredRecordsState>;
 };
 
 export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
-  const store = useContext(ApiRecordsStoreContext);
-  if (!store) {
-    throw new Error("store not found!");
+  const store = useApiClientFeatureContext().stores;
+  if (!store || !store.records) {
+    throw new Error("records store not found!");
   }
 
-  return useStore(store, useShallow(selector));
+  return useStore(store.records, useShallow(selector));
 }
 
 export function useAPIRecordsStore() {
-  const store = useContext(ApiRecordsStoreContext);
-  if (!store) {
-    throw new Error("store not found!");
+  const store = useApiClientFeatureContext().stores;
+
+  if (!store || !store.records) {
+    throw new Error("records store not found!");
   }
 
-  return store;
+  return store.records;
+}
+
+export function useAPIEnvironment<T>(selector: (state: EnvironmentsState) => T) {
+  const store = useApiClientFeatureContext().stores;
+
+  if (!store || !store.environments) {
+    throw new Error("environments store not found!");
+  }
+
+  return useStore(store.environments, useShallow(selector));
+}
+
+export function useAPIEnvironmentStore() {
+  const store = useApiClientFeatureContext().stores;
+
+  if (!store || !store.environments) {
+    throw new Error("environments store not found!");
+  }
+
+  return store.environments;
+}
+
+export function useErroredRecords<T>(selector: (state: ErroredRecordsState) => T) {
+  const store = useApiClientFeatureContext().stores;
+
+  if (!store || !store.erroredRecords) {
+    throw new Error("Errored records store not found!");
+  }
+
+  return useStore(store.erroredRecords, useShallow(selector));
 }
