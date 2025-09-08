@@ -32,7 +32,8 @@ export const switchWorkspace = async (
   currentSyncingState,
   appMode,
   setLoader,
-  source
+  source,
+  skipMultiWorkspaceHandling // hacky fix for multi view behaviour while switching
 ) => {
   const { teamId } = newWorkspaceDetails;
 
@@ -103,7 +104,7 @@ export const switchWorkspace = async (
     dispatch(workspaceActions.setActiveWorkspacesMembers({}));
   }
 
-  resetToSingleView();
+  if (!skipMultiWorkspaceHandling) resetToSingleView();
   dispatch(workspaceActions.setActiveWorkspaceIds(teamId ? [teamId] : []));
 
   //Refresh Rules List
