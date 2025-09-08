@@ -284,6 +284,9 @@ export class HttpRequestExecutor {
   }
 
   async execute(): Promise<RQAPI.ExecutionResult> {
+    //clear the previous response before execution
+    this.entryDetails.response = null;
+
     if (this.entryDetails.request.contentType === RequestContentType.MULTIPART_FORM) {
       const { invalidFiles } = await this.validateMultipartFormBodyFiles();
       const isInvalid = invalidFiles.length > 0;
