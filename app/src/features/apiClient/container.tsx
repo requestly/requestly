@@ -5,7 +5,7 @@ import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextPro
 import { LocalSyncRefreshHandler } from "./LocalSyncRefreshHandler";
 import "./container.scss";
 import { ApiClientLoadingView } from "./screens/apiClient/components/views/components/ApiClientLoadingView/ApiClientLoadingView";
-import { clearStaleContextsOnAuthChange, setupContextWithRepo } from "./commands/context";
+import { clearAllStaleContextOnAuthChange, setupContextWithRepo } from "./commands/context";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import {
@@ -49,7 +49,7 @@ const ApiClientFeatureContainer: React.FC = () => {
     (async () => {
       apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
 
-      clearStaleContextsOnAuthChange({
+      clearAllStaleContextOnAuthChange({
         user: { loggedIn: user.loggedIn },
         workspaceType: activeWorkspace.workspaceType,
       });

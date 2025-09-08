@@ -8,7 +8,7 @@ import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multi
 
 type UserDetails = { loggedIn: boolean };
 
-function clearContextsByRepo(predicate: (repo: ApiClientRepositoryInterface) => boolean) {
+function clearAllContextByRepo(predicate: (repo: ApiClientRepositoryInterface) => boolean) {
   const { contexts } = apiClientFeatureContextProviderStore.getState();
 
   contexts.forEach((ctx) => {
@@ -21,33 +21,33 @@ function clearContextsByRepo(predicate: (repo: ApiClientRepositoryInterface) => 
   });
 }
 
-function clearContextsOnUserLogout() {
-  clearContextsByRepo((repo) => !(repo instanceof ApiClientLocalStoreRepository));
+function clearAllContextOnUserLogout() {
+  clearAllContextByRepo((repo) => !(repo instanceof ApiClientLocalStoreRepository));
 }
 
-function clearContextsOnUserLogin(workspaceType: WorkspaceType) {
+function clearAllContextOnUserLogin(workspaceType: WorkspaceType) {
   if ([WorkspaceType.PERSONAL, WorkspaceType.SHARED].includes(workspaceType)) {
-    clearContextsByRepo((repo) => !(repo instanceof ApiClientCloudRepository));
+    clearAllContextByRepo((repo) => !(repo instanceof ApiClientCloudRepository));
     return;
   }
 
   if (WorkspaceType.LOCAL === workspaceType) {
-    clearContextsByRepo((repo) => !(repo instanceof ApiClientLocalRepository));
+    clearAllContextByRepo((repo) => !(repo instanceof ApiClientLocalRepository));
     return;
   }
 
   if (WorkspaceType.LOCAL_STORAGE === workspaceType) {
-    clearContextsByRepo((repo) => !(repo instanceof ApiClientLocalStoreRepository));
+    clearAllContextByRepo((repo) => !(repo instanceof ApiClientLocalStoreRepository));
     return;
   }
 }
 
-export function clearStaleContextsOnAuthChange(params: { user: UserDetails; workspaceType: WorkspaceType }) {
+export function clearAllStaleContextOnAuthChange(params: { user: UserDetails; workspaceType: WorkspaceType }) {
   const { user, workspaceType } = params;
 
   if (!user.loggedIn) {
-    clearContextsOnUserLogout();
+    clearAllContextOnUserLogout();
   } else {
-    clearContextsOnUserLogin(workspaceType);
+    clearAllContextOnUserLogin(workspaceType);
   }
 }
