@@ -52,6 +52,7 @@ type TabActions = {
   getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
   getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
   consumeIgnorePath: () => boolean;
+  setIgnorePath: (ignorePath: boolean) => void;
 };
 
 export type TabServiceStore = TabServiceState & TabActions;
@@ -74,6 +75,10 @@ const createTabServiceStore = () => {
     persist(
       (set, get) => ({
         ...initialState,
+
+        setIgnorePath(ignorePath) {
+          set({ ignorePath });
+        },
 
         consumeIgnorePath() {
           const { ignorePath } = get();
