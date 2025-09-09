@@ -71,7 +71,7 @@ import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsCon
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
-import { useHttpRequestExecutor } from "features/apiClient/hooks/useHttpRequestExecutor";
+import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,

@@ -41,7 +41,7 @@ import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.ho
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { getRequestTypeForAnalyticEvent } from "../../../utils";
-import { useGraphQLRequestExecutor } from "features/apiClient/hooks/useGraphQLRequestExecutor";
+import { useGraphQLRequestExecutor } from "features/apiClient/hooks/requestExecutors/useGraphQLRequestExecutor";
 
 interface Props {
   recordId: string;
