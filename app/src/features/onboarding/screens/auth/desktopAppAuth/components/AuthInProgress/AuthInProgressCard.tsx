@@ -5,11 +5,11 @@ import { MdOutlineArrowBack } from "@react-icons/all-files/md/MdOutlineArrowBack
 import { googleSignInDesktopApp } from "actions/FirebaseActions";
 import { v4 as uuidv4 } from "uuid";
 import { getDesktopSignInAuthPath } from "utils/PathUtils";
-import { toast } from "utils/Toast";
 import { snakeCase } from "lodash";
 import { useDispatch } from "react-redux";
 import { trackAuthRedirectedFromDesktopApp, trackAuthRedirectUrlCopied } from "modules/analytics/events/desktopApp";
 import "./authInProgressCard.scss";
+import { copyToClipBoard } from "utils/Misc";
 
 interface AuthInProgressCardProp {
   authMode: string;
@@ -42,8 +42,7 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
   }, [authMode, eventSource, onGoBackClick, dispatch]);
 
   const handleCopyUrlClick = () => {
-    navigator.clipboard.writeText(desktopSignInAuthUrl);
-    toast.info("Copied to clipboard");
+    copyToClipBoard(desktopSignInAuthUrl, "Copied to clipboard");
     trackAuthRedirectUrlCopied();
   };
 

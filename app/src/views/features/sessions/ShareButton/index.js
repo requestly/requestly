@@ -17,6 +17,7 @@ import { getSessionRecordingVisibility } from "store/features/session-recording/
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { copyToClipBoard } from "utils/Misc";
 
 const ShareButton = ({ recordingId, showShareModal }) => {
   const dispatch = useDispatch();
@@ -112,11 +113,12 @@ const ShareButton = ({ recordingId, showShareModal }) => {
     return options;
   }, [currentVisibility, isSharedWorkspaceMode]);
 
-  const onCopyLinkClicked = useCallback(() => {
+  const onCopyLinkClicked = useCallback(async () => {
     trackSessionRecordingShareLinkCopied("app");
-    navigator.clipboard.writeText(sharedLink).then(() => {
+    const result = await copyToClipBoard(sharedLink);
+    if (result.success) {
       setLinkCopied(true);
-    });
+    }
   }, [sharedLink]);
 
   return (

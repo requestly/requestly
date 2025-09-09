@@ -21,16 +21,35 @@ export const generateSupportTicketNumber = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-export const copyToClipBoard = (textToCopy, prompt) => {
-  prompt = prompt || "Copied to clipboard!";
-  navigator.clipboard.writeText(textToCopy).then(
-    () => {
-      toast.info(prompt);
-    },
-    (err) => {
-      toast.error("Oops something went wrong");
+export const copyToClipBoard = async (textToCopy, prompt) => {
+  if (document.hasFocus()) {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      if (prompt) {
+        toast.info(prompt);
+      }
+      return { success: true };
+    } catch (error) {
+      toast.error("Oops something went wrong while copying");
+      return { success: false };
     }
-  );
+  } else {
+    const textArea = document.createElement("textarea");
+    textArea.value = textToCopy;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    textArea.style.visibility = "hidden";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    if (prompt) {
+      toast.info(prompt);
+    }
+    return { success: true };
+  }
 };
 
 export const isUserRegisteredOnInstallationDate = async (user, appMode) => {
