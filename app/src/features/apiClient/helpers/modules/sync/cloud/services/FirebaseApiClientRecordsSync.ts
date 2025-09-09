@@ -217,7 +217,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async updateRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"],
-    runConfig: Partial<RQAPI.RunConfig>
+    runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
   ): ResultPromise<boolean> {
     const result = await updateRunConfigFromFirebase(collectionId, runConfigId, runConfig);
 

@@ -85,7 +85,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   updateRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"],
-    runConfig: Partial<RQAPI.RunConfig>
+    runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
   ): ResultPromise<boolean>;
 }
 

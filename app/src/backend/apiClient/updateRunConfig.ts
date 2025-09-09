@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/react";
 export async function updateRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfigId: RQAPI.RunConfig["id"],
-  runConfig: Partial<RQAPI.RunConfig>
+  runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
 ): ResponsePromise<boolean> {
   const result = await _updateRunConfigInFirebase(collectionId, runConfigId, runConfig);
   return result;
@@ -16,7 +16,7 @@ export async function updateRunConfig(
 async function _updateRunConfigInFirebase(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfigId: RQAPI.RunConfig["id"],
-  runConfig: Partial<RQAPI.RunConfig>
+  runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
 ): ResponsePromise<boolean> {
   try {
     const db = getFirestore(firebaseApp);

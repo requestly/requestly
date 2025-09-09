@@ -297,7 +297,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async updateRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"],
-    runConfig: Partial<RQAPI.RunConfig>
+    runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
   ): ResultPromise<boolean> {
     return {
       success: false,
