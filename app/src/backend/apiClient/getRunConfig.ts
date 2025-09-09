@@ -1,5 +1,5 @@
 import firebaseApp from "../../firebase";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { RQAPI } from "features/apiClient/types";
 import * as Sentry from "@sentry/react";
 import { ResponsePromise } from "../types";
@@ -18,7 +18,8 @@ async function _getRunConfigFromFirebase(
 ): ResponsePromise<RQAPI.RunConfig> {
   try {
     const db = getFirestore(firebaseApp);
-    const docRef = doc(db, "apis", collectionId, "runs", "configs", runConfigId);
+    const configsCollectionRef = collection(db, "apis", collectionId, "runs", "configs");
+    const docRef = doc(configsCollectionRef, runConfigId);
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) {
