@@ -22,33 +22,42 @@ export const generateSupportTicketNumber = () => {
 };
 
 export const copyToClipBoard = async (textToCopy, prompt) => {
-  if (document.hasFocus()) {
-    try {
+  const showSuccess = () => {
+    if (prompt) toast.info(prompt);
+  };
+  const showError = () => toast.error("Oops something went wrong while copying");
+
+  try {
+    if (document.hasFocus()) {
       await navigator.clipboard.writeText(textToCopy);
-      if (prompt) {
-        toast.info(prompt);
-      }
+      showSuccess();
       return { success: true };
-    } catch (error) {
-      toast.error("Oops something went wrong while copying");
-      return { success: false };
     }
-  } else {
+  } catch (error) {
+    showError();
+    return { success: false };
+  }
+  try {
     const textArea = document.createElement("textarea");
     textArea.value = textToCopy;
+    textArea.setAttribute("readonly", "");
     textArea.style.position = "fixed";
     textArea.style.left = "-999999px";
     textArea.style.top = "-999999px";
-    textArea.style.visibility = "hidden";
+    textArea.style.opacity = "0";
     document.body.appendChild(textArea);
-    textArea.focus();
     textArea.select();
-    document.execCommand("copy");
+    const ok = typeof document.execCommand === "function" && document.execCommand("copy");
     document.body.removeChild(textArea);
-    if (prompt) {
-      toast.info(prompt);
+    if (ok) {
+      showSuccess();
+      return { success: true };
     }
-    return { success: true };
+    showError();
+    return { success: false };
+  } catch (_) {
+    showError();
+    return { success: false };
   }
 };
 
