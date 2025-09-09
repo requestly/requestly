@@ -20,7 +20,15 @@ const config = async ({ mode }) => {
   return defineConfig({
     define: {
       global: "globalThis",
-      "process.env": loadEnv(mode, process.cwd(), ""),
+      "process.env": {
+        ...loadEnv(mode, process.cwd(), "VITE_"),
+        NODE_ENV: process.env.NODE_ENV,
+        BUILD_MODE: process.env.BUILD_MODE,
+        REACT_APP_ENV: process.env.REACT_APP_ENV,
+        BROWSER: process.env.BROWSER,
+        ENV: process.env.ENV,
+        GITHUB_SHA: process.env.GITHUB_SHA,
+      },
     },
     plugins: [
       nodePolyfills(),
