@@ -86,10 +86,10 @@ const ShareRecordingModal = ({
 
   const onCopyHandler = async () => {
     const offset = getSecondsFromStringifiedMinSec(startFromOffset);
-    trackSessionRecordingShareLinkCopied("app");
     const result = await copyToClipBoard(`${publicURL}${offset ? `?t=${offset}` : ""}`);
     if (result.success) {
       setIsTextCopied(true);
+      trackSessionRecordingShareLinkCopied("app");
       setTimeout(() => {
         setIsTextCopied(false);
       }, 700);

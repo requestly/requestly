@@ -114,10 +114,10 @@ const ShareButton = ({ recordingId, showShareModal }) => {
   }, [currentVisibility, isSharedWorkspaceMode]);
 
   const onCopyLinkClicked = useCallback(async () => {
-    trackSessionRecordingShareLinkCopied("app");
     const result = await copyToClipBoard(sharedLink);
     if (result.success) {
       setLinkCopied(true);
+      trackSessionRecordingShareLinkCopied("app");
     }
   }, [sharedLink]);
 
