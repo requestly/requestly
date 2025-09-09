@@ -34,11 +34,6 @@ import { BlockScreenHoc } from "componentsV2/BlockScreen/BlockScreenHoc";
 import { AppUpdateNotifier } from "componentsV2/AppUpdateNotifier/AppUpdateNotifier";
 
 const { PATHS } = APP_CONSTANTS;
-console.log("DEBUG", { env: process.env });
-console.log("DEBUG", {
-  REACT_APP_VERSION: process.env.REACT_APP_VERSION,
-  VITE_REACT_APP_VERSION: process.env.VITE_REACT_APP_VERSION,
-});
 const App: React.FC = () => {
   useEffect(() => {
     // Load features asynchronously when the app renders
