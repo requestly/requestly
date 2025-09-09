@@ -4,7 +4,7 @@ import { HttpRequestValidationService } from "./httpRequestValidationService";
 import { WorkResultType } from "../modules/scriptsV2/workload-manager/workLoadTypes";
 import { UserAbortError } from "../../errors/UserAbortError/UserAbortError";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
-import { addUrlSchemeIfMissing, makeRequest } from "../../screens/apiClient/utils";
+import { makeRequest } from "../../screens/apiClient/utils";
 import { DEFAULT_SCRIPT_VALUES } from "../../constants";
 import {
   trackScriptExecutionCompleted,
@@ -88,7 +88,6 @@ export class HttpRequestExecutor {
     this.abortController = new AbortController();
 
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
-    preparedEntry.request.url = addUrlSchemeIfMissing(preparedEntry.request.url);
 
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
       const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
