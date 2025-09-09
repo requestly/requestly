@@ -1,20 +1,21 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { NudgePrompt } from "componentsV2/Nudge/NudgePrompt";
+import React, { useCallback, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { githubSignIn } from "actions/FirebaseActions";
 import { getFunctions, httpsCallable } from "@firebase/functions";
 import { toast } from "utils/Toast";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import "./githubStudentPack.scss";
+import { redirectToHome } from "utils/RedirectionUtils";
+import { getAppMode } from "store/selectors";
+import { useNavigate } from "react-router-dom";
 
 export const GithubStudentPack: React.FC = () => {
-  const user = useSelector(getUserAuthDetails);
-  const [notGrantedMessage, setNotGrantedMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const isStudentPlanActive = useMemo(() => {
-    return user?.details?.planDetails?.type === "student";
-  }, [user]);
+  const appMode = useSelector(getAppMode);
+
+  const [showNotGrantedMessage, setShowNotGrantedMessage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGithubSignIn = useCallback(async () => {
     setIsLoading(true);
@@ -29,60 +30,79 @@ export const GithubStudentPack: React.FC = () => {
       const data = result.data;
       if (data.success) {
         if (data.granted) {
-          toast.success(
-            "Github Student Developer Pack access granted! You now have access to Requestly's Student Plan."
-          );
+          setShowNotGrantedMessage(false);
+          toast.success("Congratulations! You've been granted access to the Pro plan via the GitHub Student Pack.");
+          redirectToHome(appMode, navigate);
         } else {
-          setNotGrantedMessage(
-            "You are not eligible for Github Student Developer Pack. If you believe this is an error, please contact support."
-          );
+          setShowNotGrantedMessage(true);
         }
       }
     } catch (error) {
       console.log("Error during GitHub Student Pack activation:", error);
-      toast.error(
-        "An error occurred while activating GitHub Student Pack. Please contact support if the issue persists."
-      );
+      setShowNotGrantedMessage(true);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [appMode, navigate]);
 
-  const promptButtons = useMemo(() => {
-    if (isStudentPlanActive || notGrantedMessage) {
-      return [];
-    }
-    return [
-      <RQButton
-        type="secondary"
-        className="onboarding-google-auth-button"
-        onClick={handleGithubSignIn}
-        loading={isLoading}
-      >
-        <img src={"/assets/media/common/github-white-logo.svg"} alt="github" height={24} width={24} />
-        Connect with Github
-      </RQButton>,
-    ];
-  }, [handleGithubSignIn, isLoading, isStudentPlanActive, notGrantedMessage]);
+  if (showNotGrantedMessage) {
+    return (
+      <div className="gh-student-pack">
+        <div className="gh-student-pack-container">
+          <div className="gh-student-pack-image">
+            <img
+              src={"/assets/media/common/gh-student-pack-not-eligible.svg"}
+              alt="github-student-pack"
+              height={34}
+              width={144}
+            />
+          </div>
+          <div className="gh-student-pack-title">You're not currently eligible for the Student Pack</div>
+          <div className="gh-student-pack-subtitle">
+            GitHub hasn't verified your student status yet. Once it's confirmed, you can sign in again with GitHub.
+            Until then, you can continue using the app on the free plan.
+          </div>
+          <div className="gh-student-pack-btn">
+            <RQButton
+              type="primary"
+              className="gh-signin-button"
+              onClick={() => {
+                redirectToHome(appMode, navigate);
+              }}
+              loading={isLoading}
+              shape="round"
+            >
+              Continue with free plan
+            </RQButton>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="coming-soon-view-full">
-      <NudgePrompt icon="/assets/media/common/feature-disabled.svg" buttons={promptButtons}>
-        {notGrantedMessage ? (
-          <div className="coming-soon-title">{notGrantedMessage}</div>
-        ) : (
-          <>
-            <div className="coming-soon-title">
-              {isStudentPlanActive
-                ? "You have an active Requestly Student Plan"
-                : "Thank you for the interest in Requestly as part of Github Student Developer Pack"}
-            </div>
-            {!isStudentPlanActive && (
-              <div className="coming-soon-description">Please connect your Github account to proceed further.</div>
-            )}
-          </>
-        )}
-      </NudgePrompt>
+    <div className="gh-student-pack">
+      <div className="gh-student-pack-container">
+        <div className="gh-student-pack-image">
+          <img src={"/assets/media/common/gh-student-pack.svg"} alt="github-student-pack" height={80} width={80} />
+        </div>
+        <div className="gh-student-pack-title">Get pro plan free with Github Student Pack</div>
+        <div className="gh-student-pack-subtitle">
+          Verify your student status by signing in with your GitHub account and enjoy full access to all features.
+        </div>
+        <div className="gh-student-pack-btn">
+          <RQButton
+            type="primary"
+            className="gh-signin-button"
+            onClick={handleGithubSignIn}
+            loading={isLoading}
+            shape="round"
+          >
+            <img src={"/assets/media/common/github-white-logo.svg"} alt="github" height={20} width={20} />
+            Sign in with Github
+          </RQButton>
+        </div>
+      </div>
     </div>
   );
 };
