@@ -4,8 +4,10 @@ import {
   getApiRecords,
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
+  getRunConfig as getRunConfigFromFirebase,
+  updateRunConfig as updateRunConfigFromFirebase,
 } from "backend/apiClient";
-import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
+import { ApiClientCloudMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
@@ -194,5 +196,38 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     }
 
     return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
+  }
+
+  async getRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfigId: RQAPI.RunConfig["id"]
+  ): ResultPromise<RQAPI.RunConfig> {
+    const result = await getRunConfigFromFirebase(collectionId, runConfigId);
+
+    if (result.success === false) {
+      return { success: false, data: null, message: result.message };
+    }
+
+    return {
+      success: result.success,
+      data: result.data,
+    };
+  }
+
+  async updateRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfigId: RQAPI.RunConfig["id"],
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<boolean> {
+    const result = await updateRunConfigFromFirebase(collectionId, runConfigId, runConfig);
+
+    if (result.success === false) {
+      return { success: false, data: null, message: result.message };
+    }
+
+    return {
+      success: result.success,
+      data: result.data,
+    };
   }
 }
