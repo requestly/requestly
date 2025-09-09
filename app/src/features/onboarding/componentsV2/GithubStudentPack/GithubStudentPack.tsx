@@ -36,6 +36,8 @@ export const GithubStudentPack: React.FC = () => {
         } else {
           setShowNotGrantedMessage(true);
         }
+      } else {
+        setShowNotGrantedMessage(true);
       }
     } catch (error) {
       console.log("Error during GitHub Student Pack activation:", error);
