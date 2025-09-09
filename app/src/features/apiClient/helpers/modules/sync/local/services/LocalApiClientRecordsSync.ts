@@ -583,11 +583,10 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async updateRunConfig(
+  async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfigId: RQAPI.RunConfig["id"],
-    runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
-  ): ResultPromise<boolean> {
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<RQAPI.RunConfig> {
     return {
       success: false,
       data: null,

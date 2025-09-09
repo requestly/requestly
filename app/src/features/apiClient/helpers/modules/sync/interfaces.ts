@@ -82,11 +82,10 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     runConfigId: RQAPI.RunConfig["id"]
   ): ResultPromise<RQAPI.RunConfig>;
 
-  updateRunConfig(
+  upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfigId: RQAPI.RunConfig["id"],
-    runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
-  ): ResultPromise<boolean>;
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>>;
 }
 
 export interface ApiClientRepositoryInterface {

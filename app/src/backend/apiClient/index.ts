@@ -4,4 +4,4 @@ export { getApiRecord } from "./getApiRecord";
 export { deleteApiRecords } from "./deleteApiRecords";
 export { batchCreateApiRecordsWithExistingId } from "./batchCreateApiRecordsWithExistingId";
 export { getRunConfig } from "./getRunConfig";
-export { updateRunConfig } from "./updateRunConfig";
+export { upsertRunConfig } from "./upsertRunConfig";

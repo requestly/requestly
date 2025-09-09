@@ -5,7 +5,7 @@ import {
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
   getRunConfig as getRunConfigFromFirebase,
-  updateRunConfig as updateRunConfigFromFirebase,
+  upsertRunConfig as upsertRunConfigFromFirebase,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
@@ -214,12 +214,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     };
   }
 
-  async updateRunConfig(
+  async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfigId: RQAPI.RunConfig["id"],
-    runConfig: Partial<Omit<RQAPI.RunConfig, "id">>
-  ): ResultPromise<boolean> {
-    const result = await updateRunConfigFromFirebase(collectionId, runConfigId, runConfig);
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>> {
+    const result = await upsertRunConfigFromFirebase(collectionId, runConfig);
 
     if (result.success === false) {
       return { success: false, data: null, message: result.message };
