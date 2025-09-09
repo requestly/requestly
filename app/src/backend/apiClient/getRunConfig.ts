@@ -25,7 +25,8 @@ async function _getRunConfigFromFirebase(
       return { success: false, data: null, message: "Not found!" };
     }
 
-    return { success: true, data: snapshot.data() as RQAPI.RunConfig };
+    const data = snapshot.data() as RQAPI.RunConfig;
+    return { success: true, data: { ...data, id: runConfigId } };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigId },
