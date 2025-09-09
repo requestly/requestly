@@ -30,13 +30,13 @@ type WorkspaceItemProps =
   | {
       type: WorkspaceType.PERSONAL;
       toggleDropdown: () => void;
-      onClick: (addToMultiView?: boolean) => void;
+      onClick: (callback?: () => any) => void;
     }
   | {
       type: WorkspaceType.SHARED | WorkspaceType.LOCAL;
       workspace: Workspace;
       toggleDropdown: () => void;
-      onClick: (addToMultiView?: boolean) => void;
+      onClick: (callback?: () => any) => void;
     };
 
 const ShareWorkspaceActions = ({
@@ -100,7 +100,7 @@ const LocalWorkspaceActions = ({
 }: {
   workspace: Workspace;
   toggleDropdown: () => void;
-  switchWorkspace: (addToMultiView?: boolean) => void;
+  switchWorkspace: (cb?: () => any) => void;
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
@@ -117,7 +117,7 @@ const LocalWorkspaceActions = ({
       const handleWorkspaceSelection = async () => {
         const isFirstSelectedWorkspace = getAllSelectedWorkspaces().length === 0 && workspace.id !== activeWorkspace.id;
         if (isFirstSelectedWorkspace) {
-          switchWorkspace(true);
+          switchWorkspace(() => addWorkspaceToView(workspace, user.details?.profile?.uid));
         } else {
           await addWorkspaceToView(workspace, user.details?.profile?.uid);
         }
@@ -207,8 +207,8 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
   };
 
   const handleWorkspaceClick = useCallback(
-    (addToMultiView?: boolean) => {
-      onClick(addToMultiView);
+    (callback?: () => any) => {
+      onClick(callback);
       toggleDropdown();
     },
     [onClick, toggleDropdown]

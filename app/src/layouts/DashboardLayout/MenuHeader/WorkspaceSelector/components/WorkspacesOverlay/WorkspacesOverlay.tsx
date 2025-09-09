@@ -26,7 +26,7 @@ interface WorkspaceListSectionProps {
   workspaces: Workspace[];
   workspaceType: WorkspaceType;
   toggleDropdown: () => void;
-  onItemClick: (workspace: Workspace, addWorkspaceToView?: boolean) => void;
+  onItemClick: (workspace: Workspace, callback?: () => any) => void;
 }
 
 const EmptyWorkspaceListSection = ({
