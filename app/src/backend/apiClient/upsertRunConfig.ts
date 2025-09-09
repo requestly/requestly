@@ -3,6 +3,7 @@ import { getFirestore, Timestamp, updateDoc, doc, addDoc, collection } from "fir
 import { RQAPI } from "features/apiClient/types";
 import { ResponsePromise } from "backend/types";
 import * as Sentry from "@sentry/react";
+import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
 
 export async function upsertRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
@@ -25,7 +26,7 @@ async function _createRunConfigInFirebase(
 ): ResponsePromise<RQAPI.RunConfig> {
   try {
     const db = getFirestore(firebaseApp);
-    const collectionRef = collection(db, "apis", collectionId, "runs", "configs");
+    const collectionRef = collection(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE);
 
     const newRunConfig = {
       ...runConfig,
@@ -51,7 +52,7 @@ async function _updateRunConfigInFirebase(
 ): ResponsePromise<Partial<RQAPI.RunConfig>> {
   try {
     const db = getFirestore(firebaseApp);
-    const docRef = doc(db, "apis", collectionId, "runs", "configs", runConfig.id);
+    const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfig.id);
 
     const updatedRunConfig = {
       ...runConfig,
