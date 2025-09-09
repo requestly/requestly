@@ -1,12 +1,5 @@
-import { NativeError } from "errors/NativeError";
-import { parseEnvironmentState } from "../../commands/environments/utils";
-import {
-  getApiClientEnvironmentsStore,
-  getApiClientRecordsStore,
-  getApiClientRecordStore,
-} from "../../commands/store.utils";
+import { getApiClientRecordsStore } from "../../commands/store.utils";
 import { ApiClientFeatureContext } from "../../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { getParsedRuntimeVariables } from "../../store/runtimeVariables/utils";
 import { RQAPI } from "../../types";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
@@ -14,30 +7,36 @@ import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
 } from "../modules/scriptsV2/workload-manager/workLoadTypes";
+import { getScopedVariables } from "../variableResolver/variable-resolver";
+import { VariableData } from "features/apiClient/store/variables/types";
+import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 
 export class HttpRequestScriptExecutionService {
   constructor(private ctx: ApiClientFeatureContext, private workloadManager: APIClientWorkloadManager) {}
 
-  private buildBaseSnapshot(recordId: string): BaseSnapshot {
-    const { activeEnvironment, globalEnvironment } = getApiClientEnvironmentsStore(this.ctx).getState();
-    const globalEnvironmentState = globalEnvironment.getState();
-    const globalVariables = parseEnvironmentState(globalEnvironmentState).variables;
-    const environmentVariables = activeEnvironment ? parseEnvironmentState(activeEnvironment.getState()).variables : {};
-    const variables = getParsedRuntimeVariables();
-    const collectionVariables = (() => {
-      const parent = getApiClientRecordsStore(this.ctx).getState().getParent(recordId);
-      if (!parent) {
-        return {};
-      }
-      const recordState = getApiClientRecordStore(this.ctx, parent)?.getState();
-      if (!recordState || recordState.type !== RQAPI.RecordType.COLLECTION) {
-        throw new NativeError("Expected value to be present and be a collection!").addContext({
-          recordId: parent,
-        });
-      }
+  private getVariablesByScope(recordId: string) {
+    const parents = getApiClientRecordsStore(this.ctx).getState().getParentChain(recordId);
+    const scopedVariables = getScopedVariables(parents, this.ctx.stores);
 
-      return Object.fromEntries(recordState.collectionVariables.getState().getAll());
-    })();
+    const variablesByScope: Record<string, Record<string, VariableData>> = Array.from(scopedVariables).reduce(
+      (acc, [key, [variableData, variableSource]]) => {
+        acc[variableSource.scope] = acc[variableSource.scope] || {};
+        acc[variableSource.scope][key] = variableData;
+        return acc;
+      },
+      {} as Record<string, Record<string, VariableData>>
+    );
+
+    return variablesByScope;
+  }
+
+  private buildBaseSnapshot(recordId: string): BaseSnapshot {
+    const varibalesByScope = this.getVariablesByScope(recordId);
+    const globalVariables = (varibalesByScope[VariableScope.GLOBAL] || {}) as EnvironmentVariables;
+    const collectionVariables = (varibalesByScope[VariableScope.COLLECTION] || {}) as EnvironmentVariables;
+    const environmentVariables = (varibalesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
+    const variables = varibalesByScope[VariableScope.RUNTIME] || {};
+
     return {
       global: globalVariables,
       collectionVariables,
