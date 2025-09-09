@@ -57,3 +57,7 @@ export const getAppFlavour = () => {
 
   return GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY;
 };
+
+export const isSetappBuild = () => {
+  return isDesktopMode() && (window.RQ?.DESKTOP.IS_SETAPP_BUILD ?? false);
+};
