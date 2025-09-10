@@ -312,6 +312,20 @@ export namespace RQAPI {
     SCRIPT = "script",
     MISSING_FILE = "missing_file",
   }
+
+  export type RunOrder = ApiClientRecord["id"][];
+
+  export type RunConfig = {
+    id: string;
+    runOrder: RunOrder;
+    iterations: number;
+    delay: number;
+
+    // TODO: add more as we go
+
+    createdTs: number;
+    updatedTs: number;
+  };
 }
 
 export enum PostmanBodyMode {
