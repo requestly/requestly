@@ -23,10 +23,7 @@ const config = async ({ mode }) => {
       "process.env": {
         ...loadEnv(mode, process.cwd(), "VITE_"),
         NODE_ENV: process.env.NODE_ENV,
-        BUILD_MODE: process.env.BUILD_MODE,
         REACT_APP_ENV: process.env.REACT_APP_ENV,
-        BROWSER: process.env.BROWSER,
-        ENV: process.env.ENV,
         GITHUB_SHA: process.env.GITHUB_SHA,
       },
     },
@@ -59,7 +56,7 @@ const config = async ({ mode }) => {
         ],
       }),
       sentryVitePlugin({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
         org: "requestly",
         project: "web-app",
         sourcemaps: {
