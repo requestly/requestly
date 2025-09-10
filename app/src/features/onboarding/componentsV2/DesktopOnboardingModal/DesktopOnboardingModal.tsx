@@ -31,8 +31,10 @@ export const DesktopOnboardingModal = () => {
   }, [dispatch, user.loggedIn, isLocalSyncSupported]);
 
   useEffect(() => {
-    trackDesktopOnboardingViewed(onboardingStep);
-  }, [onboardingStep]);
+    if (isLocalSyncSupported) {
+      trackDesktopOnboardingViewed(onboardingStep);
+    }
+  }, [onboardingStep, isLocalSyncSupported]);
 
   if (!isLocalSyncSupported) {
     return null;
