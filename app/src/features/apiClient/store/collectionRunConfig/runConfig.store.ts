@@ -76,8 +76,19 @@ export function createRunConfigStore(data: {
     },
 
     patchRunOrder(requests) {
-      const ids = requests.map((r) => r.id);
-      get().setRunOrder(ids);
+      const { runOrder, setRunOrder } = get();
+
+      const runOrderSet = new Set(runOrder);
+
+      const patch = [];
+      for (const request of requests) {
+        if (!runOrderSet.has(request.id)) {
+          patch.push(request.id);
+        }
+      }
+
+      const newRunOrder = [...runOrder, ...patch];
+      setRunOrder(newRunOrder);
     },
   }));
 }
