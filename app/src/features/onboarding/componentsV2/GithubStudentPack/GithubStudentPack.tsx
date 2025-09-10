@@ -31,7 +31,7 @@ export const GithubStudentPack: React.FC = () => {
       if (data.success) {
         if (data.granted) {
           setShowNotGrantedMessage(false);
-          toast.success("Congratulations! You've been granted access to the Pro plan via the GitHub Student Pack.");
+          toast.success("Congratulations! You've been granted the Professional plan via the GitHub Student Pack.");
           redirectToHome(appMode, navigate);
         } else {
           setShowNotGrantedMessage(true);
@@ -88,7 +88,7 @@ export const GithubStudentPack: React.FC = () => {
         <div className="gh-student-pack-image">
           <img src={"/assets/media/common/gh-student-pack.svg"} alt="github-student-pack" height={80} width={80} />
         </div>
-        <div className="gh-student-pack-title">Get pro plan free with Github Student Pack</div>
+        <div className="gh-student-pack-title">Get Professional plan free with Github Student Pack</div>
         <div className="gh-student-pack-subtitle">
           Verify your student status by signing in with your GitHub account and enjoy full access to all features.
         </div>
