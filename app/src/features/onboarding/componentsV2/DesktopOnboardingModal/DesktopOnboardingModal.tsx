@@ -7,10 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
-import "./desktopOnboardingModal.scss";
 import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
 import { OnboardingStep } from "./types";
 import { WorkspaceType } from "features/workspaces/types";
+import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import "./desktopOnboardingModal.scss";
 
 export const DesktopOnboardingCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return <div className={`rq-desktop-onboarding-modal-content__card ${className}`}>{children}</div>;
@@ -21,15 +22,22 @@ export const DesktopOnboardingModal = () => {
   const user = useSelector(getUserAuthDetails);
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(OnboardingStep.FEATURE_SELECTION);
 
+  const isLocalSyncSupported = useCheckLocalSyncSupport({ skipWorkspaceCheck: true });
+
   useEffect(() => {
-    if (user.loggedIn) {
+    if (user.loggedIn || !isLocalSyncSupported) {
       dispatch(globalActions.updateIsOnboardingCompleted(true));
     }
-  }, [dispatch, user.loggedIn]);
+  }, [dispatch, user.loggedIn, isLocalSyncSupported]);
 
   useEffect(() => {
     trackDesktopOnboardingViewed(onboardingStep);
   }, [onboardingStep]);
+
+  if (!isLocalSyncSupported) {
+    return null;
+  }
+
   return (
     <Modal
       open={true}
