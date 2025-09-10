@@ -27,7 +27,7 @@ import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
@@ -88,7 +88,7 @@ export const CollectionRow: React.FC<Props> = ({
 
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
-  const contextId = useContextId();
+  const context = useApiClientFeatureContext();
   const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.openTab,
     state.activeTabSource,
@@ -274,13 +274,13 @@ export const CollectionRow: React.FC<Props> = ({
       type: RQAPI.RecordType.COLLECTION,
       item: {
         record,
-        contextId,
+        contextId: context.id,
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record, contextId]
+    [record, context.id]
   );
 
   const [{ isOver }, drop] = useDrop(
@@ -292,14 +292,14 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item, contextId);
+        handleRecordDrop(item, context.id);
       },
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem, contextId]
+    [handleRecordDrop, checkCanDropItem, context.id]
   );
 
   return (
@@ -390,7 +390,7 @@ export const CollectionRow: React.FC<Props> = ({
                             id: record.id,
                             title: record.name || "New Collection",
                             context: {
-                              id: contextId,
+                              id: context.id,
                             },
                           }),
                           { preview: true }
@@ -407,7 +407,7 @@ export const CollectionRow: React.FC<Props> = ({
                             id: record.id,
                             title: record.name || "New Collection",
                             context: {
-                              id: contextId,
+                              id: context.id,
                             },
                           }),
                           { preview: true }
@@ -488,7 +488,7 @@ export const CollectionRow: React.FC<Props> = ({
                       newRecordBtnText="New collection"
                       onNewClick={(src, recordType, collectionId, entryType) =>
                         onNewClickV2({
-                          contextId: contextId,
+                          contextId: context.id,
                           analyticEventSource: src,
                           recordType,
                           collectionId,
