@@ -43,6 +43,9 @@ export const setupContextWithRepoWithoutMarkingLoaded = async (
     erroredRecords: errorStore,
   };
 
+  const storeId = apiRecordsStore.getState().storeId;
+  console.log("DG-5.3: setupContextWithRepo creating context", JSON.stringify({workspaceId, storeId, recordsCount: apiClientRecords.records.length}, null, 2));
+
   const context: ApiClientFeatureContext = {
     id: workspaceId,
     workspaceId,
@@ -56,6 +59,7 @@ export const setupContextWithRepoWithoutMarkingLoaded = async (
   }
 
   apiClientFeatureContextProviderStore.getState().addContext(context);
+  console.log("DG-5.4: Context added to provider", JSON.stringify({workspaceId: context.id, storeId}, null, 2));
   return context.id;
 };
 

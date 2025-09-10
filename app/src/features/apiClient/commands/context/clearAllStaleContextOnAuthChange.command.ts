@@ -14,6 +14,7 @@ function clearAllContextByRepo(predicate: (repo: ApiClientRepositoryInterface) =
   contexts.forEach((ctx) => {
     if (predicate(ctx.repositories)) {
       const contextId = ctx.id;
+      console.log("DG-4.2: Removing context during clearAllStaleContextOnAuthChange", JSON.stringify({contextId}, null, 2));
 
       apiClientMultiWorkspaceViewStore.getState().removeWorkspace(contextId);
       apiClientFeatureContextProviderStore.getState().removeContext(contextId);

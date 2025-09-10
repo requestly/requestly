@@ -12,10 +12,14 @@ export type AllApiClientStores = {
 };
 
 export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
-  const store = useApiClientFeatureContext().stores;
+  const context = useApiClientFeatureContext();
+  const store = context.stores;
   if (!store || !store.records) {
     throw new Error("records store not found!");
   }
+
+  const storeId = store.records.getState().storeId;
+  console.log("DG-5.2: useAPIRecords called", JSON.stringify({contextId: context.id, storeId}, null, 2));
 
   return useStore(store.records, useShallow(selector));
 }

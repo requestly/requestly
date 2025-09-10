@@ -30,6 +30,11 @@ export type RecordState = ApiRecordState | CollectionRecordState;
 
 export type ApiRecordsState = {
   /**
+   * Store identifier for debugging
+   */
+  storeId?: string;
+  
+  /**
    * This is the list of records that are currently in the apiClientRecords.
    */
   apiClientRecords: RQAPI.ApiClientRecord[];
@@ -162,12 +167,19 @@ function createIndexStore(index: ApiRecordsState["index"]) {
   return indexStore;
 }
 
+// Global counter for store instances
+let storeCounter = 0;
+
 export const createApiRecordsStore = (initialRecords: {
   records: RQAPI.ApiClientRecord[];
   erroredRecords: ErroredRecord[];
 }) => {
+  const storeId = 'store_' + (++storeCounter);
+  console.log("DG-5.0: createApiRecordsStore", JSON.stringify({storeId, recordsCount: initialRecords.records.length}, null, 2));
+  
   const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
   return create<ApiRecordsState>()((set, get) => ({
+    storeId, // Add store identifier
     apiClientRecords: initialRecords.records,
     erroredRecords: initialRecords.erroredRecords,
 
@@ -177,7 +189,8 @@ export const createApiRecordsStore = (initialRecords: {
     indexStore: createIndexStore(initialIndex),
 
     refresh(records) {
-      console.log("DG-3.7.1: refresh called", JSON.stringify({recordsLength: records.length}, null, 2))
+      const { storeId } = get();
+      console.log("DG-3.7.1: refresh called", JSON.stringify({recordsLength: records.length, storeId}, null, 2))
       const { indexStore } = get();
       const { childParentMap, index } = parseRecords(records);
 
@@ -252,7 +265,8 @@ export const createApiRecordsStore = (initialRecords: {
     },
 
     addNewRecord(record) {
-      console.log("DG-3.7.0: addNewRecord", JSON.stringify({recordId: record.id}, null, 2))
+      const { storeId } = get();
+      console.log("DG-3.7.0: addNewRecord", JSON.stringify({recordId: record.id, storeId}, null, 2))
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
     },
@@ -317,9 +331,14 @@ export const createApiRecordsStore = (initialRecords: {
     },
 
     getRecordStore(id) {
-      const { indexStore } = get();
+      const { indexStore, storeId } = get();
       const recordStore = indexStore.get(id);
-      console.log("DG-3.5: getRecordStore", JSON.stringify({id, 'indexStore.keys()': indexStore.keys(), 'indexStore.has(id)': indexStore.has(id)}, null, 2))
+      console.log("DG-3.5: getRecordStore", JSON.stringify({
+        id, 
+        'indexStore.keys()': Array.from(indexStore.keys()), 
+        'indexStore.has(id)': indexStore.has(id),
+        'storeId': storeId
+      }, null, 2))
       return recordStore;
     },
 

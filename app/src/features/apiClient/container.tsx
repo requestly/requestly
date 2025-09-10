@@ -47,6 +47,12 @@ const ApiClientFeatureContainer: React.FC = () => {
     }
 
     (async () => {
+      console.log("DG-4.0: Container effect triggered - about to clear contexts", JSON.stringify({
+        userId: user.details?.profile?.uid,
+        workspaceId: activeWorkspace.id,
+        workspaceType: activeWorkspace.workspaceType
+      }, null, 2));
+      
       apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
 
       clearAllStaleContextOnAuthChange({
@@ -59,6 +65,7 @@ const ApiClientFeatureContainer: React.FC = () => {
         uid: user.details?.profile?.uid ?? "",
       });
 
+      console.log("DG-4.1: About to setup context with repo");
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
   }, [user, activeWorkspace?.id, viewMode]);
