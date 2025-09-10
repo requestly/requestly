@@ -6,7 +6,12 @@ import { getApiClientFeatureContext } from "../commands/store.utils";
 export function useApiClientFeatureContext(): apiClientFeatureContextStore.ApiClientFeatureContext {
   const contextId = useContextId();
   const context = useMemo(() => {
-    return getApiClientFeatureContext(contextId);
+    const ctx = getApiClientFeatureContext(contextId);
+    if (ctx && ctx.stores?.records) {
+      const storeId = ctx.stores.records.getState().storeId;
+      console.log("DG-5.1: useApiClientFeatureContext", JSON.stringify({contextId, storeId}, null, 2));
+    }
+    return ctx;
   }, [contextId]);
 
   if (!context) {
