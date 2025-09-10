@@ -21,6 +21,7 @@ export class BaseTabSource implements AbstractTabSource {
 
   render(): React.ReactNode {
     const contextId = this.metadata.context?.id;
+    console.log("DG-3.3: BaseTabSource render", JSON.stringify({contextId}, null, 2))
     if (contextId) {
       return ContextId({
         children: this.component,

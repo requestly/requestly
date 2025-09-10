@@ -21,7 +21,7 @@ import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { useCommand } from "features/apiClient/commands";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -52,7 +52,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
     env: { renameEnvironment, duplicateEnvironment, deleteEnvironment },
   } = useCommand();
 
-  const contextId = useContextId();
+  const {id: contextId} = useApiClientFeatureContext();
   const activeEnvironment = useActiveEnvironment();
   const environment = useEnvironment(environmentId, (s) => s);
 
@@ -94,6 +94,7 @@ export const EnvironmentsListItem: React.FC<EnvironmentsListItemProps> = ({
       );
       toast.success("Environment renamed successfully");
     } catch (error) {
+      console.error(error)
       toast.error("Failed to rename environment");
     } finally {
       setIsRenaming(false);

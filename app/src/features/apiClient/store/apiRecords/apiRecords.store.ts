@@ -155,6 +155,7 @@ export const createRecordStore = (record: RQAPI.ApiClientRecord, contextId: stri
 function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<RecordState>>();
   for (const [id] of index) {
+    console.log("DG-3.6: createIndexStore", JSON.stringify({id}, null, 2))
     indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
   }
 
@@ -176,17 +177,20 @@ export const createApiRecordsStore = (initialRecords: {
     indexStore: createIndexStore(initialIndex),
 
     refresh(records) {
+      console.log("DG-3.7.1: refresh called", JSON.stringify({recordsLength: records.length}, null, 2))
       const { indexStore } = get();
       const { childParentMap, index } = parseRecords(records);
 
       for (const [id] of index) {
         if (!indexStore.has(id)) {
+          console.log("DG-3.7.2: refresh-createRecordStore", JSON.stringify({id}, null, 2))
           indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
         }
       }
 
       for (const [id] of indexStore) {
         if (!index.has(id)) {
+          console.log("DG-3.7.3: refresh-deleteRecordStore", JSON.stringify({id}, null, 2))
           indexStore.delete(id);
         }
       }
@@ -248,6 +252,7 @@ export const createApiRecordsStore = (initialRecords: {
     },
 
     addNewRecord(record) {
+      console.log("DG-3.7.0: addNewRecord", JSON.stringify({recordId: record.id}, null, 2))
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
     },
@@ -314,6 +319,7 @@ export const createApiRecordsStore = (initialRecords: {
     getRecordStore(id) {
       const { indexStore } = get();
       const recordStore = indexStore.get(id);
+      console.log("DG-3.5: getRecordStore", JSON.stringify({id, 'indexStore.keys()': indexStore.keys(), 'indexStore.has(id)': indexStore.has(id)}, null, 2))
       return recordStore;
     },
 

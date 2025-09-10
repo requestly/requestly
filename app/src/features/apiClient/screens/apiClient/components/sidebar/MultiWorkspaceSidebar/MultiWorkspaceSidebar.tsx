@@ -44,7 +44,7 @@ export const MultiWorkspaceSidebar: React.FC = () => {
     onImportRequestModalClose,
     setIsImportModalOpen,
   } = useApiClientContext();
-
+  console.log("DG-0: multiWorkspaceSidebar", isImportModalOpen)
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
 
@@ -181,6 +181,7 @@ export const MultiWorkspaceSidebar: React.FC = () => {
         }
         return result.data;
       } catch (error) {
+        console.log("error", error)
         notification.error({
           message: `Error importing request`,
           description: error?.message,
