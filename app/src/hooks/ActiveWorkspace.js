@@ -16,6 +16,7 @@ import { trackAttr } from "modules/analytics";
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
 window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
   // Refresh the webpage so that it could find updated state later on
+  console.log("DG-8.0: BroadcastChannel message received, about to reload", JSON.stringify({event: _event.data}, null, 2));
   window.location.reload();
 });
 

@@ -175,7 +175,7 @@ export const createApiRecordsStore = (initialRecords: {
   erroredRecords: ErroredRecord[];
 }) => {
   const storeId = 'store_' + (++storeCounter);
-  console.log("DG-5.0: createApiRecordsStore", JSON.stringify({storeId, recordsCount: initialRecords.records.length}, null, 2));
+  console.log("DG-5.0: createApiRecordsStore", JSON.stringify({timestamp: Date.now(), storeId, recordsCount: initialRecords.records.length}, null, 2));
   
   const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
   return create<ApiRecordsState>()((set, get) => ({
