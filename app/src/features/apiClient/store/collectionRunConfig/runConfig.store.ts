@@ -28,6 +28,10 @@ type RunConfigState = {
   patchRunOrder(requests: RQAPI.ApiClientRecord[]): void;
 };
 
+function isValidNumber(number: unknown) {
+  return Number.isFinite(number) && Number.isInteger(number);
+}
+
 export function createRunConfigStore(data: {
   id: RQAPI.RunConfig["id"];
   runOrder: RQAPI.RunOrder;
@@ -47,24 +51,28 @@ export function createRunConfigStore(data: {
     },
 
     setDelay(delay) {
-      if (delay < 0) {
-        throw new NativeError("Delay cannot be negative").addContext({ delay });
+      const isValid = isValidNumber(delay) && delay >= 0;
+
+      if (!isValid) {
+        throw new NativeError("Delay must be a non-negative integer").addContext({ delay });
       }
 
       set({ delay });
     },
 
     setIterations(iterations) {
-      if (iterations <= 0) {
-        throw new NativeError("Invalid iterations!").addContext({ iterations });
+      const isValid = isValidNumber(iterations) && iterations > 0;
+
+      if (!isValid) {
+        throw new NativeError("Iterations must be a positive integer").addContext({ iterations });
       }
 
       set({ iterations });
     },
 
     getConfigToSave() {
-      const { id, runOrder, delay, iterations } = get();
-      return { id, runOrder, delay, iterations };
+      const { runOrder } = get();
+      return { runOrder };
     },
 
     patchRunOrder(requests) {
