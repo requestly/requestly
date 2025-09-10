@@ -14,7 +14,7 @@ export class BatchRequestExecutor {
       entry: RQAPI.ApiEntry;
     }[],
     runConfig: RQAPI.RunConfig
-  ): AsyncGenerator<RQAPI.ExecutionResult> {
+  ) {
     const { runOrder, iterations, delay } = runConfig;
 
     const entryMap = new Map(batchedEntryDetails.map((e) => [e.recordId, e.entry]));
@@ -24,7 +24,7 @@ export class BatchRequestExecutor {
         const recordId = runOrder[executionIndex];
         const entry = entryMap.get(recordId);
         if (entry) {
-          yield this.executeSingleRequest(recordId, entry);
+          yield await this.executeSingleRequest(recordId, entry);
 
           // Only delay if there's a next request
           const isLastRequestInIteration = executionIndex === runOrder.length - 1;
