@@ -1,5 +1,5 @@
 import firebaseApp from "../../firebase";
-import { getFirestore, Timestamp, updateDoc, doc, addDoc, collection } from "firebase/firestore";
+import { getFirestore, Timestamp, doc, addDoc, collection, getDoc, setDoc } from "firebase/firestore";
 import { RQAPI } from "features/apiClient/types";
 import { ResponsePromise } from "backend/types";
 import * as Sentry from "@sentry/react";
@@ -14,7 +14,7 @@ export async function upsertRunConfig(
   if (!runConfig.id) {
     result = await _createRunConfigInFirebase(collectionId, runConfig);
   } else {
-    result = await _updateRunConfigInFirebase(collectionId, runConfig);
+    result = await _upsertRunConfigInFirebase(collectionId, runConfig);
   }
 
   return result;
@@ -28,10 +28,11 @@ async function _createRunConfigInFirebase(
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE);
 
+    const timeStamp = Timestamp.now().toMillis();
     const newRunConfig = {
       ...runConfig,
-      createdTs: Timestamp.now().toMillis(),
-      updatedTs: Timestamp.now().toMillis(),
+      createdTs: timeStamp,
+      updatedTs: timeStamp,
     } as RQAPI.RunConfig;
 
     const resultDocRef = await addDoc(collectionRef, newRunConfig);
@@ -46,7 +47,7 @@ async function _createRunConfigInFirebase(
   }
 }
 
-async function _updateRunConfigInFirebase(
+async function _upsertRunConfigInFirebase(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfig: Partial<RQAPI.RunConfig>
 ): ResponsePromise<Partial<RQAPI.RunConfig>> {
@@ -54,13 +55,22 @@ async function _updateRunConfigInFirebase(
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfig.id);
 
+    // remove id
+    const { id: runConfigId, ...rest } = runConfig;
+
+    const timeStamp = Timestamp.now().toMillis();
     const updatedRunConfig = {
-      ...runConfig,
-      updatedTs: Timestamp.now().toMillis(),
+      ...rest,
+      updatedTs: timeStamp,
     } as RQAPI.RunConfig;
 
-    await updateDoc(docRef, updatedRunConfig);
-    return { success: true, data: updatedRunConfig };
+    const snapshot = await getDoc(docRef);
+    if (!snapshot.exists()) {
+      updatedRunConfig.createdTs = timeStamp;
+    }
+
+    await setDoc(docRef, updatedRunConfig, { merge: true });
+    return { success: true, data: { ...snapshot.data(), ...updatedRunConfig, id: runConfig.id } };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigToUpdate: runConfig },
