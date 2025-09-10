@@ -2,7 +2,6 @@ import { isGraphQLApiEntry, isHTTPApiEntry } from "../screens/apiClient/utils";
 import { RQAPI } from "../types";
 import { GraphQLRequestExecutor } from "./graphQLRequestExecutor/GraphQLRequestExecutor";
 import { HttpRequestExecutor } from "./httpRequestExecutor/httpRequestExecutor";
-
 export class BatchRequestExecutor {
   constructor(
     private httpRequestExecutor: HttpRequestExecutor,
@@ -15,13 +14,13 @@ export class BatchRequestExecutor {
       entry: RQAPI.ApiEntry;
     }[],
     runConfig: RQAPI.RunConfig
-  ) {
+  ): AsyncGenerator<RQAPI.ExecutionResult> {
     const { runOrder, iterations, delay } = runConfig;
 
     const entryMap = new Map(batchedEntryDetails.map((e) => [e.recordId, e.entry]));
 
-    for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
-      for (let executionIndex = 0; executionIndex < runOrder.length; executionIndex++) {
+    for (let iterationIndex = 0; iterationIndex < iterations; ++iterationIndex) {
+      for (let executionIndex = 0; executionIndex < runOrder.length; ++executionIndex) {
         const recordId = runOrder[executionIndex];
         const entry = entryMap.get(recordId);
         if (entry) {
