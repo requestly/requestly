@@ -2,6 +2,8 @@ import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } 
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { ErroredRecord, FileType } from "./local/services/types";
 
+export type ResultPromise<T> = Promise<{ success: true; data: T } | { success: false; data: null; message: string }>;
+
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
   getAllEnvironments(): Promise<{
@@ -73,6 +75,17 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   duplicateApiEntities(entities: Partial<RQAPI.ApiClientRecord>[]): Promise<RQAPI.ApiClientRecord[]>;
   moveAPIEntities(entities: Partial<RQAPI.ApiClientRecord>[], newParentId: string): Promise<RQAPI.ApiClientRecord[]>;
   batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise;
+
+  // collection runner
+  getRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfigId: RQAPI.RunConfig["id"]
+  ): ResultPromise<RQAPI.RunConfig>;
+
+  upsertRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>>;
 }
 
 export interface ApiClientRepositoryInterface {

@@ -1,5 +1,5 @@
 import { RQAPI } from "features/apiClient/types";
-import { ApiClientLocalStoreMeta, ApiClientRecordsInterface } from "../../interfaces";
+import { ApiClientLocalStoreMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { sanitizeRecord } from "backend/apiClient/upsertApiRecord";
 import { Timestamp } from "firebase/firestore";
@@ -281,5 +281,27 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async getIsAllCleared(): Promise<boolean> {
     return this.queryService.getIsAllCleared();
+  }
+
+  async getRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfigId: RQAPI.RunConfig["id"]
+  ): ResultPromise<RQAPI.RunConfig> {
+    return {
+      success: false,
+      data: null,
+      message: "Not implemented",
+    };
+  }
+
+  async upsertRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<RQAPI.RunConfig> {
+    return {
+      success: false,
+      data: null,
+      message: "Not implemented",
+    };
   }
 }
