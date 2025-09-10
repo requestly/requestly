@@ -36,6 +36,7 @@ export const switchWorkspace = async (
   source
 ) => {
   const { teamId } = newWorkspaceDetails;
+  console.log("DG-7.0: switchWorkspace called", JSON.stringify({timestamp: Date.now(), teamId, appMode, source}, null, 2));
 
   let needToMergeRecords = false;
   await StorageService(appMode).waitForAllTransactions();
@@ -111,6 +112,7 @@ export const switchWorkspace = async (
   dispatch(globalActions.updateHardRefreshPendingStatus({ type: "rules" }));
 
   // Notify other tabs
+  console.log("DG-8.1: About to post active_workspace_changed message");
   window.activeWorkspaceBroadcastChannel &&
     window.activeWorkspaceBroadcastChannel.postMessage("active_workspace_changed");
 };

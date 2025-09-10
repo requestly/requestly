@@ -28,6 +28,16 @@ const ApiClientFeatureContainer: React.FC = () => {
     s.getViewMode,
   ]);
 
+  console.log("DG-6.0: Container render", JSON.stringify({
+    timestamp: Date.now(),
+    userId: user?.details?.profile?.uid,
+    userLoggedIn: user?.loggedIn,
+    workspaceId: activeWorkspace?.id,
+    workspaceType: activeWorkspace?.workspaceType,
+    viewMode,
+    isLoaded
+  }, null, 2));
+
   useEffect(() => {
     (async () => {
       if (getViewMode() === ApiClientViewMode.MULTI) {
@@ -48,6 +58,7 @@ const ApiClientFeatureContainer: React.FC = () => {
 
     (async () => {
       console.log("DG-4.0: Container effect triggered - about to clear contexts", JSON.stringify({
+        timestamp: Date.now(),
         userId: user.details?.profile?.uid,
         workspaceId: activeWorkspace.id,
         workspaceType: activeWorkspace.workspaceType
