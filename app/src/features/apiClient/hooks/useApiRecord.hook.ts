@@ -10,6 +10,7 @@ export const useApiRecord = (id: string) => {
   const [getRecordStore] = useAPIRecords((s) => [s.getRecordStore]);
 
   const recordStore = getRecordStore(id);
+  console.log("DG-3: useApiRecord", JSON.stringify({id, noopStore: Boolean(noopStore), recordStore: Boolean(recordStore)}, null, 2))
   // Use noopStore as fallback when recordStore is undefined to prevent useStore error
   const record = useStore(
     recordStore || noopStore,
