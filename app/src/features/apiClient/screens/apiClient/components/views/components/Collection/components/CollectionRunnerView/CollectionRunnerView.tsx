@@ -9,6 +9,7 @@ interface Props {
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   return (
     <div className="collection-runner-view">
+      {/* TODO: should be resizable */}
       <RunConfigViewManager collectionId={collectionId} />
       {/* RunResults will be here */}
     </div>
