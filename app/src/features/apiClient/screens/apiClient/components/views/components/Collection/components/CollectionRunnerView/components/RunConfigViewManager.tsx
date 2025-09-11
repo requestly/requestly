@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { RQAPI } from "features/apiClient/types";
 import { useCommand } from "features/apiClient/commands";
 import { RunConfigStoreContextProvider } from "features/apiClient/store/collectionRunConfig/RunConfigStoreContextProvider";
 import { toast } from "utils/Toast";
 import { RunnerViewLoader } from "./RunnerViewLoader/RunnerViewLoader";
 import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/getDefaultRunConfig.command";
+import { RunConfigView } from "./RunConfigView/RunConfigView";
+import { useCollectionRunnerView } from "../collectionRunnerView.context";
 import * as Sentry from "@sentry/react";
 
-interface Props {
-  collectionId: RQAPI.CollectionRecord["id"];
-}
+interface Props {}
 
-export const RunConfigViewManager: React.FC<Props> = ({ collectionId }) => {
+export const RunConfigViewManager: React.FC<Props> = () => {
+  const { collectionId } = useCollectionRunnerView();
   const {
     runner: { getDefaultRunConfig },
   } = useCommand();
@@ -37,8 +37,7 @@ export const RunConfigViewManager: React.FC<Props> = ({ collectionId }) => {
 
   return (
     <RunConfigStoreContextProvider key={collectionId} runConfig={config}>
-      {/* <RunConfigView id={props.id} /> */}
-      <></>
+      <RunConfigView />
     </RunConfigStoreContextProvider>
   );
 };
