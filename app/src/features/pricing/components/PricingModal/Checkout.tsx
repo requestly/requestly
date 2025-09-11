@@ -24,7 +24,7 @@ interface CheckoutProps {
   source: string;
   onCheckoutCompleted?: () => void;
 }
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(process.env.VITE_REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 export const Checkout: React.FC<CheckoutProps> = ({
   clientSecret,
