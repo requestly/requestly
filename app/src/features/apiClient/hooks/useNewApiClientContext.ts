@@ -31,10 +31,10 @@ export function useNewApiClientContext() {
       const doesRecordExist = !!getData(recordId);
 
       if (doesRecordExist) {
-        console.log("DG-3.1")
+        console.log("DG-3.1");
         updateRecord(apiClientRecord);
       } else {
-        console.log("DG-3.2 addRecord called for contextId", context.id)
+        console.log("DG-3.2 addRecord called for contextId", context.id);
         addNewRecord(apiClientRecord);
       }
 

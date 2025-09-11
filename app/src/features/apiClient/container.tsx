@@ -28,15 +28,22 @@ const ApiClientFeatureContainer: React.FC = () => {
     s.getViewMode,
   ]);
 
-  console.log("DG-6.0: Container render", JSON.stringify({
-    timestamp: Date.now(),
-    userId: user?.details?.profile?.uid,
-    userLoggedIn: user?.loggedIn,
-    workspaceId: activeWorkspace?.id,
-    workspaceType: activeWorkspace?.workspaceType,
-    viewMode,
-    isLoaded
-  }, null, 2));
+  console.log(
+    "DG-6.0: Container render",
+    JSON.stringify(
+      {
+        timestamp: Date.now(),
+        userId: user?.details?.profile?.uid,
+        userLoggedIn: user?.loggedIn,
+        workspaceId: activeWorkspace?.id,
+        workspaceType: activeWorkspace?.workspaceType,
+        viewMode,
+        isLoaded,
+      },
+      null,
+      2
+    )
+  );
 
   useEffect(() => {
     (async () => {
@@ -55,15 +62,26 @@ const ApiClientFeatureContainer: React.FC = () => {
     if (!activeWorkspace) {
       return;
     }
-
+    // console.log("DG-9: dependencies", JSON.stringify({user: {loggedIn: user.loggedIn, uid: user.details?.profile?.uid}, activeWorkspaceId: activeWorkspace?.id, viewMode}, null, 2));
+    console.log(
+      "DG-9.1: dependencies",
+      JSON.stringify({ user, activeWorkspaceId: activeWorkspace?.id, viewMode }, null, 2)
+    );
     (async () => {
-      console.log("DG-4.0: Container effect triggered - about to clear contexts", JSON.stringify({
-        timestamp: Date.now(),
-        userId: user.details?.profile?.uid,
-        workspaceId: activeWorkspace.id,
-        workspaceType: activeWorkspace.workspaceType
-      }, null, 2));
-      
+      console.log(
+        "DG-4.0: Container effect triggered - about to clear contexts",
+        JSON.stringify(
+          {
+            timestamp: Date.now(),
+            userId: user.details?.profile?.uid,
+            workspaceId: activeWorkspace.id,
+            workspaceType: activeWorkspace.workspaceType,
+          },
+          null,
+          2
+        )
+      );
+
       apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
 
       clearAllStaleContextOnAuthChange({
@@ -79,7 +97,8 @@ const ApiClientFeatureContainer: React.FC = () => {
       console.log("DG-4.1: About to setup context with repo");
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
-  }, [user, activeWorkspace?.id, viewMode]);
+  }, [user.loggedIn, user.details?.profile?.uid, activeWorkspace?.id, viewMode]);
+  // }, [user, activeWorkspace?.id, viewMode]);
 
   if (!isLoaded) {
     return <ApiClientLoadingView />;

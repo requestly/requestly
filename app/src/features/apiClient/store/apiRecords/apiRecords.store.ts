@@ -5,6 +5,7 @@ import { create, StoreApi } from "zustand";
 import { EnvVariableState, parseEnvVariables } from "../variables/variables.store";
 import { apiClientFileStore } from "../apiClientFilesStore";
 import { PersistedVariables } from "../shared/variablePersistence";
+import { devtools } from "zustand/middleware";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -33,7 +34,7 @@ export type ApiRecordsState = {
    * Store identifier for debugging
    */
   storeId?: string;
-  
+
   /**
    * This is the list of records that are currently in the apiClientRecords.
    */
@@ -160,7 +161,7 @@ export const createRecordStore = (record: RQAPI.ApiClientRecord, contextId: stri
 function createIndexStore(index: ApiRecordsState["index"]) {
   const indexStore = new Map<string, StoreApi<RecordState>>();
   for (const [id] of index) {
-    console.log("DG-3.6: createIndexStore", JSON.stringify({id}, null, 2))
+    console.log("DG-3.6: createIndexStore", JSON.stringify({ id }, null, 2));
     indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
   }
 
@@ -174,176 +175,188 @@ export const createApiRecordsStore = (initialRecords: {
   records: RQAPI.ApiClientRecord[];
   erroredRecords: ErroredRecord[];
 }) => {
-  const storeId = 'store_' + (++storeCounter);
-  console.log("DG-5.0: createApiRecordsStore", JSON.stringify({timestamp: Date.now(), storeId, recordsCount: initialRecords.records.length}, null, 2));
-  
+  const storeId = "store_" + ++storeCounter;
+  console.log(
+    "DG-5.0: createApiRecordsStore",
+    JSON.stringify({ timestamp: Date.now(), storeId, recordsCount: initialRecords.records.length }, null, 2)
+  );
+
   const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
-  return create<ApiRecordsState>()((set, get) => ({
-    storeId, // Add store identifier
-    apiClientRecords: initialRecords.records,
-    erroredRecords: initialRecords.erroredRecords,
+  return create<ApiRecordsState>()(
+    devtools((set, get) => ({
+      storeId, // Add store identifier
+      apiClientRecords: initialRecords.records,
+      erroredRecords: initialRecords.erroredRecords,
 
-    childParentMap: initialChildParentMap,
-    index: initialIndex,
+      childParentMap: initialChildParentMap,
+      index: initialIndex,
 
-    indexStore: createIndexStore(initialIndex),
+      indexStore: createIndexStore(initialIndex),
 
-    refresh(records) {
-      const { storeId } = get();
-      console.log("DG-3.7.1: refresh called", JSON.stringify({recordsLength: records.length, storeId}, null, 2))
-      const { indexStore } = get();
-      const { childParentMap, index } = parseRecords(records);
+      refresh(records) {
+        const { storeId } = get();
+        console.log("DG-3.7.1: refresh called", JSON.stringify({ recordsLength: records.length, storeId }, null, 2));
+        const { indexStore } = get();
+        const { childParentMap, index } = parseRecords(records);
 
-      for (const [id] of index) {
-        if (!indexStore.has(id)) {
-          console.log("DG-3.7.2: refresh-createRecordStore", JSON.stringify({id}, null, 2))
-          indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
-        }
-      }
-
-      for (const [id] of indexStore) {
-        if (!index.has(id)) {
-          console.log("DG-3.7.3: refresh-deleteRecordStore", JSON.stringify({id}, null, 2))
-          indexStore.delete(id);
-        }
-      }
-
-      // We initimate the file store to sync with updated records.
-      // This is not performant, as we'd want to provide granular updates
-      // so that the file store is only contacted with changed records.
-      // This works out only because there's no reactive field in the file store
-      // and frequent resetting doesn't cause any renders.
-      // TODO: Send patches to file store
-      apiClientFileStore.getState().initialize(records);
-      set({
-        apiClientRecords: records,
-        childParentMap,
-        index,
-        indexStore,
-      });
-    },
-
-    getData(id) {
-      const { index } = get();
-      return index.get(id)!;
-    },
-
-    getParent(id) {
-      const { childParentMap } = get();
-      return childParentMap.get(id);
-    },
-
-    getParentChain(id) {
-      const { getParent } = get();
-      const result: string[] = [];
-      const parseRecursively = (id: string) => {
-        const parent = getParent(id);
-        if (!parent) {
-          return;
-        }
-        result.push(parent);
-        parseRecursively(parent);
-      };
-      parseRecursively(id);
-      return result;
-    },
-
-    triggerUpdateForChildren(id) {
-      const { childParentMap, indexStore } = get();
-
-      const allChildren = getAllChildren(id, childParentMap);
-
-      allChildren.forEach((cid) => {
-        const recordStore = indexStore.get(cid);
-
-        if (!recordStore) {
-          throw new NativeError("Record store does not exist!").addContext({ id: cid });
+        for (const [id] of index) {
+          if (!indexStore.has(id)) {
+            console.log("DG-3.7.2: refresh-createRecordStore", JSON.stringify({ id }, null, 2));
+            indexStore.set(id, createRecordStore(index.get(id) as RQAPI.ApiClientRecord));
+          }
         }
 
-        recordStore.getState().incrementVersion();
-      });
-    },
+        for (const [id] of indexStore) {
+          if (!index.has(id)) {
+            console.log("DG-3.7.3: refresh-deleteRecordStore", JSON.stringify({ id }, null, 2));
+            indexStore.delete(id);
+          }
+        }
 
-    addNewRecord(record) {
-      const { storeId } = get();
-      console.log("DG-3.7.0: addNewRecord", JSON.stringify({recordId: record.id, storeId}, null, 2))
-      const updatedRecords = [...get().apiClientRecords, record];
-      get().refresh(updatedRecords);
-    },
+        // We initimate the file store to sync with updated records.
+        // This is not performant, as we'd want to provide granular updates
+        // so that the file store is only contacted with changed records.
+        // This works out only because there's no reactive field in the file store
+        // and frequent resetting doesn't cause any renders.
+        // TODO: Send patches to file store
+        apiClientFileStore.getState().initialize(records);
+        set({
+          apiClientRecords: records,
+          childParentMap,
+          index,
+          indexStore,
+        });
+      },
 
-    addNewRecords(records) {
-      const updatedRecords = [...get().apiClientRecords, ...records];
-      get().refresh(updatedRecords);
-    },
+      getData(id) {
+        const { index } = get();
+        return index.get(id)!;
+      },
 
-    updateRecord(patch) {
-      const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
-      get().refresh(updatedRecords);
+      getParent(id) {
+        const { childParentMap } = get();
+        return childParentMap.get(id);
+      },
 
-      const recordStore = get().getRecordStore(patch.id);
+      getParentChain(id) {
+        const { getParent } = get();
+        const result: string[] = [];
+        const parseRecursively = (id: string) => {
+          const parent = getParent(id);
+          if (!parent) {
+            return;
+          }
+          result.push(parent);
+          parseRecursively(parent);
+        };
+        parseRecursively(id);
+        return result;
+      },
 
-      if (!recordStore) {
-        throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
-      }
+      triggerUpdateForChildren(id) {
+        const { childParentMap, indexStore } = get();
 
-      const { updateRecordState } = recordStore.getState();
-      updateRecordState(patch);
-      get().triggerUpdateForChildren(patch.id);
-    },
+        const allChildren = getAllChildren(id, childParentMap);
 
-    updateRecords(patches) {
-      const patchMap = new Map(patches.map((r) => [r.id, r]));
-      const updatedRecords = get().apiClientRecords.map((r) =>
-        patchMap.has(r.id) ? { ...r, ...patchMap.get(r.id) } : r
-      );
-      get().refresh(updatedRecords);
-
-      const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
-      for (const patch of patches) {
-        const updatedRecord = updatedRecordMap.get(patch.id);
-        if (updatedRecord) {
-          const recordStore = get().getRecordStore(patch.id);
+        allChildren.forEach((cid) => {
+          const recordStore = indexStore.get(cid);
 
           if (!recordStore) {
-            throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
+            throw new NativeError("Record store does not exist!").addContext({ id: cid });
           }
 
-          const { updateRecordState } = recordStore.getState();
-          updateRecordState(patch);
-          get().triggerUpdateForChildren(patch.id);
+          recordStore.getState().incrementVersion();
+        });
+      },
+
+      addNewRecord(record) {
+        const { storeId } = get();
+        console.log("DG-3.7.0: addNewRecord", JSON.stringify({ recordId: record.id, storeId }, null, 2));
+        const updatedRecords = [...get().apiClientRecords, record];
+        get().refresh(updatedRecords);
+      },
+
+      addNewRecords(records) {
+        const updatedRecords = [...get().apiClientRecords, ...records];
+        get().refresh(updatedRecords);
+      },
+
+      updateRecord(patch) {
+        const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
+        get().refresh(updatedRecords);
+
+        const recordStore = get().getRecordStore(patch.id);
+
+        if (!recordStore) {
+          throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
         }
-      }
-    },
 
-    updateCollectionVariables(variables) {
-      const { indexStore } = get();
-      for (const [recordId, newData] of Object.entries(variables)) {
-        const record = indexStore.get(recordId)?.getState();
-        if (record && record.type === RQAPI.RecordType.COLLECTION) {
-          record.collectionVariables.getState().resetSyncValues(parseEnvVariables(newData.variables));
+        const { updateRecordState } = recordStore.getState();
+        updateRecordState(patch);
+        get().triggerUpdateForChildren(patch.id);
+      },
+
+      updateRecords(patches) {
+        const patchMap = new Map(patches.map((r) => [r.id, r]));
+        const updatedRecords = get().apiClientRecords.map((r) =>
+          patchMap.has(r.id) ? { ...r, ...patchMap.get(r.id) } : r
+        );
+        get().refresh(updatedRecords);
+
+        const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
+        for (const patch of patches) {
+          const updatedRecord = updatedRecordMap.get(patch.id);
+          if (updatedRecord) {
+            const recordStore = get().getRecordStore(patch.id);
+
+            if (!recordStore) {
+              throw new NativeError("Record store does not exist!").addContext({ id: patch.id });
+            }
+
+            const { updateRecordState } = recordStore.getState();
+            updateRecordState(patch);
+            get().triggerUpdateForChildren(patch.id);
+          }
         }
-      }
-    },
+      },
 
-    deleteRecords(recordIds) {
-      const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
-      get().refresh(updatedRecords);
-    },
+      updateCollectionVariables(variables) {
+        const { indexStore } = get();
+        for (const [recordId, newData] of Object.entries(variables)) {
+          const record = indexStore.get(recordId)?.getState();
+          if (record && record.type === RQAPI.RecordType.COLLECTION) {
+            record.collectionVariables.getState().resetSyncValues(parseEnvVariables(newData.variables));
+          }
+        }
+      },
 
-    getRecordStore(id) {
-      const { indexStore, storeId } = get();
-      const recordStore = indexStore.get(id);
-      console.log("DG-3.5: getRecordStore", JSON.stringify({
-        id, 
-        'indexStore.keys()': Array.from(indexStore.keys()), 
-        'indexStore.has(id)': indexStore.has(id),
-        'storeId': storeId
-      }, null, 2))
-      return recordStore;
-    },
+      deleteRecords(recordIds) {
+        const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
+        get().refresh(updatedRecords);
+      },
 
-    getAllRecords() {
-      return get().apiClientRecords;
-    },
-  }));
+      getRecordStore(id) {
+        const { indexStore, storeId } = get();
+        const recordStore = indexStore.get(id);
+        console.log(
+          "DG-3.5: getRecordStore",
+          JSON.stringify(
+            {
+              id,
+              "indexStore.keys()": Array.from(indexStore.keys()),
+              "indexStore.has(id)": indexStore.has(id),
+              storeId: storeId,
+            },
+            null,
+            2
+          )
+        );
+        return recordStore;
+      },
+
+      getAllRecords() {
+        return get().apiClientRecords;
+      },
+    }))
+  );
 };
