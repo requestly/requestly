@@ -56,7 +56,7 @@ export const BillingInvoiceCard: React.FC = () => {
               type="default"
               onClick={() => {
                 trackBillingTeamInvoiceDashboardClicked();
-                redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/billing`, true);
+                redirectToUrl(`${process.env.VITE_BROWSERSTACK_BASE_URL}/accounts/billing`, true);
               }}
             >
               Go to billing dashboard
