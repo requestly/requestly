@@ -70,7 +70,7 @@ async function _upsertRunConfigInFirebase(
     }
 
     await setDoc(docRef, updatedRunConfig, { merge: true });
-    return { success: true, data: { ...snapshot.data(), ...updatedRunConfig, id: runConfig.id } };
+    return { success: true, data: { ...(snapshot.data() ?? {}), ...updatedRunConfig, id: runConfig.id } };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigToUpdate: runConfig },
