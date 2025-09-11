@@ -21,7 +21,7 @@ import { redirectToForgotPassword } from "utils/RedirectionUtils";
 import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils";
 import posthog from "posthog-js";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { workspaceActions } from "store/slices/workspaces/slice";
 import { clientStorageService } from "services/clientStorageService";
 
 const showError = (err: string) => {
@@ -190,11 +190,8 @@ export const handleLogoutButtonOnClick = async (appMode: string, isWorkspaceMode
       return signOut();
     }
 
-    if (isWorkspaceMode) {
-      // clearCurrentlyActiveWorkspace(dispatch, appMode);
-    } else if (window.uid && window.isSyncEnabled) {
-      clientStorageService.clearStorage();
-    }
+    dispatch(workspaceActions.resetState());
+    clientStorageService.clearStorage();
 
     return signOut();
   } catch (err) {

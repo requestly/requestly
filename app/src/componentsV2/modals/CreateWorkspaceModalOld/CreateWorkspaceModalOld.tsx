@@ -20,15 +20,14 @@ import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { Workspace, WorkspaceMemberRole, WorkspaceType } from "features/workspaces/types";
 import "./createOldWorkspaceModal.scss";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface Props {
   isOpen: boolean;
@@ -42,7 +41,6 @@ export const CreateWorkspaceModalOld: React.FC<Props> = ({ isOpen, defaultWorksp
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceType, setWorkspaceType] = useState(
@@ -51,6 +49,7 @@ export const CreateWorkspaceModalOld: React.FC<Props> = ({ isOpen, defaultWorksp
   const [folderPath, setFolderPath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const folderSelectCallback = (path: string) => {
     setFolderPath(path);
@@ -58,22 +57,7 @@ export const CreateWorkspaceModalOld: React.FC<Props> = ({ isOpen, defaultWorksp
 
   const handlePostTeamCreationStep = useCallback(
     (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-          workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
-          isWorkspaceMode: isSharedWorkspaceMode,
-        },
-        appMode,
-        null,
-        "create_workspace_modal"
-      );
+      switchWorkspace(teamId, "create_workspace_modal");
       if (workspaceType === WorkspaceType.SHARED) {
         redirectToTeam(navigate, teamId, {
           state: {
@@ -82,15 +66,7 @@ export const CreateWorkspaceModalOld: React.FC<Props> = ({ isOpen, defaultWorksp
         });
       }
     },
-    [
-      dispatch,
-      appMode,
-      isNotifyAllSelected,
-      isSharedWorkspaceMode,
-      navigate,
-      user?.details?.isSyncEnabled,
-      workspaceType,
-    ]
+    [switchWorkspace, workspaceType, navigate, isNotifyAllSelected]
   );
 
   const handleDomainInvitesCreation = useCallback(

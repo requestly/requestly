@@ -11,7 +11,6 @@ import { getAppMode, getIsRefreshRulesPending, getUserAttributes } from "store/s
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { recordsActions } from "store/features/rules/slice";
-import { StorageService } from "init";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
@@ -31,6 +30,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { Group, RecordStatus, Rule, StorageRecord } from "@requestly/shared/types/entities/rules";
 import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import { RULES_WITHOUT_LIMITS } from "../constants";
+import syncingHelper from "lib/syncing/helpers/syncingHelper";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -82,7 +82,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     async (updatedRecord: StorageRecord, originalRecord: StorageRecord) => {
       dispatch(recordsActions.upsertRecord(updatedRecord));
 
-      return StorageService(appMode)
+      return syncingHelper
         .saveRuleOrGroup(updatedRecord, { silentUpdate: true })
         .then(() => {
           Logger.log("Rule updated in Storage Service");
@@ -91,7 +91,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
           dispatch(recordsActions.upsertRecord(originalRecord));
         });
     },
-    [appMode, dispatch]
+    [dispatch]
   );
 
   const updateRecordsInStorage = useCallback(
@@ -100,12 +100,12 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
       dispatch(recordsActions.upsertRecords(updatedRecords));
 
-      return StorageService(appMode)
+      return syncingHelper
         .saveMultipleRulesOrGroups(updatedRecords)
         .then(() => Logger.log("Records updated in Storage Service"))
         .catch(() => dispatch(recordsActions.upsertRecords(originalRecords)));
     },
-    [appMode, dispatch]
+    [dispatch]
   );
 
   const createRuleAction = useCallback((source = "") => {

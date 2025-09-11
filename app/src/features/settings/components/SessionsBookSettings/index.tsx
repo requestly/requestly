@@ -16,7 +16,6 @@ import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
-import { StorageService } from "init";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettings.css";
@@ -73,25 +72,22 @@ export const SessionsSettings: React.FC = () => {
     trackConfigurationOpened();
   }, []);
 
-  const handleSaveConfig = useCallback(
-    async (newConfig: SessionRecordingConfig, showToast = true) => {
-      Logger.log("Writing storage in handleSaveConfig");
-      await StorageService(appMode).saveSessionRecordingPageConfig(newConfig);
-      setConfig(newConfig);
+  const handleSaveConfig = useCallback(async (newConfig: SessionRecordingConfig, showToast = true) => {
+    Logger.log("Writing storage in handleSaveConfig");
+    await clientSessionRecordingStorageService.saveSessionRecordingConfig(newConfig);
+    setConfig(newConfig);
 
-      if (showToast) {
-        toast.success("Settings saved successfully.");
-      }
+    if (showToast) {
+      toast.success("Settings saved successfully.");
+    }
 
-      trackConfigurationSaved({
-        maxDuration: newConfig?.maxDuration,
-        pageSources: newConfig?.pageSources?.length ?? 0,
-        autoRecordingMode: newConfig?.autoRecording?.mode,
-        isAutoRecordingActive: newConfig?.autoRecording?.isActive,
-      });
-    },
-    [appMode]
-  );
+    trackConfigurationSaved({
+      maxDuration: newConfig?.maxDuration,
+      pageSources: newConfig?.pageSources?.length ?? 0,
+      autoRecordingMode: newConfig?.autoRecording?.mode,
+      isAutoRecordingActive: newConfig?.autoRecording?.isActive,
+    });
+  }, []);
 
   useEffect(() => {
     Logger.log("Reading storage in SessionsIndexPage");

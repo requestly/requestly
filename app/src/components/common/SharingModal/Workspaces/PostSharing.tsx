@@ -1,16 +1,12 @@
 import React, { useCallback, useMemo } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { FaRegCopy } from "@react-icons/all-files/fa/FaRegCopy";
 import { PostShareViewData, WorkspaceSharingTypes } from "../types";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 import { toast } from "utils/Toast";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface PostSharingProps {
   postShareViewData: PostShareViewData;
@@ -19,37 +15,16 @@ interface PostSharingProps {
 }
 
 export const PostSharing: React.FC<PostSharingProps> = ({ postShareViewData, setPostShareViewData, toggleModal }) => {
-  const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handleSwitchWorkspace = useCallback(() => {
-    switchWorkspace(
-      {
-        teamId: postShareViewData.targetTeamData.id,
-        teamName: postShareViewData.targetTeamData.name,
-        teamMembersCount: postShareViewData.targetTeamData.accessCount,
-      },
-      dispatch,
-      {
-        isWorkspaceMode: isSharedWorkspaceMode,
-        isSyncEnabled: true,
-      },
-      appMode,
-      null,
-      "sharing_modal"
-    )
-      .then(() => {
-        toggleModal();
-      })
-      .catch((error) => {
-        console.error(error);
-        toggleModal();
-        toast.error(
-          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
-        );
-      });
-  }, [appMode, dispatch, isSharedWorkspaceMode, toggleModal, postShareViewData]);
+    switchWorkspace(postShareViewData.targetTeamData.id, "sharing_modal").then(() => {
+      toggleModal();
+      toast.error(
+        "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
+      );
+    });
+  }, [switchWorkspace, postShareViewData.targetTeamData.id, toggleModal]);
 
   const postSharingViews = useMemo(() => {
     return {

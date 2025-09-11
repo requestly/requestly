@@ -2,11 +2,8 @@ import React, { useCallback, useState } from "react";
 import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { SharedWorkspaceCreationView } from "./SharedWorkspaceCreationView/SharedWorkspaceCreationView";
 import { LocalWorkspaceCreationView } from "./LocalWorkspaceCreationView/LocalWorkspaceCreationView";
-import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getAppMode } from "store/selectors";
-import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast";
@@ -24,6 +21,7 @@ import { workspaceActions } from "store/slices/workspaces/slice";
 import { getDomainFromEmail } from "utils/mailCheckerUtils";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import * as Sentry from "@sentry/react";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 interface Props {
   workspaceType: WorkspaceType;
@@ -48,30 +46,14 @@ export type CreateWorkspaceArgs = {
 export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analyticEventSource, callback, onCancel }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const [isLoading, setIsLoading] = useState(false);
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const handlePostTeamCreationStep = useCallback(
     (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
-      switchWorkspace(
-        {
-          teamId: teamId,
-          teamName: newTeamName,
-          teamMembersCount: 1,
-          workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
-          isWorkspaceMode: isSharedWorkspaceMode,
-        },
-        appMode,
-        null,
-        analyticEventSource
-      );
+      switchWorkspace(teamId, analyticEventSource);
       if (workspaceType === WorkspaceType.SHARED) {
         redirectToTeam(navigate, teamId, {
           state: {
@@ -80,15 +62,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
         });
       }
     },
-    [
-      dispatch,
-      appMode,
-      isSharedWorkspaceMode,
-      navigate,
-      user?.details?.isSyncEnabled,
-      workspaceType,
-      analyticEventSource,
-    ]
+    [switchWorkspace, analyticEventSource, workspaceType, navigate]
   );
 
   const handleDomainInvitesCreation = useCallback(

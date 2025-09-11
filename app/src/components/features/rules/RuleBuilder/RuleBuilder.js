@@ -37,6 +37,7 @@ import { sampleRuleDetails } from "features/rules/screens/rulesList/components/R
 import "./RuleBuilder.css";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
 import { RecordType } from "@requestly/shared/types/entities/rules";
+import { RuleStorageModel } from "lib/syncing";
 
 //CONSTANTS
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
@@ -117,14 +118,14 @@ const RuleBuilder = (props) => {
         stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE], navigate);
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
         Logger.log("Reading to storage in RuleBuilder");
-        clientRuleStorageService.getRecordById(RULE_TO_EDIT_ID).then((rule) => {
-          if (rule === undefined) {
+        RuleStorageModel.getById(RULE_TO_EDIT_ID).then((ruleModel) => {
+          if (ruleModel === undefined) {
             RedirectionUtils.redirectTo404(navigate);
           } else {
             //Prevent updating state when component is about to unmount
             if (!isCleaningUpRef.current) {
-              stableSetCurrentlySelectedRule(dispatch, rule);
-              stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(rule), navigate);
+              stableSetCurrentlySelectedRule(dispatch, ruleModel.data);
+              stableSetCurrentlySelectedRuleConfig(dispatch, getRuleConfigInEditMode(ruleModel.data), navigate);
             }
           }
         });

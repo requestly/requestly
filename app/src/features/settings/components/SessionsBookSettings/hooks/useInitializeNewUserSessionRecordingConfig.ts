@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { defaultSessionRecordingConfig } from "..";
-import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled, isExtensionVersionCompatible } from "actions/ExtensionActions";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
@@ -29,7 +28,7 @@ export const useInitializeNewUserSessionRecordingConfig = () => {
           },
         };
 
-        StorageService(appMode).saveSessionRecordingPageConfig(newUserRecordingConfig);
+        clientSessionRecordingStorageService.saveSessionRecordingConfig(newUserRecordingConfig);
       }
     });
   }, [appMode]);

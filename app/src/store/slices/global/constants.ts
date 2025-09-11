@@ -139,6 +139,10 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       isActive: false,
       props: {},
     },
+    workspaceLoadingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {

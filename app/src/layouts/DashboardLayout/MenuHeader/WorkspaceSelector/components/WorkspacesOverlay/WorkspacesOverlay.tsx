@@ -77,7 +77,6 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   const {
     handleWorkspaceSwitch,
     confirmWorkspaceSwitch,
-    handleSwitchToPrivateWorkspace,
     isWorkspaceLoading,
     setIsWorkspaceLoading,
   } = useWorkspaceSwitcher();
@@ -111,6 +110,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
 
   const hasLocalWorkspaces = workspaceMap[WorkspaceType.LOCAL].length > 0;
   const hasSharedWorkspaces = workspaceMap[WorkspaceType.SHARED].length;
+  const hasPersonalWorkspaces = workspaceMap[WorkspaceType.PERSONAL].length > 0;
 
   const handleJoinWorkspaceMenuItemClick = () => {
     dispatch(
@@ -127,7 +127,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
   return (
     <>
       <div className="workspaces-overlay">
-        {user.loggedIn && (
+        {user.loggedIn && hasPersonalWorkspaces && (
           <>
             <div
               style={{
@@ -136,8 +136,11 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
             >
               <WorkspaceItem
                 type={WorkspaceType.PERSONAL}
+                workspace={workspaceMap[WorkspaceType.PERSONAL]?.[0]}
                 toggleDropdown={toggleDropdown}
-                onClick={() => confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace)}
+                onClick={() =>
+                  confirmWorkspaceSwitch(() => handleWorkspaceSwitch(workspaceMap[WorkspaceType.PERSONAL]?.[0]))
+                }
               />
             </div>
           </>

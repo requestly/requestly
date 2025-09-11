@@ -1,17 +1,13 @@
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 import Logger from "lib/logger";
-import { toast } from "utils/Toast";
 import firebaseApp from "../../../firebase";
 import APP_CONSTANTS from "config/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import * as Sentry from "@sentry/react";
 import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
-import { getActiveWorkspaceId } from "features/workspaces/utils";
 
 const db = getFirestore(firebaseApp);
 
@@ -29,10 +25,10 @@ const splitMembersBasedOnRoles = (members: any) => {
 export const useFetchTeamWorkspaces = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const appMode = useSelector(getAppMode);
 
   const [sharedWorkspaces, setSharedWorkspaces] = useState<Workspace[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const unsubscribeAvailableTeams = useRef<(() => void) | null>(null);
 
@@ -44,6 +40,7 @@ export const useFetchTeamWorkspaces = () => {
     }
 
     const uid = user?.details?.profile?.uid;
+
     if (user?.loggedIn && uid) {
       try {
         const q = query(collection(db, "teams"), where(`members.${uid}.role`, "in", ["admin", "write", "read"]));
@@ -77,6 +74,7 @@ export const useFetchTeamWorkspaces = () => {
                   members: teamData.members,
                   appsumo: teamData?.appsumo || null,
                   workspaceType: teamData?.workspaceType || WorkspaceType.SHARED,
+                  isSyncEnabled: teamData.isSyncEnabled || true, // Default to true for backward compatibility
                 };
 
                 if (teamData?.browserstackDetails) {
@@ -89,42 +87,11 @@ export const useFetchTeamWorkspaces = () => {
                 return formattedTeamData;
               })
               .filter(Boolean);
+            setIsInitialized(true);
             setSharedWorkspaces(records);
-
-            if (!activeWorkspaceId) return;
-
-            //FIX ME: the following code's intention is unclear
-            //Showing an alert is unnecessary
-            const found = records.find((team) => team.id === activeWorkspaceId);
-
-            Logger.log("DBG: availableTeamsListener", {
-              teamFound: found,
-              fetchedRecords: records,
-              activeWorkspaceId,
-              hasUserRemovedHimselfRecently: (window as any).hasUserRemovedHimselfRecently,
-            });
-
-            if (!found) {
-              Sentry.captureException(new Error(`No workspace found`), {
-                extra: {
-                  activeWorkspaceId,
-                  hasUserRemovedHimselfRecently: (window as any).hasUserRemovedHimselfRecently,
-                },
-              });
-
-              if (!(window as any).hasUserRemovedHimselfRecently) {
-                alert("You no longer have access to this workspace. Please contact your team admin.");
-              }
-
-              clearCurrentlyActiveWorkspace(dispatch, appMode);
-              toast.info("Verifying storage checksum");
-              setTimeout(() => {
-                window.location.reload();
-              }, 4000);
-            }
           },
           (error) => {
-            console.log("DBG: availableTeams Query -> error", error);
+            console.log("[Debug]: availableTeams Query -> error", error);
             Logger.error(error);
           }
         );
@@ -133,10 +100,13 @@ export const useFetchTeamWorkspaces = () => {
         unsubscribeAvailableTeams.current = null;
       }
     } else {
+      setIsInitialized(true);
       setSharedWorkspaces([]);
     }
 
     return () => {
+      setIsInitialized(false);
+      setSharedWorkspaces([]);
       unsubscribeAvailableTeams.current?.();
       unsubscribeAvailableTeams.current = null;
     };
@@ -148,5 +118,6 @@ export const useFetchTeamWorkspaces = () => {
 
   return {
     sharedWorkspaces,
+    isInitialized,
   };
 };

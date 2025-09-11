@@ -1,24 +1,19 @@
-import {
-  clearCurrentlyActiveWorkspace,
-  showSwitchWorkspaceSuccessToast,
-  switchWorkspace,
-} from "actions/TeamWorkspaceActions";
 import PATHS from "config/constants/sub/paths";
 import {
   ApiClientViewMode,
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { Workspace, WorkspaceType } from "features/workspaces/types";
+import { Workspace } from "features/workspaces/types";
 import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
+import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { toast } from "utils/Toast";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Modal } from "antd";
+import { useWorkspaceHelpers } from "features/workspaces/hooks/useWorkspaceHelpers";
 
 //TODO: move it into top level hooks
 export const useWorkspaceSwitcher = () => {
@@ -27,10 +22,8 @@ export const useWorkspaceSwitcher = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
-  const isSharedWorkspace = useSelector(isActiveWorkspaceShared);
+  const { switchWorkspace } = useWorkspaceHelpers();
 
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
 
@@ -72,25 +65,10 @@ export const useWorkspaceSwitcher = () => {
       }
 
       setIsWorkspaceLoading(true);
-      switchWorkspace(
-        {
-          teamId: workspace.id,
-          teamName: workspace.name,
-          teamMembersCount: workspace.accessCount,
-          workspaceType: workspace.workspaceType,
-        },
-        dispatch,
-        {
-          isSyncEnabled: workspace.workspaceType === WorkspaceType.SHARED ? user?.details?.isSyncEnabled : true,
-          isWorkspaceMode: isSharedWorkspace,
-        },
-        appMode,
-        undefined,
-        "workspaces_dropdown"
-      )
+      switchWorkspace(workspace.id)
         .then(() => {
           if (!isWorkspaceLoading) {
-            showSwitchWorkspaceSuccessToast(workspace.name);
+            toast.info(`Switched to workspace: ${workspace.name}`);
           }
 
           setIsWorkspaceLoading(false);
@@ -102,15 +80,7 @@ export const useWorkspaceSwitcher = () => {
           );
         });
     },
-    [
-      activeWorkspace?.id,
-      appMode,
-      dispatch,
-      getViewMode,
-      isSharedWorkspace,
-      isWorkspaceLoading,
-      user?.details?.isSyncEnabled,
-    ]
+    [activeWorkspace?.id, getViewMode, isWorkspaceLoading, switchWorkspace]
   );
 
   const confirmWorkspaceSwitch = useCallback(
@@ -142,35 +112,9 @@ export const useWorkspaceSwitcher = () => {
     [isCurrentlySelectedRuleHasUnsavedChanges, navigate, path, pathname, redirects, dispatch]
   );
 
-  const handleSwitchToPrivateWorkspace = useCallback(async () => {
-    const viewMode = getViewMode();
-
-    if (viewMode === ApiClientViewMode.SINGLE) {
-      if (activeWorkspace?.id === null) {
-        toast.info("Workspace already selected!");
-        return;
-      }
-    }
-    setIsWorkspaceLoading(true);
-    return clearCurrentlyActiveWorkspace(dispatch, appMode)
-      .then(() => {
-        showSwitchWorkspaceSuccessToast();
-      })
-      .catch(() => {
-        toast.error(
-          "Failed to switch workspace. Please reload and try again. If the issue persists, please contact support."
-        );
-      })
-      .finally(() => {
-        setIsWorkspaceLoading(false);
-      });
-  }, [appMode, dispatch, activeWorkspace?.id, getViewMode]);
-
   return {
     handleWorkspaceSwitch,
     confirmWorkspaceSwitch,
-    handleSwitchToPrivateWorkspace,
-
     isWorkspaceLoading,
     setIsWorkspaceLoading,
   };

@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { getAppMode } from "store/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { setSyncState } from "utils/syncing/SyncUtils";
 import { toast } from "utils/Toast";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import SettingsItem from "./SettingsItem";
@@ -13,7 +11,6 @@ import { useRBAC } from "features/rbac";
 
 const RulesSyncing = () => {
   const dispatch = useDispatch();
-  const appMode = useSelector(getAppMode);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("global_settings", "update");
   const user = useSelector(getUserAuthDetails);
@@ -38,14 +35,14 @@ const RulesSyncing = () => {
     }
 
     setIsSyncStatusChangeProcessing(true);
-    setSyncState(user.details.profile.uid, status, appMode)
-      .then(() => {
-        toast.info(`We ${status ? "will" : "won't"} be syncing your rules automatically hereon.`);
-      })
-      .catch(() => {
-        toast.error(`Sorry, we are experiencing issues updating the sync state.`);
-      })
-      .finally(() => setIsSyncStatusChangeProcessing(false));
+    // setSyncState(user.details.profile.uid, status, appMode)
+    //   .then(() => {
+    //     toast.info(`We ${status ? "will" : "won't"} be syncing your rules automatically hereon.`);
+    //   })
+    //   .catch(() => {
+    //     toast.error(`Sorry, we are experiencing issues updating the sync state.`);
+    //   })
+    //   .finally(() => setIsSyncStatusChangeProcessing(false));
 
     trackSettingsToggled("rules_syncing", status);
   };
