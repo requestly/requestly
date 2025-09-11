@@ -152,7 +152,7 @@ const LINKS = {
 
   REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
 
-  OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
+  OAUTH_REDIRECT_URL: `${process.env.VITE_BACKEND_BASE_URL}/oauth/authorize`,
 
   ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
 

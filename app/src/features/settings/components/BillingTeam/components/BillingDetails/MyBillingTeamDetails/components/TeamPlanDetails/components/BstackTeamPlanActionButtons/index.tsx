@@ -19,7 +19,7 @@ export const BstackTeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetai
           icon={<FaRegCreditCard />}
           onClick={() => {
             trackBillingTeamManagePlanClicked();
-            redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/profile/overview`, true);
+            redirectToUrl(`${process.env.VITE_BROWSERSTACK_BASE_URL}/accounts/profile/overview`, true);
           }}
         >
           Manage Plan

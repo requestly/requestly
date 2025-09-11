@@ -20,7 +20,12 @@ const config = async ({ mode }) => {
   return defineConfig({
     define: {
       global: "globalThis",
-      "process.env": loadEnv(mode, process.cwd(), ""),
+      "process.env": {
+        ...loadEnv(mode, process.cwd(), "VITE_"),
+        NODE_ENV: process.env.NODE_ENV,
+        REACT_APP_ENV: process.env.REACT_APP_ENV,
+        GITHUB_SHA: process.env.GITHUB_SHA,
+      },
     },
     plugins: [
       nodePolyfills(),
@@ -51,7 +56,7 @@ const config = async ({ mode }) => {
         ],
       }),
       sentryVitePlugin({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
         org: "requestly",
         project: "web-app",
         sourcemaps: {
