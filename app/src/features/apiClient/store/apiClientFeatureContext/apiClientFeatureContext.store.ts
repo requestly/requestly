@@ -42,15 +42,33 @@ type ApiClientFeatureContextProviderState = {
 };
 
 function createApiClientFeatureContextProviderStore() {
+  console.log("DG-8.3: createApiClientFeatureContextProviderStore called", Date.now());
   return create<ApiClientFeatureContextProviderState>()((set, get) => {
     return {
       contexts: new Map(),
 
       addContext(context) {
+        const randomID = Math.random().toString(36).substring(2, 15);
         const { contexts, setLastUsedContext } = get();
+        console.log(
+          "DG-8.0: addContext called for contextID",
+          JSON.stringify({ id: context.id, data: Array.from(contexts.keys()) }, null, 2),
+          randomID,
+          Date.now()
+        );
+        if (contexts.has(context.id)) {
+          console.log("DG-8.1: early return for contexID", context.id, randomID, Date.now());
+          return;
+        }
         contexts.set(context.id, context);
         set({ contexts });
         setLastUsedContext(context);
+        console.log(
+          "DG-8.2: addContext completed for contextID",
+          JSON.stringify({ id: context.id, data: Array.from(contexts.keys()) }, null, 2),
+          randomID,
+          Date.now()
+        );
       },
 
       removeContext(id) {
