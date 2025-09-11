@@ -3,6 +3,7 @@ import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { globalActions } from "store/slices/global/slice";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import Logger from "lib/logger";
+import { isSetappBuild } from "../../utils/AppUtils";
 
 export const userSubscriptionDocListener = (dispatch, uid) => {
   if (uid) {
@@ -62,6 +63,28 @@ const checkIfAnnualPlan = (firestoreData) => {
 export const newSchemaToOldSchemaAdapter = (firestoreData) => {
   if (!firestoreData) {
     return null;
+  }
+
+  if (isSetappBuild()) {
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(today.getDate() + 30);
+
+    return {
+      planId: "professional",
+      status: "active",
+      subscription: {
+        cancelAtPeriodEnd: false,
+        endDate: endDate.toISOString().split("T")[0],
+        startDate: today.toISOString().split("T")[0],
+        id: "setapp_subscription",
+        duration: "monthly",
+        quantity: 1,
+        billingId: null,
+        isBrowserstackSubscription: false,
+      },
+      type: "setapp",
+    };
   }
 
   const planDetails = {
