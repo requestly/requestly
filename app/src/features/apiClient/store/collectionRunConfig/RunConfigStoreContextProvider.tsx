@@ -5,12 +5,14 @@ import { RQAPI } from "features/apiClient/types";
 
 export const RunConfigStoreContext = createContext<StoreApi<RunConfigState> | null>(null);
 
-export const RunConfigStoreContextProvider: React.FC<{ runConfig: RQAPI.RunConfig; children: React.ReactNode }> = ({
-  runConfig,
-  children,
-}) => {
+export const RunConfigStoreContextProvider: React.FC<{
+  runConfig: Partial<RQAPI.RunConfig>;
+  children: React.ReactNode;
+}> = ({ runConfig, children }) => {
   const store = useMemo(() => {
-    return createRunConfigStore(runConfig);
+    const data = { id: runConfig.id, runOrder: runConfig.runOrder };
+    // should we patch new requests and existing order here and then create store?
+    return createRunConfigStore(data);
   }, [runConfig]);
 
   return <RunConfigStoreContext.Provider value={store}>{children}</RunConfigStoreContext.Provider>;

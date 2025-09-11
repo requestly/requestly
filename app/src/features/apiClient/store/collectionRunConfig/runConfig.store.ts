@@ -25,7 +25,8 @@ export type RunConfigState = {
    * This would be called when a new request is added by the user.
    * They could add to the collection we are dealing with, or to a child collection.
    */
-  patchRunOrder(requests: RQAPI.ApiClientRecord[]): void;
+  patchRunOrderByRequestIds(requests: RQAPI.ApiClientRecord["id"][]): void;
+  patchRunOrderByRequests(requests: RQAPI.ApiClientRecord[]): void;
 };
 
 function isValidNumber(number: unknown) {
@@ -35,8 +36,8 @@ function isValidNumber(number: unknown) {
 export function createRunConfigStore(data: {
   id: RQAPI.RunConfig["id"];
   runOrder: RQAPI.RunOrder;
-  delay: RQAPI.RunConfig["delay"];
-  iterations: RQAPI.RunConfig["iterations"];
+  delay?: RQAPI.RunConfig["delay"];
+  iterations?: RQAPI.RunConfig["iterations"];
 }) {
   const { id, runOrder, delay = 0, iterations = 1 } = data;
 
@@ -75,10 +76,9 @@ export function createRunConfigStore(data: {
       return { runOrder };
     },
 
-    patchRunOrder(requests) {
+    patchRunOrderByRequestIds(ids) {
       const { runOrder, setRunOrder } = get();
 
-      const ids = requests.map((r) => r.id);
       const incomingRequestSet = new Set(ids);
 
       // remove stale ids from existing order
@@ -86,14 +86,21 @@ export function createRunConfigStore(data: {
 
       const filteredRunOrderSet = new Set(filteredRunOrder);
       const patch = [];
-      for (const request of requests) {
-        if (!filteredRunOrderSet.has(request.id)) {
-          patch.push(request.id);
+      for (const id of ids) {
+        if (!filteredRunOrderSet.has(id)) {
+          patch.push(id);
         }
       }
 
       const newRunOrder = [...filteredRunOrder, ...patch];
       setRunOrder(newRunOrder);
+    },
+
+    patchRunOrderByRequests(requests) {
+      const { patchRunOrderByRequestIds } = get();
+
+      const ids = requests.map((r) => r.id);
+      patchRunOrderByRequestIds(ids);
     },
   }));
 }
