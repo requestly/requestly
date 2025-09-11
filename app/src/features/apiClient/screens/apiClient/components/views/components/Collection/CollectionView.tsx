@@ -15,11 +15,13 @@ import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
+import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
   AUTHORIZATION: "authorization",
+  RUNNER: "runner",
 };
 
 interface CollectionViewProps {
@@ -105,6 +107,11 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           />
         ),
       },
+      {
+        label: "Runner",
+        key: TAB_KEYS.RUNNER,
+        children: <CollectionRunnerView collectionId={collection.collectionId} />,
+      },
     ];
   }, [collection, collectionId, updateCollectionAuthData]);
 
@@ -163,7 +170,13 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             />
           </div>
           <div className="collection-view-content">
-            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />
+            <Tabs
+              destroyInactiveTabPane={false}
+              defaultActiveKey={TAB_KEYS.OVERVIEW}
+              items={tabItems}
+              animated={false}
+              moreIcon={null}
+            />
           </div>
         </>
       )}
