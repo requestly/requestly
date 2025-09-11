@@ -8,6 +8,7 @@ import "./githubStudentPack.scss";
 import { redirectToHome } from "utils/RedirectionUtils";
 import { getAppMode } from "store/selectors";
 import { useNavigate } from "react-router-dom";
+import { trackEvent } from "modules/analytics";
 
 export const GithubStudentPack: React.FC = () => {
   const navigate = useNavigate();
@@ -32,16 +33,20 @@ export const GithubStudentPack: React.FC = () => {
         if (data.granted) {
           setShowNotGrantedMessage(false);
           toast.success("Congratulations! You've been granted the Professional plan via the GitHub Student Pack.");
+          trackEvent("github_student_verification_success");
           redirectToHome(appMode, navigate);
         } else {
           setShowNotGrantedMessage(true);
+          trackEvent("github_student_verification_failed");
         }
       } else {
         setShowNotGrantedMessage(true);
+        trackEvent("github_student_verification_failed");
       }
     } catch (error) {
       console.log("Error during GitHub Student Pack activation:", error);
       setShowNotGrantedMessage(true);
+      trackEvent("github_student_verification_failed");
     } finally {
       setIsLoading(false);
     }
