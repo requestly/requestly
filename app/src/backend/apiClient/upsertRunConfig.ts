@@ -1,5 +1,5 @@
 import firebaseApp from "../../firebase";
-import { getFirestore, Timestamp, doc, addDoc, collection, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
 import { RQAPI } from "features/apiClient/types";
 import { ResponsePromise } from "backend/types";
 import * as Sentry from "@sentry/react";
@@ -9,49 +9,8 @@ export async function upsertRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfig: Partial<RQAPI.RunConfig>
 ): ResponsePromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>> {
-  let result;
-
-  if (!runConfig.id) {
-    result = await _createRunConfigInFirebase(collectionId, runConfig);
-  } else {
-    result = await _upsertRunConfigInFirebase(collectionId, runConfig);
-  }
-
+  const result = await _upsertRunConfigInFirebase(collectionId, runConfig);
   return result;
-}
-
-async function _createRunConfigInFirebase(
-  collectionId: RQAPI.ApiClientRecord["collectionId"],
-  runConfig: Partial<RQAPI.RunConfig>
-): ResponsePromise<RQAPI.RunConfig> {
-  try {
-    const db = getFirestore(firebaseApp);
-    const collectionRef = collection(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE);
-
-    const timeStamp = Timestamp.now().toMillis();
-    const newRunConfig = {
-      ...runConfig,
-      createdTs: timeStamp,
-      updatedTs: timeStamp,
-    } as RQAPI.RunConfig;
-
-    const resultDocRef = await addDoc(collectionRef, newRunConfig);
-
-    return { success: true, data: { ...newRunConfig, id: resultDocRef.id } as RQAPI.RunConfig };
-  } catch (e) {
-    Sentry.captureException(e, {
-      extra: { collectionId, runConfigToSave: runConfig },
-    });
-
-    return {
-      success: false,
-      data: null,
-      error: {
-        type: "INTERNAL_SERVER_ERROR",
-        message: "Something went wrong!",
-      },
-    };
-  }
 }
 
 async function _upsertRunConfigInFirebase(
