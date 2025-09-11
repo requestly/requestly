@@ -1,0 +1,97 @@
+.reOrderable-list {
+  display: flex;
+  padding: var(--space-4, 8px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4, 8px);
+  align-self: stretch;
+
+  .reOrderable-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 4px);
+    padding: var(--space-2, 4px);
+    border-radius: 4px;
+    flex-wrap: nowrap;
+
+    &:hover {
+      background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    }
+
+    .drag-icon {
+      cursor: grab;
+      user-select: none;
+      width: 12.25px;
+      height: 14px;
+      flex-shrink: 0;
+
+      color: var(--requestly-color-text-placeholder, #8f8f8f);
+      font-weight: 300;
+      line-height: 16px; /* 114.286% */
+    }
+
+    .collection-path-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1, 2px);
+      padding-left: var(--space-4, 6px);
+
+      .collection-path-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-1, 2px);
+
+        .collection-icon {
+          width: 16px;
+          height: 16px;
+          aspect-ratio: 1/1;
+        }
+
+        .separator {
+          color: var(--requestly-color-text-placeholder, #8f8f8f);
+          font-size: var(--requestly-font-size-sm, 12px);
+          font-style: normal;
+          font-weight: 400;
+          line-height: 18px; /* 150% */
+        }
+      }
+    }
+
+    .request-info-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 4px);
+
+      .request-method {
+        flex-shrink: 0;
+        font-size: 8px;
+        font-weight: var(--requestly-font-weight-medium);
+        line-height: 13px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        display: flex;
+        width: 32px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 2px;
+      }
+
+      // TODO: handle text overflow
+      .request-name {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--requestly-color-text-default, #fff);
+        font-size: var(--requestly-font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px; /* 150% */
+      }
+    }
+  }
+}
