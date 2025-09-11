@@ -35,6 +35,10 @@ export async function fetchOrCreateDefaultRunConfig(
     return getConfigFromSavedData(result.data);
   }
 
+  if (result.success === false && result.error.type === "INTERNAL_SERVER_ERROR") {
+    throw new NativeError("Something went wrong while fetching run config!").addContext({ collectionId });
+  }
+
   // create deafult config
   const defaultConfig: Partial<RQAPI.RunConfig> = {
     id: DEFAULT_RUN_CONFIG_ID,
@@ -44,7 +48,7 @@ export async function fetchOrCreateDefaultRunConfig(
   const upsertResult = await apiClientRecordsRepository.upsertRunConfig(collectionId, defaultConfig);
 
   if (!upsertResult.success) {
-    throw new NativeError("Something went wrong while fetching run config!").addContext({ upsertResult });
+    throw new NativeError("Something went wrong while fetching run config!").addContext({ collectionId, upsertResult });
   }
 
   return getConfigFromSavedData(upsertResult.data);
