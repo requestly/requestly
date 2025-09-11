@@ -109,7 +109,7 @@ const DesktopSignIn = () => {
       const token = await firebaseUser?.getIdToken();
 
       const isNewUser = params.get("isNewUser");
-      const isAuthForSetappBuild = params.get("isAuthForSetappBuild");
+      const isAuthForSetappBuild = params.get("isAuthForSetappBuild") === "true";
       const code = desktopAuthParams.get("ot-auth-code");
       let source = desktopAuthParams.get("source").replace(/ /g, "_");
       source = `desktop_app_${source}`;
@@ -157,7 +157,7 @@ const DesktopSignIn = () => {
           */
           redirectToDesktopApp(
             `${PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE}?isNewUser=${isNewUser}`,
-            isAuthForSetappBuild || false
+            isAuthForSetappBuild
           );
         })
         .catch((err) => {

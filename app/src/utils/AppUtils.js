@@ -59,5 +59,5 @@ export const getAppFlavour = () => {
 };
 
 export const isSetappBuild = () => {
-  return isDesktopMode() && (window.RQ?.DESKTOP.IS_SETAPP_BUILD ?? false);
+  return isDesktopMode() && !!window.RQ?.DESKTOP?.IS_SETAPP_BUILD;
 };

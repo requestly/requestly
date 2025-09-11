@@ -468,7 +468,7 @@ export function redirectToHome(appMode, navigate) {
 
 // route should be choosen from APP_CONSTANTS.PATH.<your-route>.ABSOLUTE
 export const redirectToDesktopApp = (route, redirectToSetappBuild = false) => {
-  let redirectedRoute = redirectToSetappBuild ? "setapp-requestly://open-url" : "requestly://open-url";
+  let redirectedRoute = redirectToSetappBuild ? "requestly-setapp://open-url" : "requestly://open-url";
   if (route) {
     redirectedRoute = `${redirectedRoute}?route=${route}`;
   }
