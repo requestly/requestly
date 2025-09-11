@@ -1,1 +1,1 @@
-export { fetchOrCreateDefaultRunConfig } from "./fetchOrCreateDefaultRunConfig.command";
+export { getDefaultRunConfig } from "./getDefaultRunConfig.command";

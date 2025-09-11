@@ -1,7 +1,7 @@
 import React, { createContext, useMemo } from "react";
 import { StoreApi } from "zustand";
 import { createRunConfigStore, RunConfigState } from "./runConfig.store";
-import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/fetchOrCreateDefaultRunConfig.command";
+import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/getDefaultRunConfig.command";
 
 export const RunConfigStoreContext = createContext<StoreApi<RunConfigState> | null>(null);
 
