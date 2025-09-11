@@ -11,7 +11,6 @@ export const RunConfigStoreContextProvider: React.FC<{
 }> = ({ runConfig, children }) => {
   const store = useMemo(() => {
     const data = { id: runConfig.id, runOrder: runConfig.runOrder };
-    // should we patch new requests and existing order here and then create store?
     return createRunConfigStore(data);
   }, [runConfig]);
 
