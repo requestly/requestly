@@ -54,6 +54,7 @@ export type ApiRecordsState = {
   indexStore: Map<string, StoreApi<RecordState>>;
 
   getParentChain: (id: string) => string[];
+  getAllChildren: (id: string) => string[];
 
   /**
    * It updates the version of children of given entity. Meaning any component relying on version
@@ -320,5 +321,7 @@ export const createApiRecordsStore = (initialRecords: {
     getAllRecords() {
       return get().apiClientRecords;
     },
+
+    getAllChildren: (id: string) => getAllChildren(id, get().childParentMap),
   }));
 };
