@@ -11,7 +11,7 @@ import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
-import { TeamRole, WorkspaceType } from "types";
+import { TeamRole } from "types";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { generateDefaultTeamName } from "utils/teams";
@@ -20,7 +20,7 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
 import { getActiveWorkspace, getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   selectedRules: string[];

@@ -22,7 +22,7 @@ const EnvironmentDaemon: React.FC = () => {
         activeEnvrionment
           .getState()
           .data.variables?.getState()
-          .reset(parseEnvVariables(updatedEnvironmentData.variables));
+          .resetSyncValues(parseEnvVariables(updatedEnvironmentData.variables));
       },
     });
     return unsusbscribe;
@@ -36,7 +36,7 @@ const EnvironmentDaemon: React.FC = () => {
         globalEnvironement
           .getState()
           .data.variables.getState()
-          .reset(parseEnvVariables(updatedEnvironmentData.variables));
+          .resetSyncValues(parseEnvVariables(updatedEnvironmentData.variables));
       },
     });
     return unsubscribe;

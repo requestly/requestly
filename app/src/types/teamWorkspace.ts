@@ -1,3 +1,4 @@
+import { WorkspaceType } from "features/workspaces/types";
 import { Invite } from "./invite";
 
 export interface TeamWorkspace {
@@ -5,12 +6,6 @@ export interface TeamWorkspace {
   name: string;
   accessCount?: number;
   inviteId: string;
-}
-
-export enum WorkspaceType {
-  PERSONAL = "PERSONAL",
-  SHARED = "SHARED",
-  LOCAL = "LOCAL",
 }
 
 export interface Team {

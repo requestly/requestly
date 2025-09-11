@@ -4,7 +4,7 @@ import { buildBasicUserProperties } from "modules/analytics/utils";
 
 export const growthbook = new GrowthBook({
   apiHost: "https://cdn.growthbook.io",
-  clientKey: process.env.GROWTHBOOK_CLIENT_KEY,
+  clientKey: process.env.VITE_GROWTHBOOK_CLIENT_KEY,
   enableDevMode: true,
   trackingCallback: (experiment, result) => {
     trackEvent("experiment_assigned", { id: experiment.key, value: result.value });

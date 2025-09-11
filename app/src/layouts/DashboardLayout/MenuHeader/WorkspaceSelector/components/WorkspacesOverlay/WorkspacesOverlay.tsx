@@ -2,10 +2,10 @@ import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { WorkspaceItem } from "./components/WorkspaceListItem/WorkspaceListItem";
-import { Invite, WorkspaceType } from "types";
+import { Invite } from "types";
 import { Divider } from "antd";
 import { getAllWorkspaces } from "store/slices/workspaces/selectors";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { WorkspaceList } from "./components/WorkspaceList/WorkspaceList";
 import { MdOutlineGroups } from "@react-icons/all-files/md/MdOutlineGroups";
 import { globalActions } from "store/slices/global/slice";
@@ -92,6 +92,7 @@ export const WorkspacesOverlay: React.FC<WorkspacesOverlayProps> = ({ toggleDrop
 
   const workspaceMap = useMemo(() => {
     let map: { [key in WorkspaceType]: Workspace[] } = {
+      [WorkspaceType.LOCAL_STORAGE]: [],
       [WorkspaceType.LOCAL]: [],
       [WorkspaceType.SHARED]: [],
       [WorkspaceType.PERSONAL]: [],

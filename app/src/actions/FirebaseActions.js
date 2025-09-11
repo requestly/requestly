@@ -59,7 +59,6 @@ import {
 } from "modules/analytics/events/common/auth/verifyOobcode";
 import { sanitizeDataForFirebase } from "utils/Misc";
 import Logger from "lib/logger";
-import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import {
@@ -70,6 +69,7 @@ import {
 import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
 import { AuthErrorCode } from "features/onboarding/screens/auth/types";
+import { clientStorageService } from "services/clientStorageService";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -659,7 +659,7 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
     } else {
       syncStatus = profile.isSyncEnabled;
       // Optional - Just in case!
-      if (!syncStatus) await StorageService(appMode).removeRecordsWithoutSyncing([APP_CONSTANTS.LAST_SYNC_TARGET]);
+      if (!syncStatus) await clientStorageService.removeStorageObjects([APP_CONSTANTS.LAST_SYNC_TARGET]);
     }
   } else {
     // Profile has not been created yet - user must have signed up recently

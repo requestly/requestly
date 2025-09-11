@@ -14,6 +14,7 @@ import { growthbook } from "utils/feature-flag/growthbook";
 import FEATURES from "config/constants/sub/features";
 import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 import { clientStorageService } from "services/clientStorageService";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 const _ = require("lodash");
 
 const defaultSyncValue = "Inactive";
@@ -313,7 +314,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   const recordsThatShouldBeDeletedFromLocal = recordIdsInStorage.filter((x) => !recordIdsOnFirebase.includes(x));
   if (!isEmpty(recordsThatShouldBeDeletedFromLocal)) {
     Logger.log("Removing storage in syncToLocalFromFirebase");
-    await StorageService(appMode).removeRecordsWithoutSyncing(recordsThatShouldBeDeletedFromLocal);
+    await clientStorageService.removeStorageObjects(recordsThatShouldBeDeletedFromLocal);
   }
 
   // END - Handles the case where a rule/group is delete from the cloud but still might exist locally
@@ -350,7 +351,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   // END - Handle prevention of syncing of isFavourite and syncRuleStatus
 
   Logger.log("Writing storage in syncToLocalFromFirebase");
-  await StorageService(appMode).saveRulesOrGroupsWithoutSyncing(allSyncedRecords);
+  await clientRuleStorageService.saveMultipleRulesOrGroups(allSyncedRecords);
   return updateLastSyncedTS(appMode);
 };
 

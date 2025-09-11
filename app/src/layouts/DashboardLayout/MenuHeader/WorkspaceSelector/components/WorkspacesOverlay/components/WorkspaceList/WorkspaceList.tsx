@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
-import { Workspace } from "features/workspaces/types";
-import { WorkspaceType } from "types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { WorkspaceItem } from "../WorkspaceListItem/WorkspaceListItem";
@@ -53,6 +52,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({ workspaces, type, 
           <WorkspaceItem
             key={workspace.id}
             workspace={workspace}
+            // @ts-ignore
             type={type}
             toggleDropdown={toggleDropdown}
             onClick={(callback) => onItemClick(workspace, callback)}

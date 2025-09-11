@@ -50,4 +50,8 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
         return <MdOutlineSyncAlt />;
     }
   }
+
+  getIsValidTab(): boolean {
+    return true; // Always a valid tab, on reload we get new draft tab
+  }
 }

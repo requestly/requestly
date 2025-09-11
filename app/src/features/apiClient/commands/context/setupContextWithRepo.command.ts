@@ -14,6 +14,7 @@ import {
   apiClientMultiWorkspaceViewStore,
   ApiClientViewMode,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { markWorkspaceLoaded } from "../multiView";
 
 export type ContextSetupData = {
   apiClientRecords: { records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] }; // old api expects errors to also be passed in
@@ -21,7 +22,7 @@ export type ContextSetupData = {
   erroredRecords: { apiErroredRecords: ErroredRecord[]; environmentErroredRecords: ErroredRecord[] };
 };
 
-export const setupContextWithRepo = async (
+export const setupContextWithRepoWithoutMarkingLoaded = async (
   workspaceId: ApiClientFeatureContext["workspaceId"],
   repoForWorkspace: ApiClientRepositoryInterface
 ) => {
@@ -55,6 +56,14 @@ export const setupContextWithRepo = async (
   }
 
   apiClientFeatureContextProviderStore.getState().addContext(context);
-  apiClientMultiWorkspaceViewStore.getState().setIsLoaded(true);
   return context.id;
 };
+
+export async function setupContextWithRepo(
+  workspaceId: ApiClientFeatureContext["workspaceId"],
+  repoForWorkspace: ApiClientRepositoryInterface
+) {
+  const result = await setupContextWithRepoWithoutMarkingLoaded(workspaceId, repoForWorkspace);
+  markWorkspaceLoaded();
+  return result;
+}
