@@ -15,10 +15,11 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { WorkspaceType } from "types";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { resetToSingleView } from "features/apiClient/commands/multiView";
+import { WorkspaceType } from "features/workspaces/types";
+import { clientStorageService } from "services/clientStorageService";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -88,7 +89,7 @@ export const switchWorkspace = async (
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
-    await StorageService(appMode).clearDB();
+    await clientStorageService.clearStorage();
   }
 
   getTabServiceActions().resetTabs(true);

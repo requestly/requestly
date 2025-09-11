@@ -8,6 +8,7 @@ type _VariablesState<T extends VariableData> = {
   data: Map<VariableKey, T>;
 
   reset: (data?: Map<VariableKey, T>) => void;
+  resetSyncValues: (data: Map<VariableKey, T>) => void;
 
   delete: (key: VariableKey) => void;
   add: (key: VariableKey, variable: T) => void;
@@ -43,6 +44,19 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
       if (persistedDB?.loaded) {
         persistedDB?.persist(newData);
       }
+    },
+
+    resetSyncValues(data) {
+      const newData = data ? new Map(data) : new Map();
+      const { data: currentData, reset } = get();
+
+      newData.forEach((val, key) => {
+        if (currentData.has(key)) {
+          newData.set(key, { ...val, localValue: currentData.get(key).localValue });
+        }
+      });
+
+      reset(newData);
     },
 
     delete(key) {
