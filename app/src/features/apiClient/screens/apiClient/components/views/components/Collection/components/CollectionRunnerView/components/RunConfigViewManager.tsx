@@ -5,6 +5,7 @@ import { RunConfigStoreContextProvider } from "features/apiClient/store/collecti
 import { toast } from "utils/Toast";
 import { RunnerViewLoader } from "./RunnerViewLoader/RunnerViewLoader";
 import * as Sentry from "@sentry/react";
+import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/fetchOrCreateDefaultRunConfig.command";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -15,7 +16,7 @@ export const RunConfigViewManager: React.FC<Props> = ({ collectionId }) => {
     runner: { fetchOrCreateDefaultRunConfig },
   } = useCommand();
 
-  const [config, setConfig] = useState<Partial<RQAPI.RunConfig> | null>(null);
+  const [config, setConfig] = useState<FetchedRunConfig | null>(null);
 
   useEffect(() => {
     (async () => {

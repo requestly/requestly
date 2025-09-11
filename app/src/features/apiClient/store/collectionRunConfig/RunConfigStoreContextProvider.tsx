@@ -1,12 +1,12 @@
 import React, { createContext, useMemo } from "react";
 import { StoreApi } from "zustand";
 import { createRunConfigStore, RunConfigState } from "./runConfig.store";
-import { RQAPI } from "features/apiClient/types";
+import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/fetchOrCreateDefaultRunConfig.command";
 
 export const RunConfigStoreContext = createContext<StoreApi<RunConfigState> | null>(null);
 
 export const RunConfigStoreContextProvider: React.FC<{
-  runConfig: Partial<RQAPI.RunConfig>;
+  runConfig: FetchedRunConfig;
   children: React.ReactNode;
 }> = ({ runConfig, children }) => {
   const store = useMemo(() => {

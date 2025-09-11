@@ -14,10 +14,16 @@ function getDefaultRunOrderByCollectionId(
   return runOrder;
 }
 
+export type FetchedRunConfig = Pick<RQAPI.RunConfig, "id" | "runOrder">;
+
+function getConfigFromSavedData(config: Partial<RQAPI.RunConfig>): FetchedRunConfig {
+  return { id: config.id, runOrder: config.runOrder };
+}
+
 export async function fetchOrCreateDefaultRunConfig(
   ctx: ApiClientFeatureContext,
   params: { collectionId: RQAPI.ApiClientRecord["collectionId"] }
-): Promise<Partial<RQAPI.RunConfig>> {
+): Promise<FetchedRunConfig> {
   const DEFAULT_RUN_CONFIG_ID = "default"; // In future configId will be provided
 
   const { collectionId } = params;
@@ -26,7 +32,7 @@ export async function fetchOrCreateDefaultRunConfig(
   const result = await apiClientRecordsRepository.getRunConfig(collectionId, DEFAULT_RUN_CONFIG_ID);
 
   if (result.success) {
-    return result.data;
+    return getConfigFromSavedData(result.data);
   }
 
   // create deafult config
@@ -41,5 +47,5 @@ export async function fetchOrCreateDefaultRunConfig(
     throw new NativeError("Something went wrong while fetching run config!").addContext({ upsertResult });
   }
 
-  return upsertResult.data;
+  return getConfigFromSavedData(upsertResult.data);
 }
