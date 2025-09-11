@@ -43,7 +43,14 @@ async function _createRunConfigInFirebase(
       extra: { collectionId, runConfigToSave: runConfig },
     });
 
-    return { success: false, data: null, message: "Something went wrong!" };
+    return {
+      success: false,
+      data: null,
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      },
+    };
   }
 }
 
@@ -76,6 +83,13 @@ async function _upsertRunConfigInFirebase(
       extra: { collectionId, runConfigToUpdate: runConfig },
     });
 
-    return { success: false, data: null, message: "Something went wrong!" };
+    return {
+      success: false,
+      data: null,
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      },
+    };
   }
 }
