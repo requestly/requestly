@@ -24,6 +24,7 @@ import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
 import { NotifyOnImport } from "./components/NotifyOnImport/NotifyOnImport";
+import { copyToClipBoard } from "utils/Misc";
 import "./index.css";
 
 interface ShareLinkProps {
@@ -185,9 +186,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
 
         setShareableLinkData(shareableLinkData);
 
-        navigator.clipboard.writeText(shareableLinkData.link).catch((e) => {
-          // NOOP
-        });
+        copyToClipBoard(shareableLinkData.link);
 
         const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
         const recipientsCount =

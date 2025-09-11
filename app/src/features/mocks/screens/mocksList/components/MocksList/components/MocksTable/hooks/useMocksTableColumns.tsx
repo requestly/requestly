@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table, TooltipProps } from "antd";
+import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, Table, TooltipProps } from "antd";
 import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { EditOutlined } from "@ant-design/icons";
@@ -27,6 +27,7 @@ import PATHS from "config/constants/sub/paths";
 import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { useRBAC } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
+import { copyToClipBoard } from "utils/Misc";
 
 export const useMocksTableColumns = ({
   source,
@@ -312,9 +313,7 @@ export const useMocksTableColumns = ({
                     collectionPath,
                   });
 
-              navigator.clipboard.writeText(copyText).then(() => {
-                message.success("Link copied!");
-              });
+              copyToClipBoard(copyText, "Link copied!");
             },
             label: (
               <div className="mock-action">

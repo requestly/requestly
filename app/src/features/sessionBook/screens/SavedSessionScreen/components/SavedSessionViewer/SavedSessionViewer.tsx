@@ -28,6 +28,7 @@ import "./savedSessionViewer.scss";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { useRBAC } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
+import { copyToClipBoard } from "utils/Misc";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -56,12 +57,14 @@ export const SavedSessionViewer = () => {
 
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
-  const handleCopySessionLink = useCallback(() => {
-    navigator.clipboard.writeText(window.location.href);
-    setIsLinkCopied(true);
-    setTimeout(() => {
-      setIsLinkCopied(false);
-    }, 1000);
+  const handleCopySessionLink = useCallback(async () => {
+    const result = await copyToClipBoard(window.location.href);
+    if (result.success) {
+      setIsLinkCopied(true);
+      setTimeout(() => {
+        setIsLinkCopied(false);
+      }, 1000);
+    }
   }, []);
 
   const handleShareModalVisibiliity = useCallback(() => {
