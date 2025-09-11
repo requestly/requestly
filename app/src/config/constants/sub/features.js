@@ -102,5 +102,6 @@ FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
 
 FEATURES.GRAPHQL_SUPPORT = "graphql_support";
 FEATURES.LOCAL_FIRST_DESKTOP_APP = "local_first_desktop_app";
+FEATURES.OPEN_PATH_IN_FILE_MANAGER = "open_path_in_file_manager";
 
 export default FEATURES;
