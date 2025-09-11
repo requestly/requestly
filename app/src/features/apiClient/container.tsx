@@ -61,7 +61,7 @@ const ApiClientFeatureContainer: React.FC = () => {
 
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
-  }, [user, activeWorkspace?.id, viewMode]);
+  }, [user.loggedIn, user.details?.profile?.uid, activeWorkspace?.id, viewMode]);
 
   if (!isLoaded) {
     return <ApiClientLoadingView />;
