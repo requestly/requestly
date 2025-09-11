@@ -29,7 +29,7 @@
     }
 
     .ant-tabs-nav {
-      margin-bottom: 8px;
+      margin-bottom: 0px;
 
       .ant-tabs-nav-list {
         margin-left: 1rem;
@@ -69,6 +69,7 @@
 
       .authorization-view {
         margin: 0 16px;
+        margin-top: 8px;
       }
     }
   }
