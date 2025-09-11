@@ -360,7 +360,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                 className="billing-team-members-section-header-btn"
                 onClick={() => {
                   trackBillingTeamManageLicenseClicked();
-                  redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/manage-users/users`, true);
+                  redirectToUrl(`${process.env.VITE_BROWSERSTACK_BASE_URL}/accounts/manage-users/users`, true);
                 }}
                 disabled={!isUserAdmin}
               >
