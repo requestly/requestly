@@ -1,0 +1,16 @@
+.runner-view-loader {
+  padding: 16px;
+  display: flex;
+  gap: 28px;
+
+  .config-section {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    flex-basis: 50%;
+  }
+
+  .result-section {
+    flex-basis: 50%;
+  }
+}
