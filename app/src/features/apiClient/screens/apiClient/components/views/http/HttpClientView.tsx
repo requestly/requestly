@@ -164,7 +164,7 @@ const HttpClientView: React.FC<Props> = ({
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(
-    sanitizeEntry({ ...entryWithoutResponse, response: null })
+    sanitizeEntry({ ...entryWithoutResponse, response: null }, false)
   );
 
   const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
