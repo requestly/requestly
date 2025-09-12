@@ -34,6 +34,7 @@ import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records"
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
@@ -97,23 +98,38 @@ export const CollectionRow: React.FC<Props> = ({
     state.activeTabSource,
     state.closeTabBySource,
   ]);
-  const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
+
+  const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
   const activeWorkspace = useSelector(getActiveWorkspace);
+  const handleCollectionExport = useCallback(
+    (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+      const collectionRecordState = getRecordStore(record.id).getState() as CollectionRecordState;
+      const collectionVariables = collectionRecordState.collectionVariables.getState().data;
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
+      const removeLocalValue = (variables: Map<string, any>): Record<string, any> => {
+        // set localValue to empty before exporting
+        return Object.fromEntries([...variables.entries()].map(([k, v]) => [k, { ...v, localValue: "" }]));
+      };
 
-    switch (exportType) {
-      case ExportType.REQUESTLY:
-        setIsExportModalOpen(true);
-        break;
-      case ExportType.POSTMAN:
-        setIsPostmanExportModalOpen(true);
-        break;
-      default:
-        console.warn(`Unknown export type: ${exportType}`);
-    }
-  }, []);
+      const exportData: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
+      };
+      setCollectionsToExport((prev) => [...prev, exportData]);
+
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
+    },
+    [getRecordStore, record.id]
+  );
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
