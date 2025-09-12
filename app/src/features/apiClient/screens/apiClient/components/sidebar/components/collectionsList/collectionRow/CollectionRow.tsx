@@ -105,9 +105,15 @@ export const CollectionRow: React.FC<Props> = ({
     (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
       const collectionRecordState = getRecordStore(record.id).getState() as CollectionRecordState;
       const collectionVariables = collectionRecordState.collectionVariables.getState().data;
+
+      const removeLocalValue = (variables: Map<string, any>): Record<string, any> => {
+        // set localValue to empty before exporting
+        return Object.fromEntries([...variables.entries()].map(([k, v]) => [k, { ...v, localValue: "" }]));
+      };
+
       const exportData: RQAPI.CollectionRecord = {
         ...collection,
-        data: { ...collection.data, variables: Object.fromEntries(collectionVariables.entries()) },
+        data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
       };
       setCollectionsToExport((prev) => [...prev, exportData]);
 
@@ -124,7 +130,6 @@ export const CollectionRow: React.FC<Props> = ({
     },
     [getRecordStore, record.id]
   );
-
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
