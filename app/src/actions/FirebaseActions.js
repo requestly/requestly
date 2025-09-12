@@ -70,6 +70,7 @@ import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
 import { AuthErrorCode } from "features/onboarding/screens/auth/types";
 import { clientStorageService } from "services/clientStorageService";
+import { isSetappBuild } from "utils/AppUtils";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -470,6 +471,9 @@ export const googleSignInDesktopApp = (callback, MODE, source, oneTimeCode) => {
     if (oneTimeCode) {
       desktopSignInAuthUrl = new URL(desktopSignInAuthUrl);
       desktopSignInAuthUrl.searchParams.append("auth_mode", MODE);
+      if (isSetappBuild()) {
+        desktopSignInAuthUrl.searchParams.append("isAuthForSetappBuild", "true");
+      }
       desktopSignInAuthUrl = desktopSignInAuthUrl.toString();
     }
 

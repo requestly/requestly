@@ -7,6 +7,7 @@ import { globalActions } from "store/slices/global/slice";
 import { FeatureLimitType } from "./types";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { PRICING } from "features/pricing";
+import { isSetappBuild } from "utils/AppUtils";
 
 const premiumPlansToCheckLimit = [PRICING.PLAN_NAMES.LITE, PRICING.PLAN_NAMES.BASIC, PRICING.PLAN_NAMES.BASIC_V2];
 
@@ -15,7 +16,11 @@ export const useFeatureLimiter = () => {
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const isUserPremium = user?.details?.isPremium;
-  const userPlan = isUserPremium ? getPlanNameFromId(user?.details?.planDetails?.planId) : PRICING.PLAN_NAMES.FREE;
+  const userPlan = isSetappBuild()
+    ? PRICING.PLAN_NAMES.SETAPP
+    : isUserPremium
+    ? getPlanNameFromId(user?.details?.planDetails?.planId)
+    : PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
