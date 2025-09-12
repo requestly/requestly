@@ -5,13 +5,13 @@ import { toast } from "utils/Toast";
 import { RunnerViewLoader } from "./RunnerViewLoader/RunnerViewLoader";
 import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/getDefaultRunConfig.command";
 import { RunConfigView } from "./RunConfigView/RunConfigView";
-import { useCollectionRunnerView } from "../collectionRunnerView.context";
+import { useCollectionView } from "../../../collectionView.context";
 import * as Sentry from "@sentry/react";
 
 interface Props {}
 
 export const RunConfigViewManager: React.FC<Props> = () => {
-  const { collectionId } = useCollectionRunnerView();
+  const { collectionId } = useCollectionView();
   const {
     runner: { getDefaultRunConfig },
   } = useCommand();
