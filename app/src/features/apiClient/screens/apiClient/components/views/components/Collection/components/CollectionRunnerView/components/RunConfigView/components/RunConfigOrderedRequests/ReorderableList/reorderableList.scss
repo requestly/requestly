@@ -1,4 +1,4 @@
-.reOrderable-list {
+.reorderable-list {
   display: flex;
   padding: var(--space-4, 8px);
   flex-direction: column;
@@ -6,15 +6,28 @@
   gap: var(--space-4, 8px);
   align-self: stretch;
 
-  .reOrderable-list-item {
+  .reorderable-list-item {
     display: flex;
     align-items: center;
     gap: var(--space-2, 4px);
-    padding: var(--space-2, 4px);
-    border-radius: 4px;
+    padding: 2px;
     flex-wrap: nowrap;
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    box-sizing: border-box;
+
+    &.collect-dragged-item {
+      &.up {
+        border-top: 2px solid var(--requestly-color-primary-600);
+      }
+
+      &.down {
+        border-bottom: 2px solid var(--requestly-color-primary-600);
+      }
+    }
 
     &:hover {
+      border-radius: 4px;
       background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     }
 

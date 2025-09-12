@@ -1,5 +1,5 @@
 import React from "react";
-import { ReOrderableList } from "./ReOrderableList/ReOrderableList";
+import { ReorderableList } from "./ReorderableList/ReorderableList";
 import { useCollectionRunnerView } from "../../../../collectionRunnerView.context";
 
 export const RunConfigOrderedRequests: React.FC<{}> = (props) => {
@@ -13,7 +13,7 @@ export const RunConfigOrderedRequests: React.FC<{}> = (props) => {
   return (
     <>
       {/* @ts-ignore */}
-      <ReOrderableList list={[]} onOrderUpdate={(updatedOrder: string[]) => {}} />
+      <ReorderableList list={[]} onOrderUpdate={(updatedOrder: string[]) => {}} />
     </>
   );
 };
