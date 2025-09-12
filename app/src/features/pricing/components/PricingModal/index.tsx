@@ -16,7 +16,6 @@ import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analyt
 import { PricingModalFooterBanner } from "./components/FooterBanner";
 import "./index.scss";
 import ProductSwitcher from "../ProductSwitcher";
-import { StudentProgram } from "../PricingPage/components/StudentProgram";
 import { isSafariBrowser } from "actions/ExtensionActions";
 
 interface PricingModalProps {
@@ -219,7 +218,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               source={source}
               product={activeProduct}
             />
-            <StudentProgram source={source} />
+            {/* <StudentProgram source={source} /> */}
             <CompaniesSection />
             <PricingModalFooterBanner />
           </>

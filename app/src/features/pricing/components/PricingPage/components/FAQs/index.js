@@ -53,19 +53,19 @@ const PricingFAQs = () => {
         </React.Fragment>
       ),
     },
-    {
-      question: <React.Fragment>Do you offer student discounts?</React.Fragment>,
-      answer: (
-        <React.Fragment>
-          Requestly’s Professional Plan is completely free for students! Simply sign up with your school email address
-          to unlock premium features instantly. Read more details{" "}
-          <a target="_blank" href={LINKS.STUDENT_PROGRAM_DOC} rel="noreferrer">
-            here
-          </a>
-          .
-        </React.Fragment>
-      ),
-    },
+    // {
+    //   question: <React.Fragment>Do you offer student discounts?</React.Fragment>,
+    //   answer: (
+    //     <React.Fragment>
+    //       Requestly’s Professional Plan is completely free for students! Simply sign up with your school email address
+    //       to unlock premium features instantly. Read more details{" "}
+    //       <a target="_blank" href={LINKS.STUDENT_PROGRAM_DOC} rel="noreferrer">
+    //         here
+    //       </a>
+    //       .
+    //     </React.Fragment>
+    //   ),
+    // },
   ];
   return (
     <>
