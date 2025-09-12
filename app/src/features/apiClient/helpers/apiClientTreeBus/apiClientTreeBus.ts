@@ -19,13 +19,17 @@ abstract class ApiClientEventForParents implements ApiClientEvent {
   constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {}
 }
 
-class AuthChanged implements ApiClientEventForChildren {
+export class AuthChanged extends ApiClientEventForChildren {
   readonly topic = ApiClientEventTopic.AUTH_CHANGED;
-  constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {}
+  constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {
+    super(emitterId);
+  }
 }
-class ChildAdded implements ApiClientEventForParents {
+export class ChildAdded extends ApiClientEventForParents {
   readonly topic = ApiClientEventTopic.CHILD_ADDED;
-  constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {}
+  constructor(public emitterId: RQAPI.ApiClientRecord["id"], public one: any, public two: any) {
+    super(emitterId);
+  }
 }
 
 type ApiClientEventMap = {
@@ -41,12 +45,26 @@ export class ApiClientTreeBus {
     Map<RQAPI.ApiClientRecord["id"], Set<Subscription<any, any>>>
   > = new Map();
   private store: StoreApi<ApiRecordsState>;
+  private ctx: ApiClientFeatureContext;
+  public static instance: ApiClientTreeBus;
 
-  constructor(private ctx: ApiClientFeatureContext) {
-    this.store = getApiClientRecordsStore(ctx);
+  private constructor() {
     for (const event of Object.values(ApiClientEventTopic)) {
       this.subscriptionMap.set(event, new Map());
     }
+  }
+
+  private updateContext(ctx: ApiClientFeatureContext) {
+    this.ctx = ctx;
+    this.store = getApiClientRecordsStore(ctx);
+  }
+
+  static getInstance(ctx: ApiClientFeatureContext): ApiClientTreeBus {
+    if (!this.instance) {
+      this.instance = new ApiClientTreeBus();
+    }
+    this.instance.updateContext(ctx);
+    return this.instance;
   }
 
   subscribe<T extends ApiClientEventTopic>(params: { id: string; topic: T; subscription: Subscription<T, any> }) {
