@@ -1,21 +1,20 @@
 import React, { useState } from "react";
-import { RunConfigOrderedRequests } from "../RunConfigOrderedRequests/RunConfigOrderedRequests";
-import { Checkbox, InputNumber } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { RQButton, RQTooltip } from "lib/design-system-v2/components";
-import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
-import "./runConfigContainer.scss";
+import { InputNumber } from "antd";
+import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import "./runConfigSettings.scss";
 
-const RunConfigSettings: React.FC = () => {
+export const RunConfigSettings: React.FC = () => {
   const [iterations, setIterations] = useState(1);
   const [delay, setDelay] = useState(0);
 
   const handleIterationsChange = (value: number) => {
+    // TODO: update in store
     setIterations(value);
   };
 
   const handleDelayChange = (value: number) => {
+    // TODO: update in store
     setDelay(value);
   };
 
@@ -53,34 +52,6 @@ const RunConfigSettings: React.FC = () => {
       </div>
 
       <div className="advanced-settings">{/* TODO: for later */}</div>
-    </div>
-  );
-};
-
-export const RunConfigContainer: React.FC<{}> = (props) => {
-  const [selectAll, setSelectAll] = useState(true);
-
-  const onChange = (e: CheckboxChangeEvent) => {
-    setSelectAll(e.target.checked);
-  };
-
-  const handleResetClick = () => {
-    // TODO
-  };
-
-  return (
-    <div className="run-config-container">
-      <div className="run-config-ordered-requests-header">
-        <Checkbox checked={selectAll} onChange={onChange}>
-          Select all
-        </Checkbox>
-        <RQButton type="transparent" size="small" icon={<MdOutlineRestartAlt />} onClick={handleResetClick}>
-          Reset
-        </RQButton>
-      </div>
-
-      <RunConfigOrderedRequests />
-      <RunConfigSettings />
     </div>
   );
 };

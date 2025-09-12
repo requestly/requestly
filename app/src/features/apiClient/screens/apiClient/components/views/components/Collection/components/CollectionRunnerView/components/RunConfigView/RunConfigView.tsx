@@ -1,13 +1,71 @@
-import React from "react";
-import { RunConfigHeader } from "./components/RunConfigHeader/RunConfigHeader";
-import { RunConfigContainer } from "./components/RunConfigContainer/RunConfigContainer";
+import React, { useCallback, useState } from "react";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
+import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
+import { Checkbox } from "antd";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
+import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
+import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
 import "./runConfigView.scss";
 
 export const RunConfigView: React.FC = () => {
+  const [selectAll, setSelectAll] = useState(true);
+
+  const handleSaveClick = useCallback(() => {}, []);
+  const handleRunClick = useCallback(() => {}, []);
+
+  const onChange = (e: CheckboxChangeEvent) => {
+    setSelectAll(e.target.checked);
+  };
+
+  const handleResetClick = () => {
+    // TODO
+    setSelectAll(false);
+  };
+
   return (
     <div className="run-config-view-container">
-      <RunConfigHeader />
-      <RunConfigContainer />
+      {/* header */}
+      <div className="run-config-header">
+        <div className="title">
+          Configuration
+          <RQTooltip
+            title={
+              ""
+              // TODO: add title
+            }
+          >
+            <MdInfoOutline />
+          </RQTooltip>
+        </div>
+
+        <div className="actions">
+          <RQButton size="small" icon={<MdOutlineSave />} onClick={handleSaveClick}>
+            Save
+          </RQButton>
+          {/* TODO: For CLI support convert it into dropdown button */}
+          <RQButton size="small" type="primary" icon={<MdOutlineVideoLibrary />} onClick={handleRunClick}>
+            Run
+          </RQButton>
+        </div>
+      </div>
+
+      {/* config container */}
+      <div className="run-config-container">
+        <div className="run-config-ordered-requests-header">
+          <Checkbox checked={selectAll} onChange={onChange}>
+            Select all
+          </Checkbox>
+          <RQButton type="transparent" size="small" icon={<MdOutlineRestartAlt />} onClick={handleResetClick}>
+            Reset
+          </RQButton>
+        </div>
+
+        <RunConfigOrderedRequests isSelectAll={selectAll} />
+        <RunConfigSettings />
+      </div>
     </div>
   );
 };
