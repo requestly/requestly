@@ -1,0 +1,13 @@
+.collection-runner-view {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+
+  .bottomsheet-layout-container.horizontal-split .bottom-sheet-panel-container {
+    background-color: transparent;
+  }
+
+  .bottomsheet-layout-container {
+    height: 100%;
+  }
+}
