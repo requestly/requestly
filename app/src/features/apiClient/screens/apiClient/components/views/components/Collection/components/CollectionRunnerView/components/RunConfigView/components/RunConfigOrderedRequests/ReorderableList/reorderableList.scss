@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4, 8px);
-  padding: var(--space-4, 8px);
+  padding: 16px var(--space-4, 8px);
   overflow-x: hidden;
-  max-height: calc(100% - 191px);
+  height: 100%;
+  max-height: calc(100% - 146px);
 
   .reorderable-list-item {
     display: flex;
@@ -12,6 +13,11 @@
     gap: var(--space-2, 4px);
     padding: 2px;
     width: 100%;
+
+    ::selection {
+      text-shadow: none;
+      background-color: transparent;
+    }
 
     border-top: 2px solid transparent;
     border-bottom: 2px solid transparent;
@@ -45,6 +51,7 @@
     }
 
     .collection-path-container {
+      user-select: none;
       display: flex;
       align-items: center;
       gap: var(--space-1, 2px);
@@ -78,6 +85,7 @@
       overflow: hidden;
 
       .request-method {
+        user-select: none;
         flex-shrink: 0;
         font-size: 8px;
         font-weight: var(--requestly-font-weight-medium);

@@ -5,6 +5,7 @@
     display: flex;
     align-items: center;
     padding: var(--space-4, 8px) var(--space-6, 16px);
+    padding-bottom: 0;
 
     .ant-checkbox-wrapper {
       user-select: none;
