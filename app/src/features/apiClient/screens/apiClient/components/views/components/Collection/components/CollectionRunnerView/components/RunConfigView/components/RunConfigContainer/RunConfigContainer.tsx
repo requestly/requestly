@@ -14,7 +14,7 @@ export const RunConfigContainer: React.FC<{}> = (props) => {
   const [selectAll, setSelectAll] = useState(true);
 
   const onChange = (e: CheckboxChangeEvent) => {
-    setSelectAll(e.target.value);
+    setSelectAll(e.target.checked);
   };
 
   const handleResetClick = () => {
