@@ -1,5 +1,6 @@
 .run-config-view-container {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  overflow: hidden;
+  width: 100%;
 }

@@ -20,7 +20,7 @@
 
   .collection-view-content {
     width: 100%;
-    height: calc(100% - 35px);
+    height: calc(100% - 24px); // footer height
     overflow-y: hidden;
     border-top: 1px solid var(--requestly-color-white-t-10);
 

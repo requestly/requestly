@@ -1,17 +1,18 @@
 .reorderable-list {
   display: flex;
-  padding: var(--space-4, 8px);
   flex-direction: column;
-  align-items: flex-start;
   gap: var(--space-4, 8px);
-  align-self: stretch;
+  padding: var(--space-4, 8px);
+  overflow-x: hidden;
+  max-height: calc(100% - 191px);
 
   .reorderable-list-item {
     display: flex;
     align-items: center;
     gap: var(--space-2, 4px);
     padding: 2px;
-    flex-wrap: nowrap;
+    width: 100%;
+
     border-top: 2px solid transparent;
     border-bottom: 2px solid transparent;
     box-sizing: border-box;
@@ -74,6 +75,7 @@
       display: flex;
       align-items: center;
       gap: var(--space-2, 4px);
+      overflow: hidden;
 
       .request-method {
         flex-shrink: 0;
@@ -82,27 +84,21 @@
         line-height: 13px;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        display: flex;
+
         width: 32px;
+        display: flex;
         justify-content: center;
         align-items: center;
         border-radius: 2px;
       }
 
-      // TODO: handle text overflow
       .request-name {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
-
-        white-space: nowrap;
         overflow: hidden;
+        white-space: nowrap;
         text-overflow: ellipsis;
+
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-sm, 12px);
-        font-style: normal;
-        font-weight: 400;
         line-height: 18px; /* 150% */
       }
     }
