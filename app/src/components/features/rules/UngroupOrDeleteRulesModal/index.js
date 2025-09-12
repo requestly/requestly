@@ -16,6 +16,7 @@ import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
@@ -36,22 +37,20 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
     return new Promise((resolve) => {
       // Fetch all records to get rule data
       Logger.log("Reading storage in doMoveToUngrouped");
-      StorageService(appMode)
-        .getAllRecords()
-        .then((allRecords) => {
-          const updatedRules = groupRules.map((rule) => {
-            return {
-              ...allRecords[rule.id],
-              modificationDate: generateObjectCreationDate(),
-              groupId: UNGROUPED_GROUP_ID,
-            };
-          });
-
-          Logger.log("Writing storage in doMoveToUngrouped");
-          StorageService(appMode)
-            .saveMultipleRulesOrGroups(updatedRules)
-            .then(() => resolve());
+      clientRuleStorageService.getAllRulesAndGroups().then((allRecords) => {
+        const updatedRules = groupRules.map((rule) => {
+          return {
+            ...allRecords[rule.id],
+            modificationDate: generateObjectCreationDate(),
+            groupId: UNGROUPED_GROUP_ID,
+          };
         });
+
+        Logger.log("Writing storage in doMoveToUngrouped");
+        StorageService(appMode)
+          .saveMultipleRulesOrGroups(updatedRules)
+          .then(() => resolve());
+      });
     });
   };
 

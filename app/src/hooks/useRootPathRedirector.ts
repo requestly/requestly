@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { globalActions } from "store/slices/global/slice";
 import PATHS from "config/constants/sub/paths";
 import { getAppMode, getLastUsedFeaturePath } from "store/selectors";
@@ -14,7 +14,15 @@ const useRootPathRedirector = () => {
   const storedFeaturePath = useSelector(getLastUsedFeaturePath);
   const appMode = useSelector(getAppMode);
   const isAuthSkipped = useIsAuthSkipped();
-  const params = isAuthSkipped ? `skip_auth=${true}` : "";
+  const [searchParams] = useSearchParams();
+  const params = useMemo(() => {
+    const searchParamsCopy = new URLSearchParams(searchParams);
+    // Seems redundant. But not removed right now not to break anything
+    if (isAuthSkipped) {
+      searchParamsCopy.set("skip_auth", "true");
+    }
+    return searchParamsCopy;
+  }, [searchParams, isAuthSkipped]);
 
   const LAST_KNOWN_PATHS = new Set([
     PATHS.API_CLIENT.INDEX,
@@ -29,7 +37,7 @@ const useRootPathRedirector = () => {
   useEffect(() => {
     if (location.pathname === PATHS.ROOT) {
       if (storedFeaturePath && storedFeaturePath !== PATHS.ROOT) {
-        navigate(storedFeaturePath, { replace: true });
+        navigate(`${storedFeaturePath}?${params}`, { replace: true });
       } else {
         isOpenedInDesktopMode
           ? navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE, { replace: true })

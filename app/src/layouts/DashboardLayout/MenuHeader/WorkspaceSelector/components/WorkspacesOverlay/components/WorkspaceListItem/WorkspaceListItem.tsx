@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from "react";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
-import { WorkspaceType } from "types";
-import { Checkbox, Tooltip, Typography } from "antd";
+import { Checkbox, Tag, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { redirectToTeam } from "utils/RedirectionUtils";
@@ -24,6 +23,7 @@ import {
 import { toast } from "utils/Toast";
 import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 
 type WorkspaceItemProps =
   | {
@@ -47,6 +47,10 @@ const ShareWorkspaceActions = ({
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
+  const isPrivateWorkspace = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL || workspaceId === null;
 
   const handleSendInvites = () => {
     dispatch(
@@ -62,6 +66,9 @@ const ShareWorkspaceActions = ({
 
   return (
     <>
+      {!isPrivateWorkspace && activeWorkspace.id === workspaceId && viewMode === ApiClientViewMode.SINGLE ? (
+        <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
+      ) : null}
       <div className="shared-workspace-actions">
         <RQButton
           type="transparent"
@@ -98,6 +105,8 @@ const LocalWorkspaceActions = ({
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+
   const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
     s.selectedWorkspaces,
     s.getViewMode,
@@ -132,30 +141,35 @@ const LocalWorkspaceActions = ({
   ]);
 
   return (
-    <div className="local-workspace-actions" onClick={(e) => e.stopPropagation()}>
-      <Tooltip title="Settings" color="#000">
-        <RQButton
-          className="local-workspace-actions__settings-btn"
-          type="transparent"
-          icon={<MdOutlineSettings />}
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            trackManageWorkspaceClicked("workspace_selector_dropdown");
-            redirectToTeam(navigate, workspace.id);
-            toggleDropdown();
+    <>
+      {activeWorkspace.id === workspace.id && getViewMode() === ApiClientViewMode.SINGLE ? (
+        <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
+      ) : null}
+      <div className="local-workspace-actions" onClick={(e) => e.stopPropagation()}>
+        <Tooltip title="Settings" color="#000">
+          <RQButton
+            className="local-workspace-actions__settings-btn"
+            type="transparent"
+            icon={<MdOutlineSettings />}
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              trackManageWorkspaceClicked("workspace_selector_dropdown");
+              redirectToTeam(navigate, workspace.id);
+              toggleDropdown();
+            }}
+          />
+        </Tooltip>
+
+        <Checkbox
+          checked={isSelected}
+          className="local-workspace-actions__checkbox"
+          onChange={(e) => {
+            handleMultiworkspaceAdder(e.target.checked);
           }}
         />
-      </Tooltip>
-
-      <Checkbox
-        checked={isSelected}
-        className="local-workspace-actions__checkbox"
-        onChange={(e) => {
-          handleMultiworkspaceAdder(e.target.checked);
-        }}
-      />
-    </div>
+      </div>
+    </>
   );
 };
 

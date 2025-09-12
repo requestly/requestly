@@ -14,7 +14,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { globalActions } from "store/slices/global/slice";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
-import { useDesktopAppConnection } from "hooks/useDesktopAppConnection";
+import { getShouldShowDesktopConnected, useDesktopAppConnection } from "hooks/useDesktopAppConnection";
 import "./DashboardLayout.scss";
 import { ConnectedToDesktopView } from "./ConnectedToDesktopView/ConnectedToDesktopView";
 import { getUserOS } from "utils/osUtils";
@@ -53,8 +53,14 @@ const DashboardLayout = () => {
     [pathname]
   );
 
-  const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
+  const isAppHeaderVisible = useMemo(() => {
+    return !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname));
+  }, [pathname]);
 
+  const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
+  const shouldShowDesktopAppConnectedScreen = useMemo(() => {
+    return getShouldShowDesktopConnected(pathname);
+  }, [pathname]);
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -83,20 +89,22 @@ const DashboardLayout = () => {
       <PlanExpiredBanner />
 
       <div className={`app-layout app-dashboard-layout  ${isReadRole ? "read-role" : ""}`}>
-        <div
-          className={`app-header ${
-            isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
-              ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
-              : ""
-          }`}
-        >
-          {isPricingPage(pathname) ? null : <MenuHeader />}
-          <Conditional condition={isReadRole}>
-            <ViewOnlyModeBanner />
-          </Conditional>
-        </div>
+        {isAppHeaderVisible && (
+          <div
+            className={`app-header ${
+              isDesktopMode() && isFeatureCompatible(FEATURES.FRAMELESS_DESKTOP_APP)
+                ? `app-mode-desktop app-mode-desktop-${getUserOS()}`
+                : ""
+            }`}
+          >
+            <MenuHeader />
+            <Conditional condition={isReadRole}>
+              <ViewOnlyModeBanner />
+            </Conditional>
+          </div>
+        )}
 
-        {isDesktopAppConnected ? (
+        {isDesktopAppConnected && shouldShowDesktopAppConnectedScreen ? (
           <ConnectedToDesktopView />
         ) : (
           <>

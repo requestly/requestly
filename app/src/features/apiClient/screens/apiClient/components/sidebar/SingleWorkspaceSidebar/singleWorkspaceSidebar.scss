@@ -1,14 +1,13 @@
 .api-client-sidebar {
   width: 280px;
   flex: 0 0 auto;
-  border-right: 1px solid var(--border-dark);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
   overflow: hidden;
-  border-right: 1px solid var(--border-dark);
-  background-color: var(--requestly-color-background);
+  border-right: 1px solid var(--requestly-color-white-t-10);
+  background-color: var(--requestly-color-surface-0);
 
   .storage-communication-note {
     display: flex;
@@ -41,7 +40,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-dark);
+    border-bottom: 1px solid var(--requestly-color-white-t-10);
 
     .actions {
       flex-shrink: 0;
@@ -58,7 +57,6 @@
   .api-client-sidebar-tabs {
     flex: 1;
     overflow: hidden;
-    background-color: var(--requestly-color-background);
 
     .api-client-sidebar-placeholder {
       height: 100%;
@@ -163,9 +161,16 @@
         padding: 0;
         border-radius: 4px;
 
-        &:hover,
+        &:hover {
+          background-color: var(--requestly-color-white-t-10);
+        }
+
         &.ant-tabs-tab-active {
-          background-color: var(--requestly-color-surface-1);
+          background-color: var(--requestly-color-white-t-20);
+
+          svg {
+            color: var(--requestly-color-text-default);
+          }
         }
 
         .ant-tabs-tab-btn,
@@ -188,10 +193,6 @@
           svg {
             width: 16px;
             height: 16px;
-          }
-
-          &:hover {
-            background-color: var(--requestly-color-surface-1);
           }
         }
       }

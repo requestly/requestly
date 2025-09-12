@@ -11,12 +11,8 @@ class StorageServiceWrapper {
   constructor(options) {
     this.appMode = options.appMode || GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     this.StorageHelper = clientStorageService;
-    this.primaryKeys = options.primaryKeys || ["objectType", "ruleType"];
 
-    this.saveRecordWithID = this.saveRecordWithID.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
-    this.getRecord = this.getRecord.bind(this);
-    this.getRecords = this.getRecords.bind(this);
 
     this.transactionQueue = new Set(); // promises of transactions that are still pending
     this.transactionLedger = new Map(); // optional: helpful only in putting console logs
@@ -43,48 +39,6 @@ class StorageServiceWrapper {
     await Promise.allSettled([...this.transactionQueue]);
     this.transactionQueue.clear();
     this.transactionLedger.clear();
-  }
-
-  getAllRecords() {
-    return this.StorageHelper.getStorageSuperObject();
-  }
-
-  hasPrimaryKey(record) {
-    if (typeof record === "object" && !Array.isArray(record) && record !== null) {
-      for (let index = 0; index < this.primaryKeys.length; index++) {
-        if (typeof record[this.primaryKeys[index]] !== "undefined") {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  getRecords(objectType) {
-    const self = this;
-    return new Promise((resolve) => {
-      this.StorageHelper.getStorageSuperObject().then((superObject) => {
-        const myArr = [];
-        for (let key in superObject) {
-          // clear out everything that is not an object with a primary key - eventually allows only rules & groups
-          if (self.hasPrimaryKey(superObject[key])) {
-            myArr.push(superObject[key]);
-          }
-        }
-        resolve(self.filterRecordsByType(myArr, objectType));
-      });
-    });
-  }
-
-  filterRecordsByType(records, requestedObjectType) {
-    if (!requestedObjectType) {
-      return records;
-    }
-
-    return records.filter((record) => {
-      let objectType = record.objectType || GLOBAL_CONSTANTS.OBJECT_TYPES.RULE;
-      return objectType === requestedObjectType;
-    });
   }
 
   async saveRecord(object) {
@@ -125,27 +79,9 @@ class StorageServiceWrapper {
     return promise;
   }
 
-  saveRulesOrGroupsWithoutSyncing(array) {
-    const formattedObject = processRecordsArrayIntoObject(array);
-    return this.saveRecord(formattedObject);
-  }
-
   async saveSessionRecordingPageConfig(config) {
     await doSyncRecords(config, SYNC_CONSTANTS.SYNC_TYPES.SESSION_RECORDING_PAGE_CONFIG, this.appMode);
     return this.saveRecord({ sessionRecordingConfig: config });
-  }
-
-  /**
-   * Saves the object which contains ID so that we do not need to specify id as the key and whole object as value
-   * @param object
-   * @returns {Promise<any>}
-   */
-  async saveRecordWithID(object) {
-    await this.StorageHelper.saveStorageObject({ [object.id]: object });
-  }
-
-  getRecord(key) {
-    return this.StorageHelper.getStorageObject(key);
   }
 
   async removeRecord(key) {
@@ -168,27 +104,6 @@ class StorageServiceWrapper {
       console.error("Error removing record:", error);
       throw error;
     }
-  }
-
-  removeRecordsWithoutSyncing(array) {
-    return this.StorageHelper.removeStorageObjects(array);
-  }
-
-  printRecords() {
-    this.StorageHelper.getStorageSuperObject().then(function (superObject) {
-      console.log(superObject);
-    });
-  }
-
-  async clearDB() {
-    await this.StorageHelper.clearStorage();
-  }
-
-  saveConsoleLoggerState(state) {
-    const consoleLoggerState = {
-      [GLOBAL_CONSTANTS.CONSOLE_LOGGER_ENABLED]: state,
-    };
-    this.StorageHelper.saveStorageObject(consoleLoggerState);
   }
 }
 

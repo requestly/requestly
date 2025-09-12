@@ -4,7 +4,7 @@ import Logger from "lib/logger";
 import posthogIntegration from "./integrations/posthog";
 import localIntegration from "./integrations/local";
 import { isEnvAutomation } from "utils/EnvUtils";
-import { WorkspaceType } from "types";
+import { WorkspaceType } from "features/workspaces/types";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [

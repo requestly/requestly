@@ -1,5 +1,5 @@
 import localStoreRepository from "features/apiClient/helpers/modules/sync/localStore/ApiClientLocalStorageRepository";
-import { setupContextWithRepo } from "./setupContextWithRepo.command";
+import { setupContextWithRepoWithoutMarkingLoaded, setupContextWithRepo } from "./setupContextWithRepo.command";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
 import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
@@ -26,8 +26,16 @@ export const setupContext = async (
   workspace: Workspace,
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
-
   const repository = createRepository(workspace, user);
-  const id = await setupContextWithRepo(workspace.id,repository);
+  const id = await setupContextWithRepo(workspace.id, repository);
+  return { id };
+};
+
+export const setupContextWithoutMarkingLoaded = async (
+  workspace: Workspace,
+  user: UserDetails
+): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
+  const repository = createRepository(workspace, user);
+  const id = await setupContextWithRepoWithoutMarkingLoaded(workspace.id, repository);
   return { id };
 };

@@ -24,6 +24,7 @@ import { RuleSourceKey, RuleSourceOperator } from "@requestly/shared/types/entit
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 import { useRBAC } from "features/rbac";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -94,8 +95,8 @@ export const SessionsSettings: React.FC = () => {
 
   useEffect(() => {
     Logger.log("Reading storage in SessionsIndexPage");
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
+    clientSessionRecordingStorageService
+      .getSessionRecordingConfig()
       .then((config) => {
         if (!config || Object.keys(config).length === 0) return defaultSessionRecordingConfig;
 

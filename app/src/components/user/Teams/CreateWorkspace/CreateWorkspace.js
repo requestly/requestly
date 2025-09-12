@@ -17,7 +17,7 @@ import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { useSelector } from "react-redux";
 import TeamWorkSolvePuzzleAnimation from "components/misc/LottieAnimation/TeamWorkSolvePuzzleAnimation";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
+import { WorkspaceType } from "features/workspaces/types";
 
 const CreateWorkspace = () => {
   const navigate = useNavigate();

@@ -4,8 +4,6 @@ import { Col } from "antd";
 import { Modal } from "antd";
 import CreatableReactSelect from "react-select/creatable";
 import { toast } from "utils/Toast.js";
-//EXTERNALS
-import { StorageService } from "../../../../init";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //REDUCER ACTIONS
@@ -17,6 +15,8 @@ import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
 import { trackGroupChangedEvent } from "features/rules/analytics";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import Logger from "lib/logger";
+import { RecordType } from "@requestly/shared/types/entities/rules";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const ChangeRuleGroupModal = (props) => {
   //Accepted Modes
@@ -105,11 +105,9 @@ const ChangeRuleGroupModal = (props) => {
 
   useEffect(() => {
     Logger.log("Reading storage in ChangeRuleGroupModal");
-    StorageService(appMode)
-      .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP)
-      .then((groups) => {
-        dispatch(globalActions.updateGroups(groups));
-      });
+    clientRuleStorageService.getRecordsByObjectType(RecordType.GROUP).then((groups) => {
+      dispatch(globalActions.updateGroups(groups));
+    });
   }, [dispatch, currentlySelectedRuleData, appMode]);
 
   useEffect(() => {

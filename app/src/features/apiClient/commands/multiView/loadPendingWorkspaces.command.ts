@@ -1,10 +1,11 @@
 import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { setupContext } from "../context";
+import { setupContextWithoutMarkingLoaded } from "../context";
+import { markWorkspaceLoaded } from "./markWorkspaceLoaded.command";
 
 export async function loadWorkspaces(userId?: string) {
-
-  const workspacesToLoad = apiClientMultiWorkspaceViewStore.getState().selectedWorkspaces
-    .filter(w => !w.getState().state.loading);
+  const workspacesToLoad = apiClientMultiWorkspaceViewStore
+    .getState()
+    .selectedWorkspaces.filter((w) => !w.getState().state.loading);
 
   const tasks = workspacesToLoad.map(async (workspaceState) => {
     const workspace = workspaceState.getState();
@@ -12,10 +13,11 @@ export async function loadWorkspaces(userId?: string) {
       .getState()
       .setStateForSelectedWorkspace(workspace.id, { loading: true, errored: false });
     try {
-      await setupContext(workspace.rawWorkspace, {
+      await setupContextWithoutMarkingLoaded(workspace.rawWorkspace, {
         loggedIn: !!userId,
         uid: userId ?? "",
       });
+
       apiClientMultiWorkspaceViewStore
         .getState()
         .setStateForSelectedWorkspace(workspace.id, { loading: false, errored: false });
@@ -31,6 +33,7 @@ export async function loadWorkspaces(userId?: string) {
   });
 
   const result = await Promise.allSettled(tasks);
-  apiClientMultiWorkspaceViewStore.getState().setIsLoaded(true);
+
+  markWorkspaceLoaded();
   return result;
 }

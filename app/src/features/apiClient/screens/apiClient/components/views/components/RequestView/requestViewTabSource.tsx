@@ -6,6 +6,8 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { ReactNode } from "react";
+import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
+import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -35,7 +37,7 @@ export class RequestViewTabSource extends BaseTabSource {
     return new RequestViewTabSource({ id: requestId, title: "Request", context: {} });
   }
 
-    private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
+  private getTabIcon(type: RQAPI.ApiEntryType): ReactNode {
     switch (type) {
       case RQAPI.ApiEntryType.HTTP:
         return <MdOutlineSyncAlt />;
@@ -44,5 +46,11 @@ export class RequestViewTabSource extends BaseTabSource {
       default:
         return <MdOutlineSyncAlt />;
     }
+  }
+
+  getIsValidTab(context: ApiClientFeatureContext): boolean {
+    const store = getApiClientRecordsStore(context);
+    const isExist = store.getState().getData(this.metadata.id);
+    return !!isExist;
   }
 }

@@ -72,6 +72,7 @@ export const ImportFromCurlModal: React.FC<Props> = ({
 
       handleImportRequest(requestFromCurl);
       trackCurlImported();
+      setCurlCommand("");
       setError(null);
       trackRQLastActivity(API_CLIENT.CURL_IMPORTED);
       trackRQDesktopLastActivity(API_CLIENT.CURL_IMPORTED);

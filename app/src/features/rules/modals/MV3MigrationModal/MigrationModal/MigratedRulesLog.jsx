@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { StorageService } from "init";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 
@@ -14,6 +13,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/utils";
 import { isEmpty } from "lodash";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -92,8 +92,8 @@ const MigratedRules = () => {
   useEffect(() => {
     if (Object.keys(migratedRulesLogs).length) {
       Object.keys(migratedRulesLogs).forEach((ruleId) => {
-        StorageService(appMode)
-          .getRecord(ruleId)
+        clientRuleStorageService
+          .getRecordById(ruleId)
           .then((rule) => {
             if (rule) {
               setRulesData((prev) => ({ ...prev, [ruleId]: rule }));

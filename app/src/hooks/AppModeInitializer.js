@@ -28,7 +28,6 @@ import {
   trackProxyReStartedEvent,
   trackProxyServerStartedEvent,
 } from "modules/analytics/events/desktopApp";
-import { StorageService } from "init";
 import { getEventsEngineFlag, handleEventBatches } from "modules/analytics/events/extension";
 import PSMH from "../config/PageScriptMessageHandler";
 import { invokeSyncingIfRequired } from "./DbListenerInit/syncingNodeListener";
@@ -47,6 +46,7 @@ import { trackHarFileOpened } from "modules/analytics/events/features/sessionRec
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { ApiClientImporterType } from "features/apiClient/types";
+import { clientStorageService } from "services/clientStorageService";
 
 let hasAppModeBeenSet = false;
 /**
@@ -336,9 +336,7 @@ const AppModeInitializer = () => {
     hasMessageHandlersBeenSet.current = true;
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      StorageService(appMode)
-        .saveRecord(getEventsEngineFlag)
-        .then(() => notifyAppLoadedToExtension());
+      clientStorageService.saveStorageObject(getEventsEngineFlag).then(() => notifyAppLoadedToExtension());
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.SEND_EXTENSION_EVENTS, (message) => {
         const batchIdsToAcknowledge = handleEventBatches(message.eventBatches);
@@ -365,14 +363,14 @@ const AppModeInitializer = () => {
       });
 
       PSMH.addMessageListener(GLOBAL_CONSTANTS.EXTENSION_MESSAGES.OPEN_CURL_IMPORT_MODAL, (message) => {
-        const { curlCommand, pageURL, source } = message.payload;
+        const { payload } = message;
 
         // Navigate to API Client with cURL import modal state
         const navigationState = {
           modal: ApiClientImporterType.CURL,
-          curlCommand,
-          pageURL,
-          source,
+          curlCommand: payload.curlCommand,
+          pageURL: payload.pageURL,
+          source: payload.source,
         };
 
         navigate(PATHS.API_CLIENT.ABSOLUTE, { state: navigationState });

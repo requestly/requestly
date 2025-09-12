@@ -15,6 +15,12 @@
     .ant-avatar {
       border-radius: 50%;
     }
+
+    &:hover {
+      .workspace-list-item-active-tag {
+        display: none;
+      }
+    }
   }
 
   &--shared:hover {
@@ -68,6 +74,18 @@
     }
   }
 
+  .workspace-list-item-active-tag {
+    border-radius: 4px;
+    background: var(--requestly-color-success-darker, #104b2f);
+    border: none;
+    color: var(--requestly-color-success-text, #6fdaa6);
+    font-size: 9px;
+    font-weight: var(--requestly-font-weight-medium);
+    line-height: var(--line-height-2xs, 13px); /* 144.444% */
+    letter-spacing: 1px;
+    padding: var(--space-1, 2px) var(--space-2, 4px);
+  }
+
   .shared-workspace-actions {
     display: none;
     align-items: center;
@@ -96,6 +114,14 @@
     .local-workspace-actions__checkbox,
     .local-workspace-actions__settings-btn {
       display: none;
+    }
+  }
+
+  &.single-mode {
+    &:hover {
+      .local-workspace-actions {
+        display: flex;
+      }
     }
   }
 

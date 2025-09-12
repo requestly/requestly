@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getIsHardRefreshRulesPending, getIsRefreshRulesPending } from "store/selectors";
 import { useHasChanged } from "hooks";
-import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
 import { recordsActions } from "store/features/rules/slice";
@@ -14,6 +13,7 @@ import Logger from "../../../../../../../../../common/logger";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
 import { sendIndividualRuleTypesCountAttributes } from "../utils";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -42,8 +42,8 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     }
 
     // FIXME: This can be fetched in one call. getRecords([RULE, GROUP]);
-    const groupsPromise = StorageService(appMode).getRecords(RecordType.GROUP);
-    const rulesPromise = StorageService(appMode).getRecords(RecordType.RULE);
+    const groupsPromise = clientRuleStorageService.getRecordsByObjectType(RecordType.GROUP);
+    const rulesPromise = clientRuleStorageService.getRecordsByObjectType(RecordType.RULE);
     Promise.all([groupsPromise, rulesPromise])
       .then(async (data) => {
         let groups = data[0] as Group[];
