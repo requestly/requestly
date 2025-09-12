@@ -144,7 +144,7 @@ export const FEATURE_COMPATIBLE_VERSION = {
   },
   [FEATURES.LOCAL_FILE_SYNC]: {
     [GLOBAL_CONSTANTS.APP_MODES.DESKTOP]: {
-      macOS: "25.8.28",
+      macOS: "2.0.0",
       Windows: "25.8.28",
     },
     [GLOBAL_CONSTANTS.APP_MODES.EXTENSION]: null,
