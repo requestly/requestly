@@ -1,8 +1,8 @@
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
-import { StorageService } from "init";
 import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { clientStorageService } from "services/clientStorageService";
 import { getAppMode } from "store/selectors";
 import { globalActions } from "store/slices/global/slice";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -17,9 +17,9 @@ export const useInitPopupConfig = () => {
   ]);
 
   const fetchConfig = useCallback(async () => {
-    const popupConfig = await StorageService(appMode).getRecord("popup_config");
+    const popupConfig = await clientStorageService.getStorageObject("popup_config");
     return popupConfig;
-  }, [appMode]);
+  }, []);
 
   const setDefaultConfig = useCallback(async () => {
     const popupConfig = await fetchConfig();
@@ -33,12 +33,12 @@ export const useInitPopupConfig = () => {
         session_replay: isSessionReplayEnabled ?? false,
       };
 
-      await StorageService(appMode).saveRecord({
+      await clientStorageService.saveStorageObject({
         popup_config: defaultConfig,
       });
       dispatch(globalActions.updatePopupConfig(defaultConfig));
     }
-  }, [appMode, dispatch, fetchConfig, isSessionReplayEnabled, shouldSetDefaultConfig]);
+  }, [dispatch, fetchConfig, isSessionReplayEnabled, shouldSetDefaultConfig]);
 
   useEffect(() => {
     if (appMode !== "EXTENSION") {

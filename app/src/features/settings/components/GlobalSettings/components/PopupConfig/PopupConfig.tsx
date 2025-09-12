@@ -3,9 +3,9 @@ import { Checkbox } from "antd";
 import SettingsItem from "../SettingsItem";
 import { getAppMode, getPopupConfig } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { StorageService } from "init";
 import { globalActions } from "store/slices/global/slice";
 import { trackEvent } from "modules/analytics";
+import { clientStorageService } from "services/clientStorageService";
 
 const CONFIG_OPTIONS = [
   {
@@ -30,15 +30,13 @@ export const PopupConfig: React.FC = () => {
         return acc;
       }, {} as Record<string, boolean>);
 
-      await StorageService(appMode).saveRecord({
-        popup_config: config,
-      });
+      await clientStorageService.saveStorageObject({ popup_config: config });
       dispatch(globalActions.updatePopupConfig(config));
       trackEvent("popup_config_updated", {
         config,
       });
     },
-    [appMode, dispatch]
+    [dispatch]
   );
 
   if (appMode !== "EXTENSION") {

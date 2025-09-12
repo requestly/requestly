@@ -10,10 +10,11 @@ type Props = {
   onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
   handleAppRequestFinished?: (entry: RQAPI.ApiEntry) => void;
   isCreateMode: boolean;
+  isOpenInModal?: boolean;
 };
 
 export const GenericApiClient: React.FC<Props> = React.memo(
-  ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode }) => {
+  ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
     return (
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
         <div className="api-client-container-content">
@@ -23,6 +24,7 @@ export const GenericApiClient: React.FC<Props> = React.memo(
               handleRequestFinished={handleAppRequestFinished}
               onSaveCallback={onSaveCallback}
               isCreateMode={isCreateMode}
+              isOpenInModal={isOpenInModal}
             />
           </AutogenerateProvider>
         </div>

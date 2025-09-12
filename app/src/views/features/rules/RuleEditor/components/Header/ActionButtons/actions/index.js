@@ -15,6 +15,7 @@ import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types"
 import { toast } from "utils/Toast";
 import { minifyCode } from "utils/CodeEditorUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 export const saveRule = async (appMode, dispatch, ruleObject) => {
   let ruleToSave = cloneDeep(ruleObject);
@@ -48,7 +49,7 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
   Logger.log("Writing to storage in saveRule");
   const ruleSavePromises = [
     detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
-    detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),
+    detectUnsettledPromise(clientRuleStorageService.getRecordById(ruleToSave.groupId), 10000),
   ];
 
   return Promise.all(ruleSavePromises)
