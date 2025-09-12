@@ -93,7 +93,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             direction="horizontal"
             sizes={[20, 80]}
             minSize={[300, getSecondPaneMinSize()]}
-            gutterSize={8}
+            gutterSize={4}
           >
             <APIClientSidebar />
             <TabsContainer />
