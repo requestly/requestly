@@ -5,17 +5,12 @@ import { SecondarySidebarLayout } from "componentsV2/SecondarySidebar";
 import { MocksContextProvider } from "./contexts";
 import { LocalFirstComingSoon } from "componentsV2/Nudge/views/LocalFirstComingSoon/LocalFirstComingSoon";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 const MocksFeatureContainer: React.FC = () => {
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
 
   // fixme: rethink when expanding multi view to cloud workspaces
-  if (isLocalSyncEnabled || viewMode === ApiClientViewMode.MULTI) {
+  if (isLocalSyncEnabled) {
     return (
       <LocalFirstComingSoon
         featureName="Mock Server"

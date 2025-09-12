@@ -22,15 +22,11 @@ import { getAppMode } from "store/selectors";
 import { LocalFirstComingSoon } from "componentsV2/Nudge/views/LocalFirstComingSoon/LocalFirstComingSoon";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import clientRuleStorageService from "services/clientStorageService/features/rule";
-import {
-  ApiClientViewMode,
-  useApiClientMultiWorkspaceView,
-} from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 
 const RulesFeatureContainer = () => {
   const appMode = useSelector(getAppMode);
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
-  const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
+
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
       notification.warn({
@@ -84,8 +80,7 @@ const RulesFeatureContainer = () => {
     });
   }, [appMode]);
 
-  // fixme: rethink when expanding multi view to cloud workspaces
-  if (isLocalSyncEnabled || viewMode === ApiClientViewMode.MULTI) {
+  if (isLocalSyncEnabled) {
     return (
       <LocalFirstComingSoon
         featureName="HTTP Rules"
