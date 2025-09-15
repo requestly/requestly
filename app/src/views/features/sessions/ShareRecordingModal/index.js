@@ -97,8 +97,6 @@ const ShareRecordingModal = ({
   };
 
   const handleIframeEmbedCopy = async () => {
-    trackIframeEmbedCopied();
-
     const iframeEmbed = `<iframe
     width="700"
     height="615"
@@ -112,6 +110,7 @@ const ShareRecordingModal = ({
     const result = await copyToClipBoard(iframeEmbed);
     if (result.success) {
       setIsTextCopied(true);
+      trackIframeEmbedCopied();
       setTimeout(() => {
         setIsTextCopied(false);
       }, 700);

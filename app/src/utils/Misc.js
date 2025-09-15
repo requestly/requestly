@@ -32,7 +32,7 @@ export const copyToClipBoard = async (textToCopy, prompt) => {
       await navigator.clipboard.writeText(textToCopy);
       showSuccess();
       return { success: true };
-    }
+    } else throw new Error("Document is not focused");
   } catch (error) {
     try {
       const textArea = document.createElement("textarea");
