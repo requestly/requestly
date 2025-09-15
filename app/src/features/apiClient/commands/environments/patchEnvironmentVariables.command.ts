@@ -20,15 +20,14 @@ export async function patchEnvironmentVariables(
   const currentVariables = Object.fromEntries(varStore.getState().data.entries());
   const rawNewVariables = params.variables;
 
-  const finalVariables = { ...currentVariables };
+  const finalVariables: Record<string, any> = {};
 
   let counter = Object.keys(currentVariables).length;
+
   Object.keys(rawNewVariables).forEach((key) => {
-    // merge keys
-    if (finalVariables[key]) {
-      finalVariables[key] = { ...finalVariables[key], ...rawNewVariables[key], id: currentVariables[key].id };
+    if (currentVariables[key]) {
+      finalVariables[key] = { ...currentVariables[key], ...rawNewVariables[key], id: currentVariables[key].id };
     } else {
-      // create new ids
       finalVariables[key] = { ...rawNewVariables[key], id: counter };
       counter++;
     }
