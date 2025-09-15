@@ -552,9 +552,7 @@ export async function authorizeWithGithub(callback, source) {
       return { accessToken: token, email };
     })
     .catch((err) => {
-      console.log("!!!debug", "code", err.code);
       if (err.code === "auth/account-exists-with-different-credential") {
-        console.log("!!!debug", "cust", err.customData);
         return { accessToken: err.customData._tokenResponse.oauthAccessToken, email: err.customData.email };
       }
 
