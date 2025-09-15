@@ -88,6 +88,7 @@ export class HttpRequestExecutor {
     this.abortController = new AbortController();
 
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
+    preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.F
 
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
       const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
