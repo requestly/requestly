@@ -41,9 +41,11 @@ export const AuthInProgressCard: React.FC<AuthInProgressCardProp> = ({ authMode,
     });
   }, [authMode, eventSource, onGoBackClick, dispatch]);
 
-  const handleCopyUrlClick = () => {
-    copyToClipBoard(desktopSignInAuthUrl, "Copied to clipboard");
-    trackAuthRedirectUrlCopied();
+  const handleCopyUrlClick = async () => {
+    const copyResult = await copyToClipBoard(desktopSignInAuthUrl, "Copied to clipboard");
+    if (copyResult.success) {
+      trackAuthRedirectUrlCopied();
+    }
   };
 
   return (
