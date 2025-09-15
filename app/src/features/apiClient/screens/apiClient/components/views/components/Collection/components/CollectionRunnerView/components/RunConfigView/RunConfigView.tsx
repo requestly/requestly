@@ -4,7 +4,7 @@ import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
