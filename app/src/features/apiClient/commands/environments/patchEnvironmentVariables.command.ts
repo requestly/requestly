@@ -20,7 +20,7 @@ export async function patchEnvironmentVariables(
   const currentVariables = Object.fromEntries(varStore.getState().data.entries());
   const rawNewVariables = params.variables;
 
-  const finalVariables: Record<string, any> = {};
+  const finalVariables: EnvironmentVariables = {};
 
   let counter = Object.keys(currentVariables).length;
 
