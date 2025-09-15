@@ -1,19 +1,25 @@
 import React, { useCallback, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import { githubSignIn } from "actions/FirebaseActions";
+import { authorizeWithGithub } from "actions/FirebaseActions";
 import { getFunctions, httpsCallable } from "@firebase/functions";
 import { toast } from "utils/Toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./githubStudentPack.scss";
 import { redirectToHome } from "utils/RedirectionUtils";
 import { getAppMode } from "store/selectors";
 import { useNavigate } from "react-router-dom";
 import { trackEvent } from "modules/analytics";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
+import APP_CONSTANTS from "config/constants";
+import { Button } from "antd";
 
 export const GithubStudentPack: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
 
   const [showNotGrantedMessage, setShowNotGrantedMessage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +28,22 @@ export const GithubStudentPack: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { accessToken } = await githubSignIn(() => {}, "github_student_pack");
+      const { accessToken, email } = await authorizeWithGithub(() => {}, "github_student_pack");
+
+      if (!accessToken || !email) {
+        toast.error("Failed to authenticate with GitHub. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (email !== user.details?.profile?.email) {
+        toast.error(
+          "Your github email does not match with the email you used to sign up. Please use the same email for both."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       const activateGithubStudentAccess = httpsCallable<
         { code: string },
         { success: boolean; granted: boolean; error: string }
@@ -50,7 +71,7 @@ export const GithubStudentPack: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [appMode, navigate]);
+  }, [appMode, navigate, user.details?.profile?.email]);
 
   if (showNotGrantedMessage) {
     return (
@@ -96,6 +117,35 @@ export const GithubStudentPack: React.FC = () => {
         <div className="gh-student-pack-title">Get Professional plan free with Github Student Pack</div>
         <div className="gh-student-pack-subtitle">
           Verify your student status by signing in with your GitHub account and enjoy full access to all features.
+          {!user.loggedIn && (
+            <span>
+              {" "}
+              Please{" "}
+              <Button
+                size="small"
+                style={{
+                  padding: 0,
+                }}
+                type="link"
+                onClick={() => {
+                  dispatch(
+                    globalActions.toggleActiveModal({
+                      modalName: "authModal",
+                      newValue: true,
+                      newProps: {
+                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                        redirectURL: window.location.href,
+                        eventSource: "github_student_pack",
+                      },
+                    })
+                  );
+                }}
+              >
+                login
+              </Button>{" "}
+              to continue.
+            </span>
+          )}
         </div>
         <div className="gh-student-pack-btn">
           <RQButton
@@ -104,9 +154,10 @@ export const GithubStudentPack: React.FC = () => {
             onClick={handleGithubSignIn}
             loading={isLoading}
             shape="round"
+            disabled={!user.loggedIn}
           >
             <img src={"/assets/media/common/github-white-logo.svg"} alt="github" height={20} width={20} />
-            Sign in with Github
+            Connect with Github
           </RQButton>
         </div>
       </div>

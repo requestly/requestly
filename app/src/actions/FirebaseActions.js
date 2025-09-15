@@ -71,6 +71,7 @@ import {
 import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
 import { AuthErrorCode } from "features/onboarding/screens/auth/types";
+import { trackEvent } from "modules/analytics";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -537,62 +538,27 @@ export async function appleSignIn(source, callback) {
     });
 }
 
-export async function githubSignIn(callback, source) {
+export async function authorizeWithGithub(callback, source) {
   const provider = new GithubAuthProvider();
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
     .then(async (result) => {
-      let is_new_user = getAdditionalUserInfo(result).isNewUser || false;
-      let uid = result?.user?.uid || null;
       let email = result?.user?.email || null;
       const credential = GithubAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
 
-      const emailType = await getEmailType(email);
-      if (is_new_user) {
-        trackSignUpAttemptedEvent({
-          auth_provider: AUTH_PROVIDERS.GITHUB,
-          source,
-        });
-        trackSignupSuccessEvent({
-          auth_provider: AUTH_PROVIDERS.GITHUB,
-          email,
-          uid,
-          email_type: emailType,
-          domain: email.split("@")[1],
-          source,
-        });
-        setSignupDate(uid);
-        setEmailVerified(uid, true);
-      } else {
-        trackLoginAttemptedEvent({
-          auth_provider: AUTH_PROVIDERS.GITHUB,
-          source,
-        });
-        trackLoginSuccessEvent({
-          auth_provider: AUTH_PROVIDERS.GITHUB,
-          uid,
-          email,
-          email_type: emailType,
-          domain: email.split("@")[1],
-          source,
-        });
-      }
+      trackEvent("github_authorized");
 
-      const authData = getAuthData(result.user);
-      const database = getDatabase();
-      update(ref(database, getUserProfilePath(authData.uid)), authData);
-
-      callback && callback.call(null, true);
-
-      return { ...authData, isNewUser: is_new_user, accessToken: token };
+      return { accessToken: token, email };
     })
     .catch((err) => {
-      trackLoginFailedEvent({
-        auth_provider: AUTH_PROVIDERS.GITHUB,
-        error_message: err.message,
-        source,
-      });
+      console.log("!!!debug", "code", err.code);
+      if (err.code === "auth/account-exists-with-different-credential") {
+        console.log("!!!debug", "cust", err.customData);
+        return { accessToken: err.customData._tokenResponse.oauthAccessToken, email: err.customData.email };
+      }
+
+      return {};
     });
 }
 
