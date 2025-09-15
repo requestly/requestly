@@ -218,7 +218,6 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               source={source}
               product={activeProduct}
             />
-            {/* <StudentProgram source={source} /> */}
             <CompaniesSection />
             <PricingModalFooterBanner />
           </>
