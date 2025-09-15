@@ -250,7 +250,7 @@ const UpdatePaymentMethodIndex = () => {
 
   useEffect(() => {
     // Initialize Stripe
-    if (!stripePromise) setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY));
+    if (!stripePromise) setStripePromise(loadStripe(process.env.VITE_REACT_APP_STRIPE_PUBLISHABLE_KEY));
   }, [stripePromise]);
 
   return (
