@@ -22,14 +22,18 @@ export async function patchEnvironmentVariables(
 
   const finalVariables: EnvironmentVariables = {};
 
-  let counter = Object.keys(currentVariables).length;
+  const usedIds = new Set<number>(Object.values(currentVariables).map((variable) => variable.id));
+  let nextId = usedIds.size ? Math.max(...usedIds) + 1 : 0;
 
   Object.keys(rawNewVariables).forEach((key) => {
     if (currentVariables[key]) {
       finalVariables[key] = { ...currentVariables[key], ...rawNewVariables[key], id: currentVariables[key].id };
     } else {
-      finalVariables[key] = { ...rawNewVariables[key], id: counter };
-      counter++;
+      finalVariables[key] = { ...rawNewVariables[key], id: nextId };
+      while (usedIds.has(nextId)) nextId++;
+      finalVariables[key] = { ...rawNewVariables[key], id: nextId };
+      usedIds.add(nextId);
+      nextId++;
     }
   });
 
