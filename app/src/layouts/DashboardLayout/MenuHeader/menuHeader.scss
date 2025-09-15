@@ -22,6 +22,7 @@
   &__left {
     display: flex;
     align-items: center;
+    width: 312px;
 
     .app-primary-header-link {
       height: 30px;
@@ -36,11 +37,6 @@
         color: var(--requestly-color-text-default);
       }
     }
-  }
-
-  &__mid {
-    position: absolute;
-    left: 50%;
   }
 
   &__right {
