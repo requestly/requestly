@@ -434,7 +434,6 @@ const HttpClientView: React.FC<Props> = ({
 
       notifyApiRequestFinished?.(executedEntry);
     } catch (e) {
-      clearTimeout(longRequestTimer);
       setIsFailed(true);
       setError({
         type: e.type,
@@ -443,6 +442,7 @@ const HttpClientView: React.FC<Props> = ({
         message: e.message,
       });
     } finally {
+      clearTimeout(longRequestTimer);
       setIsLoadingResponse(false);
       setIsLongRequest(false);
     }
