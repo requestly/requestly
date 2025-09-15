@@ -714,6 +714,14 @@ export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.Gra
   return record.data.type === RQAPI.ApiEntryType.GRAPHQL;
 }
 
+export const isGraphQLApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.GraphQLApiEntry => {
+  return entry.type === RQAPI.ApiEntryType.GRAPHQL;
+};
+
+export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEntry => {
+  return entry.type === RQAPI.ApiEntryType.HTTP;
+};
+
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
   return "redirectUrl" in response;
 };
