@@ -43,7 +43,7 @@ export const RulesCard = () => {
 
   const rulesToShow = useMemo(() => {
     return rules
-      ?.sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
+      ?.sort((a: Rule, b: Rule) => (b.updatedAt as number) - (a.updatedAt as number))
       ?.slice(0, MAX_RULES_TO_SHOW + 1)
       .map(
         (rule: Rule): CardListItem => {

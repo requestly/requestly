@@ -21,6 +21,10 @@ class WorkspaceManager {
 
   initInProgress = false;
 
+  get activeWorkspaceIds() {
+    return this._activeWorkspacesMap ? Object.keys(this._activeWorkspacesMap) : [];
+  }
+
   init(dispatch: Dispatch<any>, workspaces: Workspace[], userId?: string) {
     this._dispatch = dispatch;
     this._userId = userId;
