@@ -15,6 +15,7 @@ export type TabState = {
   setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
+  setSource: (source: AbstractTabSource) => void;
 };
 
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
@@ -30,5 +31,8 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
+    setSource(source) {
+        set({source});
+    },
   }));
 };
