@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from "react";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
-import { WorkspaceType } from "types";
-import { Checkbox, Tooltip, Typography } from "antd";
+import { Checkbox, Tag, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { redirectToTeam } from "utils/RedirectionUtils";
@@ -24,18 +23,19 @@ import {
 import { toast } from "utils/Toast";
 import { addWorkspaceToView, removeWorkspaceFromView } from "features/apiClient/commands/multiView";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 
 type WorkspaceItemProps =
   | {
       type: WorkspaceType.PERSONAL;
       toggleDropdown: () => void;
-      onClick: () => void;
+      onClick: (callback?: () => any) => void;
     }
   | {
       type: WorkspaceType.SHARED | WorkspaceType.LOCAL;
       workspace: Workspace;
       toggleDropdown: () => void;
-      onClick: () => void;
+      onClick: (callback?: () => any) => void;
     };
 
 const ShareWorkspaceActions = ({
@@ -47,6 +47,10 @@ const ShareWorkspaceActions = ({
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
+
+  const isPrivateWorkspace = activeWorkspace?.workspaceType === WorkspaceType.PERSONAL || workspaceId === null;
 
   const handleSendInvites = () => {
     dispatch(
@@ -62,6 +66,9 @@ const ShareWorkspaceActions = ({
 
   return (
     <>
+      {!isPrivateWorkspace && activeWorkspace.id === workspaceId && viewMode === ApiClientViewMode.SINGLE ? (
+        <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
+      ) : null}
       <div className="shared-workspace-actions">
         <RQButton
           type="transparent"
@@ -94,36 +101,55 @@ const LocalWorkspaceActions = ({
 }: {
   workspace: Workspace;
   toggleDropdown: () => void;
-  switchWorkspace: () => void;
+  switchWorkspace: (cb?: () => any) => void;
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+
   const [selectedWorkspaces, getViewMode, getAllSelectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [
     s.selectedWorkspaces,
     s.getViewMode,
     s.getAllSelectedWorkspaces,
   ]);
 
-  const handleMultiworkspaceAdder = useCallback(
+  const handleMultiWorkspaceCheckbox = useCallback(
     async (isChecked: boolean) => {
+      const handleWorkspaceSelection = async () => {
+        const isFirstSelectedWorkspace = getAllSelectedWorkspaces().length === 0 && workspace.id !== activeWorkspace.id;
+        if (isFirstSelectedWorkspace) {
+          switchWorkspace(() => addWorkspaceToView(workspace, user.details?.profile?.uid));
+        } else {
+          await addWorkspaceToView(workspace, user.details?.profile?.uid);
+        }
+        trackMultiWorkspaceSelected("workspace_selector_dropdown");
+      };
+
+      const handleWorkspaceDeselection = () => {
+        const isLastSelectedWorkspace =
+          getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1;
+
+        if (isLastSelectedWorkspace) {
+          switchWorkspace();
+        } else {
+          removeWorkspaceFromView(workspace.id);
+        }
+
+        trackMultiWorkspaceDeselected("workspace_selector_dropdown");
+      };
+
       try {
         if (isChecked) {
-          await addWorkspaceToView(workspace, user.details?.profile?.uid);
-          trackMultiWorkspaceSelected("workspace_selector_dropdown");
+          await handleWorkspaceSelection();
         } else {
-          if (getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1) {
-            switchWorkspace();
-          } else {
-            removeWorkspaceFromView(workspace.id);
-          }
-
-          trackMultiWorkspaceDeselected("workspace_selector_dropdown");
+          handleWorkspaceDeselection();
         }
       } catch (e) {
+        // fixme: error should be observed in some way
         toast.error(e.message);
       }
     },
-    [workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
+    [getAllSelectedWorkspaces, workspace, activeWorkspace.id, switchWorkspace, user.details?.profile?.uid, getViewMode]
   );
 
   const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.getState().id === workspace.id), [
@@ -132,30 +158,35 @@ const LocalWorkspaceActions = ({
   ]);
 
   return (
-    <div className="local-workspace-actions" onClick={(e) => e.stopPropagation()}>
-      <Tooltip title="Settings" color="#000">
-        <RQButton
-          className="local-workspace-actions__settings-btn"
-          type="transparent"
-          icon={<MdOutlineSettings />}
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            trackManageWorkspaceClicked("workspace_selector_dropdown");
-            redirectToTeam(navigate, workspace.id);
-            toggleDropdown();
+    <>
+      {activeWorkspace.id === workspace.id && getViewMode() === ApiClientViewMode.SINGLE ? (
+        <Tag className="workspace-list-item-active-tag">CURRENT</Tag>
+      ) : null}
+      <div className="local-workspace-actions" onClick={(e) => e.stopPropagation()}>
+        <Tooltip title="Settings" color="#000">
+          <RQButton
+            className="local-workspace-actions__settings-btn"
+            type="transparent"
+            icon={<MdOutlineSettings />}
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              trackManageWorkspaceClicked("workspace_selector_dropdown");
+              redirectToTeam(navigate, workspace.id);
+              toggleDropdown();
+            }}
+          />
+        </Tooltip>
+
+        <Checkbox
+          checked={isSelected}
+          className="local-workspace-actions__checkbox"
+          onChange={(e) => {
+            handleMultiWorkspaceCheckbox(e.target.checked);
           }}
         />
-      </Tooltip>
-
-      <Checkbox
-        checked={isSelected}
-        className="local-workspace-actions__checkbox"
-        onChange={(e) => {
-          handleMultiworkspaceAdder(e.target.checked);
-        }}
-      />
-    </div>
+      </div>
+    </>
   );
 };
 
@@ -176,14 +207,17 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
     }
   };
 
-  const handleWorkspaceClick = useCallback(() => {
-    onClick();
-    toggleDropdown();
-  }, [onClick, toggleDropdown]);
+  const handleWorkspaceClick = useCallback(
+    (callback?: () => any) => {
+      onClick(callback);
+      toggleDropdown();
+    },
+    [onClick, toggleDropdown]
+  );
 
   if (props.type === WorkspaceType.PERSONAL) {
     return (
-      <div className="workspace-overlay__list-item" onClick={handleWorkspaceClick}>
+      <div className="workspace-overlay__list-item" onClick={() => handleWorkspaceClick()}>
         <WorkspaceAvatar
           size={32}
           workspace={{

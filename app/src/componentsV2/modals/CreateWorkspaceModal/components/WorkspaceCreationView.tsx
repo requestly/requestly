@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig, WorkspaceType } from "types";
+import { CreateTeamParams, LocalWorkspaceConfig, SharedOrPrivateWorkspaceConfig } from "types";
 import { SharedWorkspaceCreationView } from "./SharedWorkspaceCreationView/SharedWorkspaceCreationView";
 import { LocalWorkspaceCreationView } from "./LocalWorkspaceCreationView/LocalWorkspaceCreationView";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
@@ -17,7 +17,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { createWorkspaceFolder } from "services/fsManagerServiceAdapter";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { workspaceActions } from "store/slices/workspaces/slice";
@@ -29,6 +29,7 @@ interface Props {
   workspaceType: WorkspaceType;
   callback?: () => void;
   onCancel: () => void;
+  analyticEventSource: string;
 }
 
 export type CreateWorkspaceArgs = {
@@ -44,7 +45,7 @@ export type CreateWorkspaceArgs = {
     }
 );
 
-export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback, onCancel }) => {
+export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analyticEventSource, callback, onCancel }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
@@ -69,7 +70,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
         },
         appMode,
         null,
-        "create_workspace_modal"
+        analyticEventSource
       );
       if (workspaceType === WorkspaceType.SHARED) {
         redirectToTeam(navigate, teamId, {
@@ -79,7 +80,15 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
         });
       }
     },
-    [dispatch, appMode, isSharedWorkspaceMode, navigate, user?.details?.isSyncEnabled, workspaceType]
+    [
+      dispatch,
+      appMode,
+      isSharedWorkspaceMode,
+      navigate,
+      user?.details?.isSyncEnabled,
+      workspaceType,
+      analyticEventSource,
+    ]
   );
 
   const handleDomainInvitesCreation = useCallback(
@@ -186,7 +195,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
         trackNewTeamCreateSuccess(
           teamId,
           workspaceName,
-          "create_workspace_modal",
+          analyticEventSource,
           workspaceType,
           args.workspaceType === WorkspaceType.SHARED ? args.isNotifyAllSelected : false
         );
@@ -214,6 +223,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, callback
       handlePostTeamCreationStep,
       handleDomainInvitesCreation,
       workspaceType,
+      analyticEventSource,
     ]
   );
 

@@ -1,10 +1,9 @@
 import { captureException } from "@sentry/react";
 import APP_CONSTANTS from "config/constants";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { useCallback, useEffect, useState } from "react";
 import { getAllWorkspaces } from "services/fsManagerServiceAdapter";
-import { WorkspaceType } from "types";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 export const useFetchLocalWorkspaces = () => {

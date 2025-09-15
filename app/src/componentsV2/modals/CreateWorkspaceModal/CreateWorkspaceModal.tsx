@@ -1,7 +1,6 @@
 import React from "react";
 import { Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { WorkspaceType } from "types";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { WorkspaceCreationView } from "./components/WorkspaceCreationView";
@@ -10,6 +9,7 @@ import FEATURES from "config/constants/sub/features";
 import { CreateWorkspaceModalOld } from "../CreateWorkspaceModalOld/CreateWorkspaceModalOld";
 import { globalActions } from "store/slices/global/slice";
 import "./createWorkspaceModal.scss";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   isOpen: boolean;
@@ -71,6 +71,7 @@ export const CreateWorkspaceModal: React.FC<Props> = ({
           toggleModal();
           callback?.();
         }}
+        analyticEventSource="create_workspace_modal"
       />
     </Modal>
   );

@@ -7,9 +7,10 @@ import "./errorboundary.scss";
 import { NativeError } from "errors/NativeError";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "types";
 import { isDesktopMode } from "utils/AppUtils";
 import { Alert } from "antd";
+import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
+import { WorkspaceType } from "features/workspaces/types";
 
 interface Props {
   children: React.ReactNode;
@@ -127,6 +128,7 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
   }
 
   private handleGoBack = () => {
+    getTabServiceActions().resetTabs(true);
     this.setState({ hasError: false, error: null });
   };
 
@@ -150,7 +152,14 @@ class ApiClientErrorBoundary extends React.Component<Props, State> {
               If the issue persists, contact <a href="mailto:contact@requestly.io">support</a>
             </div>
             <div className="error-boundary__actions">
-              <RQButton onClick={() => window.location.reload()}>Reload</RQButton>
+              <RQButton
+                onClick={() => {
+                  getTabServiceActions().resetTabs(true);
+                  window.location.reload();
+                }}
+              >
+                Reload
+              </RQButton>
               <RQButton type="primary" onClick={this.handleGoBack}>
                 Go Back
               </RQButton>

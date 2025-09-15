@@ -18,10 +18,10 @@ import { Row, notification } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
 import { useSelector } from "react-redux";
-import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
 import { LocalFirstComingSoon } from "componentsV2/Nudge/views/LocalFirstComingSoon/LocalFirstComingSoon";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const RulesFeatureContainer = () => {
   const appMode = useSelector(getAppMode);
@@ -64,21 +64,19 @@ const RulesFeatureContainer = () => {
         duration: 0,
       });
       console.log(`[Requestly]: Error saving rule - ${message.error}`);
-      StorageService(appMode)
-        .getRecord(message.rqRuleId)
-        .then((ruleDetails) => {
-          const sourceCondition = ruleDetails?.pairs?.[0]?.source;
-          trackErrorInSavingDNR({
-            rule_type: message.rqRuleId?.split("_")[0],
-            rule_id: message.rqRuleId,
-            error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
-            is_migration_triggered: window.location.search.includes("updatedToMv3"),
-            source_key: sourceCondition?.key,
-            source_operator: sourceCondition?.operator,
-            source_value: sourceCondition?.value,
-            page_path: window.location.pathname + window.location.search,
-          });
+      clientRuleStorageService.getRecordById(message.rqRuleId).then((ruleDetails) => {
+        const sourceCondition = ruleDetails?.pairs?.[0]?.source;
+        trackErrorInSavingDNR({
+          rule_type: message.rqRuleId?.split("_")[0],
+          rule_id: message.rqRuleId,
+          error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
+          is_migration_triggered: window.location.search.includes("updatedToMv3"),
+          source_key: sourceCondition?.key,
+          source_operator: sourceCondition?.operator,
+          source_value: sourceCondition?.value,
+          page_path: window.location.pathname + window.location.search,
         });
+      });
     });
   }, [appMode]);
 
