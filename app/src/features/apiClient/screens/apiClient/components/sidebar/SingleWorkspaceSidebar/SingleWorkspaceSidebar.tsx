@@ -268,6 +268,9 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
       ) : null}
 
       <ImportFromCurlModal
+        initialCurlCommand={state?.curlCommand}
+        source={state?.source || ""}
+        pageURL={state?.pageURL || ""}
         isRequestLoading={isLoading}
         isOpen={isImportModalOpen}
         handleImportRequest={handleImportRequest}
