@@ -614,3 +614,8 @@ div.react-multi-email .multi-email-tag {
   // Our new -sm token has 13px value while DS has 12px
   font-size: var(--requestly-font-size-sm, 12px);
 }
+
+.fc-widget-normal {
+  bottom: 8px !important;
+  right: 1px !important;
+}
