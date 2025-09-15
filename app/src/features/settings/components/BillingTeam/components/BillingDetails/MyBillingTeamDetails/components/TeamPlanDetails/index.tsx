@@ -184,8 +184,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               </div>
             </div>
           ) : null}
-          {!billingTeamDetails?.browserstackGroupId &&
-          billingTeamDetails?.subscriptionDetails?.rqSubscriptionType !== PlanType.STUDENT ? (
+          {!billingTeamDetails?.browserstackGroupId ? (
             <div className="team-plan-details-section display-row-center items-center">
               <div>
                 <Col className="text-center caption">Plan renewal date</Col>
