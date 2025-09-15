@@ -1,5 +1,21 @@
 .api-client-container {
+  &__split {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    & > .gutter {
+      background-color: var(--requestly-color-primary);
+      background-clip: content-box;
+      cursor: col-resize;
+      opacity: 0;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
   width: 100%;
   height: 100%;
-  display: flex;
 }

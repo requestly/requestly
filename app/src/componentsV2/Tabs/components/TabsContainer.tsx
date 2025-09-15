@@ -141,7 +141,9 @@ export const TabsContainer: React.FC = () => {
   }, [tabs, _version]);
 
   return tabItems.length === 0 ? (
-    <Outlet />
+    <div className="tabs-outlet-container">
+      <Outlet />
+    </div>
   ) : (
     <div className="tabs-container">
       <Tabs
