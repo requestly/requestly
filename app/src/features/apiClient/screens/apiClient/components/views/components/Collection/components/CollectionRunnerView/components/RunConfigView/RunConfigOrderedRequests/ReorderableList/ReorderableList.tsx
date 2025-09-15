@@ -17,7 +17,7 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ isSelectAll, r
   const reorder = useCallback(
     (currentIndex: number, newIndex: number) => {
       if (currentIndex === newIndex) {
-        return requests;
+        return;
       }
 
       const result = [...requests];
