@@ -61,6 +61,7 @@ const ApiClientFeatureContainer: React.FC = () => {
 
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- not adding `activeWorkspace` to control reactivity
   }, [user.loggedIn, user.details?.profile?.uid, activeWorkspace?.id, viewMode]);
 
   if (!isLoaded) {
