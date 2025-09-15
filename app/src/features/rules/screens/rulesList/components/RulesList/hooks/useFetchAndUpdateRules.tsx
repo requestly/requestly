@@ -83,9 +83,10 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     async function initRulesListener() {
       console.debug("[useFetchAndUpdateRules] initRulesListener", { activeWorkspaceId });
       if (!syncEngine.initialized) {
-        // setTimeout(() => {
-        //   initRulesListener();
-        // }, 1000);
+        console.log("[useFetchAndUpdateRules] syncEngine not initialized yet, retrying...");
+        setTimeout(() => {
+          initRulesListener();
+        }, 1000);
         return;
       }
       // FIXME-syncing: Improvements Required
