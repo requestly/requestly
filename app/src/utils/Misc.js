@@ -34,30 +34,28 @@ export const copyToClipBoard = async (textToCopy, prompt) => {
       return { success: true };
     }
   } catch (error) {
-    showError();
-    return { success: false };
-  }
-  try {
-    const textArea = document.createElement("textarea");
-    textArea.value = textToCopy;
-    textArea.setAttribute("readonly", "");
-    textArea.style.position = "fixed";
-    textArea.style.left = "-999999px";
-    textArea.style.top = "-999999px";
-    textArea.style.opacity = "0";
-    document.body.appendChild(textArea);
-    textArea.select();
-    const ok = typeof document.execCommand === "function" && document.execCommand("copy");
-    document.body.removeChild(textArea);
-    if (ok) {
-      showSuccess();
-      return { success: true };
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = textToCopy;
+      textArea.setAttribute("readonly", "");
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      const ok = typeof document.execCommand === "function" && document.execCommand("copy");
+      document.body.removeChild(textArea);
+      if (ok) {
+        showSuccess();
+        return { success: true };
+      }
+      showError();
+      return { success: false };
+    } catch (_) {
+      showError();
+      return { success: false };
     }
-    showError();
-    return { success: false };
-  } catch (_) {
-    showError();
-    return { success: false };
   }
 };
 
