@@ -1,3 +1,4 @@
+import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
 import { createContext, useContext } from "react";
 import { ReactNode } from "react";
 
@@ -10,6 +11,7 @@ export interface GenericState {
   getIsActive: () => boolean;
 
   replace: (args: unknown) => void; // TODO: make type generic
+  replaceWithTabSource: (fn: (oldSource: AbstractTabSource) => AbstractTabSource) => void;
   close: () => void;
 }
 
@@ -21,6 +23,7 @@ const defaultGenericState: GenericState = {
   getIsNew: () => false,
   getIsActive: () => false,
   replace: () => {},
+  replaceWithTabSource: () => {},
   close: () => {},
 };
 

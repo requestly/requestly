@@ -11,13 +11,16 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
     resetPreviewTab,
     closeTabById,
     upsertTabSource,
+    updateTabSource,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.incrementVersion,
     state.resetPreviewTab,
     state.closeTabById,
     state.upsertTabSource,
+    state.updateTabSource,
   ]);
+
 
   return (
     <GenericStateContext.Provider
@@ -32,6 +35,12 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           },
           [props.store, upsertTabSource]
         ),
+
+        replaceWithTabSource: useCallback((fn) => {
+          const oldSource = props.store.getState().source;
+          const newSource = fn(oldSource);
+          updateTabSource(oldSource.getSourceId(), oldSource.getSourceName(), newSource);
+        }, [props.store, updateTabSource]),
 
         getIsNew: useCallback(() => {
           return props.store.getState().source.getIsNewTab();

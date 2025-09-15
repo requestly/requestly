@@ -7,6 +7,7 @@ import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
 import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { NativeError } from "errors/NativeError";
 
 type TabId = number;
 type SourceName = string;
@@ -33,6 +34,7 @@ type TabServiceState = {
 type TabActions = {
   reset: (ignorePath?: boolean) => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
+  updateTabSource: (sourceId: SourceId, sourceName: SourceName, newSource: AbstractTabSource, config?: TabConfig) => void;
   updateTabBySource: (
     sourceId: SourceId,
     sourceName: SourceName,
@@ -117,6 +119,33 @@ const createTabServiceStore = () => {
 
           set({
             tabs: new Map(tabs),
+          });
+        },
+
+        updateTabSource(sourceId, sourceName, newSource, config) {
+          const { tabs,tabsIndex, getTabIdBySource } = get();
+          const tabId = getTabIdBySource(sourceId, sourceName);
+
+          if(tabId === undefined || tabId === null) {
+            throw new NativeError(`Tab Id not found for ${sourceName} ${sourceId}`);
+          }
+
+          const tabStore = tabs.get(tabId);
+
+          if(!tabStore) {
+            throw new NativeError(`Tab not found for ${sourceName} ${sourceId}`);
+          }
+          tabStore.setState({source: newSource});
+          if (tabsIndex.has(sourceName)) {
+            tabsIndex.get(sourceName)?.set(newSource.getSourceId(), tabId);
+          } else {
+            tabsIndex.set(sourceName, new Map().set(newSource.getSourceId(), tabId));
+          }
+
+          tabs.set(tabId, tabStore);
+          set({
+            tabs: new Map(tabs),
+            tabsIndex,
           });
         },
 
