@@ -26,7 +26,7 @@ export const GithubStudentPack: React.FC = () => {
       const activateGithubStudentAccess = httpsCallable<
         { code: string },
         { success: boolean; granted: boolean; error: string }
-      >(getFunctions(), "auth-activateGithubStudentAccess");
+      >(getFunctions(), "subscription-activateGithubStudentAccess");
       const result = await activateGithubStudentAccess({ code: accessToken });
       const data = result.data;
       if (data.success) {
