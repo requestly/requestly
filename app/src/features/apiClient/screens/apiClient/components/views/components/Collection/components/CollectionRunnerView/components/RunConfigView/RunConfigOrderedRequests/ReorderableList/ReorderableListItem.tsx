@@ -7,12 +7,12 @@ import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 
 enum ReorderableItemType {
-  REORDERABLE_ITEM = "reorderableItem",
+  REQUEST = "request",
 }
 
 type ReorderableItem = {
   draggedIndex: number;
-  type: ReorderableItemType.REORDERABLE_ITEM;
+  type: ReorderableItemType.REQUEST;
 };
 
 enum DragDirection {
@@ -68,16 +68,16 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
   }, [isSelectAll]);
 
   const [{ isDragging }, drag] = useDrag({
-    type: ReorderableItemType.REORDERABLE_ITEM,
+    type: ReorderableItemType.REQUEST,
 
-    item: { draggedIndex: index, type: ReorderableItemType.REORDERABLE_ITEM },
+    item: { draggedIndex: index, type: ReorderableItemType.REQUEST },
     collect: (monitor) => {
       return { isDragging: monitor.isDragging() };
     },
   });
 
   const [{ isOver, isValidTarget, dragDirection }, drop] = useDrop({
-    accept: ReorderableItemType.REORDERABLE_ITEM,
+    accept: ReorderableItemType.REQUEST,
 
     drop(item: ReorderableItem, monitor) {
       if (!ref.current) {
