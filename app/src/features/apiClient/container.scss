@@ -4,14 +4,19 @@
     height: 100%;
     display: flex;
 
-    & > .gutter {
-      background-color: var(--requestly-color-primary);
-      background-clip: content-box;
+    .api-client-container__split-gutter .gutter {
+      z-index: 1;
+      position: absolute;
+      transition: 0.3s all;
+      background: transparent;
+      border: 2px solid transparent;
+      width: inherit !important;
+      height: inherit !important;
       cursor: col-resize;
-      opacity: 0;
 
-      &:hover {
-        opacity: 1;
+      &:hover,
+      &:active {
+        border: 2px solid var(--requestly-color-primary);
       }
     }
   }

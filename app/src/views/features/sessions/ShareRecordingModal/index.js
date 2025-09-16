@@ -21,6 +21,7 @@ import { StartFromOffsetInput } from "./components/StartFromOffsetInput/StartFro
 import { getSecondsFromStringifiedMinSec } from "utils/DateTimeUtils";
 import "./shareRecordingModal.scss";
 import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { copyToClipBoard } from "utils/Misc";
 
 const _ = require("lodash");
 
@@ -83,20 +84,19 @@ const ShareRecordingModal = ({
     setVisible(false);
   };
 
-  const onCopyHandler = () => {
+  const onCopyHandler = async () => {
     const offset = getSecondsFromStringifiedMinSec(startFromOffset);
-    trackSessionRecordingShareLinkCopied("app");
-    setIsTextCopied(true);
-    navigator.clipboard.writeText(`${publicURL}${offset ? `?t=${offset}` : ""}`);
-    setTimeout(() => {
-      setIsTextCopied(false);
-    }, 700);
+    const result = await copyToClipBoard(`${publicURL}${offset ? `?t=${offset}` : ""}`);
+    if (result.success) {
+      setIsTextCopied(true);
+      trackSessionRecordingShareLinkCopied("app");
+      setTimeout(() => {
+        setIsTextCopied(false);
+      }, 700);
+    }
   };
 
-  const handleIframeEmbedCopy = () => {
-    trackIframeEmbedCopied();
-    setIsTextCopied(true);
-
+  const handleIframeEmbedCopy = async () => {
     const iframeEmbed = `<iframe
     width="700"
     height="615"
@@ -107,11 +107,14 @@ const ShareRecordingModal = ({
     src="${publicURL}"
   />`;
 
-    navigator.clipboard.writeText(iframeEmbed);
-
-    setTimeout(() => {
-      setIsTextCopied(false);
-    }, 700);
+    const result = await copyToClipBoard(iframeEmbed);
+    if (result.success) {
+      setIsTextCopied(true);
+      trackIframeEmbedCopied();
+      setTimeout(() => {
+        setIsTextCopied(false);
+      }, 700);
+    }
   };
 
   const handleVisibilityChange = async (newVisibility) => {

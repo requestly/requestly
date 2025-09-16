@@ -94,7 +94,20 @@ const ApiClientFeatureContainer: React.FC = () => {
             direction="horizontal"
             sizes={[20, 80]}
             minSize={[300, getSecondPaneMinSize()]}
-            gutterSize={4}
+            gutter={(index, direction) => {
+              const gutterContainer = document.createElement("div");
+              gutterContainer.style.position = "relative";
+              gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
+              gutterContainer.innerHTML = `<div class="gutter" />`;
+              return gutterContainer;
+            }}
+            gutterStyle={() => {
+              return {
+                height: "100%",
+                width: "0px",
+              };
+            }}
+            gutterAlign="center"
           >
             <APIClientSidebar />
             <TabsContainer />
