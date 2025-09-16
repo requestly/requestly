@@ -15,6 +15,7 @@ import {
   trackCodeEditorCodeMinified,
   trackCodeEditorCodeCopied,
 } from "componentsV2/CodeEditor/components/analytics";
+import { copyToClipBoard } from "utils/Misc";
 
 interface CodeEditorToolbarProps {
   language: EditorLanguage;
@@ -78,13 +79,15 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
     }
   };
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(code);
-    setIsCopied(true);
-    trackCodeEditorCodeCopied();
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 1000);
+  const handleCopyCode = async () => {
+    const result = await copyToClipBoard(code);
+    if (result.success) {
+      setIsCopied(true);
+      trackCodeEditorCodeCopied();
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 1000);
+    }
   };
 
   return (

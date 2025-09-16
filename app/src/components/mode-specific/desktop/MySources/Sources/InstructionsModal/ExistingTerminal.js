@@ -4,12 +4,21 @@ import { Steps, Button, Tooltip, Typography, Row } from "antd";
 import { CopyOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { getDesktopSpecificDetails } from "../../../../../../store/selectors";
 import InstructionsHeader from "./InstructionsHeader";
+import { copyToClipBoard } from "utils/Misc";
 
 const { Title } = Typography;
 
 const TerminalCommand = ({ helperServerPort }) => {
   const command = `. <(curl -sS localhost:${helperServerPort}/tpsetup)`;
   const [copyClicked, setCopyClicked] = useState(false);
+
+  const handleCopyClick = async () => {
+    const result = await copyToClipBoard(command);
+    if (result.success) {
+      setCopyClicked(true);
+      setTimeout(() => setCopyClicked(false), 500);
+    }
+  };
   return (
     <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
       <Title strong level={4} style={{ margin: 0 }}>
@@ -35,11 +44,7 @@ const TerminalCommand = ({ helperServerPort }) => {
           }
           style={{ margin: 0 }}
           size={"small"}
-          onClick={() => {
-            navigator.clipboard.writeText(command);
-            setCopyClicked(true);
-            setTimeout(() => setCopyClicked(false), 2000); // hide the flag after 2 seconds
-          }}
+          onClick={handleCopyClick}
         ></Button>
       </Tooltip>
     </div>
