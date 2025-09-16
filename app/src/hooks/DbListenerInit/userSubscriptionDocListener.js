@@ -60,11 +60,7 @@ const checkIfAnnualPlan = (firestoreData) => {
   return monthsDiff > 1;
 };
 
-export const newSchemaToOldSchemaAdapter = (firestoreData) => {
-  if (!firestoreData) {
-    return null;
-  }
-
+export const preparePlan = (firestoreData) => {
   if (isSetappBuild()) {
     const today = new Date();
     const endDate = new Date();
@@ -87,6 +83,13 @@ export const newSchemaToOldSchemaAdapter = (firestoreData) => {
     };
   }
 
+  if (!firestoreData) {
+    return null;
+  }
+  return newSchemaToOldSchemaAdapter(firestoreData);
+};
+
+const newSchemaToOldSchemaAdapter = (firestoreData) => {
   const planDetails = {
     planId: firestoreData?.plan,
     status: firestoreData?.subscriptionStatus,
