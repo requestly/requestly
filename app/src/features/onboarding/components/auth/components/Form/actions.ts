@@ -20,8 +20,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { redirectToForgotPassword } from "utils/RedirectionUtils";
 import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils";
 import posthog from "posthog-js";
-import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
+import { clientStorageService } from "services/clientStorageService";
 
 const showError = (err: string) => {
   toast.error(err, 3);
@@ -192,7 +192,7 @@ export const handleLogoutButtonOnClick = async (appMode: string, isWorkspaceMode
     if (isWorkspaceMode) {
       // clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
-      StorageService(appMode).clearDB();
+      clientStorageService.clearStorage();
     }
 
     return signOut();

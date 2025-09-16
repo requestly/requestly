@@ -153,13 +153,13 @@ export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request
   };
 };
 
-export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = true) => {
+export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = true) => {
   const sanitizedEntry: RQAPI.HttpApiEntry = {
     ...entry,
     request: {
       ...entry.request,
-      queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeDisabledKeys),
-      headers: sanitizeKeyValuePairs(entry.request.headers, removeDisabledKeys),
+      queryParams: sanitizeKeyValuePairs(entry.request.queryParams, removeInvalidPairs),
+      headers: sanitizeKeyValuePairs(entry.request.headers, removeInvalidPairs),
     },
     scripts: {
       preRequest: entry.scripts?.preRequest || "",
@@ -173,12 +173,12 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = tr
     } else if (entry.request.contentType === RequestContentType.FORM) {
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
         entry.request.body as RQAPI.RequestFormBody,
-        removeDisabledKeys
+        removeInvalidPairs
       );
     } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
         entry.request.body as RQAPI.MultipartFormBody,
-        removeDisabledKeys
+        removeInvalidPairs
       );
     }
   }
@@ -189,7 +189,7 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeDisabledKeys = tr
 /**
  * generic sanitization fx for keyValuePairs (form & multipartform)
  */
-export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[], removeDisabledKeys = true): T[] => {
+export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[], removeInvalidPairs = true): T[] => {
   if (!keyValuePairs) {
     return [];
   }
@@ -204,7 +204,7 @@ export const sanitizeKeyValuePairs = <T extends KeyValuePair>(keyValuePairs: T[]
       ...pair,
       isEnabled: pair.isEnabled ?? true,
     }))
-    .filter((pair) => pair.key?.length > 0 && (!removeDisabledKeys || pair.isEnabled));
+    .filter((pair) => !removeInvalidPairs || (pair.isEnabled && pair.key?.length > 0));
 };
 
 export const supportsRequestBody = (method: RequestMethod): boolean => {
@@ -427,7 +427,6 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
 
   const queryString = enabledParams
     .map(({ key, value }) => {
-      if (!key) return "";
       if (value === undefined || value === "") {
         return key;
       } else {
@@ -714,6 +713,14 @@ export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpAp
 export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.GraphQLApiRecord {
   return record.data.type === RQAPI.ApiEntryType.GRAPHQL;
 }
+
+export const isGraphQLApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.GraphQLApiEntry => {
+  return entry.type === RQAPI.ApiEntryType.GRAPHQL;
+};
+
+export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEntry => {
+  return entry.type === RQAPI.ApiEntryType.HTTP;
+};
 
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
   return "redirectUrl" in response;
