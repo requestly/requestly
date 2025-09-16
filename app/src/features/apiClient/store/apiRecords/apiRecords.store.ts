@@ -73,7 +73,6 @@ export type ApiRecordsState = {
   addNewRecord: (record: RQAPI.ApiClientRecord) => void;
   addNewRecords: (records: RQAPI.ApiClientRecord[]) => void;
   updateRecord: (record: RQAPI.ApiClientRecord) => void;
-  updateRecordId: (existingId: string, newId: string) => void;
   updateRecords: (records: RQAPI.ApiClientRecord[]) => void;
   deleteRecords: (recordIds: string[]) => void;
 
@@ -271,18 +270,6 @@ export const createApiRecordsStore = (initialRecords: {
       const { updateRecordState } = recordStore.getState();
       updateRecordState(patch);
       get().triggerUpdateForChildren(patch.id);
-    },
-
-    updateRecordId(existingId, newId) {
-      const recordStore = get().getRecordStore(existingId);
-
-      if (!recordStore) {
-        throw new NativeError("Record store does not exist!").addContext({ id: existingId });
-      }
-
-      const updatedRecords = get().apiClientRecords.map((r) => (r.id === existingId ? { ...r, id: newId } : r));
-      get().refresh(updatedRecords);
-
     },
 
     updateRecords(patches) {

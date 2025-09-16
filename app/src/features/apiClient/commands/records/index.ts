@@ -5,3 +5,4 @@ export { duplicateRecords } from "./duplicateRecords.command";
 export { moveRecords } from "./moveRecords.command";
 export { deleteRecords } from "./deleteRecords.command";
 export { moveRecordsAcrossWorkspace } from "./moveRecordsAcrossWorkspace.command";
+export { updateIdIfChanged } from "./updateIdIfChanged.command"
