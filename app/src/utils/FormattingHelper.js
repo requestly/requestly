@@ -2,6 +2,7 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
+import { isSetappBuild } from "./AppUtils";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -22,6 +23,7 @@ export const getPrettyString = (string) => {
 };
 
 export const getPrettyPlanName = (planName) => {
+  if (isSetappBuild()) return "Professional (Setapp)";
   if (!planName) return "Free";
   if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
   if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
