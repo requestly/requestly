@@ -23,7 +23,14 @@ async function _getRunConfigFromFirebase(
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) {
-      return { success: false, data: null, message: "Not found!" };
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "NOT_FOUND",
+          message: "Not found!",
+        },
+      };
     }
 
     const data = snapshot.data() as RQAPI.RunConfig;
@@ -33,6 +40,13 @@ async function _getRunConfigFromFirebase(
       extra: { collectionId, runConfigId },
     });
 
-    return { success: false, data: null, message: "Something went wrong!" };
+    return {
+      success: false,
+      data: null,
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      },
+    };
   }
 }

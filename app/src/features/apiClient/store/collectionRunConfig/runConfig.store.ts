@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
 
-type RunConfigState = {
+export type RunConfigState = {
   id: RQAPI.RunConfig["id"];
   runOrder: RQAPI.RunOrder;
   delay: RQAPI.RunConfig["delay"];
@@ -35,10 +35,10 @@ function isValidNumber(number: unknown) {
 export function createRunConfigStore(data: {
   id: RQAPI.RunConfig["id"];
   runOrder: RQAPI.RunOrder;
-  delay: RQAPI.RunConfig["delay"];
-  iterations: RQAPI.RunConfig["iterations"];
+  delay?: RQAPI.RunConfig["delay"];
+  iterations?: RQAPI.RunConfig["iterations"];
 }) {
-  const { id, runOrder, delay, iterations } = data;
+  const { id, runOrder, delay = 0, iterations = 1 } = data;
 
   return create<RunConfigState>()((set, get) => ({
     id,

@@ -1,8 +1,7 @@
 import { EnvironmentData, EnvironmentMap, EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { ErroredRecord, FileType } from "./local/services/types";
-
-export type ResultPromise<T> = Promise<{ success: true; data: T } | { success: false; data: null; message: string }>;
+import { ResponsePromise } from "backend/types";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
@@ -80,12 +79,12 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
   getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResultPromise<RQAPI.RunConfig>;
+  ): ResponsePromise<RQAPI.RunConfig>;
 
   upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfig: Partial<RQAPI.RunConfig>
-  ): ResultPromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>>;
+  ): ResponsePromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>>;
 }
 
 export interface ApiClientRepositoryInterface {
