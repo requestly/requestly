@@ -14,10 +14,13 @@ export async function saveRunConfig(
   const { collectionId, configId, configToSave } = params;
   const { apiClientRecordsRepository } = ctx.repositories;
 
-  const config = { id: configId, ...configToSave };
-  const result = await apiClientRecordsRepository.upsertRunConfig(collectionId, configId, config);
+  const result = await apiClientRecordsRepository.upsertRunConfig(collectionId, configId, configToSave);
 
   if (result.success === false && result.error.type === "INTERNAL_SERVER_ERROR") {
-    throw new NativeError("Something went wrong while saving run config!").addContext({ collectionId, config });
+    throw new NativeError("Something went wrong while saving run config!").addContext({
+      collectionId,
+      configId,
+      configToSave,
+    });
   }
 }
