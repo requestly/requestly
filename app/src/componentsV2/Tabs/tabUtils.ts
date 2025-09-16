@@ -1,4 +1,5 @@
 import { tabServiceStore } from "./store/tabServiceStore";
+import { AbstractTabSource } from "./helpers/tabSource";
 
 export const getTabServiceActions = () => {
   const resetTabs = (ignorePath?: boolean) => {
@@ -9,5 +10,9 @@ export const getTabServiceActions = () => {
     tabServiceStore.getState().closeTabByContext(contextId, skipUnsavedPrompt);
   }
 
-  return { resetTabs, closeTabsByContext };
+  function updateTabSource(sourceId: string, sourceName: string, fn: (source: AbstractTabSource) => AbstractTabSource) {
+    tabServiceStore.getState().updateTabSource(sourceId, sourceName, fn);
+  }
+
+  return { resetTabs, closeTabsByContext, updateTabSource };
 };

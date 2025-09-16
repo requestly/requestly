@@ -11,7 +11,6 @@ export interface GenericState {
   getIsActive: () => boolean;
 
   replace: (args: unknown) => void; // TODO: make type generic
-  replaceWithTabSource: (fn: (oldSource: AbstractTabSource) => AbstractTabSource) => void;
   close: () => void;
 }
 
@@ -23,7 +22,6 @@ const defaultGenericState: GenericState = {
   getIsNew: () => false,
   getIsActive: () => false,
   replace: () => {},
-  replaceWithTabSource: () => {},
   close: () => {},
 };
 

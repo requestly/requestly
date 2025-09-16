@@ -7,7 +7,6 @@ import CollectionAuthorizationView from "./components/CollectionAuthorizationVie
 import { useGenericState } from "hooks/useGenericState";
 import "./collectionView.scss";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { CollectionViewTabSource } from "./collectionViewTabSource";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 import { isEmpty } from "lodash";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
@@ -30,7 +29,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
-    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+    api: {  updateIdIfChanged },
   } = useCommand();
   const contextId = useContextId();
 
@@ -121,23 +120,16 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           return;
         }
 
+        await updateIdIfChanged({
+          existingId: record.id,
+          newId: result.data.id,
+          type: RQAPI.RecordType.COLLECTION,
+        })
         onSaveRecord(result.data);
-        const wasForceRefreshed = await forceRefreshApiClientRecords();
-        if (wasForceRefreshed) {
-          closeTab(
-            new CollectionViewTabSource({
-              id: record.id,
-              title: "",
-              context: {
-                id: contextId,
-              },
-            })
-          );
-        }
         setTitle(result.data.name);
       });
     },
-    [collection, contextId, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab, forceRefreshApiClientRecords]
+    [collection, contextId, setTitle, apiClientRecordsRepository, onSaveRecord, closeTab]
   );
 
   const collectionName = collection?.name || "New Collection";

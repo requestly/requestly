@@ -70,14 +70,11 @@ import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContext
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { useAPIEnvironment, useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useAPIEnvironment, useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { patchRuntimeStore } from "features/apiClient/store/runtimeVariables/utils";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
-import { RequestViewTabSource } from "../components/RequestView/requestViewTabSource";
-import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
-import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -136,7 +133,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const {
     env: { patchEnvironmentVariables },
-    api: { patchCollectionVariables },
+    api: { patchCollectionVariables, updateIdIfChanged },
   } = useCommand();
 
   const { environmentVariablesRepository, apiClientRecordsRepository } = useApiClientRepository();
@@ -161,8 +158,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
-  const { setPreview, setUnsaved, setTitle, getIsActive, setIcon, replaceWithTabSource } = useGenericState();
-  const apiRecordsStore = useAPIRecordsStore();
+  const { setPreview, setUnsaved, setTitle, getIsActive, setIcon } = useGenericState();
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   // Passing sanitized entry because response and empty key value pairs are saved in DB
@@ -573,21 +569,19 @@ const HttpClientView: React.FC<Props> = ({
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      setTitle(requestName);
       const savedRecord: RQAPI.HttpApiRecord = {
         ...(apiEntryDetails ?? {}),
         ...result.data,
         data: { ...result.data.data, ...record.data },
       };
       if(savedRecord.id !== record.id) {
-        replaceWithTabSource((source: RequestViewTabSource) => {
-          return new RequestViewTabSource({
-            ...source.metadata,
-            id: savedRecord.id,
-          });
+        await updateIdIfChanged({
+          existingId: record.id,
+          newId: savedRecord.id,
+          type: record.type,
         });
-        apiRecordsStore.getState().updateRecordId(record.id, savedRecord.id);
       }
+      setTitle(requestName);
       onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
       setRequestName("");

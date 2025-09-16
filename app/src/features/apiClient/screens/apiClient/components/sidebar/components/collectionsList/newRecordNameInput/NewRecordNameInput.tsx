@@ -21,7 +21,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
   const {
-    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+    api: {  updateIdIfChanged },
   } = useCommand();
   const [updateTabBySource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.updateTabBySource,
@@ -45,7 +45,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
       ...recordToBeEdited,
       name: recordName,
     };
-
     const result =
       record.type === RQAPI.RecordType.API
         ? await apiClientRecordsRepository.updateRecord(record, record.id)
@@ -53,13 +52,15 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
 
     if (result.success) {
       const tabSourceName = record.type === RQAPI.RecordType.API ? "request" : "collection";
+      if (result.data.id !== record.id) {
+        await updateIdIfChanged({
+          existingId: record.id,
+          newId: result.data.id,
+          type: record.type,
+        });
+      }
       onSaveRecord(result.data);
       updateTabBySource(result.data.id, tabSourceName, { title: result.data.name });
-
-      const wasForceRefreshed = await forceRefreshApiClientRecords();
-      if (wasForceRefreshed && recordType === RQAPI.RecordType.COLLECTION) {
-        closeTabBySource(record.id, "collection", true);
-      }
 
       if (recordType === RQAPI.RecordType.API) {
         trackRequestRenamed("api_client_sidebar");
@@ -82,7 +83,6 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
     onSaveRecord,
     onSuccess,
     apiClientRecordsRepository,
-    forceRefreshApiClientRecords,
     closeTabBySource,
     updateTabBySource,
   ]);

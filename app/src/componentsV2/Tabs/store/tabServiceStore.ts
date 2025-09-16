@@ -34,7 +34,7 @@ type TabServiceState = {
 type TabActions = {
   reset: (ignorePath?: boolean) => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
-  updateTabSource: (sourceId: SourceId, sourceName: SourceName, newSource: AbstractTabSource, config?: TabConfig) => void;
+  updateTabSource: (sourceId: SourceId, sourceName: SourceName, fn: (currentSource: AbstractTabSource) => AbstractTabSource, ) => void;
   updateTabBySource: (
     sourceId: SourceId,
     sourceName: SourceName,
@@ -122,12 +122,12 @@ const createTabServiceStore = () => {
           });
         },
 
-        updateTabSource(sourceId, sourceName, newSource, config) {
+        updateTabSource(sourceId, sourceName, fn) {
           const { tabs,tabsIndex, getTabIdBySource } = get();
           const tabId = getTabIdBySource(sourceId, sourceName);
 
           if(tabId === undefined || tabId === null) {
-            throw new NativeError(`Tab Id not found for ${sourceName} ${sourceId}`);
+            return;
           }
 
           const tabStore = tabs.get(tabId);
@@ -135,6 +135,7 @@ const createTabServiceStore = () => {
           if(!tabStore) {
             throw new NativeError(`Tab not found for ${sourceName} ${sourceId}`);
           }
+          const newSource = fn(tabStore.getState().source);
           tabStore.setState({source: newSource});
           if (tabsIndex.has(sourceName)) {
             tabsIndex.get(sourceName)?.set(newSource.getSourceId(), tabId);
