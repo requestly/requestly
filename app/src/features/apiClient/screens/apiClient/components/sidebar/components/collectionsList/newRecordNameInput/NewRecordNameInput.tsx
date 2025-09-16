@@ -52,13 +52,11 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
 
     if (result.success) {
       const tabSourceName = record.type === RQAPI.RecordType.API ? "request" : "collection";
-      if (result.data.id !== record.id) {
-        await updateIdIfChanged({
-          existingId: record.id,
-          newId: result.data.id,
-          type: record.type,
-        });
-      }
+      await updateIdIfChanged({
+        existingId: record.id,
+        newId: result.data.id,
+        type: record.type,
+      });
       onSaveRecord(result.data);
       updateTabBySource(result.data.id, tabSourceName, { title: result.data.name });
 

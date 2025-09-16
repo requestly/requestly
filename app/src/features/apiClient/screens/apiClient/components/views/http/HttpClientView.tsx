@@ -519,13 +519,11 @@ const HttpClientView: React.FC<Props> = ({
         ...result.data,
         data: { ...result.data.data, ...record.data },
       };
-      if(savedRecord.id !== record.id) {
-        await updateIdIfChanged({
-          existingId: record.id,
-          newId: savedRecord.id,
-          type: record.type,
-        });
-      }
+      await updateIdIfChanged({
+        existingId: record.id,
+        newId: savedRecord.id,
+        type: record.type,
+      });
       setTitle(requestName);
       onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
