@@ -19,7 +19,7 @@ export type RunConfigState = {
   setRunOrder(runOrder: RunConfigState["runOrder"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
-  getConfigToSave(): Partial<RunConfigState>;
+  getConfigToSave(): Pick<RunConfigState, "runOrder">;
 
   /**
    * This would be called when a new request is added by the user.

@@ -3,10 +3,10 @@ import { useCommand } from "features/apiClient/commands";
 import { RunConfigStoreContextProvider } from "features/apiClient/store/collectionRunConfig/RunConfigStoreContextProvider";
 import { toast } from "utils/Toast";
 import { RunnerViewLoader } from "./RunnerViewLoader/RunnerViewLoader";
-import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/getDefaultRunConfig.command";
 import { RunConfigView } from "./RunConfigView/RunConfigView";
 import { useCollectionView } from "../../../collectionView.context";
 import * as Sentry from "@sentry/react";
+import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 interface Props {}
 

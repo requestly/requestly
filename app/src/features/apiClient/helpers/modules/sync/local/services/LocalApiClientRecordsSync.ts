@@ -589,6 +589,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfigId: RQAPI.RunConfig["id"],
     runConfig: Partial<RQAPI.RunConfig>
   ): ResponsePromise<RQAPI.RunConfig> {
     return {

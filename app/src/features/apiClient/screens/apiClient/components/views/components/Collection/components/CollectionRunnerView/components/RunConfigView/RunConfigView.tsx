@@ -8,12 +8,37 @@ import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
+import { useCommand } from "features/apiClient/commands";
+import { useCollectionView } from "../../../../collectionView.context";
+import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
+import { toast } from "utils/Toast";
+import * as Sentry from "@sentry/react";
 import "./runConfigView.scss";
 
 export const RunConfigView: React.FC = () => {
   const [selectAll, setSelectAll] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveClick = useCallback(() => {}, []);
+  const { collectionId } = useCollectionView();
+  const [id, getConfigToSave] = useRunConfigStore((s) => [s.id, s.getConfigToSave]);
+  const {
+    runner: { saveRunConfig },
+  } = useCommand();
+
+  const handleSaveClick = useCallback(async () => {
+    setIsSaving(true);
+    const configToSave = getConfigToSave();
+
+    try {
+      await saveRunConfig({ collectionId, configId: id, configToSave });
+    } catch (error) {
+      toast.error("Something went wrong while saving!");
+      Sentry.captureException(error, { extra: { collectionId, configId: id, configToSave } });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [getConfigToSave, saveRunConfig, collectionId, id]);
+
   const handleRunClick = useCallback(() => {}, []);
 
   const onChange = (e: CheckboxChangeEvent) => {
@@ -42,7 +67,7 @@ export const RunConfigView: React.FC = () => {
         </div>
 
         <div className="actions">
-          <RQButton size="small" icon={<MdOutlineSave />} onClick={handleSaveClick}>
+          <RQButton size="small" loading={isSaving} icon={<MdOutlineSave />} onClick={handleSaveClick}>
             Save
           </RQButton>
           {/* TODO: For CLI support convert it into dropdown button */}

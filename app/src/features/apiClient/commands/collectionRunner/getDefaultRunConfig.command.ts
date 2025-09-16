@@ -4,6 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { getChildParentMap } from "../store.utils";
 import { RunConfigState } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import { NativeError } from "errors/NativeError";
+import { FetchedRunConfig } from "./types";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
@@ -13,8 +14,6 @@ function getDefaultRunOrderByCollectionId(
   const runOrder = getAllChildren(id, childParentMap);
   return runOrder;
 }
-
-export type FetchedRunConfig = Pick<RQAPI.RunConfig, "id" | "runOrder">;
 
 function getConfigFromSavedData(config: Partial<RQAPI.RunConfig>): FetchedRunConfig {
   return { id: config.id, runOrder: config.runOrder };
