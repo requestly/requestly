@@ -11,7 +11,7 @@ import { VariableData, VariableKey } from "features/apiClient/store/variables/ty
 import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
-type VariableSource = {
+export type VariableSource = {
   scope: VariableScope;
   scopeId: string;
   name: string;
@@ -167,7 +167,7 @@ function readScopesIntoVariableHolder(
   }
 }
 
-export function getScopedVariables(parents: string[], stores: AllApiClientStores) {
+export function getScopedVariables(parents: string[], stores: AllApiClientStores): ScopedVariables {
   const variableHolder = new VariableHolder();
   readScopesIntoVariableHolder(
     {

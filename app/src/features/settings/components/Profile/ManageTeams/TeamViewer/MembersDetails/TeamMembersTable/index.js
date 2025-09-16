@@ -327,7 +327,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback, teamDetails 
   }, [members, loggedInUserId, pendingMembers]);
 
   useEffect(() => {
-    if (user.details.isLoggedIn) {
+    if (user.details?.isLoggedIn) {
       stableFetchTeamSubscriptionStatus();
     }
   }, [user, stableFetchTeamSubscriptionStatus, teamId, isTeamPlanActive]);
