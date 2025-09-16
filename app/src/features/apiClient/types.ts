@@ -151,7 +151,7 @@ export namespace RQAPI {
     statusText: string;
     time: number;
     redirectedUrl: string;
-  };
+  } | null;
 
   export type HttpSpec = {
     request: HttpRequest;
@@ -173,7 +173,7 @@ export namespace RQAPI {
     status: number;
     statusText: string;
     time: number;
-  };
+  } | null;
 
   export type ApiEntryMetaData = {
     testResults?: TestResult[];
