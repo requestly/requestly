@@ -43,7 +43,7 @@ export const GithubStudentPack: React.FC = () => {
             <br />
             <span>Please use the same email for both accounts to proceed.</span>
           </>,
-          15
+          20
         );
         setIsLoading(false);
         return;
@@ -58,7 +58,7 @@ export const GithubStudentPack: React.FC = () => {
       if (data.success) {
         if (data.granted) {
           setShowNotGrantedMessage(false);
-          toast.success("Congratulations! You've been granted the Professional plan via the GitHub Student Pack.");
+          toast.success("Congratulations! You've been granted the Professional plan via the GitHub Student Pack.", 15);
           trackEvent("github_student_verification_success");
           redirectToHome(appMode, navigate);
         } else {
