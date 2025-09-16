@@ -152,7 +152,7 @@ const HttpClientView: React.FC<Props> = ({
   const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
   // Passing sanitized entry because response and empty key value pairs are saved in DB
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(
-    sanitizeEntry({ ...entryWithoutResponse, response: null })
+    sanitizeEntry({ ...entryWithoutResponse, response: null }, false)
   );
 
   const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
@@ -434,7 +434,6 @@ const HttpClientView: React.FC<Props> = ({
 
       notifyApiRequestFinished?.(executedEntry);
     } catch (e) {
-      clearTimeout(longRequestTimer);
       setIsFailed(true);
       setError({
         type: e.type,
@@ -443,6 +442,7 @@ const HttpClientView: React.FC<Props> = ({
         message: e.message,
       });
     } finally {
+      clearTimeout(longRequestTimer);
       setIsLoadingResponse(false);
       setIsLongRequest(false);
     }
