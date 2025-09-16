@@ -51,6 +51,7 @@ export function createRunConfigStore(data: {
     },
 
     setDelay(delay) {
+      // TODO: add upper limit
       const isValid = isValidNumber(delay) && delay >= 0;
 
       if (!isValid) {
@@ -61,6 +62,7 @@ export function createRunConfigStore(data: {
     },
 
     setIterations(iterations) {
+      // TODO: add upper limit
       const isValid = isValidNumber(iterations) && iterations > 0;
 
       if (!isValid) {

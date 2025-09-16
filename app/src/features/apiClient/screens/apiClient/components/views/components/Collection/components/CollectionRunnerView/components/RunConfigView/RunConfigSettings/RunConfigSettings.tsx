@@ -1,21 +1,33 @@
-import React, { useState } from "react";
+import React from "react";
 import { InputNumber } from "antd";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
+import { toast } from "utils/Toast";
 import "./runConfigSettings.scss";
 
 export const RunConfigSettings: React.FC = () => {
-  const [iterations, setIterations] = useState(1);
-  const [delay, setDelay] = useState(0);
+  const [iterations, setIterations, delay, setDelay] = useRunConfigStore((s) => [
+    s.iterations,
+    s.setIterations,
+    s.delay,
+    s.setDelay,
+  ]);
 
   const handleIterationsChange = (value: number) => {
-    // TODO: update in store
-    setIterations(value);
+    try {
+      setIterations(value);
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   const handleDelayChange = (value: number) => {
-    // TODO: update in store
-    setDelay(value);
+    try {
+      setDelay(value);
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   return (
@@ -51,7 +63,8 @@ export const RunConfigSettings: React.FC = () => {
         </div>
       </div>
 
-      <div className="advanced-settings">{/* TODO: for later */}</div>
+      {/* TODO: for later */}
+      {/* <div className="advanced-settings"></div> */}
     </div>
   );
 };
