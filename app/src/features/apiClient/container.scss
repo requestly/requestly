@@ -1,5 +1,26 @@
 .api-client-container {
+  &__split {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    .api-client-container__split-gutter .gutter {
+      z-index: 1;
+      position: absolute;
+      transition: 0.3s all;
+      background: transparent;
+      border: 2px solid transparent;
+      width: inherit !important;
+      height: inherit !important;
+      cursor: col-resize;
+
+      &:hover,
+      &:active {
+        border: 2px solid var(--requestly-color-primary);
+      }
+    }
+  }
+
   width: 100%;
   height: 100%;
-  display: flex;
 }

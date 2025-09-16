@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import APIClientSidebar from "./screens/apiClient/components/sidebar/APIClientSidebar";
 import { TabsContainer } from "componentsV2/Tabs/components/TabsContainer";
 import { TabServiceProvider } from "componentsV2/Tabs/store/TabServiceContextProvider";
@@ -18,6 +18,7 @@ import { ApiClientProvider } from "./contexts";
 import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.command";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createRepository } from "./commands/context/setupContext.command";
+import Split from "react-split";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -27,6 +28,20 @@ const ApiClientFeatureContainer: React.FC = () => {
     s.isLoaded,
     s.getViewMode,
   ]);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getSecondPaneMinSize = () => {
+    return screenWidth < 1440 ? 700 : 800;
+  };
 
   useEffect(() => {
     (async () => {
@@ -61,6 +76,7 @@ const ApiClientFeatureContainer: React.FC = () => {
 
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- not adding `activeWorkspace` to control reactivity
   }, [user.loggedIn, user.details?.profile?.uid, activeWorkspace?.id, viewMode]);
 
   if (!isLoaded) {
@@ -73,8 +89,29 @@ const ApiClientFeatureContainer: React.FC = () => {
       <div className="api-client-container">
         <Daemon />
         <ApiClientProvider>
-          <APIClientSidebar />
-          <TabsContainer />
+          <Split
+            className="api-client-container__split"
+            direction="horizontal"
+            sizes={[20, 80]}
+            minSize={[300, getSecondPaneMinSize()]}
+            gutter={(index, direction) => {
+              const gutterContainer = document.createElement("div");
+              gutterContainer.style.position = "relative";
+              gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
+              gutterContainer.innerHTML = `<div class="gutter" />`;
+              return gutterContainer;
+            }}
+            gutterStyle={() => {
+              return {
+                height: "100%",
+                width: "0px",
+              };
+            }}
+            gutterAlign="center"
+          >
+            <APIClientSidebar />
+            <TabsContainer />
+          </Split>
         </ApiClientProvider>
       </div>
     </TabServiceProvider>

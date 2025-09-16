@@ -29,13 +29,13 @@ type WorkspaceItemProps =
   | {
       type: WorkspaceType.PERSONAL;
       toggleDropdown: () => void;
-      onClick: () => void;
+      onClick: (callback?: () => any) => void;
     }
   | {
       type: WorkspaceType.SHARED | WorkspaceType.LOCAL;
       workspace: Workspace;
       toggleDropdown: () => void;
-      onClick: () => void;
+      onClick: (callback?: () => any) => void;
     };
 
 const ShareWorkspaceActions = ({
@@ -101,7 +101,7 @@ const LocalWorkspaceActions = ({
 }: {
   workspace: Workspace;
   toggleDropdown: () => void;
-  switchWorkspace: () => void;
+  switchWorkspace: (cb?: () => any) => void;
 }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
@@ -113,26 +113,43 @@ const LocalWorkspaceActions = ({
     s.getAllSelectedWorkspaces,
   ]);
 
-  const handleMultiworkspaceAdder = useCallback(
+  const handleMultiWorkspaceCheckbox = useCallback(
     async (isChecked: boolean) => {
+      const handleWorkspaceSelection = async () => {
+        const isFirstSelectedWorkspace = getAllSelectedWorkspaces().length === 0 && workspace.id !== activeWorkspace.id;
+        if (isFirstSelectedWorkspace) {
+          switchWorkspace(() => addWorkspaceToView(workspace, user.details?.profile?.uid));
+        } else {
+          await addWorkspaceToView(workspace, user.details?.profile?.uid);
+        }
+        trackMultiWorkspaceSelected("workspace_selector_dropdown");
+      };
+
+      const handleWorkspaceDeselection = () => {
+        const isLastSelectedWorkspace =
+          getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1;
+
+        if (isLastSelectedWorkspace) {
+          switchWorkspace();
+        } else {
+          removeWorkspaceFromView(workspace.id);
+        }
+
+        trackMultiWorkspaceDeselected("workspace_selector_dropdown");
+      };
+
       try {
         if (isChecked) {
-          await addWorkspaceToView(workspace, user.details?.profile?.uid);
-          trackMultiWorkspaceSelected("workspace_selector_dropdown");
+          await handleWorkspaceSelection();
         } else {
-          if (getViewMode() === ApiClientViewMode.MULTI && getAllSelectedWorkspaces().length === 1) {
-            switchWorkspace();
-          } else {
-            removeWorkspaceFromView(workspace.id);
-          }
-
-          trackMultiWorkspaceDeselected("workspace_selector_dropdown");
+          handleWorkspaceDeselection();
         }
       } catch (e) {
+        // fixme: error should be observed in some way
         toast.error(e.message);
       }
     },
-    [workspace, user.details?.profile?.uid, getViewMode, getAllSelectedWorkspaces, switchWorkspace]
+    [getAllSelectedWorkspaces, workspace, activeWorkspace.id, switchWorkspace, user.details?.profile?.uid, getViewMode]
   );
 
   const isSelected = useMemo(() => selectedWorkspaces.some((w) => w.getState().id === workspace.id), [
@@ -165,7 +182,7 @@ const LocalWorkspaceActions = ({
           checked={isSelected}
           className="local-workspace-actions__checkbox"
           onChange={(e) => {
-            handleMultiworkspaceAdder(e.target.checked);
+            handleMultiWorkspaceCheckbox(e.target.checked);
           }}
         />
       </div>
@@ -190,14 +207,17 @@ export const WorkspaceItem: React.FC<WorkspaceItemProps> = (props) => {
     }
   };
 
-  const handleWorkspaceClick = useCallback(() => {
-    onClick();
-    toggleDropdown();
-  }, [onClick, toggleDropdown]);
+  const handleWorkspaceClick = useCallback(
+    (callback?: () => any) => {
+      onClick(callback);
+      toggleDropdown();
+    },
+    [onClick, toggleDropdown]
+  );
 
   if (props.type === WorkspaceType.PERSONAL) {
     return (
-      <div className="workspace-overlay__list-item" onClick={handleWorkspaceClick}>
+      <div className="workspace-overlay__list-item" onClick={() => handleWorkspaceClick()}>
         <WorkspaceAvatar
           size={32}
           workspace={{

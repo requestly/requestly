@@ -61,7 +61,7 @@ export const useWorkspaceSwitcher = () => {
   const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode, s.getAllSelectedWorkspaces]);
 
   const handleWorkspaceSwitch = useCallback(
-    async (workspace: Workspace) => {
+    async (workspace: Workspace, callback?: () => any) => {
       const viewMode = getViewMode();
 
       if (viewMode === ApiClientViewMode.SINGLE) {
@@ -92,6 +92,8 @@ export const useWorkspaceSwitcher = () => {
           if (!isWorkspaceLoading) {
             showSwitchWorkspaceSuccessToast(workspace.name);
           }
+
+          callback?.();
 
           setIsWorkspaceLoading(false);
         })
