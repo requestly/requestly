@@ -38,7 +38,12 @@ export const GithubStudentPack: React.FC = () => {
 
       if (email !== user.details?.profile?.email) {
         toast.error(
-          "Your github email does not match with the email you used to sign up. Please use the same email for both."
+          <>
+            <span>The email associated with your GitHub account does not match your registered email.</span>
+            <br />
+            <span>Please use the same email for both accounts to proceed.</span>
+          </>,
+          15
         );
         setIsLoading(false);
         return;
