@@ -39,9 +39,9 @@ export const GithubStudentPack: React.FC = () => {
       if (email !== user.details?.profile?.email) {
         toast.error(
           <>
-            <span>The email associated with your GitHub account does not match your registered email.</span>
+            <span>Your GitHub email doesn't match your Requestly email.</span>
             <br />
-            <span>Please use the same email for both accounts to proceed.</span>
+            <span>Login to Requestly with the same GitHub email to get student access.</span>
           </>,
           20
         );
