@@ -459,7 +459,7 @@ export const redirectToWebAppHomePage = (navigate) => {
 };
 
 export function redirectToHome(appMode, navigate) {
-  if (appMode === "desktop") {
+  if (appMode === "DESKTOP") {
     redirectToDesktopHomepage(navigate);
   } else {
     redirectToWebAppHomePage(navigate);
