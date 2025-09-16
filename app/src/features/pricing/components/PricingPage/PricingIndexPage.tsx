@@ -17,7 +17,6 @@ import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
 import ProductSwitcher from "../ProductSwitcher";
 import { kebabCase } from "lodash";
-import { StudentProgram } from "./components/StudentProgram";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
@@ -98,7 +97,6 @@ export const PricingIndexPage = () => {
               <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} product={activeProduct} />
             </div>
             <EnterprisePlanCard product={activeProduct} />
-            <StudentProgram source={SOURCE.PRICING_PAGE} />
             <CompaniesSection />
             <StatsCard />
             <OtherWaysToMakePurchase />
