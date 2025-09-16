@@ -137,11 +137,13 @@ const createTabServiceStore = () => {
           }
           const newSource = fn(tabStore.getState().source);
           tabStore.setState({source: newSource});
-          if (tabsIndex.has(sourceName)) {
-            tabsIndex.get(sourceName)?.set(newSource.getSourceId(), tabId);
-          } else {
-            tabsIndex.set(sourceName, new Map().set(newSource.getSourceId(), tabId));
-          }
+
+          // We can claim that tabsIndex has entries since we have tabId which can only
+          // be indexed if an entry is present
+          tabsIndex.get(sourceName)!.delete(sourceId);
+          tabsIndex.get(sourceName)!.set(newSource.getSourceId(), tabId);
+          
+          
 
           tabs.set(tabId, tabStore);
           set({
