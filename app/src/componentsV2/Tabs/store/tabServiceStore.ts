@@ -123,7 +123,7 @@ const createTabServiceStore = () => {
         },
 
         updateTabSource(sourceId, sourceName, fn) {
-          const { tabs,tabsIndex, getTabIdBySource } = get();
+          const { tabs,tabsIndex, getTabIdBySource, previewTabId } = get();
           const tabId = getTabIdBySource(sourceId, sourceName);
 
           if(tabId === undefined || tabId === null) {
@@ -150,6 +150,12 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
             tabsIndex,
           });
+
+          if(previewTabId === tabId) {
+            set({
+              previewTabSource: newSource,
+            });
+          }
         },
 
         updateTabBySource(sourceId, sourceName, updates) {
