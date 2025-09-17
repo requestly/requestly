@@ -6,7 +6,7 @@ import { RunnerViewLoader } from "./RunnerViewLoader/RunnerViewLoader";
 import { RunConfigView } from "./RunConfigView/RunConfigView";
 import { useCollectionView } from "../../../collectionView.context";
 import * as Sentry from "@sentry/react";
-import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 interface Props {}
 
@@ -16,7 +16,7 @@ export const RunConfigViewManager: React.FC<Props> = () => {
     runner: { getDefaultRunConfig },
   } = useCommand();
 
-  const [config, setConfig] = useState<FetchedRunConfig | null>(null);
+  const [config, setConfig] = useState<SavedRunConfig | null>(null);
 
   useEffect(() => {
     (async () => {

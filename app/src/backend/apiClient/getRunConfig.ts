@@ -4,12 +4,12 @@ import { RQAPI } from "features/apiClient/types";
 import * as Sentry from "@sentry/react";
 import { ResponsePromise } from "../types";
 import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
-import { FetchedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 export async function getRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfigId: RQAPI.RunConfig["id"]
-): ResponsePromise<FetchedRunConfig> {
+): ResponsePromise<SavedRunConfig> {
   const result = await _getRunConfigFromFirebase(collectionId, runConfigId);
   return result;
 }
@@ -17,7 +17,7 @@ export async function getRunConfig(
 async function _getRunConfigFromFirebase(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfigId: RQAPI.RunConfig["id"]
-): ResponsePromise<FetchedRunConfig> {
+): ResponsePromise<SavedRunConfig> {
   try {
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfigId);

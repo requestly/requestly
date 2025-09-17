@@ -16,7 +16,7 @@ import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiReco
 import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../../local/services/types";
 import { ResponsePromise } from "backend/types";
-import { FetchedRunConfig, SaveRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -203,17 +203,16 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResponsePromise<FetchedRunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
     const result = await getRunConfigFromFirebase(collectionId, runConfigId);
     return result;
   }
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfigId: RQAPI.RunConfig["id"],
-    runConfig: SaveRunConfig
-  ): ResponsePromise<FetchedRunConfig> {
-    const result = await upsertRunConfigFromFirebase(collectionId, runConfigId, runConfig);
+    runConfig: SavedRunConfig
+  ): ResponsePromise<SavedRunConfig> {
+    const result = await upsertRunConfigFromFirebase(collectionId, runConfig);
     return result;
   }
 }

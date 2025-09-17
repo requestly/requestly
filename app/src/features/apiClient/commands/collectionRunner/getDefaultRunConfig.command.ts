@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { getChildParentMap } from "../store.utils";
 import { RunConfigState } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import { NativeError } from "errors/NativeError";
-import { FetchedRunConfig } from "./types";
+import { SavedRunConfig } from "./types";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
@@ -15,14 +15,14 @@ function getDefaultRunOrderByCollectionId(
   return runOrder;
 }
 
-function getConfigFromSavedData(config: Partial<RQAPI.RunConfig>): FetchedRunConfig {
+function getConfigFromSavedData(config: Partial<RQAPI.RunConfig>): SavedRunConfig {
   return { id: config.id, runOrder: config.runOrder };
 }
 
 export async function getDefaultRunConfig(
   ctx: ApiClientFeatureContext,
   params: { collectionId: RQAPI.ApiClientRecord["collectionId"] }
-): Promise<FetchedRunConfig> {
+): Promise<SavedRunConfig> {
   const DEFAULT_RUN_CONFIG_ID = "default"; // In future configId will be provided
 
   const { collectionId } = params;
@@ -38,7 +38,7 @@ export async function getDefaultRunConfig(
     throw new NativeError("Something went wrong while fetching run config!").addContext({ collectionId });
   }
 
-  const defaultConfig: FetchedRunConfig = {
+  const defaultConfig: SavedRunConfig = {
     id: DEFAULT_RUN_CONFIG_ID,
     runOrder: getDefaultRunOrderByCollectionId(ctx, collectionId),
   };

@@ -20,7 +20,7 @@ export const RunConfigView: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const { collectionId } = useCollectionView();
-  const [id, getConfigToSave] = useRunConfigStore((s) => [s.id, s.getConfigToSave]);
+  const [getConfigToSave] = useRunConfigStore((s) => [s.getConfigToSave]);
   const {
     runner: { saveRunConfig },
   } = useCommand();
@@ -30,14 +30,14 @@ export const RunConfigView: React.FC = () => {
     const configToSave = getConfigToSave();
 
     try {
-      await saveRunConfig({ collectionId, configId: id, configToSave });
+      await saveRunConfig({ collectionId, configToSave });
     } catch (error) {
       toast.error("Something went wrong while saving!");
-      Sentry.captureException(error, { extra: { collectionId, configId: id, configToSave } });
+      Sentry.captureException(error, { extra: { collectionId, configToSave } });
     } finally {
       setIsSaving(false);
     }
-  }, [getConfigToSave, saveRunConfig, collectionId, id]);
+  }, [getConfigToSave, saveRunConfig, collectionId]);
 
   const handleRunClick = useCallback(() => {}, []);
 
