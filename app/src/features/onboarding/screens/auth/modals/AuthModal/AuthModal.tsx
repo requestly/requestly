@@ -23,6 +23,7 @@ interface AuthModalProps {
   authMode?: string;
   eventSource: string;
   redirectURL?: string;
+  callback?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -31,6 +32,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   eventSource = "",
   authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
   redirectURL = window.location.href,
+  callback = () => {},
 }) => {
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
@@ -50,8 +52,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   useEffect(() => {
     if (user.loggedIn) {
       toggleModal(false);
+      callback?.();
     }
-  }, [user.loggedIn, toggleModal]);
+  }, [user.loggedIn, toggleModal, callback]);
 
   useEffect(() => {
     if (!isWebAppSignup && isOpen) {
