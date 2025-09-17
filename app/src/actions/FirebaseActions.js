@@ -542,18 +542,26 @@ export async function authorizeWithGithub(callback, source) {
   const provider = new GithubAuthProvider();
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
-    .then(async (result) => {
+    .then((result) => {
       let email = result?.user?.email || null;
       const credential = GithubAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
 
-      trackEvent("github_authorized");
+      trackEvent("github_authorized", {
+        source,
+        email,
+      });
 
       return { accessToken: token, email };
     })
     .catch((err) => {
       if (err.code === "auth/account-exists-with-different-credential") {
-        return { accessToken: err.customData._tokenResponse.oauthAccessToken, email: err.customData.email };
+        const email = err.customData.email;
+        trackEvent("github_authorized", {
+          source,
+          email,
+        });
+        return { accessToken: err.customData._tokenResponse.oauthAccessToken, email };
       }
 
       return {};
