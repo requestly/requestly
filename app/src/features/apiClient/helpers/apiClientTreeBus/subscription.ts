@@ -1,9 +1,5 @@
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-
-export enum ApiClientEventTopic {
-  AUTH_CHANGED = "authChanged",
-  CHILD_ADDED = "childAdded",
-}
+import { ApiClientEventTopic } from "./types";
 
 export class Subscription<K extends ApiClientEventTopic, T> {
   constructor(

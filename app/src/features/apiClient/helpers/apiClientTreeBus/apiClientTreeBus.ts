@@ -3,12 +3,8 @@ import { getApiClientRecordsStore } from "../../commands/store.utils";
 import { ApiClientFeatureContext } from "../../store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { RQAPI } from "../../types";
 import { ApiRecordsState } from "../../store/apiRecords/apiRecords.store";
-import { ApiClientEventTopic, Subscription } from "./subscription";
-
-interface ApiClientEvent {
-  topic: ApiClientEventTopic;
-  emitterId: RQAPI.ApiClientRecord["id"];
-}
+import { Subscription } from "./subscription";
+import { ApiClientEvent, ApiClientEventTopic } from "./types";
 
 abstract class ApiClientEventForChildren implements ApiClientEvent {
   readonly topic: ApiClientEventTopic;
