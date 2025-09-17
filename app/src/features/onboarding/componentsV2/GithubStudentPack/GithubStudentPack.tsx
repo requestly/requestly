@@ -78,7 +78,6 @@ export const GithubStudentPack: React.FC = () => {
   }, [appMode, navigate, user.details?.profile?.email]);
 
   const handleAppSignin = useCallback(() => {
-    setIsLoading(true);
     dispatch(
       globalActions.toggleActiveModal({
         modalName: "authModal",
@@ -88,7 +87,6 @@ export const GithubStudentPack: React.FC = () => {
           redirectURL: window.location.href,
           eventSource: "github_student_pack",
           callback: () => {
-            setIsLoading(false);
             handleGithubAuthorization();
           },
         },
@@ -98,8 +96,6 @@ export const GithubStudentPack: React.FC = () => {
   }, [handleGithubAuthorization, dispatch]);
 
   const handleGithubSignIn = useCallback(async () => {
-    setIsLoading(true);
-
     if (!user.loggedIn) {
       handleAppSignin();
       return;
