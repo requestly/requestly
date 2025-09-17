@@ -64,7 +64,7 @@
   border: 1px solid var(--border);
   border-radius: 0.25rem;
   box-shadow: rgba(50, 50, 93, 0.15) 0px 1px 3px, rgba(0, 0, 0, 0.02) 0px 1px 0px;
-  color: #8898aa;
+  color: var(--requestly-color-text-default);
   display: block;
   font-size: var(--requestly-font-size-md, 14px);
   font-weight: 400;

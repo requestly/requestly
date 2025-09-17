@@ -16,7 +16,7 @@
   }
 
   .recommended-plan-card {
-    border: 1px solid var(--success);
+    border: 1px solid var(--requestly-color-success);
   }
   .recommended-tag {
     position: relative;
@@ -24,11 +24,11 @@
     align-self: flex-start;
     padding: 4px;
     border-radius: var(--border-radius-sm);
-    background: var(--success);
+    background: var(--requestly-color-success);
     font-weight: 600;
     letter-spacing: 1.5px;
     font-size: var(--requestly-font-size-2xs);
-    color: var(--black);
+    color: var(--requestly-color-black);
   }
 
   & .ant-input-number-handler-wrap {
@@ -165,7 +165,7 @@
   line-height: 22px;
   font-weight: 500;
   font-style: normal;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .plan-price.ant-typography {
@@ -187,7 +187,7 @@
 
 .pro-basic-feature-title {
   font-size: 1rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-weight: 500;
   margin-top: 24px;
 

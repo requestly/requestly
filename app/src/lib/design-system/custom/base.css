@@ -3,21 +3,21 @@
   font-size: 1.25rem; /* 20px */
   line-height: 1.465rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .subheader {
   font-size: 1.125rem; /* 18px */
   line-height: 1.565rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .title {
   font-size: 1rem; /* 16px */
   line-height: 1.625rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .subtitle {
@@ -60,7 +60,7 @@
 }
 
 .text-white {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .text-gray {
@@ -80,7 +80,7 @@
 }
 
 .text-primary {
-  color: var(--primary);
+  color: var(--requestly-color-primary);
 }
 
 .text-center {
@@ -273,12 +273,12 @@
   max-width: 90%;
 }
 .external-link {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
   transition: 0.2s ease-in-out;
 }
 .external-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 

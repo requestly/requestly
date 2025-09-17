@@ -56,7 +56,7 @@
   font-weight: 700;
   line-height: 53px;
   text-align: center;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   margin-top: 38px;
   mix-blend-mode: screen;
 }
@@ -107,13 +107,13 @@
 .desktop-app-promo-modal .left-section .download-btn.ant-btn svg {
   width: 14px;
   height: 14px;
-  fill: var(--white);
+  fill: var(--requestly-color-white);
 }
 
 .desktop-app-promo-modal .left-section .view-all-platforms-link {
   z-index: 1;
   margin-bottom: 41px;
-  color: var(--primary);
+  color: var(--requestly-color-primary);
 }
 
 .desktop-app-promo-modal .left-section .view-all-platforms-link:hover {
