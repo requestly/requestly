@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { toast } from "utils/Toast";
+import { copyToClipBoard } from "utils/Misc";
 
 const CopyText = ({ text, size }) => {
   return (
@@ -7,8 +7,7 @@ const CopyText = ({ text, size }) => {
       type="text"
       size={size}
       onClick={() => {
-        navigator.clipboard.writeText(text);
-        toast.info("Copied to clipboard");
+        copyToClipBoard(text, "Copied to clipboard");
       }}
     >
       {text ? text : ""}
