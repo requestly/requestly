@@ -2,7 +2,7 @@
   margin-top: 12px;
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  background: var(--component-dark-background);
+  background: var(--requestly-color-surface-0);
 }
 
 .redirect-destination-container.ant-row .destination-options {
@@ -17,7 +17,7 @@
   padding: 20px;
   box-shadow: var(--input-box-shadow);
   border-top: 1px solid var(--border-dark);
-  background: var(--component-dark-background);
+  background: var(--requestly-color-surface-0);
   border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
 }
 
@@ -49,7 +49,7 @@
 
 .tooltip-link,
 .tooltip-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 

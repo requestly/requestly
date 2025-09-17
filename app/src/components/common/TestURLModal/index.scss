@@ -1,13 +1,13 @@
 .test-url-modal {
   .ant-modal-body {
-    background: var(--component-background);
+    background: var(--requestly-color-surface-1);
   }
   &-header {
     padding: 20px 30px;
     padding-bottom: 0;
 
     h4.ant-typography {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
   .ant-divider {
@@ -21,7 +21,7 @@
     .test-url-modal-section .ant-input {
       box-shadow: var(--input-box-shadow);
       border-radius: var(--border-radius-sm);
-      background-color: var(--component-dark-background);
+      background-color: var(--requestly-color-surface-0);
     }
   }
   &-section {
@@ -42,10 +42,10 @@
       margin-right: 8px;
     }
     span.danger {
-      color: var(--danger);
+      color: var(--requestly-color-error);
     }
     span.success {
-      color: var(--success);
+      color: var(--requestly-color-success);
     }
     .result-text {
       margin: 0 4px;

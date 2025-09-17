@@ -8,11 +8,11 @@
   margin-bottom: 2.5rem;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .workspace-member-table.ant-table-wrapper .ant-table {
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .workspace-member-table.ant-table-wrapper .ant-table-thead .ant-table-cell {
@@ -20,7 +20,7 @@
   font-size: var(--requestly-font-size-sm, 12px);
   line-height: 16px;
   color: var(--text-gray);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .workspace-member-table.ant-table-wrapper
@@ -36,7 +36,7 @@
 }
 
 .workspace-member-table.ant-table-wrapper .ant-table-tbody .ant-table-cell-row-hover {
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .workspace-member-table.ant-table-wrapper .ant-table-tbody .ant-table-row td {

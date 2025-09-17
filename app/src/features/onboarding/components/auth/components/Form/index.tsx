@@ -304,7 +304,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                   <Tooltip
                     placement="right"
                     title="Use your work email to use team workspaces, session replay and organization-level access controls."
-                    color="var(--black)"
+                    color="var(--requestly-color-black)"
                   >
                     <Col className="why-work-email">Why work email?</Col>
                   </Tooltip>
@@ -452,7 +452,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 <Tooltip
                   placement="right"
                   title="Use your work email to use team workspaces, session replay and organization-level access controls."
-                  color="var(--black)"
+                  color="var(--requestly-color-black)"
                 >
                   <Col className="why-work-email">Why work email?</Col>
                 </Tooltip>

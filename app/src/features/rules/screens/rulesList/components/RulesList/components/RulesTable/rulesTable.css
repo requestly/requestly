@@ -59,7 +59,7 @@
   padding: 4px;
   background: var(--requestly-color-surface-0);
   border: 1px solid var(--requestly-color-surface-1);
-  border-radius: var(--border-radius-sm);
+  border-radius: 4px;
   box-shadow: 0px 8px 12px 0px var(--requestly-color-black-t-20);
 }
 
@@ -88,7 +88,7 @@
 }
 
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }
 
 .rule-name-container {
