@@ -12,13 +12,13 @@
   color: var(--text-gray);
 }
 .new-file-modal .new-file-modal-card {
-  background: var(--component-background) !important;
+  background: var(--requestly-color-surface-1) !important;
   border-radius: var(--border-radius-md);
   padding: 1rem;
 }
 .new-file-modal .new-file-modal-card .ant-card-body,
 .new-file-modal .new-file-modal-card .ant-card-actions {
-  background: var(--component-background);
+  background: var(--requestly-color-surface-1);
   padding: 0;
 }
 .new-file-modal .new-file-modal-card .ant-card-actions > li {

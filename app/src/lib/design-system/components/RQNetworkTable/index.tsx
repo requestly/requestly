@@ -48,7 +48,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
           return (
             <div className="offset-cell">
               <span className="row-pointer">
-                {currentTimeLogId === log.id && <AiFillCaretRight color="var(--white)" />}
+                {currentTimeLogId === log.id && <AiFillCaretRight color="var(--requestly-color-white)" />}
               </span>
               <span>{secToMinutesAndSeconds(offset)}</span>
             </div>
