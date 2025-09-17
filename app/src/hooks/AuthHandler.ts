@@ -13,7 +13,7 @@ import moment from "moment";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
 import { getUserSubscription } from "backend/user/userSubscription";
-import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
+import { preparePlan } from "./DbListenerInit/userSubscriptionDocListener";
 import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
@@ -119,8 +119,7 @@ const AuthHandler: React.FC<{}> = () => {
 
         emailTypeRef.current = mailType;
 
-        // phase-1 migration: Adaptor to convert firestore schema into old schema
-        const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
+        const planDetails = preparePlan(firestorePlanDetails);
         const isUserPremium = isPremiumUser(planDetails);
 
         window.isSyncEnabled = isSyncEnabled;
@@ -262,10 +261,13 @@ const AuthHandler: React.FC<{}> = () => {
         localStorage.removeItem("__rq_uid");
         clientStorageService.removeStorageObject(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
         // set amplitude anon id to local storage:
-
+        const planDetails = preparePlan();
         dispatch(
           // @ts-ignore
-          globalActions.updateUserInfo({ loggedIn: false, details: null })
+          globalActions.updateUserInfo({
+            loggedIn: false,
+            details: { planDetails, isPremium: isPremiumUser(planDetails) },
+          })
         );
         dispatch(
           globalActions.updateInitializations({
