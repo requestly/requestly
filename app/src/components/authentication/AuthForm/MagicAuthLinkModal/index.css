@@ -4,7 +4,7 @@
 }
 
 .mail-sent-title {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   margin-top: 8px;
   margin-bottom: 4px !important;
 }
@@ -14,7 +14,7 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--border-dark);
 }
@@ -34,7 +34,7 @@
 }
 
 .modal-back-btn-wrapper {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -62,5 +62,5 @@
 }
 
 .ant-typography.text-white {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }

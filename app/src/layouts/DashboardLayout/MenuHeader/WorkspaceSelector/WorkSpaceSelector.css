@@ -46,7 +46,7 @@
 }
 
 .workspace-selector-dropdown:hover {
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .active-workspace-name {
@@ -62,7 +62,7 @@
   width: 10px;
   height: 10px;
   top: 5px;
-  background: var(--primary);
+  background: var(--requestly-color-primary);
   animation: blink 2.5s infinite;
 }
 @keyframes blink {
@@ -108,7 +108,7 @@
 
 .workspaces-menu.ant-dropdown-menu {
   width: 290px;
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .workspaces-menu.ant-dropdown-menu .ant-dropdown-menu-item-group-list {
@@ -204,7 +204,7 @@
 .join-workspace-dropdown:hover {
   cursor: pointer;
   border-radius: var(--border-radius-sm);
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
 }
 
 .join-workspace-menu.ant-dropdown-menu {

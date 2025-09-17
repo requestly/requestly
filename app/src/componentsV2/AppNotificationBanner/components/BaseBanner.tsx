@@ -37,10 +37,13 @@ export const BaseBanner: React.FC<Props> = ({
     <>
       <div
         className={`app-banner ${getBannerClassName(banner.type)}`}
-        style={{ backgroundColor: banner.backgroundColor || "var(--blue-blue-600)" }}
+        style={{ backgroundColor: banner.backgroundColor || "var(--requestly-color-primary-600)" }}
       >
         {banner.short_text && (
-          <span className="app-banner-badge" style={{ backgroundColor: banner.badgeColor || "var(--blue-blue-600)" }}>
+          <span
+            className="app-banner-badge"
+            style={{ backgroundColor: banner.badgeColor || "var(--requestly-color-primary-600)" }}
+          >
             {banner.short_text}
           </span>
         )}

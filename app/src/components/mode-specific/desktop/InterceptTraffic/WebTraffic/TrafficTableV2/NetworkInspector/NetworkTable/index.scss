@@ -4,7 +4,7 @@
     tbody {
       tr[aria-selected="true"] {
         .graphql-operation-name {
-          color: var(--text-default);
+          color: var(--requestly-color-text-default);
         }
       }
     }
@@ -30,7 +30,7 @@
       font-weight: 400;
 
       &.selected {
-        color: var(--text-default);
+        color: var(--requestly-color-text-default);
       }
     }
   }

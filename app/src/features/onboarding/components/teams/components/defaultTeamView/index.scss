@@ -19,13 +19,13 @@
   margin-top: 1rem;
 
   & span {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     font-weight: 500;
   }
 }
 
 .getting-started-manage-workspace-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-flex;
   gap: 8px;
   font-size: var(--requestly-font-size-sm, 13px);
@@ -38,7 +38,7 @@
   &:hover,
   &:focus {
     background: none;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 }
 

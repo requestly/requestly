@@ -2,7 +2,7 @@
   margin-bottom: 12px;
   font-size: var(--requestly-font-size-md);
   font-weight: var(--requestly-font-weight-medium);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .changelog-log:not(:first-child) {
@@ -24,11 +24,11 @@
 }
 
 .changelog-card-log-title {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm);
 
   &:hover {
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     text-decoration: underline;
   }
 }
@@ -50,11 +50,11 @@
 }
 
 .changelog-feature {
-  color: var(--success);
+  color: var(--requestly-color-success);
 }
 
 .changelog-fix {
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }
 
 .changelog-card-view-all-btn {

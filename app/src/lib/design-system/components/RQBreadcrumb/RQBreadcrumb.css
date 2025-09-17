@@ -12,7 +12,7 @@
 
 .rq-breadcrumb-item:hover,
 .rq-breadcrumb-item:focus {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .rq-breadcrumb-item + .ant-breadcrumb-separator {

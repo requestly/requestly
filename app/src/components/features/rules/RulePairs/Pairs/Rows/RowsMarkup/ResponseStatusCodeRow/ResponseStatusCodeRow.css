@@ -4,12 +4,12 @@
 
 .response-status-code-select.ant-select.ant-select-auto-complete {
   width: 100%;
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .response-status-code-select.ant-select.ant-select-auto-complete .ant-select-selector {
   font-size: var(--requestly-font-size-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .response-status-code-select-icon {
@@ -18,13 +18,13 @@
   bottom: 9px;
   padding: 0 5px;
   color: var(--text-dark-gray);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 label.response-status-code-label {
   font-weight: 500;
   margin-bottom: 12px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-block;
   font-size: var(--requestly-font-size-sm);
 }
