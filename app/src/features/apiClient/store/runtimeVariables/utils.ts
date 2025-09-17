@@ -8,26 +8,8 @@ export const getParsedRuntimeVariables = (): RuntimeVariables => {
   return Object.fromEntries(runtimeVariablesStore.getState().getAll());
 };
 
-export const patchRuntimeStore = (patch: RuntimeVariables) => {
-  const currentVariables = runtimeVariablesStore.getState().getAll();
-  const finalVariables = new Map();
-
-  let counter = currentVariables.size;
-  for (const key in patch) {
-    if (finalVariables.has(key)) {
-      const currentValue = currentVariables.get(key);
-      finalVariables.set(key, {
-        ...patch[key],
-        id: currentValue.id,
-      });
-    } else {
-      finalVariables.set(key, {
-        ...patch[key],
-        id: counter,
-      });
-      counter++;
-    }
-  }
+export const setRuntimeStore = (patch: RuntimeVariables) => {
+  const finalVariables = new Map(Object.entries(patch).map(([key, value], index) => [key, { ...value, id: index }]));
 
   runtimeVariablesStore.getState().reset(finalVariables);
 };
