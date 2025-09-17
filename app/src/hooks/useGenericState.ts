@@ -1,4 +1,3 @@
-import { AbstractTabSource } from "componentsV2/Tabs/helpers/tabSource";
 import { createContext, useContext } from "react";
 import { ReactNode } from "react";
 
