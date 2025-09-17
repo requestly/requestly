@@ -67,22 +67,25 @@ export class ApiClientTreeBus {
     return this.instance;
   }
 
-  subscribe<T extends ApiClientEventTopic>(params: { id: string; topic: T; subscription: Subscription<T, any> }) {
+  subscribe<T extends ApiClientEventTopic>(params: { nodeId: string; topic: T; subscription: Subscription<T, any> }) {
     const topicMap = this.subscriptionMap.get(params.topic);
-    if (topicMap) {
-      let subscriptions = topicMap.get(params.id);
-      if (!subscriptions) {
-        subscriptions = new Set();
-        topicMap.set(params.id, subscriptions);
-      }
-      subscriptions.add(params.subscription);
+
+    if (!topicMap) {
+      return;
     }
+
+    let subscriptions = topicMap.get(params.nodeId);
+    if (!subscriptions) {
+      subscriptions = new Set();
+      topicMap.set(params.nodeId, subscriptions);
+    }
+    subscriptions.add(params.subscription);
   }
 
-  unsubscribe(params: { id: string; topic: ApiClientEventTopic; subscription: Subscription<any, any> }) {
+  unsubscribe(params: { nodeId: string; topic: ApiClientEventTopic; subscription: Subscription<any, any> }) {
     const topicMap = this.subscriptionMap.get(params.topic);
     if (topicMap) {
-      const subscriptions = topicMap.get(params.id);
+      const subscriptions = topicMap.get(params.nodeId);
       if (subscriptions) {
         subscriptions.delete(params.subscription);
       }
@@ -97,13 +100,13 @@ export class ApiClientTreeBus {
     }
   }
 
-  private emitToChildren(recordId: string, event: ApiClientEventForChildren) {
-    const allChildren = this.store.getState().getAllChildren(recordId);
+  private emitToChildren(nodeId: string, event: ApiClientEventForChildren) {
+    const allChildren = this.store.getState().getAllChildren(nodeId);
     return this.sendToSubscribers(event, allChildren);
   }
 
-  private emitToParentChain(recordId: string, event: ApiClientEventForParents) {
-    const parentChain = this.store.getState().getParentChain(recordId);
+  private emitToParentChain(nodeId: string, event: ApiClientEventForParents) {
+    const parentChain = this.store.getState().getParentChain(nodeId);
     return this.sendToSubscribers(event, parentChain);
   }
 
@@ -114,13 +117,16 @@ export class ApiClientTreeBus {
       return;
     }
 
-    recipientIds.forEach((id) => {
-      const subscriptions = topicMap.get(id);
-      if (subscriptions) {
-        subscriptions.forEach((subscription) => {
-          subscription.next(event, this.ctx);
-        });
+    for (const recipientId of recipientIds) {
+      const subscriptions = topicMap.get(recipientId);
+
+      if (!subscriptions) {
+        continue;
       }
-    });
+
+      subscriptions.forEach((subscription) => {
+        subscription.next(event, this.ctx);
+      });
+    }
   }
 }
