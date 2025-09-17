@@ -44,14 +44,15 @@ export const setupContextWithRepoWithoutMarkingLoaded = async (
     erroredRecords: errorStore,
   };
 
-  const context: ApiClientFeatureContext = {} as ApiClientFeatureContext;
+  const context: ApiClientFeatureContext = {
+    id: workspaceId,
+    workspaceId,
+    stores,
+    repositories: repoForWorkspace,
+    treeBus: {} as ApiClientTreeBus,
+  } as ApiClientFeatureContext;
 
   const treeBus = new ApiClientTreeBus(context);
-
-  context.id = workspaceId;
-  context.workspaceId = workspaceId;
-  context.stores = stores;
-  context.repositories = repoForWorkspace;
   context.treeBus = treeBus;
 
   const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
