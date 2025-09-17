@@ -12,7 +12,6 @@ import { trackEvent } from "modules/analytics";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
-import { Button } from "antd";
 
 export const GithubStudentPack: React.FC = () => {
   const navigate = useNavigate();
@@ -24,14 +23,13 @@ export const GithubStudentPack: React.FC = () => {
   const [showNotGrantedMessage, setShowNotGrantedMessage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGithubSignIn = useCallback(async () => {
+  const handleGithubAuthorization = useCallback(async () => {
     setIsLoading(true);
-
     try {
       const { accessToken, email } = await authorizeWithGithub(() => {}, "github_student_pack");
 
       if (!accessToken || !email) {
-        toast.error("Failed to authenticate with GitHub. Please try again.");
+        toast.error("Failed to connect with Github. Please try again.");
         setIsLoading(false);
         return;
       }
@@ -39,9 +37,9 @@ export const GithubStudentPack: React.FC = () => {
       if (email !== user.details?.profile?.email) {
         toast.error(
           <>
-            <span>Your GitHub email doesn't match your Requestly email.</span>
+            <span>Your Github email doesn't match your Requestly email.</span>
             <br />
-            <span>Login to Requestly with the same GitHub email to get student access.</span>
+            <span>Login to Requestly with the same Github email to get student access.</span>
           </>,
           20
         );
@@ -53,6 +51,7 @@ export const GithubStudentPack: React.FC = () => {
         { code: string },
         { success: boolean; granted: boolean; error: string }
       >(getFunctions(), "subscription-activateGithubStudentAccess");
+
       const result = await activateGithubStudentAccess({ code: accessToken });
       const data = result.data;
       if (data.success) {
@@ -77,6 +76,37 @@ export const GithubStudentPack: React.FC = () => {
       setIsLoading(false);
     }
   }, [appMode, navigate, user.details?.profile?.email]);
+
+  const handleAppSignin = useCallback(() => {
+    setIsLoading(true);
+    dispatch(
+      globalActions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: true,
+        newProps: {
+          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+          redirectURL: window.location.href,
+          eventSource: "github_student_pack",
+          callback: () => {
+            setIsLoading(false);
+            handleGithubAuthorization();
+          },
+        },
+      })
+    );
+    return;
+  }, [handleGithubAuthorization, dispatch]);
+
+  const handleGithubSignIn = useCallback(async () => {
+    setIsLoading(true);
+
+    if (!user.loggedIn) {
+      handleAppSignin();
+      return;
+    }
+
+    handleGithubAuthorization();
+  }, [handleGithubAuthorization, handleAppSignin, user.loggedIn]);
 
   if (showNotGrantedMessage) {
     return (
@@ -104,6 +134,7 @@ export const GithubStudentPack: React.FC = () => {
               }}
               loading={isLoading}
               shape="round"
+              size="large"
             >
               Continue with free plan
             </RQButton>
@@ -121,36 +152,7 @@ export const GithubStudentPack: React.FC = () => {
         </div>
         <div className="gh-student-pack-title">Get Professional plan free with Github Student Pack</div>
         <div className="gh-student-pack-subtitle">
-          Verify your student status by signing in with your GitHub account and enjoy full access to all features.
-          {!user.loggedIn && (
-            <span>
-              {" "}
-              Please{" "}
-              <Button
-                size="small"
-                style={{
-                  padding: 0,
-                }}
-                type="link"
-                onClick={() => {
-                  dispatch(
-                    globalActions.toggleActiveModal({
-                      modalName: "authModal",
-                      newValue: true,
-                      newProps: {
-                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                        redirectURL: window.location.href,
-                        eventSource: "github_student_pack",
-                      },
-                    })
-                  );
-                }}
-              >
-                login
-              </Button>{" "}
-              to continue.
-            </span>
-          )}
+          Verify your student status by signing in with your Github account and enjoy full access to all features.
         </div>
         <div className="gh-student-pack-btn">
           <RQButton
@@ -159,7 +161,7 @@ export const GithubStudentPack: React.FC = () => {
             onClick={handleGithubSignIn}
             loading={isLoading}
             shape="round"
-            disabled={!user.loggedIn}
+            size="large"
           >
             <img src={"/assets/media/common/github-white-logo.svg"} alt="github" height={20} width={20} />
             Connect with Github
