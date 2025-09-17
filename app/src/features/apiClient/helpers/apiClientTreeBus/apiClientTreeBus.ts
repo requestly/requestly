@@ -45,26 +45,13 @@ export class ApiClientTreeBus {
     Map<RQAPI.ApiClientRecord["id"], Set<Subscription<any, any>>>
   > = new Map();
   private store: StoreApi<ApiRecordsState>;
-  private ctx: ApiClientFeatureContext;
   public static instance: ApiClientTreeBus;
 
-  private constructor() {
+  constructor(private ctx: ApiClientFeatureContext) {
+    this.store = getApiClientRecordsStore(ctx);
     for (const event of Object.values(ApiClientEventTopic)) {
       this.subscriptionMap.set(event, new Map());
     }
-  }
-
-  private updateContext(ctx: ApiClientFeatureContext) {
-    this.ctx = ctx;
-    this.store = getApiClientRecordsStore(ctx);
-  }
-
-  static getInstance(ctx: ApiClientFeatureContext): ApiClientTreeBus {
-    if (!this.instance) {
-      this.instance = new ApiClientTreeBus();
-    }
-    this.instance.updateContext(ctx);
-    return this.instance;
   }
 
   subscribe<T extends ApiClientEventTopic>(params: { nodeId: string; topic: T; subscription: Subscription<T, any> }) {
