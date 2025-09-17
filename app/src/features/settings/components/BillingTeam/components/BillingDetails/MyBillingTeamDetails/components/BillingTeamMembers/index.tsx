@@ -6,7 +6,7 @@ import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
-import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamMemberStatus, BillingTeamRoles, PlanType } from "features/settings/components/BillingTeam/types";
 import { BillingAction } from "./types";
 import { removeMemberFromBillingTeam, revokeBillingTeamInvite, updateBillingTeamMemberRole } from "backend/billing";
 import { ActionLoadingModal } from "componentsV2/modals/ActionLoadingModal";
@@ -360,7 +360,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                 className="billing-team-members-section-header-btn"
                 onClick={() => {
                   trackBillingTeamManageLicenseClicked();
-                  redirectToUrl(`${process.env.BROWSERSTACK_BASE_URL}/accounts/manage-users/users`, true);
+                  redirectToUrl(`${process.env.VITE_BROWSERSTACK_BASE_URL}/accounts/manage-users/users`, true);
                 }}
                 disabled={!isUserAdmin}
               >
@@ -372,7 +372,11 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                 icon={<IoMdAdd />}
                 className="billing-team-members-section-header-btn"
                 onClick={openDrawer}
-                disabled={!isUserAdmin || billingTeamDetails?.migratedToBrowserstack}
+                disabled={
+                  !isUserAdmin ||
+                  billingTeamDetails?.migratedToBrowserstack ||
+                  billingTeamDetails?.subscriptionDetails?.rqSubscriptionType === PlanType.GITHUB_STUDENT_PACK
+                }
               >
                 Assign license
               </RQButton>

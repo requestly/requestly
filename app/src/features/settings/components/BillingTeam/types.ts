@@ -10,6 +10,7 @@ export enum PlanType {
   STUDENT = "student",
   APPSUMO = "appsumo",
   SIGNUP_TRIAL = "signup_trial",
+  GITHUB_STUDENT_PACK = "github-student-pack",
 }
 
 export interface BillingTeamDetails {

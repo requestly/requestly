@@ -35,7 +35,8 @@ export const UserPlanDetails = () => {
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
   const { type } = user.details?.planDetails ?? {};
   const hasProfessionalStudentPlan =
-    type === PlanType.STUDENT || user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT;
+    [PlanType.STUDENT, PlanType.GITHUB_STUDENT_PACK].includes(type as PlanType) ||
+    user?.details?.planDetails?.planId === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT;
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
@@ -227,7 +228,7 @@ export const UserPlanDetails = () => {
                             {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
                           </div>
                           <div className="user-plan-date">
-                            {hasAppSumoSubscription || hasProfessionalStudentPlan
+                            {hasAppSumoSubscription
                               ? "Lifetime access"
                               : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
                           </div>

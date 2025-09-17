@@ -18,5 +18,5 @@ export const createBStackCheckoutUrl = (
     product_type: "requestly",
   });
 
-  return `${process.env.BROWSERSTACK_BASE_URL}/user/pricing-to-checkout?${searchParams.toString()}`;
+  return `${process.env.VITE_BROWSERSTACK_BASE_URL}/user/pricing-to-checkout?${searchParams.toString()}`;
 };
