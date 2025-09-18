@@ -375,7 +375,6 @@ const HttpClientView: React.FC<Props> = ({
     });
 
     try {
-      // const apiClientExecutionResult = await apiClientExecutorRef.current?.execute();
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         apiEntryDetails?.id,
         sanitizeEntry(requestToSend)
@@ -665,7 +664,6 @@ const HttpClientView: React.FC<Props> = ({
         setError(result.error);
       }
     } catch (error) {
-      console.log("!!!debug", "error", error);
       toast.error("Something went wrong while refreshing test results");
     }
   }, [httpRequestExecutor, apiEntryDetails?.id, entry]);

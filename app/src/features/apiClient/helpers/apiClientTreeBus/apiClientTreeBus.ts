@@ -41,7 +41,6 @@ export class ApiClientTreeBus {
     Map<RQAPI.ApiClientRecord["id"], Set<Subscription<any, any>>>
   > = new Map();
   private store: StoreApi<ApiRecordsState>;
-  public static instance: ApiClientTreeBus;
 
   constructor(private ctx: ApiClientFeatureContext) {
     this.store = getApiClientRecordsStore(ctx);
