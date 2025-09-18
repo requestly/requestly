@@ -15,6 +15,7 @@ export type RunConfigState = {
   setOrderedRequests(requests: RunConfigState["orderedRequests"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
+  getConfig(): RQAPI.RunConfig;
   getConfigToSave(): SavedRunConfig;
 
   /**
@@ -66,6 +67,11 @@ export function createRunConfigStore(data: {
       }
 
       set({ iterations });
+    },
+
+    getConfig() {
+      const { id, orderedRequests, iterations, delay } = get();
+      return { id, orderedRequests, iterations, delay };
     },
 
     getConfigToSave() {
