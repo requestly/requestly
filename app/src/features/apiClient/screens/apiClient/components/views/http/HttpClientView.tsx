@@ -375,7 +375,6 @@ const HttpClientView: React.FC<Props> = ({
     });
 
     try {
-      // const apiClientExecutionResult = await apiClientExecutorRef.current?.execute();
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         apiEntryDetails?.id,
         sanitizeEntry(requestToSend)
