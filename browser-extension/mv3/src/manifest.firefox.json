@@ -32,7 +32,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["libs/cacheJson.js", "resources/images/128x128.png"],
+      "resources": ["resources/images/128x128.png"],
       "matches": ["<all_urls>"]
     }
   ],
