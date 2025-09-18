@@ -16,18 +16,12 @@ const LocalUserAttributesHelperComponent = () => {
 
   // deviceId generation. Only once
   useEffect(() => {
-    if (!userAttributes?.device_id) {
-      const deviceId = uuidv4();
+    if (!isDeviceIdInitialized) {
+      const deviceId = userAttributes?.device_id || uuidv4();
       trackAttr("device_id", deviceId);
       // Failsafe in case local module is not initialized yet
       stableDispatch(globalActions.updateUserAttributes({ device_id: deviceId }));
-    } else {
-      if (!isDeviceIdInitialized) {
-        trackAttr("device_id", userAttributes?.device_id);
-        // Failsafe in case local module is not initialized yet
-        stableDispatch(globalActions.updateUserAttributes({ device_id: userAttributes?.device_id }));
-        setIsDeviceIdInitialized(true);
-      }
+      setIsDeviceIdInitialized(true);
     }
   }, [userAttributes?.device_id, stableDispatch, isDeviceIdInitialized]);
 
