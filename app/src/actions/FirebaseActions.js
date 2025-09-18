@@ -555,7 +555,7 @@ export async function authorizeWithGithub(callback, source) {
       trackLoginSuccessEvent({
         auth_provider: AUTH_PROVIDERS.GITHUB,
         email,
-        domain: email.split("@")[1],
+        domain: email?.split("@")?.[1],
         source,
       });
 
@@ -571,10 +571,10 @@ export async function authorizeWithGithub(callback, source) {
         trackLoginSuccessEvent({
           auth_provider: AUTH_PROVIDERS.GITHUB,
           email,
-          domain: email.split("@")[1],
+          domain: email?.split("@")?.[1],
           source,
         });
-        return { accessToken: err.customData._tokenResponse.oauthAccessToken, email };
+        return { accessToken: err.customData?._tokenResponse?.oauthAccessToken, email };
       }
 
       return {};
