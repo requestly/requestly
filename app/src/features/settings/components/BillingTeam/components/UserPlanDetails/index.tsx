@@ -285,8 +285,9 @@ export const UserPlanDetails = () => {
               </div>
             ) : (
               <>
-                {user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
-                user?.details?.planDetails?.status === "trialing" ? (
+                {!isSetapp &&
+                (user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
+                  user?.details?.planDetails?.status === "trialing") ? (
                   <Col className="user-plan-upgrade-card">
                     <MdDiversity1 />
                     <div className="title">
