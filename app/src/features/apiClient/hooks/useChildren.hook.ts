@@ -10,7 +10,7 @@ export const useChildren = (id: string) => {
   const [children, setChildren] = useState(ctx.stores.records.getState().getAllChildren(id));
 
   useEffect(() => {
-    const subscription = new Subscription<ApiClientEventTopic.CHILD_ADDED, string[]>(setChildren, () =>
+    const subscription = new Subscription<ApiClientEventTopic.CHILD_ADDED, string[]>(setChildren, (ChildAdded, ctx) =>
       ctx.stores.records.getState().getAllChildren(id)
     );
     treeBus.subscribe({ nodeId: id, topic: ApiClientEventTopic.CHILD_ADDED, subscription });

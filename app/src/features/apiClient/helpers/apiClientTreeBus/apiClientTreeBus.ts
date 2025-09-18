@@ -23,7 +23,7 @@ export class AuthChanged extends ApiClientEventForChildren {
 }
 export class ChildAdded extends ApiClientEventForParents {
   readonly topic = ApiClientEventTopic.CHILD_ADDED;
-  constructor(public emitterId: RQAPI.ApiClientRecord["id"], public one: any, public two: any) {
+  constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {
     super(emitterId);
   }
 }
