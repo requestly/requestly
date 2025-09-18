@@ -165,7 +165,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
   },
 
   userAttributes: {
-    deviceId: null,
+    device_id: null,
   },
 
   appOnboarding: {
