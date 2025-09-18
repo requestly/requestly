@@ -313,9 +313,9 @@ export namespace RQAPI {
     MISSING_FILE = "missing_file",
   }
 
-  export type OrderedRequests = ApiClientRecord[];
+  export type OrderedRequests = ApiRecord[];
 
-  export type RunOrder = ApiClientRecord["id"][];
+  export type RunOrder = ApiRecord["id"][];
 
   export type RunConfig = {
     id: string;

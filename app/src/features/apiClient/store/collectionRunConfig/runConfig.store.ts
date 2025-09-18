@@ -21,7 +21,7 @@ export type RunConfigState = {
    * This would be called when a new request is added by the user.
    * They could add to the collection we are dealing with, or to a child collection.
    */
-  patchOrderedRequests(requests: RQAPI.ApiClientRecord[]): void;
+  patchOrderedRequests(requests: RQAPI.ApiRecord[]): void;
 };
 
 function isValidNumber(number: unknown) {
