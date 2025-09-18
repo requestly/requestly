@@ -1,6 +1,9 @@
 import React from "react";
 import { RunConfigViewManager } from "./components/RunConfigViewManager";
 import { RQAPI } from "features/apiClient/types";
+import { CollectionViewContextProvider } from "../../collectionView.context";
+import Split from "react-split";
+import "./collectionRunnerView.scss";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -8,10 +11,34 @@ interface Props {
 
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   return (
-    <div className="collection-runner-view">
-      {/* TODO: should be resizable */}
-      <RunConfigViewManager collectionId={collectionId} />
-      {/* RunResults will be here */}
-    </div>
+    <CollectionViewContextProvider collectionId={collectionId}>
+      <div className="collection-runner-view">
+        {/* <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+        <BottomSheetLayout minSize={350} initialSizes={[50, 50]} layout={SheetLayout.SPLIT} bottomSheet={<></>}>
+          <RunConfigViewManager collectionId={collectionId} />
+        </BottomSheetLayout>
+      </BottomSheetProvider> */}
+
+        <Split
+          gutterSize={4}
+          sizes={[50, 50]}
+          minSize={[400, 500]}
+          direction="horizontal"
+          className="collection-runner-view-split"
+        >
+          {/* TODO: remove extra divs after result view */}
+          <div>
+            <RunConfigViewManager />
+          </div>
+
+          <div>
+            {/* TODO: Result view */}
+            <h3>
+              <i>Result view in wip...</i>
+            </h3>
+          </div>
+        </Split>
+      </div>
+    </CollectionViewContextProvider>
   );
 };

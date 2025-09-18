@@ -16,6 +16,7 @@ import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiReco
 import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../../local/services/types";
 import { ResponsePromise } from "backend/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -202,15 +203,15 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResponsePromise<RQAPI.RunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
     const result = await getRunConfigFromFirebase(collectionId, runConfigId);
     return result;
   }
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfig: Partial<RQAPI.RunConfig>
-  ): ResponsePromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>> {
+    runConfig: SavedRunConfig
+  ): ResponsePromise<SavedRunConfig> {
     const result = await upsertRunConfigFromFirebase(collectionId, runConfig);
     return result;
   }

@@ -4,29 +4,27 @@ import { RQAPI } from "features/apiClient/types";
 import { ResponsePromise } from "backend/types";
 import * as Sentry from "@sentry/react";
 import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 export async function upsertRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
-  runConfig: Partial<RQAPI.RunConfig>
-): ResponsePromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>> {
+  runConfig: SavedRunConfig
+): ResponsePromise<SavedRunConfig> {
   const result = await _upsertRunConfigInFirebase(collectionId, runConfig);
   return result;
 }
 
 async function _upsertRunConfigInFirebase(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
-  runConfig: Partial<RQAPI.RunConfig>
-): ResponsePromise<Partial<RQAPI.RunConfig>> {
+  runConfig: SavedRunConfig
+): ResponsePromise<SavedRunConfig> {
   try {
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfig.id);
 
-    // remove id
-    const { id: runConfigId, ...rest } = runConfig;
-
     const timeStamp = Timestamp.now().toMillis();
     const updatedRunConfig = {
-      ...rest,
+      ...runConfig,
       updatedTs: timeStamp,
     } as RQAPI.RunConfig;
 
