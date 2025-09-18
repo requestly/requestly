@@ -322,9 +322,9 @@ export namespace RQAPI {
     orderedRequests: OrderedRequests;
     iterations: number;
     delay: number;
+  };
 
-    // TODO: add more as we go
-
+  export type RunConfigRecord = RunConfig & {
     createdTs: number;
     updatedTs: number;
   };
