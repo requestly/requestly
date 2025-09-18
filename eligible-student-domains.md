@@ -1,7 +1,5 @@
 # Student Programme Domains
 
-The following domains are eligible for the student programme:
-
 ```json
 {
   "eligible_domains": [
