@@ -5,6 +5,8 @@ import { create, StoreApi } from "zustand";
 import { EnvVariableState, parseEnvVariables } from "../variables/variables.store";
 import { apiClientFileStore } from "../apiClientFilesStore";
 import { PersistedVariables } from "../shared/variablePersistence";
+import { ApiClientFeatureContext } from "../apiClientFeatureContext/apiClientFeatureContext.store";
+import { TreeChanged } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -162,10 +164,13 @@ function createIndexStore(index: ApiRecordsState["index"]) {
   return indexStore;
 }
 
-export const createApiRecordsStore = (initialRecords: {
-  records: RQAPI.ApiClientRecord[];
-  erroredRecords: ErroredRecord[];
-}) => {
+export const createApiRecordsStore = (
+  context: ApiClientFeatureContext,
+  initialRecords: {
+    records: RQAPI.ApiClientRecord[];
+    erroredRecords: ErroredRecord[];
+  }
+) => {
   const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
   return create<ApiRecordsState>()((set, get) => ({
     apiClientRecords: initialRecords.records,
@@ -249,13 +254,16 @@ export const createApiRecordsStore = (initialRecords: {
     },
 
     addNewRecord(record) {
+      console.log("!!!debug", "add new record called", record);
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
+      context.treeBus.emit(new TreeChanged(record.id));
     },
 
     addNewRecords(records) {
       const updatedRecords = [...get().apiClientRecords, ...records];
       get().refresh(updatedRecords);
+      context.treeBus.emit(new TreeChanged(records[0].id));
     },
 
     updateRecord(patch) {
@@ -309,6 +317,7 @@ export const createApiRecordsStore = (initialRecords: {
 
     deleteRecords(recordIds) {
       const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
+      context.treeBus.emit(new TreeChanged(recordIds[0]));
       get().refresh(updatedRecords);
     },
 

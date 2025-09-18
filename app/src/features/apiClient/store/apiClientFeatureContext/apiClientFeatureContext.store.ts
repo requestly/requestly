@@ -124,7 +124,7 @@ export const NoopContext: ApiClientFeatureContext = {
   id: NoopContextId,
   workspaceId: NoopContextId,
   stores: {
-    records: createApiRecordsStore({ records: [], erroredRecords: [] }),
+    records: createApiRecordsStore({} as ApiClientFeatureContext, { records: [], erroredRecords: [] }),
     environments: createEnvironmentsStore({
       environments: {},
       globalEnvironment: {
