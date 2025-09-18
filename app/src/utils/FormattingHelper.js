@@ -23,7 +23,6 @@ export const getPrettyString = (string) => {
 };
 
 export const getPrettyPlanName = (planName) => {
-  if (isSetappBuild()) return "Professional (Setapp)";
   if (!planName) return "Free";
   if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
   if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
