@@ -38,6 +38,7 @@ import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRe
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { TreeChanged } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -256,6 +257,11 @@ export const CollectionRow: React.FC<Props> = ({
           setExpandedRecordIds(newExpandedRecordIds);
           sessionStorage.setItem(SESSION_STORAGE_EXPANDED_RECORD_IDS_KEY, newExpandedRecordIds);
         }
+
+        const sourceCollectionId = item.record.collectionId;
+        // destination and source both need to be notified about the tree change
+        sourceContext.treeBus.emit(new TreeChanged(destination.collectionId));
+        sourceContext.treeBus.emit(new TreeChanged(sourceCollectionId));
       } catch (error) {
         notification.error({
           message: "Error moving item",

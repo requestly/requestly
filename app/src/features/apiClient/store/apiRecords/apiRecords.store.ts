@@ -6,7 +6,7 @@ import { EnvVariableState, parseEnvVariables } from "../variables/variables.stor
 import { apiClientFileStore } from "../apiClientFilesStore";
 import { PersistedVariables } from "../shared/variablePersistence";
 import { ApiClientFeatureContext } from "../apiClientFeatureContext/apiClientFeatureContext.store";
-import { ChildAdded } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
+import { TreeChanged } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -257,17 +257,16 @@ export const createApiRecordsStore = (
       console.log("!!!debug", "add new record called", record);
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
-      context.treeBus.emit(new ChildAdded(record.id));
+      context.treeBus.emit(new TreeChanged(record.id));
     },
 
     addNewRecords(records) {
       const updatedRecords = [...get().apiClientRecords, ...records];
       get().refresh(updatedRecords);
-      context.treeBus.emit(new ChildAdded(records[0].id));
+      context.treeBus.emit(new TreeChanged(records[0].id));
     },
 
     updateRecord(patch) {
-      console.log("!!!debug", "update record called");
       const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
       get().refresh(updatedRecords);
 
@@ -318,6 +317,7 @@ export const createApiRecordsStore = (
 
     deleteRecords(recordIds) {
       const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
+      context.treeBus.emit(new TreeChanged(recordIds[0]));
       get().refresh(updatedRecords);
     },
 

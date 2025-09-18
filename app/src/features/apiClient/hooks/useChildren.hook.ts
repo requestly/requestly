@@ -10,13 +10,13 @@ export const useChildren = (id: string) => {
   const [children, setChildren] = useState(ctx.stores.records.getState().getAllChildren(id));
 
   useEffect(() => {
-    const subscription = new Subscription<ApiClientEventTopic.CHILD_ADDED, string[]>(setChildren, (ChildAdded, ctx) =>
+    const subscription = new Subscription<ApiClientEventTopic.TREE_CHANGED, string[]>(setChildren, (TreeChanged, ctx) =>
       ctx.stores.records.getState().getAllChildren(id)
     );
-    treeBus.subscribe({ nodeId: id, topic: ApiClientEventTopic.CHILD_ADDED, subscription });
+    treeBus.subscribe({ nodeId: id, topic: ApiClientEventTopic.TREE_CHANGED, subscription });
 
     return () => {
-      treeBus.unsubscribe({ nodeId: id, topic: ApiClientEventTopic.CHILD_ADDED, subscription });
+      treeBus.unsubscribe({ nodeId: id, topic: ApiClientEventTopic.TREE_CHANGED, subscription });
     };
   }, [ctx, id, treeBus]);
 
