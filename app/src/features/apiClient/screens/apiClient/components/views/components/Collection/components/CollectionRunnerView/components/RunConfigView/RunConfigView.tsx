@@ -3,8 +3,6 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
-import { Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
@@ -16,14 +14,22 @@ import * as Sentry from "@sentry/react";
 import "./runConfigView.scss";
 
 export const RunConfigView: React.FC = () => {
-  const [selectAll, setSelectAll] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSelectAll, setIsSelectAll] = useState(false);
 
   const { collectionId } = useCollectionView();
   const [getConfigToSave] = useRunConfigStore((s) => [s.getConfigToSave]);
   const {
     runner: { saveRunConfig },
   } = useCommand();
+
+  const handleSelectAllClick = () => {
+    setIsSelectAll(true);
+  };
+
+  const handleDeselectAllClick = () => {
+    setIsSelectAll(false);
+  };
 
   const handleSaveClick = useCallback(async () => {
     setIsSaving(true);
@@ -41,13 +47,8 @@ export const RunConfigView: React.FC = () => {
 
   const handleRunClick = useCallback(() => {}, []);
 
-  const onChange = (e: CheckboxChangeEvent) => {
-    setSelectAll(e.target.checked);
-  };
-
   const handleResetClick = () => {
     // TODO
-    setSelectAll(false);
   };
 
   return (
@@ -80,15 +81,18 @@ export const RunConfigView: React.FC = () => {
       {/* config container */}
       <div className="run-config-container">
         <div className="run-config-ordered-requests-header">
-          <Checkbox checked={selectAll} onChange={onChange}>
+          <RQButton type="transparent" size="small" onClick={handleSelectAllClick}>
             Select all
-          </Checkbox>
+          </RQButton>
+          <RQButton type="transparent" size="small" onClick={handleDeselectAllClick}>
+            Deselect all
+          </RQButton>
           <RQButton type="transparent" size="small" icon={<MdOutlineRestartAlt />} onClick={handleResetClick}>
             Reset
           </RQButton>
         </div>
 
-        <RunConfigOrderedRequests isSelectAll={selectAll} />
+        <RunConfigOrderedRequests isSelectAll={isSelectAll} />
         <RunConfigSettings />
       </div>
     </div>
