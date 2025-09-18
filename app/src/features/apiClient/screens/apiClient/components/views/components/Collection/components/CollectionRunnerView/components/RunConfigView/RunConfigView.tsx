@@ -23,11 +23,22 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
   const executor = useBatchRequestExecutor(collectionId);
 
-  const handleRunClick = useCallback(() => {
-    runCollection({ runResultStore: {}, runConfig: getConfig(), executor, orderedRequests: [] });
+  const handleRunClick = useCallback(async () => {
+    try {
+      // TODO: update params
+      await runCollection({ runResultStore: {}, runConfig: getConfig(), executor, orderedRequests: [] });
+    } catch (error) {
+      toast.error("Unable to run collection!");
+      Sentry.captureException(error, {
+        extra: {
+          reason: "Unable to run collection!",
+        },
+      });
+    }
   }, [runCollection, getConfig, executor]);
 
   /* TODO: For CLI support convert it into dropdown button */
+  /* TODO: add cancel button */
   return (
     <RQButton disabled={disabled} size="small" type="primary" icon={<MdOutlineVideoLibrary />} onClick={handleRunClick}>
       Run
