@@ -7,6 +7,7 @@ import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
 import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { NativeError } from "errors/NativeError";
 
 type TabId = number;
 type SourceName = string;
@@ -33,6 +34,7 @@ type TabServiceState = {
 type TabActions = {
   reset: (ignorePath?: boolean) => void;
   upsertTabSource: (tabId: TabId | undefined, source: AbstractTabSource, config?: TabConfig) => void;
+  updateTabSource: (sourceId: SourceId, sourceName: SourceName, fn: (currentSource: AbstractTabSource) => AbstractTabSource, ) => void;
   updateTabBySource: (
     sourceId: SourceId,
     sourceName: SourceName,
@@ -118,6 +120,48 @@ const createTabServiceStore = () => {
           set({
             tabs: new Map(tabs),
           });
+        },
+
+        updateTabSource(sourceId, sourceName, fn) {
+          const { tabs,tabsIndex, getTabIdBySource, previewTabId, activeTabId } = get();
+          const tabId = getTabIdBySource(sourceId, sourceName);
+
+          if(tabId === undefined || tabId === null) {
+            return;
+          }
+
+          const tabStore = tabs.get(tabId);
+
+          if(!tabStore) {
+            throw new NativeError(`Tab not found for ${sourceName} ${sourceId}`);
+          }
+          const newSource = fn(tabStore.getState().source);
+          tabStore.setState({source: newSource});
+
+          // We can claim that tabsIndex has entries since we have tabId which can only
+          // be indexed if an entry is present
+          tabsIndex.get(sourceName)!.delete(sourceId);
+          tabsIndex.get(sourceName)!.set(newSource.getSourceId(), tabId);
+          
+          
+
+          tabs.set(tabId, tabStore);
+          set({
+            tabs: new Map(tabs),
+            tabsIndex,
+          });
+
+          if(previewTabId === tabId) {
+            set({
+              previewTabSource: newSource,
+            });
+          }
+
+          if(activeTabId === tabId) {
+            set({
+              activeTabSource: newSource,
+            });
+          }
         },
 
         updateTabBySource(sourceId, sourceName, updates) {

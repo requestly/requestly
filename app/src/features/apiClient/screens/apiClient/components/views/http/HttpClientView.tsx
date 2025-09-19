@@ -72,6 +72,7 @@ import { Authorization } from "../components/request/components/AuthorizationVie
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
+import { useCommand } from "features/apiClient/commands";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -118,6 +119,12 @@ const HttpClientView: React.FC<Props> = ({
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
 
+  const {
+    api: {
+      updateIdIfChanged
+    }
+  } = useCommand();
+
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
 
   const { onSaveRecord } = useNewApiClientContext();
@@ -146,7 +153,6 @@ const HttpClientView: React.FC<Props> = ({
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
   const { setPreview, setUnsaved, setTitle, getIsActive, setIcon } = useGenericState();
-
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
   const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
@@ -508,12 +514,17 @@ const HttpClientView: React.FC<Props> = ({
       : await apiClientRecordsRepository.updateRecord(record, record.id);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
-      setTitle(requestName);
       const savedRecord: RQAPI.HttpApiRecord = {
         ...(apiEntryDetails ?? {}),
         ...result.data,
         data: { ...result.data.data, ...record.data },
       };
+      await updateIdIfChanged({
+        existingId: record.id,
+        newId: savedRecord.id,
+        type: record.type,
+      });
+      setTitle(requestName);
       onSaveRecord(savedRecord);
       trackRequestRenamed("breadcrumb");
       setRequestName("");

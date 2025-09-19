@@ -24,11 +24,11 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
-    api: { forceRefreshRecords: forceRefreshApiClientRecords },
+    api: { updateIdIfChanged },
   } = useCommand();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_collection", "create");
-  const { setTitle, close } = useGenericState();
+  const { setTitle } = useGenericState();
 
   const [collectionName, setCollectionName] = useState(collection?.name || "");
   const [collectionDescription, setCollectionDescription] = useState(collection?.description || "");
@@ -79,13 +79,13 @@ export const CollectionOverview: React.FC<CollectionOverviewProps> = ({ collecti
 
     const result = await apiClientRecordsRepository.renameCollection(updatedCollection.id, collectionName);
     if (result.success) {
+      await updateIdIfChanged({
+        existingId: updatedCollection.id,
+        newId: result.data.id,
+        type: RQAPI.RecordType.COLLECTION,
+      })
       onSaveRecord(result.data, "open");
       setTitle(updatedCollectionName);
-    }
-
-    const wasForceRefreshed = await forceRefreshApiClientRecords();
-    if (wasForceRefreshed) {
-      close();
     }
   };
 

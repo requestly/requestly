@@ -32,7 +32,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           },
           [props.store, upsertTabSource]
         ),
-
+       
         getIsNew: useCallback(() => {
           return props.store.getState().source.getIsNewTab();
         }, [props.store]),
