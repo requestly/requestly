@@ -39,10 +39,10 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const result = await service.getAllEnvironments();
     if (result.type === "success") {
       const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
-      const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
-      if (!parsedEnvs[globalEnvPath]) {
+      const globalEnvId = this.getGlobalEnvironmentId();
+      if (!parsedEnvs[globalEnvId]) {
         const globalEnv = await this.createGlobalEnvironment();
-        parsedEnvs[globalEnvPath] = globalEnv;
+        parsedEnvs[globalEnvId] = globalEnv;
       }
       return {
         success: true,
@@ -138,7 +138,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   getGlobalEnvironmentId(): string {
-    return appendPath(this.meta.rootPath, appendPath("environments", "global.json"));
+    return 'global';
   }
 
   attachListener(params: EnvironmentListenerParams): () => any {
