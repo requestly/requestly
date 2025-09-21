@@ -5,14 +5,14 @@
 .getting-started-screen-banner {
   padding: 28px 0;
   padding-left: 40px;
-  background: var(--blue-blue-500);
+  background: var(--requestly-color-primary);
   border-radius: var(--border-radius-md);
   background-image: url("/assets/media/onboarding/banner-art.svg");
 
   & .get-started-title {
     font-size: 10px;
     font-weight: 500;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     letter-spacing: 1.5px;
   }
 
@@ -20,7 +20,7 @@
     font-weight: 500;
     margin-top: 12px;
     margin-bottom: 0;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
   }
 
   & .getting-started-banner-by-line.ant-typography {

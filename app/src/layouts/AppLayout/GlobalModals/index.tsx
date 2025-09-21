@@ -25,6 +25,7 @@ export const GlobalModals = () => {
               eventSource={activeModals.authModal.props.eventSource}
               closable={activeModals.authModal.props.closable}
               redirectURL={activeModals.authModal.props.redirectURL}
+              {...activeModals.authModal.props}
             />
           ) : (
             <RQAuthModal

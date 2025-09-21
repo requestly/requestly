@@ -7,12 +7,12 @@
   padding: 4px;
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .rule-pair-source-dropdown {
   font-size: var(--requestly-font-size-sm);
-  background-color: var(--input-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .rules-pair-content-header .rules-pair-input,

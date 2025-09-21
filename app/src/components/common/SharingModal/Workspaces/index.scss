@@ -61,7 +61,7 @@
     transition: 0.25s ease-in-out;
 
     &:hover {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
 }
@@ -70,7 +70,7 @@
   max-height: 150px;
   overflow-y: auto;
   border: 1px solid var(--border-dark);
-  background: var(--body-background);
+  background: var(--requestly-color-surface-0);
   border-radius: var(--border-radius-sm);
 
   & .ant-dropdown-menu-item {

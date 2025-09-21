@@ -123,12 +123,12 @@
       .collection-icon {
         width: 16px;
         height: 16px;
-        color: var(--white);
+        color: var(--requestly-color-text-default);
       }
 
       .mock-collection-name {
         cursor: pointer;
-        color: var(--white);
+        color: var(--requestly-color-text-default);
         font-size: var(--requestly-font-size-sm, 13px);
         font-weight: 500;
         line-height: 18px;
@@ -140,7 +140,7 @@
         font-weight: 400;
         line-height: 14px;
         letter-spacing: 0.4px;
-        color: var(--text-subtle);
+        color: var(--requestly-color-text-subtle);
       }
     }
 
@@ -159,7 +159,7 @@
 
           .mock-name {
             cursor: pointer;
-            color: var(--white);
+            color: var(--requestly-color-text-default);
             font-size: var(--requestly-font-size-sm, 13px);
             font-weight: 500;
             line-height: 18px;
@@ -183,7 +183,7 @@
           letter-spacing: 0.4px;
 
           .ant-typography {
-            color: var(--text-subtle);
+            color: var(--requestly-color-text-subtle);
           }
         }
       }
@@ -209,7 +209,7 @@
         }
 
         &:hover svg {
-          color: var(--white);
+          color: var(--requestly-color-text-default);
         }
       }
     }
@@ -277,7 +277,7 @@
 }
 
 .mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }
 
 .rq-modal {
