@@ -165,7 +165,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
           <div className="w-100">
             {isRulesCreated ? (
               <>
-                <CheckCircleOutlined style={{ color: "var(--success)" }} className="mr-4" />
+                <CheckCircleOutlined style={{ color: "var(--requestly-color-success)" }} className="mr-4" />
                 <span>{`Mock rules have been created successfully in the group: ${createdGroupName}`}</span>
               </>
             ) : selectedRequestsLength === 0 ? (

@@ -6,6 +6,7 @@
 .app-footer-links {
   display: flex;
   align-items: center;
+  margin-right: 48px;
 }
 
 .app-footer-links .ant-typography {
@@ -30,7 +31,7 @@
 }
 
 .app-footer-links .ant-typography:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn {
@@ -44,7 +45,7 @@
 
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn:hover,
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn:focus {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: transparent;
 }
 

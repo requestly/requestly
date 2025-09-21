@@ -35,6 +35,10 @@ export const isInterceptTrafficPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
 };
 
+export const isGithubStudentPackPage = (pathname = window.location.pathname) => {
+  return pathname.includes(APP_CONSTANTS.PATHS.GITHUB_STUDENT_DEVELOPER.RELATIVE);
+};
+
 export const getSessionRecordingSharedLink = (recordingId) => {
   return window.location.origin + APP_CONSTANTS.PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + recordingId;
 };

@@ -54,7 +54,7 @@
 
 .primary-sidebar-container .primary-sidebar-link:hover {
   cursor: pointer;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   background-color: var(--requestly-color-white-t-10);
 }
 

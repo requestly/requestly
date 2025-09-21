@@ -7,7 +7,7 @@
   width: 100%;
   height: 48px;
   font-size: var(--requestly-font-size-sm, 13px);
-  color: var(--white) !important;
+  color: var(--requestly-color-text-default) !important;
   position: relative;
   display: flex;
   align-items: center;
@@ -60,7 +60,7 @@
   .app-banner-badge {
     text-transform: uppercase;
     font-size: 10px;
-    color: var((--text-default));
+    color: var(--requestly-color-text-default);
     padding: 4px 8px;
     border-radius: 4px;
     font-weight: 500;
@@ -73,7 +73,7 @@
 
     .ant-btn-default,
     .ant-btn-default:hover {
-      border-color: var(--white) !important;
+      border-color: var(--requestly-color-text-default) !important;
       background: transparent !important;
     }
 
@@ -96,7 +96,7 @@
 }
 
 .app-banner__warning {
-  background: var(--warning) !important;
+  background: var(--requestly-color-warning) !important;
   color: black !important;
 
   a {

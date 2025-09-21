@@ -13,8 +13,8 @@
   transition: 0.2s ease-in-out;
 }
 .file-picker-wrapper-active {
-  border-color: var(--white);
-  background: var(--component-background);
+  border-color: var(--requestly-color-white);
+  background: var(--requestly-color-surface-1);
 }
 
 .file-picker-wrapper .file-picker-icon-lg,

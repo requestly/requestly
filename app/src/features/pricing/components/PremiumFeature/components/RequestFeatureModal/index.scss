@@ -9,7 +9,7 @@
     border: none;
 
     & .ant-modal-title {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       font-size: 1rem;
       font-weight: 500;
     }
@@ -41,7 +41,7 @@
       padding-left: 0;
     }
     .request-modal-link-btn:hover {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
 
     .send-icon {

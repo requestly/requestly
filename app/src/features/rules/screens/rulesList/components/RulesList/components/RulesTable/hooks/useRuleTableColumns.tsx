@@ -62,7 +62,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 ? `Unpin ${isRule(record) ? "rule from extension popup" : "group from extension popup"}`
                 : `Pin ${isRule(record) ? "rule to extension popup" : "group to extension popup"}`
             }
-            color="var(--black)"
+            color="var(--requestly-color-black)"
           >
             <Button
               type="text"

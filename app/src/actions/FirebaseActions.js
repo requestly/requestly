@@ -20,6 +20,7 @@ import {
   sendSignInLinkToEmail,
   SAMLAuthProvider,
   OAuthProvider,
+  GithubAuthProvider,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -69,6 +70,7 @@ import {
 import { toast } from "utils/Toast";
 import { getUserProfilePath } from "utils/db/UserModel";
 import { AuthErrorCode } from "features/onboarding/screens/auth/types";
+import { trackEvent } from "modules/analytics";
 import { clientStorageService } from "services/clientStorageService";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
@@ -533,6 +535,49 @@ export async function appleSignIn(source, callback) {
         error_message: err.message,
         source,
       });
+    });
+}
+
+export async function authorizeWithGithub(callback, source) {
+  const provider = new GithubAuthProvider();
+  const auth = getAuth(firebaseApp);
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      let email = result?.user?.email || null;
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+
+      trackEvent("github_authorized", {
+        source,
+        email,
+      });
+
+      trackLoginSuccessEvent({
+        auth_provider: AUTH_PROVIDERS.GITHUB,
+        email,
+        domain: email?.split("@")?.[1],
+        source,
+      });
+
+      return { accessToken: token, email };
+    })
+    .catch((err) => {
+      if (err.code === "auth/account-exists-with-different-credential") {
+        const email = err.customData.email;
+        trackEvent("github_authorized", {
+          source,
+          email,
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.GITHUB,
+          email,
+          domain: email?.split("@")?.[1],
+          source,
+        });
+        return { accessToken: err.customData?._tokenResponse?.oauthAccessToken, email };
+      }
+
+      return {};
     });
 }
 
