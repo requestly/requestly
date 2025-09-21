@@ -37,7 +37,6 @@ import { PostmanExportModal } from "../../../../modals/postmanCollectionExportMo
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "features/workspaces/types";
 
 export enum ExportType {
   REQUESTLY = "requestly",
