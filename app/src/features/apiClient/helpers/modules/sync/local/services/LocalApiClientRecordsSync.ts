@@ -18,9 +18,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }
 
-  private generateFileName() {
-    return `${uuidv4()}.json`;
-  }
+  
 
   private getNormalizedPath(path: string) {
     const normalizedPath = path.endsWith("/") ? path : `${path}/`;
@@ -146,14 +144,12 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     }
   }
 
-  generateApiRecordId(parentId?: string) {
-    const name = this.generateFileName();
-    return parseFsId(this.appendPath(parentId || this.meta.rootPath, name));
+  generateApiRecordId() {
+    return uuidv4();
   }
 
-  generateCollectionId(name: string, parentId?: string) {
-    const path = this.appendPath(parentId || this.meta.rootPath, name);
-    return parseFsId(this.getNormalizedPath(path));
+  generateCollectionId() {
+    return uuidv4();
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {

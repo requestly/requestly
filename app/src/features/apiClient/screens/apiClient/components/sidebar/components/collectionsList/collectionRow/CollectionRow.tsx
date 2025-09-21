@@ -93,10 +93,9 @@ export const CollectionRow: React.FC<Props> = ({
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
-  const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [
     state.openTab,
     state.activeTabSource,
-    state.closeTabBySource,
   ]);
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
@@ -240,16 +239,12 @@ export const CollectionRow: React.FC<Props> = ({
           collectionId: record.id,
         };
 
-        const { oldContextRecords } = await moveRecordsAcrossWorkspace(sourceContext, {
+        await moveRecordsAcrossWorkspace(sourceContext, {
           recordsToMove: [item.record],
           destination,
         });
 
-        if (activeWorkspace.workspaceType !== WorkspaceType.SHARED) {
-          oldContextRecords?.forEach((r) => {
-            closeTabBySource(r.id, "request", true);
-          });
-        }
+        
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -266,7 +261,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [activeWorkspace.workspaceType, record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
+    [activeWorkspace.workspaceType, record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
