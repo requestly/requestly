@@ -4,34 +4,23 @@ import { createVariablesStore, EnvVariableState, VariablesState } from "../varia
 import { RuntimeVariableStore as ExternalRNStore } from "../runtimeVariables/runtimeVariables.store";
 import { StoreApi } from "zustand";
 import { EnvironmentVariableType } from "backend/environment/types";
-import { handleDexieError, withDexieErrorHandling } from "features/apiClient/helpers/dexieErrorHandler";
 
 interface StoredVariable {
   id: string; // composite key: contextId + key for environments/collections, just key for runtime
   localValue: VariableData["localValue"];
 }
 
-let db: Dexie & {
+const db = new Dexie("persistedVariables") as Dexie & {
   runtime: EntityTable<StoredVariable, "id">;
   environments: EntityTable<StoredVariable, "id">;
   collectionVariables: EntityTable<StoredVariable, "id">;
 };
 
-try {
-  db = new Dexie("persistedVariables") as Dexie & {
-    runtime: EntityTable<StoredVariable, "id">;
-    environments: EntityTable<StoredVariable, "id">;
-    collectionVariables: EntityTable<StoredVariable, "id">;
-  };
-
-  db.version(1).stores({
-    runtime: "id, localValue",
-    environments: "id, localValue",
-    collectionVariables: "id, localValue",
-  });
-} catch (error) {
-  handleDexieError(error);
-}
+db.version(1).stores({
+  runtime: "id, localValue",
+  environments: "id, localValue",
+  collectionVariables: "id, localValue",
+});
 
 function createCompositeKey(contextId: string, variableKey: string): string {
   return `${contextId}::${variableKey}`;
@@ -135,13 +124,11 @@ export namespace PersistedVariables {
             localValue: variable.localValue,
           }));
 
-        await withDexieErrorHandling(async () => {
-          await db.transaction("rw", db.runtime, async () => {
-            await db.runtime.clear();
-            if (entries.length > 0) {
-              await db.runtime.bulkAdd(entries);
-            }
-          });
+        await db.transaction("rw", db.runtime, async () => {
+          await db.runtime.clear();
+          if (entries.length > 0) {
+            await db.runtime.bulkAdd(entries);
+          }
         });
       } catch (error) {
         console.error("Failed to persist runtime variables:", error);
@@ -176,17 +163,16 @@ export namespace PersistedVariables {
           }));
 
         const table = db[this.tableName] as EntityTable<StoredVariable, "id">;
-        await withDexieErrorHandling(async () => {
-          await db.transaction("rw", table, async () => {
-            await table
-              .where("id")
-              .startsWith(this.contextId + "::")
-              .delete();
+        await db.transaction("rw", table, async () => {
+          // Clear only this context's entries
+          await table
+            .where("id")
+            .startsWith(this.contextId + "::")
+            .delete();
 
-            if (entries.length > 0) {
-              await table.bulkAdd(entries);
-            }
-          });
+          if (entries.length > 0) {
+            await table.bulkAdd(entries);
+          }
         });
       } catch (error) {
         console.error(`Failed to persist ${this.tableName} variables:`, error);

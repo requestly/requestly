@@ -3,7 +3,6 @@ import { ApiClientLocalStoreMeta } from "../../interfaces";
 import { ApiClientLocalDb } from "./ApiClientLocalDb";
 import dbProvider from "./ApiClientLocalDbProvider";
 import { ApiClientLocalDbTable } from "./types";
-import { withDexieErrorHandling } from "features/apiClient/helpers/dexieErrorHandler";
 
 export class ApiClientLocalDbQueryService<T> {
   private dbInstance: ApiClientLocalDb;
@@ -18,52 +17,50 @@ export class ApiClientLocalDbQueryService<T> {
   }
 
   async getRecord(id: string) {
-    return withDexieErrorHandling(() => this.getTable().get(id));
+    return this.getTable().get(id);
   }
 
   async getRecords() {
-    return withDexieErrorHandling(() => this.getTable().toArray());
+    return this.getTable().toArray();
   }
 
   async updateRecord(id: string, record: T) {
-    return withDexieErrorHandling(() => this.getTable().update(id, record as UpdateSpec<T>));
+    return this.getTable().update(id, record as UpdateSpec<T>);
   }
 
   async createRecord(record: T) {
-    return withDexieErrorHandling(() => this.getTable().add(record));
+    return this.getTable().add(record);
   }
 
   async createBulkRecords(records: T[]) {
-    return withDexieErrorHandling(() => this.getTable().bulkAdd(records));
+    return this.getTable().bulkAdd(records);
   }
 
   async updateRecords(updates: (Partial<T> & { id: string })[]) {
-    return withDexieErrorHandling(() =>
-      this.getTable().bulkUpdate(
-        updates.map((update) => {
-          return {
-            key: update.id,
-            changes: update as UpdateSpec<T>,
-          };
-        })
-      )
+    return this.getTable().bulkUpdate(
+      updates.map((update) => {
+        return {
+          key: update.id,
+          changes: update as UpdateSpec<T>,
+        };
+      })
     );
   }
 
   async deleteRecord(id: string) {
-    return withDexieErrorHandling(() => this.getTable().delete(id));
+    return this.getTable().delete(id);
   }
 
   async deleteRecords(ids: string[]) {
-    return withDexieErrorHandling(() => this.getTable().bulkDelete(ids));
+    return this.getTable().bulkDelete(ids);
   }
 
   async clearAllRecords() {
-    return withDexieErrorHandling(() => this.getTable().clear());
+    return this.getTable().clear();
   }
 
   async getIsAllCleared() {
-    const count = await withDexieErrorHandling(() => this.getTable().count());
+    const count = await this.getTable().count();
     return count === 0;
   }
 }
