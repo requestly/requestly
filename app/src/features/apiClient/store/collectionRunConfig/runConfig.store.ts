@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 export type RunConfigState = {
   id: RQAPI.RunConfig["id"];
@@ -19,7 +20,7 @@ export type RunConfigState = {
   setRunOrder(runOrder: RunConfigState["runOrder"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
-  getConfigToSave(): Partial<RunConfigState>;
+  getConfigToSave(): SavedRunConfig;
 
   /**
    * This would be called when a new request is added by the user.
@@ -51,6 +52,7 @@ export function createRunConfigStore(data: {
     },
 
     setDelay(delay) {
+      // TODO: add upper limit
       const isValid = isValidNumber(delay) && delay >= 0;
 
       if (!isValid) {
@@ -61,6 +63,7 @@ export function createRunConfigStore(data: {
     },
 
     setIterations(iterations) {
+      // TODO: add upper limit
       const isValid = isValidNumber(iterations) && iterations > 0;
 
       if (!isValid) {
@@ -71,8 +74,8 @@ export function createRunConfigStore(data: {
     },
 
     getConfigToSave() {
-      const { runOrder } = get();
-      return { runOrder };
+      const { id, runOrder } = get();
+      return { id, runOrder };
     },
 
     patchRunOrder(requests) {
