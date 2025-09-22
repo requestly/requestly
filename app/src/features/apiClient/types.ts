@@ -313,9 +313,11 @@ export namespace RQAPI {
     MISSING_FILE = "missing_file",
   }
 
-  export type OrderedRequests = ApiRecord[];
+  export type OrderedRequest = { record: ApiRecord; isSelected: boolean };
 
-  export type RunOrder = ApiRecord["id"][];
+  export type OrderedRequests = OrderedRequest[];
+
+  export type RunOrder = { id: ApiRecord["id"]; isSelected: boolean }[];
 
   export type RunConfig = {
     id: string;

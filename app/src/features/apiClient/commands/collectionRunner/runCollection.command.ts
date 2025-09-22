@@ -3,14 +3,16 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExecutor";
 
 function parseRequestToExecute(
-  request: RQAPI.ApiRecord
+  orderedRequest: RQAPI.OrderedRequest
 ): {
   recordId: RQAPI.ApiRecord["id"];
   entry: RQAPI.ApiEntry;
 } {
+  const { record } = orderedRequest;
+
   const parsedRequest = {
-    recordId: request.id,
-    entry: request.data,
+    recordId: record.id,
+    entry: record.data,
   };
 
   return parsedRequest;
@@ -22,7 +24,7 @@ export async function runCollection(
     runResultStore: any; // TODO: create run result store
     executor: BatchRequestExecutor;
     runConfig: RQAPI.RunConfig;
-    orderedRequests: RQAPI.ApiRecord[];
+    orderedRequests: RQAPI.OrderedRequests;
   }
 ) {
   const { executor, runConfig, orderedRequests } = params;
@@ -40,12 +42,17 @@ export async function runCollection(
       // }
 
       const request = orderedRequests[requestIndex];
+
+      if (!request.isSelected) {
+        continue;
+      }
+
       const parsedRequest = parseRequestToExecute(request);
 
       // TODO: mark request run loading state here
       const result = await executor.executeSingleRequest(parsedRequest.recordId, parsedRequest.entry);
 
-      console.log({ result });
+      console.log(`Iteration: ${iterationIndex + 1} :: Request: ${requestIndex + 1}`, { result });
 
       // Only delay if there's a next request
       const isLastIteration = iterationIndex === iterations - 1;

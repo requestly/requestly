@@ -40,8 +40,6 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
   const handleCancelRunClick = useCallback(async () => {}, []);
 
-  /* TODO: For CLI support convert it into dropdown button */
-  /* TODO: add cancel button */
   const isRunning = false; // TODO: get it from result store
   return isRunning ? (
     <RQButton disabled={disabled} size="small" type="danger" onClick={handleCancelRunClick}>

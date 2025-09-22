@@ -15,6 +15,7 @@ export type RunConfigState = {
   setOrderedRequests(requests: RunConfigState["orderedRequests"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
+  setSelected(id: string, value: boolean): void;
   getConfig(): RQAPI.RunConfig;
   getConfigToSave(): SavedRunConfig;
 
@@ -32,10 +33,10 @@ function isValidNumber(number: unknown) {
 function parseUnorderedRequests(runOrder: RQAPI.RunOrder, unorderedRequests: RQAPI.ApiRecord[]) {
   const orderedRequests: RQAPI.RunConfig["orderedRequests"] = [];
 
-  runOrder.forEach((id) => {
-    const request = unorderedRequests.find((r) => r.id === id);
+  runOrder.forEach((value) => {
+    const request = unorderedRequests.find((r) => r.id === value.id);
     if (request) {
-      orderedRequests.push(request);
+      orderedRequests.push({ record: request, isSelected: value.isSelected });
     }
   });
 
@@ -56,6 +57,14 @@ export function createRunConfigStore(data: {
     orderedRequests: parseUnorderedRequests(runOrder, unorderedRequests),
     delay,
     iterations,
+
+    setSelected(id, value) {
+      set({
+        orderedRequests: get().orderedRequests.map((r) => {
+          return r.record.id === id ? { record: r.record, isSelected: value } : r;
+        }),
+      });
+    },
 
     setOrderedRequests(requests) {
       set({ orderedRequests: requests });
@@ -90,7 +99,7 @@ export function createRunConfigStore(data: {
 
     getConfigToSave() {
       const { id, orderedRequests } = get();
-      const runOrder = orderedRequests.map((r) => r.id);
+      const runOrder = orderedRequests.map((r) => ({ id: r.record.id, isSelected: r.isSelected }));
       return { id, runOrder };
     },
 
@@ -101,14 +110,15 @@ export function createRunConfigStore(data: {
       const incomingRequestSet = new Set(ids);
 
       // remove stale ids from existing order
-      const filteredRunOrder = orderedRequests.filter((r) => incomingRequestSet.has(r.id));
-      const filteredRunOrderIds = filteredRunOrder.map((r) => r.id);
+      const filteredRunOrder = orderedRequests.filter((value) => incomingRequestSet.has(value.record.id));
+      const filteredRunOrderIds = filteredRunOrder.map((value) => value.record.id);
 
       const filteredRunOrderSet = new Set(filteredRunOrderIds);
-      const patch = [];
+      const patch: RQAPI.RunConfig["orderedRequests"] = [];
       for (const request of requests) {
         if (!filteredRunOrderSet.has(request.id)) {
-          patch.push(request);
+          // Assuming all incoming requests are selected
+          patch.push({ record: request, isSelected: true });
         }
       }
 

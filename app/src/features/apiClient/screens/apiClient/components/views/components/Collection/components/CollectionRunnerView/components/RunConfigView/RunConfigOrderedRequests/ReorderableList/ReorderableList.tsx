@@ -9,8 +9,8 @@ import "./reorderableList.scss";
 
 interface ReorderableListProps {
   selectAll: { value: boolean };
-  requests: RQAPI.ApiRecord[];
-  onOrderUpdate: (updatedList: RQAPI.ApiRecord[]) => void;
+  requests: RQAPI.RunConfig["orderedRequests"];
+  onOrderUpdate: (updatedList: RQAPI.RunConfig["orderedRequests"]) => void;
 }
 
 export const ReorderableList: React.FC<ReorderableListProps> = ({ selectAll, requests, onOrderUpdate }) => {
@@ -30,13 +30,13 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ selectAll, req
 
   const rowRenderer: ListRowRenderer = useCallback(
     (props: ListRowProps): React.ReactNode => {
-      const record = requests[props.index];
+      const orderedRequest = requests[props.index];
 
       return (
         <ReorderableListItem
-          key={props.key}
+          key={orderedRequest.record.id}
           index={props.index}
-          record={record}
+          orderedRequest={orderedRequest}
           reorder={reorder}
           style={props.style}
           selectAll={selectAll}

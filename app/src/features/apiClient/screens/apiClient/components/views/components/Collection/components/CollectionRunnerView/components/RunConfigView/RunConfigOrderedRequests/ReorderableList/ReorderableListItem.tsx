@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { MdDragIndicator } from "@react-icons/all-files/md/MdDragIndicator";
 import { Checkbox, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { useDrag, useDrop } from "react-dnd";
 import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
+import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -46,7 +47,7 @@ const RequestInfo: React.FC<{
 
 interface ReorderableListItemProps {
   index: number;
-  record: RQAPI.ApiRecord;
+  orderedRequest: RQAPI.OrderedRequest;
   style: React.CSSProperties;
   selectAll: { value: boolean };
   reorder: (currentIndex: number, newIndex: number) => void;
@@ -54,17 +55,17 @@ interface ReorderableListItemProps {
 
 export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
   index,
-  record,
+  orderedRequest,
   style,
   selectAll,
   reorder,
 }) => {
-  const [selected, setSelected] = useState(false);
+  const [setSelected] = useRunConfigStore((s) => [s.setSelected]);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelected(selectAll.value);
-  }, [selectAll]);
+    setSelected(orderedRequest.record.id, selectAll.value);
+  }, [orderedRequest.record.id, selectAll, setSelected]);
 
   const [{ isDragging }, drag] = useDrag({
     type: ReorderableItemType.REQUEST,
@@ -117,13 +118,13 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
       </span>
 
       <Checkbox
-        checked={selected}
+        checked={orderedRequest.isSelected}
         onChange={(e) => {
-          setSelected(e.target.checked);
+          setSelected(orderedRequest.record.id, e.target.checked);
         }}
       />
-      <CollectionChain recordId={record.id} />
-      <RequestInfo record={record} />
+      <CollectionChain recordId={orderedRequest.record.id} />
+      <RequestInfo record={orderedRequest.record} />
     </div>
   );
 };
