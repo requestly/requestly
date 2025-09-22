@@ -24,6 +24,9 @@ export type RunConfigState = {
    * They could add to the collection we are dealing with, or to a child collection.
    */
   patchOrderedRequests(requests: RQAPI.ApiRecord[]): void;
+
+  hasUnsavedChanges: boolean;
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 };
 
 function isValidNumber(number: unknown) {
@@ -57,6 +60,11 @@ export function createRunConfigStore(data: {
     orderedRequests: parseUnorderedRequests(runOrder, unorderedRequests),
     delay,
     iterations,
+    hasUnsavedChanges: false,
+
+    setHasUnsavedChanges(hasUnsavedChanges) {
+      set({ hasUnsavedChanges });
+    },
 
     setSelected(id, value) {
       set({
@@ -67,7 +75,7 @@ export function createRunConfigStore(data: {
     },
 
     setOrderedRequests(requests) {
-      set({ orderedRequests: requests });
+      set({ orderedRequests: requests, hasUnsavedChanges: true });
     },
 
     setDelay(delay) {
@@ -104,7 +112,7 @@ export function createRunConfigStore(data: {
     },
 
     patchOrderedRequests(requests) {
-      const { orderedRequests, setOrderedRequests } = get();
+      const { orderedRequests, setOrderedRequests, setHasUnsavedChanges } = get();
 
       const ids = requests.map((r) => r.id);
       const incomingRequestSet = new Set(ids);
@@ -124,6 +132,7 @@ export function createRunConfigStore(data: {
 
       const newOrder = [...filteredRunOrder, ...patch];
       setOrderedRequests(newOrder);
+      setHasUnsavedChanges(false);
     },
   }));
 }
