@@ -1,0 +1,114 @@
+.run-config-view-container .reorderable-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 8px);
+  padding: 16px var(--space-4, 8px);
+  overflow-x: hidden;
+  height: 100%;
+  max-height: calc(100% - 146px);
+
+  .reorderable-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 4px);
+    padding: 2px;
+    width: 100%;
+
+    ::selection {
+      text-shadow: none;
+      background-color: transparent;
+    }
+
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    box-sizing: border-box;
+
+    &.collect-dragged-item {
+      &.up {
+        border-top: 2px solid var(--requestly-color-primary-600);
+      }
+
+      &.down {
+        border-bottom: 2px solid var(--requestly-color-primary-600);
+      }
+    }
+
+    &:hover {
+      border-radius: 4px;
+      background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    }
+
+    .drag-icon {
+      cursor: grab;
+      user-select: none;
+      width: 12.25px;
+      height: 14px;
+      flex-shrink: 0;
+
+      color: var(--requestly-color-text-placeholder, #8f8f8f);
+      font-weight: 300;
+      line-height: 16px; /* 114.286% */
+    }
+
+    .collection-path-container {
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-1, 2px);
+      padding-left: var(--space-4, 6px);
+
+      .collection-path-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-1, 2px);
+
+        .collection-icon {
+          width: 16px;
+          height: 16px;
+          aspect-ratio: 1/1;
+        }
+
+        .separator {
+          color: var(--requestly-color-text-placeholder, #8f8f8f);
+          font-size: var(--requestly-font-size-sm, 12px);
+          font-style: normal;
+          font-weight: 400;
+          line-height: 18px; /* 150% */
+        }
+      }
+    }
+
+    .request-info-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 4px);
+      overflow: hidden;
+
+      .request-method {
+        user-select: none;
+        flex-shrink: 0;
+        font-size: 8px;
+        font-weight: var(--requestly-font-weight-medium);
+        line-height: 13px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+
+        width: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 2px;
+      }
+
+      .request-name {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        color: var(--requestly-color-text-default, #fff);
+        font-size: var(--requestly-font-size-sm, 12px);
+        line-height: 18px; /* 150% */
+      }
+    }
+  }
+}

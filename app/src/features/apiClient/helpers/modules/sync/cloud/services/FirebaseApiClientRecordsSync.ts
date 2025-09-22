@@ -7,7 +7,7 @@ import {
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
 } from "backend/apiClient";
-import { ApiClientCloudMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
+import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
@@ -15,6 +15,8 @@ import { RQAPI } from "features/apiClient/types";
 import { sanitizeRecord, updateApiRecord } from "backend/apiClient/upsertApiRecord";
 import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../../local/services/types";
+import { ResponsePromise } from "backend/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -201,32 +203,16 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResultPromise<RQAPI.RunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
     const result = await getRunConfigFromFirebase(collectionId, runConfigId);
-
-    if (result.success === false) {
-      return { success: false, data: null, message: result.message };
-    }
-
-    return {
-      success: result.success,
-      data: result.data,
-    };
+    return result;
   }
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfig: Partial<RQAPI.RunConfig>
-  ): ResultPromise<RQAPI.RunConfig | Partial<RQAPI.RunConfig>> {
+    runConfig: SavedRunConfig
+  ): ResponsePromise<SavedRunConfig> {
     const result = await upsertRunConfigFromFirebase(collectionId, runConfig);
-
-    if (result.success === false) {
-      return { success: false, data: null, message: result.message };
-    }
-
-    return {
-      success: result.success,
-      data: result.data,
-    };
+    return result;
   }
 }

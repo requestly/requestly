@@ -58,7 +58,7 @@ const HttpMethodIcon = ({ entry }: { entry: RQAPI.HttpApiEntry }) => {
   );
 };
 
-const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
+export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
   switch (record.data.type) {
     case RQAPI.ApiEntryType.HTTP:
       return <HttpMethodIcon entry={record.data} />;
