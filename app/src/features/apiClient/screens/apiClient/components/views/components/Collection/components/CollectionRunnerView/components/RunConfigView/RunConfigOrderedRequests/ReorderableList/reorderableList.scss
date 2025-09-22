@@ -7,6 +7,13 @@
   height: 100%;
   max-height: calc(100% - 146px);
 
+  &:active,
+  &:focus,
+  &:focus-visible {
+    border: none;
+    outline: none;
+  }
+
   .reorderable-list-item {
     display: flex;
     align-items: center;
