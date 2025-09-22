@@ -13,12 +13,6 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   return (
     <CollectionViewContextProvider collectionId={collectionId}>
       <div className="collection-runner-view">
-        {/* <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
-        <BottomSheetLayout minSize={350} initialSizes={[50, 50]} layout={SheetLayout.SPLIT} bottomSheet={<></>}>
-          <RunConfigViewManager collectionId={collectionId} />
-        </BottomSheetLayout>
-      </BottomSheetProvider> */}
-
         <Split
           gutterSize={4}
           sizes={[50, 50]}
