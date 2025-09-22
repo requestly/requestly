@@ -56,7 +56,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
 export const RunConfigView: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
-  const [isSelectAll, setIsSelectAll] = useState(true);
+  const [selectAll, setSelectAll] = useState({ value: true });
 
   const { collectionId } = useCollectionView();
   const [getConfigToSave] = useRunConfigStore((s) => [s.getConfigToSave]);
@@ -65,11 +65,11 @@ export const RunConfigView: React.FC = () => {
   } = useCommand();
 
   const handleSelectAllClick = () => {
-    setIsSelectAll(true);
+    setSelectAll({ value: true });
   };
 
   const handleDeselectAllClick = () => {
-    setIsSelectAll(false);
+    setSelectAll({ value: false });
   };
 
   const handleSaveClick = useCallback(async () => {
@@ -128,7 +128,7 @@ export const RunConfigView: React.FC = () => {
           </RQButton>
         </div>
 
-        <RunConfigOrderedRequests isSelectAll={isSelectAll} />
+        <RunConfigOrderedRequests selectAll={selectAll} />
         <RunConfigSettings />
       </div>
     </div>

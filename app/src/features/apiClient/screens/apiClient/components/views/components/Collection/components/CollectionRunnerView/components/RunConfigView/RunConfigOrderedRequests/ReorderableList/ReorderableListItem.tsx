@@ -48,7 +48,7 @@ interface ReorderableListItemProps {
   index: number;
   record: RQAPI.ApiRecord;
   style: React.CSSProperties;
-  isSelectAll: boolean;
+  selectAll: { value: boolean };
   reorder: (currentIndex: number, newIndex: number) => void;
 }
 
@@ -56,15 +56,15 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
   index,
   record,
   style,
-  isSelectAll,
+  selectAll,
   reorder,
 }) => {
   const [selected, setSelected] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelected(isSelectAll);
-  }, [isSelectAll]);
+    setSelected(selectAll.value);
+  }, [selectAll]);
 
   const [{ isDragging }, drag] = useDrag({
     type: ReorderableItemType.REQUEST,

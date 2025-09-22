@@ -8,12 +8,12 @@ import "react-virtualized/styles.css";
 import "./reorderableList.scss";
 
 interface ReorderableListProps {
-  isSelectAll: boolean;
+  selectAll: { value: boolean };
   requests: RQAPI.ApiRecord[];
   onOrderUpdate: (updatedList: RQAPI.ApiRecord[]) => void;
 }
 
-export const ReorderableList: React.FC<ReorderableListProps> = ({ isSelectAll, requests, onOrderUpdate }) => {
+export const ReorderableList: React.FC<ReorderableListProps> = ({ selectAll, requests, onOrderUpdate }) => {
   const reorder = useCallback(
     (currentIndex: number, newIndex: number) => {
       if (currentIndex === newIndex) {
@@ -39,11 +39,11 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ isSelectAll, r
           record={record}
           reorder={reorder}
           style={props.style}
-          isSelectAll={isSelectAll}
+          selectAll={selectAll}
         />
       );
     },
-    [reorder, requests, isSelectAll]
+    [reorder, requests, selectAll]
   );
 
   return (
