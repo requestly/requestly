@@ -254,7 +254,6 @@ export const createApiRecordsStore = (
     },
 
     addNewRecord(record) {
-      console.log("!!!debug", "add new record called", record);
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
       context.treeBus.emit(new TreeChanged(record.id));
