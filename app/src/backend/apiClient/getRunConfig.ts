@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import * as Sentry from "@sentry/react";
 import { ResponsePromise } from "../types";
 import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 
 export async function getRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
@@ -34,8 +34,8 @@ async function _getRunConfigFromFirebase(
       };
     }
 
-    const data = snapshot.data() as RQAPI.RunConfig;
-    return { success: true, data: { ...data, id: runConfigId } };
+    const data = snapshot.data() as SavedRunConfigRecord;
+    return { success: true, data: { id: runConfigId, runOrder: data.runOrder } };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigId },

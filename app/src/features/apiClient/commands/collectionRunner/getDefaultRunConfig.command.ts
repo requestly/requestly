@@ -14,9 +14,8 @@ function getDefaultRunOrderByCollectionId(
   return runOrder;
 }
 
-function getConfigFromSavedData(config: Partial<RQAPI.RunConfig>): SavedRunConfig {
-  const runOrder = config.orderedRequests.map((r) => r.id);
-  return { id: config.id, runOrder };
+function getConfigFromSavedData(config: SavedRunConfig): SavedRunConfig {
+  return { id: config.id, runOrder: config.runOrder };
 }
 
 export async function getDefaultRunConfig(
