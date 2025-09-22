@@ -13,6 +13,7 @@ import { EnvironmentData, EnvironmentVariables } from "backend/environment/types
 import { RQAPI } from "features/apiClient/types";
 import { FsAccessError } from "features/apiClient/errors/FsError/FsAccessError/FsAccessError";
 import { ErrorCode } from "errors/types";
+import { Mutex, MutexInterface, withTimeout } from "async-mutex";
 
 const LOCAL_SYNC_BUILDER_NAMESPACE = "local_sync_builder";
 
@@ -178,13 +179,21 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
 class FsManagerServiceAdapterProvider {
   private cache = new Map<string, FsManagerServiceAdapter>();
+  private lockMap = new Map<string, MutexInterface>;
   constructor() {
     console.log("provider created");
   }
 
   async get(rootPath: string) {
+    let lock = this.lockMap.get(rootPath);
+    if(!lock) {
+      lock = withTimeout(new Mutex(), 10 * 1000);
+      this.lockMap.set(rootPath, lock);
+    }
+    await lock.acquire();
     if (this.cache.has(rootPath)) {
       console.log("got provider from cache");
+      lock.release();
       return this.cache.get(rootPath);
     }
     try {
@@ -201,6 +210,8 @@ class FsManagerServiceAdapterProvider {
         throw new FsAccessError(e.message || e, rootPath);
       }
       throw e;
+    } finally {
+      lock.release();
     }
   }
 }
