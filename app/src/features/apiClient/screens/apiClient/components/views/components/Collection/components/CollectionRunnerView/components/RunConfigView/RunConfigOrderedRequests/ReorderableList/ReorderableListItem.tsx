@@ -63,7 +63,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
   selectAll,
   reorder,
 }) => {
-  const [setSelected] = useRunConfigStore((s) => [s.setSelected]);
+  const [setSelected, setHasUnsavedChanges] = useRunConfigStore((s) => [s.setSelected, s.setHasUnsavedChanges]);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,6 +124,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
         checked={orderedRequest.isSelected}
         onChange={(e) => {
           setSelected(orderedRequest.record.id, e.target.checked);
+          setHasUnsavedChanges(true);
         }}
       />
       <CollectionChain recordId={orderedRequest.record.id} />

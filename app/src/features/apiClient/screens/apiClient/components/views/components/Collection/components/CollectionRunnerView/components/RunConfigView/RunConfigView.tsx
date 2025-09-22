@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
@@ -12,7 +12,73 @@ import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
+import { useGenericState } from "hooks/useGenericState";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import "./runConfigView.scss";
+
+const RunConfigSaveButton: React.FC = () => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { collectionId } = useCollectionView();
+  const [getConfigToSave, hasUnsavedChanges, setHasUnsavedChanges] = useRunConfigStore((s) => [
+    s.getConfigToSave,
+    s.hasUnsavedChanges,
+    s.setHasUnsavedChanges,
+  ]);
+
+  const {
+    runner: { saveRunConfig },
+  } = useCommand();
+
+  const { setPreview, setUnsaved, getIsActive } = useGenericState();
+
+  const isActiveTab = getIsActive();
+
+  useEffect(() => {
+    setUnsaved(hasUnsavedChanges);
+
+    if (hasUnsavedChanges) {
+      setPreview(false);
+    }
+  }, [setUnsaved, setPreview, hasUnsavedChanges]);
+
+  const handleSaveClick = useCallback(async () => {
+    setIsSaving(true);
+    const configToSave = getConfigToSave();
+
+    try {
+      await saveRunConfig({ collectionId, configToSave });
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      toast.error("Something went wrong while saving!");
+      Sentry.captureException(error, { extra: { collectionId, configToSave } });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [getConfigToSave, saveRunConfig, collectionId, setHasUnsavedChanges]);
+
+  return (
+    <RQTooltip
+      placement="top"
+      title={
+        hasUnsavedChanges
+          ? "Save your current configuration for future use. You can also run the collection without saving"
+          : null
+      }
+    >
+      <RQButton
+        enableHotKey={isActiveTab}
+        hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION.hotKey}
+        size="small"
+        loading={isSaving}
+        icon={hasUnsavedChanges ? <div className="unsaved-changes-indicator" /> : <MdOutlineSave />}
+        onClick={handleSaveClick}
+      >
+        Save
+      </RQButton>
+    </RQTooltip>
+  );
+};
 
 const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const { collectionId } = useCollectionView();
@@ -53,36 +119,32 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 };
 
 export const RunConfigView: React.FC = () => {
-  const [isSaving, setIsSaving] = useState(false);
   const [selectAll, setSelectAll] = useState({ value: true });
 
   const { collectionId } = useCollectionView();
-  const [getConfigToSave, setOrderedRequests] = useRunConfigStore((s) => [s.getConfigToSave, s.setOrderedRequests]);
+  const [setOrderedRequests, setHasUnsavedChanges] = useRunConfigStore((s) => [
+    s.setOrderedRequests,
+    s.setHasUnsavedChanges,
+  ]);
   const {
-    runner: { saveRunConfig, resetRunOrder },
+    runner: { resetRunOrder },
   } = useCommand();
 
   const handleSelectAllClick = () => {
     setSelectAll({ value: true });
+
+    if (!selectAll) {
+      setHasUnsavedChanges(true);
+    }
   };
 
   const handleDeselectAllClick = () => {
     setSelectAll({ value: false });
-  };
 
-  const handleSaveClick = useCallback(async () => {
-    setIsSaving(true);
-    const configToSave = getConfigToSave();
-
-    try {
-      await saveRunConfig({ collectionId, configToSave });
-    } catch (error) {
-      toast.error("Something went wrong while saving!");
-      Sentry.captureException(error, { extra: { collectionId, configToSave } });
-    } finally {
-      setIsSaving(false);
+    if (selectAll) {
+      setHasUnsavedChanges(true);
     }
-  }, [getConfigToSave, saveRunConfig, collectionId]);
+  };
 
   const handleResetClick = () => {
     resetRunOrder({ collectionId, setOrderedRequests });
@@ -105,9 +167,7 @@ export const RunConfigView: React.FC = () => {
         </div>
 
         <div className="actions">
-          <RQButton size="small" loading={isSaving} icon={<MdOutlineSave />} onClick={handleSaveClick}>
-            Save
-          </RQButton>
+          <RunConfigSaveButton />
           <RunCollectionButton />
         </div>
       </div>
