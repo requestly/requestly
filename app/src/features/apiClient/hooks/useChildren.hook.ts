@@ -1,7 +1,7 @@
 import { ApiClientEventTopic } from "../helpers/apiClientTreeBus/types";
 import { RQAPI } from "../types";
 import { ApiClientFeatureContext } from "../store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { createApiClientTreeBus } from "../helpers/apiClientTreeBus/createReactiveHook";
+import { createApiClientTreeBus } from "../helpers/apiClientTreeBus/createApiClientTreeBus";
 
 export const getAllChildrenRecords = (ctx: ApiClientFeatureContext, nodeId: string) => {
   const children = ctx.stores.records.getState().getAllChildren(nodeId);
