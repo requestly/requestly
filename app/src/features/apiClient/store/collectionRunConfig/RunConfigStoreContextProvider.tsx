@@ -2,8 +2,9 @@ import React, { createContext, useEffect, useMemo } from "react";
 import { StoreApi } from "zustand";
 import { createRunConfigStore, RunConfigState } from "./runConfig.store";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { useAPIRecords } from "../apiRecords/ApiRecordsContextProvider";
 import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
+import { useChildren } from "features/apiClient/hooks/useChildren.hook";
+import { useCollectionView } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionView.context";
 
 export const RunConfigStoreContext = createContext<StoreApi<RunConfigState> | null>(null);
 
@@ -11,8 +12,9 @@ export const RunConfigStoreContextProvider: React.FC<{
   runConfig: SavedRunConfig;
   children: React.ReactNode;
 }> = ({ runConfig, children }) => {
-  const apiClientRecords = useAPIRecords((s) => s.apiClientRecords);
-  const requests = useMemo(() => apiClientRecords.filter(isApiRequest), [apiClientRecords]);
+  const { collectionId } = useCollectionView();
+  const records = useChildren(collectionId);
+  const requests = useMemo(() => records.filter(isApiRequest), [records]);
 
   const store = useMemo(() => {
     const data = { id: runConfig.id, runOrder: runConfig.runOrder, unorderedRequests: requests };

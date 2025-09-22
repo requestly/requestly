@@ -57,9 +57,9 @@ export const RunConfigView: React.FC = () => {
   const [selectAll, setSelectAll] = useState({ value: true });
 
   const { collectionId } = useCollectionView();
-  const [getConfigToSave] = useRunConfigStore((s) => [s.getConfigToSave]);
+  const [getConfigToSave, setOrderedRequests] = useRunConfigStore((s) => [s.getConfigToSave, s.setOrderedRequests]);
   const {
-    runner: { saveRunConfig },
+    runner: { saveRunConfig, resetRunOrder },
   } = useCommand();
 
   const handleSelectAllClick = () => {
@@ -85,7 +85,7 @@ export const RunConfigView: React.FC = () => {
   }, [getConfigToSave, saveRunConfig, collectionId]);
 
   const handleResetClick = () => {
-    // TODO
+    resetRunOrder({ collectionId, setOrderedRequests });
   };
 
   return (

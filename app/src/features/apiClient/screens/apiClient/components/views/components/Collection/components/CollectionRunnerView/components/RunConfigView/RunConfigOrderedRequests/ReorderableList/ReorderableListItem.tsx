@@ -6,6 +6,7 @@ import { useDrag, useDrop } from "react-dnd";
 import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
+import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 
 enum ReorderableItemType {
   REQUEST = "request",
@@ -23,23 +24,25 @@ enum DragDirection {
 }
 
 const RequestInfo: React.FC<{
-  record: RQAPI.ApiRecord;
-}> = ({ record }) => {
+  recordId: RQAPI.ApiRecord["id"];
+}> = ({ recordId }) => {
+  const request = useApiRecord(recordId) as RQAPI.ApiRecord;
+
   return (
     <div className="request-info-container">
-      <RequestIcon record={record} />
+      <RequestIcon record={request} />
       <Typography.Text
         className="request-name"
         ellipsis={{
           tooltip: {
-            title: record.name || record.data.request?.url,
+            title: request.name || request.data.request?.url,
             color: "#000",
             placement: "top",
             mouseEnterDelay: 0.5,
           },
         }}
       >
-        {record.name || record.data.request?.url}
+        {request.name || request.data.request?.url}
       </Typography.Text>
     </div>
   );
@@ -124,7 +127,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
         }}
       />
       <CollectionChain recordId={orderedRequest.record.id} />
-      <RequestInfo record={orderedRequest.record} />
+      <RequestInfo recordId={orderedRequest.record.id} />
     </div>
   );
 };
