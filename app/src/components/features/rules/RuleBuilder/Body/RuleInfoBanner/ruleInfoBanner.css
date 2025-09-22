@@ -5,7 +5,7 @@
 .rule-info-banner.ant-alert {
   padding: 8px;
   background-color: rgba(30, 105, 255, 0.05);
-  border: 1px dashed var(--primary);
+  border: 1px dashed var(--requestly-color-primary);
   border-radius: var(--border-radius-sm);
 }
 

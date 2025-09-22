@@ -42,7 +42,7 @@
   margin-right: 2px;
   font-size: var(--requestly-font-size-sm, 13px);
   font-weight: normal;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border-radius: var(--border-radius-sm);
 }
 
@@ -77,7 +77,7 @@
 }
 
 .request-log-pane .log-table {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .request-log-pane .log-table thead tr {
@@ -131,7 +131,7 @@
 .action-header-input .traffic-table-regex-btn-active,
 .traffic-table-filter-btn-active.ant-btn {
   background: var(--border-dark);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .ant-btn span.traffic-table-filter-btn-content {
@@ -169,11 +169,11 @@
   font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 500;
   margin-top: 1.6rem;
-  color: var(--primary);
+  color: var(--requestly-color-primary);
 }
 
 .traffic-table-filter-label {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-weight: 500;
 }
 

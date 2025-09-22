@@ -21,7 +21,6 @@ import { redirectToForgotPassword } from "utils/RedirectionUtils";
 import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils";
 import posthog from "posthog-js";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { clientStorageService } from "services/clientStorageService";
 
 const showError = (err: string) => {

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--black);
+  background: var(--requestly-color-black);
   width: 100%;
   overflow: hidden;
 
@@ -29,7 +29,7 @@
     width: 100%;
 
     padding: 8px 1rem;
-    background: var(--black);
+    background: var(--requestly-color-black);
     border-bottom: 1px solid var(--requestly-color-surface-1);
 
     &-content {
@@ -105,7 +105,7 @@
   margin-left: 8px;
 
   .success {
-    color: var(--green-green-300);
+    color: var(--requestly-color-success-300);
   }
 }
 
