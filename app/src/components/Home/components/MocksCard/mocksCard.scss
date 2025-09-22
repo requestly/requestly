@@ -16,12 +16,12 @@
   cursor: pointer;
 
   &:hover {
-    background: var(--surface-1);
+    background: var(--requestly-color-surface-1);
   }
 
   &:hover .mocks-card-list-item-name {
     text-decoration: underline;
-    text-decoration-color: var(--white);
+    text-decoration-color: var(--requestly-color-text-default);
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
   }
