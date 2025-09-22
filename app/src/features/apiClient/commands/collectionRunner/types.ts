@@ -1,6 +1,3 @@
 import { RQAPI } from "features/apiClient/types";
 
-export type SavedRunConfig = {
-  id: RQAPI.RunConfig["id"];
-  runOrder: RQAPI.RunOrder;
-};
+export type SavedRunConfig = Pick<RQAPI.RunConfig, "id" | "runOrder">;

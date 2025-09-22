@@ -11,40 +11,7 @@ import { useCollectionView } from "../../../../collectionView.context";
 import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
-import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
 import "./runConfigView.scss";
-
-const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
-  const { collectionId } = useCollectionView();
-  const getConfig = useRunConfigStore((s) => s.getConfig);
-  const {
-    runner: { runCollection },
-  } = useCommand();
-
-  const executor = useBatchRequestExecutor(collectionId);
-
-  const handleRunClick = useCallback(async () => {
-    try {
-      // TODO: update params
-      await runCollection({ runResultStore: {}, runConfig: getConfig(), executor, orderedRequests: [] });
-    } catch (error) {
-      toast.error("Unable to run collection!");
-      Sentry.captureException(error, {
-        extra: {
-          reason: "Unable to run collection!",
-        },
-      });
-    }
-  }, [runCollection, getConfig, executor]);
-
-  /* TODO: For CLI support convert it into dropdown button */
-  /* TODO: add cancel button */
-  return (
-    <RQButton disabled={disabled} size="small" type="primary" icon={<MdOutlineVideoLibrary />} onClick={handleRunClick}>
-      Run
-    </RQButton>
-  );
-};
 
 export const RunConfigView: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -78,6 +45,8 @@ export const RunConfigView: React.FC = () => {
     }
   }, [getConfigToSave, saveRunConfig, collectionId]);
 
+  const handleRunClick = useCallback(() => {}, []);
+
   const handleResetClick = () => {
     // TODO
   };
@@ -102,7 +71,10 @@ export const RunConfigView: React.FC = () => {
           <RQButton size="small" loading={isSaving} icon={<MdOutlineSave />} onClick={handleSaveClick}>
             Save
           </RQButton>
-          <RunCollectionButton />
+          {/* TODO: For CLI support convert it into dropdown button */}
+          <RQButton size="small" type="primary" icon={<MdOutlineVideoLibrary />} onClick={handleRunClick}>
+            Run
+          </RQButton>
         </div>
       </div>
 
