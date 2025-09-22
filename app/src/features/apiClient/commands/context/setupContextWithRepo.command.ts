@@ -36,21 +36,23 @@ export const setupContextWithRepoWithoutMarkingLoaded = async (
     globalEnvironment: environments.globalEnvironment,
     contextId: workspaceId,
   });
-  const apiRecordsStore = createApiRecordsStore(apiClientRecords);
+
+  const context: ApiClientFeatureContext = {
+    id: workspaceId,
+    workspaceId,
+    stores: {},
+    repositories: repoForWorkspace,
+    treeBus: {} as ApiClientTreeBus,
+  } as ApiClientFeatureContext;
+
+  const apiRecordsStore = createApiRecordsStore(context, apiClientRecords);
   const errorStore = createErroredRecordsStore(erroredRecords);
   const stores = {
     environments: environmentStore,
     records: apiRecordsStore,
     erroredRecords: errorStore,
   };
-
-  const context: ApiClientFeatureContext = {
-    id: workspaceId,
-    workspaceId,
-    stores,
-    repositories: repoForWorkspace,
-    treeBus: {} as ApiClientTreeBus,
-  } as ApiClientFeatureContext;
+  context.stores = stores;
 
   const treeBus = new ApiClientTreeBus(context);
   context.treeBus = treeBus;

@@ -2,7 +2,7 @@ import { RQAPI } from "features/apiClient/types";
 
 export enum ApiClientEventTopic {
   AUTH_CHANGED = "authChanged",
-  CHILD_ADDED = "childAdded",
+  TREE_CHANGED = "treeChanged",
 }
 
 export interface ApiClientEvent {

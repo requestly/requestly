@@ -5,6 +5,8 @@ import { create, StoreApi } from "zustand";
 import { EnvVariableState, parseEnvVariables } from "../variables/variables.store";
 import { apiClientFileStore } from "../apiClientFilesStore";
 import { PersistedVariables } from "../shared/variablePersistence";
+import { ApiClientFeatureContext } from "../apiClientFeatureContext/apiClientFeatureContext.store";
+import { TreeChanged } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -162,10 +164,13 @@ function createIndexStore(index: ApiRecordsState["index"]) {
   return indexStore;
 }
 
-export const createApiRecordsStore = (initialRecords: {
-  records: RQAPI.ApiClientRecord[];
-  erroredRecords: ErroredRecord[];
-}) => {
+export const createApiRecordsStore = (
+  context: ApiClientFeatureContext,
+  initialRecords: {
+    records: RQAPI.ApiClientRecord[];
+    erroredRecords: ErroredRecord[];
+  }
+) => {
   const { childParentMap: initialChildParentMap, index: initialIndex } = parseRecords(initialRecords.records);
   return create<ApiRecordsState>()((set, get) => ({
     apiClientRecords: initialRecords.records,
@@ -251,15 +256,24 @@ export const createApiRecordsStore = (initialRecords: {
     addNewRecord(record) {
       const updatedRecords = [...get().apiClientRecords, record];
       get().refresh(updatedRecords);
+      context.treeBus.emit(new TreeChanged(record.id));
     },
 
     addNewRecords(records) {
       const updatedRecords = [...get().apiClientRecords, ...records];
       get().refresh(updatedRecords);
+      updatedRecords.forEach((r) => context.treeBus.emit(new TreeChanged(r.id)));
     },
 
     updateRecord(patch) {
-      const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
+      const existingRecords = get().apiClientRecords;
+
+      const existingCollectionId = existingRecords.find((r) => r.id === patch.id)?.collectionId;
+      const newCollectionId = patch.collectionId;
+
+      const treeBusEmitEffect = context.treeBus.getEmitEffect(new TreeChanged(patch.id));
+
+      const updatedRecords = existingRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
       get().refresh(updatedRecords);
 
       const recordStore = get().getRecordStore(patch.id);
@@ -271,6 +285,11 @@ export const createApiRecordsStore = (initialRecords: {
       const { updateRecordState } = recordStore.getState();
       updateRecordState(patch);
       get().triggerUpdateForChildren(patch.id);
+
+      if (existingCollectionId !== newCollectionId) {
+        treeBusEmitEffect();
+        context.treeBus.emit(new TreeChanged(patch.id));
+      }
     },
 
     updateRecords(patches) {
@@ -283,6 +302,10 @@ export const createApiRecordsStore = (initialRecords: {
       const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
       for (const patch of patches) {
         const updatedRecord = updatedRecordMap.get(patch.id);
+        const existingCollectionId = updatedRecord?.collectionId;
+        const newCollectionId = patch?.collectionId;
+        const treeBusEmitEffect = context.treeBus.getEmitEffect(new TreeChanged(patch.id));
+
         if (updatedRecord) {
           const recordStore = get().getRecordStore(patch.id);
 
@@ -293,6 +316,11 @@ export const createApiRecordsStore = (initialRecords: {
           const { updateRecordState } = recordStore.getState();
           updateRecordState(patch);
           get().triggerUpdateForChildren(patch.id);
+
+          if (existingCollectionId !== newCollectionId) {
+            treeBusEmitEffect();
+            context.treeBus.emit(new TreeChanged(patch.id));
+          }
         }
       }
     },
@@ -308,8 +336,13 @@ export const createApiRecordsStore = (initialRecords: {
     },
 
     deleteRecords(recordIds) {
+      const treeBusEmitEffect = recordIds.map((recordId) => context.treeBus.getEmitEffect(new TreeChanged(recordId)));
+
       const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
+
       get().refresh(updatedRecords);
+
+      treeBusEmitEffect.forEach((emit) => emit());
     },
 
     getRecordStore(id) {
