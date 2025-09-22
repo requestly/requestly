@@ -63,7 +63,6 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log("selecting each......");
     setSelected(isSelectAll);
   }, [isSelectAll]);
 
@@ -105,12 +104,6 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
     }),
   });
 
-  const collections = [
-    { id: "1", name: "C1" },
-    { id: "2", name: "C2" },
-    { id: "3", name: "C3" },
-  ] as RQAPI.CollectionRecord[];
-
   drag(drop(ref));
   const opacity = isDragging ? 0.5 : 1;
   return (
@@ -129,7 +122,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
           setSelected(e.target.checked);
         }}
       />
-      <CollectionChain collections={collections} />
+      <CollectionChain recordId={record.id} />
       <RequestInfo record={record} />
     </div>
   );

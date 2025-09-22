@@ -29,17 +29,31 @@ function isValidNumber(number: unknown) {
   return Number.isFinite(number) && Number.isInteger(number);
 }
 
+function parseUnorderedRequests(runOrder: RQAPI.RunOrder, unorderedRequests: RQAPI.ApiRecord[]) {
+  const orderedRequests: RQAPI.RunConfig["orderedRequests"] = [];
+
+  runOrder.forEach((id) => {
+    const request = unorderedRequests.find((r) => r.id === id);
+    if (request) {
+      orderedRequests.push(request);
+    }
+  });
+
+  return orderedRequests;
+}
+
 export function createRunConfigStore(data: {
   id: RQAPI.RunConfig["id"];
-  orderedRequests: RQAPI.RunConfig["orderedRequests"];
+  runOrder: RQAPI.RunOrder;
+  unorderedRequests: RQAPI.ApiRecord[];
   delay?: RQAPI.RunConfig["delay"];
   iterations?: RQAPI.RunConfig["iterations"];
 }) {
-  const { id, orderedRequests, delay = 0, iterations = 1 } = data;
+  const { id, runOrder, unorderedRequests, delay = 0, iterations = 1 } = data;
 
   return create<RunConfigState>()((set, get) => ({
     id,
-    orderedRequests,
+    orderedRequests: parseUnorderedRequests(runOrder, unorderedRequests),
     delay,
     iterations,
 
