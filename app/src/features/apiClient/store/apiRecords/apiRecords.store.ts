@@ -262,7 +262,7 @@ export const createApiRecordsStore = (
     addNewRecords(records) {
       const updatedRecords = [...get().apiClientRecords, ...records];
       get().refresh(updatedRecords);
-      context.treeBus.emit(new TreeChanged(records[0].id));
+      updatedRecords.forEach((r) => context.treeBus.emit(new TreeChanged(r.id)));
     },
 
     updateRecord(patch) {
@@ -302,6 +302,10 @@ export const createApiRecordsStore = (
       const updatedRecordMap = new Map(updatedRecords.map((r) => [r.id, r]));
       for (const patch of patches) {
         const updatedRecord = updatedRecordMap.get(patch.id);
+        const existingCollectionId = updatedRecord?.collectionId;
+        const newCollectionId = patch?.collectionId;
+        const treeBusEmitEffect = context.treeBus.getEmitEffect(new TreeChanged(patch.id));
+
         if (updatedRecord) {
           const recordStore = get().getRecordStore(patch.id);
 
@@ -312,6 +316,11 @@ export const createApiRecordsStore = (
           const { updateRecordState } = recordStore.getState();
           updateRecordState(patch);
           get().triggerUpdateForChildren(patch.id);
+
+          if (existingCollectionId !== newCollectionId) {
+            treeBusEmitEffect();
+            context.treeBus.emit(new TreeChanged(patch.id));
+          }
         }
       }
     },
@@ -327,9 +336,13 @@ export const createApiRecordsStore = (
     },
 
     deleteRecords(recordIds) {
+      const treeBusEmitEffect = recordIds.map((recordId) => context.treeBus.getEmitEffect(new TreeChanged(recordId)));
+
       const updatedRecords = get().apiClientRecords.filter((r) => !recordIds.includes(r.id));
-      context.treeBus.emit(new TreeChanged(recordIds[0]));
+
       get().refresh(updatedRecords);
+
+      treeBusEmitEffect.forEach((emit) => emit());
     },
 
     getRecordStore(id) {

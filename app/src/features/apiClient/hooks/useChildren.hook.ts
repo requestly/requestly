@@ -11,8 +11,8 @@ export const useChildren = (nodeId: string) => {
   const getAllChildrenRecords = useCallback(
     function () {
       const children = ctx.stores.records.getState().getAllChildren(nodeId);
-      const allRecords = ctx.stores.records.getState().getAllRecords();
-      return allRecords.filter((r) => children.includes(r.id));
+      const getRecord = ctx.stores.records.getState().getData;
+      return children.map((child) => getRecord(child)).filter(Boolean);
     },
     [ctx, nodeId]
   );
@@ -23,10 +23,7 @@ export const useChildren = (nodeId: string) => {
     const subscription = new Subscription<ApiClientEventTopic.TREE_CHANGED, RQAPI.ApiClientRecord[]>(
       setChildren,
       (_, ctx) => {
-        const children = ctx.stores.records.getState().getAllChildren(nodeId);
-        const allRecords = ctx.stores.records.getState().getAllRecords();
-        const childrenRecords = allRecords.filter((r) => children.includes(r.id));
-        return childrenRecords;
+        return getAllChildrenRecords();
       }
     );
     treeBus.subscribe({ nodeId: nodeId, topic: ApiClientEventTopic.TREE_CHANGED, subscription });
@@ -34,7 +31,7 @@ export const useChildren = (nodeId: string) => {
     return () => {
       treeBus.unsubscribe({ nodeId: nodeId, topic: ApiClientEventTopic.TREE_CHANGED, subscription });
     };
-  }, [ctx, nodeId, treeBus]);
+  }, [getAllChildrenRecords, nodeId, treeBus]);
 
   return children;
 };
