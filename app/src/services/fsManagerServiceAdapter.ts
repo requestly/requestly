@@ -67,8 +67,8 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async createRecordWithId(record: API["data"], id: string) {
-    return this.invokeProcedureInBG("createRecordWithId", record, id) as Promise<FileSystemResult<API>>;
+  async createRecordWithId(record: API["data"], id: string, collectionId: string) {
+    return this.invokeProcedureInBG("createRecordWithId", record, id, collectionId) as Promise<FileSystemResult<API>>;
   }
 
   @FsErrorHandler

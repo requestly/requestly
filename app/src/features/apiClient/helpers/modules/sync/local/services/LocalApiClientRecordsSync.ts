@@ -251,7 +251,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       {
         ...this.parseApiRecordRequest(record),
       },
-      id
+      id,
+      record.collectionId,
     );
 
     if (result.type === "error") {
