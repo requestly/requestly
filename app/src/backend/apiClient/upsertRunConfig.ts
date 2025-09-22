@@ -4,7 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { ResponsePromise } from "backend/types";
 import * as Sentry from "@sentry/react";
 import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 
 export async function upsertRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
@@ -26,7 +26,7 @@ async function _upsertRunConfigInFirebase(
     const updatedRunConfig = {
       ...runConfig,
       updatedTs: timeStamp,
-    } as RQAPI.RunConfig;
+    } as Partial<SavedRunConfigRecord>;
 
     const snapshot = await getDoc(docRef);
     if (!snapshot.exists()) {
@@ -34,7 +34,7 @@ async function _upsertRunConfigInFirebase(
     }
 
     await setDoc(docRef, updatedRunConfig, { merge: true });
-    return { success: true, data: { ...(snapshot.data() ?? {}), ...updatedRunConfig, id: runConfig.id } };
+    return { success: true, data: { id: runConfig.id, runOrder: updatedRunConfig.runOrder } };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigToUpdate: runConfig },

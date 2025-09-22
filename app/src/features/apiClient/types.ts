@@ -323,11 +323,6 @@ export namespace RQAPI {
     iterations: number;
     delay: number;
   };
-
-  export type RunConfigRecord = RunConfig & {
-    createdTs: number;
-    updatedTs: number;
-  };
 }
 
 export enum PostmanBodyMode {

@@ -2,21 +2,21 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 import { getAllChildren } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { RQAPI } from "features/apiClient/types";
 import { getChildParentMap } from "../store.utils";
-import { RunConfigState } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import { NativeError } from "errors/NativeError";
 import { SavedRunConfig } from "./types";
 
 function getDefaultRunOrderByCollectionId(
   ctx: ApiClientFeatureContext,
   id: RQAPI.ApiClientRecord["collectionId"]
-): RunConfigState["runOrder"] {
+): RQAPI.RunOrder {
   const childParentMap = getChildParentMap(ctx);
   const runOrder = getAllChildren(id, childParentMap);
   return runOrder;
 }
 
 function getConfigFromSavedData(config: Partial<RQAPI.RunConfig>): SavedRunConfig {
-  return { id: config.id, runOrder: config.runOrder };
+  const runOrder = config.orderedRequests.map((r) => r.id);
+  return { id: config.id, runOrder };
 }
 
 export async function getDefaultRunConfig(
