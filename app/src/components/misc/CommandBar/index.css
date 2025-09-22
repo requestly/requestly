@@ -14,7 +14,7 @@
   min-height: 200px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--component-background);
+  border: 1px solid var(--requestly-color-surface-1);
   background: var(--dialog-bg);
   transition: transform 100ms ease;
   pointer-events: auto;
@@ -75,7 +75,7 @@ div[cmdk-dialog] {
 }
 .dialog [cmdk-item][aria-selected="true"] {
   background: var(--cmdk-gray0);
-  border-left: 3px solid var(--primary);
+  border-left: 3px solid var(--requestly-color-primary);
   color: #fff;
 }
 
@@ -149,7 +149,7 @@ div[cmdk-dialog] {
   gap: 20px;
   padding: 10px;
   color: var(--text-gray);
-  border-top: 1px solid var(--component-background);
+  border-top: 1px solid var(--requestly-color-surface-1);
   z-index: 3;
 }
 .dialog .cmd-footer-wrapper .cmd-key-icon {

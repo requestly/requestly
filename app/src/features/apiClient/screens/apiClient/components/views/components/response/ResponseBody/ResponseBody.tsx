@@ -6,6 +6,7 @@ import "./responseBody.scss";
 import { RQButton } from "lib/design-system-v2/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import Editor from "componentsV2/CodeEditor";
+import { copyToClipBoard } from "utils/Misc";
 
 interface Props {
   responseText: string;
@@ -38,12 +39,14 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
     }
   }, []);
 
-  const onCopyButtonClick = useCallback(() => {
-    navigator.clipboard.writeText(responseText);
-    setIsResponseCopied(true);
-    setTimeout(() => {
-      setIsResponseCopied(false);
-    }, 1000);
+  const onCopyButtonClick = useCallback(async () => {
+    const result = await copyToClipBoard(responseText);
+    if (result.success) {
+      setIsResponseCopied(true);
+      setTimeout(() => {
+        setIsResponseCopied(false);
+      }, 1000);
+    }
   }, [responseText]);
 
   const bodyPreviewModeOptions = useMemo(() => {

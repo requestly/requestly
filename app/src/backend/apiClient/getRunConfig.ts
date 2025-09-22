@@ -1,0 +1,38 @@
+import firebaseApp from "../../firebase";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { RQAPI } from "features/apiClient/types";
+import * as Sentry from "@sentry/react";
+import { ResponsePromise } from "../types";
+import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
+
+export async function getRunConfig(
+  collectionId: RQAPI.ApiClientRecord["collectionId"],
+  runConfigId: RQAPI.RunConfig["id"]
+): ResponsePromise<RQAPI.RunConfig> {
+  const result = await _getRunConfigFromFirebase(collectionId, runConfigId);
+  return result;
+}
+
+async function _getRunConfigFromFirebase(
+  collectionId: RQAPI.ApiClientRecord["collectionId"],
+  runConfigId: RQAPI.RunConfig["id"]
+): ResponsePromise<RQAPI.RunConfig> {
+  try {
+    const db = getFirestore(firebaseApp);
+    const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfigId);
+    const snapshot = await getDoc(docRef);
+
+    if (!snapshot.exists()) {
+      return { success: false, data: null, message: "Not found!" };
+    }
+
+    const data = snapshot.data() as RQAPI.RunConfig;
+    return { success: true, data: { ...data, id: runConfigId } };
+  } catch (e) {
+    Sentry.captureException(e, {
+      extra: { collectionId, runConfigId },
+    });
+
+    return { success: false, data: null, message: "Something went wrong!" };
+  }
+}

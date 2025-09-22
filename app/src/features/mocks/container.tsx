@@ -9,6 +9,7 @@ import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/syn
 const MocksFeatureContainer: React.FC = () => {
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
 
+  // fixme: rethink when expanding multi view to cloud workspaces
   if (isLocalSyncEnabled) {
     return (
       <LocalFirstComingSoon

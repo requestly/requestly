@@ -22,10 +22,10 @@
 
     &:hover,
     &:focus {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       border: 1px solid #343434;
       border-left: 0;
-      background-color: var(--hover-color);
+      background-color: var(--requestly-color-surface-2);
     }
   }
 }

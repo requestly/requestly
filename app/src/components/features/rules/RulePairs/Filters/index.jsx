@@ -253,11 +253,12 @@ const Filters = (props) => {
                 ...theme.colors,
                 primary: "#141414",
                 primary25: "#2b2b2b",
-                neutral0: "#141414",
+                neutral0: "#1f1f1f",
                 neutral10: "#323337", // tag background color
                 neutral80: "whitesmoke", // tag text color
                 danger: "whitesmoke", // tag cancel icon color
-                dangerLight: "#323337", // tag cancel background color
+                dangerLight: "#323337",
+                // tag cancel background color
               },
             })}
             name="request-method"
@@ -373,7 +374,7 @@ const Filters = (props) => {
                 ...theme.colors,
                 primary: "#141414",
                 primary25: "#2b2b2b",
-                neutral0: "#141414",
+                neutral0: "#1f1f1f",
                 neutral10: "#323337", // tag background color
                 neutral80: "whitesmoke", // tag text color
                 danger: "whitesmoke", // tag cancel icon color

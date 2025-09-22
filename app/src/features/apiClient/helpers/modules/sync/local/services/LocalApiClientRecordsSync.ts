@@ -1,4 +1,4 @@
-import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
+import { ApiClientLocalMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { API, APIEntity, ApiRequestDetails, FileSystemResult, FileType } from "./types";
@@ -569,6 +569,28 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return {
       success: true,
       data: { records: result, erroredRecords: [] },
+    };
+  }
+
+  async getRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfigId: RQAPI.RunConfig["id"]
+  ): ResultPromise<RQAPI.RunConfig> {
+    return {
+      success: false,
+      data: null,
+      message: "Not implemented",
+    };
+  }
+
+  async upsertRunConfig(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runConfig: Partial<RQAPI.RunConfig>
+  ): ResultPromise<RQAPI.RunConfig> {
+    return {
+      success: false,
+      data: null,
+      message: "Not implemented",
     };
   }
 }

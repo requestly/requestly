@@ -27,13 +27,17 @@ import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../../NewApiRecordDropdown/NewApiRecordDropdown";
 import "./CollectionRow.scss";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientExportModal } from "../../../../modals/exportModal/ApiClientExportModal";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
+import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
+import { useSelector } from "react-redux";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
+import { WorkspaceType } from "features/workspaces/types";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -88,28 +92,44 @@ export const CollectionRow: React.FC<Props> = ({
 
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
-  const contextId = useContextId();
+  const context = useApiClientFeatureContext();
   const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
     state.openTab,
     state.activeTabSource,
     state.closeTabBySource,
   ]);
-  const [getParentChain] = useAPIRecords((state) => [state.getParentChain]);
 
-  const handleCollectionExport = useCallback((collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-    setCollectionsToExport((prev) => [...prev, collection]);
+  const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
+  const activeWorkspace = useSelector(getActiveWorkspace);
+  const handleCollectionExport = useCallback(
+    (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
+      const collectionRecordState = getRecordStore(record.id).getState() as CollectionRecordState;
+      const collectionVariables = collectionRecordState.collectionVariables.getState().data;
 
-    switch (exportType) {
-      case ExportType.REQUESTLY:
-        setIsExportModalOpen(true);
-        break;
-      case ExportType.POSTMAN:
-        setIsPostmanExportModalOpen(true);
-        break;
-      default:
-        console.warn(`Unknown export type: ${exportType}`);
-    }
-  }, []);
+      const removeLocalValue = (variables: Map<string, any>): Record<string, any> => {
+        // set localValue to empty before exporting
+        return Object.fromEntries([...variables.entries()].map(([k, v]) => [k, { ...v, localValue: "" }]));
+      };
+
+      const exportData: RQAPI.CollectionRecord = {
+        ...collection,
+        data: { ...collection.data, variables: removeLocalValue(collectionVariables) },
+      };
+      setCollectionsToExport((prev) => [...prev, exportData]);
+
+      switch (exportType) {
+        case ExportType.REQUESTLY:
+          setIsExportModalOpen(true);
+          break;
+        case ExportType.POSTMAN:
+          setIsPostmanExportModalOpen(true);
+          break;
+        default:
+          console.warn(`Unknown export type: ${exportType}`);
+      }
+    },
+    [getRecordStore, record.id]
+  );
 
   const activeTabSourceId = useMemo(() => {
     if (activeTabSource) {
@@ -225,9 +245,11 @@ export const CollectionRow: React.FC<Props> = ({
           destination,
         });
 
-        oldContextRecords?.forEach((r) => {
-          closeTabBySource(r.id, "request", true);
-        });
+        if (activeWorkspace.workspaceType !== WorkspaceType.SHARED) {
+          oldContextRecords?.forEach((r) => {
+            closeTabBySource(r.id, "request", true);
+          });
+        }
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -244,7 +266,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
+    [activeWorkspace.workspaceType, record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -274,13 +296,13 @@ export const CollectionRow: React.FC<Props> = ({
       type: RQAPI.RecordType.COLLECTION,
       item: {
         record,
-        contextId,
+        contextId: context.id,
       },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [record, contextId]
+    [record, context.id]
   );
 
   const [{ isOver }, drop] = useDrop(
@@ -292,14 +314,14 @@ export const CollectionRow: React.FC<Props> = ({
 
         if (item.record.id === record.id) return;
         setIsCollectionRowLoading(true);
-        handleRecordDrop(item, contextId);
+        handleRecordDrop(item, context.id);
       },
       canDrop: checkCanDropItem,
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
     }),
-    [handleRecordDrop, checkCanDropItem, contextId]
+    [handleRecordDrop, checkCanDropItem, context.id]
   );
 
   return (
@@ -390,7 +412,7 @@ export const CollectionRow: React.FC<Props> = ({
                             id: record.id,
                             title: record.name || "New Collection",
                             context: {
-                              id: contextId,
+                              id: context.id,
                             },
                           }),
                           { preview: true }
@@ -407,7 +429,7 @@ export const CollectionRow: React.FC<Props> = ({
                             id: record.id,
                             title: record.name || "New Collection",
                             context: {
-                              id: contextId,
+                              id: context.id,
                             },
                           }),
                           { preview: true }
@@ -488,7 +510,7 @@ export const CollectionRow: React.FC<Props> = ({
                       newRecordBtnText="New collection"
                       onNewClick={(src, recordType, collectionId, entryType) =>
                         onNewClickV2({
-                          contextId: contextId,
+                          contextId: context.id,
                           analyticEventSource: src,
                           recordType,
                           collectionId,

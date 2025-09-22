@@ -57,9 +57,9 @@ const PricingFAQs = () => {
       question: <React.Fragment>Do you offer student discounts?</React.Fragment>,
       answer: (
         <React.Fragment>
-          Requestly’s Professional Plan is completely free for students! Simply sign up with your school email address
-          to unlock premium features instantly. Read more details{" "}
-          <a target="_blank" href={LINKS.STUDENT_PROGRAM_DOC} rel="noreferrer">
+          Requestly’s Professional Plan (worth $270) is free for students for one year! Just connect your GitHub Student
+          account to unlock premium features instantly. Read more details{" "}
+          <a target="_blank" href={LINKS.GITHUB_STUDENT_PROGRAM_DOC} rel="noreferrer">
             here
           </a>
           .

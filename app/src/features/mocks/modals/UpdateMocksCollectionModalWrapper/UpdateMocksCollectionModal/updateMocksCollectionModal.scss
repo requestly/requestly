@@ -10,7 +10,7 @@
     border: 1px solid var(--requestly-color-white-t-10);
 
     .header {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       font-size: 1rem;
       font-weight: 500;
       line-height: 24px;
@@ -23,7 +23,7 @@
       gap: 4px;
 
       & > span {
-        color: var(--white);
+        color: var(--requestly-color-text-default);
         font-size: var(--requestly-font-size-sm, 13px);
         font-weight: 500;
         line-height: 18px;

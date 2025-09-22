@@ -6,7 +6,7 @@
   z-index: 10;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 
   // ant-design modal's default box shadow
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48), 0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
@@ -15,7 +15,7 @@
     padding: 8px 8px 8px 20px;
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
-    background-color: var(--component-dark-background);
+    background-color: var(--requestly-color-surface-0);
 
     .header {
       font-size: var(--requestly-font-size-sm);
@@ -59,6 +59,6 @@
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     border-top: 1px solid var(--border-dark);
-    background-color: var(--component-dark-background);
+    background-color: var(--requestly-color-surface-0);
   }
 }

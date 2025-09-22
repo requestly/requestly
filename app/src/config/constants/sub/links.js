@@ -146,13 +146,15 @@ const LINKS = {
 
   ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
 
-  STUDENT_PROGRAM_DOC: "https://requestly.notion.site/Requestly-Student-Program-12dd193f3c998018ad45d31c784f3131",
+  GITHUB_STUDENT_PROGRAM_DOC: "https://rqst.ly/github-education",
+
+  GITHUB_EDUCATION_PACK_LP: "https://requestly.com/github-education/",
 
   API_CLIENT_LOCAL_FIRST_ANNOUNCEMENT: "https://github.com/requestly/requestly/issues/2629",
 
   REQUESTLY_GITHUB: "https://github.com/requestly/requestly",
 
-  OAUTH_REDIRECT_URL: `${process.env.BACKEND_BASE_URL}/oauth/authorize`,
+  OAUTH_REDIRECT_URL: `${process.env.VITE_BACKEND_BASE_URL}/oauth/authorize`,
 
   ACQUISITION_DETAILS: "https://rqst.ly/rq-bstack-acq",
 

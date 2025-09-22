@@ -8,11 +8,11 @@
   border-radius: inherit;
   padding: 0 0 1rem 0;
   border: 1px solid var(--border-dark);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-header {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   padding: 1.5rem 1.25rem 8px 1.25rem;
 }
 
@@ -26,13 +26,10 @@
   padding: 0 1.25rem;
   color: var(--text-gray);
   border-radius: inherit;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
-.ant-collapse.custom-collapse
-  .ant-collapse-item
-  .ant-collapse-content
-  .ant-collapse-content-box {
+.ant-collapse.custom-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
   padding-top: 0;
   padding-bottom: 8px;
 }
@@ -43,8 +40,6 @@
 }
 
 .custom-collapse.ant-collapse > .ant-collapse-item:last-child,
-.custom-collapse.ant-collapse
-  > .ant-collapse-item:last-child
-  > .ant-collapse-header {
+.custom-collapse.ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header {
   border-radius: var(--border-radius-md);
 }

@@ -2,8 +2,8 @@
   width: 184px;
   padding: 12px;
   height: 100vw;
-  border-right: 1px solid var(--surface-2);
-  background: var(--surface-1);
+  border-right: 1px solid var(--requestly-color-surface-2);
+  background: var(--requestly-color-surface-1);
   box-shadow: -2px 0px 12px 0px rgba(0, 0, 0, 0.28);
   overflow-y: auto;
 
@@ -17,7 +17,7 @@
     padding-left: 1rem !important;
 
     &-link:hover {
-      background: var(--surface-2);
+      background: var(--requestly-color-surface-2);
     }
   }
 }

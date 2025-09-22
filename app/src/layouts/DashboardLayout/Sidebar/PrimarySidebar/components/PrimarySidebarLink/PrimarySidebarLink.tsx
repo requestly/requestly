@@ -6,7 +6,7 @@ export const PrimarySidebarLink: React.FC<PrimarySidebarItem> = ({
   title,
   path,
   icon,
-  activeColor = "var(--primary)",
+  activeColor = "var(--requestly-color-primary)",
   disabled,
 }) => (
   <NavLink

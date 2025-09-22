@@ -44,13 +44,13 @@
 
 .billing-team-action-loader-container {
   .billing-team-action-loader {
-    color: var(--text-default);
+    color: var(--requestly-color-text-default);
     font-size: 24px;
   }
 }
 
 .billing-team-action-loader-text {
-  color: var(--text-default);
+  color: var(--requestly-color-text-default);
   font-size: 1rem;
   font-weight: 500;
   line-height: 24px;
@@ -58,7 +58,7 @@
 }
 
 .billing-team-action-result-text {
-  color: var(--text-subtle);
+  color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-sm, 13px);
   line-height: 18px;
   letter-spacing: 0.25px;

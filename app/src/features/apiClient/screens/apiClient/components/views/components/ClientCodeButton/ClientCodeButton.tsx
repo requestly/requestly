@@ -2,16 +2,17 @@ import { IoMdCode } from "@react-icons/all-files/io/IoMdCode";
 import { RQButton } from "lib/design-system-v2/components";
 import React, { useState } from "react";
 import { ApiClientSnippetModal } from "../../../modals/ApiClientSnippetModal/ApiClientSnippetModal";
-import { GraphQLRequestExecutor } from "features/apiClient/helpers/graphQLRequestExecutor/GraphQLRequestExecutor";
-import { HttpRequestExecutor } from "features/apiClient/helpers/httpRequestExecutor/httpRequestExecutor";
+import { RQAPI } from "features/apiClient/types";
+import { toast } from "utils/Toast";
 
 interface Props {
-  apiClientExecutor: GraphQLRequestExecutor | HttpRequestExecutor;
-  handleOnClick?: () => void;
+  requestPreparer: () => RQAPI.HttpRequest;
 }
 
-export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor, handleOnClick }) => {
+export const ClientCodeButton: React.FC<Props> = ({ requestPreparer }) => {
   const [isSnippetModalVisible, setIsSnippetModalVisible] = useState(false);
+  const [preparedRequest, setPreparedRequest] = useState<RQAPI.HttpRequest | null>(null);
+
   return (
     <>
       <RQButton
@@ -20,15 +21,22 @@ export const ClientCodeButton: React.FC<Props> = ({ apiClientExecutor, handleOnC
         size="small"
         className="api-client-view_get-code-btn"
         onClick={() => {
-          handleOnClick?.();
-          setIsSnippetModalVisible(true);
+          try {
+            const request = requestPreparer();
+            if (request) {
+              setPreparedRequest(request);
+              setIsSnippetModalVisible(true);
+            }
+          } catch (error) {
+            toast.error("Error preparing code snippet");
+          }
         }}
       >
         Get client code
       </RQButton>
-      {isSnippetModalVisible ? (
+      {isSnippetModalVisible && preparedRequest ? (
         <ApiClientSnippetModal
-          apiRequest={apiClientExecutor?.prepareRequest()}
+          apiRequest={preparedRequest}
           open={isSnippetModalVisible}
           onClose={() => setIsSnippetModalVisible(false)}
         />
