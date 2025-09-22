@@ -1,7 +1,7 @@
 import { createBlankApiRecord } from "features/apiClient/screens/apiClient/utils";
 import { useDispatch } from "react-redux";
 import { RQAPI } from "features/apiClient/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { trackNewCollectionClicked, trackNewRequestClicked } from "modules/analytics/events/features/apiClient";
 import { variablesActions } from "store/features/variables/slice";
 import { RBACButton, useRBAC } from "features/rbac";
@@ -14,7 +14,6 @@ import {
 import "./apiClientEmptyView.scss";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
-import { useChildren } from "features/apiClient/hooks/useChildren.hook";
 
 export const ApiClientEmptyView = () => {
   const dispatch = useDispatch();
@@ -90,16 +89,6 @@ export const ApiClientEmptyView = () => {
         setIsRecordCreating(null);
       });
   };
-
-  const children1 = useChildren("ffad5131-8f95-42d6-a746-fae62a9e9959");
-  const children2 = useChildren("a782121b-6d28-4e18-aecc-85ccac9d84c6");
-
-  useEffect(() => {
-    console.log("!!!debug", "useChildren state", {
-      children1,
-      children2,
-    });
-  }, [children1, children2]);
 
   return (
     <div className="api-client-empty-view-container">
