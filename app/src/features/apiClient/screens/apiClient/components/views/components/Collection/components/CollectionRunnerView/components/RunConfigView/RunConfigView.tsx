@@ -16,7 +16,8 @@ import "./runConfigView.scss";
 
 const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const { collectionId } = useCollectionView();
-  const getConfig = useRunConfigStore((s) => s.getConfig);
+  const [getConfig, orderedRequests] = useRunConfigStore((s) => [s.getConfig, s.orderedRequests]);
+
   const {
     runner: { runCollection },
   } = useCommand();
@@ -26,7 +27,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const handleRunClick = useCallback(async () => {
     try {
       // TODO: update params
-      await runCollection({ runResultStore: {}, runConfig: getConfig(), executor, orderedRequests: [] });
+      await runCollection({ runResultStore: {}, runConfig: getConfig(), executor, orderedRequests });
     } catch (error) {
       toast.error("Unable to run collection!");
       Sentry.captureException(error, {
@@ -35,11 +36,18 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         },
       });
     }
-  }, [runCollection, getConfig, executor]);
+  }, [runCollection, getConfig, executor, orderedRequests]);
+
+  const handleCancelRunClick = useCallback(async () => {}, []);
 
   /* TODO: For CLI support convert it into dropdown button */
   /* TODO: add cancel button */
-  return (
+  const isRunning = false; // TODO: get it from result store
+  return isRunning ? (
+    <RQButton disabled={disabled} size="small" type="danger" onClick={handleCancelRunClick}>
+      Cancel
+    </RQButton>
+  ) : (
     <RQButton disabled={disabled} size="small" type="primary" icon={<MdOutlineVideoLibrary />} onClick={handleRunClick}>
       Run
     </RQButton>
@@ -48,7 +56,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
 export const RunConfigView: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
-  const [isSelectAll, setIsSelectAll] = useState(false);
+  const [isSelectAll, setIsSelectAll] = useState(true);
 
   const { collectionId } = useCollectionView();
   const [getConfigToSave] = useRunConfigStore((s) => [s.getConfigToSave]);
