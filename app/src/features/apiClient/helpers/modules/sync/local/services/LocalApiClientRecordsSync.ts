@@ -1,4 +1,4 @@
-import { ApiClientLocalMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
+import { ApiClientLocalMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { RQAPI } from "features/apiClient/types";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { API, APIEntity, ApiRequestDetails, FileSystemResult, FileType } from "./types";
@@ -6,6 +6,7 @@ import { parseEntityVariables, parseFsId, parseNativeId } from "../../utils";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentVariables } from "backend/environment/types";
 import { Authorization } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
+import { ResponsePromise } from "backend/types";
 
 export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientLocalMeta> {
   meta: ApiClientLocalMeta;
@@ -575,22 +576,28 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResultPromise<RQAPI.RunConfig> {
+  ): ResponsePromise<RQAPI.RunConfig> {
     return {
       success: false,
       data: null,
-      message: "Not implemented",
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Not implemented",
+      },
     };
   }
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfig: Partial<RQAPI.RunConfig>
-  ): ResultPromise<RQAPI.RunConfig> {
+  ): ResponsePromise<RQAPI.RunConfig> {
     return {
       success: false,
       data: null,
-      message: "Not implemented",
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Not implemented",
+      },
     };
   }
 }
