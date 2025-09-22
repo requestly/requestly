@@ -267,7 +267,14 @@ export const createApiRecordsStore = (
     },
 
     updateRecord(patch) {
-      const updatedRecords = get().apiClientRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
+      const existingRecords = get().apiClientRecords;
+
+      const existingCollectionId = existingRecords.find((r) => r.id === patch.id)?.collectionId;
+      const newCollectionId = patch.collectionId;
+
+      const treeBusEmitEffect = context.treeBus.getEmitEffect(new TreeChanged(patch.id));
+
+      const updatedRecords = existingRecords.map((r) => (r.id === patch.id ? { ...r, ...patch } : r));
       get().refresh(updatedRecords);
 
       const recordStore = get().getRecordStore(patch.id);
@@ -279,6 +286,11 @@ export const createApiRecordsStore = (
       const { updateRecordState } = recordStore.getState();
       updateRecordState(patch);
       get().triggerUpdateForChildren(patch.id);
+
+      if (existingCollectionId !== newCollectionId) {
+        treeBusEmitEffect();
+        context.treeBus.emit(new TreeChanged(patch.id));
+      }
     },
 
     updateRecords(patches) {

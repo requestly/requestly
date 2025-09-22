@@ -22,9 +22,11 @@ export class AuthChanged extends ApiClientEventForChildren {
   }
 }
 
-export class TreeChanged implements ApiClientEvent {
+export class TreeChanged extends ApiClientEventForParents {
   readonly topic = ApiClientEventTopic.TREE_CHANGED;
-  constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {}
+  constructor(public emitterId: RQAPI.ApiClientRecord["id"]) {
+    super(emitterId);
+  }
 }
 
 type ApiClientEventMap = {
@@ -78,21 +80,26 @@ export class ApiClientTreeBus {
       this.emitToChildren(event.emitterId, event);
     } else if (event instanceof ApiClientEventForParents) {
       this.emitToParentChain(event.emitterId, event);
-    } else {
-      this.emitToChildren(event.emitterId, event);
-      this.emitToParentChain(event.emitterId, event);
+    }
+  }
+
+  getEmitEffect(event: ApiClientEvent) {
+    if (event instanceof ApiClientEventForChildren) {
+      const allChildren = this.store.getState().getAllChildren(event.emitterId);
+      return () => this.sendToSubscribers(event, allChildren);
+    } else if (event instanceof ApiClientEventForParents) {
+      const parentChain = this.store.getState().getParentChain(event.emitterId);
+      return () => this.sendToSubscribers(event, parentChain);
     }
   }
 
   private emitToChildren(nodeId: string, event: ApiClientEventForChildren) {
     const allChildren = this.store.getState().getAllChildren(nodeId);
-    console.log("!!!debug", "allchild", allChildren);
     return this.sendToSubscribers(event, allChildren);
   }
 
   private emitToParentChain(nodeId: string, event: ApiClientEventForParents) {
     const parentChain = this.store.getState().getParentChain(nodeId);
-    console.log("!!!debug", "parent", parentChain);
     return this.sendToSubscribers(event, parentChain);
   }
 
