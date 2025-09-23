@@ -9,28 +9,12 @@ import {
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 
-function parseRequestToExecute(
-  orderedRequest: RQAPI.OrderedRequest
-): {
-  recordId: RQAPI.ApiRecord["id"];
-  entry: RQAPI.ApiEntry;
-} {
-  const { record } = orderedRequest;
-
-  const parsedRequest = {
-    recordId: record.id,
-    entry: record.data,
-  };
-
-  return parsedRequest;
-}
-
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
     ? {
-        type: entry.type,
-        method: entry.request.method,
-      }
+      type: entry.type,
+      method: entry.request.method,
+    }
     : { type: entry.type };
 }
 
@@ -65,71 +49,136 @@ function parseExecutionResult(params: {
   };
 }
 
+class Runner {
+  constructor(
+    readonly runContext: RunContext,
+    readonly executor: BatchRequestExecutor,
+  ) {
+
+  }
+
+  private getRequest(requestIndex: number) {
+    const { orderedRequests } = this.runContext.runConfigStore.getState();
+    const request = orderedRequests[requestIndex];
+
+    if (!request.isSelected) {
+      return;
+    }
+
+    return request;
+  }
+
+  private beforeStart() {
+    this.runContext.runResultStore.getState().clearAll();
+    this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
+  }
+
+  private beforeRequestExecutionStart(iteration: number, request: RQAPI.OrderedRequest) {
+    const startTime = Date.now();
+    const currentExecutingRequest: CurrentlyExecutingRequest = {
+      startTime,
+      iteration,
+      recordId: request.record.id,
+      entry: parseExecutingRequestEntry(request.record.data),
+    };
+
+    this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
+
+    return {
+      currentExecutingRequest,
+    }
+
+  }
+
+  private afterRequestExecutionComplete(currentExecutingRequest: CurrentlyExecutingRequest, result: RQAPI.ExecutionResult) {
+    this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
+
+    const executionResult = parseExecutionResult({
+      iteration: currentExecutingRequest.iteration,
+      startTime: currentExecutingRequest.startTime,
+      recordId: currentExecutingRequest.recordId,
+      result,
+    });
+
+    this.runContext.runResultStore.getState().addResult(executionResult);
+
+  }
+
+  private afterComplete() {
+    this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
+  }
+
+  private onError(error: any) {
+    this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+  }
+
+  private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
+    const { runContext } = this;
+    const { runConfigStore } = runContext;
+    const { getConfig, orderedRequests } = runConfigStore.getState();
+    const { delay, iterations } = getConfig();
+    const requestsCount = orderedRequests.length;
+
+    const isLastIteration = iterationIndex === iterations - 1;
+    const isLastRequestInIteration = requestIndex === requestsCount - 1;
+    const hasNextRequest = !isLastIteration || !isLastRequestInIteration;
+
+    if (hasNextRequest && delay > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+  }
+
+  private async *iterate() {
+    const { runContext } = this;
+    const { runConfigStore } = runContext;
+    const { getConfig, orderedRequests } = runConfigStore.getState();
+    const { iterations } = getConfig();
+    const requestsCount = orderedRequests.length;
+
+    for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
+      for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
+        const request = this.getRequest(requestIndex);
+        if (!request) {
+          continue;
+        }
+
+        yield {
+          request,
+          iteration: iterationIndex + 1,
+        }
+
+        await this.delay(iterationIndex, requestIndex);
+      }
+    }
+
+  }
+
+  async run() {
+    try {
+      this.beforeStart();
+      for await (const { request, iteration } of this.iterate()) {
+        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
+        const result = await this.executor.executeSingleRequest(request.record.id, request.record.data);
+        this.afterRequestExecutionComplete(currentExecutingRequest, result);
+      }
+      this.afterComplete();
+    }
+    catch (e) {
+      this.onError(e);
+      return e;
+    }
+  }
+
+}
+
 export async function runCollection(
-  ctx: ApiClientFeatureContext,
+  _: ApiClientFeatureContext,
   params: {
     runContext: RunContext;
     executor: BatchRequestExecutor;
   }
 ) {
-  const { executor, runContext } = params;
-  const { runConfigStore, runResultStore } = runContext;
-  const { getConfig, orderedRequests } = runConfigStore.getState();
-  const { iterations, delay } = getConfig();
-
-  runResultStore.getState().clearAll();
-
-  runResultStore.getState().setRunStatus(RunStatus.RUNNING);
-  const requestsCount = orderedRequests.length;
-  for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
-    for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
-      if (runResultStore.getState().runStatus === RunStatus.CANCELLED) {
-        // TODO
-        return;
-      }
-
-      const request = orderedRequests[requestIndex];
-
-      if (!request.isSelected) {
-        continue;
-      }
-
-      const parsedRequest = parseRequestToExecute(request);
-
-      const startTime = Date.now();
-      const currentExecutingRequest: CurrentlyExecutingRequest = {
-        startTime,
-        iteration: iterationIndex + 1,
-        recordId: request.record.id,
-        entry: parseExecutingRequestEntry(request.record.data),
-      };
-
-      runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
-
-      const result = await executor.executeSingleRequest(parsedRequest.recordId, parsedRequest.entry);
-
-      runResultStore.getState().setCurrentlyExecutingRequest(null);
-
-      const executionResult = parseExecutionResult({
-        iteration: iterationIndex + 1,
-        startTime,
-        recordId: request.record.id,
-        result,
-      });
-
-      runResultStore.getState().addResult(executionResult);
-
-      // Only delay if there's a next request
-      const isLastIteration = iterationIndex === iterations - 1;
-      const isLastRequestInIteration = requestIndex === requestsCount - 1;
-      const hasNextRequest = !isLastIteration || !isLastRequestInIteration;
-
-      if (hasNextRequest && delay > 0) {
-        await executor.delay(delay);
-      }
-    }
-  }
-
-  runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
-  // TODO: store result into history
+  const runner = new Runner(params.runContext, params.executor);
+  return runner.run();
 }
