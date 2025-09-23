@@ -2,7 +2,7 @@ import React from "react";
 import { InputNumber } from "antd";
 import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
+import { useRunConfigStore } from "../../../run.context";
 import { toast } from "utils/Toast";
 import "./runConfigSettings.scss";
 
