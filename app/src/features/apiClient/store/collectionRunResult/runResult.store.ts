@@ -8,10 +8,17 @@ type Timestamp = number;
 type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
-  method: RQAPI.HttpRequest["method"];
+  entry:
+    | {
+        type: RQAPI.ApiEntryType.HTTP;
+        method: RQAPI.HttpRequest["method"];
+      }
+    | {
+        type: RQAPI.ApiEntryType.GRAPHQL;
+      };
 };
 
-type RequestExecutionResult =
+export type RequestExecutionResult =
   | (BaseRequestExecutionResult & {
       status: {
         value: RQAPI.ExecutionStatus.SUCCESS;
@@ -24,7 +31,7 @@ type RequestExecutionResult =
   | (BaseRequestExecutionResult & {
       status: {
         value: RQAPI.ExecutionStatus.ERROR;
-        error: unknown;
+        error: RQAPI.ExecutionError;
       };
       statusCode: null;
       duration: null;
@@ -53,12 +60,11 @@ export type SavedRunResult = {
 
 type RunSummary = Omit<SavedRunResult, "id">;
 
-export type CurrentlyExecutingRequest = null | {
-  iteration: Iteration;
-  recordId: RQAPI.ApiRecord["id"];
-  method: RQAPI.HttpRequest["method"];
-  startTime: Timestamp;
-};
+export type CurrentlyExecutingRequest =
+  | null
+  | (BaseRequestExecutionResult & {
+      startTime: Timestamp;
+    });
 
 type IterationDetails = {
   result: RequestExecutionResult[];
