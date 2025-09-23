@@ -72,6 +72,8 @@ import { Authorization } from "../components/request/components/AuthorizationVie
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
+import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
+import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -129,6 +131,8 @@ const HttpClientView: React.FC<Props> = ({
   const scopedVariables = useScopedVariables(apiEntryDetails!.id!);
 
   const { version: parentVersion } = useParentApiRecord(apiEntryDetails?.id);
+  const getPathVariables = usePathVariablesStore((state) => state.getPathVariables);
+
   const [requestName, setRequestName] = useState(apiEntryDetails?.name || "");
   const [entry, setEntry] = useState<RQAPI.HttpApiEntry>(
     apiEntryDetails?.data ?? (getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry)
@@ -538,6 +542,7 @@ const HttpClientView: React.FC<Props> = ({
         ...entry.request,
         url: entry.request.url.split("?")[0],
         queryParams: queryParams,
+        pathVariables: getPathVariables(),
       },
     };
     const isValidHeader = entry.request?.headers?.every((header) => {
@@ -615,6 +620,7 @@ const HttpClientView: React.FC<Props> = ({
     onSaveRecord,
     resetChanges,
     queryParams,
+    getPathVariables,
   ]);
 
   const handleCancelRequest = useCallback(() => {
@@ -813,9 +819,11 @@ const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
       <ErrorBoundary>
-        <QueryParamsProvider entry={props.apiEntryDetails?.data}>
-          <Component {...props} />
-        </QueryParamsProvider>
+        <PathVariablesProvider pathVariables={props.apiEntryDetails?.data?.request?.pathVariables}>
+          <QueryParamsProvider entry={props.apiEntryDetails?.data}>
+            <Component {...props} />
+          </QueryParamsProvider>
+        </PathVariablesProvider>
       </ErrorBoundary>
     );
   };
