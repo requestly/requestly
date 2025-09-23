@@ -111,7 +111,11 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   }
 
   resumeWidgetTimer() {
-    this.show();
+    this.#widgetDisplayStartTime = Date.now();
+    this.#widgetDisplayTimerId = setTimeout(() => {
+      super.hide();
+      this.#widgetDisplayRemainingTime = IMPLICIT_WIDGET_DISPLAY_TIME;
+    }, this.#widgetDisplayRemainingTime);
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {
