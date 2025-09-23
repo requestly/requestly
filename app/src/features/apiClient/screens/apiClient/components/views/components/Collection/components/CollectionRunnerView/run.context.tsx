@@ -9,12 +9,14 @@ import { createRunResultStore, RunResultState } from "features/apiClient/store/c
 import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
 
-export const RunContext = createContext<{
+export type RunContext = {
   runConfigStore: StoreApi<RunConfigState>;
   runResultStore: StoreApi<RunResultState>;
-} | null>(null);
+};
 
-export const RunContextProvider: React.FC<{
+const RunViewContext = createContext<RunContext | null>(null);
+
+export const RunViewContextProvider: React.FC<{
   runConfig: SavedRunConfig;
   children: React.ReactNode;
 }> = ({ runConfig, children }) => {
@@ -38,14 +40,14 @@ export const RunContextProvider: React.FC<{
     };
   }, [runConfigStore]);
 
-  return <RunContext.Provider value={value}>{children}</RunContext.Provider>;
+  return <RunViewContext.Provider value={value}>{children}</RunViewContext.Provider>;
 };
 
 export function useRunContext() {
-  const ctx = useContext(RunContext);
+  const ctx = useContext(RunViewContext);
 
   if (ctx === null) {
-    throw new NativeError("useRunContext must be used within RunContextProvider");
+    throw new NativeError("useRunContext must be used within RunViewContextProvider");
   }
 
   return ctx;
@@ -55,7 +57,7 @@ export function useRunConfigStore<T>(selector: (state: RunConfigState) => T) {
   const ctx = useRunContext();
 
   if (ctx === null) {
-    throw new NativeError("useRunConfigStore must be used within RunContextProvider");
+    throw new NativeError("useRunConfigStore must be used within RunViewContextProvider");
   }
 
   return useStore(ctx.runConfigStore, useShallow(selector));
@@ -65,7 +67,7 @@ export function useRunResultStore<T>(selector: (state: RunResultState) => T) {
   const ctx = useRunContext();
 
   if (ctx === null) {
-    throw new NativeError("useRunResultStore must be used within RunContextProvider");
+    throw new NativeError("useRunResultStore must be used within RunViewContextProvider");
   }
 
   return useStore(ctx.runResultStore, useShallow(selector));
