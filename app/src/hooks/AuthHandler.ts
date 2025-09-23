@@ -263,10 +263,10 @@ const AuthHandler: React.FC<{}> = () => {
         // set amplitude anon id to local storage:
         const planDetails = preparePlan();
         dispatch(
-          // @ts-ignore
           globalActions.updateUserInfo({
             loggedIn: false,
-            details: { planDetails, isPremium: isPremiumUser(planDetails) },
+            // @ts-ignore
+            details: planDetails ? { planDetails, isPremium: isPremiumUser(planDetails) } : null,
           })
         );
         dispatch(
