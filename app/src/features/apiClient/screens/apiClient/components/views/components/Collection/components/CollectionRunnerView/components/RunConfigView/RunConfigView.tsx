@@ -8,7 +8,7 @@ import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOr
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
 import { useCommand } from "features/apiClient/commands";
 import { useCollectionView } from "../../../../collectionView.context";
-import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
+import { useRunConfigStore } from "../../run.context";
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";

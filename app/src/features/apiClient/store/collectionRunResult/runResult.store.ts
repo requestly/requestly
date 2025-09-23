@@ -64,7 +64,7 @@ type IterationDetails = {
   result: RequestExecutionResult[];
 };
 
-type RunResultState = {
+export type RunResultState = {
   startTime: Timestamp | null;
   endTime: Timestamp | null;
   averageResponseTime: Timestamp | null;
