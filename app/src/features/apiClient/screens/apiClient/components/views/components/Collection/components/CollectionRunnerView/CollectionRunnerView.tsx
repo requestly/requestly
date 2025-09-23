@@ -41,8 +41,8 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   }
 
   return (
-    <AutogenerateProvider key={collectionId}>
-      <CollectionViewContextProvider collectionId={collectionId}>
+    <CollectionViewContextProvider key={collectionId} collectionId={collectionId}>
+      <AutogenerateProvider>
         <RunContextProvider runConfig={config}>
           <div className="collection-runner-view">
             <Split
@@ -66,7 +66,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
             </Split>
           </div>
         </RunContextProvider>
-      </CollectionViewContextProvider>
-    </AutogenerateProvider>
+      </AutogenerateProvider>
+    </CollectionViewContextProvider>
   );
 };
