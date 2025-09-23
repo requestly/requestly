@@ -47,8 +47,6 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
-  const isPathVariablesSupported = isFeatureCompatible(FEATURES.PATH_VARIABLES);
-
   const items = useMemo(() => {
     return [
       {
@@ -69,16 +67,14 @@ const HttpRequestTabs: React.FC<Props> = ({
                 }));
               }}
             />
-            {isPathVariablesSupported ? (
-              <PathVariableTable
-                onChange={(newVariables) => {
-                  setRequestEntry((prev) => ({
-                    ...prev,
-                    request: { ...prev.request, pathVariables: newVariables },
-                  }));
-                }}
-              />
-            ) : null}
+            <PathVariableTable
+              onChange={(newVariables) => {
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  request: { ...prev.request, pathVariables: newVariables },
+                }));
+              }}
+            />
           </>
         ),
       },
@@ -169,7 +165,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     requestEntry.scripts,
     setContentType,
     setRequestEntry,
-    isPathVariablesSupported,
   ]);
 
   return (
