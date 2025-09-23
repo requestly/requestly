@@ -75,7 +75,7 @@ type RunResultState = {
   clearAll(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
   addResult(result: RequestExecutionResult): void;
-  completeRun(status: RunStatus): void;
+  setRunStatus(status: RunStatus): void;
   getRunSummary(): RunSummary;
 };
 
@@ -139,7 +139,7 @@ export function createRunResultStore() {
       set({ result: new Map(result) });
     },
 
-    completeRun(status) {
+    setRunStatus(status) {
       set({ runStatus: status });
     },
 
@@ -157,14 +157,12 @@ export function createRunResultStore() {
       let skippedTests = 0;
 
       allResults.forEach((executionResult) => {
-        if (executionResult.status.value === RQAPI.ExecutionStatus.SUCCESS) {
-          if (executionResult.testResults) {
-            const { success, failed, skipped, total } = getTestSummary(executionResult);
-            totalTests += total;
-            successTests += success;
-            failedTests += failed;
-            skippedTests += skipped;
-          }
+        if (executionResult.status.value === RQAPI.ExecutionStatus.SUCCESS && executionResult.testResults) {
+          const { success, failed, skipped, total } = getTestSummary(executionResult);
+          totalTests += total;
+          successTests += success;
+          failedTests += failed;
+          skippedTests += skipped;
         }
       });
 
