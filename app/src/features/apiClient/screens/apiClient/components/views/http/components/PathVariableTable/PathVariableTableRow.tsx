@@ -3,7 +3,7 @@ import { Form, FormInstance, Input } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { toast } from "utils/Toast";
 
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
+const EditableContext = React.createContext<FormInstance<RQAPI.PathVariable> | null>(null);
 
 interface EditableRowProps {
   index: number;

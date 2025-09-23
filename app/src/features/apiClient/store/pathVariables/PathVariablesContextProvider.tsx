@@ -3,7 +3,7 @@ import { StoreApi } from "zustand";
 import { createPathVariablesStore, PathVariablesStore } from "./pathVariables.store";
 import { RQAPI } from "features/apiClient/types";
 
-export const PathVariablesStoreContext = createContext<StoreApi<PathVariablesStore>>(null);
+export const PathVariablesStoreContext = createContext<StoreApi<PathVariablesStore> | null>(null);
 
 export const PathVariablesProvider = ({
   children,

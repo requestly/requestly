@@ -367,6 +367,7 @@ const HttpClientView: React.FC<Props> = ({
       request: {
         ...entry.request,
         queryParams: queryParams,
+        pathVariables: getPathVariables(),
       },
     };
 
@@ -461,6 +462,7 @@ const HttpClientView: React.FC<Props> = ({
     dispatch,
     httpRequestExecutor,
     notifyApiRequestFinished,
+    getPathVariables,
   ]);
 
   const handleDismissError = () => {
