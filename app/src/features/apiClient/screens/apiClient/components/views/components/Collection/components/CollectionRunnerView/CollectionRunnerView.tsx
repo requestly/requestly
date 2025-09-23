@@ -10,6 +10,7 @@ import * as Sentry from "@sentry/react";
 import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
 import { RunViewContextProvider, useRunResultStore } from "./run.context";
 import { RunConfigView } from "./components/RunConfigView/RunConfigView";
+import { RunResultView } from "./components/RunResultView/RunResultView";
 import "./collectionRunnerView.scss";
 
 interface Props {
@@ -59,17 +60,8 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
               direction="horizontal"
               className="collection-runner-view-split"
             >
-              {/* TODO: remove extra divs after result view */}
-              <div>
-                <RunConfigView />
-              </div>
-
-              <div>
-                {/* TODO: Result view */}
-                <h3>
-                  <RunResult />
-                </h3>
-              </div>
+              <RunConfigView />
+              <RunResultView />
             </Split>
           </div>
         </RunViewContextProvider>
