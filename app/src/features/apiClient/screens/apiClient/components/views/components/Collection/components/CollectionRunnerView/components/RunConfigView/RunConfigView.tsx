@@ -93,20 +93,19 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const executor = useBatchRequestExecutor(collectionId);
 
   const handleRunClick = useCallback(async () => {
-    try {
-      await runCollection({ runContext, executor });
-    } catch (error) {
-      runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
-      toast.error("Unable to run collection!");
-      Sentry.captureException(error, {
-        extra: {
-          reason: "Unable to run collection!",
-        },
-      });
+    const error = await runCollection({ runContext, executor });
+    if (!error) {
+      return;
     }
+    toast.error("Unable to run collection!");
+    Sentry.captureException(error, {
+      extra: {
+        reason: "Unable to run collection!",
+      },
+    });
   }, [runCollection, runContext, executor]);
 
-  const handleCancelRunClick = useCallback(async () => {}, []);
+  const handleCancelRunClick = useCallback(async () => { }, []);
 
   const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (

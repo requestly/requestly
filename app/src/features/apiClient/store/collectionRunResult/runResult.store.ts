@@ -1,3 +1,4 @@
+import { NativeError } from "errors/NativeError";
 import { TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { RQAPI } from "features/apiClient/types";
 import { create } from "zustand";
@@ -45,6 +46,16 @@ export enum RunStatus {
   COMPLETED = "completed",
   ERRORED = "errored",
 }
+
+export class InvalidRunnerStateChange extends NativeError {};
+
+const RunStateMachine = {
+  [RunStatus.IDLE]: [RunStatus.RUNNING],
+  [RunStatus.RUNNING]: [RunStatus.CANCELLED, RunStatus.COMPLETED, RunStatus.ERRORED],
+  [RunStatus.CANCELLED]: [RunStatus.IDLE],
+  [RunStatus.COMPLETED]: [RunStatus.IDLE],
+  [RunStatus.ERRORED]: [RunStatus.IDLE]
+};
 
 export type SavedRunResult = {
   id: string; // runId
@@ -146,6 +157,11 @@ export function createRunResultStore() {
     },
 
     setRunStatus(status) {
+      const currentStatus = get().runStatus;
+      const isStateChangleAllowed = RunStateMachine[currentStatus].includes(status);
+      if(!isStateChangleAllowed) {
+        throw new InvalidRunnerStateChange(`Invalid state change from ${currentStatus} to ${status}`);
+      }
       set({ runStatus: status });
     },
 
