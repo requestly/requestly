@@ -275,7 +275,7 @@ export namespace RQAPI {
   export type PathVariable = {
     id: number;
     key: string;
-    value?: string;
+    value: string;
     description?: string;
   };
 
