@@ -26,11 +26,9 @@ export class HttpRequestPreparationService {
     let renderedUrl = url;
 
     variablesFromUrl.forEach((variableName) => {
-      const pathVariable = variablesMap.get(variableName);
-      const value = pathVariable?.value || "";
+      const variable = variablesMap.get(variableName);
 
-      const colonPattern = new RegExp(`:${variableName}\\b`, "g");
-      renderedUrl = renderedUrl.replace(colonPattern, value);
+      renderedUrl = renderedUrl.replace(new RegExp(`:${variableName}\\b`, "g"), variable.value);
     });
 
     return renderedUrl;
