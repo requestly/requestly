@@ -5,7 +5,7 @@ import { RQAPI } from "features/apiClient/types";
 import { useDrag, useDrop } from "react-dnd";
 import { CollectionChain } from "./CollectionChain";
 import { RequestIcon } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import { useRunConfigStore } from "features/apiClient/store/collectionRunConfig/runConfigStoreContext.hook";
+import { useRunConfigStore } from "../../../../run.context";
 import { useApiRecord } from "features/apiClient/hooks/useApiRecord.hook";
 
 enum ReorderableItemType {
