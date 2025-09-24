@@ -8,6 +8,7 @@ import {
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
+import { NativeError } from "errors/NativeError";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -58,8 +59,20 @@ function parseExecutionResult(params: {
   };
 }
 
+class RunCancelled extends NativeError {}
+
 class Runner {
   constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
+
+  private get abortController() {
+    return this.runContext.runResultStore.getState().abortController;
+  }
+
+  private throwIfRunCancelled() {
+    if (this.abortController.signal.aborted) {
+      throw new RunCancelled();
+    }
+  }
 
   private getRequest(requestIndex: number) {
     const { orderedRequests } = this.runContext.runConfigStore.getState();
@@ -73,7 +86,7 @@ class Runner {
   }
 
   private beforeStart() {
-    this.runContext.runResultStore.getState().clearAll();
+    this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
   }
 
@@ -87,6 +100,7 @@ class Runner {
       entry: parseExecutingRequestEntry(request.record.data),
     };
 
+    this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
     return {
@@ -98,6 +112,7 @@ class Runner {
     currentExecutingRequest: CurrentlyExecutingRequest,
     result: RQAPI.ExecutionResult
   ) {
+    this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
 
     const executionResult = parseExecutionResult({
@@ -112,11 +127,16 @@ class Runner {
   }
 
   private afterComplete() {
+    this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
   }
 
   private onError(error: any) {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+  }
+
+  private onRunCancelled() {
+    this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
   }
 
   private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
@@ -131,7 +151,18 @@ class Runner {
     const hasNextRequest = !isLastIteration || !isLastRequestInIteration;
 
     if (hasNextRequest && delay > 0) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          resolve();
+        }, delay);
+
+        const abortHandler = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+
+        this.abortController.signal.addEventListener("abort", abortHandler, { once: true });
+      });
     }
   }
 
@@ -162,13 +193,23 @@ class Runner {
   async run() {
     try {
       this.beforeStart();
+
       for await (const { request, iteration } of this.iterate()) {
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
-        const result = await this.executor.executeSingleRequest(request.record.id, request.record.data);
+        const result = await this.executor.executeSingleRequest(
+          request.record.id,
+          request.record.data,
+          this.runContext.runResultStore.getState().abortController
+        );
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
+
       this.afterComplete();
     } catch (e) {
+      if (e instanceof RunCancelled) {
+        this.onRunCancelled();
+        return;
+      }
       this.onError(e);
       return e;
     }

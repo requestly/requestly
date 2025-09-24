@@ -94,8 +94,9 @@ export type RunResultState = {
   runStatus: RunStatus;
   result: Map<Iteration, IterationDetails>;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
+  abortController: AbortController;
 
-  clearAll(): void;
+  reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: RunStatus): void;
@@ -110,8 +111,9 @@ export function createRunResultStore() {
     runStatus: RunStatus.IDLE,
     result: new Map(),
     currentlyExecutingRequest: null,
+    abortController: new AbortController(),
 
-    clearAll() {
+    reset() {
       set({
         startTime: null,
         endTime: null,
@@ -119,6 +121,7 @@ export function createRunResultStore() {
         runStatus: RunStatus.IDLE,
         result: new Map(),
         currentlyExecutingRequest: null,
+        abortController: new AbortController(),
       });
     },
 
