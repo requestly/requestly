@@ -113,8 +113,9 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, is
         )}
 
         {!(
-          getPlanNameFromId(subscriptionDetails?.plan) === PRICING.PLAN_NAMES.PROFESSIONAL &&
-          planStatus === PlanStatus.ACTIVE
+          [PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.ENTERPRISE].includes(
+            getPlanNameFromId(subscriptionDetails?.plan)
+          ) && planStatus === PlanStatus.ACTIVE
         ) && (
           <RQButton
             type="primary"

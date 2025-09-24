@@ -22,6 +22,8 @@ import { PlanStatus, PlanType } from "../../types";
 import { isSafariBrowser } from "actions/ExtensionActions";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { isSetappBuild } from "utils/AppUtils";
+import { getUserAttributes } from "store/selectors";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -46,6 +48,10 @@ export const UserPlanDetails = () => {
 
     return endDate.getTime();
   }, []);
+
+  const userAttributes = useSelector(getUserAttributes);
+  const isSetapp = isSetappBuild();
+  const installDate = userAttributes?.desktop_install_date || new Date().toISOString();
 
   useEffect(() => {
     if (type === "appsumo") {
@@ -196,15 +202,17 @@ export const UserPlanDetails = () => {
                   </Col>
                   <Col>{user?.details?.planDetails?.status !== PlanStatus.EXPIRED && renderPopConfirmation()}</Col>
                 </Row>
-                <Col className="user-plan-card-grid">
+                <Col className={`user-plan-card-grid ${isSetapp ? "two-part-grid" : "three-part-grid"}`}>
                   <div className={`user-plan-card-grid-item ${hasProfessionalStudentPlan ? "display-row-center" : ""}`}>
                     <Space direction="vertical" size={8}>
-                      {user?.details?.planDetails?.status === "trialing" ? (
+                      {!isSetapp && user?.details?.planDetails?.status === "trialing" ? (
                         <div>{trialDuration} days free trial</div>
                       ) : null}
                       <Row gutter={8} className="items-center">
                         <Col className="user-plan-card-plan-name">
-                          {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} Plan{" "}
+                          {isSetapp
+                            ? "Professional (Setapp)"
+                            : `${getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} Plan`}{" "}
                           {hasProfessionalStudentPlan ? <Tag color="green">Student Program</Tag> : ""}
                         </Col>
                       </Row>
@@ -215,25 +223,33 @@ export const UserPlanDetails = () => {
                       <div className="user-plan-card-grid-item">
                         <Space direction="vertical" size={8}>
                           <div className="user-plan-card-grid-item-label">
-                            {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} start date
+                            {isSetapp
+                              ? "Install date"
+                              : user?.details?.planDetails?.status === "trialing"
+                              ? "Trial start date"
+                              : "Plan start date"}
                           </div>
                           <div className="user-plan-date">
-                            {getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.startDate))}
+                            {isSetapp
+                              ? getLongFormatDateString(new Date(installDate))
+                              : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.startDate))}
                           </div>
                         </Space>
                       </div>
-                      <div className="user-plan-card-grid-item">
-                        <Space direction="vertical" size={8}>
-                          <div className="user-plan-card-grid-item-label">
-                            {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
-                          </div>
-                          <div className="user-plan-date">
-                            {hasAppSumoSubscription
-                              ? "Lifetime access"
-                              : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
-                          </div>
-                        </Space>
-                      </div>
+                      {!isSetapp && (
+                        <div className="user-plan-card-grid-item">
+                          <Space direction="vertical" size={8}>
+                            <div className="user-plan-card-grid-item-label">
+                              {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
+                            </div>
+                            <div className="user-plan-date">
+                              {hasAppSumoSubscription || hasProfessionalStudentPlan
+                                ? "Lifetime access"
+                                : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
+                            </div>
+                          </Space>
+                        </div>
+                      )}
                     </>
                   )}
                 </Col>
@@ -270,8 +286,10 @@ export const UserPlanDetails = () => {
               </div>
             ) : (
               <>
-                {user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
-                user?.details?.planDetails?.status === "trialing" ? (
+                {!isSetapp &&
+                (![PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.ENTERPRISE].includes(
+                  getPlanNameFromId(user?.details?.planDetails?.planId)
+                  ) || user?.details?.planDetails?.status === "trialing") ? (
                   <Col className="user-plan-upgrade-card">
                     <MdDiversity1 />
                     <div className="title">
