@@ -78,7 +78,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment(environmentName, false);
     if (result.type === "error") {
-      throw new Error("Something went wrong while create a new environment.");
+      throw new Error(result.error.message || "Something went wrong while create a new environment.");
     }
     const parsedEnv = this.parseEnvironmentEntity(result.content);
     return parsedEnv;

@@ -19,17 +19,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   
-
-  private getNormalizedPath(path: string) {
-    const normalizedPath = path.endsWith("/") ? path : `${path}/`;
-    return normalizedPath;
-  }
-
-  private appendPath(basePath: string, resourcePath: string) {
-    const separator = basePath.endsWith("/") ? "" : "/";
-    return `${basePath}${separator}${resourcePath}`;
-  }
-
   private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
     switch (requestDetails.type) {
       case "http":
