@@ -1,5 +1,7 @@
 .run-result-view-details {
   user-select: none;
+  height: 100%;
+  overflow-y: auto;
 
   .result-header {
     display: flex;
@@ -26,12 +28,44 @@
   }
 
   .result-tabs-container {
-    .ant-tabs-content-holder {
-      height: 100%;
-      overflow-y: auto;
+    .ant-tabs {
+      .ant-tabs-nav-wrap {
+        display: flex;
+        padding: var(--space-4, 8px) 0;
+        align-items: center;
+        gap: var(--space-4, 8px);
+        align-self: stretch;
+
+        .ant-tabs-nav-list {
+          margin-left: 16px;
+        }
+      }
+
+      .ant-tabs-nav-list .ant-tabs-tab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2, 4px);
+        height: 24px;
+        padding: var(--space-2, 4px) var(--space-3, 6px);
+
+        &.ant-tabs-tab-active {
+          border-radius: 4px;
+          background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+        }
+      }
+    }
+
+    .ant-tabs-ink-bar {
+      display: none;
     }
 
     .test-result-tab-title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-2, 4px);
+
       .title {
         color: var(--requestly-color-text-default, #fff);
         font-size: var(--requestly-font-size-xs, 11px);
@@ -39,10 +73,29 @@
         font-weight: 500;
         line-height: 17px; /* 154.545% */
       }
-    }
 
-    .test-result-collapse-container + .test-result-collapse-container {
-      margin-top: 8px;
+      .ant-badge {
+        .ant-badge-count {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-width: 24px;
+          padding: var(--space-1, 2px) var(--space-2, 4px);
+
+          border-radius: 29px;
+          background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+          box-shadow: none;
+
+          font-size: var(--requestly-font-size-xs, 11px);
+          font-style: normal;
+          font-weight: 400;
+          line-height: 17px; /* 154.545% */
+
+          .ant-scroll-number-only {
+            height: auto;
+          }
+        }
+      }
     }
 
     .test-result-collapse-container.tests-results-view-container {
@@ -95,7 +148,6 @@
     .tests-results-view-container {
       height: 100%;
       overflow-y: auto;
-      margin-top: 8px;
       padding-bottom: 25px;
 
       .test-details-container {
