@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { Form, FormInstance, Input } from "antd";
 import { RQAPI } from "features/apiClient/types";
-import { toast } from "utils/Toast";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import * as Sentry from "@sentry/react";
@@ -48,14 +47,9 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     return <td {...restProps}>{children}</td>;
   }
 
-  const handleChange = async (value: string) => {
+  const handleChange = (value: string) => {
     form.setFieldsValue({ [dataIndex]: value });
-    try {
-      const values = await form.validateFields();
-      handleUpdateVariable({ ...record, ...values });
-    } catch (error) {
-      toast.error("Something went wrong while saving path variables");
-    }
+    handleUpdateVariable({ ...record, [dataIndex]: value });
   };
 
   if (!editable) {
