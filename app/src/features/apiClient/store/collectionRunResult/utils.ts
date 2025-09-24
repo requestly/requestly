@@ -3,13 +3,11 @@ import { Iteration, RequestExecutionResult, RunResultState } from "./runResult.s
 import { RQAPI } from "features/apiClient/types";
 
 export function getTestSummary(result: RequestExecutionResult) {
-  const { testResults } = result;
-
   let success: TestResult[] = [];
   let failed: TestResult[] = [];
   let skipped: TestResult[] = [];
 
-  testResults.forEach((test) => {
+  result.testResults?.forEach((test) => {
     if (test.status === TestStatus.PASSED) {
       success.push(test);
     } else if (test.status === TestStatus.FAILED) {
@@ -19,7 +17,7 @@ export function getTestSummary(result: RequestExecutionResult) {
     }
   });
 
-  return { total: testResults, success, failed, skipped };
+  return { total: result.testResults ?? [], success, failed, skipped };
 }
 
 export type TestSummary = Map<
@@ -63,35 +61,33 @@ export function getAllTestSummary(result: RunResultState["result"]) {
   let totalDuration = 0;
 
   allResults.forEach((executionResult) => {
-    if (executionResult.status.value === RQAPI.ExecutionStatus.SUCCESS && executionResult.testResults) {
-      const { iteration } = executionResult;
-      const { total, success, failed, skipped } = getTestSummary(executionResult);
-      totalTestsCounts += total.length;
-      successTestsCounts += success.length;
-      failedTestsCounts += failed.length;
-      skippedTestsCounts += skipped.length;
-      totalDuration += executionResult.runDuration;
+    const { iteration } = executionResult;
+    const { total, success, failed, skipped } = getTestSummary(executionResult);
+    totalTestsCounts += total.length;
+    successTestsCounts += success.length;
+    failedTestsCounts += failed.length;
+    skippedTestsCounts += skipped.length;
+    totalDuration += executionResult.runDuration;
 
-      totalTests.set(iteration, [
-        ...(totalTests.get(iteration) ?? []),
-        { requestExecutionResult: executionResult, testResults: total },
-      ]);
+    totalTests.set(iteration, [
+      ...(totalTests.get(iteration) ?? []),
+      { requestExecutionResult: executionResult, testResults: total },
+    ]);
 
-      successTests.set(iteration, [
-        ...(successTests.get(iteration) ?? []),
-        { requestExecutionResult: executionResult, testResults: success },
-      ]);
+    successTests.set(iteration, [
+      ...(successTests.get(iteration) ?? []),
+      { requestExecutionResult: executionResult, testResults: success },
+    ]);
 
-      failedTests.set(iteration, [
-        ...(failedTests.get(iteration) ?? []),
-        { requestExecutionResult: executionResult, testResults: failed },
-      ]);
+    failedTests.set(iteration, [
+      ...(failedTests.get(iteration) ?? []),
+      { requestExecutionResult: executionResult, testResults: failed },
+    ]);
 
-      skippedTests.set(iteration, [
-        ...(skippedTests.get(iteration) ?? []),
-        { requestExecutionResult: executionResult, testResults: skipped },
-      ]);
-    }
+    skippedTests.set(iteration, [
+      ...(skippedTests.get(iteration) ?? []),
+      { requestExecutionResult: executionResult, testResults: skipped },
+    ]);
   });
 
   return {
