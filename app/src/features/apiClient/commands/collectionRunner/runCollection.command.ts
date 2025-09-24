@@ -12,28 +12,37 @@ import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
     ? {
-      type: entry.type,
-      method: entry.request.method,
-    }
-    : { type: entry.type };
+        type: entry.type,
+        method: entry.request.method,
+        responseTime: entry.response?.time ?? null,
+        statusCode: entry.response?.status ?? null,
+        statusText: entry.response?.statusText ?? null,
+      }
+    : {
+        type: entry.type,
+        responseTime: entry.response?.time ?? null,
+        statusCode: entry.response?.status ?? null,
+        statusText: entry.response?.statusText ?? null,
+      };
 }
 
 function parseExecutionResult(params: {
   recordId: string;
+  recordName: string;
   result: RQAPI.ExecutionResult;
   iteration: number;
   startTime: number;
 }): RequestExecutionResult {
-  const { recordId, result, iteration, startTime } = params;
+  const { recordId, recordName, result, iteration, startTime } = params;
 
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
     return {
       iteration,
       recordId,
+      recordName,
       entry: parseExecutingRequestEntry(result.executedEntry),
       status: { value: result.status, error: result.error },
-      duration: null,
-      statusCode: null,
+      runDuration: null,
       testResults: null,
     };
   }
@@ -41,21 +50,16 @@ function parseExecutionResult(params: {
   return {
     iteration,
     recordId,
-    duration: Date.now() - startTime,
+    recordName,
+    runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
     status: { value: result.status, warning: result.warning },
-    statusCode: result.executedEntry.response.status,
     testResults: result.executedEntry.testResults,
   };
 }
 
 class Runner {
-  constructor(
-    readonly runContext: RunContext,
-    readonly executor: BatchRequestExecutor,
-  ) {
-
-  }
+  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
 
   private getRequest(requestIndex: number) {
     const { orderedRequests } = this.runContext.runConfigStore.getState();
@@ -79,6 +83,7 @@ class Runner {
       startTime,
       iteration,
       recordId: request.record.id,
+      recordName: request.record.name,
       entry: parseExecutingRequestEntry(request.record.data),
     };
 
@@ -86,22 +91,24 @@ class Runner {
 
     return {
       currentExecutingRequest,
-    }
-
+    };
   }
 
-  private afterRequestExecutionComplete(currentExecutingRequest: CurrentlyExecutingRequest, result: RQAPI.ExecutionResult) {
+  private afterRequestExecutionComplete(
+    currentExecutingRequest: CurrentlyExecutingRequest,
+    result: RQAPI.ExecutionResult
+  ) {
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
 
     const executionResult = parseExecutionResult({
       iteration: currentExecutingRequest.iteration,
       startTime: currentExecutingRequest.startTime,
       recordId: currentExecutingRequest.recordId,
+      recordName: currentExecutingRequest.recordName,
       result,
     });
 
     this.runContext.runResultStore.getState().addResult(executionResult);
-
   }
 
   private afterComplete() {
@@ -126,7 +133,6 @@ class Runner {
     if (hasNextRequest && delay > 0) {
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
-
   }
 
   private async *iterate() {
@@ -146,12 +152,11 @@ class Runner {
         yield {
           request,
           iteration: iterationIndex + 1,
-        }
+        };
 
         await this.delay(iterationIndex, requestIndex);
       }
     }
-
   }
 
   async run() {
@@ -163,13 +168,11 @@ class Runner {
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
       this.afterComplete();
-    }
-    catch (e) {
+    } catch (e) {
       this.onError(e);
       return e;
     }
   }
-
 }
 
 export async function runCollection(

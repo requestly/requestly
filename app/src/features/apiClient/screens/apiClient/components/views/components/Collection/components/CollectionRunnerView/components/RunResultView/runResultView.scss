@@ -21,31 +21,4 @@
       line-height: 18px; /* 150% */
     }
   }
-
-  .run-result-view-content {
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-8, 24px);
-      padding: var(--space-4, 8px) var(--space-6, 16px);
-      flex-wrap: wrap;
-
-      .run-metric {
-        flex-shrink: 0;
-        font-size: var(--requestly-font-size-sm, 12px);
-        font-style: normal;
-        font-weight: 400;
-        line-height: 18px; /* 150% */
-
-        .label {
-          margin-right: 2px;
-          color: var(--requestly-color-text-subtle, #bbb);
-        }
-
-        .value {
-          color: var(--requestly-color-text-default, #fff);
-        }
-      }
-    }
-  }
 }

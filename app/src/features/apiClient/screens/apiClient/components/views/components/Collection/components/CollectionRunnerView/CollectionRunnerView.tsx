@@ -8,21 +8,14 @@ import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/typ
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
-import { RunViewContextProvider, useRunResultStore } from "./run.context";
 import { RunConfigView } from "./components/RunConfigView/RunConfigView";
+import { RunViewContextProvider } from "./run.context";
 import { RunResultView } from "./components/RunResultView/RunResultView";
 import "./collectionRunnerView.scss";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
 }
-
-const RunResult = () => {
-  const [result, getRunSummary] = useRunResultStore((s) => [s.result, s.getRunSummary]);
-
-  console.log({ result: getRunSummary() });
-  return <div>{JSON.stringify(getRunSummary(), null, 4)}</div>;
-};
 
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   const {

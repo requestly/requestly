@@ -1,21 +1,28 @@
 import { NativeError } from "errors/NativeError";
-import { TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { RQAPI } from "features/apiClient/types";
 import { create } from "zustand";
+import { getAllTestSummary } from "./utils";
 
-type Iteration = number;
+export type Iteration = number;
 type Timestamp = number;
 
 type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
+  recordName: RQAPI.ApiRecord["name"];
   entry:
     | {
         type: RQAPI.ApiEntryType.HTTP;
         method: RQAPI.HttpRequest["method"];
+        responseTime: RQAPI.HttpResponse["time"] | null;
+        statusCode: RQAPI.HttpResponse["status"] | null;
+        statusText: RQAPI.HttpResponse["statusText"] | null;
       }
     | {
         type: RQAPI.ApiEntryType.GRAPHQL;
+        responseTime: RQAPI.GraphQLResponse["time"] | null;
+        statusCode: RQAPI.GraphQLResponse["status"] | null;
+        statusText: RQAPI.GraphQLResponse["statusText"] | null;
       };
 };
 
@@ -25,8 +32,7 @@ export type RequestExecutionResult =
         value: RQAPI.ExecutionStatus.SUCCESS;
         warning?: RQAPI.ExecutionWarning;
       };
-      statusCode: number;
-      duration: Timestamp;
+      runDuration: Timestamp;
       testResults: RQAPI.ApiEntryMetaData["testResults"];
     })
   | (BaseRequestExecutionResult & {
@@ -34,8 +40,7 @@ export type RequestExecutionResult =
         value: RQAPI.ExecutionStatus.ERROR;
         error: RQAPI.ExecutionError;
       };
-      statusCode: null;
-      duration: null;
+      runDuration: null;
       testResults: null;
     });
 
@@ -47,14 +52,14 @@ export enum RunStatus {
   ERRORED = "errored",
 }
 
-export class InvalidRunnerStateChange extends NativeError {};
+export class InvalidRunnerStateChange extends NativeError {}
 
 const RunStateMachine = {
   [RunStatus.IDLE]: [RunStatus.RUNNING],
   [RunStatus.RUNNING]: [RunStatus.CANCELLED, RunStatus.COMPLETED, RunStatus.ERRORED],
   [RunStatus.CANCELLED]: [RunStatus.IDLE],
   [RunStatus.COMPLETED]: [RunStatus.IDLE],
-  [RunStatus.ERRORED]: [RunStatus.IDLE]
+  [RunStatus.ERRORED]: [RunStatus.IDLE],
 };
 
 export type SavedRunResult = {
@@ -65,6 +70,7 @@ export type SavedRunResult = {
   skippedTests: number;
   startTime: Timestamp;
   endTime: Timestamp | null;
+  duration: Timestamp | null;
   runStatus: Omit<RunStatus, RunStatus.RUNNING | RunStatus.IDLE>;
   result: RequestExecutionResult[];
 };
@@ -77,7 +83,7 @@ export type CurrentlyExecutingRequest =
       startTime: Timestamp;
     });
 
-type IterationDetails = {
+export type IterationDetails = {
   result: RequestExecutionResult[];
 };
 
@@ -95,26 +101,6 @@ export type RunResultState = {
   setRunStatus(status: RunStatus): void;
   getRunSummary(): RunSummary;
 };
-
-function getTestSummary(result: RequestExecutionResult) {
-  const { testResults } = result;
-
-  let success = 0;
-  let failed = 0;
-  let skipped = 0;
-
-  testResults.forEach((test) => {
-    if (test.status === TestStatus.PASSED) {
-      success++;
-    } else if (test.status === TestStatus.FAILED) {
-      failed++;
-    } else {
-      skipped++;
-    }
-  });
-
-  return { total: testResults.length, success, failed, skipped };
-}
 
 export function createRunResultStore() {
   return create<RunResultState>()((set, get) => ({
@@ -159,7 +145,7 @@ export function createRunResultStore() {
     setRunStatus(status) {
       const currentStatus = get().runStatus;
       const isStateChangleAllowed = RunStateMachine[currentStatus].includes(status);
-      if(!isStateChangleAllowed) {
+      if (!isStateChangleAllowed) {
         throw new InvalidRunnerStateChange(`Invalid state change from ${currentStatus} to ${status}`);
       }
       set({ runStatus: status });
@@ -167,36 +153,25 @@ export function createRunResultStore() {
 
     getRunSummary() {
       const { startTime, endTime, runStatus, result } = get();
-
-      const allResults: RequestExecutionResult[] = [];
-      for (const iterationDetails of result.values()) {
-        allResults.push(...iterationDetails.result);
-      }
-
-      let totalTests = 0;
-      let successTests = 0;
-      let failedTests = 0;
-      let skippedTests = 0;
-
-      allResults.forEach((executionResult) => {
-        if (executionResult.status.value === RQAPI.ExecutionStatus.SUCCESS && executionResult.testResults) {
-          const { success, failed, skipped, total } = getTestSummary(executionResult);
-          totalTests += total;
-          successTests += success;
-          failedTests += failed;
-          skippedTests += skipped;
-        }
-      });
+      const {
+        totalTestsCounts,
+        successTestsCounts,
+        failedTestsCounts,
+        skippedTestsCounts,
+        allResults,
+        duration,
+      } = getAllTestSummary(result);
 
       return {
-        totalTests,
-        successTests,
-        failedTests,
-        skippedTests,
-        startTime,
         endTime,
+        startTime,
         runStatus,
+        duration,
         result: allResults,
+        totalTests: totalTestsCounts,
+        successTests: successTestsCounts,
+        failedTests: failedTestsCounts,
+        skippedTests: skippedTestsCounts,
       };
     },
   }));
