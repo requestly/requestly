@@ -37,7 +37,7 @@ const DBListeners = () => {
       /* CAN BE MOVED TO SEPARATE USE EFFECT AND SHOULD HAVE AN UNSUBSCRIBER TOO, will be useful when actually implementing premium */
       userSubscriptionDocListener(dispatch, user?.details?.profile.uid);
     }
-  }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
+  }, [dispatch, user?.details?.profile?.uid, user?.loggedIn, appMode]);
 
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
   useEffect(() => {
@@ -80,7 +80,7 @@ const DBListeners = () => {
     activeWorkspaceId,
     dispatch,
     user?.loggedIn,
-    user?.details?.profile.uid,
+    user?.details?.profile?.uid,
     user?.details?.isSyncEnabled,
     hasAuthStateChanged,
   ]);
