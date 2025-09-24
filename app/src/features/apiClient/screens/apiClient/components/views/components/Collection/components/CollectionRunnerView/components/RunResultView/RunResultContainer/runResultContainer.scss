@@ -25,6 +25,11 @@
   }
 
   .result-tabs-container {
+    .ant-tabs-content-holder {
+      height: 100%;
+      overflow-y: auto;
+    }
+
     .test-result-tab-title {
       .title {
         color: var(--requestly-color-text-default, #fff);
@@ -36,8 +41,7 @@
     }
 
     .tests-results-view-container {
-      overflow: hidden;
-      height: inherit;
+      height: 100%;
       overflow-y: auto;
       margin-top: 8px;
       padding-bottom: 25px;
@@ -52,10 +56,20 @@
         align-self: stretch;
         border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
+        .no-test-found-message {
+          color: var(--requestly-color-text-subtle);
+          font-size: var(--requestly-font-size-sm);
+        }
+
         .request-details {
           display: flex;
           align-items: center;
           gap: 8px;
+
+          svg.graphql-request-icon {
+            width: 16px;
+            min-width: 16px;
+          }
 
           .request-method {
             background-color: transparent !important;

@@ -14,6 +14,7 @@ import {
   GraphQlIcon,
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
+import { RunResultEmptyState } from "../RunResultEmptyState/RunResultEmptyState";
 import "./runResultContainer.scss";
 
 enum RunResultTabKey {
@@ -27,18 +28,17 @@ const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   testResults: TestResult[];
 }> = ({ requestExecutionResult, testResults }) => {
-  if (testResults.length === 0) {
-    return null;
-  }
-
-  const responseDetails = (
-    <div className="response-details">
-      <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>·
-      <span className="response-status">
-        {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
-      </span>
-    </div>
-  );
+  const responseDetails =
+    testResults.length === 0 ? null : (
+      <>
+        <div className="response-details">
+          <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>·
+          <span className="response-status">
+            {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
+          </span>
+        </div>
+      </>
+    );
 
   return (
     <div className="test-details-container">
@@ -51,35 +51,36 @@ const TestDetails: React.FC<{
           </>
         ) : (
           <>
-            <GraphQlIcon /> {requestExecutionResult.entry.type}
+            <GraphQlIcon />
             <span className="request-name">{requestExecutionResult.recordName}</span>
             {responseDetails}
           </>
         )}
       </div>
-      <div className="results-list">
-        {testResults.map((test) => {
-          return <TestResultItem testResult={test} />;
-        })}
-      </div>
+
+      {testResults.length === 0 ? (
+        <div className="no-test-found-message">
+          <i>No test found</i>
+        </div>
+      ) : (
+        <div className="results-list">
+          {testResults.map((test) => {
+            return <TestResultItem testResult={test} />;
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
 const TestResultList: React.FC<{ results: TestSummary }> = ({ results }) => {
-  const resultsToShow = useMemo(() => {
-    return Array.from(results).filter(([iteration, details]) => {
-      return details.filter(({ testResults }) => testResults.length > 0);
-    });
-  }, [results]);
-
   // TODO: use virtualize list
 
   if (results.size > 1) {
-    return resultsToShow.map(([iteration, details]) => {
+    return Array.from(results).map(([iteration, details]) => {
       return (
         <div className="tests-results-view-container">
-          <Collapse defaultActiveKey={["1"]} ghost>
+          <Collapse className="test-result-collapse" defaultActiveKey={["1"]} ghost>
             <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
               {details.map(({ requestExecutionResult, testResults }) => {
                 return <TestDetails requestExecutionResult={requestExecutionResult} testResults={testResults} />;
@@ -94,7 +95,7 @@ const TestResultList: React.FC<{ results: TestSummary }> = ({ results }) => {
   // show first iteration without collapse
   return (
     <div className="tests-results-view-container">
-      {resultsToShow[0][1].map(({ requestExecutionResult, testResults }) => {
+      {results.get(1).map(({ requestExecutionResult, testResults }) => {
         return <TestDetails requestExecutionResult={requestExecutionResult} testResults={testResults} />;
       })}
     </div>
@@ -184,31 +185,36 @@ export const RunResultContainer: React.FC<{
 
   return (
     <div className="run-result-view-details">
-      <div className="result-header">
-        {runMetrics.map((data) => {
-          return (
-            <div className="run-metric">
-              <span className="label">{data.label}:</span>
-              <span className="value">{data.value}</span>
-            </div>
-          );
-        })}
-      </div>
-      <div className="result-tabs-container">
-        {result.result.size === 0 ? (
-          <i>Nothing to show</i>
-        ) : (
-          <Tabs
-            moreIcon={null}
-            items={tabItems}
-            animated={false}
-            activeKey={activeTab}
-            destroyInactiveTabPane={false}
-            onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
-            className="test-result-tabs"
-          />
-        )}
-      </div>
+      {result.result.size === 0 ? (
+        <RunResultEmptyState
+          title="No test result found"
+          description="Please add test cases in scripts tab and run them to see results."
+        />
+      ) : (
+        <>
+          <div className="result-header">
+            {runMetrics.map((data) => {
+              return (
+                <div className="run-metric">
+                  <span className="label">{data.label}:</span>
+                  <span className="value">{data.value}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="result-tabs-container">
+            <Tabs
+              moreIcon={null}
+              items={tabItems}
+              animated={false}
+              activeKey={activeTab}
+              destroyInactiveTabPane={false}
+              onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
+              className="test-result-tabs"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
