@@ -140,13 +140,4 @@ export default [
     },
     plugins: commonPlugins,
   },
-  {
-    ...commonConfig,
-    input: "src/utility-scripts/cacheJson/cacheJsonOnPage.js",
-    output: {
-      file: `${OUTPUT_DIR}/libs/cacheJson.js`,
-      format: "iife",
-    },
-    plugins: commonPlugins,
-  },
 ];

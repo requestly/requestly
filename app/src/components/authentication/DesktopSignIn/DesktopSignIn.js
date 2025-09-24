@@ -109,7 +109,7 @@ const DesktopSignIn = () => {
       const token = await firebaseUser?.getIdToken();
 
       const isNewUser = params.get("isNewUser");
-
+      const isAuthForSetappBuild = params.get("isAuthForSetappBuild") === "true";
       const code = desktopAuthParams.get("ot-auth-code");
       let source = desktopAuthParams.get("source").replace(/ /g, "_");
       source = `desktop_app_${source}`;
@@ -155,7 +155,10 @@ const DesktopSignIn = () => {
           TODO: FIX THIS
           We are sending user to /desktop/intercept-traffic post authentication for now, to make sure that user is able to see the persona questionnaire post redirection to desktop app.
           */
-          redirectToDesktopApp(`${PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE}?isNewUser=${isNewUser}`);
+          redirectToDesktopApp(
+            `${PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE}?isNewUser=${isNewUser}`,
+            isAuthForSetappBuild
+          );
         })
         .catch((err) => {
           setIsError(true);
