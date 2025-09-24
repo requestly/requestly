@@ -8,13 +8,20 @@ import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/typ
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { RunnerViewLoader } from "./components/RunnerViewLoader/RunnerViewLoader";
-import { RunContextProvider } from "./run.context";
+import { RunViewContextProvider, useRunResultStore } from "./run.context";
 import { RunConfigView } from "./components/RunConfigView/RunConfigView";
 import "./collectionRunnerView.scss";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
 }
+
+const RunResult = () => {
+  const [result, getRunSummary] = useRunResultStore((s) => [s.result, s.getRunSummary]);
+
+  console.log({ result: getRunSummary() });
+  return <div>{JSON.stringify(getRunSummary(), null, 4)}</div>;
+};
 
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   const {
@@ -43,7 +50,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   return (
     <CollectionViewContextProvider key={collectionId} collectionId={collectionId}>
       <AutogenerateProvider>
-        <RunContextProvider runConfig={config}>
+        <RunViewContextProvider runConfig={config}>
           <div className="collection-runner-view">
             <Split
               gutterSize={4}
@@ -60,12 +67,12 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
               <div>
                 {/* TODO: Result view */}
                 <h3>
-                  <i>Result view in wip...</i>
+                  <RunResult />
                 </h3>
               </div>
             </Split>
           </div>
-        </RunContextProvider>
+        </RunViewContextProvider>
       </AutogenerateProvider>
     </CollectionViewContextProvider>
   );

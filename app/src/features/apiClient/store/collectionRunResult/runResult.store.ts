@@ -1,3 +1,4 @@
+import { NativeError } from "errors/NativeError";
 import { TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { RQAPI } from "features/apiClient/types";
 import { create } from "zustand";
@@ -8,10 +9,17 @@ type Timestamp = number;
 type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
-  method: RQAPI.HttpRequest["method"];
+  entry:
+    | {
+        type: RQAPI.ApiEntryType.HTTP;
+        method: RQAPI.HttpRequest["method"];
+      }
+    | {
+        type: RQAPI.ApiEntryType.GRAPHQL;
+      };
 };
 
-type RequestExecutionResult =
+export type RequestExecutionResult =
   | (BaseRequestExecutionResult & {
       status: {
         value: RQAPI.ExecutionStatus.SUCCESS;
@@ -24,7 +32,7 @@ type RequestExecutionResult =
   | (BaseRequestExecutionResult & {
       status: {
         value: RQAPI.ExecutionStatus.ERROR;
-        error: unknown;
+        error: RQAPI.ExecutionError;
       };
       statusCode: null;
       duration: null;
@@ -38,6 +46,16 @@ export enum RunStatus {
   COMPLETED = "completed",
   ERRORED = "errored",
 }
+
+export class InvalidRunnerStateChange extends NativeError {};
+
+const RunStateMachine = {
+  [RunStatus.IDLE]: [RunStatus.RUNNING],
+  [RunStatus.RUNNING]: [RunStatus.CANCELLED, RunStatus.COMPLETED, RunStatus.ERRORED],
+  [RunStatus.CANCELLED]: [RunStatus.IDLE],
+  [RunStatus.COMPLETED]: [RunStatus.IDLE],
+  [RunStatus.ERRORED]: [RunStatus.IDLE]
+};
 
 export type SavedRunResult = {
   id: string; // runId
@@ -53,12 +71,11 @@ export type SavedRunResult = {
 
 type RunSummary = Omit<SavedRunResult, "id">;
 
-export type CurrentlyExecutingRequest = null | {
-  iteration: Iteration;
-  recordId: RQAPI.ApiRecord["id"];
-  method: RQAPI.HttpRequest["method"];
-  startTime: Timestamp;
-};
+export type CurrentlyExecutingRequest =
+  | null
+  | (BaseRequestExecutionResult & {
+      startTime: Timestamp;
+    });
 
 type IterationDetails = {
   result: RequestExecutionResult[];
@@ -140,6 +157,11 @@ export function createRunResultStore() {
     },
 
     setRunStatus(status) {
+      const currentStatus = get().runStatus;
+      const isStateChangleAllowed = RunStateMachine[currentStatus].includes(status);
+      if(!isStateChangleAllowed) {
+        throw new InvalidRunnerStateChange(`Invalid state change from ${currentStatus} to ${status}`);
+      }
       set({ runStatus: status });
     },
 

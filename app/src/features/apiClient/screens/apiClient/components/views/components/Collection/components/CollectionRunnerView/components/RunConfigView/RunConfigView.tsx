@@ -8,12 +8,13 @@ import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOr
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
 import { useCommand } from "features/apiClient/commands";
 import { useCollectionView } from "../../../../collectionView.context";
-import { useRunConfigStore } from "../../run.context";
+import { useRunConfigStore, useRunContext, useRunResultStore } from "../../run.context";
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
 import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecutors/useBatchRequestExecutor";
 import { useGenericState } from "hooks/useGenericState";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
+import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import "./runConfigView.scss";
 
 const RunConfigSaveButton: React.FC = () => {
@@ -82,7 +83,8 @@ const RunConfigSaveButton: React.FC = () => {
 
 const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const { collectionId } = useCollectionView();
-  const [getConfig, orderedRequests] = useRunConfigStore((s) => [s.getConfig, s.orderedRequests]);
+  const runContext = useRunContext();
+  const [runStatus] = useRunResultStore((s) => [s.runStatus]);
 
   const {
     runner: { runCollection },
@@ -91,22 +93,21 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const executor = useBatchRequestExecutor(collectionId);
 
   const handleRunClick = useCallback(async () => {
-    try {
-      // TODO: update params
-      await runCollection({ runResultStore: {}, runConfig: getConfig(), executor, orderedRequests });
-    } catch (error) {
-      toast.error("Unable to run collection!");
-      Sentry.captureException(error, {
-        extra: {
-          reason: "Unable to run collection!",
-        },
-      });
+    const error = await runCollection({ runContext, executor });
+    if (!error) {
+      return;
     }
-  }, [runCollection, getConfig, executor, orderedRequests]);
+    toast.error("Unable to run collection!");
+    Sentry.captureException(error, {
+      extra: {
+        reason: "Unable to run collection!",
+      },
+    });
+  }, [runCollection, runContext, executor]);
 
-  const handleCancelRunClick = useCallback(async () => {}, []);
+  const handleCancelRunClick = useCallback(async () => { }, []);
 
-  const isRunning = false; // TODO: get it from result store
+  const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (
     <RQButton disabled={disabled} size="small" type="danger" onClick={handleCancelRunClick}>
       Cancel
