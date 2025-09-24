@@ -4,6 +4,7 @@ import { RQAPI } from "features/apiClient/types";
 import { toast } from "utils/Toast";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import * as Sentry from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<RQAPI.PathVariable> | null>(null);
 
@@ -42,6 +43,10 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   ...restProps
 }) => {
   const form = useContext(EditableContext);
+  if (!form) {
+    Sentry.captureException(new Error("EditableCell rendered outside context"));
+    return <td {...restProps}>{children}</td>;
+  }
 
   const handleChange = async (value: string) => {
     form.setFieldsValue({ [dataIndex]: value });
