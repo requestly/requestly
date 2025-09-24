@@ -769,18 +769,18 @@ export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
 };
 
 export const extractPathVariablesFromUrl = (url: string) => {
-  const path = new URL(url).pathname;
-
-  const variablePattern = /:(\w+)/g;
+  if (!url) {
+    return [];
+  }
+  const variablePattern = /\/:(\w+)/g;
   const variables: string[] = [];
   let match;
 
-  while ((match = variablePattern.exec(path)) !== null) {
+  while ((match = variablePattern.exec(url)) !== null) {
     const variableName = match[1];
-    if (variables.includes(variableName)) {
-      continue;
+    if (!variables.includes(variableName)) {
+      variables.push(variableName);
     }
-    variables.push(variableName);
   }
 
   return variables;
