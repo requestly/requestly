@@ -88,6 +88,8 @@ class Runner {
   private beforeStart() {
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
+    this.runContext.runResultStore.getState().setStartTime(Date.now());
+    this.runContext.runResultStore.getState().setEndtime(null);
   }
 
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.OrderedRequest) {
@@ -129,14 +131,17 @@ class Runner {
   private afterComplete() {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
+    this.runContext.runResultStore.getState().setEndtime(Date.now());
   }
 
   private onError(error: any) {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+    this.runContext.runResultStore.getState().setEndtime(null);
   }
 
   private onRunCancelled() {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
+    this.runContext.runResultStore.getState().setEndtime(null);
   }
 
   private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
