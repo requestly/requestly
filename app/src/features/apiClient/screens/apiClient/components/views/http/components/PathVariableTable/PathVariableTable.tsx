@@ -4,16 +4,19 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { EditableRow, EditableCell } from "./PathVariableTableRow";
 import { RQAPI } from "features/apiClient/types";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import "./pathVariableTable.scss";
 
 interface PathVariableTableProps {
+  recordId: string;
   onChange: (variables: RQAPI.PathVariable[]) => void;
 }
 
 type ColumnTypes = Exclude<TableProps<RQAPI.PathVariable>["columns"], undefined>;
 
-export const PathVariableTable: React.FC<PathVariableTableProps> = ({ onChange }) => {
+export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, onChange }) => {
   const [variables, setPathVariables] = usePathVariablesStore((state) => [state.pathVariables, state.setPathVariables]);
+  const scopedVariables = useScopedVariables(recordId);
 
   const handleUpdateVariable = useCallback(
     (variable: RQAPI.PathVariable) => {
@@ -36,7 +39,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ onChange }
           editable: false,
           dataIndex: "key",
           title: "key",
-          variables,
+          environmentVariables: scopedVariables,
           handleUpdateVariable,
         }),
       },
@@ -50,7 +53,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ onChange }
           editable: true,
           dataIndex: "value",
           title: "value",
-          variables,
+          environmentVariables: scopedVariables,
           handleUpdateVariable,
         }),
       },
@@ -64,12 +67,12 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ onChange }
           editable: true,
           dataIndex: "description",
           title: "description",
-          variables,
+          environmentVariables: scopedVariables,
           handleUpdateVariable,
         }),
       },
     ];
-  }, [variables, handleUpdateVariable]);
+  }, [handleUpdateVariable, scopedVariables]);
 
   if (variables.length === 0) {
     return null;

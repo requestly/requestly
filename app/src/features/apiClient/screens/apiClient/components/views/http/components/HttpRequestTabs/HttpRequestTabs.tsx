@@ -68,6 +68,7 @@ const HttpRequestTabs: React.FC<Props> = ({
               }}
             />
             <PathVariableTable
+              recordId={requestId}
               onChange={(newVariables) => {
                 setRequestEntry((prev) => ({
                   ...prev,

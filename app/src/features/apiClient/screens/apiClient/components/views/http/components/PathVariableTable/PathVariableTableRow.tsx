@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import { Form, FormInstance, Input } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { toast } from "utils/Toast";
+import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
+import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 
 const EditableContext = React.createContext<FormInstance<RQAPI.PathVariable> | null>(null);
 
@@ -25,6 +27,7 @@ interface EditableCellProps {
   editable: boolean;
   dataIndex: keyof RQAPI.PathVariable;
   record: RQAPI.PathVariable;
+  environmentVariables: ScopedVariables;
   handleUpdateVariable: (record: RQAPI.PathVariable) => void;
 }
 
@@ -34,12 +37,14 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
   children,
   dataIndex,
   record,
+  environmentVariables,
   handleUpdateVariable,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
 
-  const save = async () => {
+  const handleChange = async (value: string) => {
+    form.setFieldsValue({ [dataIndex]: value });
     try {
       const values = await form.validateFields();
       handleUpdateVariable({ ...record, ...values });
@@ -67,15 +72,22 @@ export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> 
     <td {...restProps}>
       <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
         <div className="path-variable-input-container">
-          <Input
-            className="path-variable-table-input"
-            value={record?.[dataIndex]}
-            onChange={(e) => {
-              form.setFieldsValue({ [dataIndex]: e.target.value });
-              save();
-            }}
-            placeholder={dataIndex === "value" ? "Value" : "Description"}
-          />
+          {dataIndex === "value" ? (
+            <SingleLineEditor
+              className="path-variable-table-input"
+              placeholder="Value"
+              defaultValue={record?.[dataIndex]}
+              onChange={handleChange}
+              variables={environmentVariables}
+            />
+          ) : (
+            <Input
+              className="path-variable-table-input"
+              value={record?.[dataIndex]}
+              onChange={(e) => handleChange(e.target.value)}
+              placeholder={dataIndex === "key" ? "Key" : "Description"}
+            />
+          )}
         </div>
       </Form.Item>
     </td>
