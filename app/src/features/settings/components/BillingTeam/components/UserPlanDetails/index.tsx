@@ -204,7 +204,7 @@ export const UserPlanDetails = () => {
                       ) : null}
                       <Row gutter={8} className="items-center">
                         <Col className="user-plan-card-plan-name">
-                          {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} Plan{" "}
+                          {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} Plan{" "}
                           {hasProfessionalStudentPlan ? <Tag color="green">Student Program</Tag> : ""}
                         </Col>
                       </Row>
@@ -271,7 +271,7 @@ export const UserPlanDetails = () => {
             ) : (
               <>
                 {![PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.ENTERPRISE].includes(
-                  user?.details?.planDetails?.planName
+                  getPlanNameFromId(user?.details?.planDetails?.planId)
                 ) || user?.details?.planDetails?.status === "trialing" ? (
                   <Col className="user-plan-upgrade-card">
                     <MdDiversity1 />
