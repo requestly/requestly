@@ -21,7 +21,6 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/views/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
-import { getUserAuthDetails } from "store/slices/global/user/selectors";
 
 interface ContextMenuProps {
   log: any;
@@ -31,7 +30,6 @@ interface ContextMenuProps {
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, onReplayRequest }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const selectedRequestResponse = useSelector(getLogResponseById(log?.id)) || log?.response?.body;
   const isLocalSyncEnabled = useCheckLocalSyncSupport();
@@ -54,8 +52,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     },
     [dispatch, selectedRequestResponse]
   );
-
-  const isContextMenuOptionDisabled = user.loggedIn ? isLocalSyncEnabled : true;
 
   const items: MenuProps["items"] = useMemo(() => {
     const menuItems: MenuProps["items"] = [
@@ -85,31 +81,31 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
         label: (
           <LocalWorkspaceTooltip featureName="Redirect URL">Redirect URL (Map local/Remote)</LocalWorkspaceTooltip>
         ),
-        disabled: isContextMenuOptionDisabled,
+        disabled: isLocalSyncEnabled,
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.RESPONSE,
         label: <LocalWorkspaceTooltip featureName="Modify Response Body">Modify Response Body</LocalWorkspaceTooltip>,
-        disabled: isContextMenuOptionDisabled,
+        disabled: isLocalSyncEnabled,
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.REQUEST,
         label: <LocalWorkspaceTooltip featureName="Modify Request Body">Modify Request Body</LocalWorkspaceTooltip>,
-        disabled: isContextMenuOptionDisabled,
+        disabled: isLocalSyncEnabled,
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.HEADERS,
         label: <LocalWorkspaceTooltip featureName="Modify Headers">Modify Headers</LocalWorkspaceTooltip>,
-        disabled: isContextMenuOptionDisabled,
+        disabled: isLocalSyncEnabled,
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
         key: RuleType.REPLACE,
         label: <LocalWorkspaceTooltip featureName="Replace part of URL">Replace part of URL</LocalWorkspaceTooltip>,
-        disabled: isContextMenuOptionDisabled,
+        disabled: isLocalSyncEnabled,
         onClick: (menuInfo) => handleOnClick(menuInfo, log),
       },
       {
@@ -119,7 +115,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
           </LocalWorkspaceTooltip>
         ),
         key: "more_options",
-        disabled: isContextMenuOptionDisabled,
+        disabled: isLocalSyncEnabled,
         children: [
           {
             key: RuleType.CANCEL,
@@ -169,7 +165,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     }
 
     return menuItems;
-  }, [log, onReplayRequest, handleOnClick, isContextMenuOptionDisabled]);
+  }, [log, onReplayRequest, handleOnClick, isLocalSyncEnabled]);
 
   const handleDropdownOpenChange = (open: boolean) => {
     if (open) {
