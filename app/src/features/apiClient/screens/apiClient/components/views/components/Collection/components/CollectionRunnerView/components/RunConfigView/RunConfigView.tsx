@@ -87,7 +87,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const [runStatus] = useRunResultStore((s) => [s.runStatus]);
 
   const {
-    runner: { runCollection },
+    runner: { runCollection, cancelRun },
   } = useCommand();
 
   const executor = useBatchRequestExecutor(collectionId);
@@ -106,8 +106,8 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   }, [runCollection, runContext, executor]);
 
   const handleCancelRunClick = useCallback(() => {
-    runContext.runResultStore.getState().abortController.abort();
-  }, [runContext]);
+    cancelRun({ runContext });
+  }, [cancelRun, runContext]);
 
   const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (

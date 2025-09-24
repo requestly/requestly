@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
-import { Badge, Collapse, Tabs } from "antd";
+import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
+  CurrentlyExecutingRequest,
   LiveRunResult,
   RequestExecutionResult,
   RunResult,
@@ -15,6 +16,8 @@ import {
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 import { RunResultEmptyState } from "../RunResultEmptyState/RunResultEmptyState";
+import { useRunResultStore } from "../../../run.context";
+import { LoadingOutlined } from "@ant-design/icons";
 import "./runResultContainer.scss";
 
 enum RunResultTabKey {
@@ -41,6 +44,36 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
     title: "No successful tests",
     description: "No tests passed in this run.",
   },
+};
+
+const RunningRequestPlaceholder: React.FC<{
+  runningRequest: CurrentlyExecutingRequest;
+}> = ({ runningRequest }) => {
+  return (
+    <div className="test-details-container">
+      <div className="request-details">
+        {runningRequest.entry.type === RQAPI.ApiEntryType.HTTP ? (
+          <>
+            <HttpMethodIcon method={runningRequest.entry.method} />
+            <span className="request-name">{runningRequest.recordName}</span> {"..."}
+          </>
+        ) : (
+          <>
+            <GraphQlIcon />
+            <span className="request-name">{runningRequest.recordName}</span> {"..."}
+          </>
+        )}
+      </div>
+      <div className="loader">
+        <Spin
+          indicator={
+            <LoadingOutlined style={{ fontSize: 16, color: "var(--requestly-color-text-placeholder)" }} spin />
+          }
+        />
+        <span className="running-message">Request is running</span>
+      </div>
+    </div>
+  );
 };
 
 const TestDetails: React.FC<{
@@ -96,6 +129,12 @@ const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
 }> = ({ tabKey, results }) => {
+  const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
+
+  const currentRunningRequest = currentlyExecutingRequest ? (
+    <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
+  ) : null;
+
   // TODO: use virtualize list
   const resultsToShow = useMemo(() => {
     return tabKey === RunResultTabKey.ALL
@@ -117,12 +156,19 @@ const TestResultList: React.FC<{
   if (results.size > 1) {
     return resultsToShow.map(([iteration, details]) => {
       return (
-        <div className="tests-results-view-container">
+        <div key={iteration} className="tests-results-view-container">
           <Collapse className="test-result-collapse" defaultActiveKey={["1"]} ghost>
             <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
               {details.map(({ requestExecutionResult, testResults }) => {
-                return <TestDetails requestExecutionResult={requestExecutionResult} testResults={testResults} />;
+                return (
+                  <TestDetails
+                    key={requestExecutionResult.recordId}
+                    requestExecutionResult={requestExecutionResult}
+                    testResults={testResults}
+                  />
+                );
               })}
+              {currentRunningRequest}
             </Collapse.Panel>
           </Collapse>
         </div>
@@ -134,8 +180,15 @@ const TestResultList: React.FC<{
   return (
     <div className="tests-results-view-container">
       {resultsToShow[0][1].map(({ requestExecutionResult, testResults }) => {
-        return <TestDetails requestExecutionResult={requestExecutionResult} testResults={testResults} />;
+        return (
+          <TestDetails
+            key={requestExecutionResult.recordId}
+            requestExecutionResult={requestExecutionResult}
+            testResults={testResults}
+          />
+        );
       })}
+      {currentRunningRequest}
     </div>
   );
 };
@@ -231,9 +284,9 @@ export const RunResultContainer: React.FC<{
       ) : (
         <>
           <div className="result-header">
-            {runMetrics.map((data) => {
+            {runMetrics.map((data, index) => {
               return (
-                <div className="run-metric">
+                <div key={index} className="run-metric">
                   <span className="label">{data.label}:</span>
                   <span className="value">{data.value}</span>
                 </div>
