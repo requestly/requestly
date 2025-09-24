@@ -8,15 +8,17 @@ export class BatchRequestExecutor {
     private graphQLRequestExecutor: GraphQLRequestExecutor
   ) {}
 
-  async executeSingleRequest(recordId: string, entry: RQAPI.ApiEntry): Promise<RQAPI.ExecutionResult> {
+  async executeSingleRequest(
+    recordId: string,
+    entry: RQAPI.ApiEntry,
+    abortController?: AbortController
+  ): Promise<RQAPI.ExecutionResult> {
     if (isGraphQLApiEntry(entry)) {
-      return this.graphQLRequestExecutor.executeGraphQLRequest(recordId, entry);
+      return this.graphQLRequestExecutor.executeGraphQLRequest(recordId, entry, abortController);
     } else if (isHTTPApiEntry(entry)) {
-      return this.httpRequestExecutor.execute(recordId, entry);
+      return this.httpRequestExecutor.execute(recordId, entry, abortController);
     }
 
     throw new Error("Unsupported API entry type");
   }
-
-  
 }

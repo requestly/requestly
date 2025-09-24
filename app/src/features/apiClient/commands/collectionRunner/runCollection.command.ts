@@ -12,9 +12,9 @@ import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
     ? {
-      type: entry.type,
-      method: entry.request.method,
-    }
+        type: entry.type,
+        method: entry.request.method,
+      }
     : { type: entry.type };
 }
 
@@ -50,11 +50,20 @@ function parseExecutionResult(params: {
 }
 
 class Runner {
-  constructor(
-    readonly runContext: RunContext,
-    readonly executor: BatchRequestExecutor,
-  ) {
+  private isAborted = false;
 
+  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
+
+  private setupAbortListener() {
+    const abortController = this.runContext.runResultStore.getState().abortController;
+    abortController.signal.addEventListener(
+      "abort",
+      () => {
+        this.isAborted = true;
+        this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
+      },
+      { once: true }
+    );
   }
 
   private getRequest(requestIndex: number) {
@@ -70,6 +79,7 @@ class Runner {
 
   private beforeStart() {
     this.runContext.runResultStore.getState().clearAll();
+    this.setupAbortListener();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
   }
 
@@ -86,11 +96,13 @@ class Runner {
 
     return {
       currentExecutingRequest,
-    }
-
+    };
   }
 
-  private afterRequestExecutionComplete(currentExecutingRequest: CurrentlyExecutingRequest, result: RQAPI.ExecutionResult) {
+  private afterRequestExecutionComplete(
+    currentExecutingRequest: CurrentlyExecutingRequest,
+    result: RQAPI.ExecutionResult
+  ) {
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
 
     const executionResult = parseExecutionResult({
@@ -101,11 +113,12 @@ class Runner {
     });
 
     this.runContext.runResultStore.getState().addResult(executionResult);
-
   }
 
   private afterComplete() {
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
+    if (!this.isAborted) {
+      this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
+    }
   }
 
   private onError(error: any) {
@@ -124,9 +137,21 @@ class Runner {
     const hasNextRequest = !isLastIteration || !isLastRequestInIteration;
 
     if (hasNextRequest && delay > 0) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
+      const abortController = this.runContext.runResultStore.getState().abortController;
 
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          resolve();
+        }, delay);
+
+        const abortHandler = () => {
+          clearTimeout(timeout);
+          resolve(); // Resolve normally, don't reject
+        };
+
+        abortController.signal.addEventListener("abort", abortHandler, { once: true });
+      });
+    }
   }
 
   private async *iterate() {
@@ -138,6 +163,10 @@ class Runner {
 
     for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
+        if (this.isAborted) {
+          return;
+        }
+
         const request = this.getRequest(requestIndex);
         if (!request) {
           continue;
@@ -146,30 +175,38 @@ class Runner {
         yield {
           request,
           iteration: iterationIndex + 1,
-        }
+        };
 
         await this.delay(iterationIndex, requestIndex);
       }
     }
-
   }
 
   async run() {
     try {
       this.beforeStart();
+
       for await (const { request, iteration } of this.iterate()) {
+        if (this.isAborted) {
+          return;
+        }
+
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
-        const result = await this.executor.executeSingleRequest(request.record.id, request.record.data);
+        const result = await this.executor.executeSingleRequest(
+          request.record.id,
+          request.record.data,
+          this.runContext.runResultStore.getState().abortController
+        );
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
+
       this.afterComplete();
-    }
-    catch (e) {
+    } catch (e) {
+      console.log("!!!debug", "run error", e);
       this.onError(e);
       return e;
     }
   }
-
 }
 
 export async function runCollection(

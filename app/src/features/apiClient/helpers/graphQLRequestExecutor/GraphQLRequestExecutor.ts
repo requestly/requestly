@@ -10,9 +10,13 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
    * Executes a GraphQL request by converting it to HTTP format and using the parent's execute method
    * @returns Promise<RQAPI.ExecutionResult>
    */
-  async executeGraphQLRequest(recordId: string, entry: RQAPI.GraphQLApiEntry): Promise<RQAPI.ExecutionResult> {
+  async executeGraphQLRequest(
+    recordId: string,
+    entry: RQAPI.GraphQLApiEntry,
+    abortController?: AbortController
+  ): Promise<RQAPI.ExecutionResult> {
     const httpPreparedEntry = this.prepareGraphQLRequest(recordId, entry);
-    const apiClientExecutionResult = await this.execute(recordId, httpPreparedEntry.preparedEntry);
+    const apiClientExecutionResult = await this.execute(recordId, httpPreparedEntry.preparedEntry, abortController);
     const graphQLEntryWithResponse: RQAPI.GraphQLApiEntry = httpEntryToGraphQLEntryAdapter(
       apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry
     );
