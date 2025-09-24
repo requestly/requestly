@@ -3,7 +3,7 @@ import { RequestContentType, RQAPI } from "features/apiClient/types";
 import GraphQLClientUrl from "./components/GraphQLClientUrl/GraphQLClientUrl";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "utils/Toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGraphQLIntrospection } from "features/apiClient/hooks/useGraphQLIntrospection";
 import { useDebounce } from "hooks/useDebounce";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
@@ -32,6 +32,7 @@ import { DEFAULT_REQUEST_NAME, INVALID_KEY_CHARACTERS } from "features/apiClient
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import {
   trackAPIRequestSent,
+  trackInstallExtensionDialogShown,
   trackRequestRenamed,
   trackRequestSaved,
 } from "modules/analytics/events/features/apiClient";
@@ -42,6 +43,9 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
 import { getRequestTypeForAnalyticEvent } from "../../../utils";
 import { useGraphQLRequestExecutor } from "features/apiClient/hooks/requestExecutors/useGraphQLRequestExecutor";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isDesktopMode } from "utils/AppUtils";
+import { globalActions } from "store/slices/global/slice";
 
 interface Props {
   recordId: string;
@@ -100,7 +104,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const { sheetPlacement, toggleSheetPlacement } = useBottomSheetContext();
 
   const location = useLocation();
-
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
   const { getIsActive, setUnsaved, setTitle, setIcon } = useGenericState();
@@ -288,6 +292,19 @@ const GraphQLClientView: React.FC<Props> = ({
 
   const handleSend = useCallback(
     async (operationName?: string) => {
+      if (!isExtensionInstalled() && !isDesktopMode()) {
+        /* SHOW INSTALL EXTENSION MODAL */
+        const modalProps = {
+          heading: "Install browser Extension to use the API Client",
+          subHeading:
+            "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
+          eventPage: "api_client",
+        };
+        dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+        trackInstallExtensionDialogShown({ src: "api_client" });
+        return;
+      }
+
       const entry = getEntry();
       const apiRecord = createApiRecord(entry, record);
       try {
@@ -426,7 +443,7 @@ const GraphQLClientView: React.FC<Props> = ({
               }}
             />
           </div>
-
+          {/* here */}
           <div className="api-client-header__url">
             <Space.Compact className="api-client-url-container">
               <GraphQLClientUrl
