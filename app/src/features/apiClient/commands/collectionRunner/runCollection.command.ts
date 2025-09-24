@@ -104,7 +104,7 @@ class Runner {
       iteration,
       recordId: request.record.id,
       recordName: request.record.name,
-      collectionName: collection.name,
+      collectionName: collection?.name ?? "",
       entry: parseExecutingRequestEntry(request.record.data),
     };
 
