@@ -15,9 +15,10 @@ import { useBatchRequestExecutor } from "features/apiClient/hooks/requestExecuto
 import { useGenericState } from "hooks/useGenericState";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { EmptyState } from "../EmptyState/EmptyState";
 import "./runConfigView.scss";
 
-const RunConfigSaveButton: React.FC = () => {
+const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   const { collectionId } = useCollectionView();
@@ -68,6 +69,7 @@ const RunConfigSaveButton: React.FC = () => {
       }
     >
       <RQButton
+        disabled={disabled}
         enableHotKey={isActiveTab}
         hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SAVE_COLLECTION.hotKey}
         size="small"
@@ -125,9 +127,10 @@ export const RunConfigView: React.FC = () => {
   const [selectAll, setSelectAll] = useState({ value: true });
 
   const { collectionId } = useCollectionView();
-  const [setOrderedRequests, setHasUnsavedChanges] = useRunConfigStore((s) => [
+  const [setOrderedRequests, setHasUnsavedChanges, orderedRequestsCount] = useRunConfigStore((s) => [
     s.setOrderedRequests,
     s.setHasUnsavedChanges,
+    s.orderedRequests.length,
   ]);
   const {
     runner: { resetRunOrder },
@@ -153,6 +156,8 @@ export const RunConfigView: React.FC = () => {
     resetRunOrder({ collectionId, setOrderedRequests });
   };
 
+  const isEmpty = orderedRequestsCount === 0;
+
   return (
     <div className="run-config-view-container">
       {/* header */}
@@ -170,28 +175,34 @@ export const RunConfigView: React.FC = () => {
         </div>
 
         <div className="actions">
-          <RunConfigSaveButton />
-          <RunCollectionButton />
+          <RunConfigSaveButton disabled={isEmpty} />
+          <RunCollectionButton disabled={isEmpty} />
         </div>
       </div>
 
-      {/* config container */}
-      <div className="run-config-container">
-        <div className="run-config-ordered-requests-header">
-          <RQButton type="transparent" size="small" onClick={handleSelectAllClick}>
-            Select all
-          </RQButton>
-          <RQButton type="transparent" size="small" onClick={handleDeselectAllClick}>
-            Deselect all
-          </RQButton>
-          <RQButton type="transparent" size="small" icon={<MdOutlineRestartAlt />} onClick={handleResetClick}>
-            Reset
-          </RQButton>
-        </div>
+      {isEmpty ? (
+        <EmptyState
+          title="No results in this collection"
+          description="Collection must include at least one request to run."
+        />
+      ) : (
+        <div className="run-config-container">
+          <div className="run-config-ordered-requests-header">
+            <RQButton type="transparent" size="small" onClick={handleSelectAllClick}>
+              Select all
+            </RQButton>
+            <RQButton type="transparent" size="small" onClick={handleDeselectAllClick}>
+              Deselect all
+            </RQButton>
+            <RQButton type="transparent" size="small" icon={<MdOutlineRestartAlt />} onClick={handleResetClick}>
+              Reset
+            </RQButton>
+          </div>
 
-        <RunConfigOrderedRequests selectAll={selectAll} />
-        <RunConfigSettings />
-      </div>
+          <RunConfigOrderedRequests selectAll={selectAll} />
+          <RunConfigSettings />
+        </div>
+      )}
     </div>
   );
 };
