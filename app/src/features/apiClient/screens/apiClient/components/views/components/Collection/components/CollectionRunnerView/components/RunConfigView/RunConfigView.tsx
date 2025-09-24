@@ -105,7 +105,9 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     });
   }, [runCollection, runContext, executor]);
 
-  const handleCancelRunClick = useCallback(async () => { }, []);
+  const handleCancelRunClick = useCallback(() => {
+    runContext.runResultStore.getState().abortController.abort();
+  }, [runContext]);
 
   const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (
