@@ -271,7 +271,7 @@ export const UserPlanDetails = () => {
             ) : (
               <>
                 {![PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.ENTERPRISE].includes(
-                  getPlanNameFromId(user?.details?.planDetails?.planId)
+                  user?.details?.planDetails?.planName
                 ) || user?.details?.planDetails?.status === "trialing" ? (
                   <Col className="user-plan-upgrade-card">
                     <MdDiversity1 />
