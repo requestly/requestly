@@ -1,10 +1,17 @@
 .runResultEmptyState {
   display: flex;
+  width: 100%;
+  margin-top: 24px;
+  padding: 32px;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  gap: var(--space-8, 24px);
-  align-self: stretch;
+  justify-content: center;
+
+  img {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
 
   .title {
     display: -webkit-box;
@@ -20,13 +27,15 @@
     font-style: normal;
     font-weight: 500;
     line-height: 18px; /* 150% */
+    margin-top: 16px;
+    margin-bottom: 4px;
   }
 
   .description {
     color: var(--requestly-color-text-subtle, #bbb);
     text-align: center;
-    font-size: var(--requestly-font-size-xs, 11px);
     font-style: normal;
+    font-size: var(--requestly-font-size-xs, 11px);
     font-weight: 400;
     line-height: 17px; /* 154.545% */
   }
