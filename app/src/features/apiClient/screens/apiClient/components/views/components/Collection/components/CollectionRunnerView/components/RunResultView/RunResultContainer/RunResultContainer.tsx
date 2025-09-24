@@ -18,6 +18,7 @@ import {
 import { RunResultEmptyState } from "../RunResultEmptyState/RunResultEmptyState";
 import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
+import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
 import "./runResultContainer.scss";
 
 enum RunResultTabKey {
@@ -162,8 +163,15 @@ const TestResultList: React.FC<{
   if (results.size > 1) {
     return resultsToShow.map(([iteration, details]) => {
       return (
-        <div key={iteration} className="tests-results-view-container">
-          <Collapse className="test-result-collapse" defaultActiveKey={["1"]} ghost>
+        <div key={iteration} className="test-result-collapse-container tests-results-view-container">
+          <Collapse
+            ghost
+            className="test-result-collapse"
+            defaultActiveKey={["1"]}
+            expandIcon={({ isActive }) => {
+              return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
+            }}
+          >
             <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
               {details.map(({ requestExecutionResult, testResults }) => {
                 return (
