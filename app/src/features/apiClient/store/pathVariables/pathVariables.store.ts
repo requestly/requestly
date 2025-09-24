@@ -33,14 +33,14 @@ export const createPathVariablesStore = (variables: RQAPI.PathVariable[]) => {
 
       const newVariables: RQAPI.PathVariable[] = variableKeys.map((key, index) => {
         const existingVariable = existingVariablesMap.get(key);
-        return (
-          existingVariable ?? {
-            id: index,
-            key,
-            value: "",
-            description: "",
-          }
-        );
+        return existingVariable
+          ? { ...existingVariable, id: index }
+          : {
+              id: index,
+              key,
+              value: "",
+              description: "",
+            };
       });
 
       set({ pathVariables: newVariables });
