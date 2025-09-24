@@ -24,6 +24,25 @@ enum RunResultTabKey {
   SKIPPED = "skipped",
 }
 
+const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; description: string }> = {
+  [RunResultTabKey.ALL]: {
+    title: "No tests found",
+    description: "No tests to show.",
+  },
+  [RunResultTabKey.FAIL]: {
+    title: "No failed tests",
+    description: "No tests failed in this run.",
+  },
+  [RunResultTabKey.SKIPPED]: {
+    title: "No skipped tests",
+    description: "No tests skipped in this run.",
+  },
+  [RunResultTabKey.SUCCESS]: {
+    title: "No successful tests",
+    description: "No tests passed in this run.",
+  },
+};
+
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   testResults: TestResult[];
@@ -73,11 +92,30 @@ const TestDetails: React.FC<{
   );
 };
 
-const TestResultList: React.FC<{ results: TestSummary }> = ({ results }) => {
+const TestResultList: React.FC<{
+  tabKey: RunResultTabKey;
+  results: TestSummary;
+}> = ({ tabKey, results }) => {
   // TODO: use virtualize list
+  const resultsToShow = useMemo(() => {
+    return tabKey === RunResultTabKey.ALL
+      ? Array.from(results)
+      : Array.from(results).filter(([iteration, details]) => {
+          return details.filter(({ testResults }) => testResults.length > 0).length > 0;
+        });
+  }, [results, tabKey]);
+
+  if (resultsToShow.length === 0) {
+    return (
+      <RunResultEmptyState
+        title={testResultListEmptyStateMessage[tabKey].title}
+        description={testResultListEmptyStateMessage[tabKey].description}
+      />
+    );
+  }
 
   if (results.size > 1) {
-    return Array.from(results).map(([iteration, details]) => {
+    return resultsToShow.map(([iteration, details]) => {
       return (
         <div className="tests-results-view-container">
           <Collapse className="test-result-collapse" defaultActiveKey={["1"]} ghost>
@@ -95,7 +133,7 @@ const TestResultList: React.FC<{ results: TestSummary }> = ({ results }) => {
   // show first iteration without collapse
   return (
     <div className="tests-results-view-container">
-      {results.get(1).map(({ requestExecutionResult, testResults }) => {
+      {resultsToShow[0][1].map(({ requestExecutionResult, testResults }) => {
         return <TestDetails requestExecutionResult={requestExecutionResult} testResults={testResults} />;
       })}
     </div>
@@ -153,22 +191,22 @@ export const RunResultContainer: React.FC<{
       {
         key: RunResultTabKey.ALL,
         label: <TestResultTabTitle title="All" count={summary.totalTestsCounts} loading={running} />,
-        children: <TestResultList key={RunResultTabKey.ALL} results={summary.totalTests} />,
+        children: <TestResultList tabKey={RunResultTabKey.ALL} results={summary.totalTests} />,
       },
       {
         key: RunResultTabKey.SUCCESS,
         label: <TestResultTabTitle title="Success" count={summary.successTestsCounts} loading={running} />,
-        children: <TestResultList key={RunResultTabKey.SUCCESS} results={summary.successTests} />,
+        children: <TestResultList tabKey={RunResultTabKey.SUCCESS} results={summary.successTests} />,
       },
       {
         key: RunResultTabKey.FAIL,
         label: <TestResultTabTitle title="Fail" count={summary.failedTestsCounts} loading={running} />,
-        children: <TestResultList key={RunResultTabKey.FAIL} results={summary.failedTests} />,
+        children: <TestResultList tabKey={RunResultTabKey.FAIL} results={summary.failedTests} />,
       },
       {
         key: RunResultTabKey.SKIPPED,
         label: <TestResultTabTitle title="Skipped" count={summary.skippedTestsCounts} loading={running} />,
-        children: <TestResultList key={RunResultTabKey.SKIPPED} results={summary.skippedTests} />,
+        children: <TestResultList tabKey={RunResultTabKey.SKIPPED} results={summary.skippedTests} />,
       },
     ];
   }, [
