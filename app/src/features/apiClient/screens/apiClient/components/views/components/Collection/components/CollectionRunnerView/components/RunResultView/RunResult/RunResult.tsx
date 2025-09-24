@@ -27,6 +27,15 @@ const TestDetails: React.FC<{
     return null;
   }
 
+  const responseDetails = (
+    <div className="response-details">
+      <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>·
+      <span className="response-status">
+        {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
+      </span>
+    </div>
+  );
+
   return (
     <div className="test-details-container">
       <div className="request-details">
@@ -34,23 +43,13 @@ const TestDetails: React.FC<{
           <>
             <HttpMethodIcon method={requestExecutionResult.entry.method} />
             <span className="request-name">{requestExecutionResult.recordName}</span>
-            <div className="response-details">
-              <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>·
-              <span className="response-status">
-                {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
-              </span>
-            </div>
+            {responseDetails}
           </>
         ) : (
           <>
             <GraphQlIcon /> {requestExecutionResult.entry.type}
             <span className="request-name">{requestExecutionResult.recordName}</span>
-            <div className="response-details">
-              <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)} ms</span>·
-              <span className="response-status">
-                {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
-              </span>
-            </div>
+            {responseDetails}
           </>
         )}
       </div>
