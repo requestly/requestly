@@ -772,7 +772,7 @@ export const extractPathVariablesFromUrl = (url: string) => {
   if (!url) {
     return [];
   }
-  const variablePattern = /\/:(\w+)/g;
+  const variablePattern = /:(\w+)/g;
   const variables: string[] = [];
   let match;
 
