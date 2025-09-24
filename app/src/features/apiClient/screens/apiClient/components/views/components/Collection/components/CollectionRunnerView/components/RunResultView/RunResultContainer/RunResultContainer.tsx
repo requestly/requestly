@@ -182,7 +182,7 @@ const TestResultList: React.FC<{
                   />
                 );
               })}
-              {currentRunningRequest}
+              {iteration === currentlyExecutingRequest?.iteration ? currentRunningRequest : null}
             </Collapse.Panel>
           </Collapse>
         </div>
