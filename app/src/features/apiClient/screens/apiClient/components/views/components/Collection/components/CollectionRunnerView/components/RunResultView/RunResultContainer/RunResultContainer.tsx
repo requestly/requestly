@@ -97,13 +97,19 @@ const TestDetails: React.FC<{
       <div className="request-details">
         {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
           <>
-            <HttpMethodIcon method={requestExecutionResult.entry.method} />
+            <span className="icon">
+              <HttpMethodIcon method={requestExecutionResult.entry.method} />
+            </span>
+            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
             <span className="request-name">{requestExecutionResult.recordName}</span>
             {responseDetails}
           </>
         ) : (
           <>
-            <GraphQlIcon />
+            <span className="icon">
+              <GraphQlIcon />
+            </span>
+            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
             <span className="request-name">{requestExecutionResult.recordName}</span>
             {responseDetails}
           </>

@@ -9,6 +9,7 @@ type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
   recordName: RQAPI.ApiRecord["name"];
+  collectionName: RQAPI.CollectionRecord["name"];
   entry:
     | {
         type: RQAPI.ApiEntryType.HTTP;

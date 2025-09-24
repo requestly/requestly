@@ -79,7 +79,15 @@
         .request-details {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 4px;
+
+          .icon {
+            margin-right: 4px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            margin-top: -1px;
+          }
 
           svg.graphql-request-icon {
             width: 16px;
@@ -96,22 +104,43 @@
             text-transform: uppercase;
           }
 
+          .collection-name {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            overflow: hidden;
+            color: var(--requestly-color-text-placeholder, #8f8f8f);
+            text-overflow: ellipsis;
+            font-size: var(--requestly-font-size-xs, 11px);
+            font-style: normal;
+            font-weight: 500;
+            line-height: 17px; /* 154.545% */
+          }
+
           .request-name {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             color: var(--requestly-color-text-default, #fff);
             font-size: var(--requestly-font-size-sm, 12px);
             font-style: normal;
             font-weight: 500;
-            line-height: 18px; /* 150% */
+            line-height: 17px; /* 150% */
+            margin-right: 4px;
           }
 
           .response-details {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             gap: 4px;
             color: var(--requestly-color-text-placeholder, #8f8f8f);
             font-size: var(--requestly-font-size-xs, 11px);
+            margin-bottom: -2px;
           }
 
           .response-time,
