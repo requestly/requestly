@@ -57,8 +57,24 @@
         border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
         .no-test-found-message {
+          font-weight: 400;
           color: var(--requestly-color-text-subtle);
           font-size: var(--requestly-font-size-sm);
+        }
+
+        .loader {
+          display: flex;
+          align-items: center;
+          gap: var(--space-6, 16px);
+          align-self: stretch;
+
+          .running-message {
+            color: var(--requestly-color-text-placeholder, #8f8f8f);
+            font-size: var(--requestly-font-size-sm);
+            font-style: italic;
+            font-weight: 400;
+            line-height: 17px; /* 154.545% */
+          }
         }
 
         .request-details {
