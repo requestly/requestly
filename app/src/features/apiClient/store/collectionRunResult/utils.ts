@@ -95,7 +95,7 @@ export function getAllTestSummary(result: RunResultState["result"]) {
   });
 
   return {
-    allResults,
+    allResults: result,
     iterations: result.size,
     totalTests,
     successTests,

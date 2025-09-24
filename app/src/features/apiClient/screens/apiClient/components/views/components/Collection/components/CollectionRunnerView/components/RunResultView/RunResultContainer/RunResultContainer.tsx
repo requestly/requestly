@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { Badge, Collapse, Tabs } from "antd";
-import { RequestExecutionResult, RunResultState } from "features/apiClient/store/collectionRunResult/runResult.store";
+import {
+  LiveRunResult,
+  RequestExecutionResult,
+  RunResult,
+} from "features/apiClient/store/collectionRunResult/runResult.store";
 import { getAllTestSummary, getRunMetrics, TestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { TestResultItem } from "../../../../../../response/TestsView/components/TestResult/TestResult";
 import moment from "moment";
@@ -10,7 +14,7 @@ import {
   GraphQlIcon,
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import "./runResult.scss";
+import "./runResultContainer.scss";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -109,20 +113,20 @@ const TestResultTabTitle: React.FC<{ title: string; count: number; loading?: boo
   );
 };
 
-export const RunResult: React.FC<{
+export const RunResultContainer: React.FC<{
   ranAt: number;
-  testResults: RunResultState["result"];
+  result: LiveRunResult | RunResult;
   running?: boolean;
-}> = ({ ranAt, testResults, running = false }) => {
+}> = ({ ranAt, result, running = false }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
 
   const metrics = useMemo(() => {
-    return getRunMetrics(testResults);
-  }, [testResults]);
+    return getRunMetrics(result.result);
+  }, [result.result]);
 
   const summary = useMemo(() => {
-    return getAllTestSummary(testResults);
-  }, [testResults]);
+    return getAllTestSummary(result.result);
+  }, [result.result]);
 
   const runMetrics = useMemo(() => {
     const { totalDuration, avgResponseTime } = metrics;
@@ -191,7 +195,7 @@ export const RunResult: React.FC<{
         })}
       </div>
       <div className="result-tabs-container">
-        {testResults.size === 0 ? (
+        {result.result.size === 0 ? (
           <i>Nothing to show</i>
         ) : (
           <Tabs

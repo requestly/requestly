@@ -1,7 +1,6 @@
 import { NativeError } from "errors/NativeError";
 import { RQAPI } from "features/apiClient/types";
 import { create } from "zustand";
-import { getAllTestSummary } from "./utils";
 
 export type Iteration = number;
 type Timestamp = number;
@@ -62,20 +61,13 @@ const RunStateMachine = {
   [RunStatus.ERRORED]: [RunStatus.IDLE],
 };
 
-export type SavedRunResult = {
-  id: string; // runId
-  totalTests: number;
-  successTests: number;
-  failedTests: number;
-  skippedTests: number;
-  startTime: Timestamp;
-  endTime: Timestamp | null;
-  duration: Timestamp | null;
-  runStatus: Omit<RunStatus, RunStatus.RUNNING | RunStatus.IDLE>;
-  result: RequestExecutionResult[];
+export type LiveRunResult = Pick<RunResultState, "startTime" | "endTime" | "runStatus" | "result">;
+
+export type RunResult = LiveRunResult & {
+  runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
 };
 
-type RunSummary = Omit<SavedRunResult, "id">;
+export type SavedRunResult = RunResult & { id: string; result: [Iteration, IterationDetails][] };
 
 export type CurrentlyExecutingRequest =
   | null
@@ -90,26 +82,27 @@ export type IterationDetails = {
 export type RunResultState = {
   startTime: Timestamp | null;
   endTime: Timestamp | null;
-  averageResponseTime: Timestamp | null;
   runStatus: RunStatus;
   result: Map<Iteration, IterationDetails>;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
 
+  history: RunResult[];
+
   reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: RunStatus): void;
-  getRunSummary(): RunSummary;
+  getRunSummary(): LiveRunResult;
 };
 
 export function createRunResultStore() {
   return create<RunResultState>()((set, get) => ({
     startTime: null,
     endTime: null,
-    averageResponseTime: null,
     runStatus: RunStatus.IDLE,
     result: new Map(),
+    history: [],
     currentlyExecutingRequest: null,
     abortController: new AbortController(),
 
@@ -117,7 +110,6 @@ export function createRunResultStore() {
       set({
         startTime: null,
         endTime: null,
-        averageResponseTime: null,
         runStatus: RunStatus.IDLE,
         result: new Map(),
         currentlyExecutingRequest: null,
@@ -156,25 +148,12 @@ export function createRunResultStore() {
 
     getRunSummary() {
       const { startTime, endTime, runStatus, result } = get();
-      const {
-        totalTestsCounts,
-        successTestsCounts,
-        failedTestsCounts,
-        skippedTestsCounts,
-        allResults,
-        duration,
-      } = getAllTestSummary(result);
 
       return {
         endTime,
         startTime,
         runStatus,
-        duration,
-        result: allResults,
-        totalTests: totalTestsCounts,
-        successTests: successTestsCounts,
-        failedTests: failedTestsCounts,
-        skippedTests: skippedTestsCounts,
+        result,
       };
     },
   }));
