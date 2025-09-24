@@ -1,7 +1,7 @@
 import React from "react";
-import "./runResultEmptyState.scss";
+import "./emptyState.scss";
 
-export const RunResultEmptyState: React.FC<{ imageSrc?: string; title: string; description: string }> = ({
+export const EmptyState: React.FC<{ imageSrc?: string; title: string; description: string }> = ({
   title,
   imageSrc,
   description,

@@ -15,7 +15,7 @@ import {
   GraphQlIcon,
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import { RunResultEmptyState } from "../RunResultEmptyState/RunResultEmptyState";
+import { EmptyState } from "../../EmptyState/EmptyState";
 import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
@@ -191,7 +191,7 @@ const TestResultList: React.FC<{
 
   if (resultsToShow.length === 0) {
     return (
-      <RunResultEmptyState
+      <EmptyState
         title={testResultListEmptyStateMessage[tabKey].title}
         description={testResultListEmptyStateMessage[tabKey].description}
       />
@@ -329,7 +329,7 @@ export const RunResultContainer: React.FC<{
   return (
     <div className="run-result-view-details">
       {result.result.size === 0 ? (
-        <RunResultEmptyState
+        <EmptyState
           title="No test result found"
           description="Please add test cases in scripts tab and run them to see results."
         />
