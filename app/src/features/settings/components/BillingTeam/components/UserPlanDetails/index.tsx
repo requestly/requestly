@@ -212,7 +212,7 @@ export const UserPlanDetails = () => {
                         <Col className="user-plan-card-plan-name">
                           {isSetapp
                             ? "Professional (Setapp)"
-                            : `${getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} Plan`}{" "}
+                            : `${getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} Plan`}{" "}
                           {hasProfessionalStudentPlan ? <Tag color="green">Student Program</Tag> : ""}
                         </Col>
                       </Row>
@@ -287,8 +287,9 @@ export const UserPlanDetails = () => {
             ) : (
               <>
                 {!isSetapp &&
-                (user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
-                  user?.details?.planDetails?.status === "trialing") ? (
+                (![PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.ENTERPRISE].includes(
+                  getPlanNameFromId(user?.details?.planDetails?.planId)
+                  ) || user?.details?.planDetails?.status === "trialing") ? (
                   <Col className="user-plan-upgrade-card">
                     <MdDiversity1 />
                     <div className="title">
