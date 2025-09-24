@@ -50,16 +50,16 @@ function parseExecutionResult(params: {
 }
 
 class Runner {
-  private isAborted = false;
+  private abortController;
 
-  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
+  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {
+    this.abortController = this.runContext.runResultStore.getState().abortController;
+  }
 
   private setupAbortListener() {
-    const abortController = this.runContext.runResultStore.getState().abortController;
-    abortController.signal.addEventListener(
+    this.abortController.signal.addEventListener(
       "abort",
       () => {
-        this.isAborted = true;
         this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
       },
       { once: true }
@@ -116,7 +116,7 @@ class Runner {
   }
 
   private afterComplete() {
-    if (!this.isAborted) {
+    if (!this.abortController.signal.aborted) {
       this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
     }
   }
@@ -137,19 +137,17 @@ class Runner {
     const hasNextRequest = !isLastIteration || !isLastRequestInIteration;
 
     if (hasNextRequest && delay > 0) {
-      const abortController = this.runContext.runResultStore.getState().abortController;
-
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const timeout = setTimeout(() => {
           resolve();
         }, delay);
 
         const abortHandler = () => {
           clearTimeout(timeout);
-          resolve(); // Resolve normally, don't reject
+          resolve();
         };
 
-        abortController.signal.addEventListener("abort", abortHandler, { once: true });
+        this.abortController.signal.addEventListener("abort", abortHandler, { once: true });
       });
     }
   }
@@ -163,7 +161,7 @@ class Runner {
 
     for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
-        if (this.isAborted) {
+        if (this.abortController.signal.aborted) {
           return;
         }
 
@@ -187,7 +185,7 @@ class Runner {
       this.beforeStart();
 
       for await (const { request, iteration } of this.iterate()) {
-        if (this.isAborted) {
+        if (this.abortController.signal.aborted) {
           return;
         }
 
@@ -202,7 +200,6 @@ class Runner {
 
       this.afterComplete();
     } catch (e) {
-      console.log("!!!debug", "run error", e);
       this.onError(e);
       return e;
     }
