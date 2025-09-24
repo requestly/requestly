@@ -50,13 +50,12 @@ function parseExecutionResult(params: {
 }
 
 class Runner {
-  private abortController;
+  private abortController: AbortController;
 
-  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {
-    this.abortController = this.runContext.runResultStore.getState().abortController;
-  }
+  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
 
   private setupAbortListener() {
+    this.abortController = this.runContext.runResultStore.getState().abortController;
     this.abortController.signal.addEventListener(
       "abort",
       () => {
@@ -79,6 +78,7 @@ class Runner {
 
   private beforeStart() {
     this.runContext.runResultStore.getState().clearAll();
+
     this.setupAbortListener();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
   }
@@ -159,10 +159,10 @@ class Runner {
     const { iterations } = getConfig();
     const requestsCount = orderedRequests.length;
 
-    for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
+    outerLoop: for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
         if (this.abortController.signal.aborted) {
-          return;
+          break outerLoop;
         }
 
         const request = this.getRequest(requestIndex);
@@ -186,7 +186,7 @@ class Runner {
 
       for await (const { request, iteration } of this.iterate()) {
         if (this.abortController.signal.aborted) {
-          return;
+          break;
         }
 
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
@@ -195,6 +195,7 @@ class Runner {
           request.record.data,
           this.runContext.runResultStore.getState().abortController
         );
+        console.log("!!!debug", "result", result);
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
 
