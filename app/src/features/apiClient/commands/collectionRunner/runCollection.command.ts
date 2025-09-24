@@ -15,26 +15,35 @@ function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResu
     ? {
         type: entry.type,
         method: entry.request.method,
+        responseTime: entry.response?.time ?? null,
+        statusCode: entry.response?.status ?? null,
+        statusText: entry.response?.statusText ?? null,
       }
-    : { type: entry.type };
+    : {
+        type: entry.type,
+        responseTime: entry.response?.time ?? null,
+        statusCode: entry.response?.status ?? null,
+        statusText: entry.response?.statusText ?? null,
+      };
 }
 
 function parseExecutionResult(params: {
   recordId: string;
+  recordName: string;
   result: RQAPI.ExecutionResult;
   iteration: number;
   startTime: number;
 }): RequestExecutionResult {
-  const { recordId, result, iteration, startTime } = params;
+  const { recordId, recordName, result, iteration, startTime } = params;
 
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
     return {
       iteration,
       recordId,
+      recordName,
       entry: parseExecutingRequestEntry(result.executedEntry),
       status: { value: result.status, error: result.error },
-      duration: null,
-      statusCode: null,
+      runDuration: null,
       testResults: null,
     };
   }
@@ -42,10 +51,10 @@ function parseExecutionResult(params: {
   return {
     iteration,
     recordId,
-    duration: Date.now() - startTime,
+    recordName,
+    runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
     status: { value: result.status, warning: result.warning },
-    statusCode: result.executedEntry.response.status,
     testResults: result.executedEntry.testResults,
   };
 }
@@ -53,17 +62,14 @@ function parseExecutionResult(params: {
 class RunCancelled extends NativeError {}
 
 class Runner {
-
-  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {
-    
-  }
+  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
 
   private get abortController() {
     return this.runContext.runResultStore.getState().abortController;
   }
 
   private throwIfRunCancelled() {
-    if(this.abortController.signal.aborted) {
+    if (this.abortController.signal.aborted) {
       throw new RunCancelled();
     }
   }
@@ -90,6 +96,7 @@ class Runner {
       startTime,
       iteration,
       recordId: request.record.id,
+      recordName: request.record.name,
       entry: parseExecutingRequestEntry(request.record.data),
     };
 
@@ -112,6 +119,7 @@ class Runner {
       iteration: currentExecutingRequest.iteration,
       startTime: currentExecutingRequest.startTime,
       recordId: currentExecutingRequest.recordId,
+      recordName: currentExecutingRequest.recordName,
       result,
     });
 
@@ -198,7 +206,7 @@ class Runner {
 
       this.afterComplete();
     } catch (e) {
-      if(e instanceof RunCancelled) {
+      if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
       }

@@ -41,31 +41,31 @@ interface Props {
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
-const HttpMethodIcon = ({ entry }: { entry: RQAPI.HttpApiEntry }) => {
+export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
   return (
     <Typography.Text
       strong
       className="request-method"
       style={{
-        color: REQUEST_METHOD_COLORS[entry.request?.method],
-        backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[entry.request?.method],
+        color: REQUEST_METHOD_COLORS[method],
+        backgroundColor: REQUEST_METHOD_BACKGROUND_COLORS[method],
       }}
     >
-      {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(entry.request?.method)
-        ? entry.request?.method.slice(0, 3)
-        : entry.request?.method}
+      {[RequestMethod.OPTIONS, RequestMethod.DELETE].includes(method) ? method.slice(0, 3) : method}
     </Typography.Text>
   );
 };
 
+export const GraphQlIcon = () => <GrGraphQl className="graphql-request-icon" />;
+
 export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
   switch (record.data.type) {
     case RQAPI.ApiEntryType.HTTP:
-      return <HttpMethodIcon entry={record.data} />;
+      return <HttpMethodIcon method={record.data.request?.method} />;
     case RQAPI.ApiEntryType.GRAPHQL:
-      return <GrGraphQl className="graphql-request-icon" />;
+      return <GraphQlIcon />;
     default:
-      return <HttpMethodIcon entry={record.data} />;
+      return null;
   }
 };
 

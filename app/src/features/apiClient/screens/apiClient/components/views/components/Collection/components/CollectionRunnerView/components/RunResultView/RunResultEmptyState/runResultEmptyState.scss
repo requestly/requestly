@@ -1,0 +1,33 @@
+.runResultEmptyState {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-8, 24px);
+  align-self: stretch;
+
+  .title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    align-self: stretch;
+    overflow: hidden;
+    color: var(--requestly-color-text-default, #fff);
+    text-align: center;
+    text-overflow: ellipsis;
+    font-size: var(--requestly-font-size-sm, 12px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px; /* 150% */
+  }
+
+  .description {
+    color: var(--requestly-color-text-subtle, #bbb);
+    text-align: center;
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 17px; /* 154.545% */
+  }
+}
