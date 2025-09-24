@@ -8,6 +8,7 @@ import {
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
+import { NativeError } from "errors/NativeError";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -49,20 +50,22 @@ function parseExecutionResult(params: {
   };
 }
 
+class RunCancelled extends NativeError {}
+
 class Runner {
-  private abortController: AbortController;
 
-  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
+  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {
+    
+  }
 
-  private setupAbortListener() {
-    this.abortController = this.runContext.runResultStore.getState().abortController;
-    this.abortController.signal.addEventListener(
-      "abort",
-      () => {
-        this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
-      },
-      { once: true }
-    );
+  private get abortController() {
+    return this.runContext.runResultStore.getState().abortController;
+  }
+
+  private throwIfRunCancelled() {
+    if(this.abortController.signal.aborted) {
+      throw new RunCancelled();
+    }
   }
 
   private getRequest(requestIndex: number) {
@@ -77,9 +80,7 @@ class Runner {
   }
 
   private beforeStart() {
-    this.runContext.runResultStore.getState().clearAll();
-
-    this.setupAbortListener();
+    this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
   }
 
@@ -92,6 +93,7 @@ class Runner {
       entry: parseExecutingRequestEntry(request.record.data),
     };
 
+    this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
     return {
@@ -103,6 +105,7 @@ class Runner {
     currentExecutingRequest: CurrentlyExecutingRequest,
     result: RQAPI.ExecutionResult
   ) {
+    this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
 
     const executionResult = parseExecutionResult({
@@ -116,13 +119,16 @@ class Runner {
   }
 
   private afterComplete() {
-    if (!this.abortController.signal.aborted) {
-      this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
-    }
+    this.throwIfRunCancelled();
+    this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
   }
 
   private onError(error: any) {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+  }
+
+  private onRunCancelled() {
+    this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
   }
 
   private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
@@ -159,12 +165,8 @@ class Runner {
     const { iterations } = getConfig();
     const requestsCount = orderedRequests.length;
 
-    outerLoop: for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
+    for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
-        if (this.abortController.signal.aborted) {
-          break outerLoop;
-        }
-
         const request = this.getRequest(requestIndex);
         if (!request) {
           continue;
@@ -185,22 +187,21 @@ class Runner {
       this.beforeStart();
 
       for await (const { request, iteration } of this.iterate()) {
-        if (this.abortController.signal.aborted) {
-          break;
-        }
-
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
         const result = await this.executor.executeSingleRequest(
           request.record.id,
           request.record.data,
           this.runContext.runResultStore.getState().abortController
         );
-        console.log("!!!debug", "result", result);
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
 
       this.afterComplete();
     } catch (e) {
+      if(e instanceof RunCancelled) {
+        this.onRunCancelled();
+        return;
+      }
       this.onError(e);
       return e;
     }

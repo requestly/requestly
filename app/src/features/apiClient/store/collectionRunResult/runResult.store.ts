@@ -90,7 +90,7 @@ export type RunResultState = {
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
 
-  clearAll(): void;
+  reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: RunStatus): void;
@@ -127,7 +127,7 @@ export function createRunResultStore() {
     currentlyExecutingRequest: null,
     abortController: new AbortController(),
 
-    clearAll() {
+    reset() {
       set({
         startTime: null,
         endTime: null,
