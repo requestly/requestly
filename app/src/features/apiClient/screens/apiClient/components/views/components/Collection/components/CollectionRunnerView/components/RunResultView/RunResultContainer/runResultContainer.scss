@@ -41,17 +41,23 @@
         }
       }
 
-      .ant-tabs-nav-list .ant-tabs-tab {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--space-2, 4px);
-        height: 24px;
-        padding: var(--space-2, 4px) var(--space-3, 6px);
+      .ant-tabs-nav-list {
+        .ant-tabs-tab {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-2, 4px);
+          height: 24px;
+          padding: var(--space-2, 4px) var(--space-3, 6px);
 
-        &.ant-tabs-tab-active {
-          border-radius: 4px;
-          background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          &.ant-tabs-tab-active {
+            border-radius: 4px;
+            background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
+        }
+
+        .ant-tabs-tab + .ant-tabs-tab {
+          margin-left: 4px;
         }
       }
     }
