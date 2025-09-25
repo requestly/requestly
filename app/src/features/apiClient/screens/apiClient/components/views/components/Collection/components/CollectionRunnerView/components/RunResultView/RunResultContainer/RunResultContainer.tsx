@@ -19,6 +19,9 @@ import { EmptyState } from "../../EmptyState/EmptyState";
 import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../../../../../../RequestView/requestViewTabSource";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./runResultContainer.scss";
 
 enum RunResultTabKey {
@@ -119,6 +122,9 @@ const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   testResults: TestResult[];
 }> = ({ requestExecutionResult, testResults }) => {
+  const context = useApiClientFeatureContext();
+  const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
+
   const responseDetails = useMemo(() => {
     return (
       <div className="response-details">
@@ -140,10 +146,31 @@ const TestDetails: React.FC<{
     return (
       <>
         <span className="collection-name">{requestExecutionResult.collectionName} /</span>
-        <span className="request-name">{requestExecutionResult.recordName}</span>
+        <span
+          className="request-name"
+          onClick={() => {
+            openTab(
+              new RequestViewTabSource({
+                id: requestExecutionResult.recordId,
+                title: requestExecutionResult.recordName,
+                context: {
+                  id: context.id,
+                },
+              })
+            );
+          }}
+        >
+          {requestExecutionResult.recordName}
+        </span>
       </>
     );
-  }, [requestExecutionResult.collectionName, requestExecutionResult.recordName]);
+  }, [
+    context.id,
+    openTab,
+    requestExecutionResult.collectionName,
+    requestExecutionResult.recordId,
+    requestExecutionResult.recordName,
+  ]);
 
   return (
     <div className="test-details-container">
