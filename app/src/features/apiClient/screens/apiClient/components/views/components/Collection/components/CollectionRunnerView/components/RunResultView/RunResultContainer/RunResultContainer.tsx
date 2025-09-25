@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -15,9 +15,10 @@ import {
   GraphQlIcon,
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
-import { RunResultEmptyState } from "../RunResultEmptyState/RunResultEmptyState";
+import { EmptyState } from "../../EmptyState/EmptyState";
 import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
+import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
 import "./runResultContainer.scss";
 
 enum RunResultTabKey {
@@ -49,8 +50,46 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
 const RunningRequestPlaceholder: React.FC<{
   runningRequest: CurrentlyExecutingRequest;
 }> = ({ runningRequest }) => {
+  const stopScrolling = useRef<boolean>(false);
+
+  // useEffect(() => {
+  //   const handleScroll = (e: Event) => {
+  //     const container = e.target as HTMLElement;
+
+  //     stopScrolling.current = true;
+  //     // } else {
+  //     //   keepScrolling.current = true;
+  //     // }
+  //   };
+
+  //   document.addEventListener("scroll", handleScroll);
+  //   document.addEventListener("wheel", handleScroll);
+  //   document.addEventListener("touchstart", handleScroll);
+
+  //   return () => {
+  //     document.removeEventListener("scroll", handleScroll);
+  //     document.removeEventListener("wheel", handleScroll);
+  //     document.removeEventListener("touchstart", handleScroll);
+  //   };
+  // }, []);
+
+  const handleAutoScroll = useCallback((node: HTMLDivElement | null) => {
+    if (!node) {
+      return;
+    }
+
+    if (stopScrolling.current) {
+      return;
+    }
+
+    // node?.scrollIntoView({
+    //   behavior: "smooth",
+    //   block: "end",
+    // });
+  }, []);
+
   return (
-    <div className="test-details-container">
+    <div ref={handleAutoScroll} className="test-details-container">
       <div className="request-details">
         {runningRequest.entry.type === RQAPI.ApiEntryType.HTTP ? (
           <>
@@ -97,13 +136,19 @@ const TestDetails: React.FC<{
       <div className="request-details">
         {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
           <>
-            <HttpMethodIcon method={requestExecutionResult.entry.method} />
+            <span className="icon">
+              <HttpMethodIcon method={requestExecutionResult.entry.method} />
+            </span>
+            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
             <span className="request-name">{requestExecutionResult.recordName}</span>
             {responseDetails}
           </>
         ) : (
           <>
-            <GraphQlIcon />
+            <span className="icon">
+              <GraphQlIcon />
+            </span>
+            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
             <span className="request-name">{requestExecutionResult.recordName}</span>
             {responseDetails}
           </>
@@ -146,7 +191,7 @@ const TestResultList: React.FC<{
 
   if (resultsToShow.length === 0) {
     return (
-      <RunResultEmptyState
+      <EmptyState
         title={testResultListEmptyStateMessage[tabKey].title}
         description={testResultListEmptyStateMessage[tabKey].description}
       />
@@ -156,8 +201,15 @@ const TestResultList: React.FC<{
   if (results.size > 1) {
     return resultsToShow.map(([iteration, details]) => {
       return (
-        <div key={iteration} className="tests-results-view-container">
-          <Collapse className="test-result-collapse" defaultActiveKey={["1"]} ghost>
+        <div key={iteration} className="test-result-collapse-container tests-results-view-container">
+          <Collapse
+            ghost
+            className="test-result-collapse"
+            defaultActiveKey={["1"]}
+            expandIcon={({ isActive }) => {
+              return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
+            }}
+          >
             <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
               {details.map(({ requestExecutionResult, testResults }) => {
                 return (
@@ -168,7 +220,7 @@ const TestResultList: React.FC<{
                   />
                 );
               })}
-              {currentRunningRequest}
+              {iteration === currentlyExecutingRequest?.iteration ? currentRunningRequest : null}
             </Collapse.Panel>
           </Collapse>
         </div>
@@ -277,7 +329,7 @@ export const RunResultContainer: React.FC<{
   return (
     <div className="run-result-view-details">
       {result.result.size === 0 ? (
-        <RunResultEmptyState
+        <EmptyState
           title="No test result found"
           description="Please add test cases in scripts tab and run them to see results."
         />

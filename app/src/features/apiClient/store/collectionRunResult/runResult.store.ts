@@ -9,6 +9,7 @@ type BaseRequestExecutionResult = {
   iteration: Iteration;
   recordId: RQAPI.ApiRecord["id"];
   recordName: RQAPI.ApiRecord["name"];
+  collectionName: RQAPI.CollectionRecord["name"];
   entry:
     | {
         type: RQAPI.ApiEntryType.HTTP;
@@ -91,6 +92,8 @@ export type RunResultState = {
 
   reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
+  setStartTime(time: Timestamp | number): void;
+  setEndtime(time: Timestamp | number): void;
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: RunStatus): void;
   getRunSummary(): LiveRunResult;
@@ -115,6 +118,14 @@ export function createRunResultStore() {
         currentlyExecutingRequest: null,
         abortController: new AbortController(),
       });
+    },
+
+    setStartTime(time) {
+      set({ startTime: time });
+    },
+
+    setEndtime(time) {
+      set({ endTime: time });
     },
 
     setCurrentlyExecutingRequest(request) {
