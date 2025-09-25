@@ -4,6 +4,7 @@ import { MdOutlineSave } from "@react-icons/all-files/md/MdOutlineSave";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRestartAlt } from "@react-icons/all-files/md/MdOutlineRestartAlt";
+import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 import { RunConfigOrderedRequests } from "./RunConfigOrderedRequests/RunConfigOrderedRequests";
 import { RunConfigSettings } from "./RunConfigSettings/RunConfigSettings";
 import { useCommand } from "features/apiClient/commands";
@@ -117,8 +118,14 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
   const isRunning = runStatus === RunStatus.RUNNING;
   return isRunning ? (
-    <RQButton disabled={disabled} size="small" type="danger" onClick={handleCancelRunClick}>
-      Cancel
+    <RQButton
+      disabled={disabled}
+      size="small"
+      type="danger"
+      icon={<MdOutlineStopCircle />}
+      onClick={handleCancelRunClick}
+    >
+      Stop
     </RQButton>
   ) : (
     <RQButton disabled={disabled} size="small" type="primary" icon={<MdOutlineVideoLibrary />} onClick={handleRunClick}>
