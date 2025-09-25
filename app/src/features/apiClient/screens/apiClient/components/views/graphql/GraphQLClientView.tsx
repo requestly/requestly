@@ -443,7 +443,7 @@ const GraphQLClientView: React.FC<Props> = ({
               }}
             />
           </div>
-          {/* here */}
+
           <div className="api-client-header__url">
             <Space.Compact className="api-client-url-container">
               <GraphQLClientUrl
