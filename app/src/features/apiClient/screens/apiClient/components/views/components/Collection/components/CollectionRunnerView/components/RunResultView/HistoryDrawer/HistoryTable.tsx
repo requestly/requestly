@@ -23,7 +23,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
       return [
         {
           startTime: runStartTime,
-          endTime: 0,
+          endTime: null as LiveRunResult["endTime"],
           runStatus,
           iterations: new Map(),
         },
