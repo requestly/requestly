@@ -9,5 +9,4 @@ export async function cancelRun(
 ) {
   const { runContext } = params;
   runContext.runResultStore.getState().abortController.abort();
-  runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
 }
