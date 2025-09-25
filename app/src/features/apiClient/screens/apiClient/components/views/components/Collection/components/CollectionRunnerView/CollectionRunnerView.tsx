@@ -42,6 +42,7 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   useEffect(() => {
     (async () => {
       try {
+        setRunResults(null);
         const results = await getRunResults({ collectionId });
         setRunResults(results);
       } catch (error) {
