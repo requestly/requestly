@@ -1,21 +1,32 @@
 import React, { useMemo } from "react";
 import { Table } from "antd";
 import "./historyTable.scss";
+import { useRunResultStore } from "../../../run.context";
+import { getAllTestSummary } from "features/apiClient/store/collectionRunResult/utils";
+import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import moment from "moment";
 
 export const HistoryTable: React.FC = () => {
+  const [history] = useRunResultStore((s) => [s.history]);
+
   const columns = useMemo(() => {
     return [
       {
         title: "Ran at",
-        dataIndex: "ranAt",
+        render: (_: any, record: RunResult) => (
+          <span>{moment(record.startTime).format("MMM DD, YYYY [at] HH:mm:ss")}</span>
+        ),
       },
       {
         title: "Duration",
-        dataIndex: "duration",
+        render: (_: any, record: RunResult) => <span>{record.endTime - record.startTime} ms</span>,
       },
       {
         title: "Total",
-        dataIndex: "total",
+        render: (_: any, record: RunResult) => {
+          const testSummary = getAllTestSummary(record.result);
+          return <span>{testSummary.totalTestsCounts}</span>;
+        },
       },
       {
         title: (
@@ -23,7 +34,10 @@ export const HistoryTable: React.FC = () => {
             <span style={{ color: "var(--requestly-color-success)" }}>Success</span>
           </>
         ),
-        dataIndex: "success",
+        render: (_: any, record: RunResult) => {
+          const testSummary = getAllTestSummary(record.result);
+          return <span>{testSummary.successTestsCounts}</span>;
+        },
       },
       {
         title: (
@@ -31,11 +45,17 @@ export const HistoryTable: React.FC = () => {
             <span style={{ color: "var(--requestly-color-error-text)" }}>Failed</span>
           </>
         ),
-        dataIndex: "failed",
+        render: (_: any, record: RunResult) => {
+          const testSummary = getAllTestSummary(record.result);
+          return <span>{testSummary.failedTestsCounts}</span>;
+        },
       },
       {
         title: "Skipped",
-        dataIndex: "skipped",
+        render: (_: any, record: RunResult) => {
+          const testSummary = getAllTestSummary(record.result);
+          return <span>{testSummary.skippedTestsCounts}</span>;
+        },
       },
     ];
   }, []);
@@ -63,5 +83,5 @@ export const HistoryTable: React.FC = () => {
     ];
   }, []);
 
-  return <Table className="history-table" columns={columns} dataSource={dataSource} pagination={false} />;
+  return <Table className="history-table" columns={columns} dataSource={history} pagination={false} />;
 };

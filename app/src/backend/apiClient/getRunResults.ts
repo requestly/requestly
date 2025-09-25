@@ -24,14 +24,16 @@ async function _getRunResultsFromFirebase(
     const snapshot = await getDocs(collectionRef);
 
     const runResults: RunResult[] = [];
-    snapshot.forEach((doc) => {
+    snapshot.docs.forEach((doc) => {
       const data = doc.data() as Omit<SavedRunResult, "id">;
-      const runResultMap = new Map<number, IterationDetails>(data.result);
-      runResults.push({ ...data, result: runResultMap });
+      console.log("!!!debug", "data", data);
+      const runResultMap = new Map(Object.entries(data.result));
+      runResults.push({ ...data, result: runResultMap }); // TODO check type here
     });
 
     return { success: true, data: runResults };
   } catch (e) {
+    console.log("!!!debug", "get err", e);
     Sentry.captureException(e, {
       extra: { collectionId },
     });

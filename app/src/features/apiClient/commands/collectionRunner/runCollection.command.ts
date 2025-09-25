@@ -57,7 +57,7 @@ function prepareExecutionResult(params: {
     collectionName,
     runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
-    status: { value: result.status, warning: result.warning },
+    status: { value: result.status, warning: result.warning || null },
     testResults: result.executedEntry.testResults,
   };
 }
@@ -141,16 +141,21 @@ class Runner {
 
     const runResult = this.runContext.runResultStore.getState().getRunSummary() as RunResult;
     this.runContext.runResultStore.getState().addToHistory(runResult);
-    await saveRunResult(this.ctx, {
-      collectionId,
-      runResult: runResult,
-    });
-    notification.success({
-      message: "Run completed!",
-      placement: "bottomRight",
-      className: "collection-runner-notification",
-      duration: 3,
-    });
+    try {
+      await saveRunResult(this.ctx, {
+        collectionId,
+        runResult: runResult,
+      });
+      notification.success({
+        message: "Run completed!",
+        placement: "bottomRight",
+        className: "collection-runner-notification",
+        duration: 3,
+      });
+    } catch (e) {
+      //TODO: add banner
+      console.log("!!!debug", "save run result err", e);
+    }
   }
 
   private onError(error: any) {
@@ -237,6 +242,7 @@ class Runner {
 
       await this.afterComplete(collectionId);
     } catch (e) {
+      console.log("!!!debug", "err", e);
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;

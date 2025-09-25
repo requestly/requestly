@@ -22,12 +22,14 @@ async function _addRunResultInFirebase(
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, APIS_NODE, collectionId, RUN_RESULT_NODE);
 
-    const resultArray = Array.from(runResult.result.entries());
+    const resultObject = Object.fromEntries(runResult.result.entries());
 
     const runResultForSave = {
       ...runResult,
-      result: resultArray,
+      result: resultObject,
     };
+
+    console.log("!!!debug", "runResultForSave", runResultForSave);
 
     const docRef = await addDoc(collectionRef, runResultForSave);
 
@@ -38,6 +40,7 @@ async function _addRunResultInFirebase(
 
     return { success: true, data: savedRunResult };
   } catch (e) {
+    console.log("!!!debug", "addrunresurlt", e);
     Sentry.captureException(e, {
       extra: { collectionId, runResult },
     });
