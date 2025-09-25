@@ -8,7 +8,6 @@ import {
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { getAllTestSummary, getRunMetrics, TestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { TestResultItem } from "../../../../../../response/TestsView/components/TestResult/TestResult";
-import moment from "moment";
 import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { RQAPI } from "features/apiClient/types";
 import {
@@ -23,6 +22,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { RequestViewTabSource } from "../../../../../../RequestView/requestViewTabSource";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./runResultContainer.scss";
+import { getFormattedStartTime, getFormattedTime } from "../utils";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -309,15 +309,15 @@ export const RunResultContainer: React.FC<{
     return [
       {
         label: "Ran at",
-        value: ranAt ? moment(ranAt).format("MMM DD, YYYY [at] HH:mm:ss") : "...",
+        value: ranAt ? getFormattedStartTime(ranAt) : "...",
       },
       {
         label: "Duration",
-        value: totalDuration ? `${totalDuration}ms` : "...",
+        value: totalDuration ? getFormattedTime(totalDuration) : "...",
       },
       {
         label: "Avg. resp. time",
-        value: avgResponseTime ? `${avgResponseTime}ms` : "...",
+        value: avgResponseTime ? getFormattedTime(avgResponseTime) : "...",
       },
     ];
   }, [metrics, ranAt]);
