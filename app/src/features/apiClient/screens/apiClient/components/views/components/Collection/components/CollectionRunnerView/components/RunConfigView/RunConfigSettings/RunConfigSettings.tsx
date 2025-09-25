@@ -4,6 +4,7 @@ import { RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useRunConfigStore } from "../../../run.context";
 import { toast } from "utils/Toast";
+import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import "./runConfigSettings.scss";
 
 export const RunConfigSettings: React.FC = () => {
@@ -36,14 +37,14 @@ export const RunConfigSettings: React.FC = () => {
         <div className="setting-container">
           <label htmlFor="run-iterations">
             Iterations
-            <RQTooltip>
+            <RQTooltip title={`Max limit is ${ITERATIONS_MAX_LIMIT}`}>
               <MdOutlineInfo />
             </RQTooltip>
           </label>
-          {/* TODO: limit TBD */}
+
           <InputNumber
             min={1}
-            max={10}
+            max={ITERATIONS_MAX_LIMIT}
             value={iterations}
             size="small"
             name="run-iterations"
@@ -54,12 +55,19 @@ export const RunConfigSettings: React.FC = () => {
         <div className="setting-container">
           <label htmlFor="run-delay">
             Delay
-            <RQTooltip>
+            <RQTooltip title={`Max limit is ${DELAY_MAX_LIMIT} (in ms)`}>
               <MdOutlineInfo />
             </RQTooltip>
           </label>
-          {/* TODO: limit TBD */}
-          <InputNumber min={0} max={10} value={delay} size="small" name="run-iterations" onChange={handleDelayChange} />
+
+          <InputNumber
+            min={0}
+            max={DELAY_MAX_LIMIT}
+            value={delay}
+            size="small"
+            name="run-iterations"
+            onChange={handleDelayChange}
+          />
         </div>
       </div>
 
