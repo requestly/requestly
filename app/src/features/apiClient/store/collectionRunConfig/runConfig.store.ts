@@ -3,6 +3,9 @@ import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 
+export const DELAY_MAX_LIMIT = 50000; // ms
+export const ITERATIONS_MAX_LIMIT = 1000;
+
 export type RunConfigState = {
   id: RQAPI.RunConfig["id"];
   orderedRequests: RQAPI.RunConfig["orderedRequests"];
@@ -79,8 +82,7 @@ export function createRunConfigStore(data: {
     },
 
     setDelay(delay) {
-      // TODO: add upper limit
-      const isValid = isValidNumber(delay) && delay >= 0;
+      const isValid = isValidNumber(delay) && 0 <= delay && delay <= DELAY_MAX_LIMIT;
 
       if (!isValid) {
         throw new NativeError("Delay must be a non-negative integer").addContext({ delay });
@@ -90,8 +92,7 @@ export function createRunConfigStore(data: {
     },
 
     setIterations(iterations) {
-      // TODO: add upper limit
-      const isValid = isValidNumber(iterations) && iterations > 0;
+      const isValid = isValidNumber(iterations) && 0 < iterations && iterations <= ITERATIONS_MAX_LIMIT;
 
       if (!isValid) {
         throw new NativeError("Iterations must be a positive integer").addContext({ iterations });
