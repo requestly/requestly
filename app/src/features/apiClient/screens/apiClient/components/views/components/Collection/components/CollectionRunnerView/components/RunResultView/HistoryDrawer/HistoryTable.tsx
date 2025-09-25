@@ -1,17 +1,36 @@
 import React, { useMemo } from "react";
-import { Table } from "antd";
+import { Skeleton, Table } from "antd";
 import "./historyTable.scss";
 import { useRunResultStore } from "../../../run.context";
 import { getAllTestSummary } from "features/apiClient/store/collectionRunResult/utils";
-import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import moment from "moment";
 import { EmptyState } from "../../EmptyState/EmptyState";
 
+const LoadingSkeleton: React.FC = () => <Skeleton.Button shape="round" size="small" />;
+
 export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
+  const [runStatus, runStartTime] = useRunResultStore((s) => [s.runStatus, s.startTime]);
+
   const [history] = useRunResultStore((s) => [s.history]);
-  const sortedHistory = useMemo(() => {
-    return [...history].sort((a, b) => b.startTime - a.startTime);
+  const formattedHistory = useMemo(() => {
+    const sortedHistory = history.sort((a, b) => b.startTime - a.startTime);
+    return sortedHistory;
   }, [history]);
+
+  const liveRunResult: LiveRunResult[] = useMemo(() => {
+    if (runStatus === RunStatus.RUNNING) {
+      return [
+        {
+          startTime: runStartTime,
+          endTime: 0,
+          runStatus,
+          iterations: new Map(),
+        },
+      ];
+    }
+    return [];
+  }, [runStartTime, runStatus]);
 
   const columns = useMemo(() => {
     return [
@@ -23,32 +42,49 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
       },
       {
         title: "Duration",
-        render: (_: any, record: RunResult) => <span>{record.endTime - record.startTime} ms</span>,
+        render: (_: any, record: RunResult | LiveRunResult) =>
+          record.runStatus === RunStatus.RUNNING ? (
+            <LoadingSkeleton />
+          ) : (
+            <span>{record.endTime - record.startTime} ms</span>
+          ),
       },
       {
         title: "Total",
-        render: (_: any, record: RunResult) => {
+        render: (_: any, record: RunResult | LiveRunResult) => {
+          if (record.runStatus === RunStatus.RUNNING) {
+            return <LoadingSkeleton />;
+          }
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.totalTestsCounts}</span>;
         },
       },
       {
         title: <span style={{ color: "var(--requestly-color-success)" }}>Success</span>,
-        render: (_: any, record: RunResult) => {
+        render: (_: any, record: RunResult | LiveRunResult) => {
+          if (record.runStatus === RunStatus.RUNNING) {
+            return <LoadingSkeleton />;
+          }
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.successTestsCounts}</span>;
         },
       },
       {
         title: <span style={{ color: "var(--requestly-color-error-text)" }}>Failed</span>,
-        render: (_: any, record: RunResult) => {
+        render: (_: any, record: RunResult | LiveRunResult) => {
+          if (record.runStatus === RunStatus.RUNNING) {
+            return <LoadingSkeleton />;
+          }
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.failedTestsCounts}</span>;
         },
       },
       {
         title: "Skipped",
-        render: (_: any, record: RunResult) => {
+        render: (_: any, record: RunResult | LiveRunResult) => {
+          if (record.runStatus === RunStatus.RUNNING) {
+            return <LoadingSkeleton />;
+          }
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.skippedTestsCounts}</span>;
         },
@@ -60,9 +96,9 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
     <Table
       className="history-table"
       columns={columns}
-      dataSource={sortedHistory}
+      dataSource={[...liveRunResult, ...formattedHistory]}
       pagination={false}
-      onRow={(record) => ({
+      onRow={(record: RunResult) => ({
         onClick: () => onHistoryClick(record),
       })}
       locale={{
