@@ -27,20 +27,19 @@ function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResu
       };
 }
 
-function parseExecutionResult(params: {
-  recordId: string;
-  recordName: string;
+function prepareExecutionResult(params: {
   result: RQAPI.ExecutionResult;
-  iteration: number;
-  startTime: number;
+  currentExecutingRequest: CurrentlyExecutingRequest;
 }): RequestExecutionResult {
-  const { recordId, recordName, result, iteration, startTime } = params;
+  const { result, currentExecutingRequest } = params;
+  const { iteration, recordId, recordName, collectionName, startTime } = currentExecutingRequest;
 
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
     return {
       iteration,
       recordId,
       recordName,
+      collectionName,
       entry: parseExecutingRequestEntry(result.executedEntry),
       status: { value: result.status, error: result.error },
       runDuration: null,
@@ -52,6 +51,7 @@ function parseExecutionResult(params: {
     iteration,
     recordId,
     recordName,
+    collectionName,
     runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
     status: { value: result.status, warning: result.warning },
@@ -62,7 +62,11 @@ function parseExecutionResult(params: {
 class RunCancelled extends NativeError {}
 
 class Runner {
-  constructor(readonly runContext: RunContext, readonly executor: BatchRequestExecutor) {}
+  constructor(
+    readonly ctx: ApiClientFeatureContext,
+    readonly runContext: RunContext,
+    readonly executor: BatchRequestExecutor
+  ) {}
 
   private get abortController() {
     return this.runContext.runResultStore.getState().abortController;
@@ -88,15 +92,19 @@ class Runner {
   private beforeStart() {
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
+    this.runContext.runResultStore.getState().setStartTime(Date.now());
+    this.runContext.runResultStore.getState().setEndtime(null);
   }
 
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.OrderedRequest) {
     const startTime = Date.now();
+    const collection = this.ctx.stores.records.getState().getData(request.record.collectionId);
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
       iteration,
       recordId: request.record.id,
       recordName: request.record.name,
+      collectionName: collection?.name ?? "",
       entry: parseExecutingRequestEntry(request.record.data),
     };
 
@@ -115,12 +123,9 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
 
-    const executionResult = parseExecutionResult({
-      iteration: currentExecutingRequest.iteration,
-      startTime: currentExecutingRequest.startTime,
-      recordId: currentExecutingRequest.recordId,
-      recordName: currentExecutingRequest.recordName,
+    const executionResult = prepareExecutionResult({
       result,
+      currentExecutingRequest,
     });
 
     this.runContext.runResultStore.getState().addResult(executionResult);
@@ -129,14 +134,17 @@ class Runner {
   private afterComplete() {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
+    this.runContext.runResultStore.getState().setEndtime(Date.now());
   }
 
   private onError(error: any) {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+    this.runContext.runResultStore.getState().setEndtime(null);
   }
 
   private onRunCancelled() {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
+    this.runContext.runResultStore.getState().setEndtime(null);
   }
 
   private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
@@ -217,12 +225,12 @@ class Runner {
 }
 
 export async function runCollection(
-  _: ApiClientFeatureContext,
+  ctx: ApiClientFeatureContext,
   params: {
     runContext: RunContext;
     executor: BatchRequestExecutor;
   }
 ) {
-  const runner = new Runner(params.runContext, params.executor);
+  const runner = new Runner(ctx, params.runContext, params.executor);
   return runner.run();
 }
