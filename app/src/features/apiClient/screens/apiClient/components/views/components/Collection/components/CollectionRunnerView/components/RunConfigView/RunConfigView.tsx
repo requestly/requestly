@@ -21,6 +21,11 @@ import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 import { Conditional } from "components/common/Conditional";
 import "./runConfigView.scss";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import { isDesktopMode } from "utils/AppUtils";
+import { useDispatch } from "react-redux";
+import { globalActions } from "store/slices/global/slice";
+import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/apiClient";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -92,6 +97,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const { collectionId } = useCollectionView();
   const runContext = useRunContext();
   const [runStatus] = useRunResultStore((s) => [s.runStatus]);
+  const dispatch = useDispatch();
 
   const {
     runner: { runCollection, cancelRun },
@@ -100,6 +106,18 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const executor = useBatchRequestExecutor(collectionId);
 
   const handleRunClick = useCallback(async () => {
+    if (!isExtensionInstalled() && !isDesktopMode()) {
+      const modalProps = {
+        heading: "Install browser Extension to use the API Client",
+        subHeading:
+          "A minimalistic API Client for front-end developers to test their APIs and fast-track their web development lifecycle. Add custom Headers and Query Params to test your APIs.",
+        eventPage: "collection_runner",
+      };
+      dispatch(globalActions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+      trackInstallExtensionDialogShown({ src: "collection_runner" });
+      return;
+    }
+
     const error = await runCollection({ runContext, executor });
     if (!error) {
       return;
@@ -110,7 +128,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         reason: "Unable to run collection!",
       },
     });
-  }, [runCollection, runContext, executor]);
+  }, [runCollection, runContext, executor, dispatch]);
 
   const handleCancelRunClick = useCallback(() => {
     cancelRun({ runContext });
