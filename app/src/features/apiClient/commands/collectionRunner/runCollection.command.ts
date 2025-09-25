@@ -230,7 +230,7 @@ class Runner {
     }
   }
 
-  async run(collectionId: RQAPI.ApiClientRecord["collectionId"]) {
+  async run() {
     try {
       this.beforeStart();
 
@@ -243,6 +243,8 @@ class Runner {
         );
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
+
+      const collectionId = this.runContext.collectionId;
 
       await this.afterComplete(collectionId);
     } catch (e) {
@@ -261,9 +263,8 @@ export async function runCollection(
   params: {
     runContext: RunContext;
     executor: BatchRequestExecutor;
-    collectionId: RQAPI.ApiClientRecord["collectionId"];
   }
 ) {
   const runner = new Runner(ctx, params.runContext, params.executor);
-  return runner.run(params.collectionId);
+  return runner.run();
 }

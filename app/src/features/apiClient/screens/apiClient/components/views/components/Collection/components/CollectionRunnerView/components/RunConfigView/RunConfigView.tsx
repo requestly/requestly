@@ -100,7 +100,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const executor = useBatchRequestExecutor(collectionId);
 
   const handleRunClick = useCallback(async () => {
-    const error = await runCollection({ runContext, executor, collectionId });
+    const error = await runCollection({ runContext, executor });
     if (!error) {
       return;
     }
@@ -110,7 +110,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         reason: "Unable to run collection!",
       },
     });
-  }, [runCollection, runContext, executor, collectionId]);
+  }, [runCollection, runContext, executor]);
 
   const handleCancelRunClick = useCallback(() => {
     cancelRun({ runContext });

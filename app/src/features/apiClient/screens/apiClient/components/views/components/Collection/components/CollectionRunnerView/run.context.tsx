@@ -12,10 +12,12 @@ import {
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
+import { RQAPI } from "features/apiClient/types";
 
 export type RunContext = {
   runConfigStore: StoreApi<RunConfigState>;
   runResultStore: StoreApi<RunResultState>;
+  collectionId: RQAPI.CollectionRecord["id"];
 };
 
 const RunViewContext = createContext<RunContext | null>(null);
@@ -42,8 +44,9 @@ export const RunViewContextProvider: React.FC<{
     return {
       runConfigStore,
       runResultStore: createRunResultStore({ history }),
+      collectionId,
     };
-  }, [runConfigStore, history]);
+  }, [runConfigStore, history, collectionId]);
 
   return <RunViewContext.Provider value={value}>{children}</RunViewContext.Provider>;
 };
