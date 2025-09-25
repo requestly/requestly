@@ -22,7 +22,7 @@ async function _addRunResultInFirebase(
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, APIS_NODE, collectionId, RUN_RESULT_NODE);
 
-    const resultArray = Array.from(runResult.result.values());
+    const resultArray = Array.from(runResult.iterations.values());
 
     const runResultForSave = {
       ...runResult,

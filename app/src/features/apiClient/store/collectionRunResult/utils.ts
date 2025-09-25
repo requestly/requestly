@@ -25,7 +25,7 @@ export type TestSummary = Map<
   { requestExecutionResult: RequestExecutionResult; testResults: TestResult[] }[]
 >;
 
-export function getRunMetrics(results: RunResultState["result"]) {
+export function getRunMetrics(results: RunResultState["iterations"]) {
   const allResults: RequestExecutionResult[] = [];
   for (const iterationDetails of results.values()) {
     allResults.push(...iterationDetails.result);
@@ -43,7 +43,7 @@ export function getRunMetrics(results: RunResultState["result"]) {
   return { totalDuration, avgResponseTime: allResults.length ? Math.round(totalResponseTime / allResults.length) : 0 };
 }
 
-export function getAllTestSummary(result: RunResultState["result"]) {
+export function getAllTestSummary(result: RunResultState["iterations"]) {
   const allResults: RequestExecutionResult[] = [];
   for (const iterationDetails of result.values()) {
     allResults.push(...iterationDetails.result);

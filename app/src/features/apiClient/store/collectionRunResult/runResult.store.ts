@@ -62,13 +62,17 @@ const RunStateMachine = {
   [RunStatus.ERRORED]: [RunStatus.IDLE],
 };
 
-export type LiveRunResult = Pick<RunResultState, "startTime" | "endTime" | "runStatus" | "result">;
+export type LiveRunResult = Pick<RunResultState, "startTime" | "endTime" | "runStatus" | "iterations">;
 
 export type RunResult = LiveRunResult & {
   runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
 };
 
-export type SavedRunResult = RunResult & { id: string; result: IterationDetails[] };
+export type SavedRunResult = RunResult & {
+  id: string;
+  iterations: IterationDetails[];
+  runStatus: RunStatus.COMPLETED;
+};
 
 export type CurrentlyExecutingRequest =
   | null
@@ -84,7 +88,7 @@ export type RunResultState = {
   startTime: Timestamp | null;
   endTime: Timestamp | null;
   runStatus: RunStatus;
-  result: Map<Iteration, IterationDetails>;
+  iterations: Map<Iteration, IterationDetails>;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
 
@@ -105,7 +109,7 @@ export function createRunResultStore(data: { history: RunResult[] }) {
     startTime: null,
     endTime: null,
     runStatus: RunStatus.IDLE,
-    result: new Map(),
+    iterations: new Map(),
     history: data.history,
     currentlyExecutingRequest: null,
     abortController: new AbortController(),
@@ -115,7 +119,7 @@ export function createRunResultStore(data: { history: RunResult[] }) {
         startTime: null,
         endTime: null,
         runStatus: RunStatus.IDLE,
-        result: new Map(),
+        iterations: new Map(),
         currentlyExecutingRequest: null,
         abortController: new AbortController(),
       });
@@ -134,19 +138,19 @@ export function createRunResultStore(data: { history: RunResult[] }) {
     },
 
     addResult(newResult) {
-      const { result } = get();
+      const { iterations: result } = get();
 
       const existingResult = result.get(newResult.iteration);
 
       if (!existingResult) {
         result.set(newResult.iteration, { result: [newResult] });
-        set({ result: new Map(result) });
+        set({ iterations: new Map(result) });
         return;
       }
 
       const updatedResult = [...existingResult.result, newResult];
       result.set(newResult.iteration, { result: updatedResult });
-      set({ result: new Map(result) });
+      set({ iterations: new Map(result) });
     },
 
     setRunStatus(status) {
@@ -159,13 +163,13 @@ export function createRunResultStore(data: { history: RunResult[] }) {
     },
 
     getRunSummary() {
-      const { startTime, endTime, runStatus, result } = get();
+      const { startTime, endTime, runStatus, iterations: result } = get();
 
       return {
         endTime,
         startTime,
         runStatus,
-        result,
+        iterations: result,
       };
     },
 

@@ -29,11 +29,11 @@ async function _getRunResultsFromFirebase(
       const data = doc.data() as Omit<SavedRunResult, "id">;
       console.log("!!!debug", "data", data);
       const runResultMap = new Map<Iteration, IterationDetails>();
-      data.result.forEach((item: IterationDetails, index: number) => {
+      data.iterations.forEach((item: IterationDetails, index: number) => {
         runResultMap.set(index + 1, item);
       });
       console.log("!!!debug", "runResultMap", runResultMap);
-      runResults.push({ ...data, result: runResultMap }); // TODO check type here
+      runResults.push({ ...data, iterations: runResultMap }); // TODO check type here
     });
 
     return { success: true, data: runResults };

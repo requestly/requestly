@@ -9,8 +9,8 @@ import "./runResultView.scss";
 import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
 
 export const RunResultView: React.FC = () => {
-  const [result, startTime, getRunSummary, runStatus] = useRunResultStore((s) => [
-    s.result,
+  const [iterations, startTime, getRunSummary, runStatus] = useRunResultStore((s) => [
+    s.iterations,
     s.startTime,
     s.getRunSummary,
     s.runStatus,
@@ -18,8 +18,8 @@ export const RunResultView: React.FC = () => {
 
   const testResults = useMemo(
     () => getRunSummary(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- need `result` for reactivity
-    [getRunSummary, result]
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- need `interations` for reactivity
+    [getRunSummary, iterations]
   );
 
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);

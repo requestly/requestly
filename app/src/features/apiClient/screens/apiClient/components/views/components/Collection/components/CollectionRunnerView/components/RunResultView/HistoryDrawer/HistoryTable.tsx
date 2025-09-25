@@ -24,7 +24,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
       {
         title: "Total",
         render: (_: any, record: RunResult) => {
-          const testSummary = getAllTestSummary(record.result);
+          const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.totalTestsCounts}</span>;
         },
       },
@@ -35,7 +35,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
           </>
         ),
         render: (_: any, record: RunResult) => {
-          const testSummary = getAllTestSummary(record.result);
+          const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.successTestsCounts}</span>;
         },
       },
@@ -46,14 +46,14 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
           </>
         ),
         render: (_: any, record: RunResult) => {
-          const testSummary = getAllTestSummary(record.result);
+          const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.failedTestsCounts}</span>;
         },
       },
       {
         title: "Skipped",
         render: (_: any, record: RunResult) => {
-          const testSummary = getAllTestSummary(record.result);
+          const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.skippedTestsCounts}</span>;
         },
       },
