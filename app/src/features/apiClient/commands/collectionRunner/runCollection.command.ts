@@ -153,8 +153,12 @@ class Runner {
         duration: 3,
       });
     } catch (e) {
-      //TODO: add banner
-      console.log("!!!debug", "save run result err", e);
+      notification.error({
+        message: "Run completed but couldn't save the result!",
+        placement: "bottomRight",
+        className: "collection-runner-notification",
+        duration: 3,
+      });
     }
   }
 
@@ -242,7 +246,6 @@ class Runner {
 
       await this.afterComplete(collectionId);
     } catch (e) {
-      console.log("!!!debug", "err", e);
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;

@@ -26,10 +26,8 @@ async function _addRunResultInFirebase(
 
     const runResultForSave = {
       ...runResult,
-      result: resultArray,
+      iterations: resultArray,
     };
-
-    console.log("!!!debug", "runResultForSave", runResultForSave);
 
     const docRef = await addDoc(collectionRef, runResultForSave);
 
@@ -40,7 +38,6 @@ async function _addRunResultInFirebase(
 
     return { success: true, data: savedRunResult };
   } catch (e) {
-    console.log("!!!debug", "addrunresurlt", e);
     Sentry.captureException(e, {
       extra: { collectionId, runResult },
     });
