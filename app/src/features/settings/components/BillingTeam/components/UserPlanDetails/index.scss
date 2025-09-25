@@ -12,6 +12,20 @@
     grid-template-columns: 1fr 1fr 1fr;
     border-bottom: 1px solid var(--requestly-color-surface-2);
 
+    // Reuse existing grid classes from TeamPlanDetails
+    &.two-part-grid {
+      grid-template-columns: 1.5fr 1.5fr;
+
+      .user-plan-card-grid-item:nth-child(2) {
+        border-left: 1px solid var(--surface-2);
+        border-right: none;
+      }
+    }
+
+    &.three-part-grid {
+      grid-template-columns: 1.1fr 1.5fr 0.5fr;
+    }
+
     .user-plan-card-grid-item {
       padding: 1rem;
     }
