@@ -9,6 +9,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "25.9.24",
+    logs: [
+      "fix: extension rule application popup not closing",
+      "chore: remove cachejson.js from extension",
+      "chore: improve NOTIFY_RECORD_UPDATED extension message",
+    ],
+  },
+  {
     version: "25.8.21",
     logs: [
       "[ENGG-4096] added default blocklist for extension (#3339)",
