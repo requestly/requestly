@@ -19,6 +19,9 @@ import { EmptyState } from "../../EmptyState/EmptyState";
 import { useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { RequestViewTabSource } from "../../../../../../RequestView/requestViewTabSource";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./runResultContainer.scss";
 
 enum RunResultTabKey {
@@ -119,40 +122,68 @@ const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   testResults: TestResult[];
 }> = ({ requestExecutionResult, testResults }) => {
-  const responseDetails =
-    testResults.length === 0 ? null : (
-      <>
-        <div className="response-details">
-          <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>·
+  const context = useApiClientFeatureContext();
+  const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
+
+  const responseDetails = useMemo(() => {
+    return (
+      <div className="response-details">
+        <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>
+        {requestExecutionResult.entry.statusCode ? (
           <span className="response-status">
-            {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
+            · {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
           </span>
-        </div>
+        ) : null}
+      </div>
+    );
+  }, [
+    requestExecutionResult.entry.responseTime,
+    requestExecutionResult.entry.statusCode,
+    requestExecutionResult.entry.statusText,
+  ]);
+
+  const requestNameDetails = useMemo(() => {
+    return (
+      <>
+        <span className="collection-name">{requestExecutionResult.collectionName} /</span>
+        <span
+          className="request-name"
+          onClick={() => {
+            openTab(
+              new RequestViewTabSource({
+                id: requestExecutionResult.recordId,
+                title: requestExecutionResult.recordName,
+                context: {
+                  id: context.id,
+                },
+              })
+            );
+          }}
+        >
+          {requestExecutionResult.recordName}
+        </span>
       </>
     );
+  }, [
+    context.id,
+    openTab,
+    requestExecutionResult.collectionName,
+    requestExecutionResult.recordId,
+    requestExecutionResult.recordName,
+  ]);
 
   return (
     <div className="test-details-container">
       <div className="request-details">
-        {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
-          <>
-            <span className="icon">
-              <HttpMethodIcon method={requestExecutionResult.entry.method} />
-            </span>
-            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
-            <span className="request-name">{requestExecutionResult.recordName}</span>
-            {responseDetails}
-          </>
-        ) : (
-          <>
-            <span className="icon">
-              <GraphQlIcon />
-            </span>
-            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
-            <span className="request-name">{requestExecutionResult.recordName}</span>
-            {responseDetails}
-          </>
-        )}
+        <span className="icon">
+          {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
+            <HttpMethodIcon method={requestExecutionResult.entry.method} />
+          ) : (
+            <GraphQlIcon />
+          )}
+        </span>
+        {requestNameDetails}
+        {responseDetails}
       </div>
 
       {testResults.length === 0 ? (
