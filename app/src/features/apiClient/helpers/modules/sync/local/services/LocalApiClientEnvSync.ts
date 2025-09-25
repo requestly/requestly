@@ -87,12 +87,11 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   async createGlobalEnvironment(): Promise<EnvironmentData> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment("Global Variables", true);
-    if (result.type === "success") {
-      const parsedEnv = this.parseEnvironmentEntity(result.content);
-      return parsedEnv;
+    if (result.type === "error") {
+      throw new Error(result.error.message || "Something went wrong while creating the global environment.");
     }
-    // TODO: FIX THIS
-    return null;
+    const parsedEnv = this.parseEnvironmentEntity(result.content);
+    return parsedEnv;
   }
 
   async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
