@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Drawer } from "antd";
 import "./historyDrawer.scss";
 import { HistoryTable } from "./HistoryTable";
@@ -12,18 +12,34 @@ export const HistoryDrawer: React.FC<{
   setIsHistoryDrawerOpen: (open: boolean) => void;
 }> = ({ isHistoryDrawerOpen, setIsHistoryDrawerOpen }) => {
   const [openedResult, setOpenedResult] = useState<RunResult | null>(null);
+  const resultRef = React.useRef<HTMLDivElement | null>(null);
+
+  const onHistoryClick = useCallback((result: RunResult) => {
+    setOpenedResult(result);
+
+    if (resultRef.current) {
+      resultRef.current.scrollIntoView({ block: "start" });
+      resultRef.current = null;
+    }
+  }, []);
+
+  const onClose = useCallback(() => {
+    setIsHistoryDrawerOpen(false);
+    setOpenedResult(null);
+  }, [setIsHistoryDrawerOpen]);
 
   return (
     <Drawer
       title="Run history"
       placement="right"
-      onClose={() => setIsHistoryDrawerOpen(false)}
+      onClose={onClose}
       open={isHistoryDrawerOpen}
       className="history-drawer"
       width={"40%"}
+      destroyOnClose={true}
     >
       {openedResult ? (
-        <>
+        <div ref={resultRef} className="history-drawer-result-container">
           <RQButton
             type="transparent"
             className="back-btn"
@@ -31,9 +47,9 @@ export const HistoryDrawer: React.FC<{
             onClick={() => setOpenedResult(null)}
           />
           <RunResultContainer result={openedResult} ranAt={openedResult.startTime} />
-        </>
+        </div>
       ) : (
-        <HistoryTable onHistoryClick={setOpenedResult} />
+        <HistoryTable onHistoryClick={onHistoryClick} />
       )}
     </Drawer>
   );

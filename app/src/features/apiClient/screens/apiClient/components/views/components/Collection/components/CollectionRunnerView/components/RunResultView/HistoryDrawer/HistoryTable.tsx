@@ -5,9 +5,13 @@ import { useRunResultStore } from "../../../run.context";
 import { getAllTestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import moment from "moment";
+import { EmptyState } from "../../EmptyState/EmptyState";
 
 export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
   const [history] = useRunResultStore((s) => [s.history]);
+  const sortedHistory = useMemo(() => {
+    return [...history].sort((a, b) => b.startTime - a.startTime);
+  }, [history]);
 
   const columns = useMemo(() => {
     return [
@@ -64,11 +68,15 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
     <Table
       className="history-table"
       columns={columns}
-      dataSource={history}
+      dataSource={sortedHistory}
       pagination={false}
       onRow={(record) => ({
         onClick: () => onHistoryClick(record),
       })}
+      locale={{
+        emptyText: <EmptyState title="No run history found" description="Run the collection to see results here." />,
+      }}
+      sticky={true}
     />
   );
 };

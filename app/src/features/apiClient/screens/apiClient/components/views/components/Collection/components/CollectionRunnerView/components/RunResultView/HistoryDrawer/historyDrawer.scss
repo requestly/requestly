@@ -38,10 +38,14 @@
     }
   }
 
-  .back-btn {
-    position: absolute;
-    top: 40px;
-    left: 4px;
+  .history-drawer-result-container {
+    position: relative;
+
+    .back-btn {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+    }
   }
 
   .run-result-view-details {
