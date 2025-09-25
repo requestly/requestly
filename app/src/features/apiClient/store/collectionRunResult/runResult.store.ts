@@ -68,7 +68,7 @@ export type RunResult = LiveRunResult & {
   runStatus: RunStatus.COMPLETED | RunStatus.CANCELLED;
 };
 
-export type SavedRunResult = RunResult & { id: string; result: { [key: string]: IterationDetails } };
+export type SavedRunResult = RunResult & { id: string; result: IterationDetails[] };
 
 export type CurrentlyExecutingRequest =
   | null

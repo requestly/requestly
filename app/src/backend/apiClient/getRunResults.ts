@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/react";
 import { ResponsePromise } from "../types";
 import { APIS_NODE, RUN_RESULT_NODE } from "./constants";
 import {
+  Iteration,
   IterationDetails,
   RunResult,
   SavedRunResult,
@@ -27,7 +28,11 @@ async function _getRunResultsFromFirebase(
     snapshot.docs.forEach((doc) => {
       const data = doc.data() as Omit<SavedRunResult, "id">;
       console.log("!!!debug", "data", data);
-      const runResultMap = new Map(Object.entries(data.result));
+      const runResultMap = new Map<Iteration, IterationDetails>();
+      data.result.forEach((item: IterationDetails, index: number) => {
+        runResultMap.set(index + 1, item);
+      });
+      console.log("!!!debug", "runResultMap", runResultMap);
       runResults.push({ ...data, result: runResultMap }); // TODO check type here
     });
 
