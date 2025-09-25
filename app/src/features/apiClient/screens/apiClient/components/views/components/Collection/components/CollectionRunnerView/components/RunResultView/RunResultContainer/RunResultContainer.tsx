@@ -119,40 +119,44 @@ const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
   testResults: TestResult[];
 }> = ({ requestExecutionResult, testResults }) => {
-  const responseDetails =
-    testResults.length === 0 ? null : (
-      <>
-        <div className="response-details">
-          <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>·
+  const responseDetails = useMemo(() => {
+    return (
+      <div className="response-details">
+        <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>
+        {requestExecutionResult.entry.statusCode ? (
           <span className="response-status">
-            {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
+            · {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
           </span>
-        </div>
+        ) : null}
+      </div>
+    );
+  }, [
+    requestExecutionResult.entry.responseTime,
+    requestExecutionResult.entry.statusCode,
+    requestExecutionResult.entry.statusText,
+  ]);
+
+  const requestNameDetails = useMemo(() => {
+    return (
+      <>
+        <span className="collection-name">{requestExecutionResult.collectionName} /</span>
+        <span className="request-name">{requestExecutionResult.recordName}</span>
       </>
     );
+  }, [requestExecutionResult.collectionName, requestExecutionResult.recordName]);
 
   return (
     <div className="test-details-container">
       <div className="request-details">
-        {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
-          <>
-            <span className="icon">
-              <HttpMethodIcon method={requestExecutionResult.entry.method} />
-            </span>
-            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
-            <span className="request-name">{requestExecutionResult.recordName}</span>
-            {responseDetails}
-          </>
-        ) : (
-          <>
-            <span className="icon">
-              <GraphQlIcon />
-            </span>
-            <span className="collection-name">{requestExecutionResult.collectionName} /</span>
-            <span className="request-name">{requestExecutionResult.recordName}</span>
-            {responseDetails}
-          </>
-        )}
+        <span className="icon">
+          {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
+            <HttpMethodIcon method={requestExecutionResult.entry.method} />
+          ) : (
+            <GraphQlIcon />
+          )}
+        </span>
+        {requestNameDetails}
+        {responseDetails}
       </div>
 
       {testResults.length === 0 ? (
