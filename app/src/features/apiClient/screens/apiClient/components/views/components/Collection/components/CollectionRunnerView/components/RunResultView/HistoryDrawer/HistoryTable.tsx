@@ -4,8 +4,8 @@ import "./historyTable.scss";
 import { useRunResultStore } from "../../../run.context";
 import { getAllTestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
-import moment from "moment";
 import { EmptyState } from "../../EmptyState/EmptyState";
+import { getFormattedStartTime, getFormattedTime } from "../utils";
 
 const LoadingSkeleton: React.FC = () => <Skeleton.Button shape="round" size="small" />;
 
@@ -36,9 +36,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
     return [
       {
         title: "Ran at",
-        render: (_: any, record: RunResult) => (
-          <span>{moment(record.startTime).format("MMM DD, YYYY [at] HH:mm:ss")}</span>
-        ),
+        render: (_: any, record: RunResult) => <span>{getFormattedStartTime(record.startTime)}</span>,
       },
       {
         title: "Duration",
@@ -46,7 +44,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
           record.runStatus === RunStatus.RUNNING ? (
             <LoadingSkeleton />
           ) : (
-            <span>{record.endTime - record.startTime} ms</span>
+            <span>{getFormattedTime(record.endTime - record.startTime)}</span>
           ),
       },
       {
