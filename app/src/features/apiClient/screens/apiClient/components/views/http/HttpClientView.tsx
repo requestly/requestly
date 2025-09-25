@@ -67,7 +67,7 @@ import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContext
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useAPIRecords, useAPIRecordsStore } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Authorization } from "../components/request/components/AuthorizationView/types/AuthConfig";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoundary";
@@ -811,9 +811,10 @@ const HttpClientView: React.FC<Props> = ({
 
 const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
+    const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
     return (
       <ErrorBoundary>
-        <QueryParamsProvider entry={props.apiEntryDetails?.data}>
+        <QueryParamsProvider entry={record.data as RQAPI.HttpApiEntry}>
           <Component {...props} />
         </QueryParamsProvider>
       </ErrorBoundary>
