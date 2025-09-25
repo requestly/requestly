@@ -773,11 +773,14 @@ export const extractPathVariablesFromUrl = (url: string) => {
     return [];
   }
 
+  const urlWithScheme = addUrlSchemeIfMissing(url);
+  const pathname = new URL(urlWithScheme).pathname;
+
   const variablePattern = /\/:(\w+)/g;
   const variables: string[] = [];
   let match;
 
-  while ((match = variablePattern.exec(url)) !== null) {
+  while ((match = variablePattern.exec(pathname)) !== null) {
     const variableName = match[1];
     if (!variables.includes(variableName)) {
       variables.push(variableName);
