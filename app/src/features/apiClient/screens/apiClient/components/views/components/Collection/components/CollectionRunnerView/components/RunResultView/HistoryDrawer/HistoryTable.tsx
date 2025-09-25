@@ -33,22 +33,14 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
         },
       },
       {
-        title: (
-          <>
-            <span style={{ color: "var(--requestly-color-success)" }}>Success</span>
-          </>
-        ),
+        title: <span style={{ color: "var(--requestly-color-success)" }}>Success</span>,
         render: (_: any, record: RunResult) => {
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.successTestsCounts}</span>;
         },
       },
       {
-        title: (
-          <>
-            <span style={{ color: "var(--requestly-color-error-text)" }}>Failed</span>
-          </>
-        ),
+        title: <span style={{ color: "var(--requestly-color-error-text)" }}>Failed</span>,
         render: (_: any, record: RunResult) => {
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.failedTestsCounts}</span>;
