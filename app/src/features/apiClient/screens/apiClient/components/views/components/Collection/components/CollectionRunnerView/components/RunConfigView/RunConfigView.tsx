@@ -16,6 +16,9 @@ import { useGenericState } from "hooks/useGenericState";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { EmptyState } from "../EmptyState/EmptyState";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
+import { Conditional } from "components/common/Conditional";
 import "./runConfigView.scss";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
@@ -50,6 +53,7 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
     try {
       await saveRunConfig({ collectionId, configToSave });
+      toast.success("Configuration saved");
       setHasUnsavedChanges(false);
     } catch (error) {
       toast.error("Something went wrong while saving!");
@@ -125,6 +129,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 
 export const RunConfigView: React.FC = () => {
   const [selectAll, setSelectAll] = useState({ value: true });
+  const ctx = useApiClientFeatureContext();
 
   const { collectionId } = useCollectionView();
   const [setOrderedRequests, setHasUnsavedChanges, orderedRequestsCount] = useRunConfigStore((s) => [
@@ -164,18 +169,15 @@ export const RunConfigView: React.FC = () => {
       <div className="run-config-header">
         <div className="title">
           Configuration
-          <RQTooltip
-            title={
-              ""
-              // TODO: add title
-            }
-          >
+          <RQTooltip title={"Collection run configuration"}>
             <MdInfoOutline />
           </RQTooltip>
         </div>
 
         <div className="actions">
-          <RunConfigSaveButton disabled={isEmpty} />
+          <Conditional condition={ctx.repositories instanceof ApiClientCloudRepository}>
+            <RunConfigSaveButton disabled={isEmpty} />
+          </Conditional>
           <RunCollectionButton disabled={isEmpty} />
         </div>
       </div>
