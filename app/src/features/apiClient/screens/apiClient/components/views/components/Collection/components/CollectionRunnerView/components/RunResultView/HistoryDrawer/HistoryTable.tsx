@@ -6,7 +6,7 @@ import { getAllTestSummary } from "features/apiClient/store/collectionRunResult/
 import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import moment from "moment";
 
-export const HistoryTable: React.FC = () => {
+export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
   const [history] = useRunResultStore((s) => [s.history]);
 
   const columns = useMemo(() => {
@@ -60,28 +60,15 @@ export const HistoryTable: React.FC = () => {
     ];
   }, []);
 
-  const dataSource = useMemo(() => {
-    return [
-      {
-        key: "1",
-        ranAt: "Nov 28, 2024 at 07:11:12",
-        duration: "5s",
-        total: 100,
-        success: 80,
-        failed: 15,
-        skipped: 5,
-      },
-      {
-        key: "2",
-        ranAt: "Nov 27, 2024 at 07:11:12",
-        duration: "6s",
-        total: 120,
-        success: 90,
-        failed: 20,
-        skipped: 10,
-      },
-    ];
-  }, []);
-
-  return <Table className="history-table" columns={columns} dataSource={history} pagination={false} />;
+  return (
+    <Table
+      className="history-table"
+      columns={columns}
+      dataSource={history}
+      pagination={false}
+      onRow={(record) => ({
+        onClick: () => onHistoryClick(record),
+      })}
+    />
+  );
 };

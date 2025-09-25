@@ -1,4 +1,5 @@
 .history-drawer {
+  position: relative;
   .ant-drawer-mask {
     background: var(--requestly-color-black-t-70, rgba(0, 0, 0, 0.7));
   }
@@ -34,10 +35,19 @@
 
     .ant-drawer-body {
       padding: 0;
+    }
+  }
 
-      .rule-selection-list-container {
-        padding: 16px;
-      }
+  .back-btn {
+    position: absolute;
+    top: 40px;
+    left: 4px;
+  }
+
+  .run-result-view-details {
+    .result-header {
+      margin-left: 32px;
+      padding: var(--space-4, 10px) var(--space-6, 16px) var(--space-4, 8px) var(--space-2, 4px);
     }
   }
 }
