@@ -5,6 +5,7 @@
   align-self: stretch;
   margin-left: -4px;
   border-left: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  position: relative;
 
   .run-result-view-header {
     display: flex;
@@ -19,6 +20,51 @@
       font-size: var(--requestly-font-size-sm, 12px);
       font-weight: 500;
       line-height: 18px; /* 150% */
+    }
+  }
+}
+
+.ant-notification {
+  .ant-notification-notice.collection-runner-notification {
+    padding: 8px 12px;
+    width: 300px;
+    border-radius: 4px;
+    color: var(--requestly-color-text-default, #fff);
+
+    background: var(--requestly-color-surface-0, #212121);
+
+    .ant-notification-notice-with-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .ant-notification-notice-icon-success {
+        &.anticon {
+          color: var(--requestly-color-success);
+        }
+      }
+
+      .ant-notification-notice-icon-error {
+        &.anticon {
+          color: var(--requestly-color-error);
+        }
+      }
+
+      .ant-notification-notice-icon {
+        position: static;
+        margin: 0;
+        font-size: var(--requestly-font-size-lg);
+      }
+
+      .ant-notification-notice-message {
+        margin: 0;
+        font-size: var(--requestly-font-size-md);
+      }
+    }
+
+    .ant-notification-notice-close {
+      top: 9px;
+      right: 16px;
     }
   }
 }

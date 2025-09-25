@@ -9,6 +9,7 @@ import {
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
+import { notification } from "antd";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -135,6 +136,12 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
     this.runContext.runResultStore.getState().setEndtime(Date.now());
+    notification.success({
+      message: "Run completed!",
+      placement: "bottomRight",
+      className: "collection-runner-notification",
+      duration: 3,
+    });
   }
 
   private onError(error: any) {
@@ -144,7 +151,14 @@ class Runner {
 
   private onRunCancelled() {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.CANCELLED);
+    this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(null);
     this.runContext.runResultStore.getState().setEndtime(null);
+    notification.error({
+      message: "Run stopped!",
+      placement: "bottomRight",
+      className: "collection-runner-notification",
+      duration: 3,
+    });
   }
 
   private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
