@@ -5,11 +5,13 @@ import { RunContext } from "features/apiClient/screens/apiClient/components/view
 import {
   CurrentlyExecutingRequest,
   RequestExecutionResult,
+  RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
+import { saveRunResult } from "./saveRunResult.command";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -132,10 +134,17 @@ class Runner {
     this.runContext.runResultStore.getState().addResult(executionResult);
   }
 
-  private afterComplete() {
+  private async afterComplete(collectionId: RQAPI.ApiClientRecord["collectionId"]) {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
     this.runContext.runResultStore.getState().setEndtime(Date.now());
+
+    const runResult = this.runContext.runResultStore.getState().getRunSummary() as RunResult;
+    this.runContext.runResultStore.getState().addToHistory(runResult);
+    await saveRunResult(this.ctx, {
+      collectionId,
+      runResult: runResult,
+    });
     notification.success({
       message: "Run completed!",
       placement: "bottomRight",
@@ -212,7 +221,7 @@ class Runner {
     }
   }
 
-  async run() {
+  async run(collectionId: RQAPI.ApiClientRecord["collectionId"]) {
     try {
       this.beforeStart();
 
@@ -226,7 +235,7 @@ class Runner {
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
 
-      this.afterComplete();
+      await this.afterComplete(collectionId);
     } catch (e) {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
@@ -243,8 +252,9 @@ export async function runCollection(
   params: {
     runContext: RunContext;
     executor: BatchRequestExecutor;
+    collectionId: RQAPI.ApiClientRecord["collectionId"];
   }
 ) {
   const runner = new Runner(ctx, params.runContext, params.executor);
-  return runner.run();
+  return runner.run(params.collectionId);
 }

@@ -97,15 +97,16 @@ export type RunResultState = {
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: RunStatus): void;
   getRunSummary(): LiveRunResult;
+  addToHistory(runResult: RunResult): void;
 };
 
-export function createRunResultStore() {
+export function createRunResultStore(data: { history: RunResult[] }) {
   return create<RunResultState>()((set, get) => ({
     startTime: null,
     endTime: null,
     runStatus: RunStatus.IDLE,
     result: new Map(),
-    history: [],
+    history: data.history,
     currentlyExecutingRequest: null,
     abortController: new AbortController(),
 
@@ -166,6 +167,11 @@ export function createRunResultStore() {
         runStatus,
         result,
       };
+    },
+
+    addToHistory(runResult: RunResult) {
+      const { history } = get();
+      set({ history: [...history, runResult] });
     },
   }));
 }
