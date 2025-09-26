@@ -5,21 +5,28 @@ import { isApiRequest } from "features/apiClient/screens/apiClient/utils";
 import { useChildren } from "features/apiClient/hooks/useChildren.hook";
 import { useCollectionView } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionView.context";
 import { createRunConfigStore, RunConfigState } from "features/apiClient/store/collectionRunConfig/runConfig.store";
-import { createRunResultStore, RunResultState } from "features/apiClient/store/collectionRunResult/runResult.store";
+import {
+  createRunResultStore,
+  RunResult,
+  RunResultState,
+} from "features/apiClient/store/collectionRunResult/runResult.store";
 import { NativeError } from "errors/NativeError";
 import { useShallow } from "zustand/shallow";
+import { RQAPI } from "features/apiClient/types";
 
 export type RunContext = {
   runConfigStore: StoreApi<RunConfigState>;
   runResultStore: StoreApi<RunResultState>;
+  collectionId: RQAPI.CollectionRecord["id"];
 };
 
 const RunViewContext = createContext<RunContext | null>(null);
 
 export const RunViewContextProvider: React.FC<{
   runConfig: SavedRunConfig;
+  history: RunResult[];
   children: React.ReactNode;
-}> = ({ runConfig, children }) => {
+}> = ({ runConfig, history, children }) => {
   const { collectionId } = useCollectionView();
   const records = useChildren(collectionId);
   const requests = useMemo(() => records.filter(isApiRequest), [records]);
@@ -36,9 +43,10 @@ export const RunViewContextProvider: React.FC<{
   const value = useMemo(() => {
     return {
       runConfigStore,
-      runResultStore: createRunResultStore(),
+      runResultStore: createRunResultStore({ history }),
+      collectionId,
     };
-  }, [runConfigStore]);
+  }, [runConfigStore, history, collectionId]);
 
   return <RunViewContext.Provider value={value}>{children}</RunViewContext.Provider>;
 };
