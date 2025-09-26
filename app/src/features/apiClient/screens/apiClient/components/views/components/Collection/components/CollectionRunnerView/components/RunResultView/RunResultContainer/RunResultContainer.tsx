@@ -296,12 +296,12 @@ export const RunResultContainer: React.FC<{
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
 
   const metrics = useMemo(() => {
-    return getRunMetrics(result.result);
-  }, [result.result]);
+    return getRunMetrics(result.iterations);
+  }, [result.iterations]);
 
   const summary = useMemo(() => {
-    return getAllTestSummary(result.result);
-  }, [result.result]);
+    return getAllTestSummary(result.iterations);
+  }, [result.iterations]);
 
   const runMetrics = useMemo(() => {
     const { totalDuration, avgResponseTime } = metrics;
@@ -359,7 +359,7 @@ export const RunResultContainer: React.FC<{
 
   return (
     <div className="run-result-view-details">
-      {result.result.size === 0 ? (
+      {result.iterations.size === 0 ? (
         <EmptyState
           title="No test result found"
           description="Please add test cases in scripts tab and run them to see results."

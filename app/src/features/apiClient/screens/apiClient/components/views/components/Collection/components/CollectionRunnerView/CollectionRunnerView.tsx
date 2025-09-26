@@ -12,6 +12,7 @@ import { RunConfigView } from "./components/RunConfigView/RunConfigView";
 import { RunViewContextProvider } from "./run.context";
 import { RunResultView } from "./components/RunResultView/RunResultView";
 import "./collectionRunnerView.scss";
+import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -19,10 +20,11 @@ interface Props {
 
 export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
   const {
-    runner: { getDefaultRunConfig },
+    runner: { getDefaultRunConfig, getRunResults },
   } = useCommand();
 
   const [config, setConfig] = useState<SavedRunConfig | null>(null);
+  const [runResults, setRunResults] = useState<RunResult[] | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -37,14 +39,27 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
     })();
   }, [collectionId, getDefaultRunConfig]);
 
-  if (!config) {
+  useEffect(() => {
+    (async () => {
+      try {
+        setRunResults(null);
+        const results = await getRunResults({ collectionId });
+        setRunResults(results);
+      } catch (error) {
+        toast.error("Something went wrong!");
+        Sentry.captureException(error, { extra: { collectionId } });
+      }
+    })();
+  }, [collectionId, getRunResults]);
+
+  if (!config || !runResults) {
     return <RunnerViewLoader />;
   }
 
   return (
     <CollectionViewContextProvider key={collectionId} collectionId={collectionId}>
       <AutogenerateProvider>
-        <RunViewContextProvider runConfig={config}>
+        <RunViewContextProvider runConfig={config} history={runResults}>
           <div className="collection-runner-view">
             <Split
               gutterSize={4}

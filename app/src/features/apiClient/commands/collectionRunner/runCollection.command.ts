@@ -5,11 +5,13 @@ import { RunContext } from "features/apiClient/screens/apiClient/components/view
 import {
   CurrentlyExecutingRequest,
   RequestExecutionResult,
+  RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
+import { saveRunResult } from "./saveRunResult.command";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -55,7 +57,7 @@ function prepareExecutionResult(params: {
     collectionName,
     runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
-    status: { value: result.status, warning: result.warning },
+    status: { value: result.status, warning: result.warning || null },
     testResults: result.executedEntry.testResults,
   };
 }
@@ -132,16 +134,33 @@ class Runner {
     this.runContext.runResultStore.getState().addResult(executionResult);
   }
 
-  private afterComplete() {
+  private async afterComplete(collectionId: RQAPI.ApiClientRecord["collectionId"]) {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
     this.runContext.runResultStore.getState().setEndtime(Date.now());
-    notification.success({
-      message: "Run completed!",
-      placement: "bottomRight",
-      className: "collection-runner-notification",
-      duration: 3,
-    });
+
+    const runResult = this.runContext.runResultStore.getState().getRunSummary() as RunResult;
+    this.runContext.runResultStore.getState().addToHistory(runResult);
+    try {
+      await saveRunResult(this.ctx, {
+        collectionId,
+        runResult: runResult,
+      });
+      notification.success({
+        message: "Run completed!",
+        placement: "bottomRight",
+        className: "collection-runner-notification",
+        duration: 3,
+      });
+    } catch (e) {
+      notification.error({
+        message: "Run completed but couldn't save the result!",
+        placement: "bottomRight",
+        className: "collection-runner-notification",
+        duration: 3,
+        style: { width: "fit-content" },
+      });
+    }
   }
 
   private onError(error: any) {
@@ -226,7 +245,9 @@ class Runner {
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
 
-      this.afterComplete();
+      const collectionId = this.runContext.collectionId;
+
+      await this.afterComplete(collectionId);
     } catch (e) {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();

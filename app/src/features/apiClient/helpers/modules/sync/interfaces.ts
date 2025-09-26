@@ -3,6 +3,7 @@ import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
 import { ErroredRecord, FileType } from "./local/services/types";
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 
 export interface EnvironmentInterface<Meta extends Record<string, any>> {
   meta: Meta;
@@ -86,6 +87,12 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfig: SavedRunConfig
   ): ResponsePromise<SavedRunConfig>;
+
+  getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]>;
+  addRunResult(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runResult: RunResult
+  ): ResponsePromise<SavedRunResult>;
 }
 
 export interface ApiClientRepositoryInterface {

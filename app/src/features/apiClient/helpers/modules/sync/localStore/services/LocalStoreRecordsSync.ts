@@ -10,6 +10,8 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -287,7 +289,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResponsePromise<RQAPI.RunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
     return {
       success: false,
       data: null,
@@ -301,7 +303,32 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfig: Partial<RQAPI.RunConfig>
-  ): ResponsePromise<RQAPI.RunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
+    return {
+      success: false,
+      data: null,
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Not implemented",
+      },
+    };
+  }
+
+  async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
+    return {
+      success: false,
+      data: null,
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Not implemented",
+      },
+    };
+  }
+
+  async addRunResult(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runResult: RunResult
+  ): ResponsePromise<SavedRunResult> {
     return {
       success: false,
       data: null,

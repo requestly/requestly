@@ -6,6 +6,8 @@ import {
   batchCreateApiRecordsWithExistingId,
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
+  getRunResults as getRunResultsFromFirebase,
+  addRunResult as addRunResultToFirebase,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
@@ -17,6 +19,7 @@ import { EnvironmentVariables } from "backend/environment/types";
 import { ErroredRecord } from "../../local/services/types";
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -213,6 +216,19 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     runConfig: SavedRunConfig
   ): ResponsePromise<SavedRunConfig> {
     const result = await upsertRunConfigFromFirebase(collectionId, runConfig);
+    return result;
+  }
+
+  async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
+    const result = await getRunResultsFromFirebase(collectionId);
+    return result;
+  }
+
+  async addRunResult(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runResult: RunResult
+  ): ResponsePromise<SavedRunResult> {
+    const result = await addRunResultToFirebase(collectionId, runResult);
     return result;
   }
 }

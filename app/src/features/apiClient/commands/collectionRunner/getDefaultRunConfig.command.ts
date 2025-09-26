@@ -10,7 +10,7 @@ function getDefaultRunOrderByCollectionId(
   id: RQAPI.ApiClientRecord["collectionId"]
 ): RQAPI.RunOrder {
   const childParentMap = getChildParentMap(ctx);
-  const runOrder = getAllChildren(id, childParentMap);
+  const runOrder = getAllChildren(id, childParentMap).map((id) => ({ id: id, isSelected: true }));
   return runOrder;
 }
 
