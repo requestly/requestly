@@ -36,10 +36,12 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
     return [
       {
         title: "Ran at",
+        width: 175,
         render: (_: any, record: RunResult) => <span>{getFormattedStartTime(record.startTime)}</span>,
       },
       {
         title: "Duration",
+        width: 130,
         render: (_: any, record: RunResult | LiveRunResult) =>
           record.runStatus === RunStatus.RUNNING ? (
             <LoadingSkeleton />
