@@ -291,11 +291,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     runConfigId: RQAPI.RunConfig["id"]
   ): ResponsePromise<SavedRunConfig> {
     return {
-      success: false,
-      data: null,
-      error: {
-        type: "INTERNAL_SERVER_ERROR",
-        message: "Not implemented",
+      success: true,
+      data: {
+        id: runConfigId,
+        runOrder: [],
       },
     };
   }
@@ -316,12 +315,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
     return {
-      success: false,
-      data: null,
-      error: {
-        type: "INTERNAL_SERVER_ERROR",
-        message: "Not implemented",
-      },
+      success: true,
+      data: [],
     };
   }
 
@@ -330,12 +325,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     runResult: RunResult
   ): ResponsePromise<SavedRunResult> {
     return {
-      success: false,
+      success: true,
       data: null,
-      error: {
-        type: "INTERNAL_SERVER_ERROR",
-        message: "Not implemented",
-      },
     };
   }
 }
