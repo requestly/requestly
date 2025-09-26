@@ -153,33 +153,24 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
 };
 
 export const RunConfigView: React.FC = () => {
-  const [selectAll, setSelectAll] = useState({ value: true });
   const ctx = useApiClientFeatureContext();
 
   const { collectionId } = useCollectionView();
-  const [setOrderedRequests, setHasUnsavedChanges, orderedRequestsCount] = useRunConfigStore((s) => [
+  const [setOrderedRequests, orderedRequestsCount, setSelectionForAll] = useRunConfigStore((s) => [
     s.setOrderedRequests,
-    s.setHasUnsavedChanges,
     s.orderedRequests.length,
+    s.setSelectionForAll,
   ]);
   const {
     runner: { resetRunOrder },
   } = useCommand();
 
   const handleSelectAllClick = () => {
-    setSelectAll({ value: true });
-
-    if (!selectAll) {
-      setHasUnsavedChanges(true);
-    }
+    setSelectionForAll(true);
   };
 
   const handleDeselectAllClick = () => {
-    setSelectAll({ value: false });
-
-    if (selectAll) {
-      setHasUnsavedChanges(true);
-    }
+    setSelectionForAll(false);
   };
 
   const handleResetClick = () => {
@@ -226,7 +217,7 @@ export const RunConfigView: React.FC = () => {
             </RQButton>
           </div>
 
-          <RunConfigOrderedRequests selectAll={selectAll} />
+          <RunConfigOrderedRequests />
           <RunConfigSettings />
         </div>
       )}

@@ -18,9 +18,10 @@ export type RunConfigState = {
   setOrderedRequests(requests: RunConfigState["orderedRequests"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
-  setSelected(id: string, value: boolean): void;
   getConfig(): RQAPI.RunConfig;
   getConfigToSave(): SavedRunConfig;
+  setSelectionForAll(value: boolean): boolean;
+  setSelected(id: string, value: boolean): boolean;
 
   /**
    * This would be called when a new request is added by the user.
@@ -69,12 +70,46 @@ export function createRunConfigStore(data: {
       set({ hasUnsavedChanges });
     },
 
-    setSelected(id, value) {
+    setSelectionForAll(value) {
+      let didChange = false;
       set({
         orderedRequests: get().orderedRequests.map((r) => {
-          return r.record.id === id ? { record: r.record, isSelected: value } : r;
+          if (value !== r.isSelected) {
+            didChange = true;
+          }
+          return { ...r, isSelected: value };
         }),
       });
+
+      if (didChange) {
+        get().setHasUnsavedChanges(true);
+      }
+
+      return didChange;
+    },
+
+    setSelected(id, value) {
+      let didChange = false;
+
+      set({
+        orderedRequests: get().orderedRequests.map((r) => {
+          if (r.record.id === id) {
+            if (value !== r.isSelected) {
+              didChange = true;
+            }
+
+            return { ...r, isSelected: value };
+          }
+
+          return r;
+        }),
+      });
+
+      if (didChange) {
+        get().setHasUnsavedChanges(true);
+      }
+
+      return didChange;
     },
 
     setOrderedRequests(requests) {
