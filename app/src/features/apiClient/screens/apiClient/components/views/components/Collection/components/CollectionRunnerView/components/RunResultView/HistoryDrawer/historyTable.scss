@@ -23,6 +23,10 @@
   & .ant-table-tbody {
     background: var(--requestly-color-surface-0, #212121);
 
+    .ant-table-row {
+      cursor: pointer;
+    }
+
     .history-row-skeleton {
       display: flex;
       align-items: center;
