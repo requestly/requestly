@@ -2,13 +2,21 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { EnvironmentEntity, FileSystemResult } from "./types";
-import { appendPath, parseEntityVariables } from "../../utils";
+import { parseEntityVariables } from "../../utils";
+import { NativeError } from "errors/NativeError";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
+  private globalId?: string;
   constructor(readonly meta: ApiClientLocalMeta) {}
 
   private async getAdapter() {
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
+  }
+
+  private setGlobalId(id: string) {
+    if(!this.globalId) {
+      this.globalId = id;
+    }
   }
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
@@ -18,6 +26,9 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
         name: cur.name,
         variables: parseEntityVariables(cur?.variables || {}),
       };
+      if(cur.isGlobal) {
+        this.setGlobalId(cur.id);
+      }
       return acc;
     }, {} as EnvironmentMap);
 
@@ -31,6 +42,10 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
       variables: parseEntityVariables(entity?.variables || {}),
     };
 
+    if(entity.isGlobal) {
+      this.setGlobalId(entity.id);
+    }
+
     return environment;
   }
 
@@ -39,12 +54,15 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const result = await service.getAllEnvironments();
     if (result.type === "success") {
       const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
-      const globalEnvPath = `${this.meta.rootPath}/environments/global.json`;
-      if (!parsedEnvs[globalEnvPath]) {
+      try {
+        this.getGlobalEnvironmentId();
+      } catch(e) {
         const globalEnv = await this.createGlobalEnvironment();
-        parsedEnvs[globalEnvPath] = globalEnv;
+        this.setGlobalId(globalEnv.id);
+        
+        parsedEnvs[globalEnv.id] = globalEnv;
       }
-      return {
+     return {
         success: true,
         data: {
           environments: parsedEnvs,
@@ -78,7 +96,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment(environmentName, false);
     if (result.type === "error") {
-      throw new Error("Something went wrong while create a new environment.");
+      throw new Error(result.error.message || "Something went wrong while create a new environment.");
     }
     const parsedEnv = this.parseEnvironmentEntity(result.content);
     return parsedEnv;
@@ -87,12 +105,11 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   async createGlobalEnvironment(): Promise<EnvironmentData> {
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.createEnvironment("Global Variables", true);
-    if (result.type === "success") {
-      const parsedEnv = this.parseEnvironmentEntity(result.content);
-      return parsedEnv;
+    if (result.type === "error") {
+      throw new Error(result.error.message || "Something went wrong while creating the global environment.");
     }
-    // TODO: FIX THIS
-    return null;
+    const parsedEnv = this.parseEnvironmentEntity(result.content);
+    return parsedEnv;
   }
 
   async createEnvironments(environments: EnvironmentData[]): Promise<EnvironmentData[]> {
@@ -138,7 +155,10 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   getGlobalEnvironmentId(): string {
-    return appendPath(this.meta.rootPath, appendPath("environments", "global.json"));
+    if(!this.globalId) {
+      throw new NativeError('Global environment id has not been set yet!');
+    }
+    return this.globalId;
   }
 
   attachListener(params: EnvironmentListenerParams): () => any {

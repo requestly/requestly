@@ -2,7 +2,6 @@ import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { RQAPI } from "features/apiClient/types";
 import { omit } from "lodash";
 import { saveBulkRecords, saveOrUpdateRecord } from "../store.utils";
-import { forceRefreshRecords } from ".";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 export async function moveRecords(
@@ -29,7 +28,6 @@ export async function moveRecords(
     saveBulkRecords(context, result);
   }
 
-  await forceRefreshRecords(context);
 
   return result;
 }
