@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { MdDragIndicator } from "@react-icons/all-files/md/MdDragIndicator";
 import { Checkbox, Typography } from "antd";
 import { RQAPI } from "features/apiClient/types";
@@ -52,29 +52,12 @@ interface ReorderableListItemProps {
   index: number;
   orderedRequest: RQAPI.OrderedRequest;
   style: React.CSSProperties;
-  selectAll: { value: boolean };
   reorder: (currentIndex: number, newIndex: number) => void;
 }
 
-export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
-  index,
-  orderedRequest,
-  style,
-  selectAll,
-  reorder,
-}) => {
-  const [setSelected, setHasUnsavedChanges] = useRunConfigStore((s) => [s.setSelected, s.setHasUnsavedChanges]);
+export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, style, reorder }) => {
+  const [setSelected] = useRunConfigStore((s) => [s.setSelected]);
   const ref = useRef<HTMLDivElement>(null);
-  const initialRender = useRef<boolean>(true);
-
-  useEffect(() => {
-    if (initialRender.current) {
-      initialRender.current = false;
-      return;
-    }
-
-    setSelected(orderedRequest.record.id, selectAll.value);
-  }, [orderedRequest.record.id, selectAll, setSelected]);
 
   const [{ isDragging }, drag] = useDrag({
     type: ReorderableItemType.REQUEST,
@@ -130,7 +113,6 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
         checked={orderedRequest.isSelected}
         onChange={(e) => {
           setSelected(orderedRequest.record.id, e.target.checked);
-          setHasUnsavedChanges(true);
         }}
       />
       <CollectionChain recordId={orderedRequest.record.id} />
