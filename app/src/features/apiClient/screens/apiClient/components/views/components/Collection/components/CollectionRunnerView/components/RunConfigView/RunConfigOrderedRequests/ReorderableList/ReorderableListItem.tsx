@@ -115,7 +115,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index,
           setSelected(orderedRequest.record.id, e.target.checked);
         }}
       />
-      <CollectionChain recordId={orderedRequest.record.id} />
+      <CollectionChain key={orderedRequest.record.collectionId} recordId={orderedRequest.record.id} />
       <RequestInfo recordId={orderedRequest.record.id} />
     </div>
   );
