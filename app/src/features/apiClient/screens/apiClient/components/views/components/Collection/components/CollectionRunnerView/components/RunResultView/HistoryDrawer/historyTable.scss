@@ -20,6 +20,14 @@
     padding: 10px;
   }
 
+  & .ant-table-tbody {
+    background: var(--requestly-color-surface-0, #212121);
+
+    .ant-table-placeholder td {
+      border: none;
+    }
+  }
+
   td {
     font-size: var(--requestly-font-size-xs, 11px);
     // color: var(--requestly-color-text-subtle);

@@ -53,5 +53,9 @@
       margin-left: 34px;
       padding: var(--space-4, 10px) var(--space-6, 16px) var(--space-4, 8px) var(--space-2, 4px);
     }
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+    }
   }
 }
