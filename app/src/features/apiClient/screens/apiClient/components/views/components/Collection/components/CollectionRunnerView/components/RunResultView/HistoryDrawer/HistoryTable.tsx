@@ -7,7 +7,7 @@ import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/store/co
 import { EmptyState } from "../../EmptyState/EmptyState";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 
-const LoadingSkeleton: React.FC = () => <Skeleton.Button shape="round" size="small" />;
+const LoadingSkeleton: React.FC = () => <Skeleton.Button className="history-row-skeleton" shape="round" size="small" />;
 
 export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => void }> = ({ onHistoryClick }) => {
   const [runStatus, runStartTime] = useRunResultStore((s) => [s.runStatus, s.startTime]);
