@@ -65,8 +65,14 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({
 }) => {
   const [setSelected, setHasUnsavedChanges] = useRunConfigStore((s) => [s.setSelected, s.setHasUnsavedChanges]);
   const ref = useRef<HTMLDivElement>(null);
+  const initialRender = useRef<boolean>(true);
 
   useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+
     setSelected(orderedRequest.record.id, selectAll.value);
   }, [orderedRequest.record.id, selectAll, setSelected]);
 
