@@ -1,0 +1,90 @@
+.run-config-view-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  .run-config-header {
+    display: flex;
+    align-items: center;
+    padding: var(--space-3, 6px) var(--space-6, 16px);
+    justify-content: space-between;
+    border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3, 6px);
+
+      text-align: center;
+      color: var(--requestly-color-text-default, #fff);
+      font-size: var(--requestly-font-size-sm, 12px);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 18px; /* 150% */
+
+      svg {
+        --size: 12px;
+
+        width: var(--size);
+        height: var(--size);
+        color: var(--requestly-color-text-subtle, #bbb);
+      }
+    }
+
+    .actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-4, 8px);
+
+      .unsaved-changes-indicator {
+        flex-shrink: 0;
+        width: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &::after {
+          content: "";
+          display: block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: var(--requestly-color-primary-soft);
+        }
+      }
+    }
+  }
+
+  .run-config-container {
+    height: 100%;
+
+    .run-config-ordered-requests-header {
+      display: flex;
+      align-items: center;
+      padding: var(--space-4, 8px) var(--space-6, 16px);
+      padding-bottom: 0;
+
+      .ant-checkbox-wrapper {
+        user-select: none;
+        display: flex;
+        align-items: flex-start;
+
+        color: var(--requestly-color-text-subtle, #bbb);
+        font-size: var(--requestly-font-size-xs, 11px);
+        font-weight: 500;
+
+        span:first-child {
+          margin-top: -2px;
+        }
+
+        span + span {
+          display: inline-block;
+          margin-top: 1px;
+        }
+      }
+    }
+  }
+}
