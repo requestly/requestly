@@ -2,13 +2,21 @@ import { EnvironmentData, EnvironmentMap } from "backend/environment/types";
 import { ApiClientLocalMeta, EnvironmentInterface, EnvironmentListenerParams } from "../../interfaces";
 import { fsManagerServiceAdapterProvider } from "services/fsManagerServiceAdapter";
 import { EnvironmentEntity, FileSystemResult } from "./types";
-import { appendPath, parseEntityVariables } from "../../utils";
+import { parseEntityVariables } from "../../utils";
+import { NativeError } from "errors/NativeError";
 
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
+  private globalId?: string;
   constructor(readonly meta: ApiClientLocalMeta) {}
 
   private async getAdapter() {
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
+  }
+
+  private setGlobalId(id: string) {
+    if(!this.globalId) {
+      this.globalId = id;
+    }
   }
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
@@ -18,6 +26,9 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
         name: cur.name,
         variables: parseEntityVariables(cur?.variables || {}),
       };
+      if(cur.isGlobal) {
+        this.setGlobalId(cur.id);
+      }
       return acc;
     }, {} as EnvironmentMap);
 
@@ -31,6 +42,10 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
       variables: parseEntityVariables(entity?.variables || {}),
     };
 
+    if(entity.isGlobal) {
+      this.setGlobalId(entity.id);
+    }
+
     return environment;
   }
 
@@ -39,12 +54,15 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     const result = await service.getAllEnvironments();
     if (result.type === "success") {
       const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
-      const globalEnvId = this.getGlobalEnvironmentId();
-      if (!parsedEnvs[globalEnvId]) {
+      try {
+        this.getGlobalEnvironmentId();
+      } catch(e) {
         const globalEnv = await this.createGlobalEnvironment();
-        parsedEnvs[globalEnvId] = globalEnv;
+        this.setGlobalId(globalEnv.id);
+        
+        parsedEnvs[globalEnv.id] = globalEnv;
       }
-      return {
+     return {
         success: true,
         data: {
           environments: parsedEnvs,
@@ -137,7 +155,10 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   getGlobalEnvironmentId(): string {
-    return 'global';
+    if(!this.globalId) {
+      throw new NativeError('Global environment id has not been set yet!');
+    }
+    return this.globalId;
   }
 
   attachListener(params: EnvironmentListenerParams): () => any {
