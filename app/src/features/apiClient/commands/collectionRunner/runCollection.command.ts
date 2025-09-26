@@ -158,6 +158,7 @@ class Runner {
         placement: "bottomRight",
         className: "collection-runner-notification",
         duration: 3,
+        style: { width: "fit-content" },
       });
     }
   }
