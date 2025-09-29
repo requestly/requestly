@@ -7,6 +7,8 @@ import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import "./runResultView.scss";
 import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
+import { useCollectionView } from "../../../../collectionView.context";
+import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
 
 export const RunResultView: React.FC = () => {
   const [iterations, startTime, getRunSummary, runStatus] = useRunResultStore((s) => [
@@ -22,6 +24,8 @@ export const RunResultView: React.FC = () => {
     [getRunSummary, iterations]
   );
 
+  const { collectionId } = useCollectionView();
+
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
 
   return (
@@ -34,6 +38,9 @@ export const RunResultView: React.FC = () => {
           icon={<MdOutlineHistory />}
           onClick={() => {
             setIsHistoryDrawerOpen(true);
+            trackCollectionRunHistoryViewed({
+              collection_id: collectionId,
+            });
           }}
         >
           History

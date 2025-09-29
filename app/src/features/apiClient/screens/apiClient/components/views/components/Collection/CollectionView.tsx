@@ -16,6 +16,7 @@ import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
+import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -176,6 +177,14 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
               items={tabItems}
               animated={false}
               moreIcon={null}
+              onTabClick={(key) => {
+                if (key === TAB_KEYS.RUNNER) {
+                  trackCollectionRunnerViewed({
+                    collection_id: collection.id,
+                    source: "collection_overview",
+                  });
+                }
+              }}
             />
           </div>
         </>
