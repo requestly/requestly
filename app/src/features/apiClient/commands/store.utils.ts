@@ -44,7 +44,12 @@ export function getOrderedApiClientRecords(
 ): RQAPI.OrderedRequests {
   const getApiRecord = ctx.stores.records.getState().getData;
 
-  return runOrder.map((o) => ({ record: getApiRecord(o.id) as RQAPI.ApiRecord, isSelected: o.isSelected }));
+  return runOrder
+    .map((o) => {
+      const record = getApiRecord(o.id);
+      return record ? { record, isSelected: o.isSelected } : null;
+    })
+    .filter((r): r is { record: RQAPI.ApiRecord; isSelected: boolean } => !!r);
 }
 
 // Multiview
