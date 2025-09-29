@@ -69,21 +69,18 @@ export function getAllTestSummary(result: RunResultState["iterations"]) {
     totalTests.set(iteration, [...(totalTests.get(iteration) ?? []), { requestExecutionResult: executionResult }]);
 
     if (success.length) {
-      successTests.set(iteration, [
-        ...(successTests.get(iteration) ?? []),
-        { requestExecutionResult: executionResult },
-      ]);
+      const requestExecutionResult = { ...executionResult, testResults: success } as RequestExecutionResult;
+      successTests.set(iteration, [...(successTests.get(iteration) ?? []), { requestExecutionResult }]);
     }
 
     if (failed.length) {
-      failedTests.set(iteration, [...(failedTests.get(iteration) ?? []), { requestExecutionResult: executionResult }]);
+      const requestExecutionResult = { ...executionResult, testResults: failed } as RequestExecutionResult;
+      failedTests.set(iteration, [...(failedTests.get(iteration) ?? []), { requestExecutionResult }]);
     }
 
     if (skipped.length) {
-      skippedTests.set(iteration, [
-        ...(skippedTests.get(iteration) ?? []),
-        { requestExecutionResult: executionResult },
-      ]);
+      const requestExecutionResult = { ...executionResult, testResults: skipped } as RequestExecutionResult;
+      skippedTests.set(iteration, [...(skippedTests.get(iteration) ?? []), { requestExecutionResult }]);
     }
   });
 
