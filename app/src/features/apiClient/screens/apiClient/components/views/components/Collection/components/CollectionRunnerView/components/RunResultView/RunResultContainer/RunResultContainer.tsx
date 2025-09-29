@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -53,46 +53,8 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
 const RunningRequestPlaceholder: React.FC<{
   runningRequest: CurrentlyExecutingRequest;
 }> = ({ runningRequest }) => {
-  const stopScrolling = useRef<boolean>(false);
-
-  // useEffect(() => {
-  //   const handleScroll = (e: Event) => {
-  //     const container = e.target as HTMLElement;
-
-  //     stopScrolling.current = true;
-  //     // } else {
-  //     //   keepScrolling.current = true;
-  //     // }
-  //   };
-
-  //   document.addEventListener("scroll", handleScroll);
-  //   document.addEventListener("wheel", handleScroll);
-  //   document.addEventListener("touchstart", handleScroll);
-
-  //   return () => {
-  //     document.removeEventListener("scroll", handleScroll);
-  //     document.removeEventListener("wheel", handleScroll);
-  //     document.removeEventListener("touchstart", handleScroll);
-  //   };
-  // }, []);
-
-  const handleAutoScroll = useCallback((node: HTMLDivElement | null) => {
-    if (!node) {
-      return;
-    }
-
-    if (stopScrolling.current) {
-      return;
-    }
-
-    // node?.scrollIntoView({
-    //   behavior: "smooth",
-    //   block: "end",
-    // });
-  }, []);
-
   return (
-    <div ref={handleAutoScroll} className="test-details-container">
+    <div className="test-details-container">
       <div className="request-details">
         {runningRequest.entry.type === RQAPI.ApiEntryType.HTTP ? (
           <>
