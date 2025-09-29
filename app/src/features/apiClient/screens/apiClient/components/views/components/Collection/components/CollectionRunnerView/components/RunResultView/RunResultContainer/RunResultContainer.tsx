@@ -8,7 +8,6 @@ import {
 } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { getAllTestSummary, getRunMetrics, TestSummary } from "features/apiClient/store/collectionRunResult/utils";
 import { TestResultItem } from "../../../../../../response/TestsView/components/TestResult/TestResult";
-import { TestResult } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { RQAPI } from "features/apiClient/types";
 import {
   GraphQlIcon,
@@ -82,8 +81,7 @@ const RunningRequestPlaceholder: React.FC<{
 
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
-  testResults: TestResult[];
-}> = ({ requestExecutionResult, testResults }) => {
+}> = ({ requestExecutionResult }) => {
   const context = useApiClientFeatureContext();
   const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
 
@@ -148,13 +146,13 @@ const TestDetails: React.FC<{
         {responseDetails}
       </div>
 
-      {testResults.length === 0 ? (
+      {requestExecutionResult?.testResults?.length === 0 ? (
         <div className="no-test-found-message">
           <i>No test found</i>
         </div>
       ) : (
         <div className="results-list">
-          {testResults.map((test) => {
+          {requestExecutionResult.testResults?.map((test) => {
             return <TestResultItem testResult={test} />;
           })}
         </div>
@@ -175,12 +173,8 @@ const TestResultList: React.FC<{
 
   // TODO: use virtualize list
   const resultsToShow = useMemo(() => {
-    return tabKey === RunResultTabKey.ALL
-      ? Array.from(results)
-      : Array.from(results).filter(([iteration, details]) => {
-          return details.filter(({ testResults }) => testResults.length > 0).length > 0;
-        });
-  }, [results, tabKey]);
+    return Array.from(results);
+  }, [results]);
 
   if (resultsToShow.length === 0) {
     return (
@@ -204,13 +198,9 @@ const TestResultList: React.FC<{
             }}
           >
             <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
-              {details.map(({ requestExecutionResult, testResults }) => {
+              {details.map(({ requestExecutionResult }) => {
                 return (
-                  <TestDetails
-                    key={requestExecutionResult.recordId}
-                    requestExecutionResult={requestExecutionResult}
-                    testResults={testResults}
-                  />
+                  <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />
                 );
               })}
               {iteration === currentlyExecutingRequest?.iteration ? currentRunningRequest : null}
@@ -224,14 +214,8 @@ const TestResultList: React.FC<{
   // show first iteration without collapse
   return (
     <div className="tests-results-view-container">
-      {resultsToShow[0][1].map(({ requestExecutionResult, testResults }) => {
-        return (
-          <TestDetails
-            key={requestExecutionResult.recordId}
-            requestExecutionResult={requestExecutionResult}
-            testResults={testResults}
-          />
-        );
+      {resultsToShow[0][1].map(({ requestExecutionResult }) => {
+        return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
       })}
       {currentRunningRequest}
     </div>

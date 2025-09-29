@@ -20,10 +20,7 @@ export function getTestSummary(result: RequestExecutionResult) {
   return { total: result.testResults ?? [], success, failed, skipped };
 }
 
-export type TestSummary = Map<
-  Iteration,
-  { requestExecutionResult: RequestExecutionResult; testResults: TestResult[] }[]
->;
+export type TestSummary = Map<Iteration, { requestExecutionResult: RequestExecutionResult }[]>;
 
 export function getRunMetrics(results: RunResultState["iterations"]) {
   const allResults: RequestExecutionResult[] = [];
@@ -69,25 +66,25 @@ export function getAllTestSummary(result: RunResultState["iterations"]) {
     skippedTestsCounts += skipped.length;
     totalDuration += executionResult.runDuration;
 
-    totalTests.set(iteration, [
-      ...(totalTests.get(iteration) ?? []),
-      { requestExecutionResult: executionResult, testResults: total },
-    ]);
+    totalTests.set(iteration, [...(totalTests.get(iteration) ?? []), { requestExecutionResult: executionResult }]);
 
-    successTests.set(iteration, [
-      ...(successTests.get(iteration) ?? []),
-      { requestExecutionResult: executionResult, testResults: success },
-    ]);
+    if (success.length) {
+      successTests.set(iteration, [
+        ...(successTests.get(iteration) ?? []),
+        { requestExecutionResult: executionResult },
+      ]);
+    }
 
-    failedTests.set(iteration, [
-      ...(failedTests.get(iteration) ?? []),
-      { requestExecutionResult: executionResult, testResults: failed },
-    ]);
+    if (failed.length) {
+      failedTests.set(iteration, [...(failedTests.get(iteration) ?? []), { requestExecutionResult: executionResult }]);
+    }
 
-    skippedTests.set(iteration, [
-      ...(skippedTests.get(iteration) ?? []),
-      { requestExecutionResult: executionResult, testResults: skipped },
-    ]);
+    if (skipped.length) {
+      skippedTests.set(iteration, [
+        ...(skippedTests.get(iteration) ?? []),
+        { requestExecutionResult: executionResult },
+      ]);
+    }
   });
 
   return {
