@@ -43,6 +43,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           body: requestDetails.body,
           bodyContainer: requestDetails.bodyContainer,
           contentType: requestDetails.contentType,
+          pathVariables: requestDetails.pathVariables,
         };
       case "graphql":
         return {
@@ -127,6 +128,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
             bodyContainer: record.data.request?.bodyContainer,
             contentType: record.data.request?.contentType,
             auth: record.data.auth,
+            pathVariables: record.data.request?.pathVariables,
           },
         };
       case RQAPI.ApiEntryType.GRAPHQL:

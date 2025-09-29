@@ -14,6 +14,8 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { Checkbox } from "antd";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
+import { PathVariableTable } from "../PathVariableTable";
+import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -45,25 +47,38 @@ const HttpRequestTabs: React.FC<Props> = ({
   const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
+  const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
   const items = useMemo(() => {
     return [
       {
         key: RequestTab.QUERY_PARAMS,
-        label: <RequestTabLabel label="Query Params" count={queryParams.length} />,
+        label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
         children: (
-          <QueryParamsTable
-            recordId={requestId}
-            onQueryParamsChange={(newParams) => {
-              setRequestEntry((prev) => ({
-                ...prev,
-                request: {
-                  ...prev.request,
-                  queryParams: newParams,
-                },
-              }));
-            }}
-          />
+          <>
+            <div className="params-table-title">Query Params</div>
+            <QueryParamsTable
+              recordId={requestId}
+              onQueryParamsChange={(newParams) => {
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  request: {
+                    ...prev.request,
+                    queryParams: newParams,
+                  },
+                }));
+              }}
+            />
+            <PathVariableTable
+              recordId={requestId}
+              onChange={(newVariables) => {
+                setRequestEntry((prev) => ({
+                  ...prev,
+                  request: { ...prev.request, pathVariables: newVariables },
+                }));
+              }}
+            />
+          </>
         ),
       },
       {
@@ -153,6 +168,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     requestEntry.scripts,
     setContentType,
     setRequestEntry,
+    pathVariables.length,
   ]);
 
   return (
