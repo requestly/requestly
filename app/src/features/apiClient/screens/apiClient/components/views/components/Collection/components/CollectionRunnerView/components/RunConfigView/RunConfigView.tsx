@@ -140,7 +140,8 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
     if (!error) {
       return;
     }
-    toast.error("Unable to run collection!");
+
+    toast.error(error?.message || "Unable to run collection!");
     Sentry.captureException(error, {
       extra: {
         reason: "Unable to run collection!",
