@@ -12,6 +12,11 @@ import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
+import {
+  trackCollectionRunSaveHistoryFailed,
+  trackCollectionRunStarted,
+  trackCollectionRunStopped,
+} from "modules/analytics/events/features/apiClient";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -160,6 +165,10 @@ class Runner {
         duration: 3,
         style: { width: "fit-content" },
       });
+
+      trackCollectionRunSaveHistoryFailed({
+        collection_id: collectionId,
+      });
     }
   }
 
@@ -232,8 +241,17 @@ class Runner {
   }
 
   async run() {
+    const runConfig = this.runContext.runConfigStore.getState().getConfig();
+    const collectionId = this.runContext.collectionId;
     try {
       this.beforeStart();
+
+      trackCollectionRunStarted({
+        collection_id: collectionId,
+        iteration_count: runConfig.iterations,
+        delay: runConfig.delay,
+        request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
+      });
 
       for await (const { request, iteration } of this.iterate()) {
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
@@ -245,12 +263,17 @@ class Runner {
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
 
-      const collectionId = this.runContext.collectionId;
-
       await this.afterComplete(collectionId);
     } catch (e) {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
+
+        trackCollectionRunStopped({
+          collection_id: collectionId,
+          iteration_count: runConfig.iterations,
+          delay: runConfig.delay,
+          request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
+        });
         return;
       }
       this.onError(e);

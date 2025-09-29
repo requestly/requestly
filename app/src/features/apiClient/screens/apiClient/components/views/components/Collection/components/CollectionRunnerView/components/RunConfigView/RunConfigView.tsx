@@ -25,16 +25,22 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { isDesktopMode } from "utils/AppUtils";
 import { useDispatch } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
-import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/apiClient";
+import {
+  trackCollectionRunnerConfigSaved,
+  trackCollectionRunnerConfigSaveFailed,
+  trackInstallExtensionDialogShown,
+} from "modules/analytics/events/features/apiClient";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   const { collectionId } = useCollectionView();
-  const [getConfigToSave, hasUnsavedChanges, setHasUnsavedChanges] = useRunConfigStore((s) => [
+  const [getConfigToSave, hasUnsavedChanges, setHasUnsavedChanges, iterations, delay] = useRunConfigStore((s) => [
     s.getConfigToSave,
     s.hasUnsavedChanges,
     s.setHasUnsavedChanges,
+    s.iterations,
+    s.delay,
   ]);
 
   const {
@@ -61,13 +67,25 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
       await saveRunConfig({ collectionId, configToSave });
       toast.success("Configuration saved");
       setHasUnsavedChanges(false);
+      trackCollectionRunnerConfigSaved({
+        collection_id: collectionId,
+        request_count: configToSave.runOrder.filter((r) => r.isSelected).length,
+        iteration_count: iterations,
+        delay: delay,
+      });
     } catch (error) {
       toast.error("Something went wrong while saving!");
       Sentry.captureException(error, { extra: { collectionId, configToSave } });
+      trackCollectionRunnerConfigSaveFailed({
+        collection_id: collectionId,
+        request_count: configToSave.runOrder.filter((r) => r.isSelected).length,
+        iteration_count: iterations,
+        delay: delay,
+      });
     } finally {
       setIsSaving(false);
     }
-  }, [getConfigToSave, saveRunConfig, collectionId, setHasUnsavedChanges]);
+  }, [getConfigToSave, saveRunConfig, collectionId, setHasUnsavedChanges, iterations, delay]);
 
   return (
     <RQTooltip
