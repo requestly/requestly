@@ -8,14 +8,14 @@ export const ITERATIONS_MAX_LIMIT = 1000;
 
 export type RunConfigState = {
   id: RQAPI.RunConfig["id"];
-  orderedRequests: RQAPI.RunConfig["orderedRequests"];
+  runOrder: RQAPI.RunConfig["runOrder"];
   delay: RQAPI.RunConfig["delay"];
   iterations: RQAPI.RunConfig["iterations"];
 
   /**
    * This would be used when request reorder happens.
    */
-  setOrderedRequests(requests: RunConfigState["orderedRequests"]): void;
+  setRunOrder(runOrder: RQAPI.RunConfig["runOrder"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
   getConfig(): RQAPI.RunConfig;
@@ -27,7 +27,7 @@ export type RunConfigState = {
    * This would be called when a new request is added by the user.
    * They could add to the collection we are dealing with, or to a child collection.
    */
-  patchOrderedRequests(requests: RQAPI.ApiRecord[]): void;
+  patchRunOrder(requestIds: RQAPI.ApiRecord["id"][]): void;
 
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
@@ -37,31 +37,30 @@ function isValidNumber(number: unknown) {
   return Number.isFinite(number) && Number.isInteger(number);
 }
 
-function parseUnorderedRequests(runOrder: RQAPI.RunOrder, unorderedRequests: RQAPI.ApiRecord[]) {
-  const orderedRequests: RQAPI.RunConfig["orderedRequests"] = [];
+function parseUnorderedRequests(runOrder: RQAPI.RunOrder, unorderedRequestIds: RQAPI.ApiRecord["id"][]) {
+  const orderedRequestIds: RQAPI.RunConfig["runOrder"] = [];
 
   runOrder.forEach((value) => {
-    const request = unorderedRequests.find((r) => r.id === value.id);
-    if (request) {
-      orderedRequests.push({ record: request, isSelected: value.isSelected });
+    if (unorderedRequestIds.includes(value.id)) {
+      orderedRequestIds.push({ id: value.id, isSelected: value.isSelected });
     }
   });
 
-  return orderedRequests;
+  return orderedRequestIds;
 }
 
 export function createRunConfigStore(data: {
   id: RQAPI.RunConfig["id"];
   runOrder: RQAPI.RunOrder;
-  unorderedRequests: RQAPI.ApiRecord[];
+  unorderedRequestIds: RQAPI.ApiRecord["id"][];
   delay?: RQAPI.RunConfig["delay"];
   iterations?: RQAPI.RunConfig["iterations"];
 }) {
-  const { id, runOrder, unorderedRequests, delay = 0, iterations = 1 } = data;
+  const { id, runOrder, unorderedRequestIds, delay = 0, iterations = 1 } = data;
 
   return create<RunConfigState>()((set, get) => ({
     id,
-    orderedRequests: parseUnorderedRequests(runOrder, unorderedRequests),
+    runOrder: parseUnorderedRequests(runOrder, unorderedRequestIds),
     delay,
     iterations,
     hasUnsavedChanges: false,
@@ -73,7 +72,7 @@ export function createRunConfigStore(data: {
     setSelectionForAll(value) {
       let didChange = false;
       set({
-        orderedRequests: get().orderedRequests.map((r) => {
+        runOrder: get().runOrder.map((r) => {
           if (value !== r.isSelected) {
             didChange = true;
           }
@@ -92,8 +91,8 @@ export function createRunConfigStore(data: {
       let didChange = false;
 
       set({
-        orderedRequests: get().orderedRequests.map((r) => {
-          if (r.record.id === id) {
+        runOrder: get().runOrder.map((r) => {
+          if (r.id === id) {
             if (value !== r.isSelected) {
               didChange = true;
             }
@@ -112,8 +111,8 @@ export function createRunConfigStore(data: {
       return didChange;
     },
 
-    setOrderedRequests(requests) {
-      set({ orderedRequests: requests, hasUnsavedChanges: true });
+    setRunOrder(runOrder) {
+      set({ runOrder, hasUnsavedChanges: true });
     },
 
     setDelay(delay) {
@@ -137,37 +136,34 @@ export function createRunConfigStore(data: {
     },
 
     getConfig() {
-      const { id, orderedRequests, iterations, delay } = get();
-      return { id, orderedRequests, iterations, delay };
+      const { id, runOrder, iterations, delay } = get();
+      return { id, runOrder, iterations, delay };
     },
 
     getConfigToSave() {
-      const { id, orderedRequests } = get();
-      const runOrder = orderedRequests.map((r) => ({ id: r.record.id, isSelected: r.isSelected }));
+      const { id, runOrder } = get();
       return { id, runOrder };
     },
 
-    patchOrderedRequests(requests) {
-      const { orderedRequests, setOrderedRequests, setHasUnsavedChanges } = get();
+    patchRunOrder(requestIds) {
+      const { runOrder, setRunOrder, setHasUnsavedChanges } = get();
 
-      const ids = requests.map((r) => r.id);
-      const incomingRequestSet = new Set(ids);
-
+      const incomingRequestSet = new Set(requestIds);
       // remove stale ids from existing order
-      const filteredRunOrder = orderedRequests.filter((value) => incomingRequestSet.has(value.record.id));
-      const filteredRunOrderIds = filteredRunOrder.map((value) => value.record.id);
+      const filteredRunOrder = runOrder.filter((value) => incomingRequestSet.has(value.id));
+      const filteredRunOrderIds = filteredRunOrder.map((value) => value.id);
 
       const filteredRunOrderSet = new Set(filteredRunOrderIds);
-      const patch: RQAPI.RunConfig["orderedRequests"] = [];
-      for (const request of requests) {
-        if (!filteredRunOrderSet.has(request.id)) {
+      const patch: RQAPI.RunConfig["runOrder"] = [];
+      for (const requestId of requestIds) {
+        if (!filteredRunOrderSet.has(requestId)) {
           // Assuming all incoming requests are selected
-          patch.push({ record: request, isSelected: true });
+          patch.push({ id: requestId, isSelected: true });
         }
       }
 
       const newOrder = [...filteredRunOrder, ...patch];
-      setOrderedRequests(newOrder);
+      setRunOrder(newOrder);
       setHasUnsavedChanges(false);
     },
   }));

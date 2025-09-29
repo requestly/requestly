@@ -156,9 +156,9 @@ export const RunConfigView: React.FC = () => {
   const ctx = useApiClientFeatureContext();
 
   const { collectionId } = useCollectionView();
-  const [setOrderedRequests, orderedRequestsCount, setSelectionForAll] = useRunConfigStore((s) => [
-    s.setOrderedRequests,
-    s.orderedRequests.length,
+  const [setRunOrder, runOrderCount, setSelectionForAll] = useRunConfigStore((s) => [
+    s.setRunOrder,
+    s.runOrder.length,
     s.setSelectionForAll,
   ]);
   const {
@@ -174,10 +174,10 @@ export const RunConfigView: React.FC = () => {
   };
 
   const handleResetClick = () => {
-    resetRunOrder({ collectionId, setOrderedRequests });
+    resetRunOrder({ collectionId, setRunOrder });
   };
 
-  const isEmpty = orderedRequestsCount === 0;
+  const isEmpty = runOrderCount === 0;
 
   return (
     <div className="run-config-view-container">

@@ -321,7 +321,7 @@ export namespace RQAPI {
 
   export type RunConfig = {
     id: string;
-    orderedRequests: OrderedRequests;
+    runOrder: RunOrder;
     iterations: number;
     delay: number;
   };
