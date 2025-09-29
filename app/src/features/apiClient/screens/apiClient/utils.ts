@@ -776,7 +776,9 @@ export const extractPathVariablesFromUrl = (url: string) => {
   const urlWithScheme = addUrlSchemeIfMissing(url);
   const pathname = new URL(urlWithScheme).pathname;
 
-  const variablePattern = /(?<!:):(\w+)/g;
+  // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
+  // Also exclude whitespace and control characters for practical reasons
+  const variablePattern = /(?<!:):([^:/?#[\]@!$&'()*+,;=\s]+)/g;
   const variables: string[] = [];
   let match;
 
