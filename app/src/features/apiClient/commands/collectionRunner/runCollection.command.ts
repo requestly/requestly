@@ -206,43 +206,35 @@ class Runner {
     }
   }
 
-  private async *iterate() {
-    const { runContext } = this;
-    const { runConfigStore } = runContext;
-    const { getConfig, runOrder } = runConfigStore.getState();
-
-    const { iterations } = getConfig();
-    const requestsCount = runOrder.length;
-
-    for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
-      for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
-        const request = this.getRequest(requestIndex);
-        if (!request) {
-          continue;
-        }
-
-        yield {
-          request,
-          iteration: iterationIndex + 1,
-        };
-
-        await this.delay(iterationIndex, requestIndex, requestsCount);
-      }
-    }
-  }
-
   async run() {
     try {
       this.beforeStart();
 
-      for await (const { request, iteration } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
-        const result = await this.executor.executeSingleRequest(
-          request.id,
-          request.data,
-          this.runContext.runResultStore.getState().abortController
-        );
-        this.afterRequestExecutionComplete(currentExecutingRequest, result);
+      const { runContext } = this;
+      const { runConfigStore } = runContext;
+      const { getConfig, runOrder } = runConfigStore.getState();
+
+      const { iterations } = getConfig();
+      const requestsCount = runOrder.length;
+
+      for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
+        for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
+          const request = this.getRequest(requestIndex);
+          if (!request) {
+            continue;
+          }
+
+          const iteration = iterationIndex + 1;
+          const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
+          const result = await this.executor.executeSingleRequest(
+            request.id,
+            request.data,
+            this.runContext.runResultStore.getState().abortController
+          );
+          this.afterRequestExecutionComplete(currentExecutingRequest, result);
+
+          await this.delay(iterationIndex, requestIndex, requestsCount);
+        }
       }
 
       const collectionId = this.runContext.collectionId;
