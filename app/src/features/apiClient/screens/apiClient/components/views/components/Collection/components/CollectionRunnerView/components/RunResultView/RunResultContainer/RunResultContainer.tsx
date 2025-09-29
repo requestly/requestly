@@ -22,6 +22,8 @@ import { RequestViewTabSource } from "../../../../../../RequestView/requestViewT
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -146,7 +148,14 @@ const TestDetails: React.FC<{
         {responseDetails}
       </div>
 
-      {requestExecutionResult?.testResults?.length === 0 ? (
+      {requestExecutionResult.status?.value === RQAPI.ExecutionStatus["ERROR"] ? (
+        <RQTooltip title={requestExecutionResult.status.error.message || "Something went wrong!"}>
+          <div className="execution-error-message">
+            <MdOutlineWarningAmber />
+            <span className="message">{requestExecutionResult.status.error.message || "Something went wrong!"}</span>
+          </div>
+        </RQTooltip>
+      ) : requestExecutionResult?.testResults?.length === 0 ? (
         <div className="no-test-found-message">
           <i>No test found</i>
         </div>
