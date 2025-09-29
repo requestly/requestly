@@ -1,12 +1,188 @@
-import { EnvironmentVariables } from "backend/environment/types";
-import { TestResult } from "./helpers/modules/scriptsV2/worker/script-internals/types";
-import {
-  ApiKeyAuthorizationConfig,
-  Authorization,
-  BasicAuthAuthorizationConfig,
-  BearerTokenAuthorizationConfig,
-} from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
-import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
+import { EnvironmentVariables } from "./env";
+
+export interface API_KEY_FORM_VALUES {
+  key: string;
+  value: string;
+  addTo: "HEADER" | "QUERY";
+}
+
+export interface BEARER_TOKEN_FORM_VALUES {
+  bearer: string;
+}
+
+export interface BASIC_AUTH_FORM_VALUES {
+  username: string;
+  password: string;
+}
+
+export type AUTH_OPTIONS = API_KEY_FORM_VALUES | BEARER_TOKEN_FORM_VALUES | BASIC_AUTH_FORM_VALUES;
+
+export namespace Authorization {
+  export enum Type {
+    INHERIT = "INHERIT",
+    NO_AUTH = "NO_AUTH",
+    API_KEY = "API_KEY",
+    BEARER_TOKEN = "BEARER_TOKEN",
+    BASIC_AUTH = "BASIC_AUTH",
+  }
+
+  type AddToOptions = "HEADER" | "QUERY";
+  export type API_KEY_CONFIG = {
+    key: string;
+    value: string;
+    addTo: AddToOptions;
+  };
+
+  export type BEARER_TOKEN_CONFIG = {
+    bearer: string;
+  };
+
+  export type BASIC_AUTH_CONFIG = {
+    username: string;
+    password: string;
+  };
+
+  export const requiresConfig = (type: Type): type is AuthConfigMeta.AuthWithConfig => {
+    return ![Type.NO_AUTH, Type.INHERIT].includes(type);
+  };
+
+  export const hasNoConfig = (type: Type): type is AuthConfigMeta.NoConfigAuth => {
+    return [Type.NO_AUTH, Type.INHERIT].includes(type);
+  };
+}
+
+export namespace AuthConfigMeta {
+  export type TypeToConfig = {
+    [Authorization.Type.API_KEY]: Authorization.API_KEY_CONFIG;
+    [Authorization.Type.BEARER_TOKEN]: Authorization.BEARER_TOKEN_CONFIG;
+    [Authorization.Type.BASIC_AUTH]: Authorization.BASIC_AUTH_CONFIG;
+    [Authorization.Type.NO_AUTH]: never;
+    [Authorization.Type.INHERIT]: never;
+  };
+
+  type HasConfig<T extends Authorization.Type> = TypeToConfig[T] extends never ? false : true;
+
+  export type AuthWithConfig = {
+    [K in Authorization.Type]: HasConfig<K> extends true ? K : never;
+  }[Authorization.Type];
+
+  export type NoConfigAuth = {
+    [K in Authorization.Type]: HasConfig<K> extends false ? K : never;
+  }[Authorization.Type];
+}
+
+export abstract class AuthConfig<T extends AuthConfigMeta.AuthWithConfig> {
+  abstract validate(): boolean;
+  abstract readonly type: T;
+  abstract get config(): AuthConfigMeta.TypeToConfig[T] | null;
+}
+
+export class ApiKeyAuthorizationConfig implements AuthConfig<Authorization.Type.API_KEY> {
+  key: string;
+  value: string;
+  addTo: Authorization.API_KEY_CONFIG["addTo"];
+
+  type: Authorization.Type.API_KEY = Authorization.Type.API_KEY;
+
+  constructor(key: string, value: string, addTo: Authorization.API_KEY_CONFIG["addTo"] = "HEADER") {
+    this.key = key;
+    this.value = value;
+    this.addTo = addTo;
+  }
+
+  validate(): boolean {
+    return Boolean(this.key && this.value);
+  }
+
+  get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.API_KEY] | null {
+    if (!this.validate()) {
+      // throw new Error("Invalid API Key Authorization Config");
+      return null;
+    }
+    return {
+      key: this.key,
+      value: this.value,
+      addTo: this.addTo,
+    };
+  }
+}
+
+export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.Type.BEARER_TOKEN> {
+  bearer: string;
+
+  type: Authorization.Type.BEARER_TOKEN = Authorization.Type.BEARER_TOKEN;
+
+  constructor(bearer: string) {
+    this.bearer = bearer;
+  }
+
+  validate(): boolean {
+    return Boolean(this.bearer);
+  }
+
+  get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BEARER_TOKEN] | null {
+    if (!this.validate()) {
+      // throw new Error("Invalid Bearer Token Authorization Config");
+      return null;
+    }
+    return {
+      bearer: this.bearer,
+    };
+  }
+}
+
+export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Type.BASIC_AUTH> {
+  username: string;
+  password: string;
+
+  type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
+
+  constructor(username: string, password: string) {
+    this.username = username;
+    this.password = password;
+  }
+
+  validate(): boolean {
+    return !!(this.username && this.password);
+  }
+
+  get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {
+    if (!this.validate()) {
+      // throw new Error("Invalid Basic Auth Authorization Config");
+      return null;
+    }
+    return {
+      username: this.username,
+      password: this.password,
+    };
+  }
+}
+
+export enum TestStatus {
+  PASSED = "passed",
+  FAILED = "failed",
+  SKIPPED = "skipped",
+}
+
+export interface BaseTestResult {
+  name: string;
+  status: TestStatus;
+}
+
+export interface PassedTestResult extends BaseTestResult {
+  status: TestStatus.PASSED;
+}
+
+export interface FailedTestResult extends BaseTestResult {
+  status: TestStatus.FAILED;
+  error: string;
+}
+
+export interface SkippedTestResult extends BaseTestResult {
+  status: TestStatus.SKIPPED;
+}
+
+export type TestResult = PassedTestResult | FailedTestResult | SkippedTestResult;
 
 export enum RequestMethod {
   GET = "GET",
@@ -143,8 +319,8 @@ export namespace RQAPI {
   export type HttpRequest = {
     url: string;
     queryParams: KeyValuePair[];
-    pathVariables?: PathVariable[];
     method: RequestMethod;
+    pathVariables?: PathVariable[];
     headers: KeyValuePair[];
     body?: RequestBody;
     bodyContainer?: RequestBodyContainer;
@@ -299,6 +475,22 @@ export namespace RQAPI {
     data: ApiEntry;
   } & BaseApiRecord;
 
+  export enum FileType {
+    API = "api",
+    ENVIRONMENT = "environment",
+    COLLECTION_VARIABLES = "collection_variables",
+    DESCRIPTION = "description",
+    AUTH = "auth",
+    UNKNOWN = "unknown",
+  }
+
+  export type ErroredRecord = {
+    name: string;
+    path: string;
+    error: string;
+    type: FileType;
+  };
+
   export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
 
   export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
@@ -321,29 +513,17 @@ export namespace RQAPI {
     MISSING_FILE = "missing_file",
   }
 
-  export type OrderedRequest = { record: ApiRecord; isSelected: boolean };
-
-  export type OrderedRequests = OrderedRequest[];
-
-  export type RunOrder = { id: ApiRecord["id"]; isSelected: boolean }[];
+  export type RunOrder = ApiClientRecord["id"][];
 
   export type RunConfig = {
     id: string;
     runOrder: RunOrder;
     iterations: number;
     delay: number;
+
+    // TODO: add more as we go
+
+    createdTs: number;
+    updatedTs: number;
   };
 }
-
-export enum PostmanBodyMode {
-  RAW = "raw",
-  FORMDATA = "formdata",
-  URL_ENCODED = "urlencoded",
-  GRAPHQL = "graphql",
-}
-
-export enum AbortReason {
-  USER_CANCELLED = "user_cancelled",
-}
-
-export type UnwrappedPromise<T> = T extends Promise<infer R> ? R : T;
