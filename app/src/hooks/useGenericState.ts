@@ -6,6 +6,7 @@ export interface GenericState {
   setPreview: (preview: boolean) => void;
   setUnsaved: (unsaved: boolean) => void;
   setIcon: (icon: ReactNode) => void;
+  setBeforeClose: (cb: () => any) => void;
   getIsNew: () => boolean;
   getIsActive: () => boolean;
 
@@ -18,6 +19,7 @@ const defaultGenericState: GenericState = {
   setPreview: () => {},
   setUnsaved: () => {},
   setIcon: () => {},
+  setBeforeClose: () => {},
   getIsNew: () => false,
   getIsActive: () => false,
   replace: () => {},

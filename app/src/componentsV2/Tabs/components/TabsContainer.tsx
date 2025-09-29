@@ -125,6 +125,11 @@ export const TabsContainer: React.FC = () => {
                 className="tab-close-button"
                 onClick={(e) => {
                   e.stopPropagation();
+                  const shouldBlock = tabState.beforeClose?.(tabState);
+                  if (shouldBlock) {
+                    return;
+                  }
+
                   closeTabById(tabState.id);
                 }}
                 icon={<MdClose />}
