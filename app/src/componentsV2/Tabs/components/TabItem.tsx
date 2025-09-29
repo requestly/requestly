@@ -26,6 +26,14 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           closeTabById(props.store.getState().id);
         }, [closeTabById, props.store]),
 
+        setBeforeClose: useCallback(
+          (cb: TabState["beforeClose"]) => {
+            props.store.getState().setBeforeClose(cb);
+            incrementVersion();
+          },
+          [incrementVersion, props.store]
+        ),
+
         replace: useCallback(
           (tabSource: TabState["source"]) => {
             upsertTabSource(props.store.getState().id, tabSource);

@@ -10,11 +10,13 @@ export type TabState = {
   preview: boolean;
   title: string;
   icon: ReactNode;
+  beforeClose: null | ((tabstate: TabState) => boolean);
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
+  setBeforeClose: (value: TabState["beforeClose"]) => void;
 };
 
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
@@ -25,10 +27,12 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     preview,
     unsaved: false,
     icon: source.getIcon(),
+    beforeClose: null,
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
+    setBeforeClose: (value: TabState["beforeClose"]) => set({ beforeClose: value }),
   }));
 };
