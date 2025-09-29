@@ -10,8 +10,10 @@ const EditableContext = React.createContext<FormInstance<RQAPI.PathVariable> | n
 interface EditableRowProps {
   index: number;
 }
-
-export const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
+/*
+TODO: Create a base context and EditableRow component and use it in Editable table components
+*/
+export const PathVariableTableEditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
   const [form] = Form.useForm();
   return (
     <Form form={form} component={false}>
@@ -31,7 +33,7 @@ interface EditableCellProps {
   handleUpdateVariable: (record: RQAPI.PathVariable) => void;
 }
 
-export const EditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
+export const PathVariableTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   title,
   editable,
   children,

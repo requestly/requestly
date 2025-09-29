@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import type { TableProps } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
-import { EditableRow, EditableCell } from "./PathVariableTableRow";
+import { PathVariableTableEditableRow, PathVariableTableEditableCell } from "./PathVariableTableRow";
 import { RQAPI } from "features/apiClient/types";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 import { useScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
@@ -92,8 +92,8 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
         locale={{ emptyText: `No path variables found` }}
         components={{
           body: {
-            row: EditableRow,
-            cell: EditableCell,
+            row: PathVariableTableEditableRow,
+            cell: PathVariableTableEditableCell,
           },
         }}
         scroll={{ x: true }}
