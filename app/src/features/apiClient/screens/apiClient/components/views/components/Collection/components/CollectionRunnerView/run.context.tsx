@@ -29,16 +29,16 @@ export const RunViewContextProvider: React.FC<{
 }> = ({ runConfig, history, children }) => {
   const { collectionId } = useCollectionView();
   const records = useChildren(collectionId);
-  const requests = useMemo(() => records.filter(isApiRequest), [records]);
+  const requestIds = useMemo(() => records.filter(isApiRequest).map((r) => r.id), [records]);
 
   const runConfigStore = useMemo(() => {
-    const data = { id: runConfig.id, runOrder: runConfig.runOrder, unorderedRequests: requests };
+    const data = { id: runConfig.id, runOrder: runConfig.runOrder, unorderedRequestIds: requestIds };
     return createRunConfigStore(data);
-  }, [requests, runConfig.id, runConfig.runOrder]);
+  }, [requestIds, runConfig.id, runConfig.runOrder]);
 
   useEffect(() => {
-    runConfigStore.getState().patchOrderedRequests(requests);
-  }, [requests, runConfigStore]);
+    runConfigStore.getState().patchRunOrder(requestIds);
+  }, [requestIds, runConfigStore]);
 
   const value = useMemo(() => {
     return {
