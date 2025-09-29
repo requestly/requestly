@@ -102,6 +102,11 @@ class Runner {
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
+
+    const selectedRequestsCount = this.runContext.runConfigStore.getState().runOrder.filter((r) => r.isSelected).length;
+    if (selectedRequestsCount === 0) {
+      throw new NativeError("No requests were selected to run!");
+    }
   }
 
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord) {
