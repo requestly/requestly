@@ -212,7 +212,7 @@ class Runner {
     const { getConfig, runOrder } = runConfigStore.getState();
 
     const { iterations } = getConfig();
-    const requestsCount = runOrder.filter((r) => r.isSelected).length;
+    const requestsCount = runOrder.length;
 
     for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
