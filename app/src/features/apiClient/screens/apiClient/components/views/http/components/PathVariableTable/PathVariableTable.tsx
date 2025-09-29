@@ -32,7 +32,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
       {
         title: "key",
         dataIndex: "key",
-        width: "15%",
+        width: "25%",
         editable: false,
         onCell: (record: RQAPI.PathVariable) => ({
           record,
@@ -60,7 +60,7 @@ export const PathVariableTable: React.FC<PathVariableTableProps> = ({ recordId, 
       {
         title: "description",
         dataIndex: "description",
-        width: "50%",
+        width: "40%",
         editable: true,
         onCell: (record: RQAPI.PathVariable) => ({
           record,

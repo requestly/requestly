@@ -29,6 +29,7 @@
     font-size: var(--requestly-font-size-sm);
     width: 100%;
     box-shadow: none;
+    text-overflow: ellipsis;
 
     &:hover {
       border: 1px solid transparent;
