@@ -61,7 +61,10 @@ export const PageSourceRow: React.FC<Props> = React.memo(
 
     return !isEditMode && !openInCreateMode ? (
       <Row align="middle" justify="space-between" wrap={false} className="page-source-row">
-        <Col className="source-label" style={{ color: disabled ? "var(--text-gray)" : "var(--white)" }}>
+        <Col
+          className="source-label"
+          style={{ color: disabled ? "var(--text-gray)" : "var(--requestly-color-text-default)" }}
+        >
           {getPageSourceLabel(source)}
         </Col>
         <Col className="ml-auto">

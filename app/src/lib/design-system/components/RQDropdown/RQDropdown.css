@@ -2,7 +2,7 @@
   padding: 8px;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .ant-dropdown .ant-dropdown-menu,
@@ -10,7 +10,7 @@
   padding: 4px 0;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .ant-dropdown-menu .ant-dropdown-menu-item,

@@ -32,7 +32,7 @@
   display: inline-flex;
   padding: 8px 1.5rem;
   color: var(--white);
-  background-color: var(--primary);
+  background-color: var(--requestly-color-primary);
   border-radius: var(--border-radius-sm);
   margin-bottom: 21px;
 }

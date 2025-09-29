@@ -4,7 +4,7 @@
   user-select: none;
   padding: 7px 8px 6px 8px;
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
   border: 1px solid transparent;
   transition: border 0.3s;
   display: block;
@@ -43,5 +43,5 @@
 
 .editor-rule-options-danger-menu-item .ant-btn-text,
 .editor-rule-options-danger-menu-item:hover .ant-btn-text {
-  color: var(--danger);
+  color: var(--requestly-color-error);
 }

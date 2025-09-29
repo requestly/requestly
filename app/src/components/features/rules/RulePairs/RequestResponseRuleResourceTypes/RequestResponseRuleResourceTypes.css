@@ -1,12 +1,12 @@
 .download-desktop-app-link {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-flex;
   align-items: center;
 }
 
 .download-desktop-app-link:hover {
   opacity: 0.7;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .download-desktop-app-link svg {
@@ -25,7 +25,7 @@
 
 .resource-types-container .subtitle {
   padding: 1rem 1.25rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-md);
   font-weight: var(--requestly-font-weight-medium);
   border-top-left-radius: inherit;
@@ -37,7 +37,7 @@
   padding: 1.25rem;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .resource-types-radio-group .ant-radio-group {
@@ -45,7 +45,7 @@
   padding: 1.25rem;
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .resource-types-radio-group .ant-radio-group .ant-radio-wrapper {

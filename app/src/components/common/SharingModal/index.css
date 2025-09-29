@@ -12,7 +12,7 @@
   gap: 8px;
   font-weight: 500;
   font-size: 1rem;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   padding: 1rem;
   padding-bottom: 0;
 }
@@ -48,7 +48,7 @@
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab .ant-tabs-tab-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-weight: 500;
   font-size: var(--requestly-font-size-sm, 13px);
 }
@@ -180,7 +180,7 @@
 .sharing-modal-wrapper .ant-input {
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
   font-size: var(--requestly-font-size-sm, 13px);
 }
 .sharing-modal-empty-view {
@@ -203,7 +203,7 @@
   gap: 10px;
   padding: 12px;
   color: var(--text-gray);
-  background: var(--component-background);
+  background: var(--requestly-color-surface-1);
   font-size: var(--requestly-font-size-sm, 13px);
   border-top: 1px solid var(--border);
   opacity: 0.8;
