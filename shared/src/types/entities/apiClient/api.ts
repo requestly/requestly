@@ -272,6 +272,13 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
+  export type PathVariable = {
+    id: number;
+    key: string;
+    value: string;
+    description?: string;
+  };
+
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
@@ -313,6 +320,7 @@ export namespace RQAPI {
     url: string;
     queryParams: KeyValuePair[];
     method: RequestMethod;
+    pathVariables?: PathVariable[];
     headers: KeyValuePair[];
     body?: RequestBody;
     bodyContainer?: RequestBodyContainer;
