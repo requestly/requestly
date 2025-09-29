@@ -24,6 +24,12 @@ export const AppNotificationBanner: React.FC = () => {
   const checkBannerVisibility = useBannerVisibility(banner?.id);
 
   useEffect(() => {
+    if (banner && checkBannerVisibility) {
+      dispatch(globalActions.updateIsAppBannerVisible(true));
+    }
+  }, [banner, checkBannerVisibility, dispatch]);
+
+  useEffect(() => {
     if (banner && isBannerVisible) {
       trackAppNotificationBannerViewed(banner.id);
     }
