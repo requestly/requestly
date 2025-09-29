@@ -72,6 +72,7 @@ import { getUserProfilePath } from "utils/db/UserModel";
 import { AuthErrorCode } from "features/onboarding/screens/auth/types";
 import { trackEvent } from "modules/analytics";
 import { clientStorageService } from "services/clientStorageService";
+import { isSetappBuild } from "utils/AppUtils";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
@@ -472,6 +473,9 @@ export const googleSignInDesktopApp = (callback, MODE, source, oneTimeCode) => {
     if (oneTimeCode) {
       desktopSignInAuthUrl = new URL(desktopSignInAuthUrl);
       desktopSignInAuthUrl.searchParams.append("auth_mode", MODE);
+      if (isSetappBuild()) {
+        desktopSignInAuthUrl.searchParams.append("isAuthForSetappBuild", "true");
+      }
       desktopSignInAuthUrl = desktopSignInAuthUrl.toString();
     }
 
@@ -542,18 +546,39 @@ export async function authorizeWithGithub(callback, source) {
   const provider = new GithubAuthProvider();
   const auth = getAuth(firebaseApp);
   return signInWithPopup(auth, provider)
-    .then(async (result) => {
+    .then((result) => {
       let email = result?.user?.email || null;
       const credential = GithubAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
 
-      trackEvent("github_authorized");
+      trackEvent("github_authorized", {
+        source,
+        email,
+      });
+
+      trackLoginSuccessEvent({
+        auth_provider: AUTH_PROVIDERS.GITHUB,
+        email,
+        domain: email?.split("@")?.[1],
+        source,
+      });
 
       return { accessToken: token, email };
     })
     .catch((err) => {
       if (err.code === "auth/account-exists-with-different-credential") {
-        return { accessToken: err.customData._tokenResponse.oauthAccessToken, email: err.customData.email };
+        const email = err.customData.email;
+        trackEvent("github_authorized", {
+          source,
+          email,
+        });
+        trackLoginSuccessEvent({
+          auth_provider: AUTH_PROVIDERS.GITHUB,
+          email,
+          domain: email?.split("@")?.[1],
+          source,
+        });
+        return { accessToken: err.customData?._tokenResponse?.oauthAccessToken, email };
       }
 
       return {};

@@ -3,7 +3,7 @@
   border-spacing: 0 4px !important;
 }
 .rq-table-row {
-  background: var(--component-background);
+  background: var(--requestly-color-surface-1);
   font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
 }

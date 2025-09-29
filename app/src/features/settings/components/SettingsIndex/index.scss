@@ -33,13 +33,13 @@
 // Billing team
 .billing-teams-primary-card {
   border-radius: 4px;
-  border: 1px solid var(--surface-2);
-  background: var(--surface-0_5);
+  border: 1px solid var(--requestly-color-surface-2);
+  background: var(--requestly-color-surface-0);
   box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
 }
 
 .my-billing-team-title {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: 0.15px;
@@ -47,11 +47,11 @@
 
 .billing-table {
   & .ant-table-thead .ant-table-cell {
-    background: var(--surface-0_5);
+    background: var(--requestly-color-surface-0);
     padding: 12px 1rem;
     color: var(--neutrals-gray-300);
     font-weight: 400;
-    border-bottom: 1px solid var(--surface-1);
+    border-bottom: 1px solid var(--requestly-color-surface-1);
   }
 
   & th::before {
@@ -59,9 +59,9 @@
   }
 
   & tbody tr .ant-table-cell {
-    background: var(--surface-0_5);
+    background: var(--requestly-color-surface-0);
     padding: 12px 1rem;
-    border-bottom: 1px solid var(--surface-1);
+    border-bottom: 1px solid var(--requestly-color-surface-1);
   }
 
   .billing-team-member-avatar-wrapper {
@@ -115,7 +115,7 @@
 
   &-link {
     display: block;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
     padding: 6px 8px;
     margin-top: 4px;
     border-radius: 4px;
@@ -124,21 +124,21 @@
     transition: 0.25s background ease-in-out;
 
     &:hover {
-      background: var(--surface-1);
+      background: var(--requestly-color-surface-1);
       border-radius: 4px;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
 
   &-active-link {
-    background: var(--surface-2);
+    background: var(--requestly-color-surface-2);
     border-radius: 4px;
-    color: var(--white);
+    color: var(--requestly-color-text-default);
 
     &:hover {
-      background: var(--surface-2);
+      background: var(--requestly-color-surface-2);
       border-radius: 4px;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
     }
   }
 }

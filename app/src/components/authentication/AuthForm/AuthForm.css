@@ -1,6 +1,6 @@
 .new-auth-banner-wrapper .auth-banner {
   padding: 40px;
-  background: var(--surface-0_5);
+  background: var(--requestly-color-surface-0);
   height: 100%;
   border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
 }
@@ -19,7 +19,7 @@
   border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
 }
 .signup-modal-hero {
-  background: var(--body-background);
+  background: var(--requestly-color-surface-0);
   border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
 }
 .signup-modal-hero .signup-modal-hero-title {
@@ -51,7 +51,7 @@
 }
 
 .auth-wrapper {
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
   border-radius: var(--border-radius-md);
   border: 1px solid var(--border-dark);
   padding: 1rem;
@@ -61,7 +61,7 @@
 }
 .auth-modal-input.ant-input {
   box-shadow: var(--input-box-shadow);
-  background: var(--component-dark-background);
+  background: var(--requestly-color-surface-0);
   border: 0 !important;
   min-height: 38px;
 }

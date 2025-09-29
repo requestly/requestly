@@ -1,7 +1,7 @@
 .user-plan-detail-card {
   .user-plan-card-header {
     padding: 8px 1rem;
-    border-bottom: 1px solid var(--surface-2);
+    border-bottom: 1px solid var(--requestly-color-surface-2);
     margin: 0 !important;
     width: 100%;
     justify-content: space-between;
@@ -10,15 +10,29 @@
   .user-plan-card-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 1px solid var(--surface-2);
+    border-bottom: 1px solid var(--requestly-color-surface-2);
+
+    // Reuse existing grid classes from TeamPlanDetails
+    &.two-part-grid {
+      grid-template-columns: 1.5fr 1.5fr;
+
+      .user-plan-card-grid-item:nth-child(2) {
+        border-left: 1px solid var(--surface-2);
+        border-right: none;
+      }
+    }
+
+    &.three-part-grid {
+      grid-template-columns: 1.1fr 1.5fr 0.5fr;
+    }
 
     .user-plan-card-grid-item {
       padding: 1rem;
     }
 
     & .user-plan-card-grid-item:nth-child(2) {
-      border-left: 1px solid var(--surface-2);
-      border-right: 1px solid var(--surface-2);
+      border-left: 1px solid var(--requestly-color-surface-2);
+      border-right: 1px solid var(--requestly-color-surface-2);
     }
 
     .user-plan-card-grid-item-label {
@@ -30,12 +44,12 @@
     .user-plan-date {
       font-size: 20px;
       font-weight: 500;
-      color: var(--text-default);
+      color: var(--requestly-color-text-default);
     }
 
     .user-plan-card-plan-name {
       font-size: 20px;
-      color: var(--text-default);
+      color: var(--requestly-color-text-default);
       letter-spacing: 0.15px;
       line-height: 30px;
       display: flex;
@@ -89,8 +103,8 @@
   &:hover,
   &:focus,
   &:active {
-    background: var(--surface-2);
-    color: var(--white);
+    background: var(--requestly-color-surface-2);
+    color: var(--requestly-color-text-default);
   }
 }
 
