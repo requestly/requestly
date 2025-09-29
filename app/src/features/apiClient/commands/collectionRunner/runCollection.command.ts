@@ -84,7 +84,7 @@ class Runner {
   private getRequest(requestIndex: number): RQAPI.ApiRecord {
     const { runOrder } = this.runContext.runConfigStore.getState();
 
-    if (runOrder[requestIndex].isSelected) {
+    if (!runOrder[requestIndex].isSelected) {
       return;
     }
     const request = this.ctx.stores.records.getState().getData(runOrder[requestIndex].id) as RQAPI.ApiRecord;
