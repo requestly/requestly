@@ -166,6 +166,36 @@
         align-self: stretch;
         border-bottom: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
+        .execution-error-message {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3, 6px);
+          color: var(--requestly-color-error-text, #ff8080);
+
+          svg {
+            flex-shrink: 0;
+
+            --size: 12px;
+            width: var(--size);
+            height: var(--size);
+          }
+
+          .message {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            font-size: var(--requestly-font-size-sm, 12px);
+            font-style: normal;
+            font-weight: 400;
+            line-height: 18px; /* 150% */
+          }
+        }
+
         .no-test-found-message {
           font-weight: 400;
           color: var(--requestly-color-text-subtle);
