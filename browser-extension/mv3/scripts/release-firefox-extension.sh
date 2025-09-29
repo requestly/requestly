@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
+# Change to the parent directory (mv3) to run npm commands
+cd "$(dirname "$0")/.."
+
 set -e
 
 BROWSER=firefox ENV=prod npm run config
 BUILD_MODE='production' npm run build
 
 # shopt -s expand_aliases
-# source $HOME/Documents/dev/requestly/scripts/alias.sh
+# source "$(dirname "$0")/alias.sh"
 
 cd dist
 
