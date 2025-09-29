@@ -8,8 +8,8 @@ import "react-virtualized/styles.css";
 import "./reorderableList.scss";
 
 interface ReorderableListProps {
-  requests: RQAPI.RunConfig["orderedRequests"];
-  onOrderUpdate: (updatedList: RQAPI.RunConfig["orderedRequests"]) => void;
+  requests: RQAPI.OrderedRequests;
+  onOrderUpdate: (updatedList: RQAPI.RunConfig["runOrder"]) => void;
 }
 
 export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOrderUpdate }) => {
@@ -19,7 +19,7 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
         return;
       }
 
-      const result = [...requests];
+      const result: RQAPI.RunOrder = requests.map((r) => ({ id: r.record.id, isSelected: r.isSelected }));
       const [item] = result.splice(currentIndex, 1);
       result.splice(newIndex, 0, item);
       onOrderUpdate(result);

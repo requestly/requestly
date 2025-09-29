@@ -81,13 +81,13 @@ class Runner {
     }
   }
 
-  private getRequest(requestIndex: number) {
-    const { orderedRequests } = this.runContext.runConfigStore.getState();
-    const request = orderedRequests[requestIndex];
+  private getRequest(requestIndex: number): RQAPI.ApiRecord {
+    const { runOrder } = this.runContext.runConfigStore.getState();
 
-    if (!request.isSelected) {
+    if (!runOrder[requestIndex].isSelected) {
       return;
     }
+    const request = this.ctx.stores.records.getState().getData(runOrder[requestIndex].id) as RQAPI.ApiRecord;
 
     return request;
   }
@@ -99,16 +99,16 @@ class Runner {
     this.runContext.runResultStore.getState().setEndtime(null);
   }
 
-  private beforeRequestExecutionStart(iteration: number, request: RQAPI.OrderedRequest) {
+  private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord) {
     const startTime = Date.now();
-    const collection = this.ctx.stores.records.getState().getData(request.record.collectionId);
+    const collection = this.ctx.stores.records.getState().getData(request.collectionId);
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
       iteration,
-      recordId: request.record.id,
-      recordName: request.record.name,
+      recordId: request.id,
+      recordName: request.name,
       collectionName: collection?.name ?? "",
-      entry: parseExecutingRequestEntry(request.record.data),
+      entry: parseExecutingRequestEntry(request.data),
     };
 
     this.throwIfRunCancelled();
@@ -180,12 +180,11 @@ class Runner {
     });
   }
 
-  private async delay(iterationIndex: number, requestIndex: number): Promise<void> {
+  private async delay(iterationIndex: number, requestIndex: number, requestsCount: number): Promise<void> {
     const { runContext } = this;
     const { runConfigStore } = runContext;
-    const { getConfig, orderedRequests } = runConfigStore.getState();
+    const { getConfig } = runConfigStore.getState();
     const { delay, iterations } = getConfig();
-    const requestsCount = orderedRequests.length;
 
     const isLastIteration = iterationIndex === iterations - 1;
     const isLastRequestInIteration = requestIndex === requestsCount - 1;
@@ -210,9 +209,10 @@ class Runner {
   private async *iterate() {
     const { runContext } = this;
     const { runConfigStore } = runContext;
-    const { getConfig, orderedRequests } = runConfigStore.getState();
+    const { getConfig, runOrder } = runConfigStore.getState();
+
     const { iterations } = getConfig();
-    const requestsCount = orderedRequests.length;
+    const requestsCount = runOrder.length;
 
     for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
@@ -226,7 +226,7 @@ class Runner {
           iteration: iterationIndex + 1,
         };
 
-        await this.delay(iterationIndex, requestIndex);
+        await this.delay(iterationIndex, requestIndex, requestsCount);
       }
     }
   }
@@ -238,8 +238,8 @@ class Runner {
       for await (const { request, iteration } of this.iterate()) {
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
         const result = await this.executor.executeSingleRequest(
-          request.record.id,
-          request.record.data,
+          request.id,
+          request.data,
           this.runContext.runResultStore.getState().abortController
         );
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
