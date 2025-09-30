@@ -34,14 +34,15 @@ export const makeRequest = async (
   signal?: AbortSignal
 ): Promise<RQAPI.HttpResponse> => {
   return new Promise((resolve, reject) => {
+    const abortListener = () => {
+      signal?.removeEventListener("abort", abortListener);
+      reject(createAbortError(signal));
+    };
+
     if (signal) {
       if (signal.aborted) {
-        reject(createAbortError(signal));
+        return reject(createAbortError(signal));
       }
-      const abortListener = () => {
-        signal.removeEventListener("abort", abortListener);
-        reject(createAbortError(signal));
-      };
       signal.addEventListener("abort", abortListener);
     }
 
@@ -49,28 +50,37 @@ export const makeRequest = async (
     request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
-        if (!result) {
-          //Backward compatibility check
-          reject(new Error("Failed to make request. Please check if the URL is valid."));
-        } else if ("error" in result) {
-          reject(new Error(result.error));
-        } else {
-          resolve(result);
-        }
-      });
+      getAPIResponseViaExtension(request)
+        .then((result: ResponseOrError) => {
+          if (!result) {
+            //Backward compatibility check
+            reject(new Error("Failed to make request. Please check if the URL is valid."));
+          } else if ("error" in result) {
+            reject(new Error(result.error));
+          } else {
+            resolve(result);
+          }
+        })
+        .finally(() => {
+          signal?.removeEventListener("abort", abortListener);
+        });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
-        if (!result) {
-          //Backward compatibility check
-          reject(new Error("Failed to make request. Please check if the URL is valid."));
-        } else if ("error" in result) {
-          reject(new Error(result.error));
-        } else {
-          resolve(result);
-        }
-      });
+      getAPIResponseViaProxy(request)
+        .then((result: ResponseOrError) => {
+          if (!result) {
+            //Backward compatibility check
+            reject(new Error("Failed to make request. Please check if the URL is valid."));
+          } else if ("error" in result) {
+            reject(new Error(result.error));
+          } else {
+            resolve(result);
+          }
+        })
+        .finally(() => {
+          signal?.removeEventListener("abort", abortListener);
+        });
     } else {
+      signal?.removeEventListener("abort", abortListener);
       resolve(null);
     }
   });
