@@ -10,6 +10,8 @@ export enum CloseTopic {
 type CloseBlockerDetails = {
   title: string;
   description: string;
+  onCancel?: () => void;
+  onConfirm?: () => void;
 };
 
 export type CloseBlocker = { canClose: true } | { canClose: false; details: CloseBlockerDetails };
