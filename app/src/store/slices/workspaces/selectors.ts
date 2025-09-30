@@ -2,6 +2,7 @@ import { RootState } from "store/types";
 import { workspacesEntityAdapter } from "./slice";
 import { ReducerKeys } from "store/constants";
 import { Workspace } from "features/workspaces/types";
+import { captureException } from "@sentry/react";
 
 const sliceRootState = (state: RootState) => state[ReducerKeys.WORKSPACE];
 
@@ -35,7 +36,15 @@ export const getActiveWorkspace = (state: RootState) => {
     return dummyPersonalWorkspace;
   }
 
-  return getWorkspaceById(activeWorkspaceId)(state);
+  const activeWorkspace = getWorkspaceById(activeWorkspaceId)(state);
+
+  if (!activeWorkspace) {
+    captureException(new Error("Active workspace not found"), {
+      extra: { activeWorkspaceId, activeWorkspace },
+    });
+  }
+
+  return activeWorkspace ?? dummyPersonalWorkspace;
 };
 
 /**
