@@ -47,18 +47,15 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
               canClose: false,
               details,
             });
-
-            incrementVersion();
           },
-          [incrementVersion, props.store]
+          [props.store]
         ),
 
         removeCloseBlocker: useCallback(
           (topic: ActiveBlocker["topic"], id: ActiveBlocker["id"]) => {
             props.store.getState().removeCloseBlocker(topic, id);
-            incrementVersion();
           },
-          [incrementVersion, props.store]
+          [props.store]
         ),
 
         setTitle: useCallback(
