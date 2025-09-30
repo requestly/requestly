@@ -206,6 +206,11 @@ const AppModeInitializer = () => {
             );
             trackDesktopBGEvent("helper-server-hit");
           });
+          window.RQ.DESKTOP.SERVICES.IPC.registerEvent("check-unsaved-changes", () => {
+            // todo check for both rules and api client
+            const confirmed = window.confirm("All unsaved changes will be lost");
+            window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("unsaved-changes-confirm", confirmed);
+          });
         });
       }
     }
