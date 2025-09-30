@@ -7,7 +7,12 @@ export enum CloseTopic {
   COLLECTION_RUNNING = "collection_running",
 }
 
-export type Closable = { value: true } | { value: false; details: { title: string; description: string } };
+type CloseBlockerDetails = {
+  title: string;
+  description: string;
+};
+
+export type CloseBlocker = { canClose: true } | { canClose: false; details: CloseBlockerDetails };
 
 export type TabState = {
   /** Tab id */
@@ -17,15 +22,18 @@ export type TabState = {
   preview: boolean;
   title: string;
   icon: ReactNode;
-  closable: Map<CloseTopic, Closable>;
+  closeBlockers: Map<CloseTopic, CloseBlocker>;
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
-  isTabClosable: () => boolean;
-  addInClosable: (topic: CloseTopic, instance: Closable) => void;
-  removeFromClosable: (topic: CloseTopic) => void;
+
+  canCloseTab: () => boolean;
+  getActiveBlockers: () => { topic: CloseTopic; details: CloseBlockerDetails }[];
+  addCloseBlocker: (topic: CloseTopic, blocker: CloseBlocker) => void;
+  removeCloseBlocker: (topic: CloseTopic) => void;
+  clearAllCloseBlockers: () => void;
 };
 
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
@@ -36,38 +44,59 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     preview,
     unsaved: false,
     icon: source.getIcon(),
-    closable: new Map(),
+    closeBlockers: new Map(),
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
-    isTabClosable: () => {
-      const { closable } = get();
-      for (const [, instance] of closable) {
-        if (instance.value === false) {
+
+    canCloseTab: () => {
+      const { closeBlockers } = get();
+
+      for (const [, blocker] of closeBlockers) {
+        if (!blocker.canClose) {
           return false;
         }
       }
+
       return true;
     },
 
-    addInClosable: (topic, instance) => {
-      const { closable } = get();
-      const updatedClosableMap = new Map(closable);
-      updatedClosableMap.set(topic, instance);
-      set({ closable: updatedClosableMap });
+    getActiveBlockers: () => {
+      const { closeBlockers } = get();
+      const activeBlockers: { topic: CloseTopic; details: CloseBlockerDetails }[] = [];
+
+      for (const [topic, blocker] of closeBlockers) {
+        if (blocker.canClose === false) {
+          activeBlockers.push({ topic, details: blocker.details });
+        }
+      }
+
+      return activeBlockers;
     },
 
-    removeFromClosable: (topic) => {
-      const { closable } = get();
-      if (!closable.has(topic)) {
+    addCloseBlocker: (topic: CloseTopic, blocker: CloseBlocker) => {
+      const { closeBlockers } = get();
+      const updatedBlockers = new Map(closeBlockers);
+      updatedBlockers.set(topic, blocker);
+      set({ closeBlockers: updatedBlockers });
+    },
+
+    removeCloseBlocker: (topic: CloseTopic) => {
+      const { closeBlockers } = get();
+
+      if (!closeBlockers.has(topic)) {
         return;
       }
 
-      const updatedClosableMap = new Map(closable);
-      updatedClosableMap.delete(topic);
-      set({ closable: updatedClosableMap });
+      const updatedBlockers = new Map(closeBlockers);
+      updatedBlockers.delete(topic);
+      set({ closeBlockers: updatedBlockers });
+    },
+
+    clearAllCloseBlockers: () => {
+      set({ closeBlockers: new Map() });
     },
   }));
 };
