@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Skeleton, Table } from "antd";
 import "./historyTable.scss";
 import { useRunResultStore } from "../../../run.context";
-import { getAllTestSummary } from "features/apiClient/store/collectionRunResult/utils";
+import { getAllTestSummary, getRunMetrics } from "features/apiClient/store/collectionRunResult/utils";
 import { LiveRunResult, RunResult, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { EmptyState } from "../../EmptyState/EmptyState";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
@@ -46,7 +46,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
           record.runStatus === RunStatus.RUNNING ? (
             <LoadingSkeleton />
           ) : (
-            <span>{getFormattedTime(record.endTime - record.startTime)}</span>
+            <span>{getFormattedTime(getRunMetrics(record.iterations).totalDuration)}</span>
           ),
       },
       {
@@ -55,6 +55,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
           if (record.runStatus === RunStatus.RUNNING) {
             return <LoadingSkeleton />;
           }
+
           const testSummary = getAllTestSummary(record.iterations);
           return <span>{testSummary.totalTestsCounts}</span>;
         },

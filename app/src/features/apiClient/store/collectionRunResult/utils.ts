@@ -1,6 +1,5 @@
 import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { Iteration, RequestExecutionResult, RunResultState } from "./runResult.store";
-import { RQAPI } from "features/apiClient/types";
 
 export function getTestSummary(result: RequestExecutionResult) {
   let success: TestResult[] = [];
@@ -31,10 +30,8 @@ export function getRunMetrics(results: RunResultState["iterations"]) {
   let totalDuration = 0;
   let totalResponseTime = 0;
   allResults.forEach((executionResult) => {
-    if (executionResult.status.value === RQAPI.ExecutionStatus.SUCCESS && executionResult.testResults) {
-      totalDuration += executionResult.runDuration ?? 0;
-      totalResponseTime += executionResult.entry.responseTime ?? 0;
-    }
+    totalDuration += executionResult.runDuration ?? 0;
+    totalResponseTime += executionResult.entry.responseTime ?? 0;
   });
 
   return { totalDuration, avgResponseTime: allResults.length ? Math.round(totalResponseTime / allResults.length) : 0 };
