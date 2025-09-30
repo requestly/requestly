@@ -53,6 +53,8 @@ type TabActions = {
   getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
   consumeIgnorePath: () => boolean;
   setIgnorePath: (ignorePath: boolean) => void;
+
+  cleanupCloseBlockers: () => void;
 };
 
 export type TabServiceStore = TabServiceState & TabActions;
@@ -201,6 +203,15 @@ const createTabServiceStore = () => {
           const { tabs, closeTabById } = get();
           tabs.forEach((_, tabId) => {
             closeTabById(tabId, skipUnsavedPrompt);
+          });
+        },
+
+        cleanupCloseBlockers() {
+          const { tabs } = get();
+          const blockersToCleanUp = Array.from(tabs.values().flatMap((t) => t.getState().getActiveBlockers()));
+
+          blockersToCleanUp.forEach((blocker) => {
+            blocker.details.onConfirm?.();
           });
         },
 
