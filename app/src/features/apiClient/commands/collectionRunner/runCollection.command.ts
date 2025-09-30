@@ -77,7 +77,7 @@ class Runner {
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
     readonly executor: BatchRequestExecutor,
-    readonly tabState: GenericState
+    readonly genericState: GenericState
   ) {}
 
   private get abortController() {
@@ -113,7 +113,7 @@ class Runner {
     }
 
     const configId = this.runContext.runConfigStore.getState().getConfig().id;
-    this.tabState.addCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId, {
+    this.genericState.addCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId, {
       title: "Collection run is in progress, still want to close?",
       onConfirm: () => {
         cancelRun(this.ctx, { runContext: this.runContext });
@@ -208,7 +208,7 @@ class Runner {
 
   private cleanup() {
     const configId = this.runContext.runConfigStore.getState().getConfig().id;
-    this.tabState.removeCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId);
+    this.genericState.removeCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId);
   }
 
   private async delay(iterationIndex: number, requestIndex: number, requestsCount: number): Promise<void> {
@@ -311,9 +311,9 @@ export async function runCollection(
   params: {
     runContext: RunContext;
     executor: BatchRequestExecutor;
-    tabState: GenericState;
+    genericState: GenericState;
   }
 ) {
-  const runner = new Runner(ctx, params.runContext, params.executor, params.tabState);
+  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState);
   return runner.run();
 }
