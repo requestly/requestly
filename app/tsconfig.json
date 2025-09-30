@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "build",
     "target": "ESNext",
-    "lib": ["es2021", "dom", "dom.iterable"],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "module": "ESNext",
     "jsx": "react-jsx",
     "allowJs": true,

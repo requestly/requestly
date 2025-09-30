@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { TabState } from "../store/tabStore";
+import { ActiveBlocker, TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
@@ -40,6 +40,25 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         getIsActive: useCallback(() => {
           return activeTabId === props.store.getState().id;
         }, [activeTabId, props.store]),
+
+        addCloseBlocker: useCallback(
+          (topic: ActiveBlocker["topic"], id: ActiveBlocker["id"], details: ActiveBlocker["details"]) => {
+            props.store.getState().addCloseBlocker(topic, id, {
+              canClose: false,
+              details,
+            });
+            incrementVersion();
+          },
+          [incrementVersion, props.store]
+        ),
+
+        removeCloseBlocker: useCallback(
+          (topic: ActiveBlocker["topic"], id: ActiveBlocker["id"]) => {
+            props.store.getState().removeCloseBlocker(topic, id);
+            incrementVersion();
+          },
+          [incrementVersion, props.store]
+        ),
 
         setTitle: useCallback(
           (title: string) => {
