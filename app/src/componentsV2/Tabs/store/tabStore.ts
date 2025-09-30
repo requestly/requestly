@@ -10,10 +10,13 @@ export enum CloseTopic {
 
 type CloseBlockerDetails = {
   title: string;
-  description: string;
+  description?: string;
   onCancel?: () => void;
   onConfirm?: () => void;
 };
+
+type CloseBlockerId = string;
+export type ActiveBlocker = { id: CloseBlockerId; topic: CloseTopic; details: CloseBlockerDetails };
 
 export type CloseBlocker = { canClose: true } | { canClose: false; details: CloseBlockerDetails };
 
@@ -25,7 +28,7 @@ export type TabState = {
   preview: boolean;
   title: string;
   icon: ReactNode;
-  closeBlockers: Map<CloseTopic, Map<string, CloseBlocker>>;
+  closeBlockers: Map<CloseTopic, Map<CloseBlockerId, CloseBlocker>>;
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
@@ -33,9 +36,10 @@ export type TabState = {
   setIcon: (icon: ReactNode) => void;
 
   canCloseTab: () => boolean;
-  getActiveBlockers: () => { topic: CloseTopic; id: string; details: CloseBlockerDetails }[];
-  addCloseBlocker: (topic: CloseTopic, id: string, blocker: CloseBlocker) => void;
-  removeCloseBlocker: (topic: CloseTopic, id: string) => void;
+  getActiveBlockers: () => ActiveBlocker[];
+  getActiveBlocker: () => null | ActiveBlocker;
+  addCloseBlocker: (topic: CloseTopic, id: CloseBlockerId, blocker: CloseBlocker) => void;
+  removeCloseBlocker: (topic: CloseTopic, id: CloseBlockerId) => void;
   clearAllCloseBlockers: () => void;
 };
 
@@ -78,6 +82,11 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
       });
 
       return activeBlockers;
+    },
+
+    getActiveBlocker: () => {
+      const activeBlockers = get().getActiveBlockers();
+      return activeBlockers.length > 0 ? activeBlockers[0] : null;
     },
 
     addCloseBlocker: (topic: CloseTopic, id: string, blocker: CloseBlocker) => {

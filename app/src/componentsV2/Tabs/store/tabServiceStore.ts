@@ -238,12 +238,26 @@ const createTabServiceStore = () => {
           const sourceId = tabState.source.getSourceId();
 
           if (tabState.unsaved && !skipUnsavedPrompt) {
-            // TODO: update alert message for RBAC viewer role
-            const result = window.confirm("Discard changes? Changes you made will not be saved.");
+            const canClose = window.confirm("Discard changes? Changes you made will not be saved.");
 
-            if (!result) {
+            if (!canClose) {
               return;
             }
+          }
+
+          const activeBlocker = tabState.getActiveBlocker();
+          if (activeBlocker && !skipUnsavedPrompt) {
+            const canClose = window.confirm(
+              activeBlocker.details.title || "Discard changes? Changes you made will not be saved."
+            );
+
+            if (!canClose) {
+              activeBlocker.details.onCancel?.();
+              return;
+            }
+
+            activeBlocker.details.onConfirm?.();
+            tabState.removeCloseBlocker(activeBlocker.topic, activeBlocker.id);
           }
 
           tabsIndex.get(sourceName)?.delete(sourceId);

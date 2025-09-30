@@ -116,6 +116,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const runContext = useRunContext();
   const [runStatus] = useRunResultStore((s) => [s.runStatus]);
   const dispatch = useDispatch();
+  const tabState = useGenericState();
 
   const {
     runner: { runCollection, cancelRun },
@@ -136,7 +137,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
       return;
     }
 
-    const error = await runCollection({ runContext, executor });
+    const error = await runCollection({ runContext, executor, tabState });
     if (!error) {
       return;
     }
@@ -147,7 +148,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         reason: "Unable to run collection!",
       },
     });
-  }, [runCollection, runContext, executor, dispatch]);
+  }, [runCollection, runContext, executor, dispatch, tabState]);
 
   const handleCancelRunClick = useCallback(() => {
     cancelRun({ runContext });
