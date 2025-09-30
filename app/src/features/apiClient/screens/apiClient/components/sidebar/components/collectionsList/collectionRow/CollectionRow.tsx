@@ -38,6 +38,8 @@ import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRe
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
+import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -186,8 +188,49 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "2",
           label: (
-            <div>
-              <MdOutlineDelete style={{ marginRight: 8 }} />
+            <div className="collection-row-option">
+              <MdOutlineVideoLibrary />
+              Run tests
+            </div>
+          ),
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            openTab(
+              new CollectionViewTabSource({
+                id: record.id,
+                title: record.name || "New Collection",
+                context: { id: context.id },
+              })
+            );
+
+            setTimeout(() => dispatchCustomEvent(CollectionRowOptionsCustomEvent.OPEN_RUNNER_TAB), 0);
+          },
+        },
+        // {
+        //   key: "3",
+        //   label: (
+        //     <div className="collection-row-option">
+        //       <MdOutlineHistory />
+        //       View run history
+        //     </div>
+        //   ),
+        //   onClick: (itemInfo) => {
+        //     itemInfo.domEvent?.stopPropagation?.();
+        //     openTab(
+        //       new CollectionViewTabSource({
+        //         id: record.id,
+        //         title: record.name || "New Collection",
+        //         context: { id: context.id },
+        //       })
+        //     );
+        //       dispatchCustomEvent(CollectionRowOptionsCustomEvent.OPEN_RUNNER_TAB);
+        //       dispatchCustomEvent(CollectionRowOptionsCustomEvent.OPEN_RUN_HISTORY);
+        // },
+        {
+          key: "4",
+          label: (
+            <div className="collection-row-option">
+              <MdOutlineDelete />
               Delete
             </div>
           ),
@@ -201,7 +244,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [handleRecordsToBeDeleted, handleCollectionExport]
+    [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted]
   );
 
   const collapseChangeHandler = useCallback(
