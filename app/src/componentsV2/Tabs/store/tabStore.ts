@@ -61,12 +61,15 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     canCloseTab: () => {
       const { closeBlockers } = get();
 
-      return closeBlockers.keys().every((topic) => {
-        return closeBlockers
-          .get(topic)
-          .values()
-          .every((blocker) => blocker.canClose);
-      });
+      for (const [, blockers] of closeBlockers) {
+        for (const blocker of blockers.values()) {
+          if (!blocker.canClose) {
+            return false;
+          }
+        }
+      }
+
+      return true;
     },
 
     getActiveBlockers: () => {

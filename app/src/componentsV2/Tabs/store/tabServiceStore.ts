@@ -237,27 +237,20 @@ const createTabServiceStore = () => {
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
 
-          if (tabState.unsaved && !skipUnsavedPrompt) {
-            const canClose = window.confirm("Discard changes? Changes you made will not be saved.");
+          if (!skipUnsavedPrompt) {
+            const activeBlocker = tabState.getActiveBlocker();
+            if (activeBlocker || tabState.unsaved) {
+              const canClose = window.confirm(
+                activeBlocker?.details.title || "Discard changes? Changes you made will not be saved."
+              );
 
-            if (!canClose) {
-              return;
+              if (!canClose) {
+                activeBlocker?.details.onCancel?.();
+                return;
+              }
+
+              activeBlocker?.details.onConfirm?.();
             }
-          }
-
-          const activeBlocker = tabState.getActiveBlocker();
-          if (activeBlocker && !skipUnsavedPrompt) {
-            const canClose = window.confirm(
-              activeBlocker.details.title || "Discard changes? Changes you made will not be saved."
-            );
-
-            if (!canClose) {
-              activeBlocker.details.onCancel?.();
-              return;
-            }
-
-            activeBlocker.details.onConfirm?.();
-            tabState.removeCloseBlocker(activeBlocker.topic, activeBlocker.id);
           }
 
           tabsIndex.get(sourceName)?.delete(sourceId);
