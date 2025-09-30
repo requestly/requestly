@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { ReactNode } from "react";
+import { NativeError } from "errors/NativeError";
 
 export enum CloseTopic {
   UNSAVED_CHANGES = "unsaved_changes",
@@ -24,7 +25,7 @@ export type TabState = {
   preview: boolean;
   title: string;
   icon: ReactNode;
-  closeBlockers: Map<CloseTopic, CloseBlocker>;
+  closeBlockers: Map<CloseTopic, Map<string, CloseBlocker>>;
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
@@ -32,9 +33,9 @@ export type TabState = {
   setIcon: (icon: ReactNode) => void;
 
   canCloseTab: () => boolean;
-  getActiveBlockers: () => { topic: CloseTopic; details: CloseBlockerDetails }[];
-  addCloseBlocker: (topic: CloseTopic, blocker: CloseBlocker) => void;
-  removeCloseBlocker: (topic: CloseTopic) => void;
+  getActiveBlockers: () => { topic: CloseTopic; id: string; details: CloseBlockerDetails }[];
+  addCloseBlocker: (topic: CloseTopic, id: string, blocker: CloseBlocker) => void;
+  removeCloseBlocker: (topic: CloseTopic, id: string) => void;
   clearAllCloseBlockers: () => void;
 };
 
@@ -56,36 +57,50 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     canCloseTab: () => {
       const { closeBlockers } = get();
 
-      for (const [, blocker] of closeBlockers) {
-        if (!blocker.canClose) {
-          return false;
-        }
-      }
-
-      return true;
+      return closeBlockers.keys().every((topic) => {
+        return closeBlockers
+          .get(topic)
+          .values()
+          .every((blocker) => blocker.canClose);
+      });
     },
 
     getActiveBlockers: () => {
       const { closeBlockers } = get();
-      const activeBlockers: { topic: CloseTopic; details: CloseBlockerDetails }[] = [];
+      const activeBlockers: { topic: CloseTopic; id: string; details: CloseBlockerDetails }[] = [];
 
-      for (const [topic, blocker] of closeBlockers) {
-        if (blocker.canClose === false) {
-          activeBlockers.push({ topic, details: blocker.details });
-        }
-      }
+      closeBlockers.entries().forEach(([topic, blockerMap]) => {
+        blockerMap.forEach((blocker, blockerId) => {
+          if (blocker.canClose === false) {
+            activeBlockers.push({ topic, id: blockerId, details: blocker.details });
+          }
+        });
+      });
 
       return activeBlockers;
     },
 
-    addCloseBlocker: (topic: CloseTopic, blocker: CloseBlocker) => {
+    addCloseBlocker: (topic: CloseTopic, id: string, blocker: CloseBlocker) => {
       const { closeBlockers } = get();
       const updatedBlockers = new Map(closeBlockers);
-      updatedBlockers.set(topic, blocker);
+
+      if (!updatedBlockers.has(topic)) {
+        updatedBlockers.set(topic, new Map());
+      }
+
+      const topicBlockers = new Map(updatedBlockers.get(topic));
+
+      if (topicBlockers.has(id)) {
+        throw new NativeError("Tab close blocker with the same id already exists").addContext({ topic, id, blocker });
+      }
+
+      topicBlockers.set(id, blocker);
+      updatedBlockers.set(topic, topicBlockers);
+
       set({ closeBlockers: updatedBlockers });
     },
 
-    removeCloseBlocker: (topic: CloseTopic) => {
+    removeCloseBlocker: (topic: CloseTopic, id: string) => {
       const { closeBlockers } = get();
 
       if (!closeBlockers.has(topic)) {
@@ -93,7 +108,21 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
       }
 
       const updatedBlockers = new Map(closeBlockers);
-      updatedBlockers.delete(topic);
+      const topicBlockers = updatedBlockers.get(topic);
+
+      if (!topicBlockers || !topicBlockers.has(id)) {
+        return;
+      }
+
+      const updatedTopicBlockers = new Map(topicBlockers);
+      updatedTopicBlockers.delete(id);
+
+      if (updatedTopicBlockers.size === 0) {
+        updatedBlockers.delete(topic);
+      } else {
+        updatedBlockers.set(topic, updatedTopicBlockers);
+      }
+
       set({ closeBlockers: updatedBlockers });
     },
 
