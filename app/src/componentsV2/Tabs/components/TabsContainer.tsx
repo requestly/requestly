@@ -23,6 +23,7 @@ export const TabsContainer: React.FC = () => {
     incrementVersion,
     resetPreviewTab,
     consumeIgnorePath,
+    cleanupCloseBlockers,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.activeTabSource,
@@ -34,11 +35,12 @@ export const TabsContainer: React.FC = () => {
     state.incrementVersion,
     state.resetPreviewTab,
     state.consumeIgnorePath,
+    state.cleanupCloseBlockers,
   ]);
 
   const { setUrl } = useSetUrl();
 
-  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved);
+  const hasUnsavedChanges = tabs.values().some((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
@@ -49,8 +51,16 @@ export const TabsContainer: React.FC = () => {
     }
 
     if (shouldBlock) {
-      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      const blockedTab = tabs.values().find((t) => t.getState().getActiveBlocker());
+      const blocker = blockedTab?.getState().getActiveBlocker();
+      const shouldDiscardChanges = window.confirm(
+        blocker?.details?.title || "Discard changes? Changes you made will not be saved."
+      );
+
       const blockNavigation = !shouldDiscardChanges;
+      if (!blockNavigation) {
+        cleanupCloseBlockers();
+      }
       return blockNavigation;
     }
 

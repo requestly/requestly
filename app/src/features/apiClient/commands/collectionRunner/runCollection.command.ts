@@ -17,6 +17,9 @@ import {
   trackCollectionRunStarted,
   trackCollectionRunStopped,
 } from "modules/analytics/events/features/apiClient";
+import { GenericState } from "hooks/useGenericState";
+import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
+import { cancelRun } from "./cancelRun.command";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -73,7 +76,8 @@ class Runner {
   constructor(
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
-    readonly executor: BatchRequestExecutor
+    readonly executor: BatchRequestExecutor,
+    readonly genericState: GenericState
   ) {}
 
   private get abortController() {
@@ -107,6 +111,14 @@ class Runner {
     if (selectedRequestsCount === 0) {
       throw new NativeError("No requests were selected to run!");
     }
+
+    const configId = this.runContext.runConfigStore.getState().getConfig().id;
+    this.genericState.addCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId, {
+      title: "Collection run is in progress, still want to close?",
+      onConfirm: () => {
+        cancelRun(this.ctx, { runContext: this.runContext });
+      },
+    });
   }
 
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord) {
@@ -192,6 +204,11 @@ class Runner {
       className: "collection-runner-notification",
       duration: 3,
     });
+  }
+
+  private cleanup() {
+    const configId = this.runContext.runConfigStore.getState().getConfig().id;
+    this.genericState.removeCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId);
   }
 
   private async delay(iterationIndex: number, requestIndex: number, requestsCount: number): Promise<void> {
@@ -283,6 +300,8 @@ class Runner {
       }
       this.onError(e);
       return e;
+    } finally {
+      this.cleanup();
     }
   }
 }
@@ -292,8 +311,9 @@ export async function runCollection(
   params: {
     runContext: RunContext;
     executor: BatchRequestExecutor;
+    genericState: GenericState;
   }
 ) {
-  const runner = new Runner(ctx, params.runContext, params.executor);
+  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState);
   return runner.run();
 }
