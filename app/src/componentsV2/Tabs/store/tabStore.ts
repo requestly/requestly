@@ -2,7 +2,12 @@ import { create } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { ReactNode } from "react";
 
-type IsTabClosable = { value: true } | { value: false; details: { title: string; description: string } };
+export enum CloseTopic {
+  UNSAVED_CHANGES = "unsaved_changes",
+  COLLECTION_RUNNING = "collection_running",
+}
+
+export type Closable = { value: true } | { value: false; details: { title: string; description: string } };
 
 export type TabState = {
   /** Tab id */
@@ -12,14 +17,15 @@ export type TabState = {
   preview: boolean;
   title: string;
   icon: ReactNode;
-  isClosable: Set<IsTabClosable>;
+  closable: Map<CloseTopic, Closable>;
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
-  addIsClosable: (instance: IsTabClosable) => void;
-  removeIsClosable: (instance: IsTabClosable) => void;
+  isTabClosable: () => boolean;
+  addInClosable: (topic: CloseTopic, instance: Closable) => void;
+  removeFromClosable: (topic: CloseTopic) => void;
 };
 
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
@@ -30,27 +36,38 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     preview,
     unsaved: false,
     icon: source.getIcon(),
-    isClosable: new Set(),
+    closable: new Map(),
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
-    addIsClosable: (instance) => {
-      set((s) => {
-        s.isClosable.add(instance);
-        return { isClosable: new Set(s.isClosable) };
-      });
+    isTabClosable: () => {
+      const { closable } = get();
+      for (const [, instance] of closable) {
+        if (instance.value === false) {
+          return false;
+        }
+      }
+      return true;
     },
 
-    removeIsClosable: (instance) => {
-      const { isClosable } = get();
-      if (!isClosable.has(instance)) {
+    addInClosable: (topic, instance) => {
+      const { closable } = get();
+      const updatedClosableMap = new Map(closable);
+      updatedClosableMap.set(topic, instance);
+      set({ closable: updatedClosableMap });
+    },
+
+    removeFromClosable: (topic) => {
+      const { closable } = get();
+      if (!closable.has(topic)) {
         return;
       }
 
-      isClosable.delete(instance);
-      set({ isClosable: new Set(isClosable) });
+      const updatedClosableMap = new Map(closable);
+      updatedClosableMap.delete(topic);
+      set({ closable: updatedClosableMap });
     },
   }));
 };
