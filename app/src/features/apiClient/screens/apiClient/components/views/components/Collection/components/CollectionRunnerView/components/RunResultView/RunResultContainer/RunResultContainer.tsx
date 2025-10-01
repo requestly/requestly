@@ -57,14 +57,14 @@ const RunningRequestPlaceholder: React.FC<{
   return (
     <div className="test-details-container">
       <div className="request-details">
-        {runningRequest.entry.type === RQAPI.ApiEntryType.HTTP ? (
+        {runningRequest.entry.type === RQAPI.ApiEntryType.GRAPHQL ? (
           <>
-            <HttpMethodIcon method={runningRequest.entry.method} />
+            <GraphQlIcon />
             <span className="request-name">{runningRequest.recordName}</span> {"..."}
           </>
         ) : (
           <>
-            <GraphQlIcon />
+            <HttpMethodIcon method={runningRequest.entry.method} />
             <span className="request-name">{runningRequest.recordName}</span> {"..."}
           </>
         )}
@@ -138,10 +138,10 @@ const TestDetails: React.FC<{
     <div className="test-details-container">
       <div className="request-details">
         <span className="icon">
-          {requestExecutionResult.entry.type === RQAPI.ApiEntryType.HTTP ? (
-            <HttpMethodIcon method={requestExecutionResult.entry.method} />
-          ) : (
+          {requestExecutionResult.entry.type === RQAPI.ApiEntryType.GRAPHQL ? (
             <GraphQlIcon />
+          ) : (
+            <HttpMethodIcon method={requestExecutionResult.entry.method} />
           )}
         </span>
         {requestNameDetails}
