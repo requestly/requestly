@@ -103,7 +103,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     switch (record.data.type) {
       case RQAPI.ApiEntryType.HTTP:
         return {
-          name: record.name || "Untitled Request",
+          name: record.name || "Untitled request",
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -120,7 +120,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         };
       case RQAPI.ApiEntryType.GRAPHQL:
         return {
-          name: record.name || "Untitled Request",
+          name: record.name || "Untitled request",
           request: {
             type: record.data.type,
             url: record.data.request.url,
