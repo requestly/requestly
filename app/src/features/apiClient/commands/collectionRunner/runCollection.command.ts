@@ -107,6 +107,15 @@ class Runner {
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
 
+    const runConfig = this.runContext.runConfigStore.getState().getConfig();
+    const collectionId = this.runContext.collectionId;
+    trackCollectionRunStarted({
+      collection_id: collectionId,
+      iteration_count: runConfig.iterations,
+      delay: runConfig.delay,
+      request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
+    });
+
     const selectedRequestsCount = this.runContext.runConfigStore.getState().runOrder.filter((r) => r.isSelected).length;
     if (selectedRequestsCount === 0) {
       throw new NativeError("No requests were selected to run!");
@@ -121,8 +130,7 @@ class Runner {
     });
   }
 
-  private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord) {
-    const startTime = Date.now();
+  private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
     const collection = this.ctx.stores.records.getState().getData(request.collectionId);
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
@@ -156,13 +164,16 @@ class Runner {
     this.runContext.runResultStore.getState().addResult(executionResult);
   }
 
-  private async afterComplete(collectionId: RQAPI.ApiClientRecord["collectionId"]) {
+  private async afterComplete() {
+    const collectionId = this.runContext.collectionId;
+
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.COMPLETED);
     this.runContext.runResultStore.getState().setEndtime(Date.now());
 
     const runResult = this.runContext.runResultStore.getState().getRunSummary() as RunResult;
     this.runContext.runResultStore.getState().addToHistory(runResult);
+
     try {
       await saveRunResult(this.ctx, {
         collectionId,
@@ -204,6 +215,16 @@ class Runner {
       className: "collection-runner-notification",
       duration: 3,
     });
+
+    const runConfig = this.runContext.runConfigStore.getState().getConfig();
+    const collectionId = this.runContext.collectionId;
+
+    trackCollectionRunStopped({
+      collection_id: collectionId,
+      iteration_count: runConfig.iterations,
+      delay: runConfig.delay,
+      request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
+    });
   }
 
   private cleanup() {
@@ -211,30 +232,35 @@ class Runner {
     this.genericState.removeCloseBlocker(CloseTopic.COLLECTION_RUNNING, configId);
   }
 
-  private async delay(iterationIndex: number, requestIndex: number, requestsCount: number): Promise<void> {
+  private async delay(iterationIndex: number, executingRequestIndex: number): Promise<void> {
     const { runContext } = this;
     const { runConfigStore } = runContext;
     const { getConfig } = runConfigStore.getState();
-    const { delay, iterations } = getConfig();
+    const { delay } = getConfig();
 
-    const isLastIteration = iterationIndex === iterations - 1;
-    const isLastRequestInIteration = requestIndex === requestsCount - 1;
-    const hasNextRequest = !isLastIteration || !isLastRequestInIteration;
+    const isFirstIteration = iterationIndex === 0;
+    const isFirstExecutingRequestInIteration = executingRequestIndex === 0;
 
-    if (hasNextRequest && delay > 0) {
-      return new Promise((resolve) => {
-        const timeout = setTimeout(() => {
-          resolve();
-        }, delay);
-
-        const abortHandler = () => {
-          clearTimeout(timeout);
-          resolve();
-        };
-
-        this.abortController.signal.addEventListener("abort", abortHandler, { once: true });
-      });
+    if (isFirstIteration && isFirstExecutingRequestInIteration) {
+      return;
     }
+
+    if (delay <= 0) {
+      return;
+    }
+
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        resolve();
+      }, delay);
+
+      const abortHandler = () => {
+        clearTimeout(timeout);
+        resolve();
+      };
+
+      this.abortController.signal.addEventListener("abort", abortHandler, { once: true });
+    });
   }
 
   private async *iterate() {
@@ -246,56 +272,47 @@ class Runner {
     const requestsCount = runOrder.length;
 
     for (let iterationIndex = 0; iterationIndex < iterations; iterationIndex++) {
+      let executingRequestIndex = 0; // Track index among executing requests only
+
       for (let requestIndex = 0; requestIndex < requestsCount; requestIndex++) {
         const request = this.getRequest(requestIndex);
         if (!request) {
           continue;
         }
 
+        const startTime = Date.now();
+        await this.delay(iterationIndex, executingRequestIndex);
+
         yield {
           request,
           iteration: iterationIndex + 1,
+          startTime,
         };
 
-        await this.delay(iterationIndex, requestIndex, requestsCount);
+        executingRequestIndex++; // Increment only for executing requests
       }
     }
   }
 
   async run() {
-    const runConfig = this.runContext.runConfigStore.getState().getConfig();
-    const collectionId = this.runContext.collectionId;
     try {
       this.beforeStart();
 
-      trackCollectionRunStarted({
-        collection_id: collectionId,
-        iteration_count: runConfig.iterations,
-        delay: runConfig.delay,
-        request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
-      });
-
-      for await (const { request, iteration } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request);
+      for await (const { request, iteration, startTime } of this.iterate()) {
+        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           request.id,
           request.data,
           this.runContext.runResultStore.getState().abortController
         );
+
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
 
-      await this.afterComplete(collectionId);
+      await this.afterComplete();
     } catch (e) {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
-
-        trackCollectionRunStopped({
-          collection_id: collectionId,
-          iteration_count: runConfig.iterations,
-          delay: runConfig.delay,
-          request_count: runConfig.runOrder.filter((r) => r.isSelected).length,
-        });
         return;
       }
       this.onError(e);
