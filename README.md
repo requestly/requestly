@@ -3,7 +3,7 @@
 Join Requestly community on Discord: [Link](https://rqst.ly/join-community)
 
 
-## Requestly - API Client with HTTP Interceptor, Modfications, Testing & Mocking.
+## Requestly - API Client with HTTP Interceptor, Modifications, Testing & Mocking.
 
 Requestly is a powerful combination of a local API Client (like Postman) & HTTP Interceptor (like Charles Proxy) with API Testing and Mocking. Requestly can be used directly in the browser as a Chrome Extension or installed as a desktop application.
 
@@ -104,7 +104,7 @@ Requestly offers a complete API Mocking solution. Using Requestly, you can
 
 *   [Create Local API Mocks](https://docs.requestly.com/general/api-mocking/api-mocking): Intercept the API Requests and return the new response
 *   [Static & Dynamic Response Overrides](https://docs.requestly.com/general/http-rules/rule-types/modify-response-body): Override the API response received from server dynamically using simple JS
-*   [GraphQL Support](https://docs.requestly.com/general/http-rules/advanced-usage/graphql-modify-request-response): Override graphQL APIs by targeting on query, operationName
+*   [GraphQL Support](https://docs.requestly.com/general/http-rules/advanced-usage/graphql-modify-request-response): Override GraphQL APIs by targeting on query, operationName
 *   [Create Cloud-based API Mocks](https://docs.requestly.com/general/api-mocking/create-cloud-based-mocks): Create cloud-based API Mocks and get new endpoints for the mocks
 *   [Bulk API Mocks](https://docs.requestly.com/general/sessions/record-api-sessions#bulk-mocking): Record API traffic & Serve the Mocks from the recorded Session
 *   Mock APIs in e2e testing: Use Requestly in your e2e Cypress/Playwright/Selenium and mock the APIs in CI pipeline
