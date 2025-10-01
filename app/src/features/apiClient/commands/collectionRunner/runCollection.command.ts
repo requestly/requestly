@@ -229,6 +229,7 @@ class Runner {
 
         const abortHandler = () => {
           clearTimeout(timeout);
+          this.abortController.signal.removeEventListener('abort', abortHandler);
           resolve();
         };
 
