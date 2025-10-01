@@ -40,7 +40,7 @@ export const TabsContainer: React.FC = () => {
 
   const { setUrl } = useSetUrl();
 
-  const hasUnsavedChanges = tabs.values().some((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
+  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
@@ -51,7 +51,7 @@ export const TabsContainer: React.FC = () => {
     }
 
     if (shouldBlock) {
-      const blockedTab = tabs.values().find((t) => t.getState().getActiveBlocker());
+      const blockedTab = Array.from(tabs.values()).find((t) => t.getState().getActiveBlocker());
       const blocker = blockedTab?.getState().getActiveBlocker();
       const shouldDiscardChanges = window.confirm(
         blocker?.details?.title || "Discard changes? Changes you made will not be saved."

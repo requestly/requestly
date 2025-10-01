@@ -76,7 +76,7 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
       const { closeBlockers } = get();
       const activeBlockers: { topic: CloseTopic; id: string; details: CloseBlockerDetails }[] = [];
 
-      closeBlockers.entries().forEach(([topic, blockerMap]) => {
+      Array.from(closeBlockers.entries()).forEach(([topic, blockerMap]) => {
         blockerMap.forEach((blocker, blockerId) => {
           if (blocker.canClose === false) {
             activeBlockers.push({ topic, id: blockerId, details: blocker.details });
