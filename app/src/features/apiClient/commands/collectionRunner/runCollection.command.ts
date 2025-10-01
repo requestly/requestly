@@ -102,6 +102,7 @@ class Runner {
   }
 
   private beforeStart() {
+    this.genericState.setPreview(false);
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
