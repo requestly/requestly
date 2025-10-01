@@ -18,6 +18,10 @@ export class HttpRequestPreparationService {
   private renderPathVariables(url: string, pathVariables: RQAPI.PathVariable[]): string {
     const variableValues: Record<RQAPI.PathVariable["key"], RQAPI.PathVariable["value"]> = {};
 
+    if (!pathVariables || pathVariables.length === 0) {
+      return url;
+    }
+
     pathVariables.forEach((variable) => {
       variableValues[variable.key] = variable.value;
     });
