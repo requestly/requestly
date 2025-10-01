@@ -24,14 +24,14 @@ import { cancelRun } from "./cancelRun.command";
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
     ? {
-        type: entry.type,
+        type: RQAPI.ApiEntryType.HTTP,
         method: entry.request.method,
         responseTime: entry.response?.time ?? null,
         statusCode: entry.response?.status ?? null,
         statusText: entry.response?.statusText ?? null,
       }
     : {
-        type: entry.type,
+        type: RQAPI.ApiEntryType.GRAPHQL,
         responseTime: entry.response?.time ?? null,
         statusCode: entry.response?.status ?? null,
         statusText: entry.response?.statusText ?? null,
