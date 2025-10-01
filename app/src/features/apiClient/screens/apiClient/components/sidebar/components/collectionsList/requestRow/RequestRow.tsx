@@ -28,6 +28,7 @@ import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -59,13 +60,12 @@ export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
 export const GraphQlIcon = () => <GrGraphQl className="graphql-request-icon" />;
 
 export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
-  switch (record.data.type) {
-    case RQAPI.ApiEntryType.HTTP:
-      return <HttpMethodIcon method={record.data.request?.method} />;
-    case RQAPI.ApiEntryType.GRAPHQL:
-      return <GraphQlIcon />;
-    default:
-      return null;
+  if (isHttpApiRecord(record)) {
+    return <HttpMethodIcon method={record.data.request?.method} />;
+  } else if (isGraphQLApiRecord(record)) {
+    return <GraphQlIcon />;
+  } else {
+    return null;
   }
 };
 

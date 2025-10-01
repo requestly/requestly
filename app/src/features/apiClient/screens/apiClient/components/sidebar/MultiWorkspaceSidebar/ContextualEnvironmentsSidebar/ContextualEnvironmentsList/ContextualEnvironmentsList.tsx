@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useContext } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import { ListEmptySearchView } from "features/apiClient/screens/apiClient/components/sidebar/components/listEmptySearchView/ListEmptySearchView";
 import { EnvironmentsListItem } from "./components/environmentsListItem/EnvironmentsListItem";
 import { RQAPI } from "features/apiClient/types";

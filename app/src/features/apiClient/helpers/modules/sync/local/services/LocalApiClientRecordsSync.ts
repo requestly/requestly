@@ -148,6 +148,25 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
             auth: record.data.auth,
           },
         };
+      default: {
+        const httpRecord = record as RQAPI.HttpApiRecord;
+        return {
+          name: record.name || "Untitled Request",
+          request: {
+            type: httpRecord.data.type,
+            url: httpRecord.data.request.url,
+            scripts: httpRecord.data.scripts,
+            method: httpRecord.data.request.method,
+            queryParams: httpRecord.data.request.queryParams,
+            headers: httpRecord.data.request.headers,
+            body: httpRecord.data.request?.body,
+            bodyContainer: httpRecord.data.request?.bodyContainer,
+            contentType: httpRecord.data.request?.contentType,
+            auth: httpRecord.data.auth,
+            pathVariables: httpRecord.data.request?.pathVariables,
+          },
+        };
+      }
     }
   }
 
