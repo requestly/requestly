@@ -717,7 +717,11 @@ export const getRequestTypeForAnalyticEvent = (
 };
 
 export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpApiRecord {
-  return record.data.type === RQAPI.ApiEntryType.HTTP;
+  if (record.data.type) {
+    return record.data.type === RQAPI.ApiEntryType.HTTP;
+  }
+  // fallback for older records where type field was not present
+  return "method" in record.data.request;
 }
 
 export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.GraphQLApiRecord {
