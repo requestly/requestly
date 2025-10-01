@@ -720,6 +720,7 @@ export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpAp
   if (record.data.type) {
     return record.data.type === RQAPI.ApiEntryType.HTTP;
   }
+
   // fallback for older records where type field was not present
   return "method" in record.data.request;
 }
@@ -733,7 +734,12 @@ export const isGraphQLApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.GraphQL
 };
 
 export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEntry => {
-  return entry.type === RQAPI.ApiEntryType.HTTP;
+  if (entry.type) {
+    return entry.type === RQAPI.ApiEntryType.HTTP;
+  }
+
+  // fallback for older records where type field was not present
+  return "method" in entry.request;
 };
 
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
