@@ -208,7 +208,7 @@ const createTabServiceStore = () => {
 
         cleanupCloseBlockers() {
           const { tabs } = get();
-          const blockersToCleanUp = Array.from(tabs.values().flatMap((t) => t.getState().getActiveBlockers()));
+          const blockersToCleanUp = Array.from(tabs.values()).flatMap((t) => t.getState().getActiveBlockers());
 
           blockersToCleanUp.forEach((blocker) => {
             blocker.details.onConfirm?.();
