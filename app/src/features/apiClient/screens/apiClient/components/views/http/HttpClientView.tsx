@@ -820,7 +820,7 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
-    const entry = record.data as RQAPI.HttpApiEntry;
+    const entry = record?.data as RQAPI.HttpApiEntry || props.apiEntryDetails.data;
     return (
       <ErrorBoundary>
         <PathVariablesProvider pathVariables={entry.request?.pathVariables}>
