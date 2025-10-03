@@ -23,7 +23,7 @@ import {
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { openApiImporter } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -32,6 +32,13 @@ interface Props {
   onImportClick: () => void;
   history: RQAPI.ApiEntry[];
   onClearHistory: () => void;
+}
+
+interface ImportModalConfig {
+  productName: string;
+  supportedFileTypes: string[];
+  importer: ApiClientImporterMethod<any>;
+  importerType: ApiClientImporterType;
 }
 
 export const ApiClientSidebarHeader: React.FC<Props> = ({
@@ -46,7 +53,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
-  const [commonImportModalConfig, setCommonImportModalConfig] = useState(null);
+  const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -112,6 +119,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
             productName: "OpenAPI Specifications",
             supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
             importer: openApiImporter,
+            importerType: ApiClientImporterType.OPENAPI,
           });
         },
       },
@@ -199,8 +207,8 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           productName={commonImportModalConfig.productName}
           supportedFileTypes={commonImportModalConfig.supportedFileTypes}
           importer={commonImportModalConfig.importer}
-          docsLink={commonImportModalConfig.docsLink}
-          isOpen={commonImportModalConfig}
+          isOpen={Boolean(commonImportModalConfig)}
+          importerType={commonImportModalConfig.importerType}
           onClose={() => setCommonImportModalConfig(null)}
         />
       )}

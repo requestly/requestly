@@ -143,12 +143,12 @@ export const batchUpsertApiRecords = async (
 
     records.forEach((record) => {
       const sanitizedRecord = sanitizeRecord(record);
-      const updatedRecord = {
+      const updatedRecord: RQAPI.ApiClientRecord = {
         ...sanitizedRecord,
-        ownerId: ownerId,
-        createdBy: uid,
+        ownerId,
+        createdBy: sanitizedRecord.createdBy ?? uid,
         updatedBy: uid,
-        createdTs: Timestamp.now().toMillis(),
+        createdTs: sanitizedRecord.createdTs ?? Timestamp.now().toMillis(),
         updatedTs: Timestamp.now().toMillis(),
       } as RQAPI.ApiClientRecord;
 
