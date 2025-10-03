@@ -101,9 +101,12 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             processedResults.environments.push(...result.value.data.environments);
           }
         });
+        setIsParseComplete(true);
+        if (processedResults.collections.length === 0 && processedResults.environments.length === 0) {
+          throw new Error("Selected Files don't contain any collections or environments");
+        }
         setCollectionsData(processedResults.collections);
         setEnvironmentsData(processedResults.environments);
-        setIsParseComplete(true);
         trackImportParsed(importerType, processedResults.collections.length, null);
       })
       .catch((error) => {
@@ -142,7 +145,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
       const traverse = (collection: RQAPI.CollectionRecord, parentCollectionId?: string) => {
         const newCollectionId = apiClientRecordsRepository.generateCollectionId(collection.name, parentCollectionId);
-
         const collectionToCreate = {
           ...collection,
           id: newCollectionId,
@@ -189,31 +191,25 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       successfulCollections: RQAPI.CollectionRecord[];
       failedCount: number;
     }> => {
-      const collectionPromises = flatCollections.map(async (collection) => {
+      const successfulCollections: RQAPI.CollectionRecord[] = [];
+      let failedCount = 0;
+
+      /* 
+      Iterating over collection sequentially because local sync if we create collections asyncronously,it may break if a sub-collection is created before its parent 
+      */
+      for (const collection of flatCollections) {
         try {
           const result = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
           if (result.success) {
             onSaveRecord(result.data);
-            return { success: true, collection };
+            successfulCollections.push(collection);
           } else {
-            return { success: false, collection };
+            failedCount++;
           }
         } catch (error) {
-          return { success: false, collection };
-        }
-      });
-
-      const results = await Promise.allSettled(collectionPromises);
-      const successfulCollections: RQAPI.CollectionRecord[] = [];
-      let failedCount = 0;
-
-      results.forEach((result) => {
-        if (result.status === "fulfilled" && result.value.success) {
-          successfulCollections.push(result.value.collection);
-        } else {
           failedCount++;
         }
-      });
+      }
 
       return { successfulCollections, failedCount };
     },
@@ -335,7 +331,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       }
 
       if (totalImported === 0) {
-        setImportError("Failed to import data");
+        setImportError("Failed to import collections and environments");
         return;
       }
 
@@ -351,7 +347,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         toast.error(`Successfully imported ${totalImported} items, but ${totalFailed} failed`);
       }
     } catch (e) {
-      setImportError("Failed to import data");
+      setImportError("Failed to import collections and environments");
       trackImportFailed(importerType, e.message);
     } finally {
       setIsLoading(false);
