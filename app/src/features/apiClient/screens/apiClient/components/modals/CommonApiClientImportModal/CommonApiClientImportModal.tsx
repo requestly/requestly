@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "antd";
 import { CommonApiClientImporter } from "../../CommonApiClientImporter/CommonApiClientImporter";
-import { ApiClientImporterMethod } from "../../../../../../../../../../alternative-importers/dist/importers/types";
+import { ApiClientImporterMethod } from "@requestly/alternative-importers";
 
 interface Props {
   isOpen: boolean;
