@@ -59,6 +59,7 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
   return (
     <ApiClientUrl
       url={queryParamsToURLString(queryParams, url)}
+      placeholder="Enter or paste HTTP URL"
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}
       onUrlChange={handleUrlChange}

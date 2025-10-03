@@ -49,6 +49,7 @@ const GraphQLClientUrl = ({
         currentEnvironmentVariables={currentEnvironmentVariables}
         onEnterPress={onEnterPress}
         onUrlChange={onUrlChange}
+        placeholder="Enter or paste GraphQL endpoint URL"
       />
       <div className="gql-url__actions">
         {!url.length ? (

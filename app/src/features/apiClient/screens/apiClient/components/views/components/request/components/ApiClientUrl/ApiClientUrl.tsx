@@ -5,12 +5,19 @@ import "./apiClientUrl.css";
 
 interface ApiClientUrlProps {
   url: string;
+  placeholder: string;
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string) => void;
 }
 
-export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+export const ApiClientUrl = ({
+  url,
+  currentEnvironmentVariables,
+  placeholder,
+  onEnterPress,
+  onUrlChange,
+}: ApiClientUrlProps) => {
   const handleUrlChange = useCallback(
     (value: string) => {
       onUrlChange(value);
@@ -21,7 +28,7 @@ export const ApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, o
   return (
     <SingleLineEditor
       className="api-request-url"
-      placeholder="Enter or paste GraphQL endpoint URL"
+      placeholder={placeholder}
       //value={entry.request.url}
       defaultValue={url}
       onChange={(value) => {
