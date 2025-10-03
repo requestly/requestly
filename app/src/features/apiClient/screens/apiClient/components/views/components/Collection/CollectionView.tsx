@@ -18,6 +18,7 @@ import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiC
 import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
 import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
 import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
@@ -31,6 +32,7 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
+  const isCollectionRunnerSupported = useFeatureIsOn("api_client_collection_runner_support");
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
@@ -115,8 +117,8 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         key: TAB_KEYS.RUNNER,
         children: <CollectionRunnerView collectionId={collection.id} />,
       },
-    ];
-  }, [collection, collectionId, updateCollectionAuthData]);
+    ].filter((tab) => (tab.key === TAB_KEYS.RUNNER ? isCollectionRunnerSupported : true));
+  }, [collection, collectionId, updateCollectionAuthData, isCollectionRunnerSupported]);
 
   useEffect(() => {
     const handler = () => {
