@@ -16,7 +16,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ message, disabled = fals
   const [isLoading, setIsLoading] = useState(false);
 
   const handleNewRecordClick = (params: { recordType: RQAPI.RecordType; entryType?: RQAPI.ApiEntryType }) => {
-    onNewRecordClick?.(params.recordType, params.entryType)
+    onNewRecordClick?.(params.recordType, params.entryType ?? RQAPI.ApiEntryType.HTTP)
       .catch((error) => {
         console.error("Error creating new API Client record", error);
       })
