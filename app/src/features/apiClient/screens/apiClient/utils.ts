@@ -164,6 +164,11 @@ export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request
 };
 
 export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = true) => {
+  // Add safety checks for entry and entry.request
+  if (!entry || !entry.request) {
+    return getEmptyHttpEntry(); // Return a default empty entry if input is invalid
+  }
+
   const sanitizedEntry: RQAPI.HttpApiEntry = {
     ...entry,
     request: {
