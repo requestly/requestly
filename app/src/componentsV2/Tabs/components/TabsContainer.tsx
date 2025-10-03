@@ -40,7 +40,22 @@ export const TabsContainer: React.FC = () => {
 
   const { setUrl } = useSetUrl();
 
-  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved || !tab.getState().canCloseTab());
+  const hasUnsavedChanges = Array.from(tabs.values()).some(
+    (tab) => tab.getState().unsaved || !tab.getState().canCloseTab()
+  );
+
+  useEffect(() => {
+    const unloadListener = (e: any) => {
+      e.preventDefault();
+      e.returnValue = "Are you sure?";
+    };
+
+    if (hasUnsavedChanges) {
+      window.addEventListener("beforeunload", unloadListener);
+    }
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, [hasUnsavedChanges]);
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
