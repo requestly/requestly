@@ -1,10 +1,10 @@
 import firebaseApp from "../../firebase";
-import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc, writeBatch } from "firebase/firestore";
 import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
-import { captureException } from "./utils";
+import { captureException, updateRecordMetaData } from "./utils";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -122,5 +122,45 @@ export const updateApiRecord = async (
     captureException(err);
     Logger.error("Error while updating api record", err);
     return { success: false, data: null };
+  }
+};
+
+export const batchUpsertApiRecords = async (
+  uid: string,
+  records: RQAPI.ApiClientRecord[],
+  teamId?: string
+): Promise<{ success: boolean; data: RQAPI.ApiClientRecord[] | null; message?: string }> => {
+  if (!uid || records.length === 0) {
+    return { success: false, data: null, message: "Invalid parameters" };
+  }
+
+  const db = getFirestore(firebaseApp);
+  const batch = writeBatch(db);
+  const ownerId = getOwnerId(uid, teamId);
+
+  try {
+    const updatedRecords: RQAPI.ApiClientRecord[] = [];
+
+    records.forEach((record) => {
+      const sanitizedRecord = sanitizeRecord(record);
+      const updatedRecord = updateRecordMetaData({
+        ...sanitizedRecord,
+        ownerId: ownerId,
+        createdBy: uid,
+        updatedBy: uid,
+      } as RQAPI.ApiClientRecord);
+
+      updatedRecords.push(updatedRecord);
+      const recordRef = doc(db, "apis", updatedRecord.id);
+      batch.set(recordRef, updatedRecord, { merge: true });
+    });
+
+    await batch.commit();
+    Logger.log(`Batch upserted ${records.length} API records`);
+    return { success: true, data: updatedRecords };
+  } catch (error) {
+    captureException(error);
+    Logger.error("Error while batch upserting API records", error);
+    return { success: false, data: null, message: error?.message };
   }
 };

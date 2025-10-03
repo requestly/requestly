@@ -21,6 +21,9 @@ import {
   ApiClientViewMode,
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
+import { openApiImporter } from "@requestly/alternative-importers";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -43,6 +46,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
+  const [commonImportModalConfig, setCommonImportModalConfig] = useState(null);
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -93,6 +97,22 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         onClick: () => {
           trackImportStarted(ApiClientImporterType.BRUNO);
           setIsBrunoImporterModalOpen(true);
+        },
+      },
+      {
+        key: "5",
+        label: (
+          <div className="new-btn-option">
+            <SiOpenapiinitiative /> OpenAPI Specfication
+          </div>
+        ),
+        onClick: () => {
+          trackImportStarted(ApiClientImporterType.OPENAPI);
+          setCommonImportModalConfig({
+            productName: "OpenAPI Specifications",
+            supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
+            importer: openApiImporter,
+          });
         },
       },
     ],
@@ -172,6 +192,17 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       )}
       {isBrunoImporterModalOpen && (
         <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
+      )}
+
+      {commonImportModalConfig && (
+        <CommonApiClientImportModal
+          productName={commonImportModalConfig.productName}
+          supportedFileTypes={commonImportModalConfig.supportedFileTypes}
+          importer={commonImportModalConfig.importer}
+          docsLink={commonImportModalConfig.docsLink}
+          isOpen={commonImportModalConfig}
+          onClose={() => setCommonImportModalConfig(null)}
+        />
       )}
     </>
   );
