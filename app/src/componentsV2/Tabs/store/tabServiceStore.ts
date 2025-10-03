@@ -53,6 +53,8 @@ type TabActions = {
   getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
   consumeIgnorePath: () => boolean;
   setIgnorePath: (ignorePath: boolean) => void;
+
+  cleanupCloseBlockers: () => void;
 };
 
 export type TabServiceStore = TabServiceState & TabActions;
@@ -204,6 +206,15 @@ const createTabServiceStore = () => {
           });
         },
 
+        cleanupCloseBlockers() {
+          const { tabs } = get();
+          const blockersToCleanUp = Array.from(tabs.values()).flatMap((t) => t.getState().getActiveBlockers());
+
+          blockersToCleanUp.forEach((blocker) => {
+            blocker.details.onConfirm?.();
+          });
+        },
+
         closeTabBySource(sourceId, sourceName, skipUnsavedPrompt) {
           const { closeTabById, getTabIdBySource } = get();
 
@@ -237,12 +248,19 @@ const createTabServiceStore = () => {
           const sourceName = tabState.source.getSourceName();
           const sourceId = tabState.source.getSourceId();
 
-          if (tabState.unsaved && !skipUnsavedPrompt) {
-            // TODO: update alert message for RBAC viewer role
-            const result = window.confirm("Discard changes? Changes you made will not be saved.");
+          if (!skipUnsavedPrompt) {
+            const activeBlocker = tabState.getActiveBlocker();
+            if (activeBlocker || tabState.unsaved) {
+              const canClose = window.confirm(
+                activeBlocker?.details.title || "Discard changes? Changes you made will not be saved."
+              );
 
-            if (!result) {
-              return;
+              if (!canClose) {
+                activeBlocker?.details.onCancel?.();
+                return;
+              }
+
+              activeBlocker?.details.onConfirm?.();
             }
           }
 

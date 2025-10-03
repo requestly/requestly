@@ -321,18 +321,17 @@ export namespace RQAPI {
     MISSING_FILE = "missing_file",
   }
 
-  export type RunOrder = ApiClientRecord["id"][];
+  export type OrderedRequest = { record: ApiRecord; isSelected: boolean };
+
+  export type OrderedRequests = OrderedRequest[];
+
+  export type RunOrder = { id: ApiRecord["id"]; isSelected: boolean }[];
 
   export type RunConfig = {
     id: string;
     runOrder: RunOrder;
     iterations: number;
     delay: number;
-
-    // TODO: add more as we go
-
-    createdTs: number;
-    updatedTs: number;
   };
 }
 
