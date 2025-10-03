@@ -63,7 +63,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   const handleResetImport = () => {
     setImportError(null);
     setIsParseComplete(false);
-    setCollectionsData(undefined);
+    setCollectionsData([]);
     setEnvironmentsData([]);
   };
 
@@ -124,7 +124,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         );
       }
       const importResults = await Promise.allSettled(importPromises);
-      console.log("importResults", importResults);
       return importResults;
     },
     [createEnvironment]
@@ -205,7 +204,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       });
 
       const results = await Promise.allSettled(collectionPromises);
-      console.log("results", results);
       const successfulCollections: RQAPI.CollectionRecord[] = [];
       let failedCount = 0;
 
@@ -356,7 +354,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       setImportError("Failed to import data");
       trackImportFailed(importerType, e.message);
     } finally {
-      console.log("finally");
       setIsLoading(false);
     }
   }, [
