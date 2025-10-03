@@ -4,11 +4,12 @@ import {
   getApiRecords,
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
+  batchUpsertApiRecords,
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
 } from "backend/apiClient";
 import { ApiClientCloudMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
-import { batchWrite, firebaseBatchWrite, generateDocumentId, getOwnerId } from "backend/utils";
+import { batchWrite, generateDocumentId, getOwnerId } from "backend/utils";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { omit } from "lodash";
 import { RQAPI } from "features/apiClient/types";
@@ -174,8 +175,14 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     }
   }
 
+  async batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]> {
+    const result = await batchUpsertApiRecords(this.meta.uid, records as RQAPI.ApiClientRecord[], this.meta.teamId);
+    return result.success ? (result.data as RQAPI.ApiRecord[]) : [];
+  }
+
   async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
-    return firebaseBatchWrite("apis", entities);
+    const result = await batchUpsertApiRecords(this.meta.uid, entities, this.meta.teamId);
+    return result.success ? result.data : [];
   }
 
   async moveAPIEntities(entities: RQAPI.ApiClientRecord[], newParentId: string) {
@@ -184,7 +191,8 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         ? { ...record, collectionId: newParentId, data: omit(record.data, "children") }
         : { ...record, collectionId: newParentId }
     );
-    return await firebaseBatchWrite("apis", updatedRequests);
+    const result = await batchUpsertApiRecords(this.meta.uid, updatedRequests, this.meta.teamId);
+    return result.success ? result.data : [];
   }
 
   async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {

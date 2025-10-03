@@ -72,6 +72,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     entities: Partial<RQAPI.ApiClientRecord>[],
     writeFunction: (entity: RQAPI.ApiClientRecord) => Promise<unknown>
   ): Promise<{ success: boolean; message?: string }>;
+  batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]>;
   duplicateApiEntities(entities: Partial<RQAPI.ApiClientRecord>[]): Promise<RQAPI.ApiClientRecord[]>;
   moveAPIEntities(entities: Partial<RQAPI.ApiClientRecord>[], newParentId: string): Promise<RQAPI.ApiClientRecord[]>;
   batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise;
