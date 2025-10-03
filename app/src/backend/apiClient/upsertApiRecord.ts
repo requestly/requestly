@@ -4,7 +4,7 @@ import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
 import lodash from "lodash";
 import { RQAPI } from "features/apiClient/types";
-import { captureException, updateRecordMetaData } from "./utils";
+import { captureException } from "./utils";
 
 export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
@@ -130,8 +130,8 @@ export const batchUpsertApiRecords = async (
   records: RQAPI.ApiClientRecord[],
   teamId?: string
 ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord[] | null; message?: string }> => {
-  if (!uid || records.length === 0) {
-    return { success: false, data: null, message: "Invalid parameters" };
+  if (!records.length) {
+    return { success: false, data: null, message: "No records found to add or update" };
   }
 
   const db = getFirestore(firebaseApp);
@@ -143,12 +143,14 @@ export const batchUpsertApiRecords = async (
 
     records.forEach((record) => {
       const sanitizedRecord = sanitizeRecord(record);
-      const updatedRecord = updateRecordMetaData({
+      const updatedRecord = {
         ...sanitizedRecord,
         ownerId: ownerId,
         createdBy: uid,
         updatedBy: uid,
-      } as RQAPI.ApiClientRecord);
+        createdTs: Timestamp.now().toMillis(),
+        updatedTs: Timestamp.now().toMillis(),
+      } as RQAPI.ApiClientRecord;
 
       updatedRecords.push(updatedRecord);
       const recordRef = doc(db, "apis", updatedRecord.id);

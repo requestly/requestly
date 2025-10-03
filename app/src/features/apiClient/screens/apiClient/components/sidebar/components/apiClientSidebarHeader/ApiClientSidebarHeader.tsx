@@ -4,7 +4,7 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
-import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
+import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
