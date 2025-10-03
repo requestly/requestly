@@ -5,10 +5,11 @@ import "./parsedEntityCollapse.scss";
 interface Props {
   title: string;
   icon: ReactNode;
-  items: any[];
+  count: number;
+  children: ReactNode;
 }
 
-export const ParsedEntityCollapse: React.FC<Props> = ({ title, icon, items }) => {
+export const ParsedEntityCollapse: React.FC<Props> = ({ title, icon, count, children }) => {
   return (
     <Collapse expandIconPosition="end" className="parsed-entity-collapse">
       <Collapse.Panel
@@ -16,16 +17,12 @@ export const ParsedEntityCollapse: React.FC<Props> = ({ title, icon, items }) =>
           <div className="parsed-entity-collapse__header">
             {icon}
             {title}
-            <Badge className="parsed-entity-collapse__badge" showZero count={items.length} />
+            <Badge className="parsed-entity-collapse__badge" showZero count={count} />
           </div>
         }
         key={title}
       >
-        <div className="parsed-entity-collapse__content">
-          {items.map((item) => (
-            <div key={item.id}>{item.name}</div>
-          ))}
-        </div>
+        <div className="parsed-entity-collapse__content">{children}</div>
       </Collapse.Panel>
     </Collapse>
   );

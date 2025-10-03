@@ -4,7 +4,7 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { RQAPI } from "@requestly/shared/types/entities/apiClient";
+import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 import { ApiClientImporterMethod, ApiClientImporterOutput } from "@requestly/alternative-importers";
 import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
@@ -14,6 +14,12 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import { ParsedEntityCollapse } from "./components/ParsedEntityCollapse/ParsedEntityCollapse";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
+import {
+  trackImportFailed,
+  trackImportParsed,
+  trackImportParseFailed,
+  trackImportSuccess,
+} from "modules/analytics/events/features/apiClient";
 import "./commonApiClientImporter.scss";
 
 export interface ImportFile {
@@ -96,9 +102,11 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         setCollectionsData(processedResults.collections);
         setEnvironmentsData(processedResults.environments);
         setIsParseComplete(true);
+        trackImportParsed(ApiClientImporterType.OPENAPI, processedResults.collections.length, null);
       })
       .catch((error) => {
         setImportError(error.message || "Could not process the selected files! Try again.");
+        trackImportParseFailed(ApiClientImporterType.OPENAPI, error.message);
       })
       .finally(() => {
         setIsDataProcessing(false);
@@ -114,6 +122,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         );
       }
       const importResults = await Promise.allSettled(importPromises);
+      console.log("importResults", importResults);
       return importResults;
     },
     [createEnvironment]
@@ -189,12 +198,12 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             return { success: false, collection };
           }
         } catch (error) {
-          console.error("Error creating collection:", error);
           return { success: false, collection };
         }
       });
 
       const results = await Promise.allSettled(collectionPromises);
+      console.log("results", results);
       const successfulCollections: RQAPI.CollectionRecord[] = [];
       let failedCount = 0;
 
@@ -236,7 +245,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
         return { successfulRequests: createdRequests, failedCount: 0 };
       } catch (error) {
-        console.error("Error creating requests in batch:", error);
         return { successfulRequests: [], failedCount: allRequests.length };
       }
     },
@@ -280,7 +288,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
           },
         };
       } catch (error) {
-        console.error("Error in optimized import process:", error);
         return {
           success: false,
           importedCount: 0,
@@ -324,8 +331,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         totalImported += collectionResult.importedCount;
         totalFailed += collectionResult.failedCount;
       } else {
-        setImportError("Failed to import collections");
-        return;
+        totalFailed += collectionsData.length;
       }
 
       if (totalImported === 0) {
@@ -334,13 +340,19 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       }
 
       if (totalFailed === 0) {
-        toast.success(`Successfully imported ${totalImported} items`);
+        toast.success(
+          `Successfully imported ${collectionsData.length} ${
+            collectionsData.length !== 1 ? "collections" : "collection"
+          } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
+        );
+        trackImportSuccess(ApiClientImporterType.OPENAPI, collectionsData.length, null);
         onImportSuccess();
       } else {
         toast.error(`Successfully imported ${totalImported} items, but ${totalFailed} failed`);
       }
     } catch (e) {
       setImportError("Failed to import data");
+      trackImportFailed(ApiClientImporterType.OPENAPI, e.message);
     } finally {
       console.log("finally");
       setIsLoading(false);
@@ -397,13 +409,21 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             <ParsedEntityCollapse
               title="Collections"
               icon={<CgStack className="check-outlined-icon" />}
-              items={collectionsData}
-            />
+              count={collectionsData.length}
+            >
+              {collectionsData.map((collection) => (
+                <div key={collection.id}>{collection.name}</div>
+              ))}
+            </ParsedEntityCollapse>
             <ParsedEntityCollapse
               title="Environments"
               icon={<MdHorizontalSplit className="check-outlined-icon" />}
-              items={environmentsData}
-            />
+              count={environmentsData.length}
+            >
+              {environmentsData.map((environment) => (
+                <div key={environment.id}>{environment.name}</div>
+              ))}
+            </ParsedEntityCollapse>
           </div>
           <Row justify="end" className="importer-actions-row">
             <RQButton type="primary" loading={isLoading} onClick={handleImportData}>
