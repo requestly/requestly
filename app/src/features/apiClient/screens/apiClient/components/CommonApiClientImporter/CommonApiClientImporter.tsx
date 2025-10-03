@@ -32,16 +32,18 @@ export interface CommonApiClientImporterProps {
   productName: string;
   supportedFileTypes: string[];
   importer: ApiClientImporterMethod<ImportFile>;
-  docsLink: string;
+  importerType: ApiClientImporterType;
   onImportSuccess: () => void;
+  docsLink?: string;
 }
 
 export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = ({
   productName,
   supportedFileTypes,
   importer,
-  docsLink,
+  importerType,
   onImportSuccess,
+  docsLink,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
@@ -102,11 +104,11 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         setCollectionsData(processedResults.collections);
         setEnvironmentsData(processedResults.environments);
         setIsParseComplete(true);
-        trackImportParsed(ApiClientImporterType.OPENAPI, processedResults.collections.length, null);
+        trackImportParsed(importerType, processedResults.collections.length, null);
       })
       .catch((error) => {
         setImportError(error.message || "Could not process the selected files! Try again.");
-        trackImportParseFailed(ApiClientImporterType.OPENAPI, error.message);
+        trackImportParseFailed(importerType, error.message);
       })
       .finally(() => {
         setIsDataProcessing(false);
@@ -345,19 +347,26 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             collectionsData.length !== 1 ? "collections" : "collection"
           } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
         );
-        trackImportSuccess(ApiClientImporterType.OPENAPI, collectionsData.length, null);
+        trackImportSuccess(importerType, collectionsData.length, null);
         onImportSuccess();
       } else {
         toast.error(`Successfully imported ${totalImported} items, but ${totalFailed} failed`);
       }
     } catch (e) {
       setImportError("Failed to import data");
-      trackImportFailed(ApiClientImporterType.OPENAPI, e.message);
+      trackImportFailed(importerType, e.message);
     } finally {
       console.log("finally");
       setIsLoading(false);
     }
-  }, [collectionsData, environmentsData, handleImportEnvironments, handleImportCollections, onImportSuccess]);
+  }, [
+    collectionsData,
+    environmentsData,
+    handleImportEnvironments,
+    handleImportCollections,
+    onImportSuccess,
+    importerType,
+  ]);
 
   const HeaderComponent: React.FC<{}> = () => {
     return (
@@ -369,6 +378,9 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   };
 
   const FooterComponent: React.FC<{}> = () => {
+    if (!docsLink) {
+      return null;
+    }
     return (
       <div className="common-importer-footer">
         To export your collections from {productName},{"  "}

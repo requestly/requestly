@@ -2,6 +2,7 @@ import React from "react";
 import { Modal } from "antd";
 import { CommonApiClientImporter } from "../../CommonApiClientImporter/CommonApiClientImporter";
 import { ApiClientImporterMethod } from "@requestly/alternative-importers";
+import { ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 
 interface Props {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface Props {
   productName: string;
   supportedFileTypes: string[];
   importer: ApiClientImporterMethod<any>;
+  importerType: ApiClientImporterType;
   docsLink?: string;
 }
 export const CommonApiClientImportModal: React.FC<Props> = ({
@@ -17,6 +19,7 @@ export const CommonApiClientImportModal: React.FC<Props> = ({
   productName,
   supportedFileTypes,
   importer,
+  importerType,
   docsLink,
 }) => {
   return (
@@ -27,6 +30,7 @@ export const CommonApiClientImportModal: React.FC<Props> = ({
         importer={importer}
         docsLink={docsLink}
         onImportSuccess={onClose}
+        importerType={importerType}
       />
     </Modal>
   );
