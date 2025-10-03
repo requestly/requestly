@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { notification, Result, Tabs } from "antd";
 import { RQAPI } from "features/apiClient/types";
 import { CollectionOverview } from "./components/CollectionOverview/CollectionOverview";
@@ -15,11 +15,16 @@ import { useCommand } from "features/apiClient/commands";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../ApiClientBreadCrumb/ApiClientBreadCrumb";
+import { CollectionRunnerView } from "./components/CollectionRunnerView/CollectionRunnerView";
+import { trackCollectionRunnerViewed } from "modules/analytics/events/features/apiClient";
+import { CollectionRowOptionsCustomEvent } from "../../../sidebar/components/collectionsList/collectionRow/utils";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const TAB_KEYS = {
   OVERVIEW: "overview",
   VARIABLES: "variables",
   AUTHORIZATION: "authorization",
+  RUNNER: "runner",
 };
 
 interface CollectionViewProps {
@@ -27,12 +32,14 @@ interface CollectionViewProps {
 }
 
 export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
+  const isCollectionRunnerSupported = useFeatureIsOn("api_client_collection_runner_support");
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
     api: { forceRefreshRecords: forceRefreshApiClientRecords },
   } = useCommand();
   const contextId = useContextId();
+  const [activeTabKey, setActiveTabKey] = useState(TAB_KEYS.OVERVIEW);
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
@@ -105,8 +112,24 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
           />
         ),
       },
-    ];
-  }, [collection, collectionId, updateCollectionAuthData]);
+      {
+        label: "Runner",
+        key: TAB_KEYS.RUNNER,
+        children: <CollectionRunnerView collectionId={collection.id} />,
+      },
+    ].filter((tab) => (tab.key === TAB_KEYS.RUNNER ? isCollectionRunnerSupported : true));
+  }, [collection, collectionId, updateCollectionAuthData, isCollectionRunnerSupported]);
+
+  useEffect(() => {
+    const handler = () => {
+      setActiveTabKey(TAB_KEYS.RUNNER);
+    };
+
+    window.addEventListener(CollectionRowOptionsCustomEvent.OPEN_RUNNER_TAB, handler);
+    return () => {
+      window.removeEventListener(CollectionRowOptionsCustomEvent.OPEN_RUNNER_TAB, handler);
+    };
+  }, []);
 
   const handleCollectionNameChange = useCallback(
     async (name: string) => {
@@ -163,7 +186,22 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
             />
           </div>
           <div className="collection-view-content">
-            <Tabs defaultActiveKey={TAB_KEYS.OVERVIEW} items={tabItems} animated={false} moreIcon={null} />
+            <Tabs
+              destroyInactiveTabPane={false}
+              activeKey={activeTabKey}
+              onChange={(key) => setActiveTabKey(key)}
+              items={tabItems}
+              animated={false}
+              moreIcon={null}
+              onTabClick={(key) => {
+                if (key === TAB_KEYS.RUNNER) {
+                  trackCollectionRunnerViewed({
+                    collection_id: collection.id,
+                    source: "collection_overview",
+                  });
+                }
+              }}
+            />
           </div>
         </>
       )}

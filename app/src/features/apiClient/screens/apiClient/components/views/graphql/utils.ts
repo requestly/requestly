@@ -10,6 +10,16 @@ export const graphQLEntryToHttpEntryAdapter = (entry: RQAPI.GraphQLApiEntry): RQ
   const httpRequest = graphQLRequestToHttpRequestAdapter(entry.request);
   const httpResponse = graphQLResponseToHttpResponseAdapter(entry.response);
 
+  const headersSet = new Set(httpRequest.headers.map((header) => header.key.toLowerCase()));
+  if (!headersSet.has("content-type")) {
+    httpRequest.headers.push({
+      key: "Content-Type",
+      value: "application/json",
+      id: headersSet.size + 1,
+      isEnabled: true,
+    });
+  }
+
   return {
     ...entry,
     request: httpRequest,

@@ -1,0 +1,55 @@
+import React, { useMemo, useState } from "react";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
+import { useRunResultStore } from "../../run.context";
+import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
+import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
+import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import "./runResultView.scss";
+import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
+import { useCollectionView } from "../../../../collectionView.context";
+import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
+
+export const RunResultView: React.FC = () => {
+  const [iterations, startTime, getRunSummary, runStatus] = useRunResultStore((s) => [
+    s.iterations,
+    s.startTime,
+    s.getRunSummary,
+    s.runStatus,
+  ]);
+
+  const testResults = useMemo(
+    () => getRunSummary(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- need `interations` for reactivity
+    [getRunSummary, iterations]
+  );
+
+  const { collectionId } = useCollectionView();
+
+  const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
+
+  return (
+    <div className="run-result-view-container">
+      <div className="run-result-view-header">
+        <span className="header">Result</span>
+        <RQButton
+          size="small"
+          type="transparent"
+          icon={<MdOutlineHistory />}
+          onClick={() => {
+            setIsHistoryDrawerOpen(true);
+            trackCollectionRunHistoryViewed({
+              collection_id: collectionId,
+            });
+          }}
+        >
+          History
+        </RQButton>
+      </div>
+
+      <RunResultContainer result={testResults} ranAt={startTime} />
+      {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}
+      <HistoryDrawer isHistoryDrawerOpen={isHistoryDrawerOpen} setIsHistoryDrawerOpen={setIsHistoryDrawerOpen} />
+    </div>
+  );
+};

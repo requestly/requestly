@@ -38,6 +38,20 @@ export function getApiClientCollectionVariablesStore(ctx: ApiClientFeatureContex
   return recordState.collectionVariables;
 }
 
+export function getOrderedApiClientRecords(
+  ctx: ApiClientFeatureContext,
+  runOrder: RQAPI.RunOrder
+): RQAPI.OrderedRequests {
+  const getApiRecord = ctx.stores.records.getState().getData;
+
+  return runOrder
+    .map((o) => {
+      const record = getApiRecord(o.id);
+      return record ? { record, isSelected: o.isSelected } : null;
+    })
+    .filter((r): r is { record: RQAPI.ApiRecord; isSelected: boolean } => !!r);
+}
+
 // Multiview
 export function getApiClientFeatureContext(contextId?: string) {
   const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();

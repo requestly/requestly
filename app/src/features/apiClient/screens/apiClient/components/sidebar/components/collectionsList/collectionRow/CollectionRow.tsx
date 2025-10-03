@@ -38,6 +38,9 @@ import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRe
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
+import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
+import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -80,6 +83,7 @@ export const CollectionRow: React.FC<Props> = ({
   isReadOnly,
   handleRecordsToBeDeleted,
 }) => {
+  const isCollectionRunnerSupported = useFeatureIsOn("api_client_collection_runner_support");
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
@@ -186,8 +190,29 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "2",
           label: (
-            <div>
-              <MdOutlineDelete style={{ marginRight: 8 }} />
+            <div className="collection-row-option">
+              <MdOutlineVideoLibrary />
+              Run tests
+            </div>
+          ),
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            openTab(
+              new CollectionViewTabSource({
+                id: record.id,
+                title: record.name || "New Collection",
+                context: { id: context.id },
+              })
+            );
+
+            setTimeout(() => dispatchCustomEvent(CollectionRowOptionsCustomEvent.OPEN_RUNNER_TAB), 0);
+          },
+        },
+        {
+          key: "3",
+          label: (
+            <div className="collection-row-option">
+              <MdOutlineDelete />
               Delete
             </div>
           ),
@@ -199,9 +224,9 @@ export const CollectionRow: React.FC<Props> = ({
         },
       ];
 
-      return items;
+      return items.filter((item) => (item.key === "2" ? isCollectionRunnerSupported : true));
     },
-    [handleRecordsToBeDeleted, handleCollectionExport]
+    [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted, isCollectionRunnerSupported]
   );
 
   const collapseChangeHandler = useCallback(
