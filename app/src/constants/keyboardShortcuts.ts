@@ -52,5 +52,13 @@ export const KEYBOARD_SHORTCUTS: Record<Feature, Record<string, KEYBOARD_SHORTCU
       hotKey: navigator.platform.match("Mac") ? "meta+s" : "ctrl+s",
       description: "Save runtime variables",
     },
+    CLOSE_ACTIVE_TAB_DESKTOP: {
+      hotKey: navigator.platform.match("Mac") ? "meta+w" : "ctrl+w",
+      description: "Close active tab",
+    },
+    CLOSE_ACTIVE_TAB_EXTENSION: {
+      hotKey: navigator.platform.match("Mac") ? "meta+alt+w" : "ctrl+alt+w",
+      description: "Close active tab",
+    },
   },
 };
