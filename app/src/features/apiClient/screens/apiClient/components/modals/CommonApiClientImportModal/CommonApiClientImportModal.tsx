@@ -23,7 +23,14 @@ export const CommonApiClientImportModal: React.FC<Props> = ({
   docsLink,
 }) => {
   return (
-    <Modal className="common-api-client-import-modal" open={isOpen} onCancel={onClose} footer={null} width={600}>
+    <Modal
+      destroyOnClose
+      className="common-api-client-import-modal"
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+      width={600}
+    >
       <CommonApiClientImporter
         productName={productName}
         supportedFileTypes={supportedFileTypes}
