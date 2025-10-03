@@ -15,6 +15,7 @@ import {
   ApiClientViewMode,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { markWorkspaceLoaded } from "../multiView";
+import { ApiClientTreeBus } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 
 export type ContextSetupData = {
   apiClientRecords: { records: RQAPI.ApiClientRecord[]; erroredRecords: ErroredRecord[] }; // old api expects errors to also be passed in
@@ -35,20 +36,26 @@ export const setupContextWithRepoWithoutMarkingLoaded = async (
     globalEnvironment: environments.globalEnvironment,
     contextId: workspaceId,
   });
-  const apiRecordsStore = createApiRecordsStore(apiClientRecords);
+
+  const context: ApiClientFeatureContext = {
+    id: workspaceId,
+    workspaceId,
+    stores: {},
+    repositories: repoForWorkspace,
+    treeBus: {} as ApiClientTreeBus,
+  } as ApiClientFeatureContext;
+
+  const apiRecordsStore = createApiRecordsStore(context, apiClientRecords);
   const errorStore = createErroredRecordsStore(erroredRecords);
   const stores = {
     environments: environmentStore,
     records: apiRecordsStore,
     erroredRecords: errorStore,
   };
+  context.stores = stores;
 
-  const context: ApiClientFeatureContext = {
-    id: workspaceId,
-    workspaceId,
-    stores,
-    repositories: repoForWorkspace,
-  };
+  const treeBus = new ApiClientTreeBus(context);
+  context.treeBus = treeBus;
 
   const viewMode = apiClientMultiWorkspaceViewStore.getState().viewMode;
   if (viewMode === ApiClientViewMode.SINGLE) {
