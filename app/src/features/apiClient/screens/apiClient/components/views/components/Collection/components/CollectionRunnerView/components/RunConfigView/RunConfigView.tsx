@@ -220,7 +220,7 @@ export const RunConfigView: React.FC = () => {
 
       {isEmpty ? (
         <EmptyState
-          title="No results in this collection"
+          title="No requests in this collection"
           description="Collection must include at least one request to run."
         />
       ) : (
