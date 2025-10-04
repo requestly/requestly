@@ -35,16 +35,31 @@
 
     .ant-drawer-body {
       padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
   }
 
   .history-drawer-result-container {
     position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     .back-btn {
       position: absolute;
       top: 2px;
       left: 2px;
+      z-index: 1;
+    }
+
+    .run-result-view-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
   }
 

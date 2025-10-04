@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -24,6 +24,7 @@ import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { RQTooltip } from "lib/design-system-v2/components";
+import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from "react-virtualized";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -81,9 +82,10 @@ const RunningRequestPlaceholder: React.FC<{
   );
 };
 
+// Memoized TestDetails component to prevent unnecessary re-renders
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
-}> = ({ requestExecutionResult }) => {
+}> = React.memo(({ requestExecutionResult }) => {
   const context = useApiClientFeatureContext();
   const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
 
@@ -162,28 +164,59 @@ const TestDetails: React.FC<{
       ) : (
         <div className="results-list">
           {requestExecutionResult.testResults?.map((test) => {
-            return <TestResultItem testResult={test} />;
+            return <TestResultItem testResult={test} key={test.name} />;
           })}
         </div>
       )}
     </div>
   );
-};
+});
 
+// Virtualized TestResultList with dynamic row heights
 const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
 }> = ({ tabKey, results }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
+  const [expandedIterations, setExpandedIterations] = useState<Set<number>>(new Set([1])); // First iteration expanded by default
+
+  // Create a cache for dynamic row heights
+  const cacheRef = useRef(
+    new CellMeasurerCache({
+      fixedWidth: true,
+      defaultHeight: 25, // Collapsed height
+      minHeight: 20,
+    })
+  );
 
   const currentRunningRequest = currentlyExecutingRequest ? (
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
   ) : null;
 
-  // TODO: use virtualize list
+  // Convert results to array for virtualization
   const resultsToShow = useMemo(() => {
     return Array.from(results);
   }, [results]);
+
+  const listRef = useRef<List>(null);
+
+  const toggleIteration = useCallback((iteration: number, index: number) => {
+    setExpandedIterations((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(iteration)) {
+        newSet.delete(iteration);
+      } else {
+        newSet.add(iteration);
+      }
+      return newSet;
+    });
+
+    // Clear cache for this row and recompute row heights
+    cacheRef.current.clear(index, 0);
+    if (listRef.current) {
+      listRef.current.recomputeRowHeights(index);
+    }
+  }, []);
 
   if (resultsToShow.length === 0) {
     return (
@@ -194,39 +227,78 @@ const TestResultList: React.FC<{
     );
   }
 
-  if (results.size > 1) {
-    return resultsToShow.map(([iteration, details]) => {
-      return (
-        <div key={iteration} className="test-result-collapse-container tests-results-view-container">
-          <Collapse
-            ghost
-            className="test-result-collapse"
-            defaultActiveKey={["1"]}
-            expandIcon={({ isActive }) => {
-              return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
-            }}
-          >
-            <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
-              {details.map(({ requestExecutionResult }) => {
-                return (
-                  <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />
-                );
-              })}
-              {iteration === currentlyExecutingRequest?.iteration ? currentRunningRequest : null}
-            </Collapse.Panel>
-          </Collapse>
-        </div>
-      );
-    });
+  // For single iteration, render without virtualization
+  if (results.size === 1) {
+    return (
+      <div className="tests-results-view-container">
+        {resultsToShow[0][1].map(({ requestExecutionResult }) => {
+          return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
+        })}
+        {currentRunningRequest}
+      </div>
+    );
   }
 
-  // show first iteration without collapse
+  // Virtualized list for multiple iterations
+  const rowRenderer = ({ index, key, style, parent }: any) => {
+    const [iteration, details] = resultsToShow[index];
+    const isExpanded = expandedIterations.has(iteration);
+    const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
+
+    return (
+      <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
+        {({ registerChild, measure }: any) => (
+          <div ref={registerChild} style={style} className="test-result-collapse-container">
+            <Collapse
+              ghost
+              className="test-result-collapse"
+              activeKey={isExpanded ? ["1"] : []}
+              onChange={() => {
+                toggleIteration(iteration, index);
+                // Trigger measure after collapse animation
+                setTimeout(() => measure(), 300);
+              }}
+              expandIcon={({ isActive }) => {
+                return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
+              }}
+            >
+              <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
+                {isExpanded &&
+                  details.map(({ requestExecutionResult }) => {
+                    return (
+                      <TestDetails
+                        key={requestExecutionResult.recordId}
+                        requestExecutionResult={requestExecutionResult}
+                      />
+                    );
+                  })}
+                {isCurrentIteration ? currentRunningRequest : null}
+              </Collapse.Panel>
+            </Collapse>
+          </div>
+        )}
+      </CellMeasurer>
+    );
+  };
+
   return (
-    <div className="tests-results-view-container">
-      {resultsToShow[0][1].map(({ requestExecutionResult }) => {
-        return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
-      })}
-      {currentRunningRequest}
+    <div className="tests-results-view-container virtualized-test-results-container">
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            ref={listRef}
+            width={width}
+            height={height}
+            rowCount={resultsToShow.length}
+            rowHeight={cacheRef.current.rowHeight}
+            deferredMeasurementCache={cacheRef.current}
+            rowRenderer={rowRenderer}
+            overscanRowCount={3}
+            scrollToIndex={currentlyExecutingRequest ? currentlyExecutingRequest.iteration - 1 : undefined}
+            scrollToAlignment="end"
+          />
+        )}
+      </AutoSizer>
     </div>
   );
 };
