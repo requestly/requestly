@@ -727,7 +727,7 @@ export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpAp
   }
 
   // fallback for older records where type field was not present
-  return "method" in record.data.request;
+  return true;
 }
 
 export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.GraphQLApiRecord {
@@ -744,7 +744,7 @@ export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEnt
   }
 
   // fallback for older records where type field was not present
-  return "method" in entry.request;
+  return true;
 };
 
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
