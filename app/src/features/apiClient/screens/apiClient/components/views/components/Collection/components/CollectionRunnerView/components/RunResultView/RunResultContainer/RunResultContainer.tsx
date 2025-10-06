@@ -183,9 +183,12 @@ const TestResultList: React.FC<{
   const COLLAPSED_HEIGHT = 28; // Fixed height for collapsed iteration header
 
   // All iterations are expanded by default
-  const [expandedIterations, setExpandedIterations] = useState<Set<number>>(() => {
-    return new Set(Array.from({ length: iterations }, (_, i) => i + 1));
-  });
+  const [expandedIterations, setExpandedIterations] = useState<Set<number>>(
+    () => new Set(Array.from({ length: iterations }, (_, i) => i + 1))
+  );
+
+  // Track the measured expanded height (all expanded rows have same height)
+  const expandedHeightRef = useRef<number | null>(null);
 
   // Cache for dynamic row heights
   const cacheRef = useRef(
@@ -203,12 +206,12 @@ const TestResultList: React.FC<{
   ) : null;
 
   // Convert results to array for virtualization
-  const resultsToShow = useMemo(() => {
-    return Array.from(results);
-  }, [results]);
+  const resultsToShow = useMemo(() => Array.from(results), [results]);
 
   const toggleIteration = useCallback(
-    (iteration: number, index: number, isCurrentlyExpanded: boolean) => {
+    (iteration: number, index: number) => {
+      const isExpanded = expandedIterations.has(iteration);
+
       setExpandedIterations((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(iteration)) {
@@ -219,13 +222,14 @@ const TestResultList: React.FC<{
         return newSet;
       });
 
-      // When collapsing, immediately set to fixed collapsed height
-      if (isCurrentlyExpanded) {
+      if (isExpanded) {
+        // Collapsing: immediately set to fixed collapsed height
         cacheRef.current.set(index, 0, COLLAPSED_HEIGHT, COLLAPSED_HEIGHT);
         listRef.current?.recomputeRowHeights(index);
       }
+      // For expanding: do nothing here, let handleTransitionEnd handle it
     },
-    [COLLAPSED_HEIGHT]
+    [COLLAPSED_HEIGHT, expandedIterations]
   );
 
   if (resultsToShow.length === 0) {
@@ -257,12 +261,20 @@ const TestResultList: React.FC<{
 
     return (
       <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        {({ registerChild }: any) => {
+        {({ registerChild, measure }: any) => {
           const handleTransitionEnd = (e: React.TransitionEvent) => {
-            // Measure after expansion animation completes
+            // After expansion animation completes, measure and cache the height
             if (e.propertyName === "height" && isExpanded) {
-              cacheRef.current.clear(index, 0);
-              listRef.current?.recomputeRowHeights(index);
+              // If we have a cached height, use it immediately
+              if (expandedHeightRef.current !== null) {
+                cacheRef.current.set(index, 0, expandedHeightRef.current, expandedHeightRef.current);
+                listRef.current?.recomputeRowHeights(index);
+              } else {
+                // First time: measure and cache
+                measure();
+                const rowHeight = cacheRef.current.rowHeight({ index });
+                expandedHeightRef.current = rowHeight;
+              }
             }
           };
 
@@ -276,7 +288,7 @@ const TestResultList: React.FC<{
               <Collapse
                 className="test-result-collapse"
                 activeKey={isExpanded ? [iteration] : []}
-                onChange={() => toggleIteration(iteration, index, isExpanded)}
+                onChange={() => toggleIteration(iteration, index)}
                 expandIcon={({ isActive }) => (
                   <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />
                 )}
