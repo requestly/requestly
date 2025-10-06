@@ -176,8 +176,8 @@ const TestDetails: React.FC<{
 const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
-}> = ({ tabKey, results }) => {
-  const [iterations] = useRunConfigStore((s) => [s.iterations]);
+  iterations: number;
+}> = ({ tabKey, results, iterations }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
 
   const COLLAPSED_HEIGHT = 28; // Fixed height for collapsed iteration header
@@ -360,6 +360,18 @@ export const RunResultContainer: React.FC<{
   running?: boolean;
 }> = ({ ranAt, result, running = false }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
+  const [iterations] = useRunConfigStore((s) => [s.iterations]);
+
+  const totalIterationCount = useMemo(() => {
+    console.log("!!!debug", "memo called");
+    if (running) {
+      return iterations;
+    } else {
+      return result.iterations.size;
+    }
+    // Do not include result.iterations.size in deps to avoid re-computation on every new result when running is true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [iterations, running]);
 
   const metrics = useMemo(() => {
     return getRunMetrics(result.iterations);
@@ -393,22 +405,42 @@ export const RunResultContainer: React.FC<{
       {
         key: RunResultTabKey.ALL,
         label: <TestResultTabTitle title="All" count={summary.totalTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.ALL} results={summary.totalTests} />,
+        children: (
+          <TestResultList tabKey={RunResultTabKey.ALL} results={summary.totalTests} iterations={totalIterationCount} />
+        ),
       },
       {
         key: RunResultTabKey.SUCCESS,
         label: <TestResultTabTitle title="Success" count={summary.successTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.SUCCESS} results={summary.successTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.SUCCESS}
+            results={summary.successTests}
+            iterations={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.FAIL,
         label: <TestResultTabTitle title="Fail" count={summary.failedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.FAIL} results={summary.failedTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.FAIL}
+            results={summary.failedTests}
+            iterations={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.SKIPPED,
         label: <TestResultTabTitle title="Skipped" count={summary.skippedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.SKIPPED} results={summary.skippedTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.SKIPPED}
+            results={summary.skippedTests}
+            iterations={totalIterationCount}
+          />
+        ),
       },
     ];
   }, [
@@ -421,6 +453,7 @@ export const RunResultContainer: React.FC<{
     summary.failedTests,
     summary.skippedTestsCounts,
     summary.skippedTests,
+    totalIterationCount,
   ]);
 
   return (
