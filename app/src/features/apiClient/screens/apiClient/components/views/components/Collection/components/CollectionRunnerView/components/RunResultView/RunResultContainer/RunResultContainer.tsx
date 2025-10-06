@@ -481,7 +481,7 @@ export const RunResultContainer: React.FC<{
               items={tabItems}
               animated={false}
               activeKey={activeTab}
-              destroyInactiveTabPane={false}
+              destroyInactiveTabPane={true}
               onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
               className="test-result-tabs"
             />
