@@ -1,0 +1,35 @@
+.testsRunningLoader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4, 8px);
+  padding: var(--space-5, 12px);
+  max-width: max-content;
+  margin: 0 16px;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 16px;
+
+  border-radius: 24px;
+  background: var(--requestly-color-surface-2, #383838);
+
+  /* shadow-lg */
+  box-shadow: 0 16px 24px -4px rgba(0, 0, 0, 0.32);
+
+  .message {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--requestly-color-text-default, #fff);
+    font-size: var(--requestly-font-size-sm, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 150% */
+  }
+}

@@ -1,0 +1,24 @@
+.collection-runner-view {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+
+  .collection-runner-view-split {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    & > .gutter {
+      z-index: 1;
+      background-color: var(--requestly-color-primary);
+      background-clip: content-box;
+      cursor: col-resize;
+      opacity: 0;
+
+      &:hover,
+      &:active {
+        opacity: 1;
+      }
+    }
+  }
+}
