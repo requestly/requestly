@@ -8,6 +8,8 @@ export interface GenericState {
   setIcon: (icon: ReactNode) => void;
   getIsNew: () => boolean;
   getIsActive: () => boolean;
+  addCloseBlocker: (topic: unknown, id: string, blocker: unknown) => void;
+  removeCloseBlocker: (topic: unknown, id: string) => void;
 
   replace: (args: unknown) => void; // TODO: make type generic
   close: () => void;
@@ -22,6 +24,8 @@ const defaultGenericState: GenericState = {
   getIsActive: () => false,
   replace: () => {},
   close: () => {},
+  addCloseBlocker: () => {},
+  removeCloseBlocker: () => {},
 };
 
 /**

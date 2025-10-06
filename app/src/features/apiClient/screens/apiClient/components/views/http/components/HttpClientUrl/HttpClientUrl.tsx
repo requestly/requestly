@@ -1,9 +1,14 @@
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
-import { extractQueryParams, queryParamsToURLString } from "features/apiClient/screens/apiClient/utils";
+import {
+  extractPathVariablesFromUrl,
+  extractQueryParams,
+  queryParamsToURLString,
+} from "features/apiClient/screens/apiClient/utils";
 import { KeyValuePair } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
+import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
 
 interface ApiClientUrlProps {
   url: string;
@@ -15,8 +20,13 @@ interface ApiClientUrlProps {
 const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
   const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
 
+  const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
+
   const handleUrlChange = useCallback(
     (value: string) => {
+      const pathVariables = extractPathVariablesFromUrl(value);
+      updatePathVariableKeys(pathVariables);
+
       const paramsFromUrl = extractQueryParams(value);
       const finalParams = [];
 
@@ -43,12 +53,13 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
       setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [onUrlChange, queryParams, setQueryParams]
+    [onUrlChange, queryParams, setQueryParams, updatePathVariableKeys]
   );
 
   return (
     <ApiClientUrl
       url={queryParamsToURLString(queryParams, url)}
+      placeholder="Enter or paste HTTP URL"
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}
       onUrlChange={handleUrlChange}
