@@ -164,7 +164,7 @@ const TestDetails: React.FC<{
       ) : (
         <div className="results-list">
           {requestExecutionResult.testResults?.map((test) => {
-            return <TestResultItem testResult={test} key={test.name} />;
+            return <TestResultItem testResult={test} />;
           })}
         </div>
       )}
