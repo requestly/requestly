@@ -34,14 +34,15 @@ export const makeRequest = async (
   signal?: AbortSignal
 ): Promise<RQAPI.HttpResponse> => {
   return new Promise((resolve, reject) => {
+    const abortListener = () => {
+      signal?.removeEventListener("abort", abortListener);
+      reject(createAbortError(signal));
+    };
+
     if (signal) {
       if (signal.aborted) {
-        reject(createAbortError(signal));
+        return reject(createAbortError(signal));
       }
-      const abortListener = () => {
-        signal.removeEventListener("abort", abortListener);
-        reject(createAbortError(signal));
-      };
       signal.addEventListener("abort", abortListener);
     }
 
@@ -49,28 +50,37 @@ export const makeRequest = async (
     request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request).then((result: ResponseOrError) => {
-        if (!result) {
-          //Backward compatibility check
-          reject(new Error("Failed to make request. Please check if the URL is valid."));
-        } else if ("error" in result) {
-          reject(new Error(result.error));
-        } else {
-          resolve(result);
-        }
-      });
+      getAPIResponseViaExtension(request)
+        .then((result: ResponseOrError) => {
+          if (!result) {
+            //Backward compatibility check
+            reject(new Error("Failed to make request. Please check if the URL is valid."));
+          } else if ("error" in result) {
+            reject(new Error(result.error));
+          } else {
+            resolve(result);
+          }
+        })
+        .finally(() => {
+          signal?.removeEventListener("abort", abortListener);
+        });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request).then((result: ResponseOrError) => {
-        if (!result) {
-          //Backward compatibility check
-          reject(new Error("Failed to make request. Please check if the URL is valid."));
-        } else if ("error" in result) {
-          reject(new Error(result.error));
-        } else {
-          resolve(result);
-        }
-      });
+      getAPIResponseViaProxy(request)
+        .then((result: ResponseOrError) => {
+          if (!result) {
+            //Backward compatibility check
+            reject(new Error("Failed to make request. Please check if the URL is valid."));
+          } else if ("error" in result) {
+            reject(new Error(result.error));
+          } else {
+            resolve(result);
+          }
+        })
+        .finally(() => {
+          signal?.removeEventListener("abort", abortListener);
+        });
     } else {
+      signal?.removeEventListener("abort", abortListener);
       resolve(null);
     }
   });
@@ -154,6 +164,11 @@ export const getEmptyDraftApiRecord = (apiEntryType: RQAPI.ApiEntryType, request
 };
 
 export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = true) => {
+  // Add safety checks for entry and entry.request
+  if (!entry || !entry.request) {
+    return getEmptyHttpEntry(); // Return a default empty entry if input is invalid
+  }
+
   const sanitizedEntry: RQAPI.HttpApiEntry = {
     ...entry,
     request: {
@@ -707,7 +722,12 @@ export const getRequestTypeForAnalyticEvent = (
 };
 
 export function isHttpApiRecord(record: RQAPI.ApiRecord): record is RQAPI.HttpApiRecord {
-  return record.data.type === RQAPI.ApiEntryType.HTTP;
+  if (record.data.type) {
+    return record.data.type === RQAPI.ApiEntryType.HTTP;
+  }
+
+  // fallback for older records where type field was not present
+  return true;
 }
 
 export function isGraphQLApiRecord(record: RQAPI.ApiRecord): record is RQAPI.GraphQLApiRecord {
@@ -719,7 +739,12 @@ export const isGraphQLApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.GraphQL
 };
 
 export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEntry => {
-  return entry.type === RQAPI.ApiEntryType.HTTP;
+  if (entry.type) {
+    return entry.type === RQAPI.ApiEntryType.HTTP;
+  }
+
+  // fallback for older records where type field was not present
+  return true;
 };
 
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {

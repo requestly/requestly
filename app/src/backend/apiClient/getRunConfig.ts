@@ -4,11 +4,12 @@ import { RQAPI } from "features/apiClient/types";
 import * as Sentry from "@sentry/react";
 import { ResponsePromise } from "../types";
 import { APIS_NODE, RUN_CONFIGS_NODE } from "./constants";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 
 export async function getRunConfig(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfigId: RQAPI.RunConfig["id"]
-): ResponsePromise<RQAPI.RunConfig> {
+): ResponsePromise<SavedRunConfig> {
   const result = await _getRunConfigFromFirebase(collectionId, runConfigId);
   return result;
 }
@@ -16,23 +17,37 @@ export async function getRunConfig(
 async function _getRunConfigFromFirebase(
   collectionId: RQAPI.ApiClientRecord["collectionId"],
   runConfigId: RQAPI.RunConfig["id"]
-): ResponsePromise<RQAPI.RunConfig> {
+): ResponsePromise<SavedRunConfig> {
   try {
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfigId);
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) {
-      return { success: false, data: null, message: "Not found!" };
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "NOT_FOUND",
+          message: "Not found!",
+        },
+      };
     }
 
-    const data = snapshot.data() as RQAPI.RunConfig;
-    return { success: true, data: { ...data, id: runConfigId } };
+    const data = snapshot.data() as SavedRunConfigRecord;
+    return { success: true, data: { id: runConfigId, runOrder: data.runOrder } };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigId },
     });
 
-    return { success: false, data: null, message: "Something went wrong!" };
+    return {
+      success: false,
+      data: null,
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      },
+    };
   }
 }
