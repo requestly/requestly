@@ -1,5 +1,5 @@
 import { RQAPI } from "features/apiClient/types";
-import { ApiClientLocalStoreMeta, ApiClientRecordsInterface, ResultPromise } from "../../interfaces";
+import { ApiClientLocalStoreMeta, ApiClientRecordsInterface } from "../../interfaces";
 import { ErroredRecord } from "../../local/services/types";
 import { sanitizeRecord } from "backend/apiClient/upsertApiRecord";
 import { Timestamp } from "firebase/firestore";
@@ -9,6 +9,9 @@ import { omit } from "lodash";
 import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
+import { ResponsePromise } from "backend/types";
+import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -54,7 +57,6 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async createRecord(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecordPromise {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
-
     const newRecord = {
       ...sanitizedRecord,
       id: this.getNewId(),
@@ -286,22 +288,44 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
-  ): ResultPromise<RQAPI.RunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
     return {
-      success: false,
-      data: null,
-      message: "Not implemented",
+      success: true,
+      data: {
+        id: runConfigId,
+        runOrder: [],
+      },
     };
   }
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfig: Partial<RQAPI.RunConfig>
-  ): ResultPromise<RQAPI.RunConfig> {
+  ): ResponsePromise<SavedRunConfig> {
     return {
       success: false,
       data: null,
-      message: "Not implemented",
+      error: {
+        type: "INTERNAL_SERVER_ERROR",
+        message: "Not implemented",
+      },
+    };
+  }
+
+  async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
+    return {
+      success: true,
+      data: [],
+    };
+  }
+
+  async addRunResult(
+    collectionId: RQAPI.ApiClientRecord["collectionId"],
+    runResult: RunResult
+  ): ResponsePromise<SavedRunResult> {
+    return {
+      success: true,
+      data: null,
     };
   }
 }

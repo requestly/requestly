@@ -96,6 +96,13 @@ export namespace RQAPI {
     POST_RESPONSE = "postResponse",
   }
 
+  export type PathVariable = {
+    id: number;
+    key: string;
+    value: string;
+    description?: string;
+  };
+
   export type RequestBody = RequestJsonBody | RequestRawBody | RequestFormBody | MultipartFormBody; // in case of form data, body will be key-value pairs
   export type RequestJsonBody = string;
   export type RequestRawBody = string;
@@ -136,6 +143,7 @@ export namespace RQAPI {
   export type HttpRequest = {
     url: string;
     queryParams: KeyValuePair[];
+    pathVariables?: PathVariable[];
     method: RequestMethod;
     headers: KeyValuePair[];
     body?: RequestBody;
@@ -313,18 +321,17 @@ export namespace RQAPI {
     MISSING_FILE = "missing_file",
   }
 
-  export type RunOrder = ApiClientRecord["id"][];
+  export type OrderedRequest = { record: ApiRecord; isSelected: boolean };
+
+  export type OrderedRequests = OrderedRequest[];
+
+  export type RunOrder = { id: ApiRecord["id"]; isSelected: boolean }[];
 
   export type RunConfig = {
     id: string;
     runOrder: RunOrder;
     iterations: number;
     delay: number;
-
-    // TODO: add more as we go
-
-    createdTs: number;
-    updatedTs: number;
   };
 }
 

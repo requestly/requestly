@@ -32,6 +32,18 @@
 }
 .collection-dropdown-menu .ant-dropdown-menu {
   min-width: 160px;
+
+  .collection-row-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      --size: 13px;
+      width: var(--size);
+      height: var(--size);
+    }
+  }
 }
 
 .collection-drop-target {

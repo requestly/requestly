@@ -20,7 +20,7 @@
 
   .collection-view-content {
     width: 100%;
-    height: calc(100% - 35px);
+    height: calc(100% - 24px); // footer height
     overflow-y: hidden;
     border-top: 1px solid var(--requestly-color-white-t-10);
 
@@ -29,7 +29,7 @@
     }
 
     .ant-tabs-nav {
-      margin-bottom: 8px;
+      margin-bottom: 0px;
 
       .ant-tabs-nav-list {
         margin-left: 1rem;
@@ -48,7 +48,6 @@
 
           &.ant-tabs-tab-active .ant-tabs-tab-btn {
             color: var(--requestly-color-default) !important;
-            font-weight: var(--requestly-font-weight-medium);
 
             &:hover {
               color: var(--requestly-color-default) !important;
@@ -69,6 +68,7 @@
 
       .authorization-view {
         margin: 0 16px;
+        margin-top: 8px;
       }
     }
   }

@@ -7,6 +7,7 @@ import { useShallow } from "zustand/shallow";
 import { createApiRecordsStore } from "../apiRecords/apiRecords.store";
 import { createEnvironmentsStore } from "../environments/environments.store";
 import { createErroredRecordsStore } from "../erroredRecords/erroredRecords.store";
+import { ApiClientTreeBus } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 
 function createInfiniteChainable<T>() {
   const handler = {
@@ -26,6 +27,7 @@ export type ApiClientFeatureContext = {
   workspaceId: RenderableWorkspaceState["id"];
   stores: AllApiClientStores;
   repositories: ApiClientRepositoryInterface;
+  treeBus: ApiClientTreeBus;
 };
 
 type ApiClientFeatureContextProviderState = {
@@ -122,7 +124,7 @@ export const NoopContext: ApiClientFeatureContext = {
   id: NoopContextId,
   workspaceId: NoopContextId,
   stores: {
-    records: createApiRecordsStore({ records: [], erroredRecords: [] }),
+    records: createApiRecordsStore({} as ApiClientFeatureContext, { records: [], erroredRecords: [] }),
     environments: createEnvironmentsStore({
       environments: {},
       globalEnvironment: {
@@ -135,6 +137,7 @@ export const NoopContext: ApiClientFeatureContext = {
     erroredRecords: createErroredRecordsStore({ apiErroredRecords: [], environmentErroredRecords: [] }),
   },
   repositories: createInfiniteChainable(),
+  treeBus: createInfiniteChainable(),
 };
 
 export function setLastUsedContextId(id: string) {

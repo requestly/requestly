@@ -40,6 +40,7 @@ export type HTTPRequestDetails = {
   body?: RQAPI.RequestBody;
   bodyContainer: RQAPI.RequestBodyContainer;
   contentType: RequestContentType;
+  pathVariables?: RQAPI.PathVariable[];
 };
 
 export type BaseApiRequestDetails = {
