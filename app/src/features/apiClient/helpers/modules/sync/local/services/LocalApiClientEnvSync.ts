@@ -5,6 +5,7 @@ import { EnvironmentEntity, FileSystemResult } from "./types";
 import { parseEntityVariables } from "../../utils";
 import { NativeError } from "errors/NativeError";
 
+
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   private globalId?: string;
   constructor(readonly meta: ApiClientLocalMeta) {}
@@ -19,16 +20,22 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     }
   }
 
+  private getDisasterousGlobalId() {
+    return `${this.meta.rootPath}/environments/global.json`;
+  }
+
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
     const environmentsMap = entities.reduce((acc, cur) => {
+      if(cur.isGlobal) {
+        this.setGlobalId(cur.id);
+        cur.id = this.getDisasterousGlobalId();
+      }
       acc[cur.id] = {
         id: cur.id,
         name: cur.name,
         variables: parseEntityVariables(cur?.variables || {}),
       };
-      if(cur.isGlobal) {
-        this.setGlobalId(cur.id);
-      }
+      
       return acc;
     }, {} as EnvironmentMap);
 
@@ -44,6 +51,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
     if(entity.isGlobal) {
       this.setGlobalId(entity.id);
+      environment.id = this.getDisasterousGlobalId();
     }
 
     return environment;
@@ -124,6 +132,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   async deleteEnvironment(envId: string) {
+    envId = this.translateDisasterousId(envId);
     const service = await this.getAdapter();
     const result = await service.deleteRecord(envId);
     if (result.type === "success") {
@@ -137,14 +146,16 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     environmentId: string,
     updates: Partial<Pick<EnvironmentData, "name" | "variables">>
   ): Promise<void> {
+    environmentId = this.translateDisasterousId(environmentId);
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.updateEnvironment(environmentId, updates);
     if (result.type === "error") {
-      throw new Error("Something went wrong while updating environment");
+      throw new Error(result.error.message || "Something went wrong while updating environment");
     }
   }
 
   async duplicateEnvironment(environmentId: string, allEnvironments: EnvironmentMap): Promise<EnvironmentData> {
+    environmentId = this.translateDisasterousId(environmentId);
     const service = await this.getAdapter();
     const result: FileSystemResult<EnvironmentEntity> = await service.duplicateEnvironment(environmentId);
     if (result.type === "error") {
@@ -154,7 +165,19 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
     return parsedEnv;
   }
 
+  private translateDisasterousId(id: string) {
+    if(id !== this.getDisasterousGlobalId()) {
+      return id;
+    }
+
+    return this.getActualGlobalEnvironmentId();
+  }
+
   getGlobalEnvironmentId(): string {
+    return this.getDisasterousGlobalId();
+  }
+
+  getActualGlobalEnvironmentId(): string {
     if(!this.globalId) {
       throw new NativeError('Global environment id has not been set yet!');
     }
