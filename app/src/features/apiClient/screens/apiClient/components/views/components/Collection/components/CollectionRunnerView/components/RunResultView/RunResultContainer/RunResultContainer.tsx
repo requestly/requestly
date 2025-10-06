@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -179,20 +179,24 @@ const TestResultList: React.FC<{
 }> = ({ tabKey, results }) => {
   const [iterations] = useRunConfigStore((s) => [s.iterations]);
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
+
+  const COLLAPSED_HEIGHT = 28; // Fixed height for collapsed iteration header
+
+  // All iterations are expanded by default
   const [expandedIterations, setExpandedIterations] = useState<Set<number>>(() => {
-    // Expand all iterations by default
     return new Set(Array.from({ length: iterations }, (_, i) => i + 1));
   });
 
-  // Create a cache for dynamic row heights
-
+  // Cache for dynamic row heights
   const cacheRef = useRef(
     new CellMeasurerCache({
       fixedWidth: true,
-      defaultHeight: 25, // Collapsed height
-      minHeight: 20,
+      defaultHeight: 200,
+      minHeight: COLLAPSED_HEIGHT,
     })
   );
+
+  const listRef = useRef<List>(null);
 
   const currentRunningRequest = currentlyExecutingRequest ? (
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
@@ -203,25 +207,26 @@ const TestResultList: React.FC<{
     return Array.from(results);
   }, [results]);
 
-  const listRef = useRef<List>(null);
+  const toggleIteration = useCallback(
+    (iteration: number, index: number, isCurrentlyExpanded: boolean) => {
+      setExpandedIterations((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(iteration)) {
+          newSet.delete(iteration);
+        } else {
+          newSet.add(iteration);
+        }
+        return newSet;
+      });
 
-  const toggleIteration = useCallback((iteration: number, index: number) => {
-    setExpandedIterations((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(iteration)) {
-        newSet.delete(iteration);
-      } else {
-        newSet.add(iteration);
+      // When collapsing, immediately set to fixed collapsed height
+      if (isCurrentlyExpanded) {
+        cacheRef.current.set(index, 0, COLLAPSED_HEIGHT, COLLAPSED_HEIGHT);
+        listRef.current?.recomputeRowHeights(index);
       }
-      return newSet;
-    });
-
-    // Clear cache for this row and recompute row heights
-    cacheRef.current.clear(index, 0);
-    if (listRef.current) {
-      listRef.current.recomputeRowHeights(index);
-    }
-  }, []);
+    },
+    [COLLAPSED_HEIGHT]
+  );
 
   if (resultsToShow.length === 0) {
     return (
@@ -252,36 +257,37 @@ const TestResultList: React.FC<{
 
     return (
       <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        {({ registerChild, measure }: any) => {
-          // useLayoutEffect(() => {
-          //   measure();
-          // }, [isExpanded]);
+        {({ registerChild }: any) => {
+          const handleTransitionEnd = (e: React.TransitionEvent) => {
+            // Measure after expansion animation completes
+            if (e.propertyName === "height" && isExpanded) {
+              cacheRef.current.clear(index, 0);
+              listRef.current?.recomputeRowHeights(index);
+            }
+          };
 
           return (
-            <div ref={registerChild} style={style} className="test-result-collapse-container">
+            <div
+              ref={registerChild}
+              style={style}
+              className="test-result-collapse-container"
+              onTransitionEnd={handleTransitionEnd}
+            >
               <Collapse
-                // ghost
                 className="test-result-collapse"
-                defaultActiveKey={iteration}
                 activeKey={isExpanded ? [iteration] : []}
-                onChange={() => {
-                  toggleIteration(iteration, index);
-                  // Trigger measure after collapse animation
-                  setTimeout(() => measure(), 300);
-                }}
-                expandIcon={({ isActive }) => {
-                  return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
-                }}
+                onChange={() => toggleIteration(iteration, index, isExpanded)}
+                expandIcon={({ isActive }) => (
+                  <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />
+                )}
               >
                 <Collapse.Panel header={`ITERATION-${iteration}`} key={iteration}>
-                  {details.map(({ requestExecutionResult }) => {
-                    return (
-                      <TestDetails
-                        key={requestExecutionResult.recordId}
-                        requestExecutionResult={requestExecutionResult}
-                      />
-                    );
-                  })}
+                  {details.map(({ requestExecutionResult }) => (
+                    <TestDetails
+                      key={requestExecutionResult.recordId}
+                      requestExecutionResult={requestExecutionResult}
+                    />
+                  ))}
                   {isCurrentIteration ? currentRunningRequest : null}
                 </Collapse.Panel>
               </Collapse>
@@ -295,20 +301,24 @@ const TestResultList: React.FC<{
   return (
     <div className="tests-results-view-container virtualized-test-results-container">
       <AutoSizer>
-        {({ height, width }) => (
-          <List
-            ref={listRef}
-            width={width}
-            height={height}
-            rowCount={resultsToShow.length}
-            rowHeight={cacheRef.current.rowHeight}
-            deferredMeasurementCache={cacheRef.current}
-            rowRenderer={rowRenderer}
-            overscanRowCount={3}
-            scrollToIndex={currentlyExecutingRequest ? currentlyExecutingRequest.iteration - 1 : undefined}
-            scrollToAlignment="end"
-          />
-        )}
+        {({ height, width }) => {
+          if (!height || !width) return null;
+
+          return (
+            <List
+              ref={listRef}
+              width={width}
+              height={height}
+              rowCount={resultsToShow.length}
+              rowHeight={cacheRef.current.rowHeight}
+              deferredMeasurementCache={cacheRef.current}
+              rowRenderer={rowRenderer}
+              overscanRowCount={2}
+              scrollToIndex={currentlyExecutingRequest ? currentlyExecutingRequest.iteration - 1 : undefined}
+              scrollToAlignment="end"
+            />
+          );
+        }}
       </AutoSizer>
     </div>
   );
