@@ -10,27 +10,6 @@
     display: flex;
     flex-direction: column;
 
-    .ReactVirtualized__List {
-      outline: none;
-
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: var(--requestly-color-surface-0, #1a1a1a);
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.1));
-        border-radius: 4px;
-
-        &:hover {
-          background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.2));
-        }
-      }
-    }
-
     .test-result-collapse-container {
       margin: 0;
       padding: 0;

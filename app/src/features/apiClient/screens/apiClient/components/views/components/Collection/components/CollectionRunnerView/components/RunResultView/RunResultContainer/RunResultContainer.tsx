@@ -190,6 +190,9 @@ const TestResultList: React.FC<{
   // Track the measured expanded height (all expanded rows have same height)
   const expandedHeightRef = useRef<number | null>(null);
 
+  // Track pending transitions to avoid stale closure issues
+  const pendingTransitionsRef = useRef<Map<number, "expanding" | "collapsing">>(new Map());
+
   // Cache for dynamic row heights
   const cacheRef = useRef(
     new CellMeasurerCache({
@@ -210,7 +213,7 @@ const TestResultList: React.FC<{
 
   const toggleIteration = useCallback(
     (iteration: number, index: number) => {
-      const isExpanded = expandedIterations.has(iteration);
+      const isCurrentlyExpanded = expandedIterations.has(iteration);
 
       setExpandedIterations((prev) => {
         const newSet = new Set(prev);
@@ -222,14 +225,20 @@ const TestResultList: React.FC<{
         return newSet;
       });
 
-      if (isExpanded) {
-        // Collapsing: immediately set to fixed collapsed height
-        cacheRef.current.set(index, 0, COLLAPSED_HEIGHT, COLLAPSED_HEIGHT);
-        listRef.current?.recomputeRowHeights(index);
+      // Track the transition direction
+      if (isCurrentlyExpanded) {
+        pendingTransitionsRef.current.set(iteration, "collapsing");
+      } else {
+        pendingTransitionsRef.current.set(iteration, "expanding");
+
+        // For expanding: immediately set the cached height if available
+        if (expandedHeightRef.current !== null) {
+          cacheRef.current.set(index, 0, expandedHeightRef.current, expandedHeightRef.current);
+          listRef.current?.recomputeRowHeights(index);
+        }
       }
-      // For expanding: do nothing here, let handleTransitionEnd handle it
     },
-    [COLLAPSED_HEIGHT, expandedIterations]
+    [expandedIterations]
   );
 
   if (resultsToShow.length === 0) {
@@ -263,24 +272,42 @@ const TestResultList: React.FC<{
       <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
         {({ registerChild, measure }: any) => {
           const handleTransitionEnd = (e: React.TransitionEvent) => {
-            // After expansion animation completes, measure and cache the height
-            if (e.propertyName === "height" && isExpanded) {
-              // If we have a cached height, use it immediately
-              if (expandedHeightRef.current !== null) {
-                cacheRef.current.set(index, 0, expandedHeightRef.current, expandedHeightRef.current);
-                listRef.current?.recomputeRowHeights(index);
+            if (e.propertyName === "height") {
+              const transitionType = pendingTransitionsRef.current.get(iteration);
+
+              if (!transitionType) return; // No pending transition for this iteration
+
+              // Clear the pending transition
+              pendingTransitionsRef.current.delete(iteration);
+
+              if (transitionType === "expanding") {
+                // Expanding: if we don't have cached height yet, measure and cache it now
+                if (expandedHeightRef.current === null) {
+                  measure();
+                  const rowHeight = cacheRef.current.rowHeight({ index });
+                  expandedHeightRef.current = rowHeight;
+                }
+                // If we already had cached height, it was set optimistically in toggleIteration
               } else {
-                // First time: measure and cache
-                measure();
-                const rowHeight = cacheRef.current.rowHeight({ index });
-                expandedHeightRef.current = rowHeight;
+                // Collapsing: set to fixed collapsed height
+                cacheRef.current.set(index, 0, COLLAPSED_HEIGHT, COLLAPSED_HEIGHT);
+                listRef.current?.recomputeRowHeights(index);
               }
             }
           };
 
           return (
             <div
-              ref={registerChild}
+              ref={(node) => {
+                registerChild(node);
+
+                // Measure on first render if expanded and height not yet cached
+                if (node && isExpanded && expandedHeightRef.current === null) {
+                  measure();
+                  const rowHeight = cacheRef.current.rowHeight({ index });
+                  expandedHeightRef.current = rowHeight;
+                }
+              }}
               style={style}
               className="test-result-collapse-container"
               onTransitionEnd={handleTransitionEnd}
