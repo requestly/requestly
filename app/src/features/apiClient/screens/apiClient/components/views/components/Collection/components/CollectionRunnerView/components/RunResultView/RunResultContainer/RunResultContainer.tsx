@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -14,7 +14,7 @@ import {
   HttpMethodIcon,
 } from "features/apiClient/screens/apiClient/components/sidebar/components/collectionsList/requestRow/RequestRow";
 import { EmptyState } from "../../EmptyState/EmptyState";
-import { useRunResultStore } from "../../../run.context";
+import { useRunConfigStore, useRunResultStore } from "../../../run.context";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdOutlineArrowForwardIos } from "@react-icons/all-files/md/MdOutlineArrowForwardIos";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
@@ -177,10 +177,15 @@ const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
 }> = ({ tabKey, results }) => {
+  const [iterations] = useRunConfigStore((s) => [s.iterations]);
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
-  const [expandedIterations, setExpandedIterations] = useState<Set<number>>(new Set([1])); // First iteration expanded by default
+  const [expandedIterations, setExpandedIterations] = useState<Set<number>>(() => {
+    // Expand all iterations by default
+    return new Set(Array.from({ length: iterations }, (_, i) => i + 1));
+  });
 
   // Create a cache for dynamic row heights
+
   const cacheRef = useRef(
     new CellMeasurerCache({
       fixedWidth: true,
@@ -247,24 +252,29 @@ const TestResultList: React.FC<{
 
     return (
       <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        {({ registerChild, measure }: any) => (
-          <div ref={registerChild} style={style} className="test-result-collapse-container">
-            <Collapse
-              ghost
-              className="test-result-collapse"
-              activeKey={isExpanded ? ["1"] : []}
-              onChange={() => {
-                toggleIteration(iteration, index);
-                // Trigger measure after collapse animation
-                setTimeout(() => measure(), 300);
-              }}
-              expandIcon={({ isActive }) => {
-                return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
-              }}
-            >
-              <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
-                {isExpanded &&
-                  details.map(({ requestExecutionResult }) => {
+        {({ registerChild, measure }: any) => {
+          // useLayoutEffect(() => {
+          //   measure();
+          // }, [isExpanded]);
+
+          return (
+            <div ref={registerChild} style={style} className="test-result-collapse-container">
+              <Collapse
+                // ghost
+                className="test-result-collapse"
+                defaultActiveKey={iteration}
+                activeKey={isExpanded ? [iteration] : []}
+                onChange={() => {
+                  toggleIteration(iteration, index);
+                  // Trigger measure after collapse animation
+                  setTimeout(() => measure(), 300);
+                }}
+                expandIcon={({ isActive }) => {
+                  return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
+                }}
+              >
+                <Collapse.Panel header={`ITERATION-${iteration}`} key={iteration}>
+                  {details.map(({ requestExecutionResult }) => {
                     return (
                       <TestDetails
                         key={requestExecutionResult.recordId}
@@ -272,11 +282,12 @@ const TestResultList: React.FC<{
                       />
                     );
                   })}
-                {isCurrentIteration ? currentRunningRequest : null}
-              </Collapse.Panel>
-            </Collapse>
-          </div>
-        )}
+                  {isCurrentIteration ? currentRunningRequest : null}
+                </Collapse.Panel>
+              </Collapse>
+            </div>
+          );
+        }}
       </CellMeasurer>
     );
   };
