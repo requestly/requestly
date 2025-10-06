@@ -225,11 +225,6 @@ const HttpClientView: React.FC<Props> = ({
   const setContentType = useCallback(
     (contentType: RequestContentType) => {
       setEntry((entry) => {
-        //SELF NOTES- remove before merging
-        //since needed a mapping between content type and corresponding body value to the contentype, hence used bodycontainer here
-        //No other source found that keeps the track of body value when content type is changed
-
-        //For default case, added the fallback as empty
         let newBody: RQAPI.RequestBody;
 
         if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
