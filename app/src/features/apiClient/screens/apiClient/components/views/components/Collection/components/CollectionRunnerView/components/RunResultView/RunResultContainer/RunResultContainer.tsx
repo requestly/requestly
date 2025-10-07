@@ -180,7 +180,7 @@ const TestResultList: React.FC<{
 }> = ({ tabKey, results, iterations }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
 
-  const COLLAPSED_HEIGHT = 28; // Fixed height for collapsed iteration header
+  const COLLAPSED_HEIGHT = 26.5; // Fixed height for collapsed iteration header
 
   // Track the measured expanded height (all expanded rows have same height)
   const expandedHeightRef = useRef<number | null>(null);
@@ -275,17 +275,7 @@ const TestResultList: React.FC<{
 
           return (
             <div
-              ref={(node) => {
-                registerChild(node);
-
-                // Measure on first render if expanded and height not yet cached
-                const isExpanded = expandedStateRef.current.has(iteration);
-                if (node && isExpanded && expandedHeightRef.current === null) {
-                  measure();
-                  const rowHeight = cacheRef.current.rowHeight({ index });
-                  expandedHeightRef.current = rowHeight;
-                }
-              }}
+              ref={registerChild}
               style={style}
               className="test-result-collapse-container"
               onTransitionEnd={handleTransitionEnd}
