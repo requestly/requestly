@@ -28,6 +28,14 @@ const RequestInfo: React.FC<{
 }> = ({ recordId }) => {
   const request = useApiRecord(recordId) as RQAPI.ApiRecord;
 
+  if (!request) {
+    return (
+      <div className="request-info-container">
+        <Typography.Text className="request-name">Loading...</Typography.Text>
+      </div>
+    );
+  }
+
   return (
     <div className="request-info-container">
       <RequestIcon record={request} />
