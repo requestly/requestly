@@ -19,6 +19,7 @@ interface Props {
     label: React.ReactNode;
     disabled?: boolean;
     isEditable?: boolean;
+    onClick?: (index: number) => void;
   }[];
 }
 
@@ -72,6 +73,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const breadcrumbs: ({
     pathname: string;
+    onClick?: (index: number) => void;
   } & MatchedRoute["handle"]["breadcrumb"])[] =
     defaultBreadcrumbs.length > 0
       ? defaultBreadcrumbs
@@ -114,7 +116,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
       {loading ? (
         <Skeleton.Input active size="small" block />
       ) : (
-        breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
+        breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled, onClick }, index) => {
           return (
             <>
               {isEditable ? (
@@ -149,7 +151,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
                       {label}
                     </li>
                   ) : (
-                    <Link key={index} to={pathname} className="rq-breadcrumb-item">
+                    <Link key={index} to={pathname} className="rq-breadcrumb-item" onClick={() => onClick?.(index)}>
                       {label}
                     </Link>
                   )}
