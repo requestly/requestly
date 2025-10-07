@@ -23,7 +23,7 @@ export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: 
   const isWorkspaceLocal = options.skipWorkspaceCheck ? true : rawIsWorkspaceLocal;
   const appMode = useSelector(getAppMode);
 
-  const [isLocalSyncSupported, setIsLocalSyncSupported] = useState(true);
+  const [isLocalSyncSupported, setIsLocalSyncSupported] = useState(false);
 
   useEffect(() => {
     if (

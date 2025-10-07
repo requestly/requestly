@@ -15,7 +15,7 @@ export const graphQLEntryToHttpEntryAdapter = (entry: RQAPI.GraphQLApiEntry): RQ
     httpRequest.headers.push({
       key: "Content-Type",
       value: "application/json",
-      id: headersSet.size + 1,
+      id: httpRequest.headers.length + 1,
       isEnabled: true,
     });
   }
