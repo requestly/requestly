@@ -16,7 +16,7 @@ const CollectionChainItem: React.FC<{ collectionId: RQAPI.CollectionRecord["id"]
 
   return (
     <div className="collection-path-item">
-      <RQTooltip title={collection.name}>
+      <RQTooltip title={collection?.name || "Collection"} placement="top">
         <img
           width={16}
           height={16}
