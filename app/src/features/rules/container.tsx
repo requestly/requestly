@@ -8,7 +8,6 @@ import { DeleteRecordsModalWrapper } from "./modals/DeleteRecordsModalWrapper";
 import { DuplicateRecordModalWrapper } from "./modals/DuplicateRuleModalWrapper";
 import { UngroupOrDeleteRulesModalWrapper } from "./modals/UngroupOrDeleteRulesModalWrapper";
 import { RenameGroupModalWrapper } from "./modals/RenameGroupModalWrapper";
-import { MV3MigrationModal, NotificationCard } from "./modals/MV3MigrationModal";
 import { SecondarySidebarLayout } from "componentsV2/SecondarySidebar";
 
 import "./container.scss";
@@ -67,10 +66,9 @@ const RulesFeatureContainer = () => {
       clientRuleStorageService.getRecordById(message.rqRuleId).then((ruleDetails) => {
         const sourceCondition = ruleDetails?.pairs?.[0]?.source;
         trackErrorInSavingDNR({
-          rule_type: message.rqRuleId?.split("_")[0],
+          rule_type: message.rqRuleId?.split("_")?.[0],
           rule_id: message.rqRuleId,
           error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
-          is_migration_triggered: window.location.search.includes("updatedToMv3"),
           source_key: sourceCondition?.key,
           source_operator: sourceCondition?.operator,
           source_value: sourceCondition?.value,
@@ -100,8 +98,6 @@ const RulesFeatureContainer = () => {
           <ChangeRuleGroupModalWrapper />
           <CreateNewRuleGroupModalWrapper />
           <DeleteRecordsModalWrapper />
-          <MV3MigrationModal />
-          <NotificationCard />
           <Outlet />
         </>
       </RulesContextProvider>
