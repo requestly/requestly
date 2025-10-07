@@ -59,7 +59,7 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
       acc[variable.key] = {
         id: index,
         isPersisted: true,
-        syncValue: variable.value,
+        syncValue: variable.value ?? "",
         type:
           variable.type === EnvironmentVariableType.Secret
             ? EnvironmentVariableType.Secret

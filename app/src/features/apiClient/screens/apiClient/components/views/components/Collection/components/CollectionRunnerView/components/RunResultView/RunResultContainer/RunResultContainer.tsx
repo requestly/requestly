@@ -161,8 +161,8 @@ const TestDetails: React.FC<{
         </div>
       ) : (
         <div className="results-list">
-          {requestExecutionResult.testResults?.map((test) => {
-            return <TestResultItem testResult={test} />;
+          {requestExecutionResult.testResults?.map((test, index) => {
+            return <TestResultItem key={index} testResult={test} />;
           })}
         </div>
       )}
