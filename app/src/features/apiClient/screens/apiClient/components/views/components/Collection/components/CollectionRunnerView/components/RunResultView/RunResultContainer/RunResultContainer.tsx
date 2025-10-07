@@ -252,20 +252,12 @@ const TestResultList: React.FC<{
 
     return (
       <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        {({ registerChild, measure }: any) => {
+        {({ registerChild }: any) => {
           const handleTransitionEnd = (e: React.TransitionEvent) => {
             if (e.propertyName === "height") {
               const isCurrentlyExpanded = expandedStateRef.current.has(iteration);
 
-              if (isCurrentlyExpanded) {
-                // Just finished expanding: if we don't have cached height yet, measure and cache it now
-                if (expandedHeightRef.current === null) {
-                  measure();
-                  const rowHeight = cacheRef.current.rowHeight({ index });
-                  expandedHeightRef.current = rowHeight;
-                }
-                // If we already had cached height, it was set optimistically in handleCollapseChange
-              } else {
+              if (!isCurrentlyExpanded) {
                 // Just finished collapsing: set to fixed collapsed height
                 cacheRef.current.set(index, 0, COLLAPSED_HEIGHT, COLLAPSED_HEIGHT);
                 listRef.current?.recomputeRowHeights(index);
@@ -275,7 +267,18 @@ const TestResultList: React.FC<{
 
           return (
             <div
-              ref={registerChild}
+              ref={(node) => {
+                registerChild(node);
+                // Cache the expanded height after CellMeasurer measures it
+                if (node && expandedHeightRef.current === null) {
+                  queueMicrotask(() => {
+                    const rowHeight = cacheRef.current.rowHeight({ index });
+                    if (rowHeight > COLLAPSED_HEIGHT) {
+                      expandedHeightRef.current = rowHeight;
+                    }
+                  });
+                }
+              }}
               style={style}
               className="test-result-collapse-container"
               onTransitionEnd={handleTransitionEnd}
