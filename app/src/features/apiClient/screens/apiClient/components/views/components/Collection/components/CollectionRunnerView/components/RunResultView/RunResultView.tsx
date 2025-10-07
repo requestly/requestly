@@ -20,7 +20,7 @@ export const RunResultView: React.FC = () => {
 
   const testResults = useMemo(
     () => getRunSummary(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- need `interations` for reactivity
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- need `iterations` for reactivity
     [getRunSummary, iterations]
   );
 
