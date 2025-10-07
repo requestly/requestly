@@ -65,7 +65,7 @@ function prepareExecutionResult(params: {
     collectionName,
     runDuration: Date.now() - startTime,
     entry: parseExecutingRequestEntry(result.executedEntry),
-    status: { value: result.status, warning: result.warning || null },
+    status: result.warning ? { value: result.status, warning: result.warning } : { value: result.status },
     testResults: result.executedEntry.testResults,
   };
 }
