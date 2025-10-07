@@ -247,7 +247,6 @@ const TestResultList: React.FC<{
 
   // Virtualized list for multiple iterations
   const rowRenderer = ({ index, key, style, parent }: any) => {
-    console.log("!!!debug", "rendering now", index);
     const [iteration, details] = resultsToShow[index];
     const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
 
