@@ -245,7 +245,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   );
 
   // Process a single root collection asynchronously
-  const processSingleRootCollection = useCallback(
+  const processRootCollection = useCallback(
     async (
       rootCollection: RQAPI.CollectionRecord
     ): Promise<{
@@ -306,7 +306,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       }
 
       try {
-        const rootCollectionPromises = collections.map((rootCollection) => processSingleRootCollection(rootCollection));
+        const rootCollectionPromises = collections.map((rootCollection) => processRootCollection(rootCollection));
 
         const results = await Promise.allSettled(rootCollectionPromises);
 
@@ -357,7 +357,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         };
       }
     },
-    [processSingleRootCollection]
+    [processRootCollection]
   );
 
   const handleImportData = useCallback(async () => {
