@@ -81,6 +81,7 @@ export type EnvironmentEntity = {
   type: "environment";
   id: string;
   name: string;
+  isGlobal: boolean;
   variables?: VariableEntity;
 };
 

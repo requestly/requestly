@@ -28,8 +28,8 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 enum RunResultTabKey {
   ALL = "all",
-  SUCCESS = "success",
-  FAIL = "fail",
+  PASSED = "passed",
+  FAILED = "failed",
   SKIPPED = "skipped",
 }
 
@@ -38,7 +38,7 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
     title: "No tests found",
     description: "No tests to show.",
   },
-  [RunResultTabKey.FAIL]: {
+  [RunResultTabKey.FAILED]: {
     title: "No failed tests",
     description: "No tests failed in this run.",
   },
@@ -46,7 +46,7 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
     title: "No skipped tests",
     description: "No tests skipped in this run.",
   },
-  [RunResultTabKey.SUCCESS]: {
+  [RunResultTabKey.PASSED]: {
     title: "No successful tests",
     description: "No tests passed in this run.",
   },
@@ -162,8 +162,8 @@ const TestDetails: React.FC<{
         </div>
       ) : (
         <div className="results-list">
-          {requestExecutionResult.testResults?.map((test) => {
-            return <TestResultItem testResult={test} />;
+          {requestExecutionResult.testResults?.map((test, index) => {
+            return <TestResultItem key={index} testResult={test} />;
           })}
         </div>
       )}
@@ -329,22 +329,22 @@ export const RunResultContainer: React.FC<{
         ),
       },
       {
-        key: RunResultTabKey.SUCCESS,
+        key: RunResultTabKey.PASSED,
         label: <TestResultTabTitle title="Success" count={summary.successTestsCounts} loading={running} />,
         children: (
           <TestResultList
-            tabKey={RunResultTabKey.SUCCESS}
+            tabKey={RunResultTabKey.PASSED}
             results={summary.successTests}
             iterations={totalIterationCount}
           />
         ),
       },
       {
-        key: RunResultTabKey.FAIL,
+        key: RunResultTabKey.FAILED,
         label: <TestResultTabTitle title="Fail" count={summary.failedTestsCounts} loading={running} />,
         children: (
           <TestResultList
-            tabKey={RunResultTabKey.FAIL}
+            tabKey={RunResultTabKey.FAILED}
             results={summary.failedTests}
             iterations={totalIterationCount}
           />
