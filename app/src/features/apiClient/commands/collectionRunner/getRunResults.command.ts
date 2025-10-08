@@ -19,4 +19,6 @@ export async function getRunResults(
   if (result.success === false && result.error.type === "INTERNAL_SERVER_ERROR") {
     throw new NativeError("Something went wrong while fetching run results!").addContext({ collectionId });
   }
+
+  return [];
 }
