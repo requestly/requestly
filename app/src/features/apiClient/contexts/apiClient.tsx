@@ -171,6 +171,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType).then((result) => {
             setIsRecordBeingCreated(null);
+            if(!result.success) {
+              toast.error(result.message || 'Failed to create record!');
+              return;
+            }
             saveOrUpdateRecord(context, result.data);
 
             openTab(
@@ -243,6 +247,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
               );
             })
             .catch((error) => {
+              setIsRecordBeingCreated(null);
+              toast.error(error.message);
               console.error("Error adding new environment", error);
             });
         }
