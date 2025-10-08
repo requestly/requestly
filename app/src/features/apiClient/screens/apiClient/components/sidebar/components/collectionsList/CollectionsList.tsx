@@ -378,7 +378,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
       },
       canDrop: (item: DraggableApiRecord) => {
         // Only allow if item is inside a collection (not already at top-level)
-        return item.record.collectionId !== "";
+        return Boolean(item.record.collectionId);
       },
     }),
     [handleDropToRoot]
@@ -393,7 +393,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         handleDropToRoot(item);
       },
       canDrop: (item: DraggableApiRecord) => {
-        return item.record.collectionId !== "";
+        return Boolean(item.record.collectionId);
       },
       collect: (monitor) => ({
         isOverTopLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
@@ -411,7 +411,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         handleDropToRoot(item);
       },
       canDrop: (item: DraggableApiRecord) => {
-        return item.record.collectionId !== "";
+        return Boolean(item.record.collectionId);
       },
       collect: (monitor) => ({
         isOverBottomLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
