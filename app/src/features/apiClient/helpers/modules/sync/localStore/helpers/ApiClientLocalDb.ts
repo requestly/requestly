@@ -11,8 +11,8 @@ export class ApiClientLocalDb {
     this.db.version(metadata.version).stores({
       [ApiClientLocalDbTable.APIS]: "id",
       [ApiClientLocalDbTable.ENVIRONMENTS]: "id",
-      [ApiClientLocalDbTable.COLLECTION_RUN_CONFIGS]: "[id+collectionId]", // primary key
-      [ApiClientLocalDbTable.COLLECTION_RUN_RESULTS]: "[id+collectionId]",
+      [ApiClientLocalDbTable.COLLECTION_RUN_CONFIGS]: "[collectionId+id]",
+      [ApiClientLocalDbTable.COLLECTION_RUN_RESULTS]: "[collectionId+id]",
     });
   }
 }
