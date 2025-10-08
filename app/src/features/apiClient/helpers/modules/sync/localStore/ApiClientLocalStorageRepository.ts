@@ -12,5 +12,5 @@ export class ApiClientLocalStoreRepository implements ApiClientRepositoryInterfa
   }
 }
 
-const localStoreRepository = new ApiClientLocalStoreRepository({ version: 1 });
+const localStoreRepository = new ApiClientLocalStoreRepository({ version: 2 });
 export default localStoreRepository;
