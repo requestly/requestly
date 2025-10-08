@@ -130,7 +130,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   );
 
   //flatten a single root collection and create mapping
-  const flattenSingleRootCollection = useCallback(
+  const flattenRootCollection = useCallback(
     (
       rootCollection: RQAPI.CollectionRecord
     ): {
@@ -258,7 +258,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       } | null;
     }> => {
       try {
-        const { flatCollections, collectionToRequestsMap } = flattenSingleRootCollection(rootCollection);
+        const { flatCollections, collectionToRequestsMap } = flattenRootCollection(rootCollection);
 
         const { successfulCollections, failedCount: failedCollectionsCount } = await createAllCollections(
           flatCollections
@@ -296,7 +296,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         };
       }
     },
-    [flattenSingleRootCollection, createAllCollections, createAllRequests]
+    [flattenRootCollection, createAllCollections, createAllRequests]
   );
 
   const handleImportCollections = useCallback(
