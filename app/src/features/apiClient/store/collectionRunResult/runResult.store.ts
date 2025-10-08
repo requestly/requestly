@@ -62,6 +62,20 @@ const RunStateMachine = {
   [RunStatus.ERRORED]: [RunStatus.IDLE],
 };
 
+export enum HistorySaveStatus {
+  IDLE = "idle",
+  SAVING = "saving",
+  SUCCESS = "success",
+  FAILED = "failed",
+}
+
+const HistorySaveStateMachine = {
+  [HistorySaveStatus.IDLE]: [HistorySaveStatus.IDLE, HistorySaveStatus.SAVING],
+  [HistorySaveStatus.SAVING]: [HistorySaveStatus.SUCCESS, HistorySaveStatus.FAILED],
+  [HistorySaveStatus.SUCCESS]: [HistorySaveStatus.IDLE],
+  [HistorySaveStatus.FAILED]: [HistorySaveStatus.IDLE],
+};
+
 export type LiveRunResult = Pick<RunResultState, "startTime" | "endTime" | "runStatus" | "iterations">;
 
 export type RunResult = LiveRunResult & {
@@ -93,6 +107,8 @@ export type RunResultState = {
   abortController: AbortController;
 
   history: RunResult[];
+  historySaveStatus: HistorySaveStatus;
+  setHistorySaveStatus: (status: HistorySaveStatus) => void;
 
   reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
@@ -111,6 +127,7 @@ export function createRunResultStore(data: { history: RunResult[] }) {
     runStatus: RunStatus.IDLE,
     iterations: new Map(),
     history: data.history,
+    historySaveStatus: HistorySaveStatus.IDLE,
     currentlyExecutingRequest: null,
     abortController: new AbortController(),
 
@@ -176,6 +193,16 @@ export function createRunResultStore(data: { history: RunResult[] }) {
     addToHistory(runResult: RunResult) {
       const { history } = get();
       set({ history: [...history, runResult] });
+    },
+
+    setHistorySaveStatus(status) {
+      const currentStatus = get().historySaveStatus;
+      const isStateChangeAllowed = HistorySaveStateMachine[currentStatus].includes(status);
+      if (!isStateChangeAllowed) {
+        throw new NativeError(`Invalid history save state change from ${currentStatus} to ${status}`);
+      }
+
+      set({ historySaveStatus: status });
     },
   }));
 }

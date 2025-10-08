@@ -4,6 +4,7 @@ import { BatchRequestExecutor } from "features/apiClient/helpers/batchRequestExe
 import { RunContext } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/run.context";
 import {
   CurrentlyExecutingRequest,
+  HistorySaveStatus,
   RequestExecutionResult,
   RunResult,
   RunStatus,
@@ -105,6 +106,7 @@ class Runner {
     this.genericState.setPreview(false);
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
+    this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.IDLE);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
 
@@ -176,10 +178,13 @@ class Runner {
     this.runContext.runResultStore.getState().addToHistory(runResult);
 
     try {
+      this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.SAVING);
       await saveRunResult(this.ctx, {
         collectionId,
         runResult: runResult,
       });
+
+      this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.SUCCESS);
       notification.success({
         message: "Run completed!",
         placement: "bottomRight",
@@ -187,6 +192,7 @@ class Runner {
         duration: 3,
       });
     } catch (e) {
+      this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.FAILED);
       notification.error({
         message: "Run completed but couldn't save the result!",
         placement: "bottomRight",
