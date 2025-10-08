@@ -277,10 +277,12 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
   });
 };
 
-export const generateMultipartFormKeyValuePairs = (data: Record<string, string> = {}): RQAPI.FormDataKeyValuePair[] => {
+export const generateMultipartFormKeyValuePairs = (
+  data: Array<{ key: string; value: string }>
+): RQAPI.FormDataKeyValuePair[] => {
   const result: RQAPI.FormDataKeyValuePair[] = [];
 
-  for (const [key, value] of Object.entries(data)) {
+  data.forEach(({ key, value }) => {
     if (typeof value === "string" && value.startsWith("@")) {
       result.push({
         id: Math.random(),
@@ -290,7 +292,6 @@ export const generateMultipartFormKeyValuePairs = (data: Record<string, string> 
         type: FormDropDownOptions.FILE,
       } as RQAPI.FormDataKeyValuePair);
     } else {
-      //for text values
       result.push({
         id: Math.random(),
         key: key || "",
@@ -299,7 +300,7 @@ export const generateMultipartFormKeyValuePairs = (data: Record<string, string> 
         type: FormDropDownOptions.TEXT,
       } as RQAPI.FormDataKeyValuePair);
     }
-  }
+  });
 
   return result;
 };
@@ -326,7 +327,6 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
   }
 
   let body: RQAPI.RequestBody;
-
   switch (contentType) {
     case RequestContentType.JSON:
       body = JSON.stringify(requestJson.data);
@@ -335,18 +335,17 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       body = generateKeyValuePairs(requestJson.data);
       break;
     case RequestContentType.MULTIPART_FORM: {
-      // Handle multipart form data - it can contain both text fields and files
-      // Merge both text data and file references into a single object
-      // File paths from cURL are prefixed with @ (e.g., @/path/to/file)
-      const multipartData: Record<string, string> = {};
+      const multipartData: Array<{ key: string; value: string }> = [];
       if (hasData) {
-        Object.assign(multipartData, requestJson.data);
+        for (const [key, value] of Object.entries(requestJson.data)) {
+          multipartData.push({ key, value: String(value) });
+        }
       }
 
       if (hasFiles) {
-        Object.entries(requestJson.files).forEach(([key, filePath]) => {
-          multipartData[key] = `@${filePath}`;
-        });
+        for (const [key, filePath] of Object.entries(requestJson.files)) {
+          multipartData.push({ key, value: `@${filePath}` });
+        }
       }
       body = generateMultipartFormKeyValuePairs(multipartData);
       break;
