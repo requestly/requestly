@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -24,7 +24,7 @@ import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { RQTooltip } from "lib/design-system-v2/components";
-import { List, AutoSizer, CellMeasurer, CellMeasurerCache } from "react-virtualized";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -172,32 +172,14 @@ const TestDetails: React.FC<{
   );
 });
 
-// Virtualized TestResultList with dynamic row heights
+// Virtualized TestResultList using @tanstack/react-virtual
 const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
   iterations: number;
 }> = ({ tabKey, results, iterations }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
-
-  const COLLAPSED_HEIGHT = 26.5; // Fixed height for collapsed iteration header
-
-  // Track the measured expanded height (all expanded rows have same height)
-  const expandedHeightRef = useRef<number | null>(null);
-
-  // Track which iterations are currently expanded (for height calculations only)
-  const expandedStateRef = useRef<Set<number>>(new Set(Array.from({ length: iterations }, (_, i) => i + 1)));
-
-  // Cache for dynamic row heights
-  const cacheRef = useRef(
-    new CellMeasurerCache({
-      fixedWidth: true,
-      defaultHeight: 200,
-      minHeight: COLLAPSED_HEIGHT,
-    })
-  );
-
-  const listRef = useRef<List>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const currentRunningRequest = currentlyExecutingRequest ? (
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
@@ -206,23 +188,22 @@ const TestResultList: React.FC<{
   // Convert results to array for virtualization
   const resultsToShow = useMemo(() => Array.from(results), [results]);
 
-  const handleCollapseChange = useCallback((iteration: number, index: number, activeKeys: string[] | string) => {
-    const isNowExpanded = Array.isArray(activeKeys)
-      ? activeKeys.includes(String(iteration))
-      : activeKeys === String(iteration);
+  const rowVirtualizer = useVirtualizer({
+    count: resultsToShow.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 200, // Estimated size for collapsed/expanded items
+    overscan: 1,
+  });
 
-    // Update the ref state
-    if (isNowExpanded) {
-      expandedStateRef.current.add(iteration);
-      // Expanding: immediately set the cached height if available
-      if (expandedHeightRef.current !== null) {
-        cacheRef.current.set(index, 0, expandedHeightRef.current, expandedHeightRef.current);
-        listRef.current?.recomputeRowHeights(index);
-      }
-    } else {
-      expandedStateRef.current.delete(iteration);
-    }
-  }, []);
+  // Auto-scroll to current iteration when it changes
+  // useEffect(() => {
+  //   if (currentlyExecutingRequest && currentlyExecutingRequest.iteration > 0) {
+  //     const index = currentlyExecutingRequest.iteration - 1;
+  //     if (index < resultsToShow.length) {
+  //       rowVirtualizer.scrollToIndex(index, { align: "end" });
+  //     }
+  //   }
+  // }, [currentlyExecutingRequest, resultsToShow.length, rowVirtualizer]);
 
   if (resultsToShow.length === 0) {
     return (
@@ -245,48 +226,50 @@ const TestResultList: React.FC<{
     );
   }
 
-  // Virtualized list for multiple iterations
-  const rowRenderer = ({ index, key, style, parent }: any) => {
-    const [iteration, details] = resultsToShow[index];
-    const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
+  const items = rowVirtualizer.getVirtualItems();
 
-    return (
-      <CellMeasurer cache={cacheRef.current} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        {({ registerChild }: any) => {
-          const handleTransitionEnd = (e: React.TransitionEvent) => {
-            if (e.propertyName === "height") {
-              const isCurrentlyExpanded = expandedStateRef.current.has(iteration);
-
-              if (!isCurrentlyExpanded) {
-                // Just finished collapsing: set to fixed collapsed height
-                cacheRef.current.set(index, 0, COLLAPSED_HEIGHT, COLLAPSED_HEIGHT);
-                listRef.current?.recomputeRowHeights(index);
-              }
-            }
-          };
+  // TODO: fix overflowing tests-results-view-container
+  // Fix gap between rows.
+  // Achieve parity with production
+  return (
+    <div
+      ref={parentRef}
+      className="tests-results-view-container virtualized-test-results-container"
+      style={{
+        height: "100%",
+        overflow: "auto",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          width: "100%",
+          position: "relative",
+          minHeight: "100%",
+        }}
+      >
+        {items.map((virtualItem) => {
+          const [iteration, details] = resultsToShow[virtualItem.index];
+          const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
 
           return (
             <div
-              ref={(node) => {
-                registerChild(node);
-                // Cache the expanded height after CellMeasurer measures it
-                if (node && expandedHeightRef.current === null) {
-                  queueMicrotask(() => {
-                    const rowHeight = cacheRef.current.rowHeight({ index });
-                    if (rowHeight > COLLAPSED_HEIGHT) {
-                      expandedHeightRef.current = rowHeight;
-                    }
-                  });
-                }
+              key={virtualItem.key}
+              data-index={virtualItem.index}
+              ref={rowVirtualizer.measureElement}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                transform: `translateY(${virtualItem.start}px)`,
               }}
-              style={style}
               className="test-result-collapse-container"
-              onTransitionEnd={handleTransitionEnd}
             >
               <Collapse
                 className="test-result-collapse"
                 defaultActiveKey={[iteration]}
-                onChange={(activeKeys) => handleCollapseChange(iteration, index, activeKeys)}
                 expandIcon={({ isActive }) => (
                   <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />
                 )}
@@ -303,33 +286,8 @@ const TestResultList: React.FC<{
               </Collapse>
             </div>
           );
-        }}
-      </CellMeasurer>
-    );
-  };
-
-  return (
-    <div className="tests-results-view-container virtualized-test-results-container">
-      <AutoSizer>
-        {({ height, width }) => {
-          if (!height || !width) return null;
-
-          return (
-            <List
-              ref={listRef}
-              width={width}
-              height={height}
-              rowCount={resultsToShow.length}
-              rowHeight={cacheRef.current.rowHeight}
-              deferredMeasurementCache={cacheRef.current}
-              rowRenderer={rowRenderer}
-              overscanRowCount={2}
-              scrollToIndex={currentlyExecutingRequest ? currentlyExecutingRequest.iteration - 1 : undefined}
-              scrollToAlignment="end"
-            />
-          );
-        }}
-      </AutoSizer>
+        })}
+      </div>
     </div>
   );
 };
