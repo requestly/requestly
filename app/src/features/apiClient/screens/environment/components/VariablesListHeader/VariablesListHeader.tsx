@@ -11,6 +11,7 @@ import { useCommand } from "features/apiClient/commands";
 import "./variablesListHeader.scss";
 import RequestlyIcon from "assets/img/brand/rq_logo.svg";
 import PostmanIcon from "assets/img/brand/postman-icon.svg";
+import { toast } from "utils/Toast";
 
 interface VariablesListHeaderProps {
   searchValue: string;
@@ -54,7 +55,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
       await renameEnvironment({ environmentId, newName: updatedName });
       setTitle(updatedName);
     } catch (error) {
-      // NOOP
+      toast.error(error.message || 'Could not rename environment!');
     }
   };
 

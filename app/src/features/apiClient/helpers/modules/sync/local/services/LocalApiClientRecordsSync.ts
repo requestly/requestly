@@ -21,20 +21,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }
 
-  private generateFileName() {
-    return `${uuidv4()}.json`;
-  }
-
-  private getNormalizedPath(path: string) {
-    const normalizedPath = path.endsWith("/") ? path : `${path}/`;
-    return normalizedPath;
-  }
-
-  private appendPath(basePath: string, resourcePath: string) {
-    const separator = basePath.endsWith("/") ? "" : "/";
-    return `${basePath}${separator}${resourcePath}`;
-  }
-
+  
   private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
     switch (requestDetails.type) {
       case "http":
@@ -119,7 +106,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     switch (record.data.type) {
       case RQAPI.ApiEntryType.HTTP:
         return {
-          name: record.name || "Untitled Request",
+          name: record.name || "Untitled request",
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -136,7 +123,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         };
       case RQAPI.ApiEntryType.GRAPHQL:
         return {
-          name: record.name || "Untitled Request",
+          name: record.name || "Untitled request",
           request: {
             type: record.data.type,
             url: record.data.request.url,
@@ -170,14 +157,12 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     }
   }
 
-  generateApiRecordId(parentId?: string) {
-    const name = this.generateFileName();
-    return parseFsId(this.appendPath(parentId || this.meta.rootPath, name));
+  generateApiRecordId() {
+    return uuidv4();
   }
 
-  generateCollectionId(name: string, parentId?: string) {
-    const path = this.appendPath(parentId || this.meta.rootPath, name);
-    return parseFsId(this.getNormalizedPath(path));
+  generateCollectionId() {
+    return uuidv4();
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {
@@ -279,7 +264,8 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       {
         ...this.parseApiRecordRequest(record),
       },
-      id
+      id,
+      record.collectionId,
     );
 
     if (result.type === "error") {
