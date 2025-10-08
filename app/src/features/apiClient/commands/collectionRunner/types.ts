@@ -8,4 +8,5 @@ export type SavedRunConfig = {
 export type SavedRunConfigRecord = SavedRunConfig & {
   createdTs: number;
   updatedTs: number;
+  collectionId: RQAPI.ApiClientRecord["collectionId"];
 };
