@@ -27,8 +27,8 @@ import { RQTooltip } from "lib/design-system-v2/components";
 
 enum RunResultTabKey {
   ALL = "all",
-  SUCCESS = "success",
-  FAIL = "fail",
+  PASSED = "passed",
+  FAILED = "failed",
   SKIPPED = "skipped",
 }
 
@@ -37,7 +37,7 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
     title: "No tests found",
     description: "No tests to show.",
   },
-  [RunResultTabKey.FAIL]: {
+  [RunResultTabKey.FAILED]: {
     title: "No failed tests",
     description: "No tests failed in this run.",
   },
@@ -45,7 +45,7 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
     title: "No skipped tests",
     description: "No tests skipped in this run.",
   },
-  [RunResultTabKey.SUCCESS]: {
+  [RunResultTabKey.PASSED]: {
     title: "No successful tests",
     description: "No tests passed in this run.",
   },
@@ -285,14 +285,14 @@ export const RunResultContainer: React.FC<{
         children: <TestResultList tabKey={RunResultTabKey.ALL} results={summary.totalTests} />,
       },
       {
-        key: RunResultTabKey.SUCCESS,
-        label: <TestResultTabTitle title="Success" count={summary.successTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.SUCCESS} results={summary.successTests} />,
+        key: RunResultTabKey.PASSED,
+        label: <TestResultTabTitle title="Passed" count={summary.successTestsCounts} loading={running} />,
+        children: <TestResultList tabKey={RunResultTabKey.PASSED} results={summary.successTests} />,
       },
       {
-        key: RunResultTabKey.FAIL,
-        label: <TestResultTabTitle title="Fail" count={summary.failedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.FAIL} results={summary.failedTests} />,
+        key: RunResultTabKey.FAILED,
+        label: <TestResultTabTitle title="Failed" count={summary.failedTestsCounts} loading={running} />,
+        children: <TestResultList tabKey={RunResultTabKey.FAILED} results={summary.failedTests} />,
       },
       {
         key: RunResultTabKey.SKIPPED,
