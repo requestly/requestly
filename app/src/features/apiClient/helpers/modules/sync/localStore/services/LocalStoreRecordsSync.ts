@@ -10,23 +10,27 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
+import {
+  SavedRunConfig,
+  SavedRunConfigRecord,
+  SavedRunResultRecord,
+} from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
   private queryService: ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>;
-  private runConfigQueryService: ApiClientLocalDbQueryService<SavedRunConfig>;
-  private runResultQueryService: ApiClientLocalDbQueryService<SavedRunResult>;
+  private runConfigQueryService: ApiClientLocalDbQueryService<SavedRunConfigRecord>;
+  private runResultQueryService: ApiClientLocalDbQueryService<SavedRunResultRecord>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
-    this.runConfigQueryService = new ApiClientLocalDbQueryService<SavedRunConfig>(
+    this.runConfigQueryService = new ApiClientLocalDbQueryService<SavedRunConfigRecord>(
       meta,
       ApiClientLocalDbTable.COLLECTION_RUN_CONFIGS
     );
-    this.runResultQueryService = new ApiClientLocalDbQueryService<SavedRunResult>(
+    this.runResultQueryService = new ApiClientLocalDbQueryService<SavedRunResultRecord>(
       meta,
       ApiClientLocalDbTable.COLLECTION_RUN_RESULTS
     );
@@ -413,12 +417,11 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
       const runResultToSave = {
         id: this.getNewId(),
-        collectionId,
         ...runResult,
         iterations: resultArray,
-      } as SavedRunResult & { collectionId: RQAPI.ApiClientRecord["collectionId"] };
+      } as SavedRunResult;
 
-      await this.runResultQueryService.getTable().add(runResultToSave);
+      await this.runResultQueryService.getTable().add({ ...runResultToSave, collectionId });
 
       return { success: true, data: runResultToSave };
     } catch (error) {
