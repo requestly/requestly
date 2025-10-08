@@ -339,7 +339,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfig: Partial<RQAPI.RunConfig>
+    runConfig: SavedRunConfig
   ): ResponsePromise<SavedRunConfig> {
     try {
       const result = await this.runConfigQueryService
