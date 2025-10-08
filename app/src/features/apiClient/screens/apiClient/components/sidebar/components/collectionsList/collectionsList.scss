@@ -37,6 +37,28 @@
     overflow: auto;
     padding: 0 8px;
 
+    .top-level-drop-zone {
+      height: 8px;
+      border-top: 2px solid transparent;
+      transition: border-color 0.2s ease;
+      margin: 0;
+
+      &.active {
+        border-top: 2px solid var(--requestly-color-primary-600);
+      }
+    }
+
+    .bottom-level-drop-zone {
+      height: 8px;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s ease;
+      margin: 0;
+
+      &.active {
+        border-bottom: 2px solid var(--requestly-color-primary-600);
+      }
+    }
+
     .collections-list {
       display: flex;
       flex-direction: column;

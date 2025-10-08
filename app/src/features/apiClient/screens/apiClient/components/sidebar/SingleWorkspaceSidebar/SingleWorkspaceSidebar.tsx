@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ApiClientImporterType, RQAPI } from "../../../../../types";
 import { useLocation, useParams } from "react-router-dom";
 import { notification, Tabs, TabsProps, Tooltip } from "antd";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { CollectionsList } from "../components/collectionsList/CollectionsList";
@@ -233,7 +235,7 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
   }, [context, recordsToBeDeleted]);
 
   return (
-    <>
+    <DndProvider backend={HTML5Backend}>
       <div className="api-client-sidebar">
         <div className="api-client-sidebar-content">
           <ApiClientSidebarHeader
@@ -276,6 +278,6 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         handleImportRequest={handleImportRequest}
         onClose={onImportRequestModalClose}
       />
-    </>
+    </DndProvider>
   );
 };
