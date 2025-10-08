@@ -98,12 +98,12 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
             processedResults.environments.push(...result.value.data.environments);
           }
         });
-        setIsParseComplete(true);
         if (processedResults.collections.length === 0 && processedResults.environments.length === 0) {
           throw new Error("Selected Files don't contain any collections or environments");
         }
         setCollectionsData(processedResults.collections);
         setEnvironmentsData(processedResults.environments);
+        setIsParseComplete(true);
         trackImportParsed(importerType, processedResults.collections.length, null);
       })
       .catch((error) => {
@@ -406,6 +406,10 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
           } and ${environmentsData.length} ${environmentsData.length !== 1 ? "environments" : "environment"}`
         );
         trackImportSuccess(importerType, collectionsData.length, null);
+        onImportSuccess();
+      } else {
+        toast.warn(`Partially imported: ${totalImported} succeeded, ${totalFailed} failed. Please review your files.`);
+        trackImportSuccess(importerType, totalImported, null);
         onImportSuccess();
       }
     } catch (e) {
