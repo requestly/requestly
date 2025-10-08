@@ -228,26 +228,15 @@ const TestResultList: React.FC<{
 
   const items = rowVirtualizer.getVirtualItems();
 
-  // TODO: fix overflowing tests-results-view-container
   // Fix gap between rows.
   // Achieve parity with production
   return (
-    <div
-      ref={parentRef}
-      className="tests-results-view-container virtualized-test-results-container"
-      style={{
-        height: "100%",
-        overflow: "auto",
-        position: "relative",
-      }}
-    >
+    <div ref={parentRef} className="tests-results-view-container">
       <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
-          width: "100%",
-          position: "relative",
-          minHeight: "100%",
         }}
+        className="virtualized-test-results-list-container"
       >
         {items.map((virtualItem) => {
           const [iteration, details] = resultsToShow[virtualItem.index];
@@ -259,10 +248,6 @@ const TestResultList: React.FC<{
               data-index={virtualItem.index}
               ref={rowVirtualizer.measureElement}
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
                 transform: `translateY(${virtualItem.start}px)`,
               }}
               className="test-result-collapse-container"

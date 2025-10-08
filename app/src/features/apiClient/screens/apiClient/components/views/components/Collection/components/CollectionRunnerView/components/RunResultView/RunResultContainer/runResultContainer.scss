@@ -136,11 +136,21 @@
     .test-result-collapse-container {
       padding-bottom: 0;
       margin-top: 0;
-      margin-bottom: 2px;
+
+      /* needed for virtualization */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /* */
 
       .ant-collapse {
         background: transparent;
         border: none;
+
+        &.test-result-collapse {
+          margin-bottom: 2px;
+        }
 
         .ant-collapse-item {
           border: none;
@@ -195,7 +205,12 @@
     .tests-results-view-container {
       height: 100%;
       overflow-y: auto;
-      padding-bottom: 25px;
+
+      .virtualized-test-results-list-container {
+        width: 100%;
+        position: relative;
+        min-height: 100%;
+      }
 
       .test-details-container {
         display: flex;
