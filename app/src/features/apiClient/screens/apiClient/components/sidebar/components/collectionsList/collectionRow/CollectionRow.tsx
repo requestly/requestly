@@ -37,7 +37,6 @@ import { PostmanExportModal } from "../../../../modals/postmanCollectionExportMo
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "features/workspaces/types";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
@@ -97,11 +96,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
-  const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
-    state.openTab,
-    state.activeTabSource,
-    state.closeTabBySource,
-  ]);
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -192,7 +187,7 @@ export const CollectionRow: React.FC<Props> = ({
           label: (
             <div className="collection-row-option">
               <MdOutlineVideoLibrary />
-              Run tests
+              Run
             </div>
           ),
           onClick: (itemInfo) => {
@@ -265,16 +260,10 @@ export const CollectionRow: React.FC<Props> = ({
           collectionId: record.id,
         };
 
-        const { oldContextRecords } = await moveRecordsAcrossWorkspace(sourceContext, {
+        await moveRecordsAcrossWorkspace(sourceContext, {
           recordsToMove: [item.record],
           destination,
         });
-
-        if (activeWorkspace.workspaceType !== WorkspaceType.SHARED) {
-          oldContextRecords?.forEach((r) => {
-            closeTabBySource(r.id, "request", true);
-          });
-        }
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -291,7 +280,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [activeWorkspace.workspaceType, record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
+    [activeWorkspace.workspaceType, record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
