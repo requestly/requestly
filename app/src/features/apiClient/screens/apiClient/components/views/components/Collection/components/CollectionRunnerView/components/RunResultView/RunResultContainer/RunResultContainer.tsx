@@ -82,7 +82,6 @@ const RunningRequestPlaceholder: React.FC<{
   );
 };
 
-// Memoized TestDetails component to prevent unnecessary re-renders
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
 }> = React.memo(({ requestExecutionResult }) => {
@@ -172,7 +171,6 @@ const TestDetails: React.FC<{
   );
 });
 
-// Virtualized TestResultList using @tanstack/react-virtual
 const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
@@ -185,7 +183,6 @@ const TestResultList: React.FC<{
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
   ) : null;
 
-  // Convert results to array for virtualization
   const resultsToShow = useMemo(() => Array.from(results), [results]);
 
   const rowVirtualizer = useVirtualizer({
@@ -194,16 +191,6 @@ const TestResultList: React.FC<{
     estimateSize: () => 200, // Estimated size for collapsed/expanded items
     overscan: 1,
   });
-
-  // Auto-scroll to current iteration when it changes
-  // useEffect(() => {
-  //   if (currentlyExecutingRequest && currentlyExecutingRequest.iteration > 0) {
-  //     const index = currentlyExecutingRequest.iteration - 1;
-  //     if (index < resultsToShow.length) {
-  //       rowVirtualizer.scrollToIndex(index, { align: "end" });
-  //     }
-  //   }
-  // }, [currentlyExecutingRequest, resultsToShow.length, rowVirtualizer]);
 
   if (resultsToShow.length === 0) {
     return (
@@ -228,8 +215,6 @@ const TestResultList: React.FC<{
 
   const items = rowVirtualizer.getVirtualItems();
 
-  // Fix gap between rows.
-  // Achieve parity with production
   return (
     <div ref={parentRef} className="tests-results-view-container">
       <div
@@ -298,7 +283,6 @@ export const RunResultContainer: React.FC<{
   const [iterations] = useRunConfigStore((s) => [s.iterations]);
 
   const totalIterationCount = useMemo(() => {
-    console.log("!!!debug", "memo called");
     if (running) {
       return iterations;
     } else {
