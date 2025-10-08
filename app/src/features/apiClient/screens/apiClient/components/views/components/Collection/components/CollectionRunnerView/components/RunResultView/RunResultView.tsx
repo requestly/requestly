@@ -31,7 +31,7 @@ export const RunResultView: React.FC = () => {
   return (
     <div className="run-result-view-container">
       <div className="run-result-view-header">
-        <span className="header">Result</span>
+        <span className="header">Test results</span>
         <RQButton
           size="small"
           type="transparent"

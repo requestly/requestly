@@ -96,10 +96,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
-  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [
-    state.openTab,
-    state.activeTabSource,
-  ]);
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -190,7 +187,7 @@ export const CollectionRow: React.FC<Props> = ({
           label: (
             <div className="collection-row-option">
               <MdOutlineVideoLibrary />
-              Run tests
+              Run
             </div>
           ),
           onClick: (itemInfo) => {
@@ -267,8 +264,6 @@ export const CollectionRow: React.FC<Props> = ({
           recordsToMove: [item.record],
           destination,
         });
-
-
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];

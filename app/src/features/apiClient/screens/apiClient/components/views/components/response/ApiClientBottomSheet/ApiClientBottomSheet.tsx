@@ -84,7 +84,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: <>Tests {testResultsStats}</>,
+        label: <>Test results {testResultsStats}</>,
         children: <TestsView testResults={testResults} handleTestResultRefresh={handleTestResultRefresh} />,
       },
     ];
