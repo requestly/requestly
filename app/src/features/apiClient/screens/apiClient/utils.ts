@@ -1,6 +1,6 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { AbortReason, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import { AbortReason, FormDropDownOptions, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import {
   CONTENT_TYPE_HEADER,
@@ -277,6 +277,33 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
   });
 };
 
+export const generateMultipartFormKeyValuePairs = (data: Record<string, string> = {}): RQAPI.FormDataKeyValuePair[] => {
+  const result: RQAPI.FormDataKeyValuePair[] = [];
+
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof value === "string" && value.startsWith("@")) {
+      result.push({
+        id: Math.random(),
+        key: key || "",
+        value: [] as RQAPI.MultipartFileValue[],
+        isEnabled: true,
+        type: FormDropDownOptions.FILE,
+      } as RQAPI.FormDataKeyValuePair);
+    } else {
+      //for text values
+      result.push({
+        id: Math.random(),
+        key: key || "",
+        value: value || "",
+        isEnabled: true,
+        type: FormDropDownOptions.TEXT,
+      } as RQAPI.FormDataKeyValuePair);
+    }
+  }
+
+  return result;
+};
+
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
   const requestJsonString = curlconverter.toJsonString(curl);
   const requestJson = JSON.parse(requestJsonString);
@@ -287,9 +314,17 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     */
   const requestUrlParams = new URL(requestJson.url).searchParams;
   const paramsFromUrl = generateKeyValuePairs(Object.fromEntries(requestUrlParams.entries()));
-
   const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers));
-  const contentType = getContentTypeFromRequestHeaders(headers);
+  let contentType = getContentTypeFromRequestHeaders(headers);
+
+  // For multipart-form data we need to check the json structure
+  const hasFiles = requestJson.files && Object.keys(requestJson.files).length > 0;
+  const hasData = requestJson.data && Object.keys(requestJson.data).length > 0;
+
+  if (hasFiles) {
+    contentType = RequestContentType.MULTIPART_FORM;
+  }
+
   let body: RQAPI.RequestBody;
 
   switch (contentType) {
@@ -297,9 +332,25 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       body = JSON.stringify(requestJson.data);
       break;
     case RequestContentType.FORM:
-    case RequestContentType.MULTIPART_FORM:
       body = generateKeyValuePairs(requestJson.data);
       break;
+    case RequestContentType.MULTIPART_FORM: {
+      // Handle multipart form data - it can contain both text fields and files
+      // Merge both text data and file references into a single object
+      // File paths from cURL are prefixed with @ (e.g., @/path/to/file)
+      const multipartData: Record<string, string> = {};
+      if (hasData) {
+        Object.assign(multipartData, requestJson.data);
+      }
+
+      if (hasFiles) {
+        Object.entries(requestJson.files).forEach(([key, filePath]) => {
+          multipartData[key] = `@${filePath}`;
+        });
+      }
+      body = generateMultipartFormKeyValuePairs(multipartData);
+      break;
+    }
     default:
       body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
       break;
