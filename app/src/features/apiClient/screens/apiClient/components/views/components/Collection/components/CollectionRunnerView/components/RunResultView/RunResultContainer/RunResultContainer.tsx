@@ -220,8 +220,10 @@ const TestResultList: React.FC<{
       <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
+          width: "100%",
+          position: "relative",
+          minHeight: "100%",
         }}
-        className="virtualized-test-results-list-container"
       >
         {items.map((virtualItem) => {
           const [iteration, details] = resultsToShow[virtualItem.index];
@@ -234,6 +236,10 @@ const TestResultList: React.FC<{
               ref={rowVirtualizer.measureElement}
               style={{
                 transform: `translateY(${virtualItem.start}px)`,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
               }}
               className="test-result-collapse-container"
             >
