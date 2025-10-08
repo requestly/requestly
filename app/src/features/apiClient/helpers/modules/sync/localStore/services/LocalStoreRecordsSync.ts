@@ -302,8 +302,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     try {
       const runConfig = await this.runConfigQueryService
         .getTable()
-        .where(`[id+collectionId]`)
-        .equals([runConfigId, collectionId])
+        .where(`[collectionId+id]`)
+        .equals([collectionId, runConfigId])
         .first();
 
       if (!runConfig) {
@@ -340,8 +340,8 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     try {
       const result = await this.runConfigQueryService
         .getTable()
-        .where(`[id+collectionId]`)
-        .equals([runConfig.id, collectionId])
+        .where(`[collectionId+id]`)
+        .equals([collectionId, runConfig.id])
         .first();
 
       const timeStamp = Timestamp.now().toMillis();
@@ -374,19 +374,62 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
-    return {
-      success: true,
-      data: [],
-    };
+    try {
+      const runResults = await this.runResultQueryService.getTable().where({ collectionId }).toArray();
+
+      if (!runResults) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Not found!",
+          },
+        };
+      }
+
+      return {
+        success: true,
+        data: runResults,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        },
+      };
+    }
   }
 
   async addRunResult(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runResult: RunResult
   ): ResponsePromise<SavedRunResult> {
-    return {
-      success: true,
-      data: null,
-    };
+    try {
+      const resultArray = Array.from(runResult.iterations.values());
+
+      const runResultToSave = {
+        id: this.getNewId(),
+        collectionId,
+        ...runResult,
+        iterations: resultArray,
+      } as SavedRunResult & { collectionId: RQAPI.ApiClientRecord["collectionId"] };
+
+      await this.runResultQueryService.getTable().add(runResultToSave);
+
+      return { success: true, data: runResultToSave };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        },
+      };
+    }
   }
 }
