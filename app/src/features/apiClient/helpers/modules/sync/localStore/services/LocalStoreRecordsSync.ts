@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { LocalStoreApiClientRecord } from "./types";
+import { LocalStore } from "./types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
@@ -286,14 +286,26 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return this.queryService.getIsAllCleared();
   }
 
+  private async getCollectionDetails(
+    collectionId: RQAPI.ApiClientRecord["collectionId"]
+  ): Promise<LocalStore.CollectionRecord | null> {
+    const result = await this.getRecord(collectionId);
+
+    if (!result.success) {
+      return null;
+    }
+
+    return result.data as LocalStore.CollectionRecord;
+  }
+
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
   ): ResponsePromise<SavedRunConfig> {
     try {
-      const result = await this.getRecord(collectionId);
+      const collection = await this.getCollectionDetails(collectionId);
 
-      if (!result.success) {
+      if (!collection) {
         return {
           success: false,
           data: null,
@@ -304,7 +316,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         };
       }
 
-      const runConfig = (result.data as LocalStoreApiClientRecord)?.runConfigs?.[runConfigId];
+      const runConfig = collection?.runConfigs?.[runConfigId];
 
       if (!runConfig) {
         return {
@@ -338,9 +350,9 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     runConfig: SavedRunConfig
   ): ResponsePromise<SavedRunConfig> {
     try {
-      const result = await this.getRecord(collectionId);
+      const collection = await this.getCollectionDetails(collectionId);
 
-      if (!result.success) {
+      if (!collection) {
         return {
           success: false,
           data: null,
@@ -351,24 +363,22 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         };
       }
 
-      const collection = result.data as LocalStoreApiClientRecord;
-
       const timeStamp = Timestamp.now().toMillis();
       const updatedRunConfig = {
         ...runConfig,
         updatedTs: timeStamp,
       } as SavedRunConfigRecord;
 
-      updatedRunConfig.createdTs = collection.runConfigs[runConfig.id]?.createdTs || timeStamp;
+      updatedRunConfig.createdTs = collection.runConfigs?.[runConfig.id]?.createdTs || timeStamp;
 
       this.updateRecord(
         {
           ...collection,
           runConfigs: {
-            ...collection.runConfigs,
+            ...(collection.runConfigs ?? {}),
             [runConfig.id]: updatedRunConfig,
           },
-        } as LocalStoreApiClientRecord,
+        } as LocalStore.CollectionRecord,
         collection.id
       );
 
@@ -387,9 +397,9 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
     try {
-      const result = await this.getRecord(collectionId);
+      const collection = await this.getCollectionDetails(collectionId);
 
-      if (!result.success) {
+      if (!collection) {
         return {
           success: false,
           data: null,
@@ -400,7 +410,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         };
       }
 
-      const runResults = (result.data as LocalStoreApiClientRecord)?.runResults || [];
+      const runResults = collection.runResults || [];
       return {
         success: true,
         data: runResults,
@@ -422,17 +432,9 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     runResult: RunResult
   ): ResponsePromise<SavedRunResult> {
     try {
-      const resultArray = Array.from(runResult.iterations.values());
+      const collection = await this.getCollectionDetails(collectionId);
 
-      const runResultToSave = {
-        id: this.getNewId(),
-        ...runResult,
-        iterations: resultArray,
-      } as SavedRunResult;
-
-      const result = await this.getRecord(collectionId);
-
-      if (!result.success) {
+      if (!collection) {
         return {
           success: false,
           data: null,
@@ -443,12 +445,19 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         };
       }
 
-      const collection = result.data as LocalStoreApiClientRecord;
+      const resultArray = Array.from(runResult.iterations.values());
+
+      const runResultToSave = {
+        id: this.getNewId(),
+        ...runResult,
+        iterations: resultArray,
+      } as SavedRunResult;
+
       await this.updateRecord(
         {
           ...collection,
           runResults: [...(collection.runResults || []), runResultToSave],
-        } as LocalStoreApiClientRecord,
+        } as LocalStore.CollectionRecord,
         collection.id
       );
 

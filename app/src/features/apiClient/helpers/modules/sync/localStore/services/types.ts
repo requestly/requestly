@@ -2,7 +2,9 @@ import { SavedRunConfigRecord } from "features/apiClient/commands/collectionRunn
 import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { RQAPI } from "features/apiClient/types";
 
-export type LocalStoreApiClientRecord = RQAPI.ApiClientRecord & {
-  runConfigs?: Record<SavedRunConfigRecord["id"], SavedRunConfigRecord>;
-  runResults?: RunResult[];
-};
+export namespace LocalStore {
+  export type CollectionRecord = RQAPI.CollectionRecord & {
+    runConfigs?: Record<SavedRunConfigRecord["id"], SavedRunConfigRecord>;
+    runResults?: RunResult[];
+  };
+}
