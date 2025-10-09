@@ -69,6 +69,7 @@ const RulesFeatureContainer = () => {
           rule_type: message.rqRuleId?.split("_")?.[0],
           rule_id: message.rqRuleId,
           error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
+          is_migration_triggered: window.location.search.includes("updatedToMv3"),
           source_key: sourceCondition?.key,
           source_operator: sourceCondition?.operator,
           source_value: sourceCondition?.value,

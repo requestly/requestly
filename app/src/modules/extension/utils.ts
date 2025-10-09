@@ -48,6 +48,9 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   const rulesMigrationLogs: Record<string, any> = {};
   const migratedRules: Rule[] = [];
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceMigrate = urlParams.get("updatedToMv3") != null;
+
   let pathImpactedRulesCount = 0;
   let pageUrlImpactedRulesCount = 0;
 
@@ -58,7 +61,7 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
       isMigrated,
       isPathImpactedRule,
       isPageUrlImpactedRule,
-    } = migrateRuleToMV3(rule);
+    } = migrateRuleToMV3(rule, forceMigrate);
     if (ruleMigrationLogs) {
       rulesMigrationLogs[migratedRule.id] = ruleMigrationLogs;
       pathImpactedRulesCount += isPathImpactedRule ? 1 : 0;
@@ -112,7 +115,8 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
 };
 
 export const migrateRuleToMV3 = (
-  rule: Rule
+  rule: Rule,
+  forceMigrate = false
 ): {
   isMigrated: boolean;
   rule: Rule;
@@ -122,7 +126,8 @@ export const migrateRuleToMV3 = (
 } => {
   if (
     rule?.schemaVersion &&
-    semver.gte(rule?.schemaVersion as string, LATEST_RULES_SCHEMA_VERSION[rule.ruleType])
+    semver.gte(rule?.schemaVersion as string, LATEST_RULES_SCHEMA_VERSION[rule.ruleType]) &&
+    !forceMigrate
   ) {
     return {
       isMigrated: false,
