@@ -31,7 +31,7 @@ interface PostmanEnvironmentExport {
 }
 
 interface RequestBodyProcessingResult {
-  requestBody: string | KeyValuePair[] | null;
+  bodyContainer: RQAPI.RequestBodyContainer;
   contentType: RequestContentType;
   headers: KeyValuePair[];
 }
@@ -197,7 +197,9 @@ const processRawRequestBody = (raw: string, options: any, headers: KeyValuePair[
   const updatedHeaders = raw.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
 
   return {
-    requestBody: raw,
+    bodyContainer: {
+      text: raw,
+    },
     contentType,
     headers: updatedHeaders,
   };
@@ -205,13 +207,15 @@ const processRawRequestBody = (raw: string, options: any, headers: KeyValuePair[
 
 const processFormDataBody = (formdata: any[]): Omit<RequestBodyProcessingResult, "headers"> => {
   return {
-    requestBody:
-      formdata?.map((formData: { key: string; value: string }) => ({
-        id: Date.now(),
-        key: formData.key,
-        value: formData.value,
-        isEnabled: true,
-      })) || [],
+    bodyContainer: {
+      form:
+        formdata?.map((formData: { key: string; value: string }) => ({
+          id: Date.now(),
+          key: formData.key,
+          value: formData.value,
+          isEnabled: true,
+        })) || [],
+    },
     contentType: RequestContentType.FORM,
   };
 };
@@ -221,12 +225,14 @@ const processUrlEncodedBody = (urlencoded: any[], headers: KeyValuePair[]): Requ
   const updatedHeaders = urlencoded.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
 
   return {
-    requestBody: urlencoded.map((data: { key: string; value: string }) => ({
-      id: Date.now() + Math.random(),
-      key: data?.key || "",
-      value: data?.value || "",
-      isEnabled: true,
-    })),
+    bodyContainer: {
+      form: urlencoded.map((data: { key: string; value: string }) => ({
+        id: Date.now() + Math.random(),
+        key: data?.key || "",
+        value: data?.value || "",
+        isEnabled: true,
+      })),
+    },
     contentType,
     headers: updatedHeaders,
   };
@@ -235,7 +241,7 @@ const processUrlEncodedBody = (urlencoded: any[], headers: KeyValuePair[]): Requ
 const processRequestBody = (request: any): RequestBodyProcessingResult => {
   if (!request.body) {
     return {
-      requestBody: null,
+      bodyContainer: null,
       contentType: RequestContentType.RAW,
       headers: request.header || [],
     };
@@ -245,7 +251,9 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     const contentType = RequestContentType.JSON;
     const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
     return {
-      requestBody: JSON.stringify(graphql),
+      bodyContainer: {
+        text: JSON.stringify(graphql),
+      },
       contentType,
       headers: updatedHeaders,
     };
@@ -271,13 +279,16 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
       return processGraphqlBody(graphql, headers);
     default:
       return {
-        requestBody: null,
+        bodyContainer: {
+          text: "",
+        },
         contentType: RequestContentType.RAW,
         headers,
       };
   }
 };
 
+//api record creation stage
 const createApiRecord = (
   item: any,
   parentCollectionId: string,
@@ -294,7 +305,7 @@ const createApiRecord = (
       isEnabled: true,
     })) ?? [];
 
-  const { requestBody, contentType, headers } = processRequestBody(request);
+  const { contentType, headers, bodyContainer } = processRequestBody(request);
 
   return {
     id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
@@ -309,7 +320,7 @@ const createApiRecord = (
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
-        body: requestBody,
+        bodyContainer: bodyContainer,
         contentType,
       },
       response: null,

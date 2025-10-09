@@ -290,18 +290,18 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
 
   const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers));
   const contentType = getContentTypeFromRequestHeaders(headers);
-  let body: RQAPI.RequestBody;
+  let bodyContainer: RQAPI.RequestBodyContainer = {};
 
   switch (contentType) {
     case RequestContentType.JSON:
-      body = JSON.stringify(requestJson.data);
+      bodyContainer.text = JSON.stringify(requestJson.data);
       break;
     case RequestContentType.FORM:
     case RequestContentType.MULTIPART_FORM:
-      body = generateKeyValuePairs(requestJson.data);
+      bodyContainer.form = generateKeyValuePairs(requestJson.data);
       break;
     default:
-      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
+      bodyContainer.text = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
       break;
   }
 
@@ -314,7 +314,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
     headers,
     contentType,
-    body: body ?? null,
+    bodyContainer,
   };
 
   return request;

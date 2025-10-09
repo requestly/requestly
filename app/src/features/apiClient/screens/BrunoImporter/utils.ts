@@ -74,22 +74,22 @@ const createApiRecord = (
 
   // Handle body conversions
   let contentType: RequestContentType | null = null;
-  let requestBody: string | KeyValuePair[] | null = null;
+  let bodyContainer: RQAPI.RequestBodyContainer = {};
 
   if (request.body?.mode) {
     switch (request.body.mode) {
       case "json":
         contentType = RequestContentType.JSON;
-        requestBody =
+        bodyContainer["text"] =
           typeof request.body.json === "string" ? request.body.json : JSON.stringify(request.body.json, null, 2);
         break;
       case "formUrlEncoded":
         contentType = RequestContentType.FORM;
-        requestBody = processParams(request.body.formUrlEncoded);
+        bodyContainer["form"] = processParams(request.body.formUrlEncoded);
         break;
       default:
         contentType = RequestContentType.RAW;
-        requestBody = "";
+        bodyContainer["text"] = "";
         break;
     }
   }
@@ -106,7 +106,7 @@ const createApiRecord = (
         method: (request.method || "GET") as RequestMethod,
         queryParams: processParams(request.params),
         headers: processParams(request.headers),
-        body: requestBody,
+        bodyContainer: bodyContainer,
         contentType,
       },
       response: null,
