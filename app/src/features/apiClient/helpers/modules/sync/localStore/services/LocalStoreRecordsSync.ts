@@ -371,7 +371,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
       updatedRunConfig.createdTs = collection.runConfigs?.[runConfig.id]?.createdTs || timeStamp;
 
-      this.updateRecord(
+      await this.updateRecord(
         {
           ...collection,
           runConfigs: {
