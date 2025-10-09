@@ -10,30 +10,17 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
-import {
-  SavedRunConfig,
-  SavedRunConfigRecord,
-  SavedRunResultRecord,
-} from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { LocalStoreApiClientRecord } from "./types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
   private queryService: ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>;
-  private runConfigQueryService: ApiClientLocalDbQueryService<SavedRunConfigRecord>;
-  private runResultQueryService: ApiClientLocalDbQueryService<SavedRunResultRecord>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
     this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
-    this.runConfigQueryService = new ApiClientLocalDbQueryService<SavedRunConfigRecord>(
-      meta,
-      ApiClientLocalDbTable.COLLECTION_RUN_CONFIGS
-    );
-    this.runResultQueryService = new ApiClientLocalDbQueryService<SavedRunResultRecord>(
-      meta,
-      ApiClientLocalDbTable.COLLECTION_RUN_RESULTS
-    );
   }
 
   private getNewId() {
@@ -304,11 +291,20 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     runConfigId: RQAPI.RunConfig["id"]
   ): ResponsePromise<SavedRunConfig> {
     try {
-      const runConfig = await this.runConfigQueryService
-        .getTable()
-        .where(`[collectionId+id]`)
-        .equals([collectionId, runConfigId])
-        .first();
+      const result = await this.getRecord(collectionId);
+
+      if (!result.success) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const runConfig = (result.data as LocalStoreApiClientRecord)?.runConfigs?.[runConfigId];
 
       if (!runConfig) {
         return {
@@ -342,27 +338,39 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     runConfig: SavedRunConfig
   ): ResponsePromise<SavedRunConfig> {
     try {
-      const result = await this.runConfigQueryService
-        .getTable()
-        .where(`[collectionId+id]`)
-        .equals([collectionId, runConfig.id])
-        .first();
+      const result = await this.getRecord(collectionId);
+
+      if (!result.success) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const collection = result.data as LocalStoreApiClientRecord;
 
       const timeStamp = Timestamp.now().toMillis();
       const updatedRunConfig = {
         ...runConfig,
         updatedTs: timeStamp,
-        collectionId: collectionId,
-      } as Partial<SavedRunConfigRecord>;
+      } as SavedRunConfigRecord;
 
-      if (!result) {
-        updatedRunConfig.createdTs = timeStamp;
-      }
+      updatedRunConfig.createdTs = collection.runConfigs[runConfig.id]?.createdTs || timeStamp;
 
-      await this.runConfigQueryService.getTable().upsert([collectionId, runConfig.id], {
-        ...updatedRunConfig,
-        id: runConfig.id,
-      } as SavedRunConfigRecord);
+      this.updateRecord(
+        {
+          ...collection,
+          runConfigs: {
+            ...collection.runConfigs,
+            [runConfig.id]: updatedRunConfig,
+          },
+        } as LocalStoreApiClientRecord,
+        collection.id
+      );
 
       return { success: true, data: { id: runConfig.id, runOrder: updatedRunConfig.runOrder } };
     } catch (error) {
@@ -379,8 +387,20 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
     try {
-      const runResults = await this.runResultQueryService.getTable().where({ collectionId }).toArray();
+      const result = await this.getRecord(collectionId);
 
+      if (!result.success) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const runResults = (result.data as LocalStoreApiClientRecord)?.runResults || [];
       return {
         success: true,
         data: runResults,
@@ -410,7 +430,27 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         iterations: resultArray,
       } as SavedRunResult;
 
-      await this.runResultQueryService.getTable().add({ ...runResultToSave, collectionId });
+      const result = await this.getRecord(collectionId);
+
+      if (!result.success) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const collection = result.data as LocalStoreApiClientRecord;
+      await this.updateRecord(
+        {
+          ...collection,
+          runResults: [...(collection.runResults || []), runResultToSave],
+        } as LocalStoreApiClientRecord,
+        collection.id
+      );
 
       return { success: true, data: runResultToSave };
     } catch (error) {
