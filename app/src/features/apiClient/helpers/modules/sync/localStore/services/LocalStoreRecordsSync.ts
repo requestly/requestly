@@ -381,17 +381,6 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     try {
       const runResults = await this.runResultQueryService.getTable().where({ collectionId }).toArray();
 
-      if (!runResults) {
-        return {
-          success: false,
-          data: null,
-          error: {
-            type: "NOT_FOUND",
-            message: "Not found!",
-          },
-        };
-      }
-
       return {
         success: true,
         data: runResults,
