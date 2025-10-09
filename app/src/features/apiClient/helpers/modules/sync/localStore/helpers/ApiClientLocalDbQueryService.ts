@@ -12,7 +12,7 @@ export class ApiClientLocalDbQueryService<T> {
     this.dbInstance = dbProvider.get(meta);
   }
 
-  getTable() {
+  private getTable() {
     return this.dbInstance.db.table<T>(this.tableName);
   }
 
