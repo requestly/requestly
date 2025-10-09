@@ -71,7 +71,7 @@ export enum HistorySaveStatus {
 
 const HistorySaveStateMachine = {
   [HistorySaveStatus.IDLE]: [HistorySaveStatus.IDLE, HistorySaveStatus.SAVING],
-  [HistorySaveStatus.SAVING]: [HistorySaveStatus.SUCCESS, HistorySaveStatus.FAILED],
+  [HistorySaveStatus.SAVING]: [HistorySaveStatus.IDLE, HistorySaveStatus.SUCCESS, HistorySaveStatus.FAILED],
   [HistorySaveStatus.SUCCESS]: [HistorySaveStatus.IDLE],
   [HistorySaveStatus.FAILED]: [HistorySaveStatus.IDLE],
 };
