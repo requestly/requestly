@@ -9,10 +9,8 @@ export class ApiClientLocalDb {
     this.db = new Dexie("apiClientLocalStorageDB") as Dexie;
 
     this.db.version(metadata.version).stores({
-      [ApiClientLocalDbTable.APIS]: "id",
+      [ApiClientLocalDbTable.APIS]: "id", // indexed by id
       [ApiClientLocalDbTable.ENVIRONMENTS]: "id",
-      [ApiClientLocalDbTable.COLLECTION_RUN_CONFIGS]: "[collectionId+id]",
-      [ApiClientLocalDbTable.COLLECTION_RUN_RESULTS]: "[collectionId+id]",
     });
   }
 }
