@@ -179,14 +179,14 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
 class FsManagerServiceAdapterProvider {
   private cache = new Map<string, FsManagerServiceAdapter>();
-  private lockMap = new Map<string, MutexInterface>;
+  private lockMap = new Map<string, MutexInterface>();
   constructor() {
     console.log("provider created");
   }
 
   async get(rootPath: string) {
     let lock = this.lockMap.get(rootPath);
-    if(!lock) {
+    if (!lock) {
       lock = withTimeout(new Mutex(), 10 * 1000);
       this.lockMap.set(rootPath, lock);
     }
