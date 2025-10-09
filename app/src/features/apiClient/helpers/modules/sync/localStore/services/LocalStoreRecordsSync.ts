@@ -359,7 +359,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         updatedRunConfig.createdTs = timeStamp;
       }
 
-      await this.runConfigQueryService.getTable().put({
+      await this.runConfigQueryService.getTable().upsert([collectionId, runConfig.id], {
         ...updatedRunConfig,
         id: runConfig.id,
       } as SavedRunConfigRecord);
