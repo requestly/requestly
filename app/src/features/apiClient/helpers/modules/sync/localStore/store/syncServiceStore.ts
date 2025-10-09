@@ -7,6 +7,8 @@ import { LocalStoreEnvSync } from "../services/LocalStoreEnvSync";
 import { toast } from "utils/Toast";
 import { trackLocalStorageSyncStarted } from "modules/analytics/events/features/apiClient";
 import { EnvironmentData } from "backend/environment/types";
+import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
+import { LocalStore } from "../services/types";
 
 async function getSyncStatus() {
   const apisSyncStatus = await getEntitySyncStatus(localStoreRepository.apiClientRecordsRepository);
@@ -47,9 +49,19 @@ export const createSyncServiceStore = () => {
 
       try {
         const result = await localStoreRepository.apiClientRecordsRepository.getAllRecords();
-        const recordsToSync = recordsToSkip
+        const filteredRecords = recordsToSkip
           ? result.data.records.filter((r) => !recordsToSkip.has(r.id))
           : result.data.records;
+
+        const recordsToSync = filteredRecords.map((record) => {
+          if (isApiCollection(record)) {
+            // runConfigs & runResults are synced separately
+            const { runConfigs = {}, runResults = [], ...rest } = record as LocalStore.CollectionRecord;
+            return rest;
+          }
+
+          return record;
+        });
 
         const syncResult = await syncRepository.apiClientRecordsRepository.batchCreateRecordsWithExistingId(
           recordsToSync
@@ -59,9 +71,17 @@ export const createSyncServiceStore = () => {
           throw new Error(syncResult.message);
         }
 
+        const runDetails = filteredRecords
+          .filter((record) => isApiCollection(record))
+          .map((record: LocalStore.CollectionRecord) => ({
+            collectionId: record.id,
+            runConfigs: record.runConfigs ?? {},
+            runResults: record.runResults ?? [],
+          }));
+
+        await syncRepository.apiClientRecordsRepository.batchCreateCollectionRunDetails(runDetails);
         await localStoreRepository.apiClientRecordsRepository.clear();
         set({ apisSyncStatus: APIClientSyncService.Status.SUCCESS });
-
         return { success: true, data: result.data.records };
       } catch (error) {
         Sentry.captureException(error);
