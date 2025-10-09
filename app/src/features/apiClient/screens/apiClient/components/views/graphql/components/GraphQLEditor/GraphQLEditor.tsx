@@ -139,8 +139,15 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
       extensions.push(json());
     }
 
+    const docValue =
+      typeof initialDocRef.current === "object" && initialDocRef.current !== null
+        ? JSON.stringify(initialDocRef.current, null, 2)
+        : typeof initialDocRef.current === "string"
+        ? initialDocRef.current
+        : "";
+
     const state = EditorState.create({
-      doc: initialDocRef.current || "",
+      doc: docValue,
       extensions,
     });
 
