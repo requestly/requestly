@@ -6,8 +6,7 @@ import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow, ExportType, DraggableApiRecord } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
 import { useDrop } from "react-dnd";
-import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { moveRecords } from "features/apiClient/commands/records";
+import { useCommand } from "features/apiClient/commands";
 import {
   convertFlatRecordsToNestedRecords,
   isApiCollection,
@@ -52,7 +51,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
   const { apiClientRecordsRepository } = useApiClientRepository();
-  const context = useApiClientFeatureContext();
+  const {
+    api: { moveRecords },
+  } = useCommand();
  
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -344,9 +345,9 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const handleDropToRoot = useCallback(
     async (item: DraggableApiRecord) => {
       try {
-        await moveRecords(context, {
-          recordsToMove: [item.record],
+        await moveRecords({
           collectionId: "",
+          recordsToMove: [item.record],
         });
         
         toast.success(`Moved "${item.record.name}" to workspace root`);
@@ -354,7 +355,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         toast.error((error as any)?.message || "Failed to move item. Please try again.");
       }
     },
-    [context]
+    [moveRecords]
   );
 
   // Drop zone for the entire content area (background drops)
