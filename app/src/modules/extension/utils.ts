@@ -141,6 +141,7 @@ export const migrateRuleToMV3 = (
     currentVersion: rule?.schemaVersion,
     latestVersion: LATEST_RULES_SCHEMA_VERSION[rule.ruleType],
     rule,
+    forceMigrate,
   });
 
   let isPathImpactedRule = false;
