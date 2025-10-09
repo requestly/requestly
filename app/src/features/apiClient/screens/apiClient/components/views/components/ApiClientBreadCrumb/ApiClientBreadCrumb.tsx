@@ -80,7 +80,7 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
               <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
                 <span className="api-client-local-workspace-path-breadcrumb">
                   <LuFolderCog className="api-client-local-workspace-icon" />
-                  {truncatePath + "/" + currentWorkspace.getState().name}
+                  {truncatePath}
                 </span>
               </Tooltip>
             </div>
