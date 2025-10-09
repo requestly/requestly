@@ -193,13 +193,6 @@ class Runner {
       });
     } catch (e) {
       this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.FAILED);
-      notification.error({
-        message: "Run completed but couldn't save the result!",
-        placement: "bottomRight",
-        className: "collection-runner-notification",
-        duration: 3,
-        style: { width: "fit-content" },
-      });
 
       trackCollectionRunSaveHistoryFailed({
         collection_id: collectionId,
