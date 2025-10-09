@@ -182,19 +182,31 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = tr
     },
   };
 
-  if (entry.request.body != null) {
+  // Handle bodyContainer - sanitize and sync to body
+  if (entry.request.bodyContainer) {
+    const { bodyContainer, contentType } = entry.request;
+
     if (!supportsRequestBody(entry.request.method)) {
+      // Method doesn't support body
       sanitizedEntry.request.body = null;
-    } else if (entry.request.contentType === RequestContentType.FORM) {
-      sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        entry.request.body as RQAPI.RequestFormBody,
-        removeInvalidPairs
-      );
-    } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
-      sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        entry.request.body as RQAPI.MultipartFormBody,
-        removeInvalidPairs
-      );
+      sanitizedEntry.request.bodyContainer = {};
+    } else {
+      // Sanitize bodyContainer based on content type
+      const sanitizedBodyContainer: RQAPI.RequestBodyContainer = {};
+
+      if (contentType === RequestContentType.FORM && bodyContainer.form) {
+        sanitizedBodyContainer.form = sanitizeKeyValuePairs(bodyContainer.form, removeInvalidPairs);
+        sanitizedEntry.request.body = sanitizedBodyContainer.form;
+      } else if (contentType === RequestContentType.MULTIPART_FORM && bodyContainer.multipartForm) {
+        sanitizedBodyContainer.multipartForm = sanitizeKeyValuePairs(bodyContainer.multipartForm, removeInvalidPairs);
+        sanitizedEntry.request.body = sanitizedBodyContainer.multipartForm;
+      } else if (bodyContainer.text !== undefined) {
+        // Text-based content types (JSON, RAW, HTML, XML, JavaScript)
+        sanitizedBodyContainer.text = bodyContainer.text;
+        sanitizedEntry.request.body = bodyContainer.text;
+      }
+
+      sanitizedEntry.request.bodyContainer = sanitizedBodyContainer;
     }
   }
 
