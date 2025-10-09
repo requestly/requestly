@@ -16,11 +16,14 @@ import { LocalStore } from "./types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>;
+  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
-    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
+    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>(
+      meta,
+      ApiClientLocalDbTable.APIS
+    );
   }
 
   private getNewId() {
@@ -284,6 +287,20 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
   async getIsAllCleared(): Promise<boolean> {
     return this.queryService.getIsAllCleared();
+  }
+
+  async batchCreateCollectionRunDetails(
+    details: {
+      collectionId: RQAPI.CollectionRecord["id"];
+      runConfigs?: Record<string, SavedRunConfig>;
+      runResults?: RunResult[];
+    }[]
+  ): RQAPI.RecordsPromise {
+    return {
+      success: false,
+      data: null,
+      message: "Not implemented",
+    };
   }
 
   private async getCollectionDetails(
