@@ -218,7 +218,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
       };
     }
 
-    return batchCreateCollectionRunDetailsInFirebase(this.meta.uid, this.meta.teamId, details);
+    return batchCreateCollectionRunDetailsInFirebase(details);
   }
 
   async getRunConfig(
