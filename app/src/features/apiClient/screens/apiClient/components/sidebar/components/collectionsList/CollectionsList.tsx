@@ -7,8 +7,7 @@ import { CollectionRow, ExportType, DraggableApiRecord } from "./collectionRow/C
 import { RequestRow } from "./requestRow/RequestRow";
 import { useDrop } from "react-dnd";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { moveRecordsAcrossWorkspace } from "features/apiClient/commands/records";
-import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
+import { moveRecords } from "features/apiClient/commands/records";
 import {
   convertFlatRecordsToNestedRecords,
   isApiCollection,
@@ -345,26 +344,17 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const handleDropToRoot = useCallback(
     async (item: DraggableApiRecord) => {
       try {
-        const sourceContext = getApiClientFeatureContext(item.contextId);
-        
-        await moveRecordsAcrossWorkspace(sourceContext, {
+        await moveRecords(context, {
           recordsToMove: [item.record],
-          destination: {
-            contextId: context.id,
-            collectionId: "",
-          },
+          collectionId: "",
         });
         
         toast.success(`Moved "${item.record.name}" to workspace root`);
       } catch (error) {
-        notification.error({
-          message: "Error moving item",
-          description: (error as any)?.message || "Failed to move item. Please try again.",
-          placement: "bottomRight",
-        });
+        toast.error((error as any)?.message || "Failed to move item. Please try again.");
       }
     },
-    [context.id]
+    [context]
   );
 
   // Drop zone for the entire content area (background drops)
