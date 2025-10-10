@@ -66,9 +66,7 @@ root.render(
         }}
       >
         <HotkeysProvider>
-          <DndProvider backend={HTML5Backend}>
-            {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}
-          </DndProvider>
+          {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}
         </HotkeysProvider>
       </Sentry.ErrorBoundary>
     </PersistGate>

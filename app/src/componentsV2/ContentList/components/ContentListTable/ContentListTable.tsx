@@ -229,27 +229,29 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       {isDragAndDropEnabled && dragAndDrop ? (
-        <Table
-          {...commonProps}
-          components={{
-            body: {
-              row: DraggableBodyRow,
-            },
-          }}
-          onRow={(record, index) => {
-            const onRowAttr = onRowCallback(record);
+        <DndProvider backend={HTML5Backend}>
+          <Table
+            {...commonProps}
+            components={{
+              body: {
+                row: DraggableBodyRow,
+              },
+            }}
+            onRow={(record, index) => {
+              const onRowAttr = onRowCallback(record);
 
-            const attr = {
-              index,
-              onRowDrop,
-              recordId: record[rowKey],
-              record: record,
-              ...onRowAttr,
-            };
+              const attr = {
+                index,
+                onRowDrop,
+                recordId: record[rowKey],
+                record: record,
+                ...onRowAttr,
+              };
 
-            return attr as React.HTMLAttributes<any>;
-          }}
-        />
+              return attr as React.HTMLAttributes<any>;
+            }}
+          />
+        </DndProvider>
       ) : (
         <Table {...commonProps} onRow={onRowCallback} />
       )}
