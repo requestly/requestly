@@ -11,7 +11,7 @@ export const batchCreateCollectionRunDetailsInFirebase = async (
     runConfigs?: Record<string, SavedRunConfig>;
     runResults?: RunResult[];
   }[]
-): Promise<RQAPI.RecordsPromise> => {
+): RQAPI.RecordsPromise => {
   try {
     for (const record of details) {
       const { runConfigs = {}, runResults = [], collectionId } = record;
