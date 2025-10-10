@@ -177,19 +177,46 @@ const TestResultList: React.FC<{
 }> = ({ tabKey, results }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
   const parentRef = useRef<HTMLDivElement>(null);
+  const resultsToShow = useMemo(() => Array.from(results), [results]);
+  const resultsToShowRef = useRef(resultsToShow);
+  resultsToShowRef.current = resultsToShow;
+
+  // Initialize with all iterations expanded by default
+  const [expandedKeys, setExpandedKeys] = useState<Set<number>>(() => {
+    return new Set(resultsToShowRef.current.map(([iteration]) => iteration));
+  });
+
+  // Track previous results to detect changes
+  const prevResultsRef = useRef(results);
+
+  // Reset expanded keys when results change (new run)
+  if (prevResultsRef.current !== results) {
+    prevResultsRef.current = results;
+    setExpandedKeys(new Set(resultsToShow.map(([iteration]) => iteration)));
+  }
 
   const currentRunningRequest = currentlyExecutingRequest ? (
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
   ) : null;
 
-  const resultsToShow = useMemo(() => Array.from(results), [results]);
-
   const rowVirtualizer = useVirtualizer({
     count: resultsToShow.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 200, // Estimated size for collapsed/expanded items
-    overscan: 1,
+    overscan: 3,
   });
+
+  const handleCollapseChange = (iteration: number) => {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev);
+      if (prev.has(iteration)) {
+        next.delete(iteration);
+      } else {
+        next.add(iteration);
+      }
+      return next;
+    });
+  };
 
   if (resultsToShow.length === 0) {
     return (
@@ -243,8 +270,10 @@ const TestResultList: React.FC<{
               className="test-result-collapse-container"
             >
               <Collapse
+                ghost
                 className="test-result-collapse"
-                defaultActiveKey={[iteration]}
+                activeKey={expandedKeys.has(iteration) ? [iteration] : []}
+                onChange={() => handleCollapseChange(iteration)}
                 expandIcon={({ isActive }) => (
                   <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />
                 )}
