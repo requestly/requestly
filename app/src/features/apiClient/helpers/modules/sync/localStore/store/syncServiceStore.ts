@@ -9,6 +9,7 @@ import { trackLocalStorageSyncStarted } from "modules/analytics/events/features/
 import { EnvironmentData } from "backend/environment/types";
 import { isApiCollection } from "features/apiClient/screens/apiClient/utils";
 import { LocalStore } from "../services/types";
+import { NativeError } from "errors/NativeError";
 
 async function getSyncStatus() {
   const apisSyncStatus = await getEntitySyncStatus(localStoreRepository.apiClientRecordsRepository);
@@ -68,7 +69,7 @@ export const createSyncServiceStore = () => {
         );
 
         if (!syncResult.success) {
-          throw new Error(syncResult.message);
+          throw new NativeError(syncResult.message);
         }
 
         const runDetails = filteredRecords
@@ -79,7 +80,16 @@ export const createSyncServiceStore = () => {
             runResults: record.runResults ?? [],
           }));
 
-        await syncRepository.apiClientRecordsRepository.batchCreateCollectionRunDetails(runDetails);
+        const runDetailsSync = await syncRepository.apiClientRecordsRepository.batchCreateCollectionRunDetails(
+          runDetails
+        );
+
+        if (!runDetailsSync.success) {
+          throw new NativeError(`Failed to sync collection run details!`).addContext({
+            error: runDetailsSync.message,
+          });
+        }
+
         await localStoreRepository.apiClientRecordsRepository.clear();
         set({ apisSyncStatus: APIClientSyncService.Status.SUCCESS });
         return { success: true, data: result.data.records };
@@ -117,7 +127,7 @@ export const createSyncServiceStore = () => {
     async syncGlobalEnv(syncRepository) {
       const allEnvs = await localStoreRepository.environmentVariablesRepository._getAllEnvironments();
       if (!allEnvs.success) {
-        throw new Error("Could not get all environments!");
+        throw new NativeError("Could not get all environments!");
       }
 
       const globalEnvId = localStoreRepository.environmentVariablesRepository.getGlobalEnvironmentId();
@@ -182,13 +192,13 @@ export const createSyncServiceStore = () => {
 
       if (apis.status === "fulfilled") {
         if (!apis.value.success) {
-          throw new Error("Not able to sync local APIs");
+          throw new NativeError("Not able to sync local APIs");
         }
       }
 
       if (envs.status === "fulfilled") {
         if (!envs.value.success) {
-          throw new Error("Not able to sync local Environments");
+          throw new NativeError("Not able to sync local Environments");
         }
       }
 
@@ -209,7 +219,7 @@ export const createSyncServiceStore = () => {
       }
 
       if (existingTask) {
-        throw new Error("Multiple sync tasks started!");
+        throw new NativeError("Multiple sync tasks started!");
       }
 
       set({
