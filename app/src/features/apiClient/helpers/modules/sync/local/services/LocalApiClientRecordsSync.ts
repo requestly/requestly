@@ -590,7 +590,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   ): RQAPI.RecordsPromise {
     return {
       success: false,
-      data: null,
+      data: { records: [], erroredRecords: [] },
       message: "Not implemented",
     };
   }
