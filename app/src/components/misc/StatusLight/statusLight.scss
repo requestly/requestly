@@ -1,16 +1,33 @@
 .status-light {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 4px);
+
+  font-size: var(--requestly-font-size-2xs, 9px);
+  font-weight: 600;
+  line-height: 14px; /* 144.444% */
+  letter-spacing: 1.5px;
+
+  &::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
 
   &.success {
-    color: var(--requestly-color-success-600);
+    color: var(--requestly-color-success);
   }
 
   &.warning {
-    color: var(--requestly-color-warning-300);
+    color: var(--requestly-color-warning-soft);
   }
 
   &.error {
-    color: var(--requestly-color-error-400);
+    color: var(--requestly-color-error-soft);
   }
 
   &.info {

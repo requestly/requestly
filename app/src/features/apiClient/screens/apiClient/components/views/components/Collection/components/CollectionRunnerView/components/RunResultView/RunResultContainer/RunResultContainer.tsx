@@ -24,6 +24,7 @@ import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { RQTooltip } from "lib/design-system-v2/components";
+import NetworkStatusField from "components/misc/NetworkStatusField";
 
 enum RunResultTabKey {
   ALL = "all",
@@ -92,9 +93,10 @@ const TestDetails: React.FC<{
       <div className="response-details">
         <span className="response-time">{Math.round(requestExecutionResult.entry.responseTime)}ms</span>
         {requestExecutionResult.entry.statusCode ? (
-          <span className="response-status">
-            · {requestExecutionResult.entry.statusCode} {requestExecutionResult.entry.statusText}
-          </span>
+          <NetworkStatusField
+            status={requestExecutionResult.entry.statusCode}
+            statusText={requestExecutionResult.entry.statusText}
+          />
         ) : null}
       </div>
     );
