@@ -49,22 +49,50 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
   const localWsPath = currentWorkspace.getState().rawWorkspace.rootPath;
   const truncatePath = truncateString(localWsPath, 40);
 
-  const parentCollectionNames = useMemo(() => {
+  const breadcrumbItems = useMemo(() => {
     const collections = getParentChain(id);
 
-    const parentRecords = collections
+    const items = [];
+
+    // Add workspace path as first item
+    items.push({
+      label: (
+        <div>
+          <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
+            <span className="api-client-local-workspace-path-breadcrumb">
+              <LuFolderCog className="api-client-local-workspace-icon" />
+              {truncatePath}
+            </span>
+          </Tooltip>
+        </div>
+      ),
+      pathname: PATHS.API_CLIENT.INDEX,
+      isEditable: false,
+    });
+
+    // Add all parent collections in reverse order (root to leaf)
+    collections
       .slice()
       .reverse()
-      .map((id) => {
-        return {
-          label: getData(id).name,
-          pathname: "",
+      .forEach((collectionId) => {
+        const collectionData = getData(collectionId);
+        items.push({
+          label: collectionData.name,
+          pathname: `${PATHS.API_CLIENT.INDEX}/collection/${collectionId}`,
           isEditable: false,
-        };
+        });
       });
 
-    return parentRecords;
-  }, [getData, getParentChain, id]);
+    // Add current item (API request or collection)
+    items.push({
+      isEditable: breadCrumbType === BreadcrumbType.API_REQUEST ? !isHistoryPath : true,
+      pathname: window.location.pathname,
+      label:
+        breadCrumbType === BreadcrumbType.API_REQUEST ? (isHistoryPath ? "History" : name || "Untitled request") : name,
+    });
+
+    return items;
+  }, [getData, getParentChain, id, localWsPath, truncatePath, breadCrumbType, isHistoryPath, name]);
 
   return (
     <RQBreadcrumb
@@ -73,62 +101,67 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
       onRecordNameUpdate={onRecordNameUpdate}
       onBlur={onBlur}
       autoFocus={autoFocus}
-      defaultBreadcrumbs={[
-        {
-          label: (
-            <div>
-              <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
-                <span className="api-client-local-workspace-path-breadcrumb">
-                  <LuFolderCog className="api-client-local-workspace-icon" />
-                  {truncatePath}
-                </span>
-              </Tooltip>
-            </div>
-          ),
-          pathname: PATHS.API_CLIENT.INDEX,
+      defaultBreadcrumbs={breadcrumbItems}
+    />
+  );
+};
+
+export const SingleViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
+  const { id, autoFocus, name, onRecordNameUpdate, placeholder, onBlur, breadCrumbType } = props;
+
+  const location = useLocation();
+  const isHistoryPath = location.pathname.includes("history");
+  const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
+
+  const breadcrumbItems = useMemo(() => {
+    const collections = getParentChain(id);
+
+    const items = [];
+
+    // Add all parent collections in reverse order (root to leaf)
+    collections
+      .slice()
+      .reverse()
+      .forEach((collectionId) => {
+        const collectionData = getData(collectionId);
+        items.push({
+          label: collectionData.name,
+          pathname: `${PATHS.API_CLIENT.INDEX}/collection/${collectionId}`,
           isEditable: false,
-        },
-        ...parentCollectionNames,
-        {
-          isEditable: breadCrumbType === BreadcrumbType.API_REQUEST ? !isHistoryPath : true,
-          pathname: window.location.pathname,
-          label:
-            breadCrumbType === BreadcrumbType.API_REQUEST
-              ? isHistoryPath
-                ? "History"
-                : name || "Untitled request"
-              : name,
-        },
-      ]}
+        });
+      });
+
+    // Add current item (API request or collection)
+    items.push({
+      isEditable: breadCrumbType === BreadcrumbType.API_REQUEST ? !isHistoryPath : true,
+      pathname: window.location.pathname,
+      label:
+        breadCrumbType === BreadcrumbType.API_REQUEST ? (isHistoryPath ? "History" : name || "Untitled request") : name,
+    });
+
+    return items;
+  }, [getData, getParentChain, id, breadCrumbType, isHistoryPath, name]);
+
+  return (
+    <RQBreadcrumb
+      placeholder={placeholder}
+      recordName={name}
+      onRecordNameUpdate={onRecordNameUpdate}
+      onBlur={onBlur}
+      autoFocus={autoFocus}
+      defaultBreadcrumbs={breadcrumbItems}
     />
   );
 };
 
 export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
-  const { openInModal, autoFocus, name, placeholder, onRecordNameUpdate, onBlur } = props;
-
-  const location = useLocation();
-  const isHistoryPath = location.pathname.includes("history");
+  const { openInModal } = props;
   const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode]);
 
   return (
     <Conditional condition={!openInModal}>
       {getViewMode() === ApiClientViewMode.SINGLE ? (
-        <RQBreadcrumb
-          placeholder={placeholder}
-          recordName={name}
-          onRecordNameUpdate={onRecordNameUpdate}
-          onBlur={onBlur}
-          autoFocus={autoFocus}
-          defaultBreadcrumbs={[
-            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-            {
-              isEditable: !isHistoryPath,
-              pathname: window.location.pathname,
-              label: isHistoryPath ? "History" : name || "Untitled request",
-            },
-          ]}
-        />
+        <SingleViewBreadCrumb {...props} />
       ) : (
         <MultiViewBreadCrumb {...props} />
       )}

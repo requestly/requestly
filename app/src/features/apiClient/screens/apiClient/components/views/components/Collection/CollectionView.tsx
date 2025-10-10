@@ -31,7 +31,7 @@ interface CollectionViewProps {
   collectionId: string;
 }
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
+export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId: propCollectionId }) => {
   const isCollectionRunnerSupported = useFeatureIsOn("api_client_collection_runner_support");
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
@@ -40,20 +40,21 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
   } = useCommand();
   const contextId = useContextId();
   const [activeTabKey, setActiveTabKey] = useState(TAB_KEYS.OVERVIEW);
-
+  const [activeTabSource] = useTabServiceWithSelector((state) => [state.activeTabSource]);
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
-
   const { setTitle, getIsNew } = useGenericState();
   const isNewCollection = getIsNew();
 
+  // Use collectionId from activeTabSource if available, otherwise fall back to prop
+  const collectionId = activeTabSource?.getSourceId() || propCollectionId;
   const collection = useApiRecord(collectionId) as RQAPI.CollectionRecord;
 
   useEffect(() => {
-    // To sync title for tabs opened from deeplinks
+    console.log("CollectionView rendered for ID:", collectionId, "Data:", collection);
     if (!isEmpty(collection)) {
       setTitle(collection.name);
     }
-  }, [collection, setTitle]);
+  }, [collection, setTitle, collectionId]);
 
   const updateCollectionAuthData = useCallback(
     async (newAuthOptions: RQAPI.Auth) => {
@@ -115,7 +116,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
       {
         label: "Runner",
         key: TAB_KEYS.RUNNER,
-        children: <CollectionRunnerView collectionId={collection.id} />,
+        children: <CollectionRunnerView collectionId={collectionId} />,
       },
     ].filter((tab) => (tab.key === TAB_KEYS.RUNNER ? isCollectionRunnerSupported : true));
   }, [collection, collectionId, updateCollectionAuthData, isCollectionRunnerSupported]);
@@ -177,7 +178,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         <>
           <div className="collection-view-breadcrumb-container">
             <ApiClientBreadCrumb
-              id={collection.id}
+              id={collectionId}
               placeholder="New Collection"
               name={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
@@ -196,7 +197,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
               onTabClick={(key) => {
                 if (key === TAB_KEYS.RUNNER) {
                   trackCollectionRunnerViewed({
-                    collection_id: collection.id,
+                    collection_id: collectionId,
                     source: "collection_overview",
                   });
                 }

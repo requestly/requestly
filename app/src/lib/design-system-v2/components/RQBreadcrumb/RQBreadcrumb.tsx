@@ -4,7 +4,10 @@ import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevro
 import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import { useRBAC } from "features/rbac";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import "./RQBreadcrumb.scss";
+import { CollectionViewTabSource } from "features/apiClient/screens/apiClient/components/views/components/Collection/collectionViewTabSource";
 
 interface Props {
   loading?: boolean;
@@ -51,6 +54,8 @@ export const RQBreadcrumb: React.FC<Props> = ({
   const matchedRoutes = useMatches() as MatchedRoute[];
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("breadcrumbs", "update");
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const context = useApiClientFeatureContext();
 
   useEffect(() => {
     setName(recordName);
@@ -70,9 +75,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
     return () => setIsEditRecord(false);
   }, [autoFocus]);
 
-  const breadcrumbs: ({
-    pathname: string;
-  } & MatchedRoute["handle"]["breadcrumb"])[] =
+  const breadcrumbs =
     defaultBreadcrumbs.length > 0
       ? defaultBreadcrumbs
       : matchedRoutes.reduce((result, route) => {
@@ -83,11 +86,9 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
   const handleOnChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const updatedValue = e.target.value;
-
     if (!updatedValue) {
       // TODO: show toast
     }
-
     setName(updatedValue);
     onRecordNameUpdate?.(updatedValue);
   };
@@ -95,7 +96,6 @@ export const RQBreadcrumb: React.FC<Props> = ({
   const handleOnBlur = () => {
     setIsEditRecord(false);
     onBlur?.(name);
-
     if (!name) {
       setName(recordName);
     }
@@ -105,7 +105,6 @@ export const RQBreadcrumb: React.FC<Props> = ({
     if (disabled || !isValidPermission) {
       return;
     }
-
     setIsEditRecord(true);
   };
 
@@ -115,8 +114,11 @@ export const RQBreadcrumb: React.FC<Props> = ({
         <Skeleton.Input active size="small" block />
       ) : (
         breadcrumbs.map(({ label, isEditable, pathname, disabled: isPathDisabled }, index) => {
+          const isCollection = pathname.includes("/collection/");
+          const collectionId = isCollection ? pathname.split("/").pop() : null;
+
           return (
-            <>
+            <React.Fragment key={index}>
               {isEditable ? (
                 isEditRecord ? (
                   <Input
@@ -125,15 +127,11 @@ export const RQBreadcrumb: React.FC<Props> = ({
                     onChange={handleOnChange}
                     placeholder={placeholder}
                     className={`rq-breadcrumb-input`}
-                    onBlur={() => {
-                      handleOnBlur();
-                    }}
-                    onPressEnter={() => {
-                      handleOnBlur();
-                    }}
+                    onBlur={handleOnBlur}
+                    onPressEnter={handleOnBlur}
                   />
                 ) : (
-                  <div key={index} className="rq-breadcrumb-record-name" title={name || placeholder}>
+                  <div className="rq-breadcrumb-record-name" title={name || placeholder}>
                     <Typography.Text className="record-name" ellipsis={true} onClick={handleRecordNameEditClick}>
                       {name || placeholder}
                     </Typography.Text>
@@ -145,23 +143,37 @@ export const RQBreadcrumb: React.FC<Props> = ({
               ) : (
                 <>
                   {isPathDisabled || !isValidPermission ? (
-                    <li key={index} className="rq-breadcrumb-item">
+                    <li className="rq-breadcrumb-item">{label}</li>
+                  ) : isCollection ? (
+                    <span
+                      className="rq-breadcrumb-item"
+                      onClick={() => {
+                        console.log("Opening tab for collection:", collectionId);
+                        openTab(
+                          new CollectionViewTabSource({
+                            id: collectionId,
+                            title: typeof label === "string" ? label : "Collection",
+                            context: { id: context.id },
+                          }),
+                          { preview: true }
+                        );
+                      }}
+                    >
                       {label}
-                    </li>
+                    </span>
                   ) : (
-                    <Link key={index} to={pathname} className="rq-breadcrumb-item">
+                    <Link to={pathname} className="rq-breadcrumb-item">
                       {label}
                     </Link>
                   )}
                 </>
               )}
-
               {index < breadcrumbs.length - 1 ? (
-                <span key={index} className="rq-breadcrumb-separator">
+                <span className="rq-breadcrumb-separator">
                   <MdOutlineChevronRight />
                 </span>
               ) : null}
-            </>
+            </React.Fragment>
           );
         })
       )}
