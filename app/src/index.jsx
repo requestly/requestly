@@ -17,8 +17,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppFlavour } from "utils/AppUtils";
 import App from "./App";
 import SessionBearApp from "src-SessionBear/App";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 
 const persistor = persistStore(reduxStore);
 const container = document.getElementById("root");
