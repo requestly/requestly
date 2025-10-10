@@ -174,26 +174,21 @@ const TestDetails: React.FC<{
 const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
-}> = ({ tabKey, results }) => {
+  totalIterationCount?: number;
+}> = ({ tabKey, results, totalIterationCount }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
   const parentRef = useRef<HTMLDivElement>(null);
   const resultsToShow = useMemo(() => Array.from(results), [results]);
-  const resultsToShowRef = useRef(resultsToShow);
-  resultsToShowRef.current = resultsToShow;
 
   // Initialize with all iterations expanded by default
   const [expandedKeys, setExpandedKeys] = useState<Set<number>>(() => {
-    return new Set(resultsToShowRef.current.map(([iteration]) => iteration));
+    if (!totalIterationCount) {
+      return new Set(resultsToShow.map(([iteration]) => iteration));
+    } else {
+      // fill the set with iteration numbers from 1 to totalIterationCount
+      return new Set(new Array(totalIterationCount).fill(0).map((_, idx) => idx + 1));
+    }
   });
-
-  // Track previous results to detect changes
-  const prevResultsRef = useRef(results);
-
-  // Reset expanded keys when results change (new run)
-  if (prevResultsRef.current !== results) {
-    prevResultsRef.current = results;
-    setExpandedKeys(new Set(resultsToShow.map(([iteration]) => iteration)));
-  }
 
   const currentRunningRequest = currentlyExecutingRequest ? (
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
@@ -312,7 +307,8 @@ export const RunResultContainer: React.FC<{
   ranAt: number;
   result: LiveRunResult | RunResult;
   running?: boolean;
-}> = ({ ranAt, result, running = false }) => {
+  totalIterationCount?: number;
+}> = ({ ranAt, result, running = false, totalIterationCount }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
 
   const metrics = useMemo(() => {
@@ -347,22 +343,46 @@ export const RunResultContainer: React.FC<{
       {
         key: RunResultTabKey.ALL,
         label: <TestResultTabTitle title="All" count={summary.totalTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.ALL} results={summary.totalTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.ALL}
+            results={summary.totalTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.PASSED,
         label: <TestResultTabTitle title="Passed" count={summary.successTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.PASSED} results={summary.successTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.PASSED}
+            results={summary.successTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.FAILED,
         label: <TestResultTabTitle title="Failed" count={summary.failedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.FAILED} results={summary.failedTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.FAILED}
+            results={summary.failedTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.SKIPPED,
         label: <TestResultTabTitle title="Skipped" count={summary.skippedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.SKIPPED} results={summary.skippedTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.SKIPPED}
+            results={summary.skippedTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
     ];
   }, [
@@ -375,6 +395,7 @@ export const RunResultContainer: React.FC<{
     summary.failedTests,
     summary.skippedTestsCounts,
     summary.skippedTests,
+    totalIterationCount,
   ]);
 
   return (

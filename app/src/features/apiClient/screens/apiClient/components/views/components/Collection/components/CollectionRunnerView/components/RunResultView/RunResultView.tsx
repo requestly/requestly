@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
-import { useRunResultStore } from "../../run.context";
+import { useRunConfigStore, useRunResultStore } from "../../run.context";
 import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
@@ -17,6 +17,7 @@ export const RunResultView: React.FC = () => {
     s.getRunSummary,
     s.runStatus,
   ]);
+  const [totalIterationCount] = useRunConfigStore((s) => [s.iterations]);
 
   const testResults = useMemo(
     () => getRunSummary(),
@@ -47,7 +48,7 @@ export const RunResultView: React.FC = () => {
         </RQButton>
       </div>
 
-      <RunResultContainer result={testResults} ranAt={startTime} />
+      <RunResultContainer result={testResults} ranAt={startTime} totalIterationCount={totalIterationCount} />
       {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}
       <HistoryDrawer isHistoryDrawerOpen={isHistoryDrawerOpen} setIsHistoryDrawerOpen={setIsHistoryDrawerOpen} />
     </div>
