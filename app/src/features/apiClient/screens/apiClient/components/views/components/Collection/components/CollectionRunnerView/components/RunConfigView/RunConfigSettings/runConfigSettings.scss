@@ -6,7 +6,7 @@
     margin: var(--space-4, 8px) var(--space-6, 16px);
     align-items: flex-start;
     gap: var(--space-4, 8px);
-    flex: 1 0 0;
+    flex-shrink: 0;
     align-self: stretch;
 
     padding: var(--space-6, 16px);

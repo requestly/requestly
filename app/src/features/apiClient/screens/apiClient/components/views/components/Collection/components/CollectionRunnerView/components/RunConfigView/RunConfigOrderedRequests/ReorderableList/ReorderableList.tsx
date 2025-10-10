@@ -32,46 +32,48 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
     count: requests.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 32,
-    overscan: 2,
+    overscan: 5,
   });
 
   const items = rowVirtualizer.getVirtualItems();
 
   return (
-    <div className="reorderable-list" ref={parentRef}>
-      <DndProvider backend={HTML5Backend}>
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: "100%",
-            position: "relative",
-          }}
-        >
-          {items.map((virtualRow) => {
-            const orderedRequest = requests[virtualRow.index];
-            return (
-              <div
-                key={orderedRequest.record.id}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: `${virtualRow.size}px`,
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              >
-                <ReorderableListItem
-                  index={virtualRow.index}
-                  orderedRequest={orderedRequest}
-                  reorder={reorder}
-                  style={{}}
-                />
-              </div>
-            );
-          })}
+    <DndProvider backend={HTML5Backend}>
+      <div className="reorderable-list-wrapper">
+        <div className="reorderable-list" ref={parentRef}>
+          <div
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            {items.map((virtualRow) => {
+              const orderedRequest = requests[virtualRow.index];
+              return (
+                <div
+                  key={orderedRequest.record.id}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: `${virtualRow.size}px`,
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <ReorderableListItem
+                    index={virtualRow.index}
+                    orderedRequest={orderedRequest}
+                    reorder={reorder}
+                    style={{}}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </DndProvider>
-    </div>
+      </div>
+    </DndProvider>
   );
 };

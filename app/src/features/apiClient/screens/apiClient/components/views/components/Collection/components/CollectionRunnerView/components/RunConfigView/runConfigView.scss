@@ -59,7 +59,10 @@
   }
 
   .run-config-container {
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    overflow: hidden;
 
     .run-config-ordered-requests-header {
       display: flex;
