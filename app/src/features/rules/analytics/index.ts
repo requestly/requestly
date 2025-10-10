@@ -1,9 +1,6 @@
 import { trackEvent } from "modules/analytics";
 import {
   GROUPS,
-  MIGRATION_NOTIFICATION_CLICKED,
-  MIGRATION_NOTIFICATION_CLOSED,
-  MIGRATION_NOTIFICATION_SHOWN,
   RULES,
   SAMPLE_RULES,
 } from "./constants";
@@ -73,21 +70,6 @@ export const trackRulesListBulkActionPerformed = (action: string) => {
 export const trackRulesSelected = (num_rules: number) => {
   const params = { num_rules };
   trackEvent(RULES.RULES_SELECTED, params);
-};
-
-export const trackMigrationNotificationShown = () => {
-  const params = {};
-  trackEvent(MIGRATION_NOTIFICATION_SHOWN, params);
-};
-
-export const trackMigrationNotificationClicked = () => {
-  const params = {};
-  trackEvent(MIGRATION_NOTIFICATION_CLICKED, params);
-};
-
-export const trackMigrationNotificationClosed = () => {
-  const params = {};
-  trackEvent(MIGRATION_NOTIFICATION_CLOSED, params);
 };
 
 // sample rules
