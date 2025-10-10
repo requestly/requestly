@@ -36,7 +36,7 @@ const batchCreateInFirebase = async (
       }
     }
 
-    return { success: true, data: null };
+    return { success: true, data: { records: [], erroredRecords: [] } };
   } catch (error) {
     captureException(error);
     return { success: false, data: null, message: error?.message };
