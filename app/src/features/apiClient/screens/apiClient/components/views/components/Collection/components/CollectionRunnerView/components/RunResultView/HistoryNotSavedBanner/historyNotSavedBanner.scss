@@ -1,0 +1,26 @@
+.history-not-saved-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 8px);
+  padding: var(--space-4, 8px) var(--space-9, 32px) var(--space-4, 8px) var(--space-5, 12px);
+
+  border-bottom: 1px solid var(--requestly-color-warning-800, #5c3111);
+  background: var(--requestly-color-warning-900, #2e1b00);
+
+  svg {
+    flex-shrink: 0;
+
+    --size: 14px;
+    width: var(--size);
+    height: var(--size);
+    color: var(--requestly-color-warning, #e09400);
+  }
+
+  .message {
+    color: var(--requestly-color-text-default, #fff);
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 154.545% */
+  }
+}
