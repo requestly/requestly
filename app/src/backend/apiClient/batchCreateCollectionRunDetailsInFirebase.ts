@@ -24,17 +24,17 @@ const batchCreateInFirebase = async (
   }[]
 ): Promise<RQAPI.RecordsPromise> => {
   try {
-    details.forEach((record) => {
+    for (const record of details) {
       const { runConfigs = {}, runResults = [], collectionId } = record;
+      const runConfigValues = Object.values(runConfigs);
+      if (runConfigValues.length > 0) {
+        await Promise.all(runConfigValues.map((runConfig) => upsertRunConfig(collectionId, runConfig)));
+      }
 
-      Object.values(runConfigs).forEach(async (runConfig) => {
-        await upsertRunConfig(collectionId, runConfig);
-      });
-
-      runResults.forEach(async (runResult) => {
-        await addRunResult(collectionId, runResult);
-      });
-    });
+      if (runResults.length > 0) {
+        await Promise.all(runResults.map((runResult) => addRunResult(collectionId, runResult)));
+      }
+    }
 
     return { success: true, data: null };
   } catch (error) {
