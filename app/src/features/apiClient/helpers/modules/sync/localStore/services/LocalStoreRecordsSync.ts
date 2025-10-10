@@ -298,7 +298,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   ): RQAPI.RecordsPromise {
     return {
       success: false,
-      data: null,
+      data: { records: [], erroredRecords: [] },
       message: "Not implemented",
     };
   }
