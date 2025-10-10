@@ -4,18 +4,20 @@ import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { useRunResultStore } from "../../run.context";
 import { RunResultContainer } from "./RunResultContainer/RunResultContainer";
 import { TestsRunningLoader } from "./TestsRunningLoader/TestsRunningLoader";
-import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { HistorySaveStatus, RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import "./runResultView.scss";
 import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
 import { useCollectionView } from "../../../../collectionView.context";
 import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
+import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
 
 export const RunResultView: React.FC = () => {
-  const [iterations, startTime, getRunSummary, runStatus] = useRunResultStore((s) => [
+  const [iterations, startTime, getRunSummary, runStatus, historySaveStatus] = useRunResultStore((s) => [
     s.iterations,
     s.startTime,
     s.getRunSummary,
     s.runStatus,
+    s.historySaveStatus,
   ]);
 
   const testResults = useMemo(
@@ -25,7 +27,6 @@ export const RunResultView: React.FC = () => {
   );
 
   const { collectionId } = useCollectionView();
-
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
 
   return (
@@ -47,6 +48,7 @@ export const RunResultView: React.FC = () => {
         </RQButton>
       </div>
 
+      {historySaveStatus === HistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
       <RunResultContainer result={testResults} ranAt={startTime} />
       {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}
       <HistoryDrawer isHistoryDrawerOpen={isHistoryDrawerOpen} setIsHistoryDrawerOpen={setIsHistoryDrawerOpen} />
