@@ -4,6 +4,11 @@ import { RequestContentType, RQAPI } from "../types";
 import { generateKeyValuePairs, isHttpApiRecord } from "../screens/apiClient/utils";
 import { useShallow } from "zustand/shallow";
 
+export enum FileFeature {
+  FILE_BODY = "file_body",
+  COLLECTION_RUNNER = "collection_runner",
+}
+
 function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
   const files: Record<FileId, ApiClientFile> = {};
   const canHaveFiles =
@@ -99,6 +104,10 @@ const createApiClientFilesStore = (appMode: "desktop") => {
           return doesFileExist;
         },
 
+        // TODO: This needs to be changed such that it doesn't delete entries based on given records.
+        // Rather, it should sync/refresh like we do in apiRecordsStore.
+        // If given a record which has a path that we don't have, we should add it.
+        // If given a record which has a path that we have but is invalid, we should remove it.
         initialize(records) {
           const files = parseRecordsToFiles(records);
           set({
