@@ -39,7 +39,6 @@ import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -82,7 +81,6 @@ export const CollectionRow: React.FC<Props> = ({
   isReadOnly,
   handleRecordsToBeDeleted,
 }) => {
-  const isCollectionRunnerSupported = useFeatureIsOn("api_client_collection_runner_support");
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
@@ -219,9 +217,9 @@ export const CollectionRow: React.FC<Props> = ({
         },
       ];
 
-      return items.filter((item) => (item.key === "2" ? isCollectionRunnerSupported : true));
+      return items;
     },
-    [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted, isCollectionRunnerSupported]
+    [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted]
   );
 
   const collapseChangeHandler = useCallback(
