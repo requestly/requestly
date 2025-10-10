@@ -1,11 +1,17 @@
-import { ErrorCode } from "./types";
+import { ErrorCode, ErrorSeverity } from "./types";
 
 export class NativeError<T extends Record<string, any> = Record<string, any>> extends Error {
   public errorCode: ErrorCode = ErrorCode.UNKNOWN;
-  private context: Partial<T> = {};
+  public severity: ErrorSeverity = ErrorSeverity.DEFAULT;
+  private _context: Partial<T> = {};
 
   addContext(ctx: Partial<T>) {
-    this.context = Object.assign(this.context, ctx);
+    this._context = Object.assign(this._context, ctx);
+    return this;
+  }
+
+  setSeverity(severity: ErrorSeverity) {
+    this.severity = severity;
     return this;
   }
 
@@ -14,7 +20,7 @@ export class NativeError<T extends Record<string, any> = Record<string, any>> ex
     return this;
   }
 
-  get details() {
-    return this.context;
+  get context() {
+    return this._context;
   }
 }

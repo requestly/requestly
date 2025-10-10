@@ -819,7 +819,7 @@ const HttpClientView: React.FC<Props> = ({
 const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary boundaryId="http-client-view-error-boundary">
         <PathVariablesProvider pathVariables={props.apiEntryDetails?.data?.request?.pathVariables}>
           <QueryParamsProvider entry={props.apiEntryDetails?.data}>
             <Component {...props} />

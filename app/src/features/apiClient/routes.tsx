@@ -12,7 +12,7 @@ export const apiClientRoutes: RouteObject[] = [
     path: PATHS.API_CLIENT.RELATIVE + "/*",
     element: (
       <WindowsAndLinuxGatedHoc featureName="API client">
-        <ApiClientErrorBoundary>
+        <ApiClientErrorBoundary boundaryId="api-client-error-boundary">
           <ApiClientFeatureContainer />
         </ApiClientErrorBoundary>
       </WindowsAndLinuxGatedHoc>
