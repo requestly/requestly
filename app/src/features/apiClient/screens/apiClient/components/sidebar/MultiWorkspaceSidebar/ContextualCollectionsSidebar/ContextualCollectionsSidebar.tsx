@@ -271,48 +271,46 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   return (
     <>
-      <DndProvider backend={HTML5Backend}>
-        <div className="api-client-sidebar-header-container">
-          <SidebarListHeader
-            onSearch={setSearchValue}
-            multiSelectOptions={multiSelectOptions}
-            newRecordActionOptions={{
-              showNewRecordAction: isValidPermission,
-              onNewRecordClick: onNewClick,
-            }}
+      <div className="api-client-sidebar-header-container">
+        <SidebarListHeader
+          onSearch={setSearchValue}
+          multiSelectOptions={multiSelectOptions}
+          newRecordActionOptions={{
+            showNewRecordAction: isValidPermission,
+            onNewRecordClick: onNewClick,
+          }}
+        />
+
+        {showSelection && (
+          <ActionMenu
+            isAllRecordsSelected={isAllRecordsSelected}
+            toggleSelection={toggleMultiSelect}
+            bulkActionsHandler={onBulkActionClick}
+            disabledActions={disabledActions}
           />
+        )}
+      </div>
 
-          {showSelection && (
-            <ActionMenu
-              isAllRecordsSelected={isAllRecordsSelected}
-              toggleSelection={toggleMultiSelect}
-              bulkActionsHandler={onBulkActionClick}
-              disabledActions={disabledActions}
-            />
-          )}
-        </div>
+      <div className="multi-view-collections-sidebar">
+        {selectedWorkspaces.map((workspace) => {
+          const workspaceId = workspace.getState().id;
 
-        <div className="multi-view-collections-sidebar">
-          {selectedWorkspaces.map((workspace) => {
-            const workspaceId = workspace.getState().id;
-
-            return (
-              <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
-                <ContextualCollectionsList
-                  selectAll={selectAll}
-                  showSelection={showSelection}
-                  handleShowSelection={handleShowSelection}
-                  searchValue={searchValue}
-                  onNewClick={onNewClick}
-                  recordTypeToBeCreated={recordTypeToBeCreated}
-                  handleRecordSelection={handleRecordSelection}
-                  handleRecordsToBeDeleted={handleRecordsToBeDeleted}
-                />
-              </WorkspaceProvider>
-            );
-          })}
-        </div>
-      </DndProvider>
+          return (
+            <WorkspaceProvider key={workspaceId} workspaceId={workspaceId}>
+              <ContextualCollectionsList
+                selectAll={selectAll}
+                showSelection={showSelection}
+                handleShowSelection={handleShowSelection}
+                searchValue={searchValue}
+                onNewClick={onNewClick}
+                recordTypeToBeCreated={recordTypeToBeCreated}
+                handleRecordSelection={handleRecordSelection}
+                handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+              />
+            </WorkspaceProvider>
+          );
+        })}
+      </div>
 
       {isMoveCollectionModalOpen ? (
         // TODO: TBD on modals

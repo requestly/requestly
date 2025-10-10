@@ -46,15 +46,13 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
 
   return (
     <div className="reorderable-list">
-      <DndProvider backend={HTML5Backend}>
-        <AutoSizer>
-          {({ height, width }) => {
-            return (
-              <List height={height} width={width} rowCount={requests.length} rowHeight={32} rowRenderer={rowRenderer} />
-            );
-          }}
-        </AutoSizer>
-      </DndProvider>
+      <AutoSizer>
+        {({ height, width }) => {
+          return (
+            <List height={height} width={width} rowCount={requests.length} rowHeight={32} rowRenderer={rowRenderer} />
+          );
+        }}
+      </AutoSizer>
     </div>
   );
 };

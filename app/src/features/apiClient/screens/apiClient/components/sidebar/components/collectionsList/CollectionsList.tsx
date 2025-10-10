@@ -340,7 +340,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   }, [collectionId, requestId, apiClientRecords]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <>
       <div className="api-client-sidebar-header-container">
         <SidebarListHeader
           onSearch={setSearchValue}
@@ -447,6 +447,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           }}
         />
       )}
-    </DndProvider>
+    </>
   );
 };
