@@ -322,12 +322,12 @@ export const RunResultContainer: React.FC<{
       },
       {
         key: RunResultTabKey.PASSED,
-        label: <TestResultTabTitle title="Success" count={summary.successTestsCounts} loading={running} />,
+        label: <TestResultTabTitle title="Passed" count={summary.successTestsCounts} loading={running} />,
         children: <TestResultList tabKey={RunResultTabKey.PASSED} results={summary.successTests} />,
       },
       {
         key: RunResultTabKey.FAILED,
-        label: <TestResultTabTitle title="Fail" count={summary.failedTestsCounts} loading={running} />,
+        label: <TestResultTabTitle title="Failed" count={summary.failedTestsCounts} loading={running} />,
         children: <TestResultList tabKey={RunResultTabKey.FAILED} results={summary.failedTests} />,
       },
       {
