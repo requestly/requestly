@@ -109,9 +109,12 @@ const TestDetails: React.FC<{
   const requestNameDetails = useMemo(() => {
     return (
       <>
-        <span className="collection-name">{requestExecutionResult.collectionName} /</span>
+        <span className="collection-name" title={requestExecutionResult.collectionName}>
+          {requestExecutionResult.collectionName} /
+        </span>
         <span
           className="request-name"
+          title={requestExecutionResult.recordName}
           onClick={() => {
             openTab(
               new RequestViewTabSource({
