@@ -7,6 +7,7 @@ import { updateRequestWithAuthOptions } from "../auth";
 import { cloneDeep } from "lodash";
 import { renderVariables as renderVariablesType } from "backend/environment/utils";
 import { compile } from "path-to-regexp";
+import { Scope } from "../variableResolver/variable-resolver";
 
 export class HttpRequestPreparationService {
   constructor(
@@ -38,7 +39,8 @@ export class HttpRequestPreparationService {
 
   prepareRequest(
     recordId: string,
-    entry: RQAPI.HttpApiEntry
+    entry: RQAPI.HttpApiEntry,
+    scopes?: Scope[]
   ): {
     renderedVariables: any;
     preparedEntry: RQAPI.HttpApiEntry;
@@ -49,7 +51,7 @@ export class HttpRequestPreparationService {
     workingEntry.request.url = queryParamsToURLString(workingEntry.request.queryParams, workingEntry.request.url);
     workingEntry.request.queryParams = [];
 
-    const { renderedVariables, result } = this.renderVariables(workingEntry, recordId, this.ctx);
+    const { renderedVariables, result } = this.renderVariables(workingEntry, recordId, this.ctx, scopes);
 
     const renderedEntry = result;
 

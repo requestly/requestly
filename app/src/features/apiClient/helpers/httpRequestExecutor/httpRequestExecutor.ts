@@ -14,6 +14,7 @@ import {
 import { isEmpty } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { HttpRequestScriptExecutionService } from "./httpRequestScriptExecutionService";
+import { Scope } from "../variableResolver/variable-resolver";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -87,11 +88,12 @@ export class HttpRequestExecutor {
   async execute(
     recordId: string,
     entry: RQAPI.HttpApiEntry,
-    abortController?: AbortController
+    abortController?: AbortController,
+    scopes?: Scope[]
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
+    const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry, scopes);
     preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
 
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {

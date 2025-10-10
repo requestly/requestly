@@ -3,7 +3,7 @@ import { EnvironmentVariables } from "./types";
 import Logger from "lib/logger";
 import { isEmpty } from "lodash";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
-import { getScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { getScopedVariables, Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
 
@@ -16,14 +16,15 @@ interface RenderResult<T> {
 export function renderVariables<T extends string | Record<string, any>>(
   template: T,
   recordId: string,
-  ctx: ApiClientFeatureContext
+  ctx: ApiClientFeatureContext,
+  scopes?: Scope[]
 ): {
   renderedVariables?: Record<string, unknown>;
   result: T;
 } {
   const parents = getApiClientRecordsStore(ctx).getState().getParentChain(recordId);
   const variables = Object.fromEntries(
-    Array.from(getScopedVariables(parents, ctx.stores)).map(([key, [variable, _]]) => {
+    Array.from(getScopedVariables(parents, ctx.stores, scopes)).map(([key, [variable, _]]) => {
       return [key, variable];
     })
   );
