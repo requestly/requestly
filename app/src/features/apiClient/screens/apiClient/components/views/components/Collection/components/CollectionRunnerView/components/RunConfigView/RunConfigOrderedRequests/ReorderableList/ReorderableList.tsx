@@ -62,12 +62,7 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  <ReorderableListItem
-                    index={virtualRow.index}
-                    orderedRequest={orderedRequest}
-                    reorder={reorder}
-                    style={{}}
-                  />
+                  <ReorderableListItem index={virtualRow.index} orderedRequest={orderedRequest} reorder={reorder} />
                 </div>
               );
             })}
