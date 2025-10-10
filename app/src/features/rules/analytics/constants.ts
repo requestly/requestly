@@ -24,7 +24,3 @@ export const SAMPLE_RULES = {
   SAMPLE_RULE_CREATE_RULE_CLICKED: "sample_rule_create_rule_clicked",
   SAMPLE_RULE_DELETED: "sample_rule_deleted",
 };
-
-export const MIGRATION_NOTIFICATION_SHOWN = "migration_notification_shown";
-export const MIGRATION_NOTIFICATION_CLICKED = "migration_notification_clicked";
-export const MIGRATION_NOTIFICATION_CLOSED = "migration_notification_closed";
