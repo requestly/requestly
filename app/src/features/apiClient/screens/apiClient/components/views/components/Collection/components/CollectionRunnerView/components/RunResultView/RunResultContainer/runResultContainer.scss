@@ -328,8 +328,8 @@
             margin-bottom: -2px;
           }
 
-          .response-time,
-          .response-status {
+          .response-time {
+            margin-right: 4px;
             color: var(--requestly-color-text-placeholder, #8f8f8f);
             font-size: var(--requestly-font-size-xs, 11px);
             font-style: normal;
