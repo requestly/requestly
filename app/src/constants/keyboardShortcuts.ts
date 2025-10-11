@@ -1,4 +1,4 @@
-enum Feature {
+export enum Feature {
   RULES = "RULES",
   API_CLIENT = "API_CLIENT",
   FILE_SERVER = "FILE_SERVER",

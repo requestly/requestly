@@ -1,7 +1,7 @@
 import { useHotkeys } from "react-hotkeys-hook";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
-import { isDesktopMode } from "utils/AppUtils";
-import { KEYBOARD_SHORTCUTS, Feature } from "constants/keyboardShortcuts";
+import { useTabServiceWithSelector } from "../componentsV2/Tabs/store/tabServiceStore";
+import { isDesktopMode } from "../utils/AppUtils";
+import { KEYBOARD_SHORTCUTS, Feature } from "../constants/keyboardShortcuts";
 
 /**
  * Custom hook that provides keyboard shortcuts to close the active tab.
@@ -21,8 +21,7 @@ export const useCloseActiveTabShortcut = () => {
 
   useHotkeys(
     shortcutKey,
-    (event) => {
-      event.preventDefault();
+    () => {
       closeActiveTab();
     },
     {
