@@ -249,7 +249,9 @@ export class NetworkPerformanceMonitor {
       size: (entry as any).transferSize || 0,
     };
 
-    this.requests.set(entry.name, request);
+    // Use unique key to preserve duplicate requests for the same URL
+    const uniqueKey = `${entry.name}:${entry.startTime}`;
+    this.requests.set(uniqueKey, request);
 
     // Keep only recent requests
     if (this.requests.size > this.maxRequests) {

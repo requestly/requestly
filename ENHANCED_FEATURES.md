@@ -197,7 +197,7 @@ const result = await retryAsync(
 ### Error Boundaries
 
 ```typescript
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useErrorHandling } from './utils/error-handling';
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
