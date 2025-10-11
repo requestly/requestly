@@ -1,9 +1,5 @@
 import { trackEvent } from "modules/analytics";
-import {
-  GROUPS,
-  RULES,
-  SAMPLE_RULES,
-} from "./constants";
+import { GROUPS, RULES, SAMPLE_RULES } from "./constants";
 
 // groups
 export const trackGroupStatusToggled = (enabled: boolean) => {
