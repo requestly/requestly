@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { EmptyTestsView } from "./components/EmptyTestsView/EmptyTestsView";
 import { TestResultItem } from "./components/TestResult/TestResult";
 import { Badge, Radio } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { MdRefresh } from "@react-icons/all-files/md/MdRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { useTheme } from "styled-components";
@@ -18,10 +19,18 @@ type TestsFilter = TestResult["status"] | "all";
 export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestResultRefresh }) => {
   const theme = useTheme();
   const [testsFilter, setTestsFilter] = useState<TestsFilter>("all");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = useCallback(async () => {
-    await handleTestResultRefresh();
-  }, [handleTestResultRefresh]);
+    setIsRefreshing(true);
+    try {
+      await handleTestResultRefresh();
+    } catch (error) {
+      console.error("Error refreshing test results:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [handleTestResultRefresh, setIsRefreshing]);
 
   const testCounts = useMemo(() => {
     return {
@@ -82,10 +91,10 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
           className="tests-refresh-btn"
           size="small"
           type="transparent"
-          icon={<MdRefresh />}
+          icon={isRefreshing ? <LoadingOutlined spin /> : <MdRefresh />}
           onClick={handleRefresh}
         >
-          Refresh
+          {isRefreshing ? "Refreshing..." : "Refresh"}
         </RQButton>
       </div>
 
