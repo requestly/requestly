@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Badge, Collapse, Spin, Tabs } from "antd";
 import {
   CurrentlyExecutingRequest,
@@ -24,6 +24,7 @@ import "./runResultContainer.scss";
 import { getFormattedStartTime, getFormattedTime } from "../utils";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { RQTooltip } from "lib/design-system-v2/components";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import NetworkStatusField from "components/misc/NetworkStatusField";
 
 enum RunResultTabKey {
@@ -84,7 +85,7 @@ const RunningRequestPlaceholder: React.FC<{
 
 const TestDetails: React.FC<{
   requestExecutionResult: RequestExecutionResult;
-}> = ({ requestExecutionResult }) => {
+}> = React.memo(({ requestExecutionResult }) => {
   const context = useApiClientFeatureContext();
   const [openTab] = useTabServiceWithSelector((s) => [s.openTab]);
 
@@ -173,22 +174,49 @@ const TestDetails: React.FC<{
       )}
     </div>
   );
-};
+});
 
 const TestResultList: React.FC<{
   tabKey: RunResultTabKey;
   results: TestSummary;
-}> = ({ tabKey, results }) => {
+  totalIterationCount?: number;
+}> = ({ tabKey, results, totalIterationCount }) => {
   const [currentlyExecutingRequest] = useRunResultStore((s) => [s.currentlyExecutingRequest]);
+  const parentRef = useRef<HTMLDivElement>(null);
+  const resultsToShow = useMemo(() => Array.from(results), [results]);
+
+  // Initialize with all iterations expanded by default
+  const [expandedKeys, setExpandedKeys] = useState<Set<number>>(() => {
+    if (!totalIterationCount) {
+      return new Set(resultsToShow.map(([iteration]) => iteration));
+    } else {
+      // fill the set with iteration numbers from 1 to totalIterationCount
+      return new Set(new Array(totalIterationCount).fill(0).map((_, idx) => idx + 1));
+    }
+  });
 
   const currentRunningRequest = currentlyExecutingRequest ? (
     <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
   ) : null;
 
-  // TODO: use virtualize list
-  const resultsToShow = useMemo(() => {
-    return Array.from(results);
-  }, [results]);
+  const rowVirtualizer = useVirtualizer({
+    count: resultsToShow.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 200, // Estimated size for collapsed/expanded items
+    overscan: 3,
+  });
+
+  const handleCollapseChange = (iteration: number) => {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev);
+      if (prev.has(iteration)) {
+        next.delete(iteration);
+      } else {
+        next.add(iteration);
+      }
+      return next;
+    });
+  };
 
   if (resultsToShow.length === 0) {
     return (
@@ -199,39 +227,71 @@ const TestResultList: React.FC<{
     );
   }
 
-  if (results.size > 1) {
-    return resultsToShow.map(([iteration, details]) => {
-      return (
-        <div key={iteration} className="test-result-collapse-container tests-results-view-container">
-          <Collapse
-            ghost
-            className="test-result-collapse"
-            defaultActiveKey={["1"]}
-            expandIcon={({ isActive }) => {
-              return <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />;
-            }}
-          >
-            <Collapse.Panel header={`ITERATION-${iteration}`} key="1">
-              {details.map(({ requestExecutionResult }) => {
-                return (
-                  <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />
-                );
-              })}
-              {iteration === currentlyExecutingRequest?.iteration ? currentRunningRequest : null}
-            </Collapse.Panel>
-          </Collapse>
-        </div>
-      );
-    });
+  // For single iteration, render without virtualization
+  if (results.size === 1) {
+    return (
+      <div className="tests-results-view-container">
+        {resultsToShow[0][1].map(({ requestExecutionResult }) => {
+          return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
+        })}
+        {currentRunningRequest}
+      </div>
+    );
   }
 
-  // show first iteration without collapse
+  const items = rowVirtualizer.getVirtualItems();
+
   return (
-    <div className="tests-results-view-container">
-      {resultsToShow[0][1].map(({ requestExecutionResult }) => {
-        return <TestDetails key={requestExecutionResult.recordId} requestExecutionResult={requestExecutionResult} />;
-      })}
-      {currentRunningRequest}
+    <div ref={parentRef} className="tests-results-view-container">
+      <div
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          width: "100%",
+          position: "relative",
+          minHeight: "100%",
+        }}
+      >
+        {items.map((virtualItem) => {
+          const [iteration, details] = resultsToShow[virtualItem.index];
+          const isCurrentIteration = iteration === currentlyExecutingRequest?.iteration;
+
+          return (
+            <div
+              key={virtualItem.key}
+              data-index={virtualItem.index}
+              ref={rowVirtualizer.measureElement}
+              style={{
+                transform: `translateY(${virtualItem.start}px)`,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+              }}
+              className="test-result-collapse-container"
+            >
+              <Collapse
+                ghost
+                className="test-result-collapse"
+                activeKey={expandedKeys.has(iteration) ? [iteration] : []}
+                onChange={() => handleCollapseChange(iteration)}
+                expandIcon={({ isActive }) => (
+                  <MdOutlineArrowForwardIos className={`collapse-expand-icon ${isActive ? "expanded" : ""}`} />
+                )}
+              >
+                <Collapse.Panel header={`ITERATION-${iteration}`} key={iteration}>
+                  {details.map(({ requestExecutionResult }) => (
+                    <TestDetails
+                      key={requestExecutionResult.recordId}
+                      requestExecutionResult={requestExecutionResult}
+                    />
+                  ))}
+                  {isCurrentIteration ? currentRunningRequest : null}
+                </Collapse.Panel>
+              </Collapse>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -252,7 +312,8 @@ export const RunResultContainer: React.FC<{
   ranAt: number;
   result: LiveRunResult | RunResult;
   running?: boolean;
-}> = ({ ranAt, result, running = false }) => {
+  totalIterationCount?: number;
+}> = ({ ranAt, result, running = false, totalIterationCount }) => {
   const [activeTab, setActiveTab] = useState<RunResultTabKey>(RunResultTabKey.ALL);
 
   const metrics = useMemo(() => {
@@ -287,22 +348,46 @@ export const RunResultContainer: React.FC<{
       {
         key: RunResultTabKey.ALL,
         label: <TestResultTabTitle title="All" count={summary.totalTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.ALL} results={summary.totalTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.ALL}
+            results={summary.totalTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.PASSED,
         label: <TestResultTabTitle title="Passed" count={summary.successTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.PASSED} results={summary.successTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.PASSED}
+            results={summary.successTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.FAILED,
         label: <TestResultTabTitle title="Failed" count={summary.failedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.FAILED} results={summary.failedTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.FAILED}
+            results={summary.failedTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
       {
         key: RunResultTabKey.SKIPPED,
         label: <TestResultTabTitle title="Skipped" count={summary.skippedTestsCounts} loading={running} />,
-        children: <TestResultList tabKey={RunResultTabKey.SKIPPED} results={summary.skippedTests} />,
+        children: (
+          <TestResultList
+            tabKey={RunResultTabKey.SKIPPED}
+            results={summary.skippedTests}
+            totalIterationCount={totalIterationCount}
+          />
+        ),
       },
     ];
   }, [
@@ -315,6 +400,7 @@ export const RunResultContainer: React.FC<{
     summary.failedTests,
     summary.skippedTestsCounts,
     summary.skippedTests,
+    totalIterationCount,
   ]);
 
   return (
@@ -342,7 +428,7 @@ export const RunResultContainer: React.FC<{
               items={tabItems}
               animated={false}
               activeKey={activeTab}
-              destroyInactiveTabPane={false}
+              destroyInactiveTabPane={true}
               onChange={(activeKey) => setActiveTab(activeKey as RunResultTabKey)}
               className="test-result-tabs"
             />
