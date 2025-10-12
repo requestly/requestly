@@ -1,13 +1,15 @@
 import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { getAllRecordsMap } from "store/features/rules/selectors";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
   const dispatch = useDispatch();
+  const allRecordsMap = useSelector(getAllRecordsMap);
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
@@ -41,8 +43,11 @@ const AppliedRules = ({ actions }) => {
       return null;
     }
 
+    // Prefer showing the user-defined rule name in the tooltip; fall back to rule id when not found
+    const ruleDisplayName = allRecordsMap?.[rule.rule_id]?.name || rule.rule_id;
+
     return (
-      <Tooltip title={rule.rule_id} key={rule.rule_id}>
+      <Tooltip title={ruleDisplayName} key={rule.rule_id}>
         <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => handleRuleIconClick(e, rule.rule_id)}>
           {RULE_TYPES_CONFIG[rule.rule_type].ICON()}
         </span>
