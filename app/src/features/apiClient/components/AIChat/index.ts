@@ -1,1 +1,2 @@
-export { AIChat } from "./types";
+export * from "./types";
+export { AIChatView } from "./components/AIChatView";
