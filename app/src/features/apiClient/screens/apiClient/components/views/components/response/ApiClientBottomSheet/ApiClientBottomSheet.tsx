@@ -63,7 +63,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
 
     return (
       <Tag className={`count test-results-stats ${passedTestsCount === testResults.length ? "passed" : "failed"}`}>
-        ({passedTestsCount} / {testResults.length})
+        {passedTestsCount} / {testResults.length}
       </Tag>
     );
   }, [testResults]);
