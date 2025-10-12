@@ -49,6 +49,8 @@ const HttpRequestTabs: React.FC<Props> = ({
   const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
+  const isAtleastOneTestFailed = requestEntry.testResults?.some((test) => test.status === "failed");
+
   const items = useMemo(() => {
     return [
       {
@@ -142,6 +144,7 @@ const HttpRequestTabs: React.FC<Props> = ({
             label="Scripts"
             showDot={true}
             count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
+            dotClassName={isAtleastOneTestFailed ? "request-tab-dot-error" : "request-tab-dot-success"}
           />
         ),
         children: (
@@ -169,6 +172,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     setContentType,
     setRequestEntry,
     pathVariables.length,
+    isAtleastOneTestFailed,
   ]);
 
   return (
