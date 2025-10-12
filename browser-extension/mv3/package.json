@@ -46,7 +46,7 @@
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/chrome": "^0.0.266",
     "archiver": "^5.3.1",
-    "node-sass": "^8.0.0",
+    "sass": "^1.77.0",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "tslib": "^2.4.0",
