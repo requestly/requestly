@@ -17,4 +17,9 @@
       object-fit: contain;
     }
   }
+  .model-message__bubble-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: var(--requestly-space-4);
+  }
 }
