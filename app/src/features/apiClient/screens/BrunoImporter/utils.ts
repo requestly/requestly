@@ -4,6 +4,7 @@ import { Bruno } from "./types";
 import { Authorization } from "../apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { createBodyContainer } from "../apiClient/utils";
 
 export const processBrunoScripts = (request: Bruno.Request) => {
   const scripts = {
@@ -107,6 +108,7 @@ const createApiRecord = (
         queryParams: processParams(request.params),
         headers: processParams(request.headers),
         body: requestBody,
+        bodyContainer: createBodyContainer({ contentType, body: requestBody }),
         contentType,
       },
       response: null,
