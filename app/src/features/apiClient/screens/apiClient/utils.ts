@@ -315,6 +315,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     headers,
     contentType,
     body: body ?? null,
+    bodyContainer: createBodyContainer({ contentType, body }),
   };
 
   return request;
@@ -815,4 +816,49 @@ export const extractPathVariablesFromUrl = (url: string) => {
   }
 
   return variables;
+};
+
+export const createBodyContainer = (params: {
+  contentType: RequestContentType;
+  body: RQAPI.RequestBody;
+}): RQAPI.RequestBodyContainer => {
+  const { contentType, body } = params;
+  if (body === null || body === undefined) {
+    return {};
+  }
+
+  switch (contentType) {
+    case RequestContentType.FORM:
+      return {
+        form: body as RQAPI.RequestFormBody,
+      };
+    case RequestContentType.MULTIPART_FORM:
+      return {
+        multipartForm: body as RQAPI.MultipartFormBody,
+      };
+    case RequestContentType.JSON:
+      return {
+        text: body as RQAPI.RequestJsonBody,
+      };
+    case RequestContentType.RAW:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
+    case RequestContentType.HTML:
+      return {
+        text: body as RQAPI.RequestHtmlBody,
+      };
+    case RequestContentType.JAVASCRIPT:
+      return {
+        text: body as RQAPI.RequestJavascriptBody,
+      };
+    case RequestContentType.XML:
+      return {
+        text: body as RQAPI.RequestXmlBody,
+      };
+    default:
+      return {
+        text: body as RQAPI.RequestRawBody,
+      };
+  }
 };
