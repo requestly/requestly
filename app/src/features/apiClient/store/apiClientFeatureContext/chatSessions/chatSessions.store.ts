@@ -5,20 +5,23 @@ import { NativeError } from "errors/NativeError";
 export interface ChatSessionsStore {
   sessions: AIChat.SessionsMap;
   activeSessionId: AIChat.Session["id"];
+  isProcessing: boolean;
   createChatSession: (session: AIChat.Session) => void;
   updateSession: (id: AIChat.Session["id"], newMessage: AIChat.Message) => void;
   deleteSession: (id: AIChat.Session["id"]) => void;
   getSession: (id: AIChat.Session["id"]) => AIChat.Session;
   getActiveSessionId: () => AIChat.Session["id"] | undefined;
+  setIsProcessing: (isProcessing: boolean) => void;
 }
 
 export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
   return create<ChatSessionsStore>()((set, get) => ({
     sessions: sessions || {},
-    activeSessionId: undefined,
+    activeSessionId: Object.keys(sessions)[0],
+    isProcessing: false,
     createChatSession(session: AIChat.Session) {
       const sessionsMap = { ...sessions, [session.id]: session };
-      set({ sessions: sessionsMap });
+      set({ sessions: sessionsMap, activeSessionId: session.id });
     },
     getSession(id: AIChat.Session["id"]) {
       return get().sessions[id];
@@ -46,6 +49,9 @@ export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
       const { sessions } = get();
       delete sessions[id];
       set({ sessions });
+    },
+    setIsProcessing(isProcessing: boolean) {
+      set({ isProcessing });
     },
   }));
 }

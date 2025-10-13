@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import "./chatThreadView.scss";
-// import { useChatSessionsStore } from "features/apiClient/hooks/useChatSessionsStore.hook";
-import { demoSession } from "../../demo-session";
+import { useChatSessionsStore } from "features/apiClient/hooks/useChatSessionsStore.hook";
 import { UserMessageBubble } from "./components/UserMessageBubble/UserMessageBubble";
 import { ModelMessageBubble } from "./components/ModelMessageBubble/ModelMessageBubble";
 import { AIChat } from "../../types";
@@ -15,7 +14,7 @@ const renderMessage = (message: AIChat.Message, index: number) => {
   switch (message.role) {
     case "system":
     case "model":
-      return <ModelMessageBubble key={index} message={message} />;
+      return <ModelMessageBubble key={index} message={message as AIChat.ModelMessage} />;
     case "user":
       return <UserMessageBubble key={index} message={message} />;
     default:
@@ -24,9 +23,17 @@ const renderMessage = (message: AIChat.Message, index: number) => {
 };
 
 export const ChatThreadView: React.FC<Props> = ({ sessionId }) => {
-  // USE DEMO SESSION FOR NOW
-  // const session = useChatSessionsStore((s) => s.getSession(sessionId));
-  const session = demoSession;
+  const session = useChatSessionsStore((s) => s.getSession(sessionId));
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [session.messages]);
 
   return (
     <div className="chat-thread-view">
@@ -36,6 +43,7 @@ export const ChatThreadView: React.FC<Props> = ({ sessionId }) => {
             {renderMessage(message, index)}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
     </div>
   );

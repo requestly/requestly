@@ -13,11 +13,11 @@ export const useChatActions = () => {
   const handleAction = useCallback(
     async (action: AIChat.Action) => {
       switch (action.type) {
-        case "create_request":
+        case AIChat.ActionType.CREATE_REQUEST:
           return () => Promise.resolve();
-        case "create_collection":
+        case AIChat.ActionType.CREATE_COLLECTION:
           return () => Promise.resolve();
-        case "create_environment":
+        case AIChat.ActionType.CREATE_ENVIRONMENT:
           return env.createEnvironment({
             newEnvironmentName: "NEW ENV FROM CHAT",
             variables: {},
@@ -31,11 +31,11 @@ export const useChatActions = () => {
 
   const getChatActionButtonProps = useCallback((action: AIChat.Action) => {
     switch (action.type) {
-      case "create_request":
+      case AIChat.ActionType.CREATE_REQUEST:
         return { children: "Create Request", icon: <MdAdd /> };
-      case "create_collection":
+      case AIChat.ActionType.CREATE_COLLECTION:
         return { children: "Create Collection", icon: <MdOutlineFolder /> };
-      case "create_environment":
+      case AIChat.ActionType.CREATE_ENVIRONMENT:
         return { children: "Create Environment", icon: <MdHorizontalSplit /> };
       default:
         return {};
