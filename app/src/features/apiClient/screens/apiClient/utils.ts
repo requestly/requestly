@@ -278,14 +278,14 @@ export const filterHeadersToImport = (headers: KeyValuePair[]) => {
 };
 
 export const generateMultipartFormKeyValuePairs = (
-  data: Array<{ key: string; value: string }>
+  data: { key: string; value: string }[]
 ): RQAPI.FormDataKeyValuePair[] => {
   const result: RQAPI.FormDataKeyValuePair[] = [];
 
   data.forEach(({ key, value }) => {
     if (typeof value === "string" && value.startsWith("@")) {
       result.push({
-        id: Math.random(),
+        id: Date.now(),
         key: key || "",
         value: [] as RQAPI.MultipartFileValue[],
         isEnabled: true,
@@ -293,7 +293,7 @@ export const generateMultipartFormKeyValuePairs = (
       } as RQAPI.FormDataKeyValuePair);
     } else {
       result.push({
-        id: Math.random(),
+        id: Date.now(),
         key: key || "",
         value: value || "",
         isEnabled: true,
@@ -335,7 +335,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       body = generateKeyValuePairs(requestJson.data);
       break;
     case RequestContentType.MULTIPART_FORM: {
-      const multipartData: Array<{ key: string; value: string }> = [];
+      const multipartData: { key: string; value: string }[] = [];
       if (hasData) {
         for (const [key, value] of Object.entries(requestJson.data)) {
           multipartData.push({ key, value: String(value) });
