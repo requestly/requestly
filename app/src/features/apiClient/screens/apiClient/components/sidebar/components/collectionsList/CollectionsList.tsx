@@ -35,6 +35,7 @@ import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollectio
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { MultiSelectNudge } from "components/misc/ProductWalkthrough/NewFeatureNudge/MultiSelectNudge";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -332,6 +333,25 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     [updatedRecords, childParentMap]
   );
 
+  const handleItemClick = useCallback(
+    (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => {
+      if (event.metaKey || event.ctrlKey) {
+        event.preventDefault();
+
+        if (!showSelection) {
+          setShowSelection(true);
+        }
+
+        const syntheticEvent = {
+          target: { checked: !selectedRecords.has(record.id) },
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        recordsSelectionHandler(record, syntheticEvent);
+      }
+    },
+    [showSelection, selectedRecords, recordsSelectionHandler]
+  );
+
   useEffect(() => {
     const id = requestId || collectionId;
     setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
@@ -374,6 +394,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     setExpandedRecordIds={setExpandedRecordIds}
                     handleRecordsToBeDeleted={handleRecordsToBeDeleted}
                     onRequestlyExportClick={handleExportCollection}
+                    onItemClick={handleItemClick}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
@@ -393,6 +414,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                     record={record}
                     isReadOnly={!isValidPermission}
                     handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                    onItemClick={handleItemClick}
                     bulkActionOptions={{ showSelection, selectedRecords, recordsSelectionHandler, setShowSelection }}
                   />
                 );
@@ -447,6 +469,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           }}
         />
       )}
+      <MultiSelectNudge />
     </DndProvider>
   );
 };
