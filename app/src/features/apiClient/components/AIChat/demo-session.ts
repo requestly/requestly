@@ -136,51 +136,7 @@ const demoSession: AIChat.Session = {
     {
       role: "model",
       text: "Perfect! I'll create several error test cases to help you validate your API's error handling:",
-      actions: [
-        {
-          type: "create_request",
-          payload: {
-            method: "POST",
-            url: "{{baseUrl}}/users",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: {
-              name: "Test User",
-              email: "invalid-email-format",
-              password: "123",
-            },
-          },
-        },
-        {
-          type: "create_request",
-          payload: {
-            method: "POST",
-            url: "{{baseUrl}}/users",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: {
-              name: "",
-              email: "test@example.com",
-            },
-          },
-        },
-        {
-          type: "create_request",
-          payload: {
-            method: "POST",
-            url: "{{baseUrl}}/auth/login",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: {
-              email: "nonexistent@example.com",
-              password: "wrongpassword",
-            },
-          },
-        },
-      ],
+      actions: [],
       createdAt: Date.now(),
     },
   ],

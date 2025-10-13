@@ -2,16 +2,15 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #1a1a1a;
-  color: #ffffff;
-  padding: 16px;
+  padding: var(--requestly-space-4, 8px);
   overflow-y: auto;
+  overflow-x: hidden;
 
   &__messages {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--requestly-space-6);
   }
 
   &__message {
@@ -20,6 +19,9 @@
   }
 
   .chat-message {
+    &__bubble {
+      max-width: 90%;
+    }
     &__bubble-text {
       font-size: var(--requestly-font-size-sm);
       color: var(--requestly-color-text-default);
