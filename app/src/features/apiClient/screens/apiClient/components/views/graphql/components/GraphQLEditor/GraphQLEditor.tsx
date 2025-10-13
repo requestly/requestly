@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView, basicSetup } from "codemirror";
+import { keymap } from "@codemirror/view";
 import { json } from "@codemirror/lang-json";
 import { graphql } from "cm6-graphql";
 import { buildClientSchema } from "graphql";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./graphQLEditor.css";
 import { IntrospectionData } from "features/apiClient/helpers/introspectionQuery";
+import { indentWithTab } from "@codemirror/commands";
 
 interface BaseEditorProps {
   initialDoc?: string;
@@ -25,7 +27,7 @@ interface VariablesEditorProps extends BaseEditorProps {
 
 type EditorProps = OperationEditorProps | VariablesEditorProps;
 
-const basicExtensions = [basicSetup, vscodeDark];
+const basicExtensions = [basicSetup, vscodeDark, keymap.of([indentWithTab])];
 
 export const GraphQLEditor: React.FC<EditorProps> = (props) => {
   const editorRef = useRef<HTMLDivElement | null>(null);
