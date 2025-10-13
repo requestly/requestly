@@ -823,6 +823,10 @@ export const createBodyContainer = (params: {
   body: RQAPI.RequestBody;
 }): RQAPI.RequestBodyContainer => {
   const { contentType, body } = params;
+  if (body === null || body === undefined) {
+    return {};
+  }
+
   switch (contentType) {
     case RequestContentType.FORM:
       return {
