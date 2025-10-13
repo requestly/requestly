@@ -23,6 +23,7 @@ import {
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { updateRecordSelection } from "./utils";
+import { MultiSelectNudge } from "components/misc/MultiClickNudge/MultiClickNudge";
 
 interface Props {
   searchValue: string;
@@ -135,6 +136,25 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     [context?.id, selectedRecords, updatedRecords, childParentMap, handleRecordSelection]
   );
 
+  const handleItemClick = useCallback(
+    (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => {
+      if (event.metaKey || event.ctrlKey) {
+        event.preventDefault();
+
+        if (!showSelection) {
+          handleShowSelection(true);
+        }
+
+        const syntheticEvent = {
+          target: { checked: !selectedRecords.has(record.id) },
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        recordsSelectionHandler(record, syntheticEvent);
+      }
+    },
+    [showSelection, selectedRecords, recordsSelectionHandler]
+  );
+
   useEffect(() => {
     const id = requestId || collectionId;
     setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
@@ -193,6 +213,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                     }}
                     onRequestlyExportClick={() => {}}
                     // TODO: just pass contextId
+                    onItemClick={handleItemClick}
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );
@@ -217,6 +238,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
                       recordsSelectionHandler,
                       setShowSelection: handleShowSelection,
                     }}
+                    onItemClick={handleItemClick}
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
                   />
                 );
@@ -240,6 +262,7 @@ export const ContextualCollectionsList: React.FC<Props> = ({
           )}
         </div>
       </div>
+      <MultiSelectNudge />
     </>
   );
 };

@@ -35,7 +35,7 @@ import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollectio
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { MultiSelectNudge } from "components/misc/ProductWalkthrough/NewFeatureNudge/MultiSelectNudge";
+import { MultiSelectNudge } from "components/misc/MultiClickNudge/MultiClickNudge";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
