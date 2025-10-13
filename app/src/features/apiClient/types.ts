@@ -117,7 +117,7 @@ export namespace RQAPI {
     value: string | MultipartFileValue[];
   };
 
-  type MultipartFileValue = {
+  export type MultipartFileValue = {
     id: string; // file id for each multipart key value pair
     name: string;
     path: string;
