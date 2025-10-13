@@ -59,11 +59,10 @@ const RequestInfo: React.FC<{
 interface ReorderableListItemProps {
   index: number;
   orderedRequest: RQAPI.OrderedRequest;
-  style: React.CSSProperties;
   reorder: (currentIndex: number, newIndex: number) => void;
 }
 
-export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, style, reorder }) => {
+export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index, orderedRequest, reorder }) => {
   const [setSelected] = useRunConfigStore((s) => [s.setSelected]);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -110,7 +109,7 @@ export const ReorderableListItem: React.FC<ReorderableListItemProps> = ({ index,
   return (
     <div
       ref={ref}
-      style={{ opacity: opacity, ...style }}
+      style={{ opacity: opacity }}
       className={`reorderable-list-item ${isValidTarget && isOver ? `collect-dragged-item ${dragDirection}` : ""} `}
     >
       <span className="drag-icon">
