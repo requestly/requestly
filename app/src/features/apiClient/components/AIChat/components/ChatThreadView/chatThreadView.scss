@@ -25,8 +25,17 @@
     &__bubble-text {
       font-size: var(--requestly-font-size-sm);
       color: var(--requestly-color-text-default);
-      line-height: 18px;
-      word-wrap: break-word;
+      line-height: 20px;
+
+      p {
+        margin-bottom: 0;
+      }
+
+      &.markdown-content {
+        li {
+          list-style: revert;
+        }
+      }
     }
   }
 }
