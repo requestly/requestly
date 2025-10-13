@@ -2,8 +2,6 @@ import React, { useCallback, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ReorderableListItem } from "./ReorderableListItem";
 import { RQAPI } from "features/apiClient/types";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import "./reorderableList.scss";
 
 interface ReorderableListProps {

@@ -2,9 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useApiClientMultiWorkspaceView } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { BulkActions, RQAPI } from "features/apiClient/types";
 import { useRBAC } from "features/rbac";
-import { DndProvider } from "react-dnd";
 import { SidebarListHeader } from "../../components/sidebarListHeader/SidebarListHeader";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { WorkspaceProvider } from "../WorkspaceProvider/WorkspaceProvider";
 import ActionMenu, { ActionMenuProps } from "../../components/collectionsList/BulkActionsMenu";
