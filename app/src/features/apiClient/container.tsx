@@ -19,6 +19,8 @@ import { loadWorkspaces } from "./commands/multiView/loadPendingWorkspaces.comma
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { createRepository } from "./commands/context/setupContext.command";
 import Split from "react-split";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -84,37 +86,39 @@ const ApiClientFeatureContainer: React.FC = () => {
   }
 
   return (
-    <TabServiceProvider>
-      <LocalSyncRefreshHandler />
-      <div className="api-client-container">
-        <Daemon />
-        <ApiClientProvider>
-          <Split
-            className="api-client-container__split"
-            direction="horizontal"
-            sizes={[20, 80]}
-            minSize={[300, getSecondPaneMinSize()]}
-            gutter={(index, direction) => {
-              const gutterContainer = document.createElement("div");
-              gutterContainer.style.position = "relative";
-              gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
-              gutterContainer.innerHTML = `<div class="gutter" />`;
-              return gutterContainer;
-            }}
-            gutterStyle={() => {
-              return {
-                height: "100%",
-                width: "0px",
-              };
-            }}
-            gutterAlign="center"
-          >
-            <APIClientSidebar />
-            <TabsContainer />
-          </Split>
-        </ApiClientProvider>
-      </div>
-    </TabServiceProvider>
+    <DndProvider backend={HTML5Backend}>
+      <TabServiceProvider>
+        <LocalSyncRefreshHandler />
+        <div className="api-client-container">
+          <Daemon />
+          <ApiClientProvider>
+            <Split
+              className="api-client-container__split"
+              direction="horizontal"
+              sizes={[20, 80]}
+              minSize={[300, getSecondPaneMinSize()]}
+              gutter={(index, direction) => {
+                const gutterContainer = document.createElement("div");
+                gutterContainer.style.position = "relative";
+                gutterContainer.className = `api-client-container__split-gutter gutter-container gutter-container-${direction}`;
+                gutterContainer.innerHTML = `<div class="gutter" />`;
+                return gutterContainer;
+              }}
+              gutterStyle={() => {
+                return {
+                  height: "100%",
+                  width: "0px",
+                };
+              }}
+              gutterAlign="center"
+            >
+              <APIClientSidebar />
+              <TabsContainer />
+            </Split>
+          </ApiClientProvider>
+        </div>
+      </TabServiceProvider>
+    </DndProvider>
   );
 };
 
