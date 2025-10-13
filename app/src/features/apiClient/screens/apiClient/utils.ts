@@ -285,7 +285,7 @@ export const generateMultipartFormKeyValuePairs = (
   data.forEach(({ key, value }) => {
     if (typeof value === "string" && value.startsWith("@")) {
       result.push({
-        id: Date.now(),
+        id: Math.random(),
         key: key || "",
         value: [] as RQAPI.MultipartFileValue[],
         isEnabled: true,
@@ -293,7 +293,7 @@ export const generateMultipartFormKeyValuePairs = (
       } as RQAPI.FormDataKeyValuePair);
     } else {
       result.push({
-        id: Date.now(),
+        id: Math.random(),
         key: key || "",
         value: value || "",
         isEnabled: true,
