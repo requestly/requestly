@@ -184,10 +184,9 @@
 
   .api-response-status-line {
     font-size: var(--requestly-font-size-xs);
-
-    &.ant-space.ant-space-horizontal {
-      gap: 0px;
-    }
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
     .ant-space-item {
       display: flex;
@@ -201,16 +200,6 @@
           background-color: transparent;
         }
       }
-    }
-
-    .ant-space-item::after {
-      content: "";
-      margin: 0 8px;
-      display: block;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background-color: var(--requestly-color-text-subtle, #bbb);
     }
 
     .ant-space-item:last-child::after {

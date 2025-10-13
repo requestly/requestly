@@ -45,7 +45,7 @@ const StatusLine: React.FC<Props> = ({ response }) => {
   }
 
   return (
-    <Space className="api-response-status-line" size={0}>
+    <Space className="api-response-status-line">
       {isHttpResponse(response) && response.redirectedUrl && (
         <Popover content={response.redirectedUrl}>
           <RQButton type="transparent" size="small" icon={<NodeIndexOutlined />}>
@@ -53,11 +53,11 @@ const StatusLine: React.FC<Props> = ({ response }) => {
           </RQButton>
         </Popover>
       )}
+      <PropertyRow name="Time" value={formattedTime} />
       <PropertyRow
         name="Status"
         value={<NetworkStatusField status={response.status} statusText={formattedStatusText} />}
       />
-      <PropertyRow name="Time" value={formattedTime} />
     </Space>
   );
 };

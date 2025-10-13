@@ -1,18 +1,22 @@
-.run-config-view-container .reorderable-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4, 8px);
+.run-config-view-container .reorderable-list-wrapper {
   padding: 16px var(--space-4, 8px);
   padding-top: 8px;
   overflow-x: hidden;
-  height: 100%;
-  max-height: calc(100% - 146px);
+  flex: 1;
+  min-height: 0;
 
-  &:active,
-  &:focus,
-  &:focus-visible {
-    border: none;
-    outline: none;
+  .reorderable-list {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+
+    &:active,
+    &:focus,
+    &:focus-visible {
+      border: none;
+      outline: none;
+    }
   }
 
   .reorderable-list-item {

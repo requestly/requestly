@@ -26,9 +26,6 @@ type RulesModalsContextType = {
 
   openGroupDeleteModalAction: (record: Group) => void;
   setOpenGroupDeleteModalAction: React.Dispatch<React.SetStateAction<() => void>>;
-
-  openMigratonModalAction: (record: Group) => void;
-  setOpenMigrationModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
 const RulesModalsContext = createContext<RulesModalsContextType>(null);
@@ -49,7 +46,6 @@ export const RulesModalsContextProvider: React.FC<RulesModalsContextProviderProp
   );
   const [openRenameGroupModalAction, setOpenRenameGroupModalAction] = useState<() => void>(async () => () => {});
   const [openGroupDeleteModalAction, setOpenGroupDeleteModalAction] = useState<() => void>(async () => () => {});
-  const [openMigratonModalAction, setOpenMigrationModalAction] = useState<() => void>(async () => () => {});
 
   const value = {
     openCreateGroupModalAction,
@@ -72,9 +68,6 @@ export const RulesModalsContextProvider: React.FC<RulesModalsContextProviderProp
 
     openGroupDeleteModalAction,
     setOpenGroupDeleteModalAction,
-
-    openMigratonModalAction,
-    setOpenMigrationModalAction,
   };
 
   return <RulesModalsContext.Provider value={value}>{children}</RulesModalsContext.Provider>;

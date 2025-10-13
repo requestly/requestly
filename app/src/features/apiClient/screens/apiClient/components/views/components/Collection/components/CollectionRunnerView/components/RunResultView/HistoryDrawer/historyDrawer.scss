@@ -35,27 +35,50 @@
 
     .ant-drawer-body {
       padding: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
   }
 
   .history-drawer-result-container {
     position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 
     .back-btn {
       position: absolute;
       top: 2px;
       left: 2px;
     }
-  }
 
-  .run-result-view-details {
-    .result-header {
-      margin-left: 34px;
-      padding: var(--space-4, 10px) var(--space-6, 16px) var(--space-4, 8px) var(--space-2, 4px);
+    .run-result-view-details .result-tabs-container .test-result-collapse-container .ant-collapse-header {
+      background: var(--requestly-color-surface-1);
     }
 
-    .ant-tabs-nav {
-      margin-bottom: 0;
+    .run-result-view-details {
+      .result-header {
+        margin-left: 34px;
+        padding: var(--space-4, 10px) var(--space-6, 16px) var(--space-4, 8px) var(--space-2, 4px);
+      }
+
+      .ant-tabs-content {
+        height: 100%;
+      }
+
+      .ant-tabs-tabpane {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .ant-tabs-nav {
+        margin-bottom: 0;
+      }
     }
   }
 }
