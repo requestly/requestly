@@ -1,2 +1,2 @@
 export * from "./types";
-export { AIChatView } from "./components/AIChatView";
+export { default as AIChatView } from "./components/AIChatView";

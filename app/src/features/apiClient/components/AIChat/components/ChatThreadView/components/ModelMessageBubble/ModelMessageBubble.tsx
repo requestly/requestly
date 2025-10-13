@@ -4,7 +4,7 @@ import { AIChat } from "../../../../types";
 import "./modelMessageBubble.scss";
 
 interface Props {
-  message: AIChat.Message;
+  message: AIChat.ModelMessage;
 }
 
 export const ModelMessageBubble: React.FC<Props> = ({ message }) => {

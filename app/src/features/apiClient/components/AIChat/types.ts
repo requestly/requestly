@@ -1,16 +1,27 @@
 export namespace AIChat {
   export type Role = "system" | "user" | "model";
 
+  export enum ActionType {
+    CREATE_REQUEST = "create_request",
+    CREATE_COLLECTION = "create_collection",
+    CREATE_ENVIRONMENT = "create_environment",
+  }
+
   // TEMPORARY: This will be replaced with the actual action types
   export type Action = {
-    type: "create_request" | "create_collection" | "create_environment";
+    type: ActionType;
     payload: any;
   };
   export type Message = {
     role: Role;
     text: string;
-    actions: Action[];
     createdAt: number;
+  };
+
+  export type UserMessage = Message;
+
+  export type ModelMessage = Message & {
+    actions: Action[];
   };
 
   export type Session = {
