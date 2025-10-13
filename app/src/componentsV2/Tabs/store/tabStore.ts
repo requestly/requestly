@@ -21,20 +21,20 @@ export type ActiveBlocker = { id: CloseBlockerId; topic: CloseTopic; details: Cl
 export type CloseBlocker = { canClose: true } | { canClose: false; details: CloseBlockerDetails };
 
 export type TabState = {
-  /** Tab id */
   id: number;
   source: AbstractTabSource;
   unsaved: boolean;
   preview: boolean;
   title: string;
   icon: ReactNode;
+  closable: boolean;
   closeBlockers: Map<CloseTopic, Map<CloseBlockerId, CloseBlocker>>;
 
   setTitle: (title: string) => void;
-  setUnsaved: (saved: boolean) => void;
+  setUnsaved: (unsaved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
-
+  setClosable: (closable: boolean) => void;
   canCloseTab: () => boolean;
   getActiveBlockers: () => ActiveBlocker[];
   getActiveBlocker: () => null | ActiveBlocker;
@@ -43,7 +43,7 @@ export type TabState = {
   clearAllCloseBlockers: () => void;
 };
 
-export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
+export const createTabStore = (id: number, source: AbstractTabSource, title: string, preview: boolean = false) => {
   return create<TabState>((set, get) => ({
     id,
     title,
@@ -51,12 +51,14 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     preview,
     unsaved: false,
     icon: source.getIcon(),
+    closable: true,
     closeBlockers: new Map(),
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
+    setClosable: (closable: boolean) => set({ closable }),
 
     canCloseTab: () => {
       const { closeBlockers } = get();

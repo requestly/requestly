@@ -1,22 +1,19 @@
-import { createContext, useContext } from "react";
 import { create, StoreApi, UseBoundStore, useStore } from "zustand";
 import { persist, StorageValue } from "zustand/middleware";
 import * as Sentry from "@sentry/react";
-import { useShallow } from "zustand/shallow";
 import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
 import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { useShallow } from "zustand/shallow";
+import { createContext, useContext } from "react";
 
 type TabId = number;
 type SourceName = string;
 type SourceId = string;
 type SourceMap = Map<SourceId, TabId>;
-
 type TabStore = StoreApi<TabState>;
-type TabConfig = {
-  preview: boolean;
-};
+type TabConfig = { preview: boolean };
 
 type TabServiceState = {
   tabIdSequence: TabId;
@@ -47,13 +44,13 @@ type TabActions = {
   resetPreviewTab: () => void;
   setPreviewTab: (tabId: TabId) => void;
   setActiveTab: (tabId: TabId) => void;
+  setTabs: (newTabs: Map<TabId, TabStore>) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
   getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
   getTabStateBySource: (sourceId: SourceId, sourceName: SourceName) => TabState | undefined;
   consumeIgnorePath: () => boolean;
   setIgnorePath: (ignorePath: boolean) => void;
-
   cleanupCloseBlockers: () => void;
 };
 
@@ -68,7 +65,6 @@ const initialState: TabServiceState = {
   tabsIndex: new Map(),
   tabs: new Map(),
   ignorePath: false,
-
   _version: 0,
 };
 
@@ -77,37 +73,27 @@ const createTabServiceStore = () => {
     persist(
       (set, get) => ({
         ...initialState,
-
         setIgnorePath(ignorePath) {
           set({ ignorePath });
         },
-
         consumeIgnorePath() {
           const { ignorePath } = get();
-          if (!ignorePath) {
-            return false;
-          }
+          if (!ignorePath) return false;
           set({ ignorePath: false });
           return ignorePath;
         },
-
         reset(ignorePath = false) {
           set({ ...initialState, tabsIndex: new Map(), tabs: new Map(), ignorePath });
           tabServiceStore.persist.clearStorage();
         },
-
         upsertTabSource(tabId, source, config) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-
           const { tabsIndex, tabs, setActiveTab } = get();
 
-          if (!tabId) {
-            return;
-          }
+          if (tabId == null) return;
 
           const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
-
           if (tabsIndex.has(sourceName)) {
             tabsIndex.get(sourceName)?.set(sourceId, tabId);
           } else {
@@ -115,41 +101,35 @@ const createTabServiceStore = () => {
           }
 
           tabs.set(tabId, tab);
+          set({ tabs: new Map(tabs) });
           setActiveTab(tabId);
-
-          set({
-            tabs: new Map(tabs),
-          });
         },
-
         updateTabBySource(sourceId, sourceName, updates) {
           const { tabs, getTabIdBySource, incrementVersion } = get();
           const tabId = getTabIdBySource(sourceId, sourceName);
+          if (tabId == null) return;
 
           const tabStore = tabs.get(tabId);
-          if (!tabStore) {
-            return;
-          }
+          if (!tabStore) return;
 
           const tabState = tabStore.getState();
-          const updatedTitle = updates?.title ?? tabState.title;
-          const updatedPreview = updates?.preview ?? tabState.preview;
-          const updatedIcon = updates?.icon ?? tabState.icon;
-
-          tabStore.getState().setTitle(updatedTitle);
-          tabStore.getState().setPreview(updatedPreview);
-          tabStore.getState().setIcon(updatedIcon);
+          const next = {
+            title: updates?.title ?? tabState.title,
+            preview: updates?.preview ?? tabState.preview,
+            icon: updates?.icon ?? tabState.icon,
+            unsaved: updates?.unsaved ?? tabState.unsaved,
+          };
+          tabStore.getState().setTitle(next.title);
+          tabStore.getState().setPreview(next.preview);
+          tabStore.getState().setIcon(next.icon);
+          tabStore.getState().setUnsaved(next.unsaved);
           incrementVersion();
         },
-
         openTab(source, config) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-
           const contextId = source.metadata.context?.id;
-          if (contextId) {
-            setLastUsedContextId(contextId);
-          }
+          if (contextId) setLastUsedContextId(contextId);
 
           const {
             _generateNewTabId,
@@ -161,20 +141,18 @@ const createTabServiceStore = () => {
             setPreviewTab,
             getTabIdBySource,
           } = get();
-
           const existingTabId = getTabIdBySource(sourceId, sourceName);
           if (existingTabId) {
-            // FIXME: This can cause a rerender
             setActiveTab(existingTabId);
             return;
           }
 
           if (config?.preview) {
-            if (previewTabId) {
-              // Remove previous preview tab source from tabsIndex
-              tabsIndex.get(previewTabSource.getSourceName())?.delete(previewTabSource.getSourceId());
+            if (previewTabId && previewTabSource) {
+              const oldSourceName = previewTabSource.getSourceName();
+              const oldSourceId = previewTabSource.getSourceId();
+              tabsIndex.get(oldSourceName)?.delete(oldSourceId);
             }
-
             const tabId = previewTabId ?? _generateNewTabId();
             upsertTabSource(tabId, source, config);
             setPreviewTab(tabId);
@@ -184,65 +162,41 @@ const createTabServiceStore = () => {
           const newTabId = _generateNewTabId();
           upsertTabSource(newTabId, source);
         },
-
         closeTab(source, skipUnsavedPrompt = false) {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
-
           const { closeTabById, getTabIdBySource } = get();
-
           const existingTabId = getTabIdBySource(sourceId, sourceName);
-          if (!existingTabId) {
-            return;
-          }
-
+          if (existingTabId == null) return;
           closeTabById(existingTabId, skipUnsavedPrompt);
         },
-
         closeAllTabs(skipUnsavedPrompt) {
           const { tabs, closeTabById } = get();
-          tabs.forEach((_, tabId) => {
-            closeTabById(tabId, skipUnsavedPrompt);
-          });
+          const ids = Array.from(tabs.keys());
+          ids.forEach((id) => closeTabById(id, skipUnsavedPrompt));
         },
-
         cleanupCloseBlockers() {
           const { tabs } = get();
           const blockersToCleanUp = Array.from(tabs.values()).flatMap((t) => t.getState().getActiveBlockers());
-
-          blockersToCleanUp.forEach((blocker) => {
-            blocker.details.onConfirm?.();
-          });
+          blockersToCleanUp.forEach((blocker) => blocker.details.onConfirm?.());
         },
-
         closeTabBySource(sourceId, sourceName, skipUnsavedPrompt) {
           const { closeTabById, getTabIdBySource } = get();
-
           const tabId = getTabIdBySource(sourceId, sourceName);
-          if (!tabId) {
-            return;
-          }
-
+          if (tabId == null) return;
           closeTabById(tabId, skipUnsavedPrompt);
         },
-
         closeTabByContext(contextId, skipUnsavedPrompt) {
           const { tabs, closeTabById } = get();
           const tabsToClose = Array.from(tabs.values())
             .map((t) => t.getState())
             .filter((t) => t.source.metadata.context?.id === contextId);
-
-          tabsToClose.forEach((t) => {
-            closeTabById(t.id, skipUnsavedPrompt);
-          });
+          tabsToClose.forEach((t) => closeTabById(t.id, skipUnsavedPrompt));
         },
-
         closeTabById(tabId, skipUnsavedPrompt) {
           const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
           const tabStore = tabs.get(tabId);
-          if (!tabStore) {
-            return;
-          }
+          if (!tabStore) return;
 
           const tabState = tabStore.getState();
           const sourceName = tabState.source.getSourceName();
@@ -254,63 +208,46 @@ const createTabServiceStore = () => {
               const canClose = window.confirm(
                 activeBlocker?.details.title || "Discard changes? Changes you made will not be saved."
               );
-
               if (!canClose) {
                 activeBlocker?.details.onCancel?.();
                 return;
               }
-
               activeBlocker?.details.onConfirm?.();
             }
           }
 
           tabsIndex.get(sourceName)?.delete(sourceId);
+          if (tabsIndex.get(sourceName)?.size === 0) tabsIndex.delete(sourceName);
 
-          if (tabsIndex.get(sourceName)?.size === 0) {
-            tabsIndex.delete(sourceName);
-          }
+          const tabIds = Array.from(tabs.keys());
+          const currentIndex = tabIds.indexOf(tabId);
+          const newTabIds = tabIds.filter((id) => id !== tabId);
+          const newActiveTabId =
+            activeTabId !== tabId
+              ? activeTabId
+              : (() => {
+                  if (newTabIds.length === 0) return undefined;
+                  const nextIndex = currentIndex < newTabIds.length ? currentIndex : currentIndex - 1;
+                  return nextIndex >= 0 ? newTabIds[nextIndex] : undefined;
+                })();
 
-          const newActiveTabId = (() => {
-            if (activeTabId !== tabId) {
-              return activeTabId;
-            }
-
-            const tabsArray = Array.from(tabs.keys());
-            if (tabsArray.length - 1 === 0) {
-              return null;
-            }
-
-            const currentIndex = tabsArray.indexOf(tabId);
-            if (currentIndex === tabsArray.length - 1) {
-              return tabsArray[currentIndex - 1];
-            }
-            return tabsArray[currentIndex + 1];
-          })();
           tabs.delete(tabId);
-
-          set({
-            tabs: new Map(tabs),
-          });
+          set({ tabs: new Map(tabs) });
           setActiveTab(newActiveTabId);
         },
-
         resetPreviewTab() {
-          set({
-            previewTabId: undefined,
-            previewTabSource: null,
-          });
+          set({ previewTabId: undefined, previewTabSource: null });
+          set({ _version: get()._version + 1 });
         },
-
         setPreviewTab(id: TabId) {
           const { tabs, resetPreviewTab } = get();
-
           if (tabs.has(id)) {
             set({ previewTabId: id, previewTabSource: tabs.get(id).getState().source });
+            set({ _version: get()._version + 1 });
           } else {
             resetPreviewTab();
           }
         },
-
         setActiveTab(id: TabId) {
           const { tabs } = get();
           const tab = tabs.get(id);
@@ -318,46 +255,31 @@ const createTabServiceStore = () => {
             const tabState = tab.getState();
             set({ activeTabId: id, activeTabSource: tabState.source });
             const contextId = tabState.source.metadata.context?.id;
-            if (contextId) {
-              setLastUsedContextId(contextId);
-            }
+            if (contextId) setLastUsedContextId(contextId);
           } else {
-            set({
-              activeTabId: undefined,
-              activeTabSource: null,
-            });
+            set({ activeTabId: undefined, activeTabSource: null });
           }
         },
-
+        setTabs(newTabs: Map<TabId, TabStore>) {
+          set({ tabs: new Map(newTabs), _version: get()._version + 1 });
+        },
         _generateNewTabId() {
           const { tabIdSequence } = get();
           const nextId = tabIdSequence + 1;
           set({ tabIdSequence: nextId });
           return nextId;
         },
-
         incrementVersion() {
           set({ _version: get()._version + 1 });
         },
-
         getTabIdBySource(sourceId, sourceName) {
           const { tabsIndex } = get();
-          if (!sourceId) {
-            return;
-          }
-
           return tabsIndex.get(sourceName)?.get(sourceId);
         },
-
         getTabStateBySource(sourceId, sourceName) {
           const { tabs, getTabIdBySource } = get();
           const tabId = getTabIdBySource(sourceId, sourceName);
-
-          if (!tabId) {
-            return;
-          }
-
-          return tabs.get(tabId)?.getState();
+          return tabId ? tabs.get(tabId)?.getState() : undefined;
         },
       }),
       {
@@ -369,21 +291,15 @@ const createTabServiceStore = () => {
           tabs: state.tabs,
           _version: state._version,
         }),
-
-        onRehydrateStorage: (store) => {
-          return (store, error: Error) => {
-            if (error) {
-              Sentry.withScope((scope) => {
-                scope.setTag("error_type", "tabs_rehydration_failed");
-                scope.setContext("tab_service_store_details", {
-                  tabServiceStore: store,
-                });
-                Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
-              });
-            }
-          };
+        onRehydrateStorage: (store) => (store, error: Error) => {
+          if (error) {
+            Sentry.withScope((scope) => {
+              scope.setTag("error_type", "tabs_rehydration_failed");
+              scope.setContext("tab_service_store_details", { tabServiceStore: store });
+              Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
+            });
+          }
         },
-
         storage: {
           setItem: (name, newValue: StorageValue<TabServiceState>) => {
             try {
@@ -391,58 +307,57 @@ const createTabServiceStore = () => {
                 tabId,
                 tabStore.getState(),
               ]);
-
               const tabsIndex = Array.from(newValue.state.tabsIndex.entries()).map(([sourceName, sourceMap]) => [
                 sourceName,
                 Array.from(sourceMap.entries()),
               ]);
-
+              const tabIds = Array.from(newValue.state.tabs.keys());
               const stateString = JSON.stringify({
                 ...newValue,
-                state: {
-                  ...newValue.state,
-                  tabs,
-                  tabsIndex,
-                },
+                state: { ...newValue.state, tabs, tabsIndex, tabIds },
               });
-              localStorage.setItem(name, stateString);
+              sessionStorage.setItem(name, stateString);
             } catch (error) {
               throw new Error(`Tab service setItem failed - error: ${error}`);
             }
           },
-
           getItem: (name) => {
             try {
-              const stateString = localStorage.getItem(name);
-
-              if (!stateString) {
-                return null;
-              }
+              const stateString = sessionStorage.getItem(name);
+              if (!stateString) return null;
 
               const existingValue = JSON.parse(stateString);
-
               const tabsIndex: TabServiceStore["tabsIndex"] = new Map(
                 existingValue.state.tabsIndex.map(([sourceName, sourceMap]: [string, Iterable<[SourceId, TabId]>]) => [
                   sourceName,
                   new Map(sourceMap),
                 ])
               );
-
               const tabs: TabServiceStore["tabs"] = new Map(
                 existingValue.state.tabs.map(([tabId, tabState]: [TabId, TabState]) => {
                   const source = new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata);
-                  return [tabId, createTabStore(tabId, source, tabState.title)];
+                  const tabStore = createTabStore(tabId, source, tabState.title, tabState.preview);
+                  tabStore.getState().setClosable(tabState.closable ?? true);
+                  return [tabId, tabStore];
                 })
               );
-
               const activeTabId = existingValue.state.activeTabId;
-              const activeTabSource = activeTabId ? tabs.get(activeTabId).getState().source : null;
+              const activeTabSource = activeTabId ? tabs.get(activeTabId)?.getState().source : null;
+
+              const storedTabIds = existingValue.state.tabIds || [];
+              const validTabIds = new Set(tabs.keys());
+              const validTabOrder = storedTabIds.filter((id: TabId) => validTabIds.has(id));
+              const missingTabs = Array.from(validTabIds).filter((id) => !validTabOrder.includes(id));
+              const finalTabs = new Map();
+              [...validTabOrder, ...missingTabs].forEach((id) => {
+                if (tabs.has(id)) finalTabs.set(id, tabs.get(id));
+              });
 
               return {
                 ...existingValue,
                 state: {
                   ...existingValue.state,
-                  tabs,
+                  tabs: finalTabs,
                   tabsIndex,
                   activeTabSource,
                 },
@@ -451,16 +366,14 @@ const createTabServiceStore = () => {
               throw new Error(`Tab service getItem failed - error: ${error}`);
             }
           },
-          removeItem: (name) => localStorage.removeItem(name),
+          removeItem: (name) => sessionStorage.removeItem(name),
         },
       }
     )
   );
-
   return tabServiceStore;
 };
 
-// https://zustand.docs.pmnd.rs/guides/auto-generating-selectors
 type WithSelectors<S> = S extends { getState: () => infer T } ? S & { use: { [K in keyof T]: () => T[K] } } : never;
 const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) => {
   let store = _store as WithSelectors<typeof _store>;
@@ -468,21 +381,12 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
   for (let k of Object.keys(store.getState())) {
     (store.use as any)[k] = () => store((s) => s[k as keyof typeof s]);
   }
-
   return store;
 };
 
 export const tabServiceStore = createTabServiceStore();
 export const tabServiceStoreWithAutoSelectors = createSelectors(tabServiceStore);
-
-// Creating and passing the store through context to ensure context's value can be mocked easily
 export const TabServiceStoreContext = createContext(tabServiceStoreWithAutoSelectors);
-
-/**
- * Usage: const [a, b] = useTabServiceSelector(state => [ state.a, state.b ])
- * @param selector
- * @returns selector
- */
 export const useTabServiceWithSelector = <T>(selector: (state: TabServiceStore) => T) => {
   const store = useContext(TabServiceStoreContext);
   return useStore(store, useShallow(selector));
