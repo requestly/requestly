@@ -39,16 +39,30 @@
       .form {
         .field-group {
           display: flex;
+          flex-wrap: wrap;
           gap: 8px;
           margin-bottom: 16px;
           align-items: center;
 
           label {
-            width: 120px;
+            min-width: 100px;
+            width: 100%;
+
+            @media (min-width: 768px) {
+              width: 120px;
+            }
           }
 
           .field {
-            width: 448px;
+            width: 100%;
+            flex-grow: 1;
+            min-width: 0;
+
+            @media (min-width: 768px) {
+              width: 448px;
+              flex-grow: 0;
+              min-width: initial;
+            }
 
             .input-container.error-state {
               position: relative;
@@ -61,10 +75,8 @@
               border-radius: 4px;
 
               .error-icon {
-                position: inherit;
-                margin-bottom: 12px;
+                margin-bottom: 0;
                 padding: 2px;
-                align-items: center;
                 margin-left: auto;
                 svg {
                   width: 17px;
@@ -82,8 +94,13 @@
           }
 
           .ant-select-selector {
-            width: 448px;
+            width: 100% !important;
+            min-width: 0 !important;
             background: none;
+            @media (min-width: 768px) {
+              width: 448px !important;
+              min-width: initial !important;
+            }
           }
 
           .ant-input {
@@ -105,9 +122,15 @@
 
     .auth-description {
       padding: 16px;
-      max-width: 320px;
-      margin-left: auto;
-      border-left: 1px solid rgba(255, 255, 255, 0.06);
+      width: 100%;
+      margin-left: 0;
+      border-left: none;
+
+      @media (min-width: 1024px) {
+        max-width: 320px;
+        margin-left: 0;
+        border-left: 1px solid rgba(255, 255, 255, 0.06); // Restore separator
+      }
 
       &.no-auth {
         border: none;
@@ -151,7 +174,15 @@
 
   &.read-only {
     .form-and-description {
-      height: calc(100% - 45px - 48px); // 48px = read only alert height
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      padding: 16px;
+      height: calc(100% - 45px); // 48px = read only alert height
+
+      @media (min-width: 1024px) {
+        flex-direction: row;
+      }
     }
   }
 

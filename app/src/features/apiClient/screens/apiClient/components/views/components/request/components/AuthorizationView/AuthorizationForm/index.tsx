@@ -106,6 +106,7 @@ function generateFields(
           defaultValue={field.defaultValue}
           className={field.className ?? ""}
           onChange={(value: any) => onChangeHandler(value, field.id)}
+          style={{ width: "100%" }}
         />
       );
     default:
