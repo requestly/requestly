@@ -72,7 +72,7 @@ export interface ApiClientFilesStore {
   appMode: "desktop" | "extension"; // Currently only "desktop" is supported
   isFilePresentLocally: (fileId: FileId) => Promise<boolean>;
 
-  initialize: (records: RQAPI.ApiClientRecord[]) => void;
+  refresh: (records: RQAPI.ApiClientRecord[]) => void;
   addFile: (fileId: FileId, fileDetails: any) => void;
   getFilesByIds: (fileIds: string[]) => (ApiClientFile & { id: string })[];
   removeFile: (fileId: FileId) => void;
@@ -99,26 +99,36 @@ const createApiClientFilesStore = (appMode: "desktop") => {
           return doesFileExist;
         },
 
-        initialize(records) {
-          const files = parseRecordsToFiles(records);
+        refresh(records) {
+          const filesFromRecords = parseRecordsToFiles(records);
+          const { files } = get();
+
+          // invalid files should be present in the store to reflect in UI
           set({
-            files,
+            files: { ...files, ...filesFromRecords },
           });
         },
 
         addFile: (fileId: FileId, fileDetails: any) => {
           const { files } = get();
-          files[fileId] = {
-            ...fileDetails,
-            isFileValid: true, // Assuming the file is valid when added
-          };
-          set({ files });
+          set({
+            files: {
+              ...files,
+              [fileId]: {
+                ...fileDetails,
+                isFileValid: true, // Assuming the file is valid when added
+              },
+            },
+          });
         },
+
         removeFile: (fileId: FileId) => {
           const { files } = get();
-          delete files[fileId];
-          set({ files });
+          const newFiles = { ...files };
+          delete newFiles[fileId];
+          set({ files: newFiles });
         },
+
         getFilesByIds: (fileIds: string[]) => {
           const { files } = get();
           return fileIds.map((fileId) => ({ id: fileId, ...files[fileId] })).filter((file) => file.name !== undefined);

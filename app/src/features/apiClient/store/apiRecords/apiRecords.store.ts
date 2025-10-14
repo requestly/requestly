@@ -203,7 +203,7 @@ export const createApiRecordsStore = (
       // This works out only because there's no reactive field in the file store
       // and frequent resetting doesn't cause any renders.
       // TODO: Send patches to file store
-      apiClientFileStore.getState().initialize(records);
+      apiClientFileStore.getState().refresh(records);
       set({
         apiClientRecords: records,
         childParentMap,

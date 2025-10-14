@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { apiClientFileStore } from "../apiClientFilesStore";
 
 export const DELAY_MAX_LIMIT = 50000; // ms
 export const ITERATIONS_MAX_LIMIT = 1000;
@@ -11,6 +12,7 @@ export type RunConfigState = {
   runOrder: RQAPI.RunConfig["runOrder"];
   delay: RQAPI.RunConfig["delay"];
   iterations: RQAPI.RunConfig["iterations"];
+  dataFile?: RQAPI.RunConfig["dataFile"];
 
   /**
    * This would be used when request reorder happens.
@@ -18,6 +20,7 @@ export type RunConfigState = {
   setRunOrder(runOrder: RQAPI.RunConfig["runOrder"]): void;
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
+  setDataFile(dataFile: RQAPI.RunConfig["dataFile"]): void;
   getConfig(): RQAPI.RunConfig;
   getConfigToSave(): SavedRunConfig;
   setSelectionForAll(value: boolean): boolean;
@@ -55,6 +58,7 @@ export function createRunConfigStore(data: {
   unorderedRequestIds: RQAPI.ApiRecord["id"][];
   delay?: RQAPI.RunConfig["delay"];
   iterations?: RQAPI.RunConfig["iterations"];
+  dataFile?: RQAPI.RunConfig["dataFile"];
 }) {
   const { id, runOrder, unorderedRequestIds, delay = 0, iterations = 1 } = data;
 
@@ -135,14 +139,20 @@ export function createRunConfigStore(data: {
       set({ iterations });
     },
 
+    setDataFile(dataFile) {
+      //TODO@nafees File format already validated or store should validate it?
+      apiClientFileStore.getState().addFile(dataFile.id, dataFile);
+      set({ dataFile });
+    },
+
     getConfig() {
-      const { id, runOrder, iterations, delay } = get();
-      return { id, runOrder, iterations, delay };
+      const { id, runOrder, iterations, delay, dataFile } = get();
+      return { id, runOrder, iterations, delay, dataFile };
     },
 
     getConfigToSave() {
-      const { id, runOrder } = get();
-      return { id, runOrder };
+      const { id, runOrder, dataFile } = get();
+      return { id, runOrder, dataFile };
     },
 
     patchRunOrder(requestIds) {
