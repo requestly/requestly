@@ -55,7 +55,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
   const {
     env: { createEnvironment },
   } = useCommand();
-  const { onSaveRecord } = useNewApiClientContext();
+  const { onSaveBulkRecords } = useNewApiClientContext();
 
   const handleResetImport = () => {
     setImportError(null);
@@ -198,7 +198,6 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         try {
           const result = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
           if (result.success) {
-            onSaveRecord(result.data);
             successfulCollections.push(collection);
           } else {
             failedCount++;
@@ -210,7 +209,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
 
       return { successfulCollections, failedCount };
     },
-    [apiClientRecordsRepository, onSaveRecord]
+    [apiClientRecordsRepository]
   );
 
   const createAllRequests = useCallback(
@@ -232,16 +231,12 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
       try {
         const createdRequests = await apiClientRecordsRepository.batchWriteApiRecords(allRequests);
 
-        createdRequests.forEach((request) => {
-          onSaveRecord(request);
-        });
-
         return { successfulRequests: createdRequests, failedCount: 0 };
       } catch (error) {
         return { successfulRequests: [], failedCount: allRequests.length };
       }
     },
-    [apiClientRecordsRepository, onSaveRecord]
+    [apiClientRecordsRepository]
   );
 
   const importRootCollection = useCallback(
@@ -262,10 +257,12 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         const { successfulCollections, failedCount: failedCollectionsCount } = await createAllCollections(
           flatCollections
         );
+        onSaveBulkRecords(successfulCollections);
 
         const { successfulRequests, failedCount: failedRequestsCount } = await createAllRequests(
           collectionToRequestsMap
         );
+        onSaveBulkRecords(successfulRequests);
 
         const totalImportedCount = successfulCollections.length + successfulRequests.length;
         const totalFailedCount = failedCollectionsCount + failedRequestsCount;
@@ -281,8 +278,8 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
               failed: failedCollectionsCount,
             },
             requests: {
-              successful: successfulRequests.length,
-              failed: failedRequestsCount,
+              successful: 0,
+              failed: 0,
             },
           },
         };
@@ -295,7 +292,7 @@ export const CommonApiClientImporter: React.FC<CommonApiClientImporterProps> = (
         };
       }
     },
-    [flattenRootCollection, createAllCollections, createAllRequests]
+    [flattenRootCollection, createAllCollections, onSaveBulkRecords, createAllRequests]
   );
 
   const handleImportCollections = useCallback(
