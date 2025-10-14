@@ -9,9 +9,13 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
+import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
+  // Enable keyboard shortcuts for closing active tabs
+  useCloseActiveTabShortcut();
+
   const [
     activeTabId,
     activeTabSource,
