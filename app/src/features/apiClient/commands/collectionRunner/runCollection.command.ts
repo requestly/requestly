@@ -21,6 +21,10 @@ import {
 import { GenericState } from "hooks/useGenericState";
 import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
+import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { VariableScope } from "backend/environment/types";
+import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
+import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -147,8 +151,43 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
+    // const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+    const scopes: Scope[] = [];
+    const dummyVar = [
+      {
+        city: "Madrid",
+        country: "Spain",
+      },
+      {
+        city: "Delhi",
+        country: "India",
+      },
+      {
+        city: "Tokyo",
+        country: "Japan",
+      },
+      {
+        city: "Nairobi",
+        country: "Kenya",
+      },
+    ];
+    // if (dataFile) {
+    // const fileContents = await getFileContents(dataFile.path);
+    // console.log("!!!debug", "file contents", fileContents);
+    scopes.push([
+      {
+        scope: VariableScope.DATA_FILE,
+        scopeId: "data_file",
+        name: "Data File",
+        level: 0,
+      },
+      createDummyVariablesStore(dummyVar[iteration - 1]),
+    ]);
+    // }
+
     return {
       currentExecutingRequest,
+      scopes,
     };
   }
 
@@ -299,12 +338,14 @@ class Runner {
       this.beforeStart();
 
       for await (const { request, iteration, startTime } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           request.id,
           request.data,
-          this.runContext.runResultStore.getState().abortController
+          this.runContext.runResultStore.getState().abortController,
+          scopes
         );
+        console.log("!!!debug", "result", result);
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
