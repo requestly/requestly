@@ -98,8 +98,7 @@
             min-width: 0 !important;
             background: none;
             @media (min-width: 768px) {
-              width: 448px !important;
-              min-width: initial !important;
+              width: auto !important;
             }
           }
 
