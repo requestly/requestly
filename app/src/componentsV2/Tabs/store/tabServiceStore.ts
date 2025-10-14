@@ -44,6 +44,7 @@ type TabActions = {
   closeTabById: (tabId: TabId, skipUnsavedPrompt?: boolean) => void;
   closeTabBySource: (sourceId: SourceId, sourceName: SourceName, skipUnsavedPrompt?: boolean) => void;
   closeTabByContext: (contextId?: string, skipUnsavedPrompt?: boolean) => void;
+  closeActiveTab: (skipUnsavedPrompt?: boolean) => void;
   resetPreviewTab: () => void;
   setPreviewTab: (tabId: TabId) => void;
   setActiveTab: (tabId: TabId) => void;
@@ -292,6 +293,13 @@ const createTabServiceStore = () => {
             tabs: new Map(tabs),
           });
           setActiveTab(newActiveTabId);
+        },
+
+        closeActiveTab(skipUnsavedPrompt) {
+          const { activeTabId, closeTabById } = get();
+          if (activeTabId) {
+            closeTabById(activeTabId, skipUnsavedPrompt);
+          }
         },
 
         resetPreviewTab() {
