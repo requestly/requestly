@@ -1,4 +1,5 @@
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { closeCorruptedTabs } from "../tabs";
 
 export async function forceRefreshRecords(ctx: ApiClientFeatureContext) {
   const {
@@ -11,5 +12,7 @@ export async function forceRefreshRecords(ctx: ApiClientFeatureContext) {
   }
   recordsStore.getState().refresh(recordsToRefresh.data.records);
   erroredRecordsStore.getState().setApiErroredRecords(recordsToRefresh.data.erroredRecords);
+  closeCorruptedTabs();
   return true;
+
 }

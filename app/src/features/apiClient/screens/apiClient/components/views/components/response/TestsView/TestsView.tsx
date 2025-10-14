@@ -90,8 +90,8 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
       </div>
 
       <div className="test-results-list">
-        {filteredTestResults.map((testResult) => (
-          <TestResultItem testResult={testResult} />
+        {filteredTestResults.map((testResult, index) => (
+          <TestResultItem key={index} testResult={testResult} />
         ))}
       </div>
     </div>
