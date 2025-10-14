@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { Typography, Row, Col, Dropdown, MenuProps } from "antd";
 import { ReadOutlined, CalendarOutlined, ApiOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 import { Footer } from "antd/lib/layout/layout";
@@ -23,7 +22,6 @@ const PAGES_WITHOUT_FOOTER = [PATHS.SETTINGS.RELATIVE];
 
 const AppFooter: React.FC = () => {
   const { pathname } = useLocation();
-  const SHOW_YC_BRANDING = false;
 
   const helpItems: MenuProps["items"] = useMemo(() => {
     return [
@@ -52,20 +50,6 @@ const AppFooter: React.FC = () => {
     trackFooterClicked(key);
   };
 
-  const renderYCBranding = () => {
-    return (
-      <Text>
-        Backed by{" "}
-        <span
-          style={{ color: "orange", cursor: "pointer" }}
-          onClick={() => window.open("https://twitter.com/ycombinator/status/1468968505596776469", "_blank")}
-        >
-          <FaYCombinator className="fix-icon-is-up" /> Combinator
-        </span>
-      </Text>
-    );
-  };
-
   if (PAGES_WITHOUT_FOOTER.some((path) => pathname.includes(path))) return null;
 
   return (
@@ -78,28 +62,24 @@ const AppFooter: React.FC = () => {
           </div>
 
           <Col className="ml-auto">
-            {SHOW_YC_BRANDING ? (
-              renderYCBranding()
-            ) : (
-              <div className="app-footer-links">
-                <Text
-                  onClick={() => handleFooterLinkClick(APP_CONSTANTS.LINKS.REQUESTLY_DOCS, FOOTER_LINKS.DOCUMENTATION)}
-                >
+            <div className="app-footer-links">
+              <Text
+                onClick={() => handleFooterLinkClick(APP_CONSTANTS.LINKS.REQUESTLY_DOCS, FOOTER_LINKS.DOCUMENTATION)}
+              >
+                <span className="icon__wrapper">
+                  <ReadOutlined />
+                </span>
+                Documentation
+              </Text>
+              <Dropdown trigger={["click"]} menu={{ items: helpItems }}>
+                <Text>
                   <span className="icon__wrapper">
-                    <ReadOutlined />
+                    <QuestionCircleOutlined />
                   </span>
-                  Documentation
+                  Help
                 </Text>
-                <Dropdown trigger={["click"]} menu={{ items: helpItems }}>
-                  <Text>
-                    <span className="icon__wrapper">
-                      <QuestionCircleOutlined />
-                    </span>
-                    Help
-                  </Text>
-                </Dropdown>
-              </div>
-            )}
+              </Dropdown>
+            </div>
           </Col>
         </Row>
       </Footer>
