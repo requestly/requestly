@@ -6,30 +6,18 @@ import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCirc
 import { useChatSessionsStore } from "features/apiClient/hooks/useChatSessionsStore.hook";
 import "./chatInput.scss";
 
-export const ChatInput = () => {
-  const [isProcessing, setIsProcessing, updateSession, getActiveSessionId] = useChatSessionsStore((s) => [
+interface InputProps {
+  onSendMessage: (message: string) => void;
+}
+
+export const ChatInput: React.FC<InputProps> = ({ onSendMessage }) => {
+  const [isProcessing, setIsProcessing] = useChatSessionsStore((s) => [
     s.isProcessing,
     s.setIsProcessing,
     s.updateSession,
     s.getActiveSessionId,
   ]);
   const [message, setMessage] = useState("");
-
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-
-    setIsProcessing(true);
-    const sessionId = getActiveSessionId();
-    if (sessionId) {
-      updateSession(sessionId, {
-        role: "user",
-        text: message,
-        createdAt: Date.now(),
-      });
-    }
-    setMessage("");
-    setIsProcessing(false);
-  };
 
   const handleStopProcessing = () => {
     setIsProcessing(false);
@@ -38,14 +26,13 @@ export const ChatInput = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      onSendMessage(message);
     }
   };
 
   return (
     <div className="ai-chat__body--input">
       <Input.TextArea
-        disabled={isProcessing}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         autoSize={{ minRows: 1, maxRows: 10 }}
@@ -58,7 +45,7 @@ export const ChatInput = () => {
           size="small"
           type={isProcessing ? "secondary" : "primary"}
           icon={isProcessing ? <MdOutlineStopCircle /> : <MdSend />}
-          onClick={isProcessing ? handleStopProcessing : handleSendMessage}
+          onClick={isProcessing ? handleStopProcessing : () => onSendMessage(message)}
         >
           {isProcessing ? "Stop" : "Send"}
         </RQButton>

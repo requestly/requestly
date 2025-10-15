@@ -21,11 +21,12 @@
   .chat-message {
     &__bubble {
       max-width: 90%;
+      word-break: break-word;
     }
     &__bubble-text {
       font-size: var(--requestly-font-size-sm);
       color: var(--requestly-color-text-default);
-      line-height: 20px;
+      line-height: 22px;
 
       p {
         margin-bottom: 0;

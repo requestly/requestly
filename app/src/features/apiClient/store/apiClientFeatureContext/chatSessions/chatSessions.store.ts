@@ -6,12 +6,19 @@ export interface ChatSessionsStore {
   sessions: AIChat.SessionsMap;
   activeSessionId: AIChat.Session["id"];
   isProcessing: boolean;
+  isStopped: boolean;
+  abortController: AbortController | null;
+  stopCallback: (() => void) | null;
   createChatSession: (session: AIChat.Session) => void;
   updateSession: (id: AIChat.Session["id"], newMessage: AIChat.Message) => void;
   deleteSession: (id: AIChat.Session["id"]) => void;
   getSession: (id: AIChat.Session["id"]) => AIChat.Session;
   getActiveSessionId: () => AIChat.Session["id"] | undefined;
   setIsProcessing: (isProcessing: boolean) => void;
+  setIsStopped: (isStopped: boolean) => void;
+  setAbortController: (controller: AbortController | null) => void;
+  setStopCallback: (callback: (() => void) | null) => void;
+  stopCurrentRequest: () => void;
 }
 
 export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
@@ -19,6 +26,9 @@ export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
     sessions: sessions || {},
     activeSessionId: Object.keys(sessions)[0],
     isProcessing: false,
+    isStopped: false,
+    abortController: null,
+    stopCallback: null,
     createChatSession(session: AIChat.Session) {
       const sessionsMap = { ...sessions, [session.id]: session };
       set({ sessions: sessionsMap, activeSessionId: session.id });
@@ -52,6 +62,25 @@ export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
     },
     setIsProcessing(isProcessing: boolean) {
       set({ isProcessing });
+    },
+    setIsStopped(isStopped: boolean) {
+      set({ isStopped });
+    },
+    setAbortController(controller: AbortController | null) {
+      set({ abortController: controller });
+    },
+    setStopCallback(callback: (() => void) | null) {
+      set({ stopCallback: callback });
+    },
+    stopCurrentRequest() {
+      const { abortController, stopCallback } = get();
+      if (abortController) {
+        abortController.abort();
+      }
+      if (stopCallback) {
+        stopCallback();
+      }
+      set({ isProcessing: false, isStopped: true, abortController: null, stopCallback: null });
     },
   }));
 }
