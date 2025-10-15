@@ -45,6 +45,10 @@ export class HttpRequestPreparationService {
     const { getData, getParentChain } = this.ctx.stores.records.getState();
     const apiRecord = getData(recordId);
 
+    if (!apiRecord || !apiRecord.data) {
+      return;
+    }
+
     const childDetails = {
       id: apiRecord.id,
       parentId: apiRecord.collectionId,
