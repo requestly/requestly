@@ -5,6 +5,7 @@ export namespace AIChat {
     CREATE_REQUEST = "create_request",
     CREATE_COLLECTION = "create_collection",
     CREATE_ENVIRONMENT = "create_environment",
+    TRY_IN_EDITOR = "TRY_IN_EDITOR",
   }
 
   // TEMPORARY: This will be replaced with the actual action types
@@ -12,17 +13,19 @@ export namespace AIChat {
     type: ActionType;
     payload: any;
   };
-  export type Message = {
+  export type BaseMessage = {
     role: Role;
     text: string;
     createdAt: number;
   };
 
-  export type UserMessage = Message;
+  export type UserMessage = BaseMessage;
 
-  export type ModelMessage = Message & {
+  export type ModelMessage = BaseMessage & {
     actions: Action[];
   };
+
+  export type Message = UserMessage | ModelMessage;
 
   export type Session = {
     id: string;

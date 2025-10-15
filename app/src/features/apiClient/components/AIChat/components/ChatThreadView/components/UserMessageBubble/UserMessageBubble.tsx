@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
 interface Props {
-  message: AIChat.Message;
+  message: AIChat.UserMessage;
 }
 
 export const UserMessageBubble: React.FC<Props> = ({ message }) => {

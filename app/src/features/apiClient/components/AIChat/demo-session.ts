@@ -2,7 +2,7 @@ import { AIChat } from "./types";
 
 // Demo session object based on AIChat types
 const demoSession: AIChat.Session = {
-  id: "demo-session-001",
+  id: "demo-session-003",
   messages: [
     {
       role: "system",
@@ -144,7 +144,7 @@ const demoSession: AIChat.Session = {
 
 // Demo sessions map
 const demoSessionsMap: AIChat.SessionsMap = {
-  "demo-session-001": demoSession,
+  "demo-session-003": demoSession,
   "demo-session-002": {
     id: "demo-session-002",
     messages: [

@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from "react";
-import "./chatThreadView.scss";
 import { useChatSessionsStore } from "features/apiClient/hooks/useChatSessionsStore.hook";
 import { UserMessageBubble } from "./components/UserMessageBubble/UserMessageBubble";
 import { ModelMessageBubble } from "./components/ModelMessageBubble/ModelMessageBubble";
@@ -23,7 +22,7 @@ const renderMessage = (message: AIChat.Message, index: number) => {
 };
 
 export const ChatThreadView: React.FC<Props> = ({ sessionId }) => {
-  const session = useChatSessionsStore((s) => s.getSession(sessionId));
+  const [session] = useChatSessionsStore((s) => [s.getSession(sessionId)]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
