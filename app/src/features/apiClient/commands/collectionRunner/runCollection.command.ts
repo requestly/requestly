@@ -153,36 +153,21 @@ class Runner {
 
     // const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
     const scopes: Scope[] = [];
-    const dummyVar = [
-      {
-        city: "Madrid",
-        country: "Spain",
-      },
-      {
-        city: "Delhi",
-        country: "India",
-      },
-      {
-        city: "Tokyo",
-        country: "Japan",
-      },
-      {
-        city: "Nairobi",
-        country: "Kenya",
-      },
-    ];
+    const dummyVar = this.runContext.runConfigStore.getState().fileVariables;
     // if (dataFile) {
     // const fileContents = await getFileContents(dataFile.path);
     // console.log("!!!debug", "file contents", fileContents);
-    scopes.push([
-      {
-        scope: VariableScope.DATA_FILE,
-        scopeId: "data_file",
-        name: "Data File",
-        level: 0,
-      },
-      createDummyVariablesStore(dummyVar[iteration - 1]),
-    ]);
+    if (dummyVar) {
+      scopes.push([
+        {
+          scope: VariableScope.DATA_FILE,
+          scopeId: "data_file",
+          name: "Data File",
+          level: 0,
+        },
+        createDummyVariablesStore(dummyVar[iteration - 1]),
+      ]);
+    }
     // }
 
     return {
@@ -336,6 +321,51 @@ class Runner {
   async run() {
     try {
       this.beforeStart();
+
+      const fileHandler = this.runContext.runConfigStore.getState().fileHandler;
+      const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+
+      if (fileHandler) {
+        const file = await fileHandler.getFile();
+        const fileContent = await file.text();
+        console.log("!!!debug", "content file", fileContent);
+        // parse the file content as csv and dump into json array
+        const headers: string[] = [];
+        const rows: Record<string, string>[] = [];
+        fileContent.split(/\r?\n/).forEach((line, index) => {
+          const values = line.split(",");
+          if (index === 0) {
+            values.forEach((v) => headers.push(v.trim()));
+          } else {
+            const row: Record<string, string> = {};
+            values.forEach((v, i) => {
+              row[headers[i]] = v.trim();
+            });
+            rows.push(row);
+          }
+        });
+        console.log("!!!debug", "rows extension", rows);
+        this.runContext.runConfigStore.getState().setFileVariables(rows);
+      } else if (dataFile) {
+        const fileContents = await getFileContents(dataFile.path);
+        // parse the file content as csv and dump into json array
+        const headers: string[] = [];
+        const rows: Record<string, string>[] = [];
+        fileContents.split(/\r?\n/).forEach((line, index) => {
+          const values = line.split(",");
+          if (index === 0) {
+            values.forEach((v) => headers.push(v.trim()));
+          } else {
+            const row: Record<string, string> = {};
+            values.forEach((v, i) => {
+              row[headers[i]] = v.trim();
+            });
+            rows.push(row);
+          }
+        });
+        console.log("!!!debug", "rows desktop", rows);
+        this.runContext.runConfigStore.getState().setFileVariables(rows);
+      }
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
