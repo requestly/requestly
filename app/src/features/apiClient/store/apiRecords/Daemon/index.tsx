@@ -6,7 +6,7 @@ import CollectionVariablesDaemon from "./CollectionVariablesDaemon";
 import { useApiClientFeatureContextProvider } from "../../apiClientFeatureContext/apiClientFeatureContext.store";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 
-const Daemon: React.FC = () => {
+const Daemon: React.FC = React.memo(() => {
   const contexts = useApiClientFeatureContextProvider((s) => s.contexts);
   const isMulti = contexts.size > 1;
   const daemons = Array.from(contexts.values()).map(({ id: contextId }) => (
@@ -23,6 +23,6 @@ const Daemon: React.FC = () => {
   ));
 
   return daemons;
-};
+});
 
 export default Daemon;
