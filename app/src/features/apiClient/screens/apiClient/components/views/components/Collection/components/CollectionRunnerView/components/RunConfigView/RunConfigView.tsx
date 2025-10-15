@@ -18,7 +18,6 @@ import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../../../src/c
 import { RunStatus } from "features/apiClient/store/collectionRunResult/runResult.store";
 import { EmptyState } from "../EmptyState/EmptyState";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { ApiClientCloudRepository } from "features/apiClient/helpers/modules/sync/cloud";
 import { Conditional } from "components/common/Conditional";
 import "./runConfigView.scss";
 import { isExtensionInstalled } from "actions/ExtensionActions";
@@ -30,6 +29,7 @@ import {
   trackCollectionRunnerConfigSaveFailed,
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
+import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -211,7 +211,7 @@ export const RunConfigView: React.FC = () => {
         </div>
 
         <div className="actions">
-          <Conditional condition={ctx.repositories instanceof ApiClientCloudRepository}>
+          <Conditional condition={!(ctx.repositories instanceof ApiClientLocalRepository)}>
             <RunConfigSaveButton disabled={isEmpty} />
           </Conditional>
           <RunCollectionButton disabled={isEmpty} />
