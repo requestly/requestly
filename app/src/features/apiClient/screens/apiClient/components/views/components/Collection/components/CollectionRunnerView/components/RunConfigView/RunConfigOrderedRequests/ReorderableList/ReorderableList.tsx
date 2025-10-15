@@ -2,8 +2,6 @@ import React, { useCallback, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ReorderableListItem } from "./ReorderableListItem";
 import { RQAPI } from "features/apiClient/types";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import "./reorderableList.scss";
 
 interface ReorderableListProps {
@@ -38,37 +36,35 @@ export const ReorderableList: React.FC<ReorderableListProps> = ({ requests, onOr
   const items = rowVirtualizer.getVirtualItems();
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="reorderable-list-wrapper">
-        <div className="reorderable-list" ref={parentRef}>
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              width: "100%",
-              position: "relative",
-            }}
-          >
-            {items.map((virtualRow) => {
-              const orderedRequest = requests[virtualRow.index];
-              return (
-                <div
-                  key={orderedRequest.record.id}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: `${virtualRow.size}px`,
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                >
-                  <ReorderableListItem index={virtualRow.index} orderedRequest={orderedRequest} reorder={reorder} />
-                </div>
-              );
-            })}
-          </div>
+    <div className="reorderable-list-wrapper">
+      <div className="reorderable-list" ref={parentRef}>
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: "100%",
+            position: "relative",
+          }}
+        >
+          {items.map((virtualRow) => {
+            const orderedRequest = requests[virtualRow.index];
+            return (
+              <div
+                key={orderedRequest.record.id}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <ReorderableListItem index={virtualRow.index} orderedRequest={orderedRequest} reorder={reorder} />
+              </div>
+            );
+          })}
         </div>
       </div>
-    </DndProvider>
+    </div>
   );
 };
