@@ -14,6 +14,7 @@ import * as Sentry from "@sentry/react";
 import { syncServiceStore } from "../store/syncServiceStore";
 import { APIClientSyncService } from "../store/types";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
+import { ApiClientLocalStoreRepository } from "../ApiClientLocalStorageRepository";
 
 const LoggedInDaemon: React.FC<{}> = () => {
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -22,6 +23,10 @@ const LoggedInDaemon: React.FC<{}> = () => {
   const [addNewRecords, getAllRecords] = useAPIRecords((state) => [state.addNewRecords, state.getAllRecords]);
 
   useEffect(() => {
+    if (syncRepository instanceof ApiClientLocalStoreRepository) {
+      return;
+    }
+
     if (activeWorkspace?.workspaceType !== WorkspaceType.PERSONAL) {
       return;
     }
