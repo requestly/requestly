@@ -6,7 +6,7 @@ import AuthorizationView from "../../../components/request/components/Authorizat
 import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import React, { useMemo } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
-import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
+import { sanitizeKeyValuePairs } from "features/apiClient/screens/apiClient/utils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { Conditional } from "components/common/Conditional";
@@ -43,8 +43,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   handleAuthChange,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
-
-  const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
@@ -83,9 +81,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
       {
         key: RequestTab.BODY,
-        label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
-        ),
+        label: <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot />,
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
             mode="multiple"
@@ -105,7 +101,6 @@ const HttpRequestTabs: React.FC<Props> = ({
             setContentType={setContentType}
           />
         ),
-        disabled: !isRequestBodySupported,
       },
       {
         key: RequestTab.HEADERS,
@@ -158,7 +153,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     requestId,
     collectionId,
     handleAuthChange,
-    isRequestBodySupported,
     queryParams.length,
     requestEntry.auth,
     requestEntry.request.body,

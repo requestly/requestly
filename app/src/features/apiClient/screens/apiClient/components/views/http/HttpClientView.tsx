@@ -12,7 +12,6 @@ import {
   parseHttpRequestEntry,
   resolveAuth,
   sanitizeEntry,
-  supportsRequestBody,
 } from "../../../utils";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import {
@@ -209,11 +208,6 @@ const HttpClientView: React.FC<Props> = ({
         },
       };
 
-      if (!supportsRequestBody(method)) {
-        newEntry.request.body = null;
-        newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
-        newEntry.request.contentType = RequestContentType.RAW;
-      }
       return newEntry;
     });
   }, []);
