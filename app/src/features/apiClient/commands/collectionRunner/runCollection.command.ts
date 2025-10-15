@@ -9,7 +9,12 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
+import {
+  getFileExtension,
+  isHTTPApiEntry,
+  parseCsvText,
+  parseJsonText,
+} from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -25,6 +30,7 @@ import { Scope } from "features/apiClient/helpers/variableResolver/variable-reso
 import { VariableScope } from "backend/environment/types";
 import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -76,8 +82,10 @@ function prepareExecutionResult(params: {
 }
 
 class RunCancelled extends NativeError {}
+class DataFileNotFound extends NativeError {}
 
 class Runner {
+  private variables: Record<string, any>[] = [];
   constructor(
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
@@ -106,16 +114,58 @@ class Runner {
     return request;
   }
 
-  private beforeStart() {
+  private async parseDataFile() {
+    const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+    console.log("!!!debug", "datafile", dataFile);
+    if (!dataFile) {
+      return;
+    }
+
+    const apiClientFilesStore = apiClientFileStore.getState();
+
+    if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
+      throw new DataFileNotFound("Data file not found!").addContext({ dataFile });
+    }
+
+    const fileContents = await getFileContents(dataFile.path);
+    const fileExtension = getFileExtension(dataFile.path);
+
+    console.log("!!!debug", "file extension", fileExtension);
+
+    switch (fileExtension) {
+      case ".csv": {
+        const parsedData = parseCsvText(fileContents);
+        if (!parsedData.success) {
+          throw new NativeError("Failed to parse CSV data file!").addContext({ dataFile });
+        }
+        this.variables = parsedData.data;
+        break;
+      }
+      case ".json": {
+        const parsedData = parseJsonText(fileContents);
+        if (!parsedData.success) {
+          throw new NativeError("Failed to parse JSON data file!").addContext({ dataFile });
+        }
+        this.variables = parsedData.data;
+        break;
+      }
+    }
+    console.log("!!!debug", "var", this.variables);
+  }
+
+  private async beforeStart() {
     this.genericState.setPreview(false);
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
     this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.IDLE);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
+    this.variables = [];
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
+    await this.parseDataFile();
+
     trackCollectionRunStarted({
       collection_id: collectionId,
       iteration_count: runConfig.iterations,
@@ -151,13 +201,8 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
-    // const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
     const scopes: Scope[] = [];
-    const dummyVar = this.runContext.runConfigStore.getState().fileVariables;
-    // if (dataFile) {
-    // const fileContents = await getFileContents(dataFile.path);
-    // console.log("!!!debug", "file contents", fileContents);
-    if (dummyVar) {
+    if (this.variables.length >= iteration) {
       scopes.push([
         {
           scope: VariableScope.DATA_FILE,
@@ -165,10 +210,9 @@ class Runner {
           name: "Data File",
           level: 0,
         },
-        createDummyVariablesStore(dummyVar[iteration - 1]),
+        createDummyVariablesStore(this.variables[iteration - 1]),
       ]);
     }
-    // }
 
     return {
       currentExecutingRequest,
@@ -320,52 +364,7 @@ class Runner {
 
   async run() {
     try {
-      this.beforeStart();
-
-      const fileHandler = this.runContext.runConfigStore.getState().fileHandler;
-      const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
-
-      if (fileHandler) {
-        const file = await fileHandler.getFile();
-        const fileContent = await file.text();
-        console.log("!!!debug", "content file", fileContent);
-        // parse the file content as csv and dump into json array
-        const headers: string[] = [];
-        const rows: Record<string, string>[] = [];
-        fileContent.split(/\r?\n/).forEach((line, index) => {
-          const values = line.split(",");
-          if (index === 0) {
-            values.forEach((v) => headers.push(v.trim()));
-          } else {
-            const row: Record<string, string> = {};
-            values.forEach((v, i) => {
-              row[headers[i]] = v.trim();
-            });
-            rows.push(row);
-          }
-        });
-        console.log("!!!debug", "rows extension", rows);
-        this.runContext.runConfigStore.getState().setFileVariables(rows);
-      } else if (dataFile) {
-        const fileContents = await getFileContents(dataFile.path);
-        // parse the file content as csv and dump into json array
-        const headers: string[] = [];
-        const rows: Record<string, string>[] = [];
-        fileContents.split(/\r?\n/).forEach((line, index) => {
-          const values = line.split(",");
-          if (index === 0) {
-            values.forEach((v) => headers.push(v.trim()));
-          } else {
-            const row: Record<string, string> = {};
-            values.forEach((v, i) => {
-              row[headers[i]] = v.trim();
-            });
-            rows.push(row);
-          }
-        });
-        console.log("!!!debug", "rows desktop", rows);
-        this.runContext.runConfigStore.getState().setFileVariables(rows);
-      }
+      await this.beforeStart();
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
