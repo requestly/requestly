@@ -17,7 +17,7 @@ export const refreshContext = async (ctxId: ApiClientFeatureContext["id"]) => {
     if (!contexts.has(ctxId)) throw new NativeError("Add the context to the store before trying to refresh it");
 
     const context = contexts.get(ctxId);
-    if (context.repositories.apiClientRecordsRepository instanceof ApiClientLocalRepository) {
+    if (context.repositories instanceof ApiClientLocalRepository) {
       await reloadFsManager(context.repositories.apiClientRecordsRepository.meta.rootPath);
     }
 

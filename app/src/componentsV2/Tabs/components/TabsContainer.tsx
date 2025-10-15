@@ -9,9 +9,13 @@ import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
+import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
 
 export const TabsContainer: React.FC = () => {
+  // Enable keyboard shortcuts for closing active tabs
+  useCloseActiveTabShortcut();
+
   const [
     activeTabId,
     activeTabSource,
@@ -23,6 +27,7 @@ export const TabsContainer: React.FC = () => {
     incrementVersion,
     resetPreviewTab,
     consumeIgnorePath,
+    cleanupCloseBlockers,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
     state.activeTabSource,
@@ -34,11 +39,27 @@ export const TabsContainer: React.FC = () => {
     state.incrementVersion,
     state.resetPreviewTab,
     state.consumeIgnorePath,
+    state.cleanupCloseBlockers,
   ]);
 
   const { setUrl } = useSetUrl();
 
-  const hasUnsavedChanges = Array.from(tabs.values()).some((tab) => tab.getState().unsaved);
+  const hasUnsavedChanges = Array.from(tabs.values()).some(
+    (tab) => tab.getState().unsaved || !tab.getState().canCloseTab()
+  );
+
+  useEffect(() => {
+    const unloadListener = (e: any) => {
+      e.preventDefault();
+      e.returnValue = "Are you sure?";
+    };
+
+    if (hasUnsavedChanges) {
+      window.addEventListener("beforeunload", unloadListener);
+    }
+
+    return () => window.removeEventListener("beforeunload", unloadListener);
+  }, [hasUnsavedChanges]);
 
   unstable_useBlocker(({ nextLocation }) => {
     const isNextLocationApiClientView = nextLocation.pathname.startsWith("/api-client");
@@ -49,8 +70,16 @@ export const TabsContainer: React.FC = () => {
     }
 
     if (shouldBlock) {
-      const shouldDiscardChanges = window.confirm("Discard changes? Changes you made will not be saved.");
+      const blockedTab = Array.from(tabs.values()).find((t) => t.getState().getActiveBlocker());
+      const blocker = blockedTab?.getState().getActiveBlocker();
+      const shouldDiscardChanges = window.confirm(
+        blocker?.details?.title || "Discard changes? Changes you made will not be saved."
+      );
+
       const blockNavigation = !shouldDiscardChanges;
+      if (!blockNavigation) {
+        cleanupCloseBlockers();
+      }
       return blockNavigation;
     }
 

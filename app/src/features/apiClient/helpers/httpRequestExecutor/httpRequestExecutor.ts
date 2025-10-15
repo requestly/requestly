@@ -84,8 +84,12 @@ export class HttpRequestExecutor {
     }
   }
 
-  async execute(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult> {
-    this.abortController = new AbortController();
+  async execute(
+    recordId: string,
+    entry: RQAPI.HttpApiEntry,
+    abortController?: AbortController
+  ): Promise<RQAPI.ExecutionResult> {
+    this.abortController = abortController || new AbortController();
 
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
     preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.

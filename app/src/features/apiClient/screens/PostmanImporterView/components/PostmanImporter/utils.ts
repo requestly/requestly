@@ -9,6 +9,7 @@ import {
 } from "features/apiClient/screens/apiClient/components/views/components/request/components/AuthorizationView/defaults";
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
+import { createBodyContainer } from "features/apiClient/screens/apiClient/utils";
 
 interface PostmanCollectionExport {
   info: {
@@ -31,7 +32,7 @@ interface PostmanEnvironmentExport {
 }
 
 interface RequestBodyProcessingResult {
-  requestBody: string | KeyValuePair[] | null;
+  requestBody: RQAPI.RequestBody;
   contentType: RequestContentType;
   headers: KeyValuePair[];
 }
@@ -59,7 +60,7 @@ export const processPostmanEnvironmentData = (fileContent: PostmanEnvironmentExp
       acc[variable.key] = {
         id: index,
         isPersisted: true,
-        syncValue: variable.value,
+        syncValue: variable.value ?? "",
         type:
           variable.type === EnvironmentVariableType.Secret
             ? EnvironmentVariableType.Secret
@@ -310,6 +311,7 @@ const createApiRecord = (
         queryParams,
         headers,
         body: requestBody,
+        bodyContainer: createBodyContainer({ contentType, body: requestBody }),
         contentType,
       },
       response: null,

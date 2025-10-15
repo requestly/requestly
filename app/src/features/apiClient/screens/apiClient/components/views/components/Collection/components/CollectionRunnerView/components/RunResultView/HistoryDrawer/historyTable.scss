@@ -1,0 +1,47 @@
+.history-table {
+  & .ant-table-thead > tr > th {
+    padding: 10px;
+  }
+
+  & thead th {
+    font-size: var(--requestly-font-size-xs, 11px);
+  }
+  & thead th::before {
+    display: none;
+  }
+
+  & .ant-table-tbody > tr > td {
+    padding: 10px;
+  }
+
+  & .ant-table-tbody {
+    background: var(--requestly-color-surface-0, #212121);
+
+    .ant-table-row {
+      cursor: pointer;
+    }
+
+    .history-row-skeleton {
+      display: flex;
+      align-items: center;
+
+      .ant-skeleton-button {
+        width: 100%;
+        height: 8px;
+        flex: 1 0 0;
+      }
+    }
+
+    .ant-table-placeholder td {
+      border: none;
+    }
+  }
+
+  td {
+    font-size: var(--requestly-font-size-xs, 11px);
+  }
+
+  .history-drawer & thead > tr > th.ant-table-cell {
+    background: transparent;
+  }
+}

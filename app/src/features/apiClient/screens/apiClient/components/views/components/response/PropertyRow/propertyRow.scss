@@ -1,4 +1,7 @@
 .property-row {
+  display: flex;
+  align-items: center;
+
   .property-name {
     font-weight: bold;
     margin-right: 4px;
@@ -19,5 +22,10 @@
 
   &:not(:hover) .property-actions {
     display: none;
+  }
+
+  .property-value {
+    display: flex;
+    align-items: center;
   }
 }

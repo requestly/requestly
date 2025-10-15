@@ -56,12 +56,19 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
 
     const entry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP) as RQAPI.HttpApiEntry;
     entry.type = RQAPI.ApiEntryType.HTTP;
-    const urlObj = new URL(request.url);
-    const searchParams = Object.fromEntries(new URLSearchParams(urlObj.search));
-    urlObj.search = "";
+    try {
+      const urlObj = new URL(request.url);
+      const searchParams = Object.fromEntries(new URLSearchParams(urlObj.search));
+      urlObj.search = "";
 
-    entry.request.url = urlObj.toString();
-    entry.request.queryParams = generateKeyValuePairs(searchParams);
+      entry.request.url = urlObj.toString();
+      entry.request.queryParams = generateKeyValuePairs(searchParams);
+    } catch {
+      // Fails in case of relative urls.
+      // Fallback to just using the url as is.
+      entry.request.url = request.url;
+      entry.request.queryParams = [];
+    }
     entry.request.headers = filterHeadersToImport(generateKeyValuePairs(request.headers));
     entry.request.method = (request.method as RequestMethod) || RequestMethod.GET;
     entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
