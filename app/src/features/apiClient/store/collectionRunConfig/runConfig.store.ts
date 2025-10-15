@@ -12,7 +12,7 @@ export type RunConfigState = {
   runOrder: RQAPI.RunConfig["runOrder"];
   delay: RQAPI.RunConfig["delay"];
   iterations: RQAPI.RunConfig["iterations"];
-  dataFile?: RQAPI.RunConfig["dataFile"];
+  dataFile: RQAPI.RunConfig["dataFile"] | null;
 
   /**
    * This would be used when request reorder happens.
@@ -21,6 +21,7 @@ export type RunConfigState = {
   setDelay(delay: RunConfigState["delay"]): void;
   setIterations(iterations: RunConfigState["iterations"]): void;
   setDataFile(dataFile: RQAPI.RunConfig["dataFile"]): void;
+  removeDataFile(): void;
   getConfig(): RQAPI.RunConfig;
   getConfigToSave(): SavedRunConfig;
   setSelectionForAll(value: boolean): boolean;
@@ -68,6 +69,8 @@ export function createRunConfigStore(data: {
     delay,
     iterations,
     hasUnsavedChanges: false,
+    // TODO@nafees pass dataFile while creating the store from source
+    dataFile: data.dataFile ?? null,
 
     setHasUnsavedChanges(hasUnsavedChanges) {
       set({ hasUnsavedChanges });
@@ -143,6 +146,14 @@ export function createRunConfigStore(data: {
       //TODO@nafees File format already validated or store should validate it?
       apiClientFileStore.getState().addFile(dataFile.id, dataFile);
       set({ dataFile });
+    },
+
+    removeDataFile() {
+      const { dataFile } = get();
+      if (dataFile) {
+        apiClientFileStore.getState().removeFile(dataFile.id);
+      }
+      set({ dataFile: null });
     },
 
     getConfig() {
