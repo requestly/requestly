@@ -333,7 +333,7 @@ export namespace RQAPI {
     runOrder: RunOrder;
     iterations: number;
     delay: number;
-    dataFile: ApiClientFile & {
+    dataFile: Omit<ApiClientFile, "isFileValid"> & {
       id: FileId;
     };
   };
