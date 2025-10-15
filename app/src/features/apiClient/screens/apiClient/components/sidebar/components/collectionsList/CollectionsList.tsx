@@ -5,8 +5,6 @@ import { notification } from "antd";
 import { useApiClientContext } from "features/apiClient/contexts";
 import { CollectionRow, ExportType } from "./collectionRow/CollectionRow";
 import { RequestRow } from "./requestRow/RequestRow";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import {
   convertFlatRecordsToNestedRecords,
   isApiCollection,
@@ -338,7 +336,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   }, [collectionId, requestId, apiClientRecords]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <>
       <div className="api-client-sidebar-header-container">
         <SidebarListHeader
           onSearch={setSearchValue}
@@ -445,6 +443,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           }}
         />
       )}
-    </DndProvider>
+    </>
   );
 };

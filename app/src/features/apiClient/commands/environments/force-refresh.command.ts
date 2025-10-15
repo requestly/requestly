@@ -1,4 +1,5 @@
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { closeCorruptedTabs } from "../tabs";
 
 export async function forceRefreshEnvironments(ctx: ApiClientFeatureContext) {
   const {
@@ -18,4 +19,5 @@ export async function forceRefreshEnvironments(ctx: ApiClientFeatureContext) {
     globalEnvironment,
     environments: otherEnvs,
   });
+  closeCorruptedTabs();
 }

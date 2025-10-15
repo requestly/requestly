@@ -37,7 +37,8 @@ import { PostmanExportModal } from "../../../../modals/postmanCollectionExportMo
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
 import { useSelector } from "react-redux";
 import { getActiveWorkspace } from "store/slices/workspaces/selectors";
-import { WorkspaceType } from "features/workspaces/types";
+import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
+import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 
 export enum ExportType {
   REQUESTLY = "requestly",
@@ -93,11 +94,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [collectionsToExport, setCollectionsToExport] = useState([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
-  const [openTab, activeTabSource, closeTabBySource] = useTabServiceWithSelector((state) => [
-    state.openTab,
-    state.activeTabSource,
-    state.closeTabBySource,
-  ]);
+  const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -186,8 +183,29 @@ export const CollectionRow: React.FC<Props> = ({
         {
           key: "2",
           label: (
-            <div>
-              <MdOutlineDelete style={{ marginRight: 8 }} />
+            <div className="collection-row-option">
+              <MdOutlineVideoLibrary />
+              Run
+            </div>
+          ),
+          onClick: (itemInfo) => {
+            itemInfo.domEvent?.stopPropagation?.();
+            openTab(
+              new CollectionViewTabSource({
+                id: record.id,
+                title: record.name || "New Collection",
+                context: { id: context.id },
+              })
+            );
+
+            setTimeout(() => dispatchCustomEvent(CollectionRowOptionsCustomEvent.OPEN_RUNNER_TAB), 0);
+          },
+        },
+        {
+          key: "3",
+          label: (
+            <div className="collection-row-option">
+              <MdOutlineDelete />
               Delete
             </div>
           ),
@@ -201,7 +219,7 @@ export const CollectionRow: React.FC<Props> = ({
 
       return items;
     },
-    [handleRecordsToBeDeleted, handleCollectionExport]
+    [handleCollectionExport, openTab, context.id, handleRecordsToBeDeleted]
   );
 
   const collapseChangeHandler = useCallback(
@@ -240,16 +258,10 @@ export const CollectionRow: React.FC<Props> = ({
           collectionId: record.id,
         };
 
-        const { oldContextRecords } = await moveRecordsAcrossWorkspace(sourceContext, {
+        await moveRecordsAcrossWorkspace(sourceContext, {
           recordsToMove: [item.record],
           destination,
         });
-
-        if (activeWorkspace.workspaceType !== WorkspaceType.SHARED) {
-          oldContextRecords?.forEach((r) => {
-            closeTabBySource(r.id, "request", true);
-          });
-        }
 
         if (!expandedRecordIds.includes(record.id)) {
           const newExpandedRecordIds = [...expandedRecordIds, destination.collectionId];
@@ -266,7 +278,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [activeWorkspace.workspaceType, record.id, expandedRecordIds, closeTabBySource, setExpandedRecordIds]
+    [activeWorkspace.workspaceType, record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(

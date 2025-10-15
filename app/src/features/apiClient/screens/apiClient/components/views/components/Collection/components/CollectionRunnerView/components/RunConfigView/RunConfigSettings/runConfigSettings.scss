@@ -1,0 +1,61 @@
+.run-config-view-container {
+  .run-config-settings {
+    max-height: 280px;
+    display: flex;
+    flex-direction: column;
+    margin: var(--space-4, 8px) var(--space-6, 16px);
+    align-items: flex-start;
+    gap: var(--space-4, 8px);
+    flex-shrink: 0;
+    align-self: stretch;
+
+    padding: var(--space-6, 16px);
+    align-items: flex-start;
+
+    border-radius: 8px;
+    background: var(--requestly-color-surface-0, #212121);
+
+    .base-settings {
+      display: flex;
+      padding: var(--space-0, 0);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-4, 8px);
+      align-self: stretch;
+
+      .setting-container {
+        display: flex;
+        align-items: center;
+        gap: var(--space-6, 16px);
+        align-self: stretch;
+
+        label {
+          user-select: none;
+          display: flex;
+          align-items: center;
+          gap: var(--space-2, 4px);
+
+          width: 120px;
+          color: var(--requestly-color-text-default, #fff);
+          font-size: var(--requestly-font-size-sm, 12px);
+          font-weight: 400;
+          line-height: 18px; /* 150% */
+
+          svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            color: var(--requestly-color-text-subtle, #bbb);
+          }
+        }
+
+        input {
+          color: var(--requestly-color-text-default, #fff);
+          font-size: var(--requestly-font-size-xs, 11px);
+          font-weight: 400;
+          line-height: 17px; /* 154.545% */
+        }
+      }
+    }
+  }
+}

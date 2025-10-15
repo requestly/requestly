@@ -30,9 +30,9 @@
     "build": "vite build",
     "preview": "npm run build && vite preview",
     "start": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'vite'",
-    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=DEV vite'",
-    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'REACT_APP_ENV=EMULATOR vite --mode dev-emulator'",
-    "emulated-start": "REACT_APP_ENV=EMULATOR vite --mode dev-emulator"
+    "dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'cross-env REACT_APP_ENV=DEV vite'",
+    "emulated-dev": "concurrently --kill-others --names '@requestly/shared, @requestly/app' 'cd ../shared && npm run watch' 'cross-env REACT_APP_ENV=EMULATOR vite --mode dev-emulator'",
+    "emulated-start": "cross-env REACT_APP_ENV=EMULATOR vite --mode dev-emulator"
   },
   "browserslist": [
     ">0.2%",
@@ -87,7 +87,8 @@
     "cmdk": "^0.1.21",
     "codemirror": "^6.0.2",
     "comlink": "^4.4.2",
-    "curlconverter": "^4.10.1",
+    "cross-env": "^7.0.3",
+    "curlconverter": "^4.12.0",
     "dexie": "^4.0.11",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
@@ -164,8 +165,6 @@
     "@types/react-dom": "^18.2.8",
     "@types/react-redux": "^7.1.25",
     "@types/react-resizable": "^3.0.7",
-    "@types/react-virtualized-auto-sizer": "^1.0.1",
-    "@types/react-window": "^1.8.5",
     "@types/semver": "^7.3.13",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^9.0.8",
