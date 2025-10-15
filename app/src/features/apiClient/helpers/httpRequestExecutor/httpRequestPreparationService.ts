@@ -94,13 +94,13 @@ export class HttpRequestPreparationService {
     const newQueryParams = getAllQueryParams();
 
     const mergedHeaders = new Map();
-    newHeaders.forEach((header) => mergedHeaders.set(header.key, header));
     existingHeaders.forEach((header) => mergedHeaders.set(header.key, header));
+    newHeaders.forEach((header) => mergedHeaders.set(header.key, header));
     const headers = Array.from(mergedHeaders.values()).map((kv, index) => ({ ...kv, id: index, isEnabled: true }));
 
     const mergedQueryParams = new Map();
-    newQueryParams.forEach((param) => mergedQueryParams.set(param.key, param));
     existingQueryParams.forEach((param) => mergedQueryParams.set(param.key, param));
+    newQueryParams.forEach((param) => mergedQueryParams.set(param.key, param));
     const queryParams = Array.from(mergedQueryParams.values()).map((kv, index) => ({
       ...kv,
       id: index,
