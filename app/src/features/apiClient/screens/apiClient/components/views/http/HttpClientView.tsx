@@ -815,20 +815,23 @@ const HttpClientView: React.FC<Props> = ({
   );
 };
 
-const WithQueryParamsProvider = (Component: React.ComponentType<any>) => {
-  return (props: any) => {
+const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC => {
+  const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
-    const entry = record?.data as RQAPI.HttpApiEntry || props.apiEntryDetails.data;
+    const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
+
     return (
       <ErrorBoundary>
         <PathVariablesProvider pathVariables={entry.request?.pathVariables}>
-        <QueryParamsProvider entry={entry}>
-          <Component {...props} />
-        </QueryParamsProvider>
-       </PathVariablesProvider>
+          <QueryParamsProvider entry={entry}>
+            <Component {...props} />
+          </QueryParamsProvider>
+        </PathVariablesProvider>
       </ErrorBoundary>
     );
   };
+
+  return WrappedComponent;
 };
 
 export default React.memo(WithQueryParamsProvider(HttpClientView));
