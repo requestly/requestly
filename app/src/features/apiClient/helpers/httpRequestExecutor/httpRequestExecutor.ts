@@ -91,7 +91,7 @@ export class HttpRequestExecutor {
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
+    let { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
     preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
 
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
@@ -162,6 +162,12 @@ export class HttpRequestExecutor {
           error,
         };
       }
+
+      // Re-prepare the request to reflect any changes made by pre-request script
+      const rePreparationResult = this.requestPreparer.prepareRequest(recordId, entry);
+      preparedEntry = rePreparationResult.preparedEntry;
+      renderedVariables = rePreparationResult.renderedVariables;
+      preparedEntry.response = null;
     }
 
     try {
