@@ -103,7 +103,10 @@ export class HttpRequestPreparationService {
     workingEntry.request.queryParams = updateRequestWithAuthOptions(workingEntry.request.queryParams, queryParams);
 
     const { renderedVariables, result: renderedEntry } = this.renderVariables(workingEntry, recordId, this.ctx);
-    workingEntry.request.url = this.renderPathVariables(renderedEntry.request.url, renderedEntry.request.pathVariables);
+    renderedEntry.request.url = this.renderPathVariables(
+      renderedEntry.request.url,
+      renderedEntry.request.pathVariables
+    );
 
     renderedEntry.request.url = addUrlSchemeIfMissing(renderedEntry.request.url);
 
