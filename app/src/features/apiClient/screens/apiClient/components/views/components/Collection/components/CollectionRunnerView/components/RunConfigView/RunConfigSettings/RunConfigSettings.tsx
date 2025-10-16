@@ -18,8 +18,8 @@ import { Previewmodal } from "../ParseFileModal/ParseFileModal";
 const UploadedFileView: React.FC<{
   dataFile: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
   setShowPreviewModal: React.Dispatch<React.SetStateAction<boolean>>;
-  files: ApiClientFile[];
-}> = ({ dataFile, setShowPreviewModal, files }) => {
+  file: ApiClientFile;
+}> = ({ dataFile, setShowPreviewModal, file }) => {
   return (
     <>
       <div className="file-uploaded-section">
@@ -32,7 +32,7 @@ const UploadedFileView: React.FC<{
             setShowPreviewModal(true);
           }}
         >
-          {files[0].isFileValid ? (
+          {file.isFileValid ? (
             <MdOutlineRemoveRedEye className="eye-icon" />
           ) : (
             <>
@@ -45,7 +45,7 @@ const UploadedFileView: React.FC<{
             </>
           )}
           {/*needs to be fixed according to design */}
-          <span className={`button-text ${files[0].isFileValid ? "" : "file-invalid"}`}>
+          <span className={`button-text ${file.isFileValid ? "" : "file-invalid"}`}>
             {truncateString(dataFile.name, 35) + getFileExtension(dataFile.name)}
           </span>
         </RQButton>
@@ -104,7 +104,7 @@ export const RunConfigSettings: React.FC = () => {
   ]);
   const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
 
-  const files = getFilesByIds([dataFile?.id]);
+  const [file] = getFilesByIds([dataFile?.id]);
 
   const [showPreviewModal, setShowPreviewModal] = useState<boolean>(false);
 
@@ -204,7 +204,7 @@ export const RunConfigSettings: React.FC = () => {
             <SelectFileToUpload handleSelectFile={handleSelectFile} />
           ) : (
             <>
-              <UploadedFileView dataFile={dataFile} setShowPreviewModal={setShowPreviewModal} files={files} />
+              <UploadedFileView dataFile={dataFile} setShowPreviewModal={setShowPreviewModal} file={file} />
             </>
           )}
 
