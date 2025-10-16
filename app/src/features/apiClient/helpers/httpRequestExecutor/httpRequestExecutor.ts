@@ -94,6 +94,8 @@ export class HttpRequestExecutor {
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
     preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
 
+    //now we need to add a case for failed runner in case of missing file
+    //can we re-use this part?
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
       const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
       const isInvalid = invalidFiles.length > 0;
@@ -112,6 +114,7 @@ export class HttpRequestExecutor {
                 : "The file seems to have been moved or deleted from your device. Please upload it again to continue.",
             type: RQAPI.ApiClientErrorType.MISSING_FILE,
             source: "request",
+            context: "multipart_form",
           },
         };
       }

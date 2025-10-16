@@ -5,26 +5,40 @@ import { RQAPI } from "features/apiClient/types";
 import { RQButton } from "lib/design-system-v2/components";
 import React from "react";
 
+interface TitleConfig {
+  flag: boolean;
+  title?: string;
+}
+
 const ApiClientFileMissingError: React.FC<{
   error: RQAPI.ExecutionError;
   imageUrl: string;
-  showTitle?: boolean;
-  onRetry: () => void;
-}> = ({ error, imageUrl, showTitle = true, onRetry }) => {
+  showTitle?: TitleConfig;
+  showButton?: boolean;
+  onRetry?: () => void;
+}> = ({
+  error,
+  imageUrl,
+  showTitle = { flag: true, title: "Request not sent — file missing" },
+  showButton = true,
+  onRetry,
+}) => {
   return (
     <>
       <div className="api-client-error-placeholder-container">
         <div className="api-client-error-placeholder-content">
           <img src={imageUrl} alt="Error card" width={80} height={80} />
-          {showTitle && (
-            <div className="api-client-error-placeholder-content__title">{"Request not sent — file missing"}</div>
+          {showTitle.flag && showTitle.title && (
+            <div className="api-client-error-placeholder-content__title">{showTitle.title}</div>
           )}
           <div className="file-error-container">
             <span className="error-message">{`${error.reason}`}</span>
           </div>
-          <RQButton icon={<MdOutlineRefresh />} onClick={onRetry}>
-            Try Again
-          </RQButton>
+          {showButton && onRetry && (
+            <RQButton icon={<MdOutlineRefresh />} onClick={onRetry}>
+              Try Again
+            </RQButton>
+          )}
         </div>
 
         <a className="documentation-link" href={LINKS.REQUESTLY_API_CLIENT_DOCS} target="_blank" rel="noreferrer">
