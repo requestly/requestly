@@ -21,7 +21,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }
 
-  
   private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
     switch (requestDetails.type) {
       case "http":
@@ -265,7 +264,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         ...this.parseApiRecordRequest(record),
       },
       id,
-      record.collectionId,
+      record.collectionId
     );
 
     if (result.type === "error") {
@@ -579,6 +578,20 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return {
       success: true,
       data: { records: result, erroredRecords: [] },
+    };
+  }
+
+  async batchCreateCollectionRunDetails(
+    details: {
+      collectionId: RQAPI.CollectionRecord["id"];
+      runConfigs?: Record<string, SavedRunConfig>;
+      runResults?: RunResult[];
+    }[]
+  ): RQAPI.RecordsPromise {
+    return {
+      success: false,
+      data: { records: [], erroredRecords: [] },
+      message: "Not implemented",
     };
   }
 
