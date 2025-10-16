@@ -209,7 +209,9 @@ export const RunConfigSettings: React.FC = () => {
           )}
 
           {/* added here just for testing */}
-          {showPreviewModal && <Previewmodal status={"parsing"} onClose={() => setShowPreviewModal(false)} />}
+          {showPreviewModal && (
+            <Previewmodal status={"parsing"} count={1001} onClose={() => setShowPreviewModal(false)} />
+          )}
         </div>
       </div>
 
