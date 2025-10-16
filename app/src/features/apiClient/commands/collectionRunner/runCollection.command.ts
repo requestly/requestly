@@ -83,6 +83,7 @@ function prepareExecutionResult(params: {
 
 class RunCancelled extends NativeError {}
 class DataFileNotFound extends NativeError {}
+class DataFileParseError extends NativeError {}
 
 class Runner {
   private variables: Record<string, any>[] = [];
@@ -116,39 +117,43 @@ class Runner {
 
   private async parseDataFile() {
     const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
-    console.log("!!!debug", "datafile", dataFile);
     if (!dataFile) {
       return;
     }
 
     const apiClientFilesStore = apiClientFileStore.getState();
 
+    const collectionId = this.runContext.collectionId;
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
-      throw new DataFileNotFound("Data file not found!").addContext({ dataFile });
+      throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
     }
 
-    const fileContents = await getFileContents(dataFile.path);
-    const fileExtension = getFileExtension(dataFile.path);
+    try {
+      const fileContents = await getFileContents(dataFile.path);
+      const fileExtension = getFileExtension(dataFile.path);
 
-    console.log("!!!debug", "file extension", fileExtension);
-
-    switch (fileExtension) {
-      case ".csv": {
-        const parsedData = parseCsvText(fileContents);
-        if (!parsedData.success) {
-          throw new NativeError("Failed to parse CSV data file!").addContext({ dataFile });
+      switch (fileExtension) {
+        case ".csv": {
+          const parsedData = parseCsvText(fileContents);
+          if (!parsedData.success) {
+            throw new DataFileParseError("Failed to parse CSV data file!").addContext({
+              collectionId,
+            });
+          }
+          this.variables = parsedData.data;
+          break;
         }
-        this.variables = parsedData.data;
-        break;
-      }
-      case ".json": {
-        const parsedData = parseJsonText(fileContents);
-        if (!parsedData.success) {
-          throw new NativeError("Failed to parse JSON data file!").addContext({ dataFile });
+        case ".json": {
+          const parsedData = parseJsonText(fileContents);
+          if (!parsedData.success) {
+            throw new DataFileParseError("Failed to parse JSON data file!").addContext({ collectionId });
+          }
+          this.variables = parsedData.data;
+          break;
         }
-        this.variables = parsedData.data;
-        break;
       }
+    } catch (e) {
+      throw new DataFileParseError("Failed to read or parse data file!").addContext({ collectionId, error: e });
     }
     console.log("!!!debug", "var", this.variables);
   }
@@ -384,7 +389,14 @@ class Runner {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
+      } else if (e instanceof DataFileNotFound) {
+        e.name = "DataFileNotFoundError";
+        return e;
+      } else if (e instanceof DataFileParseError) {
+        e.name = "DataFileParseError";
+        return e;
       }
+
       this.onError(e);
       return e;
     } finally {
