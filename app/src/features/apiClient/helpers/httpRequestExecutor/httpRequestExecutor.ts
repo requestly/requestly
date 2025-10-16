@@ -84,36 +84,46 @@ export class HttpRequestExecutor {
     }
   }
 
-  async execute(
-    recordId: string,
-    entry: RQAPI.HttpApiEntry,
-    abortController?: AbortController
-  ): Promise<RQAPI.ExecutionResult> {
-    this.abortController = abortController || new AbortController();
+  async validateMultiPartForm(preparedEntry: RQAPI.HttpApiEntry): Promise<RQAPI.ExecutionResult | undefined> {
+    const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
+    const isInvalid = invalidFiles.length > 0;
+    if (isInvalid) {
+      trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
 
+      return {
+        executedEntry: { ...preparedEntry },
+        status: RQAPI.ExecutionStatus.ERROR,
+        error: {
+          name: "Error",
+          message: "Request not sent -- some files are missing",
+          reason:
+            invalidFiles.length > 1
+              ? "Some files appear to be missing or unavailable on your device. Please upload them again to proceed."
+              : "The file seems to have been moved or deleted from your device. Please upload it again to continue.",
+          type: RQAPI.ApiClientErrorType.MISSING_FILE,
+          source: "request",
+        },
+      };
+    }
+  }
+
+  async prepareRequestWithValidation(
+    recordId: string,
+    entry: RQAPI.HttpApiEntry
+  ): Promise<
+    | RQAPI.ExecutionResult
+    | {
+        renderedVariables: any;
+        preparedEntry: RQAPI.HttpApiEntry;
+      }
+  > {
     let { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
     preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
 
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
-      const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
-      const isInvalid = invalidFiles.length > 0;
-      if (isInvalid) {
-        trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
-
-        return {
-          executedEntry: { ...preparedEntry },
-          status: RQAPI.ExecutionStatus.ERROR,
-          error: {
-            name: "Error",
-            message: "Request not sent -- some files are missing",
-            reason:
-              invalidFiles.length > 1
-                ? "Some files appear to be missing or unavailable on your device. Please upload them again to proceed."
-                : "The file seems to have been moved or deleted from your device. Please upload it again to continue.",
-            type: RQAPI.ApiClientErrorType.MISSING_FILE,
-            source: "request",
-          },
-        };
+      const validationResult = await this.validateMultiPartForm(preparedEntry);
+      if (validationResult) {
+        return validationResult;
       }
     }
 
@@ -127,6 +137,25 @@ export class HttpRequestExecutor {
         error,
       };
     }
+
+    return { preparedEntry, renderedVariables };
+  }
+
+  async execute(
+    recordId: string,
+    entry: RQAPI.HttpApiEntry,
+    abortController?: AbortController
+  ): Promise<RQAPI.ExecutionResult> {
+    this.abortController = abortController || new AbortController();
+
+    const result = await this.prepareRequestWithValidation(recordId, entry);
+
+    if ("status" in result) {
+      return result;
+    }
+
+    let { preparedEntry, renderedVariables } = result;
+
     let preRequestScriptResult;
     let responseScriptResult;
 
@@ -163,11 +192,15 @@ export class HttpRequestExecutor {
         };
       }
 
-      // Re-prepare the request to reflect any changes made by pre-request script
-      const rePreparationResult = this.requestPreparer.prepareRequest(recordId, entry);
+      // Re-prepare the request as pre-request script might have modified it.
+      const rePreparationResult = await this.prepareRequestWithValidation(recordId, entry);
+
+      if ("status" in rePreparationResult) {
+        return rePreparationResult;
+      }
+
       preparedEntry = rePreparationResult.preparedEntry;
       renderedVariables = rePreparationResult.renderedVariables;
-      preparedEntry.response = null;
     }
 
     try {
