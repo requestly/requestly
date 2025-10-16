@@ -27,6 +27,7 @@ export const ChatInput: React.FC<InputProps> = ({ onSendMessage }) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSendMessage(message);
+      setMessage("");
     }
   };
 
@@ -45,7 +46,14 @@ export const ChatInput: React.FC<InputProps> = ({ onSendMessage }) => {
           size="small"
           type={isProcessing ? "secondary" : "primary"}
           icon={isProcessing ? <MdOutlineStopCircle /> : <MdSend />}
-          onClick={isProcessing ? handleStopProcessing : () => onSendMessage(message)}
+          onClick={
+            isProcessing
+              ? handleStopProcessing
+              : () => {
+                  onSendMessage(message);
+                  setMessage("");
+                }
+          }
         >
           {isProcessing ? "Stop" : "Send"}
         </RQButton>
