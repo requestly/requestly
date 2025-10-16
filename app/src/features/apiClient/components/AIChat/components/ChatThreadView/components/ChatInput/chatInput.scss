@@ -1,0 +1,26 @@
+.ai-chat__body--input {
+  margin-top: 8px;
+  border: 1px solid var(--requestly-color-white-t-20);
+  border-radius: 8px;
+  padding: var(--requestly-space-4, 8px);
+
+  &-textarea {
+    background: transparent;
+    font-size: var(--requestly-font-size-sm);
+    border: none;
+    outline: none;
+    box-shadow: none;
+
+    &:focus {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}
