@@ -11,6 +11,7 @@
 
       th,
       th.ant-table-cell {
+        min-width: 138px;
         padding: 6px 12px;
         font-size: var(--requestly-font-size-sm, 13px);
         border: 1px solid var(--requestly-color-white-t-10);
