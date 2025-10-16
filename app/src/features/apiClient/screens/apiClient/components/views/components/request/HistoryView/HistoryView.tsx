@@ -16,7 +16,7 @@ export const HistoryView: React.FC = () => {
   const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
   const entry = useMemo(() => {
-    if (selectedHistoryIndex != null && selectedHistoryIndex !== undefined && history?.[selectedHistoryIndex]) {
+    if (selectedHistoryIndex != null && history?.[selectedHistoryIndex]) {
       return {
         type: RQAPI.RecordType.API,
         data: { ...history[selectedHistoryIndex] },
