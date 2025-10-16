@@ -6,29 +6,22 @@ export interface ChatSessionsStore {
   sessions: AIChat.SessionsMap;
   activeSessionId: AIChat.Session["id"];
   isProcessing: boolean;
-  isStopped: boolean;
-  abortController: AbortController | null;
-  stopCallback: (() => void) | null;
   createChatSession: (session: AIChat.Session) => void;
   updateSession: (id: AIChat.Session["id"], newMessage: AIChat.Message) => void;
   deleteSession: (id: AIChat.Session["id"]) => void;
   getSession: (id: AIChat.Session["id"]) => AIChat.Session;
   getActiveSessionId: () => AIChat.Session["id"] | undefined;
+  setActiveSessionId: (id: AIChat.Session["id"]) => void;
   setIsProcessing: (isProcessing: boolean) => void;
-  setIsStopped: (isStopped: boolean) => void;
-  setAbortController: (controller: AbortController | null) => void;
-  setStopCallback: (callback: (() => void) | null) => void;
-  stopCurrentRequest: () => void;
+  getChatSessions: () => AIChat.SessionsMap;
 }
 
 export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
+  console.log("activeSessions", Object.keys(sessions));
   return create<ChatSessionsStore>()((set, get) => ({
-    sessions: sessions || {},
+    sessions,
     activeSessionId: Object.keys(sessions)[0],
     isProcessing: false,
-    isStopped: false,
-    abortController: null,
-    stopCallback: null,
     createChatSession(session: AIChat.Session) {
       const sessionsMap = { ...sessions, [session.id]: session };
       set({ sessions: sessionsMap, activeSessionId: session.id });
@@ -55,6 +48,9 @@ export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
       }
       return sessions[0].id;
     },
+    setActiveSessionId(id: AIChat.Session["id"]) {
+      set({ activeSessionId: id });
+    },
     deleteSession(id: AIChat.Session["id"]) {
       const { sessions } = get();
       delete sessions[id];
@@ -63,24 +59,8 @@ export function createChatSessionsStore(sessions: AIChat.SessionsMap) {
     setIsProcessing(isProcessing: boolean) {
       set({ isProcessing });
     },
-    setIsStopped(isStopped: boolean) {
-      set({ isStopped });
-    },
-    setAbortController(controller: AbortController | null) {
-      set({ abortController: controller });
-    },
-    setStopCallback(callback: (() => void) | null) {
-      set({ stopCallback: callback });
-    },
-    stopCurrentRequest() {
-      const { abortController, stopCallback } = get();
-      if (abortController) {
-        abortController.abort();
-      }
-      if (stopCallback) {
-        stopCallback();
-      }
-      set({ isProcessing: false, isStopped: true, abortController: null, stopCallback: null });
+    getChatSessions() {
+      return get().sessions;
     },
   }));
 }

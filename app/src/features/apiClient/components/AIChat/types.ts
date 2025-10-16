@@ -8,7 +8,6 @@ export namespace AIChat {
     TRY_IN_EDITOR = "TRY_IN_EDITOR",
   }
 
-  // TEMPORARY: This will be replaced with the actual action types
   export type Action = {
     type: ActionType;
     payload: any;
@@ -16,7 +15,7 @@ export namespace AIChat {
   export type BaseMessage = {
     role: Role;
     text: string;
-    createdAt: number;
+    createdTs: number;
   };
 
   export type UserMessage = BaseMessage;
@@ -30,6 +29,8 @@ export namespace AIChat {
   export type Session = {
     id: string;
     messages: Message[];
+    createdTs: number;
+    updatedTs: number;
   };
 
   export type SessionsMap = Record<Session["id"], Session>;
