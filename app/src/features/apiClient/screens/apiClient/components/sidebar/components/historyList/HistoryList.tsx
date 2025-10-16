@@ -11,7 +11,7 @@ import { HistoryViewTabSource } from "../../../views/components/request/HistoryV
 
 interface Props {
   history: RQAPI.ApiEntry[];
-  selectedHistoryIndex: number;
+  selectedHistoryIndex?: number;
   onSelectionFromHistory: (index: number) => void;
 }
 
