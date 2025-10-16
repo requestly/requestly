@@ -11,21 +11,11 @@ import { useSelector } from "react-redux";
 import { displayMultiFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 
 export const RunConfigSettings: React.FC = () => {
-  const [
-    iterations,
-    setIterations,
-    delay,
-    setDelay,
-    fileHandler,
-    setFileHandler,
-    setDataFile,
-  ] = useRunConfigStore((s) => [
+  const [iterations, setIterations, delay, setDelay, setDataFile] = useRunConfigStore((s) => [
     s.iterations,
     s.setIterations,
     s.delay,
     s.setDelay,
-    s.fileHandler,
-    s.setFileHandler,
     s.setDataFile,
   ]);
 
@@ -96,18 +86,11 @@ export const RunConfigSettings: React.FC = () => {
 
           <RQButton
             onClick={async () => {
+              // Dummy code: TODO to be removed
               if (appMode === "DESKTOP") {
                 displayMultiFileSelector((files) => {
                   setDataFile(files?.[0]);
                 });
-              } else {
-                try {
-                  const [fileHandler] = await window.showOpenFilePicker();
-                  setFileHandler(fileHandler);
-                } catch (err) {
-                  console.log("!!!debug", "file picker cancelled");
-                  return;
-                }
               }
             }}
             size="small"
