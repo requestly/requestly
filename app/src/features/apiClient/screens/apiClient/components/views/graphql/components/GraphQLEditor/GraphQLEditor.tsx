@@ -29,6 +29,13 @@ type EditorProps = OperationEditorProps | VariablesEditorProps;
 
 const basicExtensions = [basicSetup, vscodeDark, keymap.of([indentWithTab])];
 
+const normalizeDocValue = (doc: any): string => {
+  if (typeof doc === "object" && doc !== null) {
+    return JSON.stringify(doc, null, 2);
+  }
+  return typeof doc === "string" ? doc : "";
+};
+
 export const GraphQLEditor: React.FC<EditorProps> = (props) => {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -92,17 +99,18 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current);
       }
+      const docValue = normalizeDocValue(props.initialDoc);
 
       // Debounce the update to avoid rapid successive updates
       updateTimeoutRef.current = setTimeout(() => {
         const currentDoc = viewRef.current?.state.doc.toString();
-        if (currentDoc !== props.initialDoc) {
+        if (currentDoc !== docValue) {
           // Only update if the content is actually different
           const transaction = viewRef.current!.state.update({
             changes: {
               from: 0,
               to: viewRef.current!.state.doc.length,
-              insert: props.initialDoc,
+              insert: docValue,
             },
           });
           viewRef.current!.dispatch(transaction);
@@ -139,8 +147,10 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
       extensions.push(json());
     }
 
+    const docValue = normalizeDocValue(initialDocRef.current);
+
     const state = EditorState.create({
-      doc: initialDocRef.current || "",
+      doc: docValue,
       extensions,
     });
 
