@@ -60,7 +60,6 @@ export function createRunConfigStore(data: {
   delay?: RQAPI.RunConfig["delay"];
   iterations?: RQAPI.RunConfig["iterations"];
   dataFile?: RQAPI.RunConfig["dataFile"];
-  fileVariables?: Record<string, any>[];
 }) {
   const { id, runOrder, unorderedRequestIds, delay = 0, iterations = 1 } = data;
 
