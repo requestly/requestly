@@ -22,21 +22,15 @@ const AIChatView = () => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
 
-  const [
-    sessionId,
-    isProcessing,
-    setIsProcessing,
-    updateSession,
-    createChatSession,
-    setActiveSessionId,
-  ] = useChatSessionsStore((s) => [
-    s.activeSessionId,
-    s.isProcessing,
-    s.setIsProcessing,
-    s.updateSession,
-    s.createChatSession,
-    s.setActiveSessionId,
-  ]);
+  const [sessionId, isProcessing, setIsProcessing, updateSession, createChatSession, setActiveSessionId] =
+    useChatSessionsStore((s) => [
+      s.activeSessionId,
+      s.isProcessing,
+      s.setIsProcessing,
+      s.updateSession,
+      s.createChatSession,
+      s.setActiveSessionId,
+    ]);
 
   console.log("sessionId", sessionId);
 
