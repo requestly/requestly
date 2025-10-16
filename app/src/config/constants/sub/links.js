@@ -127,6 +127,7 @@ const LINKS = {
 
   /** TUTORIALS */
   YOUTUBE_TUTORIALS: "https://rqst.ly/http-rules-yt-tutorials",
+  YOUTUBE_API_CLIENT_TUTORIALS: "https://rqst.ly/tutorials",
 
   TUTORIALS: {
     REDIRECT_RULE: "https://rqst.ly/redirect-rule-yt",
@@ -142,6 +143,7 @@ const LINKS = {
     LINUX: "https://bit.ly/rq-linux",
   },
 
+  CHANGELOG: "https://rqst.ly/change-logs",
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 
   ACCELERATOR_PROGRAM_FORM_LINK: "https://app.formbricks.com/s/cm1ewcpkt0000djs29ct7rpy2",
