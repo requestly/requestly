@@ -3,6 +3,7 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   height: 100%;
   overflow: scroll;
+  --breakpoint-md: 768px;
 
   &.collection-auth {
     border-bottom: 0;
@@ -39,18 +40,12 @@
       .form {
         .field-group {
           display: flex;
-          flex-wrap: wrap;
           gap: 8px;
           margin-bottom: 16px;
           align-items: center;
 
           label {
             min-width: 100px;
-            width: 100%;
-
-            @media (min-width: 768px) {
-              width: 120px;
-            }
           }
 
           .field {
@@ -58,8 +53,12 @@
             flex-grow: 1;
             min-width: 0;
 
-            @media (min-width: 768px) {
-              width: 448px;
+            .select-full {
+              width: 100%;
+            }
+
+            @media (max-width: var(--breakpoint-md)) {
+              width: auto;
               flex-grow: 0;
               min-width: initial;
             }
@@ -94,11 +93,11 @@
           }
 
           .ant-select-selector {
-            width: 100% !important;
-            min-width: 0 !important;
+            width: 100%;
+            min-width: 0;
             background: none;
-            @media (min-width: 768px) {
-              width: auto !important;
+            @media (min-width: var(--breakpoint-md)) {
+              width: auto;
             }
           }
 
