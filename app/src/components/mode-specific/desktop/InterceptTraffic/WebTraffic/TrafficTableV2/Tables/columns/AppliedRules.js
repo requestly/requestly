@@ -3,15 +3,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
-import { makeSelectRecordNamesByIds } from "store/features/rules/selectors";
+import { getRecordById } from "store/features/rules/selectors";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
   const dispatch = useDispatch();
-  const ruleIds = Array.from(new Set((actions || []).map((a) => a.rule_id).filter(Boolean)));
-  const selectNamesByIds = makeSelectRecordNamesByIds(ruleIds);
-  const appliedRuleNamesMap = useSelector(selectNamesByIds);
+  const appliedRuleNamesMap = useSelector((state) => {
+    const map = {};
+    const ruleIds = Array.from(new Set((actions || []).map((a) => a.rule_id).filter(Boolean)));
+    ruleIds.forEach((id) => {
+      const record = getRecordById(state, id);
+      if (record && record.name) map[id] = record.name;
+    });
+    return map;
+  });
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
