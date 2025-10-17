@@ -3,13 +3,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
-import { getAllRecordsMap } from "store/features/rules/selectors";
+import { getRecordById } from "store/features/rules/selectors";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
   const dispatch = useDispatch();
-  const allRecordsMap = useSelector(getAllRecordsMap);
+  const appliedRuleNamesMap = useSelector((state) => {
+    const namesById = {};
+    try {
+      const ruleIds = Array.from(new Set((actions || []).map((a) => a.rule_id).filter(Boolean)));
+      ruleIds.forEach((id) => {
+        const record = getRecordById(state, id);
+        if (record && record.name) {
+          namesById[id] = record.name;
+        }
+      });
+    } catch (e) {}
+    return namesById;
+  });
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
@@ -44,7 +56,7 @@ const AppliedRules = ({ actions }) => {
     }
 
     // Prefer showing the user-defined rule name in the tooltip; fall back to rule id when not found
-    const ruleDisplayName = allRecordsMap?.[rule.rule_id]?.name || rule.rule_id;
+    const ruleDisplayName = appliedRuleNamesMap?.[rule.rule_id] || rule.rule_id;
 
     return (
       <Tooltip title={ruleDisplayName} key={rule.rule_id}>
