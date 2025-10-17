@@ -11,7 +11,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: var(--space-8, 24px);
+    gap: 16px;
 
     .error-container {
       display: flex;
@@ -28,6 +28,8 @@
       letter-spacing: 0.25px;
       max-width: 400px;
       text-align: center;
+      margin-top: -8px;
+      margin-bottom: 8px;
 
       .error-name {
         color: var(--requestly-color-error-text);
@@ -37,6 +39,7 @@
         color: var(--requestly-color-subtle);
         display: inline;
         gap: 4px;
+        margin-bottom: 2px;
 
         svg {
           width: 16px;
@@ -78,7 +81,7 @@
 
   .documentation-link {
     display: flex;
-    padding-top: 16px;
+    padding-top: 2px;
     align-items: center;
     gap: 4px;
     color: var(--requestly-color-primary-text, #639ff9);
