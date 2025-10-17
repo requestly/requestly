@@ -104,7 +104,7 @@ export class HttpRequestPreparationService {
     workingEntry.request.headers = updateRequestWithAuthOptions(workingEntry.request.headers, headers);
     workingEntry.request.queryParams = updateRequestWithAuthOptions(workingEntry.request.queryParams, queryParams);
 
-    const { renderedVariables, result: renderedEntry } = this.renderVariables(workingEntry, recordId, this.ctx);
+    const { renderedVariables, result: renderedEntry } = this.renderVariables(workingEntry, recordId, this.ctx, scopes);
     renderedEntry.request.url = this.renderPathVariables(
       renderedEntry.request.url,
       renderedEntry.request.pathVariables
