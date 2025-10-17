@@ -237,11 +237,6 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]> {
-    await this.queryService.createBulkRecords(records);
-    return records;
-  }
-
   async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     await this.queryService.createBulkRecords(records);
     return {
