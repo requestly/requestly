@@ -69,7 +69,8 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     [dispatch, pairIndex]
   );
 
-  const handleFileSelectCallback = (selectedFile) => {
+  const handleFileSelectCallback = (file) => {
+    const selectedFile = file?.path;
     dispatch(
       globalActions.updateRulePairAtGivenPath({
         pairIndex,

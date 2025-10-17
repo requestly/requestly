@@ -231,6 +231,7 @@ export namespace RQAPI {
     name: Error["name"];
     reason?: string;
     message: Error["message"];
+    context?: string;
   };
 
   export type ExecutionWarning = {
