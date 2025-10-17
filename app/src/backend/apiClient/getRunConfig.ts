@@ -35,7 +35,16 @@ async function _getRunConfigFromFirebase(
     }
 
     const data = snapshot.data() as SavedRunConfigRecord;
-    return { success: true, data: { id: runConfigId, runOrder: data.runOrder } };
+    return {
+      success: true,
+      data: {
+        id: runConfigId,
+        runOrder: data.runOrder,
+        delay: data.delay,
+        iterations: data.iterations,
+        dataFile: data.dataFile,
+      },
+    };
   } catch (e) {
     Sentry.captureException(e, {
       extra: { collectionId, runConfigId },
