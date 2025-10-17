@@ -57,15 +57,12 @@ export abstract class Result<T> {
     return fn(this.result.result);
   }
 
-  mapErr<K>(fn: (arg: Error) => K) {
+  mapError(fn: (arg: Error) => Error) {
     if (this.result.success) {
       return this;
     }
 
-    return new Ok({
-      success: true,
-      result: fn(this.result.error),
-    });
+    return new Err(fn(this.result.error));
   }
 
   inspect(fn: (arg: T) => void) {
@@ -194,20 +191,21 @@ type TryReturn<R> = R extends Promise<infer I> ? Promise<Result<I>> : Result<R>
 export function Try<R = any>(fn: (...args: any[]) => R): TryReturn<R> {
   try {
     const possibleResultPromise = fn();
-    const isPromise = possibleResultPromise instanceof Promise;
-    if (isPromise) {
-      return possibleResultPromise.then(result => {
+    const isPromiseLike = (typeof (possibleResultPromise as any)?.then === 'function');
+    if (isPromiseLike) {
+      return (possibleResultPromise as Promise<any>).then(result => {
         return new Ok(result)
-      }).catch(e => new Err(e)) as TryReturn<R>;
+      }).catch(e => {
+          const err = e instanceof Error ? e : new Error(typeof e === 'string' ? e : 'Could not execute given function');
+          return new Err(err);
+        }) as TryReturn<R>;
     }
 
     return new Ok(possibleResultPromise) as TryReturn<R>;
 
   }
   catch (e) {
-    if (!(e instanceof Error)) {
-      e = new Error(typeof e === 'string' ? e : 'Could not execute given function');
-    }
-    return new Err(e) as TryReturn<R>;
+    const err = e instanceof Error ? e : new Error(typeof e === 'string' ? e : 'Could not execute given function');
+    return new Err(err) as TryReturn<R>;
   }
 }
