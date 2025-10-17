@@ -1,6 +1,3 @@
-//states of this modal
-
-import { Table } from "antd";
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import React from "react";
@@ -14,6 +11,7 @@ import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { PreviewTableView } from "./parsedTableView";
 /**
  * 1. successfull parsing, upload pending - show table, filename, type & cancel, usefile btn
  * 2. unsucessfull parsing - show error message with learn more & select again option
@@ -49,86 +47,6 @@ interface ModalProps {
   onClose: () => void;
   count?: number;
 }
-//stubs
-const dataSource = [
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-];
-
-//stubs
-const columns = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Age",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Address",
-    dataIndex: "address",
-    key: "address",
-  },
-];
-
-const PreviewTable = () => (
-  <Table dataSource={dataSource} columns={columns} pagination={false} scroll={{ x: 648, y: 250 }} />
-);
 
 const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
@@ -158,7 +76,7 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
         {/*
           ADD LOGIC TO CREATE ITERATIONS COLUMN 
         */}
-        <PreviewTable />
+        <PreviewTableView />
       </div>
 
       {/* Section 3 */}
@@ -176,7 +94,14 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
 
 const ViewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
-    <RQModal open={true} closable={true} closeIcon={<MdOutlineClose />} onCancel={onClose} className="preview-modal">
+    <RQModal
+      width={680}
+      open={true}
+      closable={true}
+      closeIcon={<MdOutlineClose />}
+      onCancel={onClose}
+      className="preview-modal"
+    >
       {/* Section 1 */}
       <div className="preview-modal-header-container">
         <div className="preview-modal-title">Preview: {dataFile.name}</div>
@@ -199,7 +124,7 @@ const ViewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) =
         {/*
           ADD LOGIC TO CREATE ITERATIONS COLUMN 
         */}
-        <PreviewTable />
+        <PreviewTableView />
       </div>
       {/* Section 3 */}
       <div className="preview-modal-footer-container">
@@ -257,7 +182,7 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, on
             <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase()}
           </div>
         </div>
-        <PreviewTable />
+        <PreviewTableView />
       </div>
 
       {/* Section 3 */}
