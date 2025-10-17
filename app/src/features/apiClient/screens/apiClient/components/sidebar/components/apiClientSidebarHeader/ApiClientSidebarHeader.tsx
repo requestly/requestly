@@ -24,6 +24,7 @@ import {
 import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
 import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
 import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -54,6 +55,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
   const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
+  const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -108,6 +110,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
       {
         key: "5",
+        hidden: !isOpenApiSupportEnabled,
         label: (
           <div className="new-btn-option">
             <SiOpenapiinitiative /> OpenAPI Specfication
@@ -124,7 +127,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
     ],
-    [onImportClick]
+    [onImportClick, isOpenApiSupportEnabled]
   );
 
   useEffect(() => {
