@@ -15,13 +15,16 @@
 
   .test-results-stats {
     letter-spacing: -0.4px;
+    border: none;
 
     &.passed {
-      color: var(--requestly-color-success-300);
+      color: var(--requestly-color-success-text);
+      background-color: var(--requestly-color-success-800);
     }
 
     &.failed {
-      color: var(--requestly-color-error-300);
+      color: var(--requestly-color-error-text);
+      background-color: var(--requestly-color-error-800);
     }
   }
 }
