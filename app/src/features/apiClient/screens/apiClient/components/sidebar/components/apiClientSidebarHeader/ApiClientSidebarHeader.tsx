@@ -4,7 +4,7 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
-import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
+import { ApiClientImporterType, RQAPI } from "features/apiClient/types";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
 import { trackImportStarted } from "modules/analytics/events/features/apiClient";
 import { ApiClientImportModal } from "../../../modals/importModal/ApiClientImportModal";
@@ -21,10 +21,6 @@ import {
   ApiClientViewMode,
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
-import { CommonApiClientImportModal } from "../../../modals/CommonApiClientImportModal/CommonApiClientImportModal";
-import { ApiClientImporterMethod, openApiImporter } from "@requestly/alternative-importers";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {
   activeTab: ApiClientSidebarTabKey;
@@ -33,13 +29,6 @@ interface Props {
   onImportClick: () => void;
   history: RQAPI.ApiEntry[];
   onClearHistory: () => void;
-}
-
-interface ImportModalConfig {
-  productName: string;
-  supportedFileTypes: string[];
-  importer: ApiClientImporterMethod<any>;
-  importerType: ApiClientImporterType;
 }
 
 export const ApiClientSidebarHeader: React.FC<Props> = ({
@@ -54,8 +43,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPostmanImporterModalOpen, setIsPostmanImporterModalOpen] = useState(false);
   const [isBrunoImporterModalOpen, setIsBrunoImporterModalOpen] = useState(false);
-  const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
-  const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
   const importItems: DropdownProps["menu"]["items"] = useMemo(
     () => [
@@ -108,26 +95,8 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
           setIsBrunoImporterModalOpen(true);
         },
       },
-      {
-        key: "5",
-        hidden: !isOpenApiSupportEnabled,
-        label: (
-          <div className="new-btn-option">
-            <SiOpenapiinitiative /> OpenAPI Specfication
-          </div>
-        ),
-        onClick: () => {
-          trackImportStarted(ApiClientImporterType.OPENAPI);
-          setCommonImportModalConfig({
-            productName: "OpenAPI Specifications",
-            supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
-            importer: openApiImporter,
-            importerType: ApiClientImporterType.OPENAPI,
-          });
-        },
-      },
     ],
-    [onImportClick, isOpenApiSupportEnabled]
+    [onImportClick]
   );
 
   useEffect(() => {
@@ -203,17 +172,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       )}
       {isBrunoImporterModalOpen && (
         <BrunoImporterModal isOpen={isBrunoImporterModalOpen} onClose={() => setIsBrunoImporterModalOpen(false)} />
-      )}
-
-      {commonImportModalConfig && (
-        <CommonApiClientImportModal
-          productName={commonImportModalConfig.productName}
-          supportedFileTypes={commonImportModalConfig.supportedFileTypes}
-          importer={commonImportModalConfig.importer}
-          isOpen={Boolean(commonImportModalConfig)}
-          importerType={commonImportModalConfig.importerType}
-          onClose={() => setCommonImportModalConfig(null)}
-        />
       )}
     </>
   );

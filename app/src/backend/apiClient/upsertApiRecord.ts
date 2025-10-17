@@ -1,5 +1,5 @@
 import firebaseApp from "../../firebase";
-import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc, writeBatch } from "firebase/firestore";
+import { getFirestore, Timestamp, updateDoc, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
 import lodash from "lodash";
@@ -122,47 +122,5 @@ export const updateApiRecord = async (
     captureException(err);
     Logger.error("Error while updating api record", err);
     return { success: false, data: null };
-  }
-};
-
-export const batchUpsertApiRecords = async (
-  uid: string,
-  records: RQAPI.ApiClientRecord[],
-  teamId?: string
-): Promise<{ success: boolean; data: RQAPI.ApiClientRecord[] | null; message?: string }> => {
-  if (!records.length) {
-    return { success: false, data: null, message: "No records found to add or update" };
-  }
-
-  const db = getFirestore(firebaseApp);
-  const batch = writeBatch(db);
-  const ownerId = getOwnerId(uid, teamId);
-
-  try {
-    const updatedRecords: RQAPI.ApiClientRecord[] = [];
-
-    records.forEach((record) => {
-      const sanitizedRecord = sanitizeRecord(record);
-      const updatedRecord = {
-        ...sanitizedRecord,
-        ownerId,
-        createdBy: sanitizedRecord.createdBy ?? uid,
-        updatedBy: uid,
-        createdTs: sanitizedRecord.createdTs ?? Timestamp.now().toMillis(),
-        updatedTs: Timestamp.now().toMillis(),
-      } as RQAPI.ApiClientRecord;
-
-      updatedRecords.push(updatedRecord);
-      const recordRef = doc(db, "apis", updatedRecord.id);
-      batch.set(recordRef, updatedRecord, { merge: true });
-    });
-
-    await batch.commit();
-    Logger.log(`Batch upserted ${records.length} API records`);
-    return { success: true, data: updatedRecords };
-  } catch (error) {
-    captureException(error);
-    Logger.error("Error while batch upserting API records", error);
-    return { success: false, data: null, message: error?.message };
   }
 };
