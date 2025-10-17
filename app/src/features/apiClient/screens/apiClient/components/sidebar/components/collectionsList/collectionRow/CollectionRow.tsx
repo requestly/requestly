@@ -63,6 +63,7 @@ interface Props {
     recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
@@ -80,6 +81,7 @@ export const CollectionRow: React.FC<Props> = ({
   bulkActionOptions,
   isReadOnly,
   handleRecordsToBeDeleted,
+  onItemClick,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
@@ -414,6 +416,10 @@ export const CollectionRow: React.FC<Props> = ({
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={(e) => {
+                    if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                      onItemClick(record, e);
+                      return;
+                    }
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
                     if (!isExpanded) {
@@ -540,6 +546,7 @@ export const CollectionRow: React.FC<Props> = ({
                             record={apiRecord}
                             bulkActionOptions={bulkActionOptions}
                             handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                            onItemClick={onItemClick}
                           />
                         );
                       } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -554,6 +561,7 @@ export const CollectionRow: React.FC<Props> = ({
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
                             handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                            onItemClick={onItemClick}
                           />
                         );
                       }
