@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { RQAPI } from "features/apiClient/types";
 import { NativeError } from "errors/NativeError";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
-import { apiClientFileStore } from "../apiClientFilesStore";
+import { ApiClientFile, apiClientFileStore, FileFeature } from "../apiClientFilesStore";
 
 export const DELAY_MAX_LIMIT = 50000; // ms
 export const ITERATIONS_MAX_LIMIT = 1000;
@@ -12,7 +12,7 @@ export type RunConfigState = {
   runOrder: RQAPI.RunConfig["runOrder"];
   delay: RQAPI.RunConfig["delay"];
   iterations: RQAPI.RunConfig["iterations"];
-  dataFile: RQAPI.RunConfig["dataFile"] | null;
+  dataFile: RQAPI.RunConfig["dataFile"];
 
   /**
    * This would be used when request reorder happens.
@@ -142,9 +142,15 @@ export function createRunConfigStore(data: {
       set({ iterations });
     },
 
-    setDataFile(dataFile) {
-      //TODO@nafees File format already validated or store should validate it?
-      apiClientFileStore.getState().addFile(dataFile.id, dataFile);
+    setDataFile(dataFile: RQAPI.RunConfig["dataFile"]) {
+      const apiClientFile: Omit<ApiClientFile, "isFileValid"> = {
+        name: dataFile.name,
+        path: dataFile.path,
+        source: dataFile.source,
+        size: dataFile.size,
+        fileFeature: FileFeature.COLLECTION_RUNNER,
+      };
+      apiClientFileStore.getState().addFile(dataFile.id, apiClientFile);
       set({ dataFile });
     },
 
