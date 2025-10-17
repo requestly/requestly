@@ -20,6 +20,7 @@ import { ErroredRecord } from "../../local/services/types";
 import { ResponsePromise } from "backend/types";
 import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { batchCreateCollectionRunDetailsInFirebase } from "backend/apiClient/batchCreateCollectionRunDetailsInFirebase";
 
 export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<ApiClientCloudMeta> {
   meta: ApiClientCloudMeta;
@@ -201,6 +202,23 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     }
 
     return await batchCreateApiRecordsWithExistingId(this.meta.uid, this.meta.teamId, records);
+  }
+
+  async batchCreateCollectionRunDetails(
+    details: {
+      collectionId: RQAPI.CollectionRecord["id"];
+      runConfigs?: Record<string, SavedRunConfig>;
+      runResults?: RunResult[];
+    }[]
+  ): RQAPI.RecordsPromise {
+    if (details.length === 0) {
+      return {
+        success: true,
+        data: { records: [], erroredRecords: [] },
+      };
+    }
+
+    return batchCreateCollectionRunDetailsInFirebase(details);
   }
 
   async getRunConfig(
