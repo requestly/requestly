@@ -21,6 +21,7 @@ export enum EnvironmentVariableType {
 }
 
 export enum VariableScope {
+  DATA_FILE = "data_file",
   RUNTIME = "runtime",
   ENVIRONMENT = "environment",
   COLLECTION = "collection",

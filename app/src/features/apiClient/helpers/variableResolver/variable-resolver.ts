@@ -20,7 +20,7 @@ export type VariableSource = {
 
 export type ScopedVariable = [VariableData, VariableSource];
 
-type Scope = [VariableSource, StoreApi<VariablesState>];
+export type Scope = [VariableSource, StoreApi<VariablesState>];
 
 export type ScopedVariables = Map<VariableKey, ScopedVariable>;
 
@@ -79,9 +79,8 @@ export class VariableHolder {
   }
 }
 
-function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
-  const scopes: Scope[] = [];
-  let currentScopeLevel = 0;
+function getScopes(parents: string[], stores: AllApiClientStores, scopes: Scope[] = []): Scope[] {
+  let currentScopeLevel = scopes.length;
   const {
     activeEnvironment: activeEnvironmentStore,
     globalEnvironment: globalEnvironmentStore,
@@ -167,11 +166,11 @@ function readScopesIntoVariableHolder(
   }
 }
 
-export function getScopedVariables(parents: string[], stores: AllApiClientStores): ScopedVariables {
+export function getScopedVariables(parents: string[], stores: AllApiClientStores, scopes?: Scope[]): ScopedVariables {
   const variableHolder = new VariableHolder();
   readScopesIntoVariableHolder(
     {
-      scopes: getScopes(parents, stores),
+      scopes: getScopes(parents, stores, scopes),
     },
     variableHolder
   );

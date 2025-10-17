@@ -2,7 +2,7 @@ import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
 import { EnvironmentVariableData, VariableData, VariableValues, VariableKey } from "./types";
 import { PersistedVariables } from "../shared/variablePersistence";
-import { EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariables, EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 
 type _VariablesState<T extends VariableData> = {
   data: Map<VariableKey, T>;
@@ -30,6 +30,32 @@ export const parseVariables = (rawVariables: VariableValues): VariablesState["da
 
 export const parseEnvVariables = (rawVariables: EnvironmentVariables): EnvVariableState["data"] => {
   return new Map(Object.entries(rawVariables));
+};
+
+const getVariableType = (value: VariableValueType): EnvironmentVariableType => {
+  switch (typeof value) {
+    case "string":
+      return EnvironmentVariableType.String;
+    case "number":
+      return EnvironmentVariableType.Number;
+    case "boolean":
+      return EnvironmentVariableType.Boolean;
+    default:
+      return EnvironmentVariableType.String;
+  }
+};
+
+const parsePrimitiveVariables = (variableRecord: Record<string, VariableValueType>): Map<VariableKey, VariableData> => {
+  const parsedEntries = Object.entries(variableRecord).map(([key, value], index) => {
+    const variableData: VariableData = {
+      id: index,
+      type: getVariableType(value),
+      syncValue: value,
+      localValue: value,
+    };
+    return [key, variableData] as [VariableKey, VariableData];
+  });
+  return new Map(parsedEntries);
 };
 
 export const createVariablesStore = (props?: { variables: VariableValues }) => {
@@ -107,6 +133,39 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
       if (!data.has(key)) {
         return;
       }
+
+      return data.get(key);
+    },
+
+    getAll() {
+      const { data } = get();
+      return data;
+    },
+
+    search(value) {
+      const { data } = get();
+      const searchResults = Object.entries(data).filter(([key]) => key.toLowerCase().includes(value.toLowerCase()));
+      return new Map(searchResults);
+    },
+  }));
+};
+
+export const createDummyVariablesStore = (variables: Record<string, any>) => {
+  return create<VariablesState>()((_, get) => ({
+    data: parsePrimitiveVariables(variables),
+
+    reset() {},
+
+    resetSyncValues() {},
+
+    delete() {},
+
+    add() {},
+
+    update() {},
+
+    getVariable(key) {
+      const { data } = get();
 
       return data.get(key);
     },
