@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
@@ -17,7 +17,7 @@ const AppliedRules = ({ actions }) => {
       if (record && record.name) map[id] = record.name;
     });
     return map;
-  });
+  }, shallowEqual);
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
