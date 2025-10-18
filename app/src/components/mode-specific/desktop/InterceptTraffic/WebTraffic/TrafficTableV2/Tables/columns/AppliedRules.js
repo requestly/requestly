@@ -1,13 +1,23 @@
 import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { getRecordById } from "store/features/rules/selectors";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
 const AppliedRules = ({ actions }) => {
   const dispatch = useDispatch();
+  const appliedRuleNamesMap = useSelector((state) => {
+    const map = {};
+    const ruleIds = Array.from(new Set((actions || []).map((a) => a.rule_id).filter(Boolean)));
+    ruleIds.forEach((id) => {
+      const record = getRecordById(state, id);
+      if (record && record.name) map[id] = record.name;
+    });
+    return map;
+  }, shallowEqual);
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
@@ -41,8 +51,11 @@ const AppliedRules = ({ actions }) => {
       return null;
     }
 
+    // Prefer showing the user-defined rule name in the tooltip; fall back to rule id when not found
+    const ruleDisplayName = appliedRuleNamesMap?.[rule.rule_id] || rule.rule_id;
+
     return (
-      <Tooltip title={rule.rule_id} key={rule.rule_id}>
+      <Tooltip title={ruleDisplayName} key={rule.rule_id}>
         <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => handleRuleIconClick(e, rule.rule_id)}>
           {RULE_TYPES_CONFIG[rule.rule_type].ICON()}
         </span>
