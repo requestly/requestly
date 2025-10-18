@@ -4,8 +4,10 @@ import {
   extractPathVariablesFromUrl,
   extractQueryParams,
   queryParamsToURLString,
+  parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
-import { KeyValuePair } from "features/apiClient/types";
+import { toast } from "utils/Toast";
+import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
@@ -15,15 +17,34 @@ interface ApiClientUrlProps {
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
+  onImportCurlRequest?: (request: RQAPI.Request) => void;
 }
 
-const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+//prettier-ignore
+const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange, onImportCurlRequest }: ApiClientUrlProps) => {
   const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
 
   const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
 
   const handleUrlChange = useCallback(
     (value: string) => {
+      const trimmedValue = value.trim();
+
+      if (trimmedValue.toLowerCase().startsWith("curl ")) {
+        try {
+          const requestFromCurl = parseCurlRequest(trimmedValue);
+
+          if (!requestFromCurl || !requestFromCurl.url) {
+            toast.error("Failed to parse cURL command. Please ensure it is valid.");
+            return;
+          }
+          onImportCurlRequest(requestFromCurl);
+        } catch (error) {
+          toast.error(error.message || "Failed to parse cURL command. Please ensure it is valid.");
+          return;
+        }
+      }
+
       const pathVariables = extractPathVariablesFromUrl(value);
       updatePathVariableKeys(pathVariables);
 
