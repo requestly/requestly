@@ -1,123 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { TabItemComponent } from "./TabItemComponent";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
-import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import { trackTabReordered } from "modules/analytics/events/misc/apiClient";
-import { Typography } from "antd";
 import "./tabsContainer.scss";
-import { TabState } from "../store/tabStore";
-import { StoreApi } from "zustand";
-
-interface TabItemProps {
-  tabId: number;
-  index: number;
-  moveTab: (fromIndex: number, toIndex: number) => void;
-  tabStore: StoreApi<TabState>;
-  setActiveTab: (tabId: number) => void;
-  closeTabById: (tabId: number, skipUnsavedPrompt?: boolean) => void;
-  incrementVersion: () => void;
-  resetPreviewTab: () => void;
-  activeTabId?: number;
-}
-
-const TabItemComponent: React.FC<TabItemProps> = ({
-  tabId,
-  index,
-  moveTab,
-  tabStore,
-  setActiveTab,
-  closeTabById,
-  incrementVersion,
-  resetPreviewTab,
-  activeTabId,
-}) => {
-  const tabState = tabStore.getState();
-  const [{ isDragging }, drag] = useDrag({
-    type: "tab",
-    item: { tabId, index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  const [, drop] = useDrop({
-    accept: "tab",
-    hover: (item: { tabId: number; index: number }) => {
-      if (item.index !== index) {
-        moveTab(item.index, index);
-        item.index = index;
-      }
-    },
-  });
-
-  return (
-    <li
-      id={`tab-${tabId}`}
-      ref={(node) => drag(drop(node))}
-      className={`ant-tabs-tab tab-item ${tabId === activeTabId ? "ant-tabs-tab-active" : ""} ${
-        isDragging ? "dragging" : ""
-      }`}
-      role="tab"
-      aria-selected={tabId === activeTabId}
-      aria-controls={`tabpanel-${tabId}`}
-      tabIndex={0}
-      onClick={() => setActiveTab(tabId)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setActiveTab(tabId);
-        }
-      }}
-    >
-      <div
-        className="tab-title-container"
-        onDoubleClick={() => {
-          if (tabState.preview) {
-            tabState.setPreview(false);
-            incrementVersion();
-            resetPreviewTab();
-            setActiveTab(tabId);
-          }
-        }}
-      >
-        <div className="tab-title ant-tabs-tab-btn">
-          {tabState.icon && <div className="icon">{tabState.icon}</div>}
-          <Typography.Text
-            ellipsis={{
-              tooltip: { title: tabState.title, placement: "bottom", color: "#000", mouseEnterDelay: 0.5 },
-            }}
-            className="title"
-          >
-            {tabState.preview ? <i>{tabState.title}</i> : tabState.title}
-          </Typography.Text>
-        </div>
-        <div className="tab-actions">
-          {tabState.closable && (
-            <RQButton
-              size="small"
-              type="transparent"
-              className="tab-close-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                closeTabById(tabState.id);
-              }}
-              icon={<MdClose />}
-            />
-          )}
-          {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
-        </div>
-      </div>
-    </li>
-  );
-};
 
 export const TabsContainer: React.FC = () => {
   const [
@@ -256,23 +148,26 @@ export const TabsContainer: React.FC = () => {
     </div>
   ) : (
     <div className="tabs-container">
-      <DndProvider backend={HTML5Backend}>
-        <ul className="ant-tabs tabs-content" role="tablist">
-          {tabItems.map((item) => (
-            <React.Fragment key={item.tabId}>{item.label}</React.Fragment>
-          ))}
-          <li className="ant-tabs-nav-add">
-            <RQButton
-              type="transparent"
-              size="small"
-              className="add-tab-button"
-              onClick={() => openTab(new DraftRequestContainerTabSource())}
-              icon={<span>+</span>}
-            />
-          </li>
-        </ul>
-      </DndProvider>
-      <div className="tabs-outlet-container" id={`tabpanel-${activeTabId}`} role="tabpanel">
+      <ul className="ant-tabs tabs-content" role="tablist">
+        {tabItems.map((item) => (
+          <React.Fragment key={item.tabId}>{item.label}</React.Fragment>
+        ))}
+        <li className="ant-tabs-nav-add">
+          <RQButton
+            type="transparent"
+            size="small"
+            className="add-tab-button"
+            onClick={() => openTab(new DraftRequestContainerTabSource())}
+            icon={<span>+</span>}
+          />
+        </li>
+      </ul>
+      <div
+        className="tabs-outlet-container"
+        id={`tabpanel-${activeTabId}`}
+        role="tabpanel"
+        aria-labelledby={activeTabId != null ? `tab-${activeTabId}` : undefined}
+      >
         {tabItems.find((item) => item.key === activeTabId?.toString())?.children || <Outlet />}
       </div>
     </div>

@@ -21,7 +21,7 @@ type TabServiceState = {
   activeTabSource: AbstractTabSource | null;
   previewTabId: TabId | undefined;
   previewTabSource: AbstractTabSource | null;
-  tabsIndex: Map<SourceName, SourceMap>; // Type: SourceName -> sourceId -> tabId eg: Request -> [requestId,tabId]
+  tabsIndex: Map<SourceName, SourceMap>;
   tabs: Map<TabId, TabStore>;
   ignorePath: boolean;
   _version: number;
@@ -194,7 +194,7 @@ const createTabServiceStore = () => {
           tabsToClose.forEach((t) => closeTabById(t.id, skipUnsavedPrompt));
         },
         closeTabById(tabId, skipUnsavedPrompt) {
-          const { tabs, tabsIndex, activeTabId, setActiveTab } = get();
+          const { tabs, tabsIndex, activeTabId } = get();
           const tabStore = tabs.get(tabId);
           if (!tabStore) return;
 
@@ -232,18 +232,15 @@ const createTabServiceStore = () => {
                 })();
 
           tabs.delete(tabId);
-          set({ tabs: new Map(tabs) });
-          setActiveTab(newActiveTabId);
+          set({ tabs, activeTabId: newActiveTabId });
         },
         resetPreviewTab() {
-          set({ previewTabId: undefined, previewTabSource: null });
-          set({ _version: get()._version + 1 });
+          set({ previewTabId: undefined, previewTabSource: null, _version: get()._version + 1 });
         },
         setPreviewTab(id: TabId) {
           const { tabs, resetPreviewTab } = get();
           if (tabs.has(id)) {
-            set({ previewTabId: id, previewTabSource: tabs.get(id).getState().source });
-            set({ _version: get()._version + 1 });
+            set({ previewTabId: id, previewTabSource: tabs.get(id).getState().source, _version: get()._version + 1 });
           } else {
             resetPreviewTab();
           }
@@ -291,13 +288,14 @@ const createTabServiceStore = () => {
           tabs: state.tabs,
           _version: state._version,
         }),
-        onRehydrateStorage: (store) => (store, error: Error) => {
+        onRehydrateStorage: () => (store, error: Error) => {
           if (error) {
             Sentry.withScope((scope) => {
               scope.setTag("error_type", "tabs_rehydration_failed");
               scope.setContext("tab_service_store_details", { tabServiceStore: store });
               Sentry.captureException(new Error(`Tabs rehydration failed - error:${error}`));
             });
+            return initialState;
           }
         },
         storage: {
@@ -338,6 +336,8 @@ const createTabServiceStore = () => {
                   const source = new TAB_SOURCES_MAP[tabState.source.type](tabState.source.metadata);
                   const tabStore = createTabStore(tabId, source, tabState.title, tabState.preview);
                   tabStore.getState().setClosable(tabState.closable ?? true);
+                  tabStore.getState().setUnsaved(tabState.unsaved ?? false);
+                  tabStore.getState().setIcon(tabState.icon ?? source.getIcon());
                   return [tabId, tabStore];
                 })
               );
