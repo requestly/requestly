@@ -179,8 +179,9 @@ const Editor: React.FC<EditorProps> = ({
 
   useEffect(() => {
     const handleResize = () => {
-      setEditorHeight(window.innerHeight - 100);
+      setEditorHeight(Math.max(window.innerHeight - 600, height));
     };
+    handleResize(); // updates immediately after mount
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
