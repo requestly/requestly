@@ -7,18 +7,18 @@ import testScenarios from "./testScenarios";
 
 test.describe("Modify Header Rule", () => {
   testScenarios.forEach((scenario: HeaderRuleTestScenario, i) => {
-    test(`${i + 1}. @HeaderRule:`, async ({ appPage, context }) => {
-      await testHeaderRule({ ...scenario, appPage, context });
+    test(`${i + 1}. @HeaderRule:`, async ({ appPage, extensionContext }) => {
+      await testHeaderRule({ ...scenario, appPage, extensionContext });
     });
   });
 });
 
 const testHeaderRule = async (
-  testScenarioData: HeaderRuleTestScenario & { appPage: Page; context: BrowserContext }
+  testScenarioData: HeaderRuleTestScenario & { appPage: Page; extensionContext: BrowserContext }
 ) => {
   const {
     appPage,
-    context,
+    extensionContext,
     ruleIds,
     testPageUrl: testPageURL,
     expectedHeaderInfo: expectedHeaderData,
@@ -29,7 +29,9 @@ const testHeaderRule = async (
   const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: headerRules[ruleId] }), {});
   await loadRules(appPage, rules);
 
-  const testPage = await context.newPage();
+  const testPage = await extensionContext.newPage();
+
+  // CRITICAL: Set up CDP session and listeners BEFORE navigation to avoid race conditions
   const client = await testPage.context().newCDPSession(testPage);
   await client.send("Network.enable");
 
@@ -44,6 +46,7 @@ const testHeaderRule = async (
 
   const extraRequestHeadersData: Record<string, Record<string, string>> = {};
 
+  // Set up all CDP listeners before navigation
   client.on("Network.responseReceived", (params) => {
     if (expectedHeaderData?.some((data) => data.url === params.response.url))
       headersData[params.response.url] = {
@@ -68,6 +71,9 @@ const testHeaderRule = async (
     });
   });
 
+  // No wait needed - listeners are set up synchronously
+
+  // Now navigate the page
   await testPage.goto(testPageURL, { waitUntil: "domcontentloaded" });
 
   await pageActions?.(testPage);
@@ -106,4 +112,7 @@ const testHeaderRule = async (
       }
     }
   }
+
+  // Clean up test page
+  await testPage.close();
 };

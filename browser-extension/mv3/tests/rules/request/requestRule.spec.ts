@@ -8,18 +8,18 @@ import testScenarios from "./testScenarios";
 
 test.describe("Request Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(`${i + 1}. @RequestRule: ${scenario.description}`, async ({ appPage, context }) => {
-      await testRequestRule({ appPage, context, ...scenario });
+    test(`${i + 1}. @RequestRule: ${scenario.description}`, async ({ appPage, extensionContext }) => {
+      await testRequestRule({ appPage, extensionContext, ...scenario });
     });
   });
 });
 
 const testRequestRule = async (testScenarioData: RequestRuleTestScenarioData & IBaseTestData) => {
-  const { appPage, context, ruleIds, testPageURL, pageActions } = testScenarioData;
+  const { appPage, extensionContext, ruleIds, testPageURL, pageActions } = testScenarioData;
   const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: requestRules[ruleId] }), {});
   await loadRules(appPage, rules);
 
-  const testPage = await context.newPage();
+  const testPage = await extensionContext.newPage();
 
   await testPage.goto(testPageURL, { waitUntil: "domcontentloaded" });
 

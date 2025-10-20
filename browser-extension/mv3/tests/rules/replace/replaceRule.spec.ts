@@ -7,18 +7,18 @@ import { IBaseTestData } from "../types";
 
 test.describe("Replace Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(`${i + 1}. @ReplaceRule: ${scenario.description}`, async ({ appPage, context }) => {
-      await testReplace({ appPage, context, ...scenario });
+    test(`${i + 1}. @ReplaceRule: ${scenario.description}`, async ({ appPage, extensionContext }) => {
+      await testReplace({ appPage, extensionContext, ...scenario });
     });
   });
 });
 
 const testReplace = async (testScenarioData: ReplaceRuleTestScenario & IBaseTestData) => {
-  const { appPage, context, ruleIds, testPageUrl, pageActions, expectedRedirections } = testScenarioData;
+  const { appPage, extensionContext, ruleIds, testPageUrl, pageActions, expectedRedirections } = testScenarioData;
   const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: replaceRules[ruleId] }), {});
   await loadRules(appPage, rules);
 
-  const testPage = await context.newPage();
+  const testPage = await extensionContext.newPage();
 
   const redirections = new Map<string, string>();
 
