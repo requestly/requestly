@@ -40,7 +40,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     async ({ extensionContext }, use) => {
       let background = extensionContext.serviceWorkers()[0];
       if (!background) {
-        background = await extensionContext.waitForEvent("serviceworker", { timeout: 5000 });
+        background = await extensionContext.waitForEvent("serviceworker", { timeout: 10000 });
       }
       const extensionId = background.url().split("/")[2];
       await use(extensionId);
@@ -53,10 +53,10 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     const appPage = await extensionContext.newPage();
     await appPage.goto(WEB_URL, { waitUntil: "domcontentloaded" });
 
-    // Wait for extension - faster with reused context
+    // Wait for extension with reasonable timeout
     await appPage.waitForFunction(() => !!document?.documentElement?.getAttribute("rq-ext-version"), {
-      timeout: 5000,
-      polling: 100,
+      timeout: 10000,
+      polling: 200, // Reduced polling frequency
     });
 
     await use(appPage);

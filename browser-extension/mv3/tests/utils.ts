@@ -72,8 +72,8 @@ export const loadRules = async (page: Page, rules: Record<string, any>) => {
   // Wait for confirmation or timeout
   await responsePromise;
 
-  // Propagation wait for rule sync
-  await page.waitForTimeout(800); // Increased back for reliability
+  // Minimal propagation wait - message confirmation ensures sync
+  await page.waitForTimeout(400); // Reduced from 800ms
 };
 
 export const clearRules = async (page: Page) => {
@@ -122,6 +122,6 @@ export const clearRules = async (page: Page) => {
   // Wait for confirmation or timeout
   await responsePromise;
 
-  // Cleanup wait for storage sync
-  await page.waitForTimeout(300); // Increased for reliability
+  // Minimal cleanup wait - message confirmation ensures cleared
+  await page.waitForTimeout(150); // Reduced from 300ms
 };
