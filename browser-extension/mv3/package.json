@@ -32,13 +32,13 @@
     "watch": "rm -rf dist && rollup -cw",
     "start:firefox": "web-ext run -s dist",
     "test": "playwright test",
-    "pretest": "npm run build",
     "release": "sh scripts/release-extension.sh",
     "prerelease": "sh ../install.sh",
     "release:firefox": "sh scripts/release-firefox-extension.sh"
   },
   "devDependencies": {
-    "@playwright/test": "^1.44.1",
+    "@playwright/test": "1.56.1",
+    "@puppeteer/browsers": "^2.4.1",
     "@requestly/web-sdk": "0.15.1",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",

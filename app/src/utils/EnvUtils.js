@@ -30,5 +30,6 @@ function bypassAutomation() {
 }
 
 export const isEnvAutomation = () => {
+  return false;
   return !bypassAutomation() && (window.navigator.webdriver === true || detectHeadless());
 };

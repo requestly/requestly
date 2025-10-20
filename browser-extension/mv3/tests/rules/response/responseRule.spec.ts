@@ -7,19 +7,20 @@ import { IBaseTestData } from "../types";
 
 test.describe("Response Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(`${i + 1}. @ResponseRule: ${scenario.description}`, async ({ appPage, context }) => {
-      await testResponseRule({ appPage, context, ...scenario });
+    test(`${i + 1}. @ResponseRule: ${scenario.description}`, async ({ appPage, extensionContext }) => {
+      await testResponseRule({ appPage, extensionContext, ...scenario });
     });
   });
 });
 
 const testResponseRule = async (testScenarioData: ResponseRuleTestScenarioData & IBaseTestData) => {
-  const { appPage, context, ruleIds, testPageURL, pageActions } = testScenarioData;
+  const { appPage, extensionContext, ruleIds, testPageURL, pageActions } = testScenarioData;
   const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: responseRules[ruleId] }), {});
   await loadRules(appPage, rules);
 
-  const testPage = await context.newPage();
+  const testPage = await extensionContext.newPage();
 
+  // CRITICAL: Add init script BEFORE navigation
   await testPage.addInitScript(initScript);
 
   await testPage.goto(testPageURL, { waitUntil: "domcontentloaded" });
@@ -39,6 +40,9 @@ const testResponseRule = async (testScenarioData: ResponseRuleTestScenarioData &
 
   await Promise.all(expectedResponsePromises);
 
+  // Minimal wait for response capture
+  await testPage.waitForTimeout(150); // Reduced from 300ms
+
   //@ts-ignore
   const interceptedResponses = await testPage.evaluate(() => window.__getInterceptedResponses());
 
@@ -54,6 +58,9 @@ const testResponseRule = async (testScenarioData: ResponseRuleTestScenarioData &
         : JSON.stringify(expectedResponseModification.expectedResponseBody);
     expect(interceptedResponse.response).toEqual(expectedResponseBody);
   }
+
+  // Clean up test page
+  await testPage.close();
 };
 
 const initScript = () => {

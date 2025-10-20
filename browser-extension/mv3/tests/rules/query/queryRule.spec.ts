@@ -9,8 +9,8 @@ import { IBaseTestData } from "../types";
 
 test.describe("Query Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(`${i + 1}. @QueryRule: ${scenario.description}`, async ({ appPage, context }) => {
-      await testQueryRule({ appPage, context, ...scenario });
+    test(`${i + 1}. @QueryRule: ${scenario.description}`, async ({ appPage, extensionContext }) => {
+      await testQueryRule({ appPage, extensionContext, ...scenario });
     });
   });
 });
@@ -18,7 +18,7 @@ test.describe("Query Rule", () => {
 const testQueryRule = async (testScenarioData: QueryTestScenario & IBaseTestData) => {
   const {
     appPage,
-    context,
+    extensionContext,
     ruleIds,
     testPageUrl,
     expectedQueryParams,
@@ -29,7 +29,7 @@ const testQueryRule = async (testScenarioData: QueryTestScenario & IBaseTestData
   const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: queryRules[ruleId] }), {});
   await loadRules(appPage, rules);
 
-  const testPage = await context.newPage();
+  const testPage = await extensionContext.newPage();
 
   const redirections = new Map<string, string>();
 
