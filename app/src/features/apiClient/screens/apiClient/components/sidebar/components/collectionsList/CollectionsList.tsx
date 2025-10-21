@@ -468,6 +468,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         />
       )}
       <MultiSelectNudge />
-    </DndProvider>
+    </>
   );
 };
