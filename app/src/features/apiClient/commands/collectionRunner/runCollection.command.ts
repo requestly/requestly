@@ -31,6 +31,17 @@ import { VariableScope } from "backend/environment/types";
 import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { SchemaObject } from "ajv";
+
+export const CollectionRunnerAjvSchema: SchemaObject = {
+  type: "array",
+  items: {
+    type: "object",
+    additionalProperties: {
+      type: ["string", "number", "boolean", "null"],
+    },
+  },
+};
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -129,12 +140,14 @@ class Runner {
     }
 
     try {
+      console.time("fileRead");
       const fileContents = await getFileContents(dataFile.path);
+      console.timeEnd("fileRead");
       const fileExtension = getFileExtension(dataFile.path);
 
       switch (fileExtension) {
         case ".csv": {
-          const parsedData = parseCsvText(fileContents);
+          const parsedData = await parseCsvText(fileContents);
           if (!parsedData.success) {
             throw new DataFileParseError("Failed to parse CSV data file!").addContext({
               collectionId,
@@ -144,7 +157,9 @@ class Runner {
           break;
         }
         case ".json": {
-          const parsedData = parseJsonText(fileContents);
+          console.time("fileParse");
+          const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
+          console.timeEnd("fileParse");
           if (!parsedData.success) {
             throw new DataFileParseError("Failed to parse JSON data file!").addContext({ collectionId });
           }
