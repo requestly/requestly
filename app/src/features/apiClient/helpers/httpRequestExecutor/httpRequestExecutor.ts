@@ -69,10 +69,10 @@ export class HttpRequestExecutor {
     return errorObject;
   }
 
-  private buildExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.ExecutionError): RQAPI.ExecutionResult {
+  private buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.ExecutionError): RQAPI.ExecutionResult {
     return {
-      executedEntry: { ...entry, response: null },
       status: RQAPI.ExecutionStatus.ERROR,
+      executedEntry: { ...entry, response: null },
       error,
     };
   }
@@ -178,7 +178,7 @@ export class HttpRequestExecutor {
         (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
       );
 
-      return this.buildExecutionResult(entry, executionError);
+      return this.buildErroredExecutionResult(entry, executionError);
     }
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
@@ -210,13 +210,7 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return {
-          executedEntry: {
-            ...preparedEntry,
-          },
-          status: RQAPI.ExecutionStatus.ERROR,
-          error,
-        };
+        return this.buildErroredExecutionResult(preparedEntry, error);
       }
 
       // Re-prepare the request as pre-request script might have modified it.
@@ -230,7 +224,7 @@ export class HttpRequestExecutor {
           (error as any).type || RQAPI.ApiClientErrorType.PRE_VALIDATION
         );
 
-        return this.buildExecutionResult(preparedEntry, executionError);
+        return this.buildErroredExecutionResult(preparedEntry, executionError);
       }
 
       const rePreparation = rePreparationResult.unwrap();
@@ -244,28 +238,22 @@ export class HttpRequestExecutor {
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
-        return {
-          status: RQAPI.ExecutionStatus.ERROR,
-          executedEntry: { ...preparedEntry, response: null },
-          error: this.buildErrorObjectFromHeader(rqErrorHeader),
-        };
+        return this.buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader));
       }
     } catch (err) {
-      return {
-        status: RQAPI.ExecutionStatus.ERROR,
-        executedEntry: { ...preparedEntry, response: null },
-        error: this.buildExecutionErrorObject(
-          {
-            ...err,
-            message:
-              this.appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
-                ? err.message
-                : RequestErrorMessage.DNS_RESOLUTION_ERROR,
-          },
-          "request",
-          RQAPI.ApiClientErrorType.CORE
-        ),
-      };
+      const error = this.buildExecutionErrorObject(
+        {
+          ...err,
+          message:
+            this.appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+              ? err.message
+              : RequestErrorMessage.DNS_RESOLUTION_ERROR,
+        },
+        "request",
+        RQAPI.ApiClientErrorType.CORE
+      );
+
+      return this.buildErroredExecutionResult(preparedEntry, error);
     }
 
     if (
@@ -296,11 +284,7 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return {
-          status: RQAPI.ExecutionStatus.ERROR,
-          executedEntry: preparedEntry,
-          error,
-        };
+        return this.buildErroredExecutionResult(preparedEntry, error);
       }
     }
 
