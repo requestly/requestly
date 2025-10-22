@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
@@ -7,17 +7,21 @@ import { getRecordById } from "store/features/rules/selectors";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
+const RenderRule = ({ ruleId, ruleType, onRuleClick }) => {
+  const rule = useSelector((state) => getRecordById(state, ruleId));
+  const ruleDisplayName = rule?.name || ruleId;
+
+  return (
+    <Tooltip title={ruleDisplayName}>
+      <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => onRuleClick(e, ruleId)}>
+        {RULE_TYPES_CONFIG[ruleType].ICON()}
+      </span>
+    </Tooltip>
+  );
+};
+
 const AppliedRules = ({ actions }) => {
   const dispatch = useDispatch();
-  const appliedRuleNamesMap = useSelector((state) => {
-    const map = {};
-    const ruleIds = Array.from(new Set((actions || []).map((a) => a.rule_id).filter(Boolean)));
-    ruleIds.forEach((id) => {
-      const record = getRecordById(state, id);
-      if (record && record.name) map[id] = record.name;
-    });
-    return map;
-  }, shallowEqual);
 
   const dedup_rules = (rules) => {
     const rule_ids = [];
@@ -46,22 +50,6 @@ const AppliedRules = ({ actions }) => {
     [dispatch]
   );
 
-  const render_rule_icon = (rule) => {
-    if (!rule) {
-      return null;
-    }
-
-    // Prefer showing the user-defined rule name in the tooltip; fall back to rule id when not found
-    const ruleDisplayName = appliedRuleNamesMap?.[rule.rule_id] || rule.rule_id;
-
-    return (
-      <Tooltip title={ruleDisplayName} key={rule.rule_id}>
-        <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => handleRuleIconClick(e, rule.rule_id)}>
-          {RULE_TYPES_CONFIG[rule.rule_type].ICON()}
-        </span>
-      </Tooltip>
-    );
-  };
 
   const get_rules_from_actions = (actions) => {
     const rules = actions.map((action) => {
@@ -76,7 +64,7 @@ const AppliedRules = ({ actions }) => {
   const rules = get_rules_from_actions(actions);
   const deduped_rules = dedup_rules(rules);
 
-  return <>{deduped_rules.map((rule) => render_rule_icon(rule))}</>;
+  return <>{deduped_rules.map((rule) => <RenderRule key={rule.rule_id} ruleId={rule.rule_id} ruleType={rule.rule_type} onRuleClick={handleRuleIconClick} />)}</>;
 };
 
 export default AppliedRules;
