@@ -1,15 +1,15 @@
-type RawResult<T> = {
-  success: true,
-  result: T
-} | {
-  success: false,
-  error: Error,
-};
+type RawResult<T> =
+  | {
+      success: true;
+      result: T;
+    }
+  | {
+      success: false;
+      error: Error;
+    };
 
 export abstract class Result<T> {
-  constructor(readonly result: RawResult<T>) {
-
-  }
+  constructor(readonly result: RawResult<T>) {}
 
   isOk() {
     return this.result.success;
@@ -46,10 +46,7 @@ export abstract class Result<T> {
     return fn(this.result.result);
   }
 
-  mapOrElse<U>(
-    def: (arg: Error) => U,
-    fn: (arg: T) => U,
-  ) {
+  mapOrElse<U>(def: (arg: Error) => U, fn: (arg: T) => U) {
     if (!this.result.success) {
       return def(this.result.error);
     }
@@ -58,11 +55,11 @@ export abstract class Result<T> {
   }
 
   mapError(fn: (arg: Error) => Error) {
-    if (this.result.success) {
+    if (this.isOk()) {
       return this;
     }
 
-    return new Err(fn(this.result.error));
+    return new Err(fn(this.unwrapError()));
   }
 
   inspect(fn: (arg: T) => void) {
@@ -126,14 +123,13 @@ export abstract class Result<T> {
   }
 
   andThen<U>(fn: (arg: T) => Result<U>) {
-    if(this.result.success) {
+    if (this.result.success) {
       return fn(this.result.result);
     }
 
     return this;
   }
 
-  
   or<U>(res: Result<U>) {
     if (this.isOk()) {
       return this;
@@ -143,7 +139,7 @@ export abstract class Result<T> {
   }
 
   orElse<U>(fn: (arg: Error) => Result<U>) {
-    if(!this.result.success) {
+    if (!this.result.success) {
       return fn(this.result.error);
     }
 
@@ -159,7 +155,7 @@ export abstract class Result<T> {
   }
 
   unwrapOrElse(fn: (arg: Error) => T) {
-    if(this.result.success) {
+    if (this.result.success) {
       return this.result.result;
     }
 
@@ -168,7 +164,7 @@ export abstract class Result<T> {
 }
 
 export class Ok<T> extends Result<T> {
-  declare result: RawResult<T> & {success: true};
+  declare result: RawResult<T> & { success: true };
   constructor(value: T) {
     super({
       success: true,
@@ -177,7 +173,7 @@ export class Ok<T> extends Result<T> {
   }
 }
 export class Err<T extends Error = Error> extends Result<any> {
-  declare result: RawResult<any> & {success: false};
+  declare result: RawResult<any> & { success: false };
   constructor(error: T) {
     super({
       success: false,
@@ -186,26 +182,27 @@ export class Err<T extends Error = Error> extends Result<any> {
   }
 }
 
-type TryReturn<R> = R extends Promise<infer I> ? Promise<Result<I>> : Result<R>
+type TryReturn<R> = R extends Promise<infer I> ? Promise<Result<I>> : Result<R>;
 
 export function Try<R = any>(fn: (...args: any[]) => R): TryReturn<R> {
   try {
     const possibleResultPromise = fn();
-    const isPromiseLike = (typeof (possibleResultPromise as any)?.then === 'function');
+    const isPromiseLike = typeof (possibleResultPromise as any)?.then === "function";
     if (isPromiseLike) {
-      return (possibleResultPromise as Promise<any>).then(result => {
-        return new Ok(result)
-      }).catch(e => {
-          const err = e instanceof Error ? e : new Error(typeof e === 'string' ? e : 'Could not execute given function');
+      return (possibleResultPromise as Promise<any>)
+        .then((result) => {
+          return new Ok(result);
+        })
+        .catch((e) => {
+          const err =
+            e instanceof Error ? e : new Error(typeof e === "string" ? e : "Could not execute given function");
           return new Err(err);
         }) as TryReturn<R>;
     }
 
     return new Ok(possibleResultPromise) as TryReturn<R>;
-
-  }
-  catch (e) {
-    const err = e instanceof Error ? e : new Error(typeof e === 'string' ? e : 'Could not execute given function');
+  } catch (e) {
+    const err = e instanceof Error ? e : new Error(typeof e === "string" ? e : "Could not execute given function");
     return new Err(err) as TryReturn<R>;
   }
 }
