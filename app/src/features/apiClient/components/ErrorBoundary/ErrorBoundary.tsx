@@ -8,6 +8,7 @@ import { ErrorSeverity } from "errors/types";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { ErrorNotification } from "./components/ErrorNotification";
 import { sendErrorToSentry, prepareError } from "./utils";
+import Logger from "lib/logger";
 
 interface Props {
   children: React.ReactNode;
@@ -50,7 +51,6 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    console.log("[ErrorBoundary] Registered", this.props.boundaryId);
     globalUnhandledRejectionHandlers?.add(this.promiseRejectionHandler);
   }
 
@@ -59,21 +59,19 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error) {
-    console.log("[ErrorBoundary] componentDidCatch", error, this.props.boundaryId);
+    Logger.log("[ErrorBoundary] Crash componentDidCatch", error, this.props.boundaryId);
     sendErrorToSentry(prepareError(error, ErrorSeverity.FATAL), this.props.boundaryId, this.props.defaultTags);
   }
 
   static getDerivedStateFromError(error: Error): State {
-    console.log("[ErrorBoundary] getDerivedStateFromError", error);
     return { hasError: true, error: prepareError(error, ErrorSeverity.FATAL) };
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent & { _caughtBy?: string }) => {
     if (event?._caughtBy) {
-      console.log("[ErrorBoundary] promiseRejectionHandler already caught by", event._caughtBy);
       return;
     } else {
-      console.log("[ErrorBoundary] promiseRejectionHandler", event, event._caughtBy, this.props.boundaryId);
+      Logger.log("[ErrorBoundary] uncaught promise rejection", event, event._caughtBy, this.props.boundaryId);
       const error = typeof event.reason === "string" ? new Error(event.reason) : event.reason;
       const finalError = prepareError(error);
 
@@ -94,7 +92,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       const error = this.state.error;
 
-      console.log("[ErrorBoundary] Captured", { severity: error?.severity });
+      Logger.log("[ErrorBoundary] Boundary Shown", { severity: error?.severity });
       if (error?.severity === ErrorSeverity.FATAL) {
         return <ErrorScreen error={error} resetError={this.handleResetError} />;
       } else if (error?.severity === ErrorSeverity.WARNING) {

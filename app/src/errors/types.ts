@@ -6,5 +6,6 @@ export enum ErrorCode {
 export enum ErrorSeverity {
   FATAL = "fatal", // Shows Blocking UI
   WARNING = "warning", // Shows Non-Blocking UI/Notification
-  DEBUG = "DEBUG", // Captured but not shown to the user
+  DEBUG = "debug", // Captured but not shown to the user (To be triaged)
+  INFO = "info", // Captured but not shown to the user (Can be ignored)
 }

@@ -5,6 +5,12 @@ export class NativeError<T extends Record<string, any> = Record<string, any>> ex
   public severity: ErrorSeverity = ErrorSeverity.DEBUG;
   private _context: Partial<T> = {};
 
+  constructor(message: string) {
+    super(message);
+    // To properly add type of error in Sentry
+    this.name = this.constructor.name;
+  }
+
   addContext(ctx: Partial<T>) {
     this._context = Object.assign(this._context, ctx);
     return this;
@@ -22,5 +28,12 @@ export class NativeError<T extends Record<string, any> = Record<string, any>> ex
 
   get context() {
     return this._context;
+  }
+
+  static fromError(error: Error): NativeError {
+    const nativeErr = new NativeError(error.message);
+    nativeErr.name = error.name || "NativeError";
+    nativeErr.stack = error.stack;
+    return nativeErr;
   }
 }
