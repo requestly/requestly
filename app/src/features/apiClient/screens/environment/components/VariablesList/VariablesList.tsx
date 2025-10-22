@@ -36,10 +36,16 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   isReadOnly = false,
   container = "environments",
 }) => {
-  const [dataSource, setDataSource] = useState([]);
-  const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
+  const [dataSource, setDataSource] = useState<VariableRow[]>([]);
+  const [visibleSecretsRowIds, setVisibleSecrets] = useState<number[]>([]);
+
   const filteredDataSource = useMemo(
-    () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
+    () =>
+      dataSource.filter((item) => {
+        // Show search results that match the search value.
+        // Also show empty keys so that when user clicks on Add more, the new row is visible.
+        return item.key.toLowerCase().includes(searchValue.toLowerCase()) || item.key.toLowerCase() === "";
+      }),
     [dataSource, searchValue]
   );
 
@@ -194,7 +200,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
         isReadOnly
-          ? null
+          ? undefined
           : () => (
               <div className="variables-list-footer">
                 <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
