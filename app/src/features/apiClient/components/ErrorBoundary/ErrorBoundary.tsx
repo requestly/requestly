@@ -40,7 +40,7 @@ const ErrorBoundaryWrapper = (props: Props) => {
   }, [activeWorkspace?.workspaceType]); // Only create new object when workspaceType changes
 
   return (
-    <ErrorBoundary boundaryId={props.boundaryId} ref={errorBoundaryRef} {...props} defaultTags={defaultTags} />
+    <ErrorBoundary ref={errorBoundaryRef} {...props} defaultTags={defaultTags} />
   );
 };
 
