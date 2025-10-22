@@ -1,0 +1,47 @@
+import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import { useRunConfigStore } from "../../../run.context";
+
+export const useFileSelection = () => {
+  const [setDataFile] = useRunConfigStore((s) => [s.setDataFile]);
+  const handleFileSelection = (file: { name: string; path: string; size: number }, success: () => void) => {
+    const fileId = file.name + "-" + Date.now();
+
+    //DOUBT HERE
+    //here it should not be called
+    setDataFile({
+      id: fileId,
+      name: file.name,
+      path: file.path,
+      size: file.size,
+      source: "desktop",
+    });
+
+    success();
+
+    //DOUBT: DO WE NEED TO CALL PARSER HERE? ALSO IS THE CALL REQUIRED?
+    // ARE WE PASSING FILE FROM HERE OR HOW IT IS READING THE DATA, ARE WE UPLOADING THEN
+    // READING IS DONE FROM FILE STORE(METADATA INSIDE FILE)?
+    //REMEMER - NODATA OF FILE IS STORED IN FILESTORE
+
+    // call parser
+    //f rom here parser will do its work
+    // parser on successfull parsing will share the status to preview modal
+
+    //then parser will share the status and the value of the files
+  };
+
+  const openFileSelector = (success: () => void) => {
+    displayFileSelector(
+      (file: { name: string; path: string; size: number }) => {
+        handleFileSelection(file, success);
+      },
+      {
+        filters: [{ name: "File formats allowed", extensions: ["json", "csv"] }],
+      }
+    );
+  };
+
+  return {
+    openFileSelector,
+  };
+};

@@ -92,6 +92,35 @@
         letter-spacing: 1px;
         text-transform: uppercase;
       }
+
+      .code-example {
+        margin: 8px 0;
+        border-radius: 4px;
+        background-color: var(--requestly-color-background-dark);
+        overflow-x: auto;
+        align-self: stretch;
+
+        code {
+          font-family: "Consolas", "Monaco", "Courier New", monospace;
+          font-size: 12px;
+          line-height: 1.5;
+          color: var(--requestly-color-text-placeholder);
+          white-space: pre;
+          display: block;
+
+          .key {
+            color: var(--requestly-color-error-text);
+          }
+
+          .value {
+            color: var(--requestly-color-success-text);
+          }
+
+          .punctuation {
+            color: var(--requestly-color-text-placeholder);
+          }
+        }
+      }
     }
 
     .error-state-footer-container {

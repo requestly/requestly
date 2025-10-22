@@ -8,12 +8,12 @@ import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/
 import "./runConfigSettings.scss";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
-import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { BiError } from "@react-icons/all-files/bi/BiError";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
 import { ApiClientFile, FileId, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { Previewmodal } from "../ParseFileModal/ParseFileModal";
+import { useFileSelection } from "../hooks/useFileSelection.hook";
 
 const UploadedFileView: React.FC<{
   dataFile: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
@@ -94,20 +94,20 @@ const SelectFileToUpload: React.FC<{
 };
 
 export const RunConfigSettings: React.FC = () => {
-  const [iterations, setIterations, delay, setDelay, dataFile, setDataFile] = useRunConfigStore((s) => [
+  const [iterations, setIterations, delay, setDelay, dataFile] = useRunConfigStore((s) => [
     s.iterations,
     s.setIterations,
     s.delay,
     s.setDelay,
     s.dataFile,
-    s.setDataFile,
   ]);
+
+  const { openFileSelector } = useFileSelection();
   const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
 
   const [file] = getFilesByIds([dataFile?.id]);
 
   const [showPreviewModal, setShowPreviewModal] = useState<boolean>(false);
-
   const handleIterationsChange = (value: number) => {
     try {
       setIterations(value);
@@ -124,37 +124,10 @@ export const RunConfigSettings: React.FC = () => {
     }
   };
 
-  const handleFileSelection = (file: { name: string; path: string; size: number }) => {
-    const fileId = file.name + "-" + Date.now();
-
-    //DOUBT HERE
-    //here it should not be called
-    setDataFile({
-      id: fileId,
-      name: file.name,
-      path: file.path,
-      size: file.size,
-      source: "desktop",
-    });
-
-    setShowPreviewModal(true);
-
-    // call parser
-    //f rom here parser will do its work
-    // parser on successfull parsing will share the status to preview modal
-
-    //then parser will share the status and the value of the files
-  };
-
   const handleSelectFile = () => {
-    displayFileSelector(
-      (file: { name: string; path: string; size: number }) => {
-        handleFileSelection(file);
-      },
-      {
-        filters: [{ name: "File formats allowed", extensions: ["json", "csv"] }],
-      }
-    );
+    openFileSelector(() => {
+      setShowPreviewModal(true);
+    });
   };
 
   return (
@@ -210,7 +183,12 @@ export const RunConfigSettings: React.FC = () => {
 
           {/* added here just for testing */}
           {showPreviewModal && (
-            <Previewmodal status={"parsing"} count={1001} onClose={() => setShowPreviewModal(false)} />
+            <Previewmodal
+              status={"success"}
+              count={1001}
+              onClose={() => setShowPreviewModal(false)}
+              onFileSelected={() => setShowPreviewModal(true)}
+            />
           )}
         </div>
       </div>

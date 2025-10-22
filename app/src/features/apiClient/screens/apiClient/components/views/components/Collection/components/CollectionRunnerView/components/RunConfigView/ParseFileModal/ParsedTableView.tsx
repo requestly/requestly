@@ -244,6 +244,8 @@ const columns = [
   })),
 ];
 
+//logic to create iteration column in table
+
 const addIterationColumnToTable = (dataSource: any[]) => {
   return dataSource.map((row, index) => ({
     ...row,

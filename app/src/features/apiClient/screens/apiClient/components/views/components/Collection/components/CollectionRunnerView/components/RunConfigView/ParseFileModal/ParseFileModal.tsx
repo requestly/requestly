@@ -1,3 +1,4 @@
+//states of this modal
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import React from "react";
@@ -9,9 +10,8 @@ import { useRunConfigStore } from "../../../run.context";
 import { ApiClientFile, FileId } from "features/apiClient/store/apiClientFilesStore";
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { stackoverflowDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { PreviewTableView } from "./parsedTableView";
+import { PreviewTableView } from "./ParsedTableView";
+import { useFileSelection } from "../hooks/useFileSelection.hook";
 /**
  * 1. successfull parsing, upload pending - show table, filename, type & cancel, usefile btn
  * 2. unsucessfull parsing - show error message with learn more & select again option
@@ -29,6 +29,7 @@ interface previewModalProps {
   status: "success" | "error" | "tooManyRows" | "parsing";
   count?: number;
   onClose: () => void;
+  onFileSelected?: () => void;
 }
 
 interface buttonSchema {
@@ -73,9 +74,6 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
             <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase()}
           </div>
         </div>
-        {/*
-          ADD LOGIC TO CREATE ITERATIONS COLUMN 
-        */}
         <PreviewTableView />
       </div>
 
@@ -121,9 +119,6 @@ const ViewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) =
             {dataFile.size < 1024 ? `${dataFile.size} B` : `${(dataFile.size / 1024).toFixed(2)} KB`}
           </div>
         </div>
-        {/*
-          ADD LOGIC TO CREATE ITERATIONS COLUMN 
-        */}
         <PreviewTableView />
       </div>
       {/* Section 3 */}
@@ -225,20 +220,34 @@ const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
 
         <div className="error-state-fix-suggestion">
           <div className="example-label">EXAMPLE FORMAT:</div>
-          <SyntaxHighlighter
-            language="json"
-            style={stackoverflowDark}
-            customStyle={{
-              backgroundColor: "var(--requestly-color-background-dark)",
-              margin: "8px 0",
-              padding: "12px",
-              borderRadius: "4px",
-              fontSize: "12px",
-              lineHeight: "1.5",
-            }}
-          >
-            {`[\n  {"name": "Alice", "age": 30},\n  {"name": "Bob", "age": 25}\n]`}
-          </SyntaxHighlighter>
+          <pre className="code-example">
+            <code>
+              <span className="punctuation">[</span>
+              {"\n  "}
+              <span className="punctuation">{"{"}</span>
+              <span className="key">"name"</span>
+              <span className="punctuation">: </span>
+              <span className="value">"Alice"</span>
+              <span className="punctuation">, </span>
+              <span className="key">"age"</span>
+              <span className="punctuation">: </span>
+              <span className="value">30</span>
+              <span className="punctuation">{"}"}</span>
+              <span className="punctuation">,</span>
+              {"\n  "}
+              <span className="punctuation">{"{"}</span>
+              <span className="key">"name"</span>
+              <span className="punctuation">: </span>
+              <span className="value">"Bob"</span>
+              <span className="punctuation">, </span>
+              <span className="key">"age"</span>
+              <span className="punctuation">: </span>
+              <span className="value">25</span>
+              <span className="punctuation">{"}"}</span>
+              {"\n"}
+              <span className="punctuation">]</span>
+            </code>
+          </pre>
         </div>
 
         <div className="error-state-footer-container">
@@ -252,8 +261,14 @@ const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
   );
 };
 
-export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClose }: previewModalProps) => {
+export const Previewmodal: React.FC<previewModalProps> = ({
+  status,
+  count,
+  onClose,
+  onFileSelected,
+}: previewModalProps) => {
   const [dataFile] = useRunConfigStore((s) => [s.dataFile]);
+  const { openFileSelector } = useFileSelection();
 
   //stubs: footer buttton options
 
@@ -266,6 +281,7 @@ export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClo
             onClick: () => {
               //it should close the modal
               //delete the file from store
+              onClose();
             },
           },
           secondaryButton: {
@@ -273,6 +289,9 @@ export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClo
             onClick: () => {
               //this should push the file to store and close the modal
               //and also now on click the file name on button should open the file in viewModal component
+              openFileSelector(() => {
+                onFileSelected?.();
+              });
             },
           },
         };
@@ -290,6 +309,9 @@ export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClo
                  // delete the existing file from store
                  // then move to re-upload screen again    
                  */
+              openFileSelector(() => {
+                onFileSelected?.();
+              });
             },
           },
         };
@@ -301,6 +323,9 @@ export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClo
             onClick: () => {
               //remove the existing file from store and open file selector again
               //if cancel/cross is done then is should not remove the existing file & retain the existing file
+              openFileSelector(() => {
+                onFileSelected?.();
+              });
             },
           },
           secondaryButton: {
@@ -316,6 +341,7 @@ export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClo
           primaryButton: {
             label: "Remove",
             onClick: () => {
+              onClose();
               //remove the file from store and close the modal
             },
           },
@@ -323,6 +349,9 @@ export const Previewmodal: React.FC<previewModalProps> = ({ status, count, onClo
             label: "Change data file",
             onClick: () => {
               //remove the existing file from store and open file selector again
+              openFileSelector(() => {
+                onFileSelected?.();
+              });
             },
           },
         };
