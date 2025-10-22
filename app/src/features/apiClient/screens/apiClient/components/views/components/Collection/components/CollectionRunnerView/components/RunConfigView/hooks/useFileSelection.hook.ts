@@ -1,5 +1,6 @@
 import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { useRunConfigStore } from "../../../run.context";
+import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 
 export const useFileSelection = () => {
   const [setDataFile] = useRunConfigStore((s) => [s.setDataFile]);
@@ -14,6 +15,7 @@ export const useFileSelection = () => {
       path: file.path,
       size: file.size,
       source: "desktop",
+      fileFeature: FileFeature.COLLECTION_RUNNER,
     });
 
     success();
