@@ -9,7 +9,12 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
+import {
+  getFileExtension,
+  isHTTPApiEntry,
+  parseCsvText,
+  parseJsonText,
+} from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -21,6 +26,11 @@ import {
 import { GenericState } from "hooks/useGenericState";
 import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
+import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { VariableScope } from "backend/environment/types";
+import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
+import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -72,8 +82,11 @@ function prepareExecutionResult(params: {
 }
 
 class RunCancelled extends NativeError {}
+class DataFileNotFound extends NativeError {}
+class DataFileParseError extends NativeError {}
 
 class Runner {
+  private variables: Record<string, any>[] = [];
   constructor(
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
@@ -102,16 +115,62 @@ class Runner {
     return request;
   }
 
-  private beforeStart() {
+  private async parseDataFile() {
+    const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+    if (!dataFile) {
+      return;
+    }
+
+    const apiClientFilesStore = apiClientFileStore.getState();
+
+    const collectionId = this.runContext.collectionId;
+    if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
+      throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
+    }
+
+    try {
+      const fileContents = await getFileContents(dataFile.path);
+      const fileExtension = getFileExtension(dataFile.path);
+
+      switch (fileExtension) {
+        case ".csv": {
+          const parsedData = parseCsvText(fileContents);
+          if (!parsedData.success) {
+            throw new DataFileParseError("Failed to parse CSV data file!").addContext({
+              collectionId,
+            });
+          }
+          this.variables = parsedData.data;
+          break;
+        }
+        case ".json": {
+          const parsedData = parseJsonText(fileContents);
+          if (!parsedData.success) {
+            throw new DataFileParseError("Failed to parse JSON data file!").addContext({ collectionId });
+          }
+          this.variables = parsedData.data;
+          break;
+        }
+      }
+    } catch (e) {
+      throw new DataFileParseError("Failed to read or parse data file!").addContext({ collectionId, error: e });
+    }
+    console.log("!!!debug", "var", this.variables);
+  }
+
+  private async beforeStart() {
     this.genericState.setPreview(false);
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
     this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.IDLE);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
+    this.variables = [];
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
+    await this.parseDataFile();
+
     trackCollectionRunStarted({
       collection_id: collectionId,
       iteration_count: runConfig.iterations,
@@ -147,8 +206,22 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
+    const scopes: Scope[] = [];
+    if (this.variables.length >= iteration) {
+      scopes.push([
+        {
+          scope: VariableScope.DATA_FILE,
+          scopeId: "data_file",
+          name: "Data File",
+          level: 0,
+        },
+        createDummyVariablesStore(this.variables[iteration - 1]),
+      ]);
+    }
+
     return {
       currentExecutingRequest,
+      scopes,
     };
   }
 
@@ -296,15 +369,17 @@ class Runner {
 
   async run() {
     try {
-      this.beforeStart();
+      await this.beforeStart();
 
       for await (const { request, iteration, startTime } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           request.id,
           request.data,
-          this.runContext.runResultStore.getState().abortController
+          this.runContext.runResultStore.getState().abortController,
+          scopes
         );
+        console.log("!!!debug", "result", result);
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }
@@ -314,7 +389,14 @@ class Runner {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
+      } else if (e instanceof DataFileNotFound) {
+        e.name = "DataFileNotFoundError";
+        return e;
+      } else if (e instanceof DataFileParseError) {
+        e.name = "DataFileParseError";
+        return e;
       }
+
       this.onError(e);
       return e;
     } finally {
