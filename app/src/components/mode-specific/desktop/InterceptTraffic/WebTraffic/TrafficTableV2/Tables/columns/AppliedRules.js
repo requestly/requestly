@@ -11,10 +11,24 @@ const RenderRule = ({ ruleId, ruleType, onRuleClick }) => {
   const rule = useSelector((state) => getRecordById(state, ruleId));
   const ruleDisplayName = rule?.name || ruleId;
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onRuleClick(e, ruleId);
+    }
+  };
+
   return (
     <Tooltip title={ruleDisplayName}>
-      <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => onRuleClick(e, ruleId)}>
-        {RULE_TYPES_CONFIG[ruleType].ICON()}
+      <span 
+        style={{ paddingRight: "8px", cursor: "pointer" }} 
+        onClick={(e) => onRuleClick(e, ruleId)}
+        onKeyDown={handleKeyPress}
+        role="button"
+        tabIndex={0}
+        aria-label={`Open rule editor for ${ruleDisplayName}`}
+      >
+        {RULE_TYPES_CONFIG[ruleType]?.ICON?.() || null}
       </span>
     </Tooltip>
   );
