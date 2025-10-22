@@ -220,8 +220,8 @@ export class HttpRequestExecutor {
         const error = rePreparationResult.unwrapError();
         const executionError = this.buildExecutionErrorObject(
           error,
-          (error as any).source || "request",
-          (error as any).type || RQAPI.ApiClientErrorType.PRE_VALIDATION
+          (error as any).context?.source || "request",
+          (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
         );
 
         return this.buildErroredExecutionResult(preparedEntry, executionError);
