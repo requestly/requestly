@@ -12,14 +12,15 @@ import { BiError } from "@react-icons/all-files/bi/BiError";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
 import { ApiClientFile, FileId, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
-import { Previewmodal } from "../ParseFileModal/ParseFileModal";
+import { DataFileModals } from "../ParseFileModal/DataFileModals";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
 
 const UploadedFileView: React.FC<{
   dataFile: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
-  setShowPreviewModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDataFileModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalContext: React.Dispatch<React.SetStateAction<"success" | "view">>;
   file: ApiClientFile;
-}> = ({ dataFile, setShowPreviewModal, file }) => {
+}> = ({ dataFile, setShowDataFileModal, setModalContext, file }) => {
   return (
     <>
       <div className="file-uploaded-section">
@@ -29,7 +30,8 @@ const UploadedFileView: React.FC<{
           type="secondary"
           className="file-uploaded-button"
           onClick={() => {
-            setShowPreviewModal(true);
+            setModalContext("view");
+            setShowDataFileModal(true);
           }}
         >
           {file.isFileValid ? (
@@ -87,7 +89,7 @@ const SelectFileToUpload: React.FC<{
 
       <div className="file-upload-info">
         <MdOutlineInfo className="file-info-icon" />
-        <span className="file-type-info">Supported file type: JSON & CSV</span>
+        <span className="file-type-info">Supports JSON & CSV files (max 100MB)</span>
       </div>
     </>
   );
@@ -107,7 +109,11 @@ export const RunConfigSettings: React.FC = () => {
 
   const [file] = getFilesByIds([dataFile?.id]);
 
-  const [showPreviewModal, setShowPreviewModal] = useState<boolean>(false);
+  const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
+  //this single state is handling the which viewtype should be shown in modal
+  const [modalContext, setModalContext] = useState<"success" | "view" | "largeFile" | "loading" | "error">("success");
+  const [fileRowsCount, setFileRowsCount] = useState<number>(0);
+
   const handleIterationsChange = (value: number) => {
     try {
       setIterations(value);
@@ -124,9 +130,51 @@ export const RunConfigSettings: React.FC = () => {
     }
   };
 
+  // Stub: This function will parse the file and return status
+  const parseFile = async (fileInfo: {
+    name: string;
+    path: string;
+    size: number;
+  }): Promise<{ status: "success" | "error"; count?: number }> => {
+    // TODO: Implement actual file parsing logic
+    // This should:
+    // 1. Read the file content
+    // 2. Parse JSON/CSV
+    // 3. Validate structure
+    // 4. Count rows
+    // 5. Return status and count
+
+    return new Promise((resolve) => {
+      // Simulating parsing delay
+      setTimeout(() => {
+        // Mock response - replace with actual parsing logic
+        resolve({
+          status: "success",
+          count: 850, // Mock count
+        });
+      }, 2000);
+    });
+  };
+
   const handleSelectFile = () => {
-    openFileSelector(() => {
-      setShowPreviewModal(true);
+    openFileSelector(async (file) => {
+      if (file.size > 100 * 1024 * 1024) {
+        setModalContext("largeFile");
+        setShowDataFileModal(true);
+      } else {
+        //show loading modal
+        setModalContext("loading");
+        setShowDataFileModal(true);
+
+        //parsing stub
+        const parseResult = await parseFile(file);
+        if (parseResult.status === "success") {
+          setFileRowsCount(5000);
+          setModalContext("success");
+        } else {
+          setModalContext("error");
+        }
+      }
     });
   };
 
@@ -177,17 +225,22 @@ export const RunConfigSettings: React.FC = () => {
             <SelectFileToUpload handleSelectFile={handleSelectFile} />
           ) : (
             <>
-              <UploadedFileView dataFile={dataFile} setShowPreviewModal={setShowPreviewModal} file={file} />
+              <UploadedFileView
+                dataFile={dataFile}
+                setShowDataFileModal={setShowDataFileModal}
+                setModalContext={setModalContext}
+                file={file}
+              />
             </>
           )}
 
-          {/* added here just for testing */}
-          {showPreviewModal && (
-            <Previewmodal
-              status={"success"}
-              count={1001}
-              onClose={() => setShowPreviewModal(false)}
-              onFileSelected={() => setShowPreviewModal(true)}
+          {showDataFileModal && (
+            <DataFileModals
+              status={modalContext}
+              count={fileRowsCount}
+              onClose={() => setShowDataFileModal(false)}
+              onFileSelected={() => setShowDataFileModal(true)}
+              handleSelectFile={handleSelectFile}
             />
           )}
         </div>

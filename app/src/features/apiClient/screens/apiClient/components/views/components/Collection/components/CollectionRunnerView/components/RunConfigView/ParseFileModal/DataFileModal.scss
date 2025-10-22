@@ -129,6 +129,25 @@
     }
   }
 
+  .large-file-messaging-container {
+    display: flex;
+    padding: var(--space-4, 8px) 16px 16px 16px;
+    align-items: flex-start;
+    gap: 64px;
+    align-self: stretch;
+
+    .large-file-text {
+      color: var(--alias-tokens-color-text-default, #fff);
+
+      /* body/default */
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--font-size-sm, 12px);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 18px; /* 150% */
+    }
+  }
+
   .preview-modal-body-container {
     display: flex;
     padding: var(--space-5, 12px) var(--space-6, 16px);
@@ -160,5 +179,81 @@
     justify-content: flex-end;
     gap: var(--space-4, 8px);
     align-items: center;
+  }
+
+  // Loading state styles
+  .loading-state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-10, 40px) var(--space-6, 16px);
+    gap: var(--space-6, 16px);
+    min-height: 200px;
+
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .spinner-placeholder {
+        .spinner-icon {
+          color: var(--alias-tokens-color-primary, #4285f4);
+          animation: spin 1s linear infinite;
+
+          .spinner-circle {
+            stroke-dashoffset: 0;
+            animation: dash 1.5s ease-in-out infinite;
+          }
+        }
+      }
+    }
+
+    .loading-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2, 4px);
+      text-align: center;
+
+      .loading-title {
+        color: var(--alias-tokens-color-text-default, #fff);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-md, 14px);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px;
+      }
+
+      .loading-description {
+        color: var(--requestly-color-text-subtle);
+        font-family: var(--font-family-default, Inter);
+        font-size: var(--font-size-sm, 12px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dashoffset: -60;
+  }
+  100% {
+    stroke-dashoffset: -120;
   }
 }

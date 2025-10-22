@@ -22,12 +22,13 @@ export const RunResultView: React.FC = () => {
   ]);
   const [totalIterationCount] = useRunConfigStore((s) => [s.iterations]);
 
-  if (error) {
+  if (runStatus === RunStatus.ERRORED && error) {
     // Handle error state here, possibly render an error component
     if (error instanceof RenderableError) {
       error.render();
     } else {
       //default error component
+      //LOOK ERROR BOUNDARY FOR CREATING THIS
     }
   }
   const testResults = useMemo(

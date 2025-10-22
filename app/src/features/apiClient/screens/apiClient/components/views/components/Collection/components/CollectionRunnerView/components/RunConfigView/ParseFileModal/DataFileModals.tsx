@@ -2,7 +2,7 @@
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
 import React from "react";
-import "./parseFileModal.scss";
+import "./DataFileModal.scss";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
@@ -11,7 +11,6 @@ import { ApiClientFile, FileId } from "features/apiClient/store/apiClientFilesSt
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "./ParsedTableView";
-import { useFileSelection } from "../hooks/useFileSelection.hook";
 /**
  * 1. successfull parsing, upload pending - show table, filename, type & cancel, usefile btn
  * 2. unsucessfull parsing - show error message with learn more & select again option
@@ -26,10 +25,11 @@ import { useFileSelection } from "../hooks/useFileSelection.hook";
  */
 
 interface previewModalProps {
-  status: "success" | "error" | "tooManyRows" | "parsing";
+  status: "success" | "error" | "view" | "largeFile" | "loading";
   count?: number;
   onClose: () => void;
   onFileSelected?: () => void;
+  handleSelectFile?: () => void;
 }
 
 interface buttonSchema {
@@ -48,6 +48,70 @@ interface ModalProps {
   onClose: () => void;
   count?: number;
 }
+
+//I got this generated from co-pilot, TODO use our own loading modal if it is there
+const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  return (
+    <RQModal
+      width={480}
+      open={true}
+      closable={true}
+      closeIcon={<MdOutlineClose />}
+      onCancel={onClose}
+      className="preview-modal loading-modal"
+    >
+      {/* Section 1 */}
+      <div className="preview-modal-header-container">
+        <div className="preview-modal-title">Processing File</div>
+      </div>
+
+      {/* Section 2 */}
+      <div className="loading-state-container">
+        <div className="loading-spinner">
+          {/* TODO: Replace with actual loading spinner component from design system */}
+          <div className="spinner-placeholder">
+            <svg
+              className="spinner-icon"
+              width="48"
+              height="48"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="24"
+                cy="24"
+                r="20"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="80 40"
+                opacity="0.25"
+              />
+              <circle
+                cx="24"
+                cy="24"
+                r="20"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="80 40"
+                strokeDashoffset="0"
+                className="spinner-circle"
+              />
+            </svg>
+          </div>
+        </div>
+        <div className="loading-message">
+          <div className="loading-title">Parsing your file...</div>
+          <div className="loading-description detail-label">
+            Please wait while we process and validate your data file.
+          </div>
+        </div>
+      </div>
+    </RQModal>
+  );
+};
 
 const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
@@ -90,7 +154,7 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
   );
 };
 
-const ViewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
+const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
     <RQModal
       width={680}
@@ -261,41 +325,56 @@ const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
   );
 };
 
-export const Previewmodal: React.FC<previewModalProps> = ({
+const LargeFileModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
+  return (
+    <>
+      <RQModal
+        width={480}
+        open={true}
+        closable={true}
+        closeIcon={<MdOutlineClose />}
+        onCancel={onClose}
+        className="preview-modal"
+      >
+        {/* Section 1 */}
+        <div className="preview-modal-header-container">
+          <div className="preview-modal-title">File Exceeds 100 MB Limit</div>
+        </div>
+
+        {/* Section 2 */}
+        <div className="large-file-messaging-container">
+          <span className="large-file-text">
+            The file is too large to upload. Select a smaller data file to continue.
+          </span>
+        </div>
+
+        {/* Section 3 */}
+        <div className="preview-modal-footer-container">
+          <RQButton type="secondary" onClick={buttonOptions().primaryButton.onClick}>
+            {buttonOptions().primaryButton.label}
+          </RQButton>
+          <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick}>
+            {buttonOptions().secondaryButton.label}
+          </RQButton>
+        </div>
+      </RQModal>
+    </>
+  );
+};
+
+export const DataFileModals: React.FC<previewModalProps> = ({
   status,
   count,
   onClose,
   onFileSelected,
+  handleSelectFile,
 }: previewModalProps) => {
   const [dataFile] = useRunConfigStore((s) => [s.dataFile]);
-  const { openFileSelector } = useFileSelection();
 
   //stubs: footer buttton options
 
   const buttonOptions = (): buttonTypes => {
     switch (status) {
-      case "parsing":
-        return {
-          primaryButton: {
-            label: "Cancel",
-            onClick: () => {
-              //it should close the modal
-              //delete the file from store
-              onClose();
-            },
-          },
-          secondaryButton: {
-            label: "Use File",
-            onClick: () => {
-              //this should push the file to store and close the modal
-              //and also now on click the file name on button should open the file in viewModal component
-              openFileSelector(() => {
-                onFileSelected?.();
-              });
-            },
-          },
-        };
-
       case "error":
         return {
           primaryButton: {
@@ -305,53 +384,89 @@ export const Previewmodal: React.FC<previewModalProps> = ({
           secondaryButton: {
             label: "Select Again",
             onClick: () => {
-              /**
+              handleSelectFile?.();
+              /*
                  // delete the existing file from store
+                 // SO THAT DATAFILE GETS EMPTY
                  // then move to re-upload screen again    
-                 */
-              openFileSelector(() => {
-                onFileSelected?.();
-              });
-            },
-          },
-        };
-
-      case "tooManyRows":
-        return {
-          primaryButton: {
-            label: "Replace file",
-            onClick: () => {
-              //remove the existing file from store and open file selector again
-              //if cancel/cross is done then is should not remove the existing file & retain the existing file
-              openFileSelector(() => {
-                onFileSelected?.();
-              });
-            },
-          },
-          secondaryButton: {
-            label: "Use first 1000 entries",
-            onClick: () => {
-              //close modal only i think
+              */
             },
           },
         };
 
       case "success":
+        if (count > 1000) {
+          return {
+            primaryButton: {
+              label: "Replace file",
+              onClick: () => {
+                //remove the existing file from store and open file selector again
+                //if cancel/cross is done then is should not remove the existing file & retain the existing file
+                handleSelectFile?.();
+              },
+            },
+            secondaryButton: {
+              label: "Use first 1000 entries",
+              onClick: () => {
+                //use first 1000 entries
+                //close modal
+              },
+            },
+          };
+        } else {
+          return {
+            primaryButton: {
+              label: "Cancel",
+              onClick: () => {
+                onClose();
+                //remove the file from store
+                //SO THAT DATAFILE GETS EMPTY
+                //just close the modal without saving
+              },
+            },
+            secondaryButton: {
+              label: "Use File",
+              onClick: () => {
+                //use this file and add it to store
+                //and also now on click the file name on button should open the file in viewModal component
+                onClose();
+              },
+            },
+          };
+        }
+
+      case "view":
         return {
           primaryButton: {
             label: "Remove",
             onClick: () => {
-              onClose();
               //remove the file from store and close the modal
+              onClose();
             },
           },
           secondaryButton: {
             label: "Change data file",
             onClick: () => {
               //remove the existing file from store and open file selector again
-              openFileSelector(() => {
-                onFileSelected?.();
-              });
+              handleSelectFile?.();
+            },
+          },
+        };
+
+      case "largeFile":
+        return {
+          primaryButton: {
+            label: "Cancel",
+            onClick: () => {
+              //remove the existing file from store and close the modal
+              onClose();
+            },
+          },
+          secondaryButton: {
+            label: "Reselect File",
+            onClick: () => {
+              //remove the existing file from store and open file selector again
+              handleSelectFile?.();
             },
           },
         };
@@ -360,12 +475,16 @@ export const Previewmodal: React.FC<previewModalProps> = ({
 
   return (
     <>
-      {status === "success" && <ViewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
-      {status === "tooManyRows" && count > 1000 && (
+      {status === "loading" && <LoadingModal onClose={onClose} />}
+      {status === "view" && <PreviewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
+      {status === "success" && count > 1000 && (
         <WarningModal buttonOptions={buttonOptions} count={count} dataFile={dataFile} onClose={onClose} />
       )}
       {status === "error" && <ErroredModal buttonOptions={buttonOptions} onClose={onClose} />}
-      {status === "parsing" && <ParsingModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
+      {status === "success" && count < 1000 && (
+        <ParsingModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />
+      )}
+      {status === "largeFile" && <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} />}
     </>
   );
 };

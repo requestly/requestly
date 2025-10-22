@@ -4,11 +4,16 @@ import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 
 export const useFileSelection = () => {
   const [setDataFile] = useRunConfigStore((s) => [s.setDataFile]);
-  const handleFileSelection = (file: { name: string; path: string; size: number }, success: () => void) => {
+  const handleFileSelection = (
+    file: { name: string; path: string; size: number },
+    success: (file: { name: string; path: string; size: number }) => void
+  ) => {
+    if (file.size >= 100 * 1024 * 1024) {
+      success(file);
+      return;
+    }
     const fileId = file.name + "-" + Date.now();
 
-    //DOUBT HERE
-    //here it should not be called
     setDataFile({
       id: fileId,
       name: file.name,
@@ -18,7 +23,7 @@ export const useFileSelection = () => {
       fileFeature: FileFeature.COLLECTION_RUNNER,
     });
 
-    success();
+    success(file);
 
     //DOUBT: DO WE NEED TO CALL PARSER HERE? ALSO IS THE CALL REQUIRED?
     // ARE WE PASSING FILE FROM HERE OR HOW IT IS READING THE DATA, ARE WE UPLOADING THEN
@@ -26,19 +31,19 @@ export const useFileSelection = () => {
     //REMEMER - NODATA OF FILE IS STORED IN FILESTORE
 
     // call parser
-    //f rom here parser will do its work
+    //from here parser will do its work
     // parser on successfull parsing will share the status to preview modal
 
     //then parser will share the status and the value of the files
   };
 
-  const openFileSelector = (success: () => void) => {
+  const openFileSelector = (success: (file: { name: string; path: string; size: number }) => void) => {
     displayFileSelector(
       (file: { name: string; path: string; size: number }) => {
         handleFileSelection(file, success);
       },
       {
-        filters: [{ name: "File formats allowed", extensions: ["json", "csv"] }],
+        filters: [{ name: "File formats allowed" }],
       }
     );
   };

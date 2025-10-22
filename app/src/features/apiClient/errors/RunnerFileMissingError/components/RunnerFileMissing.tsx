@@ -1,7 +1,7 @@
 import LINKS from "config/constants/sub/links";
-import { RunnerFileMissingError } from "../RunnerFsAccessError";
+import { RunnerFileMissingError } from "../RunnerFileMissingError";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import "./RunnerFsAccess.scss";
+import "./RunnerFsMissing.scss";
 import React from "react";
 
 interface Props {

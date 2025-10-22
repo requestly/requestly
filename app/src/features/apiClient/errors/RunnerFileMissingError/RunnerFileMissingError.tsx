@@ -1,5 +1,5 @@
 import { RenderableError } from "errors/RenderableError";
-import { RunnerFileMissing } from "./components/RunnerFsAccess";
+import { RunnerFileMissing } from "./components/RunnerFileMissing";
 
 export class RunnerFileMissingError extends RenderableError {
   render() {
