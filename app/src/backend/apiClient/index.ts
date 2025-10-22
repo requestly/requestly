@@ -1,4 +1,4 @@
-export { upsertApiRecord } from "./upsertApiRecord";
+export { upsertApiRecord, batchUpsertApiRecords } from "./upsertApiRecord";
 export { getApiRecords } from "./getApiRecords";
 export { getApiRecord } from "./getApiRecord";
 export { deleteApiRecords } from "./deleteApiRecords";
