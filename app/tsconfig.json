@@ -15,16 +15,25 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "ignoreDeprecations": "6.0",
     "baseUrl": "./src",
     "paths": {},
-    "types": ["vite/client", "vite-plugin-svgr/client", "chrome"],
+    "types": [
+      "vite/client",
+      "vite-plugin-svgr/client",
+      "chrome"
+    ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "exclude": ["node_modules", "build"],
-  "include": ["./src/**/*"]
+  "exclude": [
+    "node_modules",
+    "build"
+  ],
+  "include": [
+    "./src/**/*"
+  ]
 }

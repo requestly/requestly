@@ -20,7 +20,6 @@ export interface CommonRulesImporterProps {
   productName: string;
   supportedFileTypes: string[];
   importer: HttpRuleImporterMethod<any>;
-
   docsLink: string;
   shareLink: string;
 }
