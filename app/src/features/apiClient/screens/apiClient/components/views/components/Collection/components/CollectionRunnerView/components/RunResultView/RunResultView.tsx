@@ -10,17 +10,26 @@ import { HistoryDrawer } from "./HistoryDrawer/HistoryDrawer";
 import { useCollectionView } from "../../../../collectionView.context";
 import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
 import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
-
+import { RenderableError } from "errors/RenderableError";
 export const RunResultView: React.FC = () => {
-  const [iterations, startTime, getRunSummary, runStatus, historySaveStatus] = useRunResultStore((s) => [
+  const [iterations, startTime, getRunSummary, runStatus, historySaveStatus, error] = useRunResultStore((s) => [
     s.iterations,
     s.startTime,
     s.getRunSummary,
     s.runStatus,
     s.historySaveStatus,
+    s.error,
   ]);
   const [totalIterationCount] = useRunConfigStore((s) => [s.iterations]);
 
+  if (error) {
+    // Handle error state here, possibly render an error component
+    if (error instanceof RenderableError) {
+      error.render();
+    } else {
+      //default error component
+    }
+  }
   const testResults = useMemo(
     () => getRunSummary(),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- need `iterations` for reactivity
