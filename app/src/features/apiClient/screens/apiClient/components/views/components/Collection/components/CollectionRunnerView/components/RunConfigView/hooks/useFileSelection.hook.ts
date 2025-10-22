@@ -43,7 +43,7 @@ export const useFileSelection = () => {
         handleFileSelection(file, success);
       },
       {
-        filters: [{ name: "File formats allowed" }],
+        filters: [{ name: "File formats allowed", extensions: ["json", "csv"] }],
       }
     );
   };
