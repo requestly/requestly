@@ -650,6 +650,22 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
       mimeType: RequestContentType.FORM,
       params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
     };
+  } else if (apiRequest?.contentType === RequestContentType.MULTIPART_FORM) {
+    harRequest.postData = {
+      mimeType: RequestContentType.MULTIPART_FORM,
+      params: (apiRequest.body as KeyValuePair[])
+        .filter((pair) => typeof pair.value === "string")
+        .map(({ key, value }) => ({ name: key, value: value as string })),
+    };
+  } else if (
+    apiRequest?.contentType === RequestContentType.HTML ||
+    apiRequest?.contentType === RequestContentType.JAVASCRIPT ||
+    apiRequest?.contentType === RequestContentType.XML
+  ) {
+    harRequest.postData = {
+      mimeType: apiRequest.contentType,
+      text: apiRequest.body as string,
+    };
   }
 
   return harRequest;
