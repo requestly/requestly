@@ -44,7 +44,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       dataSource.filter((item) => {
         // Show search results that match the search value.
         // Also show empty keys so that when user clicks on Add more, the new row is visible.
-        return item.key.toLowerCase().includes(searchValue.toLowerCase()) || item.key.toLowerCase() === "";
+        return item.key.toLowerCase().includes(searchValue.toLowerCase()) || item.key === "";
       }),
     [dataSource, searchValue]
   );
