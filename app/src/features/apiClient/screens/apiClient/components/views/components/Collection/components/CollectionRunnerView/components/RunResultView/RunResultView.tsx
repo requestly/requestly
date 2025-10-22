@@ -11,6 +11,7 @@ import { useCollectionView } from "../../../../collectionView.context";
 import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
 import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
 import { RenderableError } from "errors/RenderableError";
+import DefaultErrorComponent from "./DefaultErrorComponent/DefaultErrorComponent";
 export const RunResultView: React.FC = () => {
   const [iterations, startTime, getRunSummary, runStatus, historySaveStatus, error] = useRunResultStore((s) => [
     s.iterations,
@@ -29,6 +30,11 @@ export const RunResultView: React.FC = () => {
     } else {
       //default error component
       //LOOK ERROR BOUNDARY FOR CREATING THIS
+      <DefaultErrorComponent
+        defaultTags={{
+          error_type: "could_not_run_collection",
+        }}
+      />;
     }
   }
   const testResults = useMemo(
