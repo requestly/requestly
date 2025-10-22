@@ -46,10 +46,10 @@ interface ModalProps {
   buttonOptions: () => buttonTypes;
   dataFile?: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
   onClose: () => void;
+  removeDataFile?: () => void;
   count?: number;
 }
 
-//I got this generated from co-pilot, TODO use our own loading modal if it is there
 const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
     <RQModal
@@ -68,7 +68,6 @@ const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       {/* Section 2 */}
       <div className="loading-state-container">
         <div className="loading-spinner">
-          {/* TODO: Replace with actual loading spinner component from design system */}
           <div className="spinner-placeholder">
             <svg
               className="spinner-icon"
@@ -113,14 +112,17 @@ const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
+const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, removeDataFile }) => {
   return (
     <RQModal
       width={680}
       open={true}
       closable={true}
       closeIcon={<MdOutlineClose />}
-      onCancel={onClose}
+      onCancel={() => {
+        onClose();
+        removeDataFile();
+      }}
       className="preview-modal"
     >
       {/* Section 1 */}
@@ -135,7 +137,7 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
             <span className="detail-label">File Name:</span> {dataFile.name}
           </div>
           <div>
-            <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase()}
+            <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase().slice(1)}
           </div>
         </div>
         <PreviewTableView />
@@ -176,7 +178,7 @@ const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
             <span className="detail-label">File Name:</span> {dataFile.name}
           </div>
           <div>
-            <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase()}
+            <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase().slice(1)}
           </div>
           <div>
             <span className="detail-label">File size:</span>{" "}
@@ -198,14 +200,17 @@ const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
   );
 };
 
-const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, onClose }) => {
+const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, onClose, removeDataFile }) => {
   return (
     <RQModal
       width={680}
       open={true}
       closable={true}
       closeIcon={<MdOutlineClose />}
-      onCancel={onClose}
+      onCancel={() => {
+        onClose();
+        removeDataFile();
+      }}
       className="preview-modal"
     >
       {/* Section 1 */}
@@ -238,7 +243,7 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, on
             <span className="detail-label">File Name:</span> {dataFile.name}
           </div>
           <div>
-            <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase()}
+            <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase().slice(1)}
           </div>
         </div>
         <PreviewTableView />
@@ -257,14 +262,17 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, on
   );
 };
 
-const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
+const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, removeDataFile }) => {
   return (
     <RQModal
       width={680}
       open={true}
       closable={true}
       closeIcon={<MdOutlineClose />}
-      onCancel={onClose}
+      onCancel={() => {
+        onClose();
+        removeDataFile();
+      }}
       className="preview-modal"
     >
       {/* Section 1 */}
@@ -315,10 +323,12 @@ const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
         </div>
 
         <div className="error-state-footer-container">
-          <RQButton icon={<MdOutlineOpenInNew />} type="secondary">
+          <RQButton icon={<MdOutlineOpenInNew />} type="secondary" onClick={buttonOptions().primaryButton.onClick}>
             {buttonOptions().primaryButton.label}
           </RQButton>
-          <RQButton type="primary">{buttonOptions().secondaryButton.label}</RQButton>
+          <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick}>
+            {buttonOptions().secondaryButton.label}
+          </RQButton>
         </div>
       </div>
     </RQModal>
@@ -369,7 +379,7 @@ export const DataFileModals: React.FC<previewModalProps> = ({
   onFileSelected,
   handleSelectFile,
 }: previewModalProps) => {
-  const [dataFile] = useRunConfigStore((s) => [s.dataFile]);
+  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
 
   //stubs: footer buttton options
 
@@ -379,7 +389,9 @@ export const DataFileModals: React.FC<previewModalProps> = ({
         return {
           primaryButton: {
             label: "Learn more",
-            onClick: () => {},
+            onClick: () => {
+              onClose();
+            },
           },
           secondaryButton: {
             label: "Select Again",
@@ -410,6 +422,7 @@ export const DataFileModals: React.FC<previewModalProps> = ({
               onClick: () => {
                 //use first 1000 entries
                 //close modal
+                onClose();
               },
             },
           };
@@ -418,6 +431,7 @@ export const DataFileModals: React.FC<previewModalProps> = ({
             primaryButton: {
               label: "Cancel",
               onClick: () => {
+                removeDataFile();
                 onClose();
                 //remove the file from store
                 //SO THAT DATAFILE GETS EMPTY
@@ -441,6 +455,7 @@ export const DataFileModals: React.FC<previewModalProps> = ({
             label: "Remove",
             onClick: () => {
               //remove the file from store and close the modal
+              removeDataFile();
               onClose();
             },
           },
@@ -458,7 +473,7 @@ export const DataFileModals: React.FC<previewModalProps> = ({
           primaryButton: {
             label: "Cancel",
             onClick: () => {
-              //remove the existing file from store and close the modal
+              //just close the modal
               onClose();
             },
           },
@@ -478,11 +493,24 @@ export const DataFileModals: React.FC<previewModalProps> = ({
       {status === "loading" && <LoadingModal onClose={onClose} />}
       {status === "view" && <PreviewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
       {status === "success" && count > 1000 && (
-        <WarningModal buttonOptions={buttonOptions} count={count} dataFile={dataFile} onClose={onClose} />
+        <WarningModal
+          buttonOptions={buttonOptions}
+          count={count}
+          dataFile={dataFile}
+          onClose={onClose}
+          removeDataFile={removeDataFile}
+        />
       )}
-      {status === "error" && <ErroredModal buttonOptions={buttonOptions} onClose={onClose} />}
+      {status === "error" && (
+        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} removeDataFile={removeDataFile} />
+      )}
       {status === "success" && count < 1000 && (
-        <ParsingModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />
+        <ParsingModal
+          buttonOptions={buttonOptions}
+          dataFile={dataFile}
+          onClose={onClose}
+          removeDataFile={removeDataFile}
+        />
       )}
       {status === "largeFile" && <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} />}
     </>

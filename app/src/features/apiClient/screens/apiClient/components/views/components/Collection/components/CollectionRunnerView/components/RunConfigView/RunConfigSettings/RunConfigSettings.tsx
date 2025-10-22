@@ -20,7 +20,8 @@ const UploadedFileView: React.FC<{
   setShowDataFileModal: React.Dispatch<React.SetStateAction<boolean>>;
   setModalContext: React.Dispatch<React.SetStateAction<"success" | "view">>;
   file: ApiClientFile;
-}> = ({ dataFile, setShowDataFileModal, setModalContext, file }) => {
+  removeDataFile: () => void;
+}> = ({ dataFile, setShowDataFileModal, setModalContext, file, removeDataFile }) => {
   return (
     <>
       <div className="file-uploaded-section">
@@ -58,9 +59,7 @@ const UploadedFileView: React.FC<{
             size="small"
             className="clear-file-btn"
             onClick={() => {
-              /**
-                use clear file method from store
-              */
+              removeDataFile();
             }}
             type="transparent"
           >
@@ -96,12 +95,13 @@ const SelectFileToUpload: React.FC<{
 };
 
 export const RunConfigSettings: React.FC = () => {
-  const [iterations, setIterations, delay, setDelay, dataFile] = useRunConfigStore((s) => [
+  const [iterations, setIterations, delay, setDelay, dataFile, removeDataFile] = useRunConfigStore((s) => [
     s.iterations,
     s.setIterations,
     s.delay,
     s.setDelay,
     s.dataFile,
+    s.removeDataFile,
   ]);
 
   const { openFileSelector } = useFileSelection();
@@ -169,7 +169,7 @@ export const RunConfigSettings: React.FC = () => {
         //parsing stub
         const parseResult = await parseFile(file);
         if (parseResult.status === "success") {
-          setFileRowsCount(5000);
+          setFileRowsCount(parseResult.count);
           setModalContext("success");
         } else {
           setModalContext("error");
@@ -230,6 +230,7 @@ export const RunConfigSettings: React.FC = () => {
                 setShowDataFileModal={setShowDataFileModal}
                 setModalContext={setModalContext}
                 file={file}
+                removeDataFile={removeDataFile}
               />
             </>
           )}
