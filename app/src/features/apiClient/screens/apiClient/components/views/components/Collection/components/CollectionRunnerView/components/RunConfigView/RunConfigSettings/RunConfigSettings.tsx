@@ -12,7 +12,12 @@ import { displayFileSelector } from "components/mode-specific/desktop/misc/FileD
 import { BiError } from "@react-icons/all-files/bi/BiError";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
-import { ApiClientFile, FileId, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import {
+  ApiClientFile,
+  FileFeature,
+  FileId,
+  useApiClientFileStore,
+} from "features/apiClient/store/apiClientFilesStore";
 import { Previewmodal } from "../ParseFileModal/ParseFileModal";
 
 const UploadedFileView: React.FC<{
@@ -135,6 +140,7 @@ export const RunConfigSettings: React.FC = () => {
       path: file.path,
       size: file.size,
       source: "desktop",
+      fileFeature: FileFeature.FILE_BODY,
     });
 
     setShowPreviewModal(true);
