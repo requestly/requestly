@@ -10,18 +10,37 @@ export function useNewApiClientContext() {
   const context = useApiClientFeatureContext();
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
-  const [addNewRecord, updateRecord, updateRecords, getData] = useAPIRecords((state) => [
+  const [addNewRecord, updateRecord, updateRecords, addNewRecords, getData] = useAPIRecords((state) => [
     state.addNewRecord,
     state.updateRecord,
     state.updateRecords,
+    state.addNewRecords,
     state.getData,
   ]);
 
   const onSaveBulkRecords = useCallback(
     (records: RQAPI.ApiClientRecord[]) => {
-      updateRecords(records);
+      const existingRecords: RQAPI.ApiClientRecord[] = [];
+      const newRecords: RQAPI.ApiClientRecord[] = [];
+
+      records.forEach((record) => {
+        const doesRecordExist = !!getData(record.id);
+        if (doesRecordExist) {
+          existingRecords.push(record);
+        } else {
+          newRecords.push(record);
+        }
+      });
+
+      if (existingRecords.length > 0) {
+        updateRecords(existingRecords);
+      }
+
+      if (newRecords.length > 0) {
+        addNewRecords(newRecords);
+      }
     },
-    [updateRecords]
+    [updateRecords, addNewRecords, getData]
   );
 
   const onSaveRecord: (apiClientRecord: RQAPI.ApiClientRecord, onSaveTabAction?: "open") => void = useCallback(
