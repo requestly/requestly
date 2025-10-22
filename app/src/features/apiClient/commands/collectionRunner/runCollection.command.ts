@@ -223,7 +223,7 @@ class Runner {
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
     const scopes: Scope[] = [];
-    if (this.variables.length >= iteration) {
+    if (iteration <= this.variables.length) {
       scopes.push([
         {
           scope: VariableScope.DATA_FILE,
