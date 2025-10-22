@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-8, 24px);
   padding: 56px 32px;
   height: 100%;
 
@@ -11,7 +11,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-6, 16px);
 
     .error-container {
       display: flex;
@@ -28,8 +28,8 @@
       letter-spacing: 0.25px;
       max-width: 400px;
       text-align: center;
-      margin-top: -8px;
-      margin-bottom: 8px;
+      margin-top: calc(var(--space-4, 8px) * -1);
+      margin-bottom: var(--space-4, 8px);
 
       .error-name {
         color: var(--requestly-color-error-text);
@@ -38,12 +38,12 @@
       .error-message {
         color: var(--requestly-color-subtle);
         display: inline;
-        gap: 4px;
-        margin-bottom: 2px;
+        gap: var(--space-2, 4px);
+        margin-bottom: var(--space-1, 2px);
 
         svg {
-          width: 16px;
-          height: 16px;
+          width: var(--space-6, 16px);
+          height: var(--space-6, 16px);
         }
       }
     }
@@ -67,8 +67,8 @@
   }
 
   img {
-    width: 80px;
-    height: 80px;
+    width: var(--space-15, 80px);
+    height: var(--space-15, 80px);
   }
 
   &__title {
@@ -81,9 +81,9 @@
 
   .documentation-link {
     display: flex;
-    padding-top: 2px;
+    padding-top: var(--space-1, 2px);
     align-items: center;
-    gap: 4px;
+    gap: var(--space-2, 4px);
     color: var(--requestly-color-primary-text, #639ff9);
     font-size: var(--requestly-font-size-xs);
   }
