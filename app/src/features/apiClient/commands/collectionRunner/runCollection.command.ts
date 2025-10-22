@@ -153,8 +153,7 @@ class Runner {
               collectionId,
             });
           }
-          this.variables = parsedData.data;
-          break;
+          return parsedData.data;
         }
         case ".json": {
           console.time("fileParse");
@@ -163,14 +162,15 @@ class Runner {
           if (!parsedData.success) {
             throw new DataFileParseError("Failed to parse JSON data file!").addContext({ collectionId });
           }
-          this.variables = parsedData.data;
-          break;
+          return parsedData.data;
+        }
+        default: {
+          throw new DataFileParseError("Unsupported data file format!").addContext({ collectionId, fileExtension });
         }
       }
     } catch (e) {
       throw new DataFileParseError("Failed to read or parse data file!").addContext({ collectionId, error: e });
     }
-    console.log("!!!debug", "var", this.variables);
   }
 
   private async beforeStart() {
@@ -184,7 +184,8 @@ class Runner {
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
-    await this.parseDataFile();
+    const variables = await this.parseDataFile();
+    this.variables = variables ?? [];
 
     trackCollectionRunStarted({
       collection_id: collectionId,
@@ -404,12 +405,6 @@ class Runner {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
-      } else if (e instanceof DataFileNotFound) {
-        e.name = "DataFileNotFoundError";
-        return e;
-      } else if (e instanceof DataFileParseError) {
-        e.name = "DataFileParseError";
-        return e;
       }
 
       this.onError(e);
