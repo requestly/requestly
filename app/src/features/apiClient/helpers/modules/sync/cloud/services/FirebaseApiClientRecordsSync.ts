@@ -4,6 +4,7 @@ import {
   getApiRecords,
   upsertApiRecord,
   batchCreateApiRecordsWithExistingId,
+  batchUpsertApiRecords,
   getRunConfig as getRunConfigFromFirebase,
   upsertRunConfig as upsertRunConfigFromFirebase,
   getRunResults as getRunResultsFromFirebase,
@@ -178,6 +179,11 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         message: error.message,
       };
     }
+  }
+
+  async batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]> {
+    const result = await batchUpsertApiRecords(this.meta.uid, records as RQAPI.ApiClientRecord[], this.meta.teamId);
+    return result.success ? (result.data as RQAPI.ApiRecord[]) : [];
   }
 
   async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
