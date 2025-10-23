@@ -139,29 +139,17 @@ class Runner {
       throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
     }
 
+    const fileExtension = getFileExtension(dataFile.path);
     try {
-      console.time("fileRead");
       const fileContents = await getFileContents(dataFile.path);
-      console.timeEnd("fileRead");
-      const fileExtension = getFileExtension(dataFile.path);
 
       switch (fileExtension) {
         case ".csv": {
           const parsedData = await parseCsvText(fileContents);
-          if (!parsedData.success) {
-            throw new DataFileParseError("Failed to parse CSV data file!").addContext({
-              collectionId,
-            });
-          }
           return parsedData.data;
         }
         case ".json": {
-          console.time("fileParse");
           const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
-          console.timeEnd("fileParse");
-          if (!parsedData.success) {
-            throw new DataFileParseError("Failed to parse JSON data file!").addContext({ collectionId });
-          }
           return parsedData.data;
         }
         default: {
@@ -169,7 +157,11 @@ class Runner {
         }
       }
     } catch (e) {
-      throw new DataFileParseError("Failed to read or parse data file!").addContext({ collectionId, error: e });
+      throw new DataFileParseError("Failed to read or parse data file!").addContext({
+        collectionId,
+        error: e,
+        fileExtension,
+      });
     }
   }
 
