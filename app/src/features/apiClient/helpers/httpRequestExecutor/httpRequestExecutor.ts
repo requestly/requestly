@@ -14,7 +14,6 @@ import {
 import { isEmpty } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { HttpRequestScriptExecutionService } from "./httpRequestScriptExecutionService";
-import Logger from "lib/logger";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -91,14 +90,9 @@ export class HttpRequestExecutor {
     abortController?: AbortController
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
-    Logger.log("!!!debug", "execute called", { recordId, entry: JSON.parse(JSON.stringify(entry)), abortController });
 
     const { preparedEntry, renderedVariables } = this.requestPreparer.prepareRequest(recordId, entry);
     preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
-
-    Logger.log("!!!debug", "[execute] 1st preparedEntry", {
-      preparedEntry: JSON.parse(JSON.stringify(preparedEntry)),
-    });
 
     if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
       const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
@@ -171,9 +165,6 @@ export class HttpRequestExecutor {
     }
 
     try {
-      Logger.log("!!!debug", "preparedEntry before making request", {
-        preparedEntry: JSON.parse(JSON.stringify(preparedEntry)),
-      });
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
@@ -264,8 +255,6 @@ export class HttpRequestExecutor {
 
   async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
     this.abortController = new AbortController();
-
-    Logger.log("!!!debug", "rerun called", { recordId, entry: JSON.parse(JSON.stringify(entry)) });
 
     const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
       recordId,
