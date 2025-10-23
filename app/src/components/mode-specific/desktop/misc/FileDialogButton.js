@@ -1,6 +1,9 @@
 import { Button } from "antd";
 
 export function displayFileSelector(callback, config = {}) {
+  if (config.properties && config.properties.includes("multiSelections")) {
+    return;
+  }
   const handleDialogPromise = (result) => {
     //this selector will always have only one single file
     const { canceled, files } = result;

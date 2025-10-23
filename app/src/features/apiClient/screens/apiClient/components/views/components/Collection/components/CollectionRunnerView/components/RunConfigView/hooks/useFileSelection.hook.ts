@@ -24,17 +24,6 @@ export const useFileSelection = () => {
     });
 
     success(file);
-
-    //DOUBT: DO WE NEED TO CALL PARSER HERE? ALSO IS THE CALL REQUIRED?
-    // ARE WE PASSING FILE FROM HERE OR HOW IT IS READING THE DATA, ARE WE UPLOADING THEN
-    // READING IS DONE FROM FILE STORE(METADATA INSIDE FILE)?
-    //REMEMER - NODATA OF FILE IS STORED IN FILESTORE
-
-    // call parser
-    //from here parser will do its work
-    // parser on successfull parsing will share the status to preview modal
-
-    //then parser will share the status and the value of the files
   };
 
   const openFileSelector = (success: (file: { name: string; path: string; size: number }) => void) => {
