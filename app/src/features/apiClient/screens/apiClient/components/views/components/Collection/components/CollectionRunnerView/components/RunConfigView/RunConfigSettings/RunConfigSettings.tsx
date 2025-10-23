@@ -6,7 +6,7 @@ import { useRunConfigStore } from "../../../run.context";
 import { toast } from "utils/Toast";
 import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import "./runConfigSettings.scss";
-import { DataFileUploadView } from "./DataFileUploadView";
+import { DataFileSelector } from "./DataFileSelector";
 
 export const RunConfigSettings: React.FC = () => {
   const [iterations, setIterations, delay, setDelay] = useRunConfigStore((s) => [
@@ -73,7 +73,7 @@ export const RunConfigSettings: React.FC = () => {
 
         <div className="setting-container">
           <label htmlFor="file-upload">Select data file</label>
-          <DataFileUploadView />
+          <DataFileSelector />
         </div>
       </div>
 
