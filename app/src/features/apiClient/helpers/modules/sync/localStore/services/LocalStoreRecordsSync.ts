@@ -348,7 +348,13 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
       return {
         success: true,
-        data: runConfig,
+        data: {
+          id: runConfigId,
+          runOrder: runConfig.runOrder,
+          delay: runConfig.delay,
+          iterations: runConfig.iterations,
+          dataFile: runConfig.dataFile,
+        },
       };
     } catch (error) {
       return {
@@ -399,7 +405,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
         collection.id
       );
 
-      return { success: true, data: { id: runConfig.id, runOrder: updatedRunConfig.runOrder } };
+      return { success: true, data: { ...runConfig, id: runConfig.id } };
     } catch (error) {
       return {
         success: false,
