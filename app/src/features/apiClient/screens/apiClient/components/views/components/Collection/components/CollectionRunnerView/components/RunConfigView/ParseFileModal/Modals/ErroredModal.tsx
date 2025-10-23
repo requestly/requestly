@@ -1,10 +1,10 @@
 import { RQModal } from "lib/design-system/components";
-import { FooterButtons, ModalHeader, ModalProps } from "../DataFileModals";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import React from "react";
+import { FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
 
-export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
+export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, dataFileMetadata }) => {
   return (
     <RQModal
       width={680}
@@ -17,7 +17,7 @@ export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) =
       }}
       className="preview-modal"
     >
-      <ModalHeader />
+      <ModalHeader dataFileMetadata={dataFileMetadata} />
       <div className="error-state-messaging-container">
         <div>
           <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />

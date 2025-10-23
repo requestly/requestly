@@ -5,11 +5,11 @@ import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemove
 import { BiError } from "@react-icons/all-files/bi/BiError";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
-import { DataFileModals } from "../ParseFileModal/DataFileModals";
 import { useRunConfigStore } from "../../../run.context";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
+import { DataFileModalWrapper } from "../ParseFileModal/DataFileModalWrapper";
 
 export const DataFileUploadView: React.FC = () => {
   const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
@@ -36,7 +36,7 @@ export const DataFileUploadView: React.FC = () => {
         size: file.size,
       });
 
-      setOpenModalInPreviewMode(false);
+      setOpenModalInPreviewMode(true);
       setShowDataFileModal(true);
     });
   }, [openFileSelector]);
@@ -61,7 +61,7 @@ export const DataFileUploadView: React.FC = () => {
           <span className="file-type-info">Supports JSON & CSV files (max 100MB)</span>
         </div>
         {showDataFileModal && (
-          <DataFileModals
+          <DataFileModalWrapper
             onClose={() => setShowDataFileModal(false)}
             onFileSelected={() => setShowDataFileModal(true)}
             handleSelectFile={handleFileSelection}
@@ -81,7 +81,7 @@ export const DataFileUploadView: React.FC = () => {
           type="secondary"
           className="file-uploaded-button"
           onClick={() => {
-            setOpenModalInPreviewMode(true);
+            setOpenModalInPreviewMode(false);
             setShowDataFileModal(true);
           }}
         >
@@ -117,7 +117,7 @@ export const DataFileUploadView: React.FC = () => {
         </RQTooltip>
       </div>
       {showDataFileModal && (
-        <DataFileModals
+        <DataFileModalWrapper
           onClose={() => setShowDataFileModal(false)}
           onFileSelected={() => setShowDataFileModal(true)}
           handleSelectFile={handleFileSelection}

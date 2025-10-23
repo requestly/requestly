@@ -1,9 +1,9 @@
 import { RQButton } from "lib/design-system-v2/components";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import "./DataFileModal.scss";
 import { useRunConfigStore } from "../../../run.context";
 import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
-import { CommonModal } from "./Modals/CommonModal";
+import { DataFileViewModal } from "./Modals/DataFileViewModal";
 import { WarningModal } from "./Modals/WarningModal";
 import { ErroredModal } from "./Modals/ErroredModal";
 import { LargeFileModal } from "./Modals/LargeFileModal";
@@ -82,14 +82,22 @@ interface PreviewModalProps {
   isPreviewMode: boolean;
 }
 
-export const DataFileModals: React.FC<PreviewModalProps> = ({
+export enum DataFileModalViewMode {
+  LOADING = "loading",
+  PREVIEW = "preview",
+  ACTIVE = "active",
+  ERROR = "error",
+  LARGE_FILE = "largeFile",
+}
+
+export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
   onClose,
   onFileSelected,
   handleSelectFile,
   dataFileMetadata,
   isPreviewMode = false,
 }) => {
-  const [viewMode, setViewMode] = React.useState<"success" | "error" | "view" | "largeFile" | "loading">("loading");
+  const [viewMode, setViewMode] = useState<DataFileModalViewMode>(DataFileModalViewMode.LOADING);
   const parsedDataRef = React.useRef<{ data: Record<string, any>[]; count: number } | null>(null);
 
   const [removeDataFile, setDataFile] = useRunConfigStore((s) => [s.removeDataFile, s.setDataFile]);
@@ -116,17 +124,17 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           count: data.count,
         };
         parsedDataRef.current = processedData;
-        setViewMode(isPreviewMode ? "view" : "success");
+        setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
       })
       .catch(() => {
-        setViewMode("error");
+        setViewMode(DataFileModalViewMode.ERROR);
       });
     return true;
   });
 
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
-      case "error":
+      case DataFileModalViewMode.ERROR:
         return {
           primaryButton: {
             label: "Learn more",
@@ -142,7 +150,7 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           },
         };
 
-      case "success":
+      case DataFileModalViewMode.PREVIEW:
         if (parsedDataRef.current?.count > 1000) {
           return {
             primaryButton: {
@@ -178,7 +186,7 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           };
         }
 
-      case "view":
+      case DataFileModalViewMode.ACTIVE:
         return {
           primaryButton: {
             label: "Remove",
@@ -195,7 +203,7 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           },
         };
 
-      case "largeFile":
+      case DataFileModalViewMode.LARGE_FILE:
         return {
           primaryButton: {
             label: "Cancel",
@@ -217,9 +225,9 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
 
   return (
     <>
-      {viewMode === "loading" && <LoadingModal onClose={onClose} />}
-      {viewMode === "view" && (
-        <CommonModal
+      {viewMode === DataFileModalViewMode.LOADING && <LoadingModal onClose={onClose} />}
+      {viewMode === DataFileModalViewMode.ACTIVE && (
+        <DataFileViewModal
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
           onClose={onClose}
@@ -227,7 +235,7 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           viewMode={viewMode}
         />
       )}
-      {viewMode === "success" && parsedDataRef.current?.count > 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedDataRef.current?.count > 1000 && (
         <WarningModal
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
@@ -236,17 +244,17 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           count={parsedDataRef.current?.count}
         />
       )}
-      {viewMode === "error" && (
-        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
-      )}
-      {viewMode === "success" && parsedDataRef.current?.count < 1000 && (
-        <CommonModal
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedDataRef.current?.count < 1000 && (
+        <DataFileViewModal
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
           onClose={onClose}
           parsedData={parsedDataRef.current?.data}
           viewMode={viewMode}
         />
+      )}
+      {viewMode === "error" && (
+        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
       )}
       {viewMode === "largeFile" && (
         <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />

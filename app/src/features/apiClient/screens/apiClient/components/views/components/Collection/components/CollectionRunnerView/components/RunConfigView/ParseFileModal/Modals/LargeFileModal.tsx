@@ -1,7 +1,7 @@
 import { RQModal } from "lib/design-system/components";
-import { FooterButtons, ModalProps } from "../DataFileModals";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import React from "react";
+import { FooterButtons, ModalProps } from "../DataFileModalWrapper";
 
 export const LargeFileModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
   return (

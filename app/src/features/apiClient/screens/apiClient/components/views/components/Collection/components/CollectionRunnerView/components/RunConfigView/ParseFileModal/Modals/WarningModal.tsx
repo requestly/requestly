@@ -1,9 +1,9 @@
 import { RQModal } from "lib/design-system/components";
-import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModals";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { PreviewTableView } from "../ParsedTableView";
 import React from "react";
+import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
 
 export const WarningModal: React.FC<ModalProps & { count: number }> = ({
   buttonOptions,
