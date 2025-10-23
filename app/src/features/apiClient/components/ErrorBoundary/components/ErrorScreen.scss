@@ -1,0 +1,40 @@
+.api-client-error-boundary-view {
+  background: var(--requestly-color-background);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+
+  .api-client-error-boundary-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--requestly-space-6);
+
+    .error-boundary__contact {
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+      margin-top: var(--requestly-space-6);
+      text-align: center;
+    }
+
+    .error-boundary__actions {
+      display: flex;
+      gap: var(--requestly-space-6);
+      margin-top: var(--requestly-space-4);
+      justify-content: center;
+    }
+  }
+
+  .ant-alert {
+    padding: var(--requestly-space-4);
+    margin-bottom: var(--requestly-space-4);
+
+    &-message {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-warning-500);
+    }
+  }
+}
+
