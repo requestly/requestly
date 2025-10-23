@@ -1,60 +1,46 @@
-.api-client-error-boundary-view {
-  background: var(--requestly-color-background);
-  height: 100%;
-  width: 100%;
+.api-client-error-placeholder-container {
   display: flex;
-  justify-content: center;
-  padding-top: 80px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 56px 32px;
+  height: 100%;
 
-  .api-client-error-boundary-content {
+  .api-client-error-placeholder-content {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-8, 24px);
 
-    img {
-      width: 80px;
-    }
-
-    &__body {
-      .error-boundary__header {
-        font-size: var(--requestly-font-size-md);
-        color: var(--requestly-color-text-default);
-        font-weight: var(--requestly-font-weight-medium);
-        text-align: center;
-      }
-
-      .error-boundary__error-message {
-        margin-top: 8px;
-        font-size: var(--requestly-font-size-sm);
-        color: var(--requestly-color-text-subtle);
-        max-width: 520px;
-        color: var(--requestly-color-error-200);
-        background: var(--requestly-color-error-800);
-        padding: 8px 16px;
-        border-radius: 4px;
-        word-break: break-all;
-      }
-    }
-
-    .error-boundary__contact {
-      font-size: var(--requestly-font-size-xs);
-      color: var(--requestly-color-text-subtle);
-    }
-
-    .error-boundary__actions {
+    .file-error-container {
       display: flex;
-      gap: 16px;
+      padding: var(--space-5, 12px) var(--space-6, 16px);
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-4, 8px);
+      align-self: stretch;
+      border-radius: 8px;
+      color: var(--requestly-color-text-subtle);
+      font-size: var(--requestly-font-size-xs, 12px);
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: 0.25px;
+      max-width: 400px;
+      text-align: center;
     }
   }
 
-  .ant-alert {
-    padding: 8px;
-    margin-bottom: 8px;
+  img {
+    width: 80px;
+    height: 80px;
+  }
 
-    &-message {
-      font-size: var(--requestly-font-size-sm);
-      color: var(--requestly-color-warning-500);
-    }
+  &__title {
+    text-align: center;
+    text-overflow: ellipsis;
+    font-weight: var(--requestly-font-weight-medium);
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-default);
   }
 }
