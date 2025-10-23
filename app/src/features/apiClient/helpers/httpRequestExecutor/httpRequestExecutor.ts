@@ -62,7 +62,6 @@ class ExecutionError extends NativeError {
   constructor(entry: RQAPI.HttpApiEntry, error: Error) {
     super(error.message);
 
-
     const executionError = buildExecutionErrorObject(
       error,
       (error as any).context?.source || "request",
@@ -70,7 +69,6 @@ class ExecutionError extends NativeError {
     );
 
     this.result = buildErroredExecutionResult(entry, executionError);
-
   }
 }
 
@@ -82,7 +80,7 @@ export class HttpRequestExecutor {
     private scriptExecutor: HttpRequestScriptExecutionService,
     private postScriptExecutionCallback: (state: any) => Promise<void>,
     private appMode: string
-  ) { }
+  ) {}
 
   private getEmptyRenderedVariables(renderedVariables: Record<string, any>): string[] {
     if (isEmpty(renderedVariables)) {
@@ -154,12 +152,13 @@ export class HttpRequestExecutor {
         trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
       });
 
-      return generalValidationResult.and(multiPartvalidationResult).and(new Ok({
-        preparedEntry,
-        renderedVariables
-      }));
-    })
-
+      return generalValidationResult.and(multiPartvalidationResult).and(
+        new Ok({
+          preparedEntry,
+          renderedVariables,
+        })
+      );
+    });
 
     return result.mapError((err) => {
       trackRequestFailed(RQAPI.ApiClientErrorType.PRE_VALIDATION);
@@ -174,8 +173,9 @@ export class HttpRequestExecutor {
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry))
-      .mapError(error => new ExecutionError(entry, error));
+    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry)).mapError(
+      (error) => new ExecutionError(entry, error)
+    );
 
     if (preparationResult.isError()) {
       return preparationResult.unwrapError().result;
@@ -214,8 +214,9 @@ export class HttpRequestExecutor {
       }
 
       // Re-prepare the request as pre-request script might have modified it.
-      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry))
-        .mapError(error => new ExecutionError(entry, error));
+      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry)).mapError(
+        (error) => new ExecutionError(entry, error)
+      );
 
       if (rePreparationResult.isError()) {
         return rePreparationResult.unwrapError().result;
@@ -311,7 +312,7 @@ export class HttpRequestExecutor {
     const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
       recordId,
       entry,
-      async () => { },
+      async () => {},
       this.abortController
     );
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
@@ -329,7 +330,7 @@ export class HttpRequestExecutor {
     const responseScriptResult = await this.scriptExecutor.executePostResponseScript(
       recordId,
       entry,
-      async () => { },
+      async () => {},
       this.abortController
     );
 
