@@ -31,6 +31,17 @@ import { VariableScope } from "backend/environment/types";
 import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { SchemaObject } from "ajv";
+
+export const CollectionRunnerAjvSchema: SchemaObject = {
+  type: "array",
+  items: {
+    type: "object",
+    additionalProperties: {
+      type: ["string", "number", "boolean", "null"],
+    },
+  },
+};
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -128,34 +139,30 @@ class Runner {
       throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
     }
 
+    const fileExtension = getFileExtension(dataFile.path);
     try {
       const fileContents = await getFileContents(dataFile.path);
-      const fileExtension = getFileExtension(dataFile.path);
 
       switch (fileExtension) {
         case ".csv": {
-          const parsedData = parseCsvText(fileContents);
-          if (!parsedData.success) {
-            throw new DataFileParseError("Failed to parse CSV data file!").addContext({
-              collectionId,
-            });
-          }
-          this.variables = parsedData.data;
-          break;
+          const parsedData = await parseCsvText(fileContents);
+          return parsedData.data;
         }
         case ".json": {
-          const parsedData = parseJsonText(fileContents);
-          if (!parsedData.success) {
-            throw new DataFileParseError("Failed to parse JSON data file!").addContext({ collectionId });
-          }
-          this.variables = parsedData.data;
-          break;
+          const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
+          return parsedData.data;
+        }
+        default: {
+          throw new DataFileParseError("Unsupported data file format!").addContext({ collectionId, fileExtension });
         }
       }
     } catch (e) {
-      throw new DataFileParseError("Failed to read or parse data file!").addContext({ collectionId, error: e });
+      throw new DataFileParseError("Failed to read or parse data file!").addContext({
+        collectionId,
+        error: e,
+        fileExtension,
+      });
     }
-    console.log("!!!debug", "var", this.variables);
   }
 
   private async beforeStart() {
@@ -169,7 +176,8 @@ class Runner {
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
-    await this.parseDataFile();
+    const variables = await this.parseDataFile();
+    this.variables = variables ?? [];
 
     trackCollectionRunStarted({
       collection_id: collectionId,
@@ -207,7 +215,7 @@ class Runner {
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
     const scopes: Scope[] = [];
-    if (this.variables.length >= iteration) {
+    if (iteration <= this.variables.length) {
       scopes.push([
         {
           scope: VariableScope.DATA_FILE,
