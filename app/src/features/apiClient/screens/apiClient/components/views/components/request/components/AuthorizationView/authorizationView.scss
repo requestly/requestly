@@ -6,13 +6,13 @@
   --breakpoint-md: 768px;
 
   &.collection-auth {
-    border-bottom: var(--space-0, 0px);
+    border-bottom: var(--requestly-space-0, 0px);
   }
 
   .form-and-description {
     display: flex;
     flex-direction: column;
-    padding: var(--space-6, 16px);
+    padding: var(--requestly-space-6, 16px);
     height: calc(100% - 45px);
 
     &.no-auth {
@@ -31,17 +31,17 @@
         font-size: var(--requestly-font-size-xs, 11px);
         display: flex;
         align-items: center;
-        margin-bottom: var(--space-6, 16px);
+        margin-bottom: var(--requestly-space-6, 16px);
         span {
-          margin-left: var(--space-2, 4px);
+          margin-left: var(--requestly-space-2, 4px);
         }
       }
 
       .form {
         .field-group {
           display: flex;
-          gap: var(--space-4, 8px);
-          margin-bottom: var(--space-6, 16px);
+          gap: var(--requestly-space-4, 8px);
+          margin-bottom: var(--requestly-space-6, 16px);
           align-items: center;
 
           label {
@@ -67,15 +67,15 @@
               position: relative;
               display: flex;
               align-items: center;
-              height: var(--space-9, 32px);
+              height: var(--requestly-space-9, 32px);
               padding: 8px 8px;
-              gap: var(--space-3, 6px);
+              gap: var(--requestly-space-3, 6px);
               border: 1px solid var(--requestly-color-error);
-              border-radius: var(--space-2, 4px);
+              border-radius: var(--requestly-space-2, 4px);
 
               .error-icon {
-                margin-bottom: var(--space-0, 0px);
-                padding: var(--space-1, 2px);
+                margin-bottom: var(--requestly-space-0, 0px);
+                padding: var(--requestly-space-1, 2px);
                 margin-left: auto;
                 svg {
                   width: 17px;
@@ -87,14 +87,14 @@
               width: 100%;
               height: 100%;
               border: none;
-              padding: var(--space-0, 0px);
-              margin-bottom: var(--space-4, 8px);
+              padding: var(--requestly-space-0, 0px);
+              margin-bottom: var(--requestly-space-4, 8px);
             }
           }
 
           .ant-select-selector {
             width: 100%;
-            min-width: var(--space-0, 0px);
+            min-width: var(--requestly-space-0, 0px);
             background: none;
             @media (min-width: var(--breakpoint-md)) {
               width: auto;
@@ -102,10 +102,10 @@
           }
 
           .ant-input {
-            height: var(--space-9, 32px);
+            height: var(--requestly-space-9, 32px);
             background: none;
             font-size: 13px;
-            line-height: var(--space-7, 20px);
+            line-height: var(--requestly-space-7, 20px);
             padding: 4px 6px;
           }
 
@@ -119,14 +119,14 @@
     }
 
     .auth-description {
-      padding: var(--space-6, 16px);
+      padding: var(--requestly-space-6, 16px);
       width: 100%;
-      margin-left: var(--space-0, 0px);
+      margin-left: var(--requestly-space-0, 0px);
       border-left: none;
 
       @media (min-width: 1024px) {
         max-width: 320px;
-        margin-left: var(--space-0, 0px);
+        margin-left: var(--requestly-space-0, 0px);
         border-left: 1px solid rgba(255, 255, 255, 0.06); // Restore separator
       }
 
@@ -137,18 +137,18 @@
         max-width: 100%;
 
         img {
-          margin-top: var(--space-14, 72px);
-          margin-bottom: var(--space-6, 16px);
-          width: var(--space-15, 80px);
-          height: var(--space-15, 80px);
+          margin-top: var(--requestly-space-14, 72px);
+          margin-bottom: var(--requestly-space-6, 16px);
+          width: var(--requestly-space-15, 80px);
+          height: var(--requestly-space-15, 80px);
         }
 
         h1 {
-          line-height: var(--space-7, 20px);
+          line-height: var(--requestly-space-7, 20px);
           font-size: 13px;
           font-weight: 500;
           color: #fff;
-          margin-bottom: var(--space-2, 4px);
+          margin-bottom: var(--requestly-space-2, 4px);
         }
 
         h2 {
@@ -161,7 +161,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: var(--space-2, 4px);
+          gap: var(--requestly-space-2, 4px);
           text-decoration: underline;
           font-size: var(--requestly-font-size-sm);
           color: var(--requestly-color-primary-text, #639ff9);
@@ -175,7 +175,7 @@
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
-      padding: var(--space-6, 16px);
+      padding: var(--requestly-space-6, 16px);
       height: calc(100% - 45px); // 48px = read only alert height
 
       @media (min-width: 1024px) {
@@ -198,7 +198,7 @@
 
       .clear-icon {
         cursor: pointer;
-        margin-left: var(--space-6, 16px);
+        margin-left: var(--requestly-space-6, 16px);
         display: flex;
         align-items: center;
 
@@ -214,7 +214,7 @@
         font-size: var(--requestly-font-size-xs, 11px);
         line-height: 15px;
         color: #bbbbbb;
-        margin-right: var(--space-5, 12px);
+        margin-right: var(--requestly-space-5, 12px);
         font-weight: 500;
       }
 
