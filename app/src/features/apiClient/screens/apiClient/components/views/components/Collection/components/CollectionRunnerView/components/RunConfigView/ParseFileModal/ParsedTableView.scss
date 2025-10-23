@@ -1,6 +1,21 @@
 .parsed-table-view-container {
-  max-height: 335px; // Header (55px) + 8 rows (8 × 35px = 280px)
-  overflow: auto;
+  // Height is controlled inline
+  // overflow: auto is controlled inline
+
+  .ant-table-wrapper {
+    overflow: visible;
+  }
+
+  .ant-table {
+    overflow: visible;
+  }
+
+  // Make header sticky
+  .ant-table-thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
 }
 
 .preview-modal-body-container .rq-content-list-table-container {
