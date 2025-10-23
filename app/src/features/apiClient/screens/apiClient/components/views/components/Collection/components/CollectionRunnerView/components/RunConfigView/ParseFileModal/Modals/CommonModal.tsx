@@ -12,7 +12,13 @@ export const getformattedFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 };
 
-export const CommonModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData, viewMode }) => {
+export const CommonModal: React.FC<ModalProps> = ({
+  buttonOptions,
+  dataFileMetadata,
+  onClose,
+  parsedData,
+  viewMode,
+}) => {
   return (
     <RQModal
       width={680}
@@ -25,16 +31,16 @@ export const CommonModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onC
       }}
       className="preview-modal"
     >
-      <ModalHeader dataFile={dataFile} />
+      <ModalHeader dataFileMetadata={dataFileMetadata} />
 
       {/*conditional rendering based on viewMode */}
       <div className="preview-modal-body-container">
         <div className="preview-file-details">
-          <CommonFileInfo dataFile={dataFile} />
+          <CommonFileInfo dataFileMetadata={dataFileMetadata} />
           {viewMode === "view" && (
             <div>
               <span className="detail-label">File size:</span>
-              {getformattedFileSize(dataFile.size)}
+              {getformattedFileSize(dataFileMetadata.size)}
             </div>
           )}
         </div>

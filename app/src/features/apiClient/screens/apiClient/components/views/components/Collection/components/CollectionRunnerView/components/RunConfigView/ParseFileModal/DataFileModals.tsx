@@ -3,12 +3,12 @@ import React, { useCallback } from "react";
 import "./DataFileModal.scss";
 import { useRunConfigStore } from "../../../run.context";
 import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
-import { RunConfigState } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import { CommonModal } from "./Modals/CommonModal";
 import { WarningModal } from "./Modals/WarningModal";
 import { ErroredModal } from "./Modals/ErroredModal";
 import { LargeFileModal } from "./Modals/LargeFileModal";
 import { LoadingModal } from "./Modals/LoadingModal";
+import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 interface buttonSchema {
   label: string;
   onClick: () => void;
@@ -21,7 +21,7 @@ interface buttonTypes {
 
 export interface ModalProps {
   buttonOptions: () => buttonTypes;
-  dataFile: RunConfigState["dataFile"];
+  dataFileMetadata: { name: string; path: string; size: number };
   onClose: () => void;
   parsedData?: Record<string, any>[];
   viewMode?: any;
@@ -44,11 +44,13 @@ export const FooterButtons: React.FC<{
   );
 };
 
-export const ModalHeader: React.FC<{ dataFile?: RunConfigState["dataFile"] }> = ({ dataFile }) => {
+export const ModalHeader: React.FC<{ dataFileMetadata: { name: string; path: string; size: number } }> = ({
+  dataFileMetadata,
+}) => {
   return (
     <div className="preview-modal-header-container">
-      {dataFile?.name ? (
-        <div className="preview-modal-title">Preview: {dataFile.name}</div>
+      {dataFileMetadata?.name ? (
+        <div className="preview-modal-title">Preview: {dataFileMetadata.name}</div>
       ) : (
         <div className="preview-modal-title">Preview data use locally</div>
       )}
@@ -57,8 +59,8 @@ export const ModalHeader: React.FC<{ dataFile?: RunConfigState["dataFile"] }> = 
 };
 
 export const CommonFileInfo: React.FC<{
-  dataFile: RunConfigState["dataFile"];
-}> = ({ dataFile }) => {
+  dataFileMetadata: { name: string; path: string; size: number };
+}> = ({ dataFileMetadata }) => {
   return (
     <>
       <div>
@@ -220,9 +222,9 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
       {viewMode === "view" && (
         <CommonModal
           buttonOptions={buttonOptions}
-          dataFile={dataFile}
+          dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          parsedData={parsedData}
+          parsedData={parsedDataRef.current?.data}
           viewMode={viewMode}
         />
       )}
@@ -235,13 +237,15 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           count={parsedDataRef.current?.count}
         />
       )}
-      {viewMode === "error" && <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />}
-      {viewMode === "success" && count < 1000 && (
+      {viewMode === "error" && (
+        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
+      )}
+      {viewMode === "success" && parsedDataRef.current?.count < 1000 && (
         <CommonModal
           buttonOptions={buttonOptions}
-          dataFile={dataFile}
+          dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          parsedData={parsedData}
+          parsedData={parsedDataRef.current?.data}
           viewMode={viewMode}
         />
       )}

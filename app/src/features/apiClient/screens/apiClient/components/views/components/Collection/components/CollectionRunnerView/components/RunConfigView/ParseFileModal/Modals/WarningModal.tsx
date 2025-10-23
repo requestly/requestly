@@ -5,7 +5,13 @@ import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTr
 import { PreviewTableView } from "../ParsedTableView";
 import React from "react";
 
-export const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData }) => {
+export const WarningModal: React.FC<ModalProps & { count: number }> = ({
+  buttonOptions,
+  dataFileMetadata,
+  onClose,
+  parsedData,
+  count,
+}) => {
   return (
     <RQModal
       width={680}
@@ -18,7 +24,7 @@ export const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, on
       }}
       className="preview-modal"
     >
-      <ModalHeader dataFile={dataFile} />
+      <ModalHeader dataFileMetadata={dataFileMetadata} />
 
       <div className="warning-state-messaging-container">
         <div className="warning-state-banner-container">
@@ -37,11 +43,9 @@ export const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, on
         <div className="preview-file-details">
           <div>
             <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of</span>
-            {/* TODO@nafees */}
-            {/* {count}{" "} */}
-            entries
+            {count} entries
           </div>
-          <CommonFileInfo dataFile={dataFile} />
+          <CommonFileInfo dataFileMetadata={dataFileMetadata} />
         </div>
         <PreviewTableView datasource={parsedData} />
       </div>
