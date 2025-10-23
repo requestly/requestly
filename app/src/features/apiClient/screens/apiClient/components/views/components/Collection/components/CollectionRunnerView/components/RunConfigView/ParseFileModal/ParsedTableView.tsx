@@ -1,5 +1,5 @@
 import { ContentListTable, withContentListTableContext } from "componentsV2/ContentList";
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import "./ParsedTableView.scss";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -72,21 +72,21 @@ const generateDataSource = () => {
   return data;
 };
 
-const dataSource = generateDataSource();
+// const dataSource = generateDataSource();
 
-const keys = Object.keys(dataSource[0]);
-const columns = [
-  {
-    title: "Iteration",
-    dataIndex: "iteration",
-    key: "iteration",
-  },
-  ...keys.map((k) => ({
-    title: k.charAt(0).toUpperCase() + k.slice(1),
-    dataIndex: k,
-    key: k,
-  })),
-];
+// const keys = Object.keys(dataSource[0]);
+// const columns = [
+//   {
+//     title: "Iteration",
+//     dataIndex: "iteration",
+//     key: "iteration",
+//   },
+//   ...keys.map((k) => ({
+//     title: k.charAt(0).toUpperCase() + k.slice(1),
+//     dataIndex: k,
+//     key: k,
+//   })),
+// ];
 
 //logic to create iteration column in table
 
@@ -97,11 +97,31 @@ const addIterationColumnToTable = (dataSource: any[]) => {
   }));
 };
 
-export const PreviewTableView: React.FC = () => {
+export const PreviewTableView: React.FC<{
+  datasource: Record<string, any>[];
+}> = ({ datasource }) => {
   const parentRef = useRef(null);
 
-  const data = addIterationColumnToTable(dataSource);
+  const data = addIterationColumnToTable(datasource);
   const limitedData = data.length > 1000 ? data.slice(0, 1000) : data;
+
+  const columns = useMemo(() => {
+    const keys = Object.keys(limitedData[0] || {});
+    return [
+      {
+        title: "Iteration",
+        dataIndex: "iteration",
+        key: "iteration",
+      },
+      ...keys
+        .filter((k) => k !== "iteration")
+        .map((k) => ({
+          title: k.charAt(0).toUpperCase() + k.slice(1),
+          dataIndex: k,
+          key: k,
+        })),
+    ];
+  }, [limitedData]);
 
   const rowVirtualizer = useVirtualizer({
     count: data.length,

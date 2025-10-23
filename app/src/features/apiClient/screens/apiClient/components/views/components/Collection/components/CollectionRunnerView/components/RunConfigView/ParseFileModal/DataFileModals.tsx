@@ -1,36 +1,16 @@
 //states of this modal
 import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import "./DataFileModal.scss";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { useRunConfigStore } from "../../../run.context";
-import { ApiClientFile, FileId } from "features/apiClient/store/apiClientFilesStore";
-import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
+import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "./ParsedTableView";
-/**
- * 1. successfull parsing, upload pending - show table, filename, type & cancel, usefile btn
- * 2. unsucessfull parsing - show error message with learn more & select again option
- * 3. successfull parsing, but too many rows/iterations - show error message with replace file & use first 1k entries
- * 4. show preview - for removing & change/upload data file
- **/
-
-/**
- * status,
- * array of columns & data for table
- * count of rows
- */
-
-interface previewModalProps {
-  status: "success" | "error" | "view" | "largeFile" | "loading";
-  count?: number;
-  onClose: () => void;
-  onFileSelected?: () => void;
-  handleSelectFile?: () => void;
-}
+import { RunConfigState } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 
 interface buttonSchema {
   label: string;
@@ -40,14 +20,6 @@ interface buttonSchema {
 interface buttonTypes {
   primaryButton: buttonSchema;
   secondaryButton: buttonSchema;
-}
-
-interface ModalProps {
-  buttonOptions: () => buttonTypes;
-  dataFile?: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
-  onClose: () => void;
-  removeDataFile?: () => void;
-  count?: number;
 }
 
 const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -112,7 +84,7 @@ const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, removeDataFile }) => {
+const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
     <RQModal
       width={680}
@@ -121,7 +93,7 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, 
       closeIcon={<MdOutlineClose />}
       onCancel={() => {
         onClose();
-        removeDataFile();
+        // removeDataFile();
       }}
       className="preview-modal"
     >
@@ -155,6 +127,12 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, 
     </RQModal>
   );
 };
+
+interface ModalProps {
+  buttonOptions: () => buttonTypes;
+  dataFile: RunConfigState["dataFile"];
+  onClose: () => void;
+}
 
 const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
@@ -200,7 +178,7 @@ const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
   );
 };
 
-const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, onClose, removeDataFile }) => {
+const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
   return (
     <RQModal
       width={680}
@@ -209,7 +187,7 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, on
       closeIcon={<MdOutlineClose />}
       onCancel={() => {
         onClose();
-        removeDataFile();
+        // removeDataFile();
       }}
       className="preview-modal"
     >
@@ -236,7 +214,9 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, on
       <div className="preview-modal-body-container">
         <div className="preview-file-details">
           <div>
-            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of</span> {count}{" "}
+            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of</span>
+            {/* TODO@nafees */}
+            {/* {count}{" "} */}
             entires
           </div>
           <div>
@@ -262,7 +242,7 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, on
   );
 };
 
-const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, removeDataFile }) => {
+const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
   return (
     <RQModal
       width={680}
@@ -271,7 +251,7 @@ const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, removeData
       closeIcon={<MdOutlineClose />}
       onCancel={() => {
         onClose();
-        removeDataFile();
+        // removeDataFile();
       }}
       className="preview-modal"
     >
@@ -372,17 +352,58 @@ const LargeFileModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
   );
 };
 
-export const DataFileModals: React.FC<previewModalProps> = ({
-  status,
-  count,
+/**
+ * 1. successfull parsing, upload pending - show table, filename, type & cancel, usefile btn
+ * 2. unsucessfull parsing - show error message with learn more & select again option
+ * 3. successfull parsing, but too many rows/iterations - show error message with replace file & use first 1k entries
+ * 4. show preview - for removing & change/upload data file
+ **/
+
+/**
+ * status,
+ * array of columns & data for table
+ * count of rows
+ */
+
+interface PreviewModalProps {
+  initialStatus: "success" | "error" | "view" | "largeFile" | "loading";
+  onClose: () => void;
+  onFileSelected?: () => void;
+  handleSelectFile?: () => void;
+  dataFile: RunConfigState["dataFile"];
+  isDataFileValid: boolean;
+}
+
+export const DataFileModals: React.FC<PreviewModalProps> = ({
+  initialStatus,
   onClose,
   onFileSelected,
   handleSelectFile,
-}: previewModalProps) => {
-  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
+  dataFile,
+}) => {
+  const [status, setStatus] = React.useState<"success" | "error" | "view" | "largeFile" | "loading">(initialStatus);
+  const [count, setCount] = React.useState<number>(0);
+  const [removeDataFile] = useRunConfigStore((s) => [s.removeDataFile]);
+
+  const parseDataFile = useCallback(async () => {
+    if (!dataFile) return;
+
+    try {
+      const parsedData = await parseCollectionRunnerDataFile(dataFile.path);
+      if (parsedData) {
+        setStatus("success");
+        setCount(parsedData.count);
+      }
+    } catch (err) {
+      setStatus("error");
+    }
+  }, [dataFile]);
+
+  useEffect(() => {
+    parseDataFile();
+  }, [parseDataFile]);
 
   //stubs: footer buttton options
-
   const buttonOptions = (): buttonTypes => {
     switch (status) {
       case "error":
@@ -400,7 +421,7 @@ export const DataFileModals: React.FC<previewModalProps> = ({
               /*
                  // delete the existing file from store
                  // SO THAT DATAFILE GETS EMPTY
-                 // then move to re-upload screen again    
+                 // then move to re-upload screen again
               */
             },
           },
@@ -493,26 +514,13 @@ export const DataFileModals: React.FC<previewModalProps> = ({
       {status === "loading" && <LoadingModal onClose={onClose} />}
       {status === "view" && <PreviewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
       {status === "success" && count > 1000 && (
-        <WarningModal
-          buttonOptions={buttonOptions}
-          count={count}
-          dataFile={dataFile}
-          onClose={onClose}
-          removeDataFile={removeDataFile}
-        />
+        <WarningModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />
       )}
-      {status === "error" && (
-        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} removeDataFile={removeDataFile} />
-      )}
+      {status === "error" && <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />}
       {status === "success" && count < 1000 && (
-        <ParsingModal
-          buttonOptions={buttonOptions}
-          dataFile={dataFile}
-          onClose={onClose}
-          removeDataFile={removeDataFile}
-        />
+        <ParsingModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />
       )}
-      {status === "largeFile" && <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} />}
+      {status === "largeFile" && <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />}
     </>
   );
 };

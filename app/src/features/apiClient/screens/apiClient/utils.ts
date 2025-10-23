@@ -23,6 +23,8 @@ import Papa from "papaparse";
 import Ajv, { SchemaObject } from "ajv";
 import { utilityWorker } from "features/apiClient/helpers/utilityWorker";
 import Logger from "lib/logger";
+import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
+import { NativeError } from "errors/NativeError";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -973,4 +975,32 @@ export const parseCsvText = async (content: string): Promise<ParsedResult> => {
       },
     });
   });
+};
+
+const CollectionRunnerAjvSchema: SchemaObject = {
+  type: "array",
+  items: {
+    type: "object",
+    additionalProperties: {
+      type: ["string", "number", "boolean", "null"],
+    },
+  },
+};
+export const parseCollectionRunnerDataFile = async (filePath: string) => {
+  const fileExtension = getFileExtension(filePath);
+  const fileContents = await getFileContents(filePath);
+
+  switch (fileExtension) {
+    case ".csv": {
+      const parsedData = await parseCsvText(fileContents);
+      return parsedData;
+    }
+    case ".json": {
+      const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
+      return parsedData;
+    }
+    default: {
+      throw new NativeError("Unsupported data file format!").addContext({ fileExtension });
+    }
+  }
 };
