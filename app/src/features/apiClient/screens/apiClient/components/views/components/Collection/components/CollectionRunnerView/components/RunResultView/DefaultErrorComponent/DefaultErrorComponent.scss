@@ -1,0 +1,60 @@
+.api-client-error-boundary-view {
+  background: var(--requestly-color-background);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+
+  .api-client-error-boundary-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    img {
+      width: 80px;
+    }
+
+    &__body {
+      .error-boundary__header {
+        font-size: var(--requestly-font-size-md);
+        color: var(--requestly-color-text-default);
+        font-weight: var(--requestly-font-weight-medium);
+        text-align: center;
+      }
+
+      .error-boundary__error-message {
+        margin-top: 8px;
+        font-size: var(--requestly-font-size-sm);
+        color: var(--requestly-color-text-subtle);
+        max-width: 520px;
+        color: var(--requestly-color-error-200);
+        background: var(--requestly-color-error-800);
+        padding: 8px 16px;
+        border-radius: 4px;
+        word-break: break-all;
+      }
+    }
+
+    .error-boundary__contact {
+      font-size: var(--requestly-font-size-xs);
+      color: var(--requestly-color-text-subtle);
+    }
+
+    .error-boundary__actions {
+      display: flex;
+      gap: 16px;
+    }
+  }
+
+  .ant-alert {
+    padding: 8px;
+    margin-bottom: 8px;
+
+    &-message {
+      font-size: var(--requestly-font-size-sm);
+      color: var(--requestly-color-warning-500);
+    }
+  }
+}

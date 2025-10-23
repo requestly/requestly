@@ -282,7 +282,7 @@ class Runner {
   }
 
   private onError(error: any) {
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+    this.runContext.runResultStore.getState().setError(error);
     this.runContext.runResultStore.getState().setEndtime(null);
   }
 
