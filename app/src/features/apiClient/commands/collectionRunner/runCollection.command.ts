@@ -9,12 +9,7 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import {
-  getFileExtension,
-  isHTTPApiEntry,
-  parseCsvText,
-  parseJsonText,
-} from "features/apiClient/screens/apiClient/utils";
+import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -29,19 +24,7 @@ import { cancelRun } from "./cancelRun.command";
 import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { VariableScope } from "backend/environment/types";
 import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
-import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
-import { SchemaObject } from "ajv";
-
-export const CollectionRunnerAjvSchema: SchemaObject = {
-  type: "array",
-  items: {
-    type: "object",
-    additionalProperties: {
-      type: ["string", "number", "boolean", "null"],
-    },
-  },
-};
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -139,30 +122,14 @@ class Runner {
       throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
     }
 
-    let fileExtension: string | undefined = undefined;
     try {
-      fileExtension = getFileExtension(dataFile.path)?.toLocaleLowerCase();
-      const fileContents = await getFileContents(dataFile.path);
-
-      switch (fileExtension) {
-        case ".csv": {
-          const parsedData = await parseCsvText(fileContents);
-          return parsedData.data;
-        }
-        case ".json": {
-          const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
-          return parsedData.data;
-        }
-        default: {
-          throw new DataFileParseError("Unsupported data file format!").addContext({ collectionId, fileExtension });
-        }
-      }
+      const parsedData = await parseCollectionRunnerDataFile(dataFile.path);
+      return parsedData.data;
     } catch (e) {
       throw new DataFileParseError("Failed to read or parse data file!").addContext({
         collectionId,
         error: e,
-        fileExtension,
-        dataFilePath: dataFile.path,
+        filePath: dataFile.path,
       });
     }
   }

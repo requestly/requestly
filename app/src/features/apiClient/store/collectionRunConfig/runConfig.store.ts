@@ -63,13 +63,13 @@ export function createRunConfigStore(data: {
 }) {
   const { id, runOrder, unorderedRequestIds, delay = 0, iterations = 1, dataFile = null } = data;
 
-  return create<RunConfigState>()((set, get) => ({
+  const store = create<RunConfigState>()((set, get) => ({
     id,
     runOrder: parseUnorderedRequests(runOrder, unorderedRequestIds),
     delay,
     iterations,
     hasUnsavedChanges: false,
-    dataFile,
+    dataFile: null,
 
     setHasUnsavedChanges(hasUnsavedChanges) {
       set({ hasUnsavedChanges });
@@ -197,4 +197,12 @@ export function createRunConfigStore(data: {
       setHasUnsavedChanges(false);
     },
   }));
+
+  // Initialize dataFile if provided
+  if (dataFile) {
+    store.getState().setDataFile(dataFile);
+    store.getState().setHasUnsavedChanges(false);
+  }
+
+  return store;
 }

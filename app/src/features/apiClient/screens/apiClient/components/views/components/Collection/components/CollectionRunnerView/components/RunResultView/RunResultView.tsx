@@ -30,11 +30,7 @@ export const RunResultView: React.FC = () => {
     } else {
       //default error component
       //LOOK ERROR BOUNDARY FOR CREATING THIS
-      <DefaultErrorComponent
-        defaultTags={{
-          error_type: "could_not_run_collection",
-        }}
-      />;
+      <DefaultErrorComponent error={error} />;
     }
   }
   const testResults = useMemo(

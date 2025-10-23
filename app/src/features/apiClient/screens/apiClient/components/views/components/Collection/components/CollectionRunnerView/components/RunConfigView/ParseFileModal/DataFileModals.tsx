@@ -1,25 +1,14 @@
-//states of this modal
-import { RQModal } from "lib/design-system/components";
 import { RQButton } from "lib/design-system-v2/components";
-import React from "react";
+import React, { useCallback } from "react";
 import "./DataFileModal.scss";
-import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
-import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { useRunConfigStore } from "../../../run.context";
-import { ApiClientFile, FileId } from "features/apiClient/store/apiClientFilesStore";
-import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
-import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
-import { PreviewTableView } from "./ParsedTableView";
-
-interface previewModalProps {
-  viewMode: "success" | "error" | "view" | "largeFile" | "loading";
-  count?: number;
-  onClose: () => void;
-  onFileSelected?: () => void;
-  handleSelectFile?: () => void;
-}
-
+import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
+import { CommonModal } from "./Modals/CommonModal";
+import { WarningModal } from "./Modals/WarningModal";
+import { ErroredModal } from "./Modals/ErroredModal";
+import { LargeFileModal } from "./Modals/LargeFileModal";
+import { LoadingModal } from "./Modals/LoadingModal";
+import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 interface buttonSchema {
   label: string;
   onClick: () => void;
@@ -30,332 +19,110 @@ interface buttonTypes {
   secondaryButton: buttonSchema;
 }
 
-interface ModalProps {
+export interface ModalProps {
   buttonOptions: () => buttonTypes;
-  dataFile?: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
+  dataFileMetadata: { name: string; path: string; size: number };
   onClose: () => void;
-  removeDataFile?: () => void;
-  count?: number;
+  parsedData?: Record<string, any>[];
+  viewMode?: any;
 }
 
-const CommonFileInfo: React.FC<{
-  dataFile: Omit<ApiClientFile, "isFileValid"> & {
-    id: FileId;
-  };
-}> = ({ dataFile }) => {
+export const FooterButtons: React.FC<{
+  buttonOptions: () => buttonTypes;
+  primaryIcon?: React.ReactNode;
+  secondaryIcon?: React.ReactNode;
+}> = ({ buttonOptions, primaryIcon, secondaryIcon }) => {
+  return (
+    <div className="preview-modal-footer-container">
+      <RQButton type="secondary" onClick={buttonOptions().primaryButton.onClick} icon={secondaryIcon ?? null}>
+        {buttonOptions().primaryButton.label}
+      </RQButton>
+      <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick} icon={primaryIcon ?? null}>
+        {buttonOptions().secondaryButton.label}
+      </RQButton>
+    </div>
+  );
+};
+
+export const ModalHeader: React.FC<{ dataFileMetadata: { name: string; path: string; size: number } }> = ({
+  dataFileMetadata,
+}) => {
+  return (
+    <div className="preview-modal-header-container">
+      {dataFileMetadata?.name ? (
+        <div className="preview-modal-title">Preview: {dataFileMetadata.name}</div>
+      ) : (
+        <div className="preview-modal-title">Preview data use locally</div>
+      )}
+    </div>
+  );
+};
+
+export const CommonFileInfo: React.FC<{
+  dataFileMetadata: { name: string; path: string; size: number };
+}> = ({ dataFileMetadata }) => {
   return (
     <>
       <div>
-        <span className="detail-label">File Name:</span> {dataFile.name}
+        <span className="detail-label">File Name:</span> {dataFileMetadata.name}
       </div>
       <div>
-        <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase().slice(1)}
+        <span className="detail-label">File type:</span>{" "}
+        {getFileExtension(dataFileMetadata.name).toUpperCase().slice(1)}
       </div>
     </>
   );
 };
 
-const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, removeDataFile }) => {
-  return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-        removeDataFile();
-      }}
-      className="preview-modal"
-    >
-      <div className="preview-modal-header-container">
-        <div className="preview-modal-title">Preview data use locally</div>
-      </div>
+interface PreviewModalProps {
+  onClose: () => void;
+  onFileSelected?: () => void;
+  handleSelectFile?: () => void;
+  dataFileMetadata: { name: string; path: string; size: number };
+  isPreviewMode: boolean;
+}
 
-      <div className="preview-modal-body-container">
-        <div className="preview-file-details">
-          <CommonFileInfo dataFile={dataFile} />
-        </div>
-        <PreviewTableView />
-      </div>
-
-      <div className="preview-modal-footer-container">
-        <RQButton type="secondary" onClick={buttonOptions().primaryButton.onClick}>
-          {buttonOptions().primaryButton.label}
-        </RQButton>
-        <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick}>
-          {buttonOptions().secondaryButton.label}
-        </RQButton>
-      </div>
-    </RQModal>
-  );
-};
-
-const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
-  return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={onClose}
-      className="preview-modal"
-    >
-      <div className="preview-modal-header-container">
-        <div className="preview-modal-title">Preview: {dataFile.name}</div>
-      </div>
-
-      <div className="preview-modal-body-container">
-        <div className="preview-file-details">
-          <CommonFileInfo dataFile={dataFile} />
-          <div>
-            <span className="detail-label">File size:</span>{" "}
-            {dataFile.size < 1024 ? `${dataFile.size} B` : `${(dataFile.size / 1024).toFixed(2)} KB`}
-          </div>
-        </div>
-        <PreviewTableView />
-      </div>
-
-      <div className="preview-modal-footer-container">
-        <RQButton type="secondary" icon={<RiDeleteBin6Line />} onClick={buttonOptions().primaryButton.onClick}>
-          {buttonOptions().primaryButton.label}
-        </RQButton>
-        <RQButton type="primary" icon={<MdOutlineOpenInNew />} onClick={buttonOptions().secondaryButton.onClick}>
-          {buttonOptions().secondaryButton.label}
-        </RQButton>
-      </div>
-    </RQModal>
-  );
-};
-
-const WarningModal: React.FC<ModalProps> = ({ buttonOptions, count, dataFile, onClose, removeDataFile }) => {
-  return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-        removeDataFile();
-      }}
-      className="preview-modal"
-    >
-      <div className="preview-modal-header-container">
-        <div className="preview-modal-title">Preview data use locally</div>
-      </div>
-
-      <div className="warning-state-messaging-container">
-        <div className="warning-state-banner-container">
-          <div className="warning-state-banner-fields">
-            <div className="warning-icon">
-              <BsExclamationTriangle />
-            </div>
-            <span className="warning-text">
-              Runner currently supports max 1000 iterations. Upload a smaller file or continue with the first 1000.
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="preview-modal-body-container">
-        <div className="preview-file-details">
-          <div>
-            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of</span> {count}{" "}
-            entires
-          </div>
-          <CommonFileInfo dataFile={dataFile} />
-        </div>
-        <PreviewTableView />
-      </div>
-
-      <div className="preview-modal-footer-container">
-        <RQButton type="secondary" onClick={buttonOptions().primaryButton.onClick}>
-          {buttonOptions().primaryButton.label}
-        </RQButton>
-        <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick}>
-          {buttonOptions().secondaryButton.label}
-        </RQButton>
-      </div>
-    </RQModal>
-  );
-};
-
-const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, removeDataFile }) => {
-  return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-        removeDataFile();
-      }}
-      className="preview-modal"
-    >
-      <div className="preview-modal-header-container">
-        <div className="preview-modal-title">Preview data use locally</div>
-      </div>
-
-      <div className="error-state-messaging-container">
-        <div>
-          <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
-        </div>
-        <div>Invalid JSON file uploaded</div>
-        <div className="detail-label">
-          Oops! We couldn't parse your file — it must be a valid JSON array of key-value objects.
-        </div>
-
-        <div className="error-state-fix-suggestion">
-          <div className="example-label">EXAMPLE FORMAT:</div>
-          <pre className="code-example">
-            <code>
-              <span className="punctuation">[</span>
-              {"\n  "}
-              <span className="punctuation">{"{"}</span>
-              <span className="key">"name"</span>
-              <span className="punctuation">: </span>
-              <span className="value">"Alice"</span>
-              <span className="punctuation">, </span>
-              <span className="key">"age"</span>
-              <span className="punctuation">: </span>
-              <span className="value">30</span>
-              <span className="punctuation">{"}"}</span>
-              <span className="punctuation">,</span>
-              {"\n  "}
-              <span className="punctuation">{"{"}</span>
-              <span className="key">"name"</span>
-              <span className="punctuation">: </span>
-              <span className="value">"Bob"</span>
-              <span className="punctuation">, </span>
-              <span className="key">"age"</span>
-              <span className="punctuation">: </span>
-              <span className="value">25</span>
-              <span className="punctuation">{"}"}</span>
-              {"\n"}
-              <span className="punctuation">]</span>
-            </code>
-          </pre>
-        </div>
-
-        <div className="error-state-footer-container">
-          <RQButton icon={<MdOutlineOpenInNew />} type="secondary" onClick={buttonOptions().primaryButton.onClick}>
-            {buttonOptions().primaryButton.label}
-          </RQButton>
-          <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick}>
-            {buttonOptions().secondaryButton.label}
-          </RQButton>
-        </div>
-      </div>
-    </RQModal>
-  );
-};
-
-const LargeFileModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
-  return (
-    <>
-      <RQModal
-        width={480}
-        open={true}
-        closable={true}
-        closeIcon={<MdOutlineClose />}
-        onCancel={onClose}
-        className="preview-modal"
-      >
-        <div className="preview-modal-header-container">
-          <div className="preview-modal-title">File Exceeds 100 MB Limit</div>
-        </div>
-
-        <div className="large-file-messaging-container">
-          <span className="large-file-text">
-            The file is too large to upload. Select a smaller data file to continue.
-          </span>
-        </div>
-
-        <div className="preview-modal-footer-container">
-          <RQButton type="secondary" onClick={buttonOptions().primaryButton.onClick}>
-            {buttonOptions().primaryButton.label}
-          </RQButton>
-          <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick}>
-            {buttonOptions().secondaryButton.label}
-          </RQButton>
-        </div>
-      </RQModal>
-    </>
-  );
-};
-
-const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  return (
-    <RQModal
-      width={480}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={onClose}
-      className="preview-modal loading-modal"
-    >
-      <div className="preview-modal-header-container">
-        <div className="preview-modal-title">Processing File</div>
-      </div>
-
-      <div className="loading-state-container">
-        <div className="loading-spinner">
-          <div className="spinner-placeholder">
-            <svg
-              className="spinner-icon"
-              width="48"
-              height="48"
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="24"
-                cy="24"
-                r="20"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeDasharray="80 40"
-                opacity="0.25"
-              />
-              <circle
-                cx="24"
-                cy="24"
-                r="20"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeDasharray="80 40"
-                strokeDashoffset="0"
-                className="spinner-circle"
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="loading-message">
-          <div className="loading-title">Parsing your file...</div>
-          <div className="loading-description detail-label">
-            Please wait while we process and validate your data file.
-          </div>
-        </div>
-      </div>
-    </RQModal>
-  );
-};
-
-export const DataFileModals: React.FC<previewModalProps> = ({
-  viewMode,
-  count,
+export const DataFileModals: React.FC<PreviewModalProps> = ({
   onClose,
   onFileSelected,
   handleSelectFile,
-}: previewModalProps) => {
-  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
+  dataFileMetadata,
+  isPreviewMode = false,
+}) => {
+  const [viewMode, setViewMode] = React.useState<"success" | "error" | "view" | "largeFile" | "loading">("loading");
+  const parsedDataRef = React.useRef<{ data: Record<string, any>[]; count: number } | null>(null);
 
-  //stubs: footer buttton options
+  const [removeDataFile, setDataFile] = useRunConfigStore((s) => [s.removeDataFile, s.setDataFile]);
+
+  const setDataFileInStore = useCallback(() => {
+    const fileId = dataFileMetadata.name + "-" + Date.now();
+
+    setDataFile({
+      id: fileId,
+      name: dataFileMetadata.name,
+      path: dataFileMetadata.path,
+      size: dataFileMetadata.size,
+      source: "desktop",
+      fileFeature: FileFeature.COLLECTION_RUNNER,
+    });
+  }, [dataFileMetadata.name, dataFileMetadata.path, dataFileMetadata.size, setDataFile]);
+
+  // Parse file on mount using useState lazy initializer (runs only once)
+  React.useState(() => {
+    parseCollectionRunnerDataFile(dataFileMetadata.path)
+      .then((data) => {
+        const processedData = {
+          data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
+          count: data.count,
+        };
+        parsedDataRef.current = processedData;
+        setViewMode(isPreviewMode ? "view" : "success");
+      })
+      .catch(() => {
+        setViewMode("error");
+      });
+    return true;
+  });
 
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
@@ -371,31 +138,23 @@ export const DataFileModals: React.FC<previewModalProps> = ({
             label: "Select Again",
             onClick: () => {
               handleSelectFile?.();
-              /*
-                 // delete the existing file from store
-                 // SO THAT DATAFILE GETS EMPTY
-                 // then move to re-upload screen again    
-              */
             },
           },
         };
 
       case "success":
-        if (count > 1000) {
+        if (parsedDataRef.current?.count > 1000) {
           return {
             primaryButton: {
               label: "Replace file",
               onClick: () => {
-                //remove the existing file from store and open file selector again
-                //if cancel/cross is done then is should not remove the existing file & retain the existing file
                 handleSelectFile?.();
               },
             },
             secondaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
-                //use first 1000 entries
-                //close modal
+                setDataFileInStore();
                 onClose();
               },
             },
@@ -407,16 +166,12 @@ export const DataFileModals: React.FC<previewModalProps> = ({
               onClick: () => {
                 removeDataFile();
                 onClose();
-                //remove the file from store
-                //SO THAT DATAFILE GETS EMPTY
-                //just close the modal without saving
               },
             },
             secondaryButton: {
               label: "Use File",
               onClick: () => {
-                //use this file and add it to store
-                //and also now on click the file name on button should open the file in viewModal component
+                setDataFileInStore();
                 onClose();
               },
             },
@@ -428,7 +183,6 @@ export const DataFileModals: React.FC<previewModalProps> = ({
           primaryButton: {
             label: "Remove",
             onClick: () => {
-              //remove the file from store and close the modal
               removeDataFile();
               onClose();
             },
@@ -436,7 +190,6 @@ export const DataFileModals: React.FC<previewModalProps> = ({
           secondaryButton: {
             label: "Change data file",
             onClick: () => {
-              //remove the existing file from store and open file selector again
               handleSelectFile?.();
             },
           },
@@ -465,28 +218,39 @@ export const DataFileModals: React.FC<previewModalProps> = ({
   return (
     <>
       {viewMode === "loading" && <LoadingModal onClose={onClose} />}
-      {viewMode === "view" && <PreviewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
-      {viewMode === "success" && count > 1000 && (
+      {viewMode === "view" && (
+        <CommonModal
+          buttonOptions={buttonOptions}
+          dataFileMetadata={dataFileMetadata}
+          onClose={onClose}
+          parsedData={parsedDataRef.current?.data}
+          viewMode={viewMode}
+        />
+      )}
+      {viewMode === "success" && parsedDataRef.current?.count > 1000 && (
         <WarningModal
           buttonOptions={buttonOptions}
-          count={count}
-          dataFile={dataFile}
+          dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          removeDataFile={removeDataFile}
+          parsedData={parsedDataRef.current?.data}
+          count={parsedDataRef.current?.count}
         />
       )}
       {viewMode === "error" && (
-        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} removeDataFile={removeDataFile} />
+        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
       )}
-      {viewMode === "success" && count < 1000 && (
-        <ParsingModal
+      {viewMode === "success" && parsedDataRef.current?.count < 1000 && (
+        <CommonModal
           buttonOptions={buttonOptions}
-          dataFile={dataFile}
+          dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          removeDataFile={removeDataFile}
+          parsedData={parsedDataRef.current?.data}
+          viewMode={viewMode}
         />
       )}
-      {viewMode === "largeFile" && <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} />}
+      {viewMode === "largeFile" && (
+        <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
+      )}
     </>
   );
 };

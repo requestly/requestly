@@ -2,7 +2,12 @@ import { Button } from "antd";
 
 export function displayFileSelector(callback, config = {}) {
   if (config.properties && config.properties.includes("multiSelections")) {
-    return;
+    /*
+    This function is meant to select a single file only.
+    Hence removing multiSelections property from config.
+    Use displayMultiFileSelector for multiple file selection.
+    */
+    config.properties = config.properties.filter((prop) => prop !== "multiSelections");
   }
   const handleDialogPromise = (result) => {
     //this selector will always have only one single file
