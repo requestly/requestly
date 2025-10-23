@@ -12,6 +12,7 @@ import { updateRequestWithAuthOptions } from "../auth";
 import { cloneDeep } from "lodash";
 import { renderVariables as renderVariablesType } from "backend/environment/utils";
 import { compile } from "path-to-regexp";
+import Logger from "lib/logger";
 
 export class HttpRequestPreparationService {
   constructor(
@@ -99,6 +100,14 @@ export class HttpRequestPreparationService {
       isEnabled: true,
     }));
 
+    Logger.log("!!!debug", "preparedHeaders", {
+      entryFromAbove: JSON.parse(JSON.stringify(entry)),
+      workingEntry: JSON.parse(JSON.stringify(workingEntry)),
+      existingHeaders,
+      newHeaders,
+      headers,
+    });
+
     workingEntry.request.headers = updateRequestWithAuthOptions(workingEntry.request.headers, headers);
     workingEntry.request.queryParams = updateRequestWithAuthOptions(workingEntry.request.queryParams, queryParams);
 
@@ -109,6 +118,8 @@ export class HttpRequestPreparationService {
     );
 
     renderedEntry.request.url = addUrlSchemeIfMissing(renderedEntry.request.url);
+
+    Logger.log("!!!debug", "preparedEntry", { renderedEntry: JSON.parse(JSON.stringify(renderedEntry)) });
 
     return {
       renderedVariables,

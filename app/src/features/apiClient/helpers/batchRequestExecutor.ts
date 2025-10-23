@@ -1,3 +1,4 @@
+import Logger from "lib/logger";
 import { isGraphQLApiEntry, isHTTPApiEntry } from "../screens/apiClient/utils";
 import { RQAPI } from "../types";
 import { GraphQLRequestExecutor } from "./graphQLRequestExecutor/GraphQLRequestExecutor";
@@ -13,6 +14,10 @@ export class BatchRequestExecutor {
     entry: RQAPI.ApiEntry,
     abortController?: AbortController
   ): Promise<RQAPI.ExecutionResult> {
+    Logger.log("!!!debug", "[BatchRequestExecutor] executeSingleRequest called", {
+      recordId,
+      entry: JSON.parse(JSON.stringify(entry)),
+    });
     if (isGraphQLApiEntry(entry)) {
       return this.graphQLRequestExecutor.executeGraphQLRequest(recordId, entry, abortController);
     } else if (isHTTPApiEntry(entry)) {

@@ -21,6 +21,7 @@ import {
 import { GenericState } from "hooks/useGenericState";
 import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
+import Logger from "lib/logger";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -99,6 +100,10 @@ class Runner {
     }
     const request = this.ctx.stores.records.getState().getData(runOrder[requestIndex].id) as RQAPI.ApiRecord;
 
+    Logger.log("!!!debug", "[Runner] getRequest", {
+      request: JSON.parse(JSON.stringify(request)),
+      ctxRecordState: this.ctx.stores.records.getState(),
+    });
     return request;
   }
 
@@ -280,6 +285,8 @@ class Runner {
           continue;
         }
 
+        Logger.log("!!!debug", "iterate yielding request", { request: JSON.parse(JSON.stringify(request)) });
+
         const startTime = Date.now();
         await this.delay(iterationIndex, executingRequestIndex);
 
@@ -300,6 +307,10 @@ class Runner {
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        Logger.log("!!!debug", "[runCollection] executing request", {
+          iteration,
+          currentExecutingRequest: JSON.parse(JSON.stringify(currentExecutingRequest)),
+        });
         const result = await this.executor.executeSingleRequest(
           request.id,
           request.data,
