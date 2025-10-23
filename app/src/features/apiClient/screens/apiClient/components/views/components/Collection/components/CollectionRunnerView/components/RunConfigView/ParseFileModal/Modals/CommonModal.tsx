@@ -4,7 +4,6 @@ import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModals";
-import { formatFileSize } from "features/apiClient/screens/apiClient/utils";
 import React from "react";
 
 export const CommonModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData, viewMode }) => {
@@ -28,7 +27,12 @@ export const CommonModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onC
           <CommonFileInfo dataFile={dataFile} />
           {viewMode === "view" && (
             <div>
-              <span className="detail-label">File size:</span> {formatFileSize(dataFile.size)}
+              <span className="detail-label">File size:</span>
+              {dataFile.size < 1024
+                ? `${dataFile.size} B`
+                : dataFile.size < 1024 * 1024
+                ? `${(dataFile.size / 1024).toFixed(2)} KB`
+                : `${(dataFile.size / (1024 * 1024)).toFixed(2)} MB`}
             </div>
           )}
         </div>
