@@ -46,7 +46,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
+  const [apiClientRecords, childParentMap] = useAPIRecords((state) => [state.apiClientRecords, state.childParentMap]);
   const { isRecordBeingCreated } = useApiClientContext();
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
@@ -66,8 +66,6 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
-
-  const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
   useEffect(() => {
     const handleUpdates = () => {
