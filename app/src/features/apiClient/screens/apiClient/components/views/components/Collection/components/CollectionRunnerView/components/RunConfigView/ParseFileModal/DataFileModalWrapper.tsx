@@ -208,14 +208,12 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           primaryButton: {
             label: "Cancel",
             onClick: () => {
-              //just close the modal
               onClose();
             },
           },
           secondaryButton: {
             label: "Reselect File",
             onClick: () => {
-              //remove the existing file from store and open file selector again
               handleSelectFile?.();
             },
           },
