@@ -92,6 +92,7 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
           className="tests-refresh-btn"
           size="small"
           type="transparent"
+          disabled={isResultRefreshing}
           icon={isResultRefreshing ? <LoadingOutlined /> : <MdRefresh />}
           onClick={handleRefresh}
         >
