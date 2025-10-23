@@ -6,6 +6,12 @@ import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModals";
 import React from "react";
 
+export const getformattedFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
+
 export const CommonModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData, viewMode }) => {
   return (
     <RQModal
@@ -28,11 +34,7 @@ export const CommonModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onC
           {viewMode === "view" && (
             <div>
               <span className="detail-label">File size:</span>
-              {dataFile.size < 1024
-                ? `${dataFile.size} B`
-                : dataFile.size < 1024 * 1024
-                ? `${(dataFile.size / 1024).toFixed(2)} KB`
-                : `${(dataFile.size / (1024 * 1024)).toFixed(2)} MB`}
+              {getformattedFileSize(dataFile.size)}
             </div>
           )}
         </div>
