@@ -61,8 +61,10 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
 
     const passedTestsCount = testResults.filter((testResult) => testResult.status === TestStatus.PASSED).length;
 
+    const isAnyTestFailed = testResults.some((testResult) => testResult.status == "failed");
+
     return (
-      <Tag className={`count test-results-stats ${passedTestsCount === testResults.length ? "passed" : "failed"}`}>
+      <Tag className={`count test-results-stats ${isAnyTestFailed ? "failed" : "passed"}`}>
         {passedTestsCount} / {testResults.length}
       </Tag>
     );

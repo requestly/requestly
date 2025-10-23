@@ -21,14 +21,13 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
   const theme = useTheme();
   const [testsFilter, setTestsFilter] = useState<TestsFilter>("all");
   const [isResultRefreshing, setIsResultRefreshing] = useState(false);
-  
 
   const handleRefresh = useCallback(async () => {
     setIsResultRefreshing(true);
     try {
       await handleTestResultRefresh();
     } catch (error) {
-      Logger.error("Error while refreshing the result", error)
+      Logger.error("Error while refreshing the result", error);
     } finally {
       setIsResultRefreshing(false);
     }
@@ -93,31 +92,29 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
           className="tests-refresh-btn"
           size="small"
           type="transparent"
-          icon={isResultRefreshing ? <LoadingOutlined/> : <MdRefresh />}
+          icon={isResultRefreshing ? <LoadingOutlined /> : <MdRefresh />}
           onClick={handleRefresh}
         >
           {isResultRefreshing ? "Refreshing..." : "Refresh"}
         </RQButton>
       </div>
 
-      { isResultRefreshing ? (
+      {isResultRefreshing ? (
         <div className="test-results-list">
           {filteredTestResults.map((testResult, index) => (
-            <div className="test-result-item">
-              <Skeleton.Button  key={index} size="small"/>
-              <Skeleton.Button  key={index} shape="round" size="small" block={true} />
+            <div key={index} className="test-result-item">
+              <Skeleton.Button size="default" style={{ height: 16 }} />
+              <Skeleton.Button shape="round" size="small" block={true} style={{ height: 16 }} />
             </div>
           ))}
         </div>
       ) : (
-
         <div className="test-results-list">
           {filteredTestResults.map((testResult, index) => (
             <TestResultItem key={index} testResult={testResult} />
           ))}
         </div>
-      )
-      }
+      )}
     </div>
   );
 };
