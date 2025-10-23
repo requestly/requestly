@@ -34,11 +34,11 @@ export const FooterButtons: React.FC<{
 }> = ({ buttonOptions, primaryIcon, secondaryIcon }) => {
   return (
     <div className="preview-modal-footer-container">
-      <RQButton type="secondary" onClick={buttonOptions().primaryButton.onClick} icon={secondaryIcon ?? null}>
-        {buttonOptions().primaryButton.label}
-      </RQButton>
-      <RQButton type="primary" onClick={buttonOptions().secondaryButton.onClick} icon={primaryIcon ?? null}>
+      <RQButton type="secondary" onClick={buttonOptions().secondaryButton.onClick} icon={secondaryIcon ?? null}>
         {buttonOptions().secondaryButton.label}
+      </RQButton>
+      <RQButton type="primary" onClick={buttonOptions().primaryButton.onClick} icon={primaryIcon ?? null}>
+        {buttonOptions().primaryButton.label}
       </RQButton>
     </div>
   );
@@ -137,13 +137,13 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
     switch (viewMode) {
       case DataFileModalViewMode.ERROR:
         return {
-          primaryButton: {
+          secondaryButton: {
             label: "Learn more",
             onClick: () => {
               onClose();
             },
           },
-          secondaryButton: {
+          primaryButton: {
             label: "Select Again",
             onClick: () => {
               handleSelectFile?.();
@@ -154,13 +154,13 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
       case DataFileModalViewMode.PREVIEW:
         if (parsedData?.count > 1000) {
           return {
-            primaryButton: {
+            secondaryButton: {
               label: "Replace file",
               onClick: () => {
                 handleSelectFile?.();
               },
             },
-            secondaryButton: {
+            primaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
                 setDataFileInStore();
@@ -170,14 +170,14 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           };
         } else {
           return {
-            primaryButton: {
+            secondaryButton: {
               label: "Cancel",
               onClick: () => {
                 removeDataFile();
                 onClose();
               },
             },
-            secondaryButton: {
+            primaryButton: {
               label: "Use File",
               onClick: () => {
                 setDataFileInStore();
@@ -189,14 +189,14 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
 
       case DataFileModalViewMode.ACTIVE:
         return {
-          primaryButton: {
+          secondaryButton: {
             label: "Remove",
             onClick: () => {
               removeDataFile();
               onClose();
             },
           },
-          secondaryButton: {
+          primaryButton: {
             label: "Change data file",
             onClick: () => {
               handleSelectFile?.();
@@ -206,13 +206,13 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
 
       case DataFileModalViewMode.LARGE_FILE:
         return {
-          primaryButton: {
+          secondaryButton: {
             label: "Cancel",
             onClick: () => {
               onClose();
             },
           },
-          secondaryButton: {
+          primaryButton: {
             label: "Reselect File",
             onClick: () => {
               handleSelectFile?.();
