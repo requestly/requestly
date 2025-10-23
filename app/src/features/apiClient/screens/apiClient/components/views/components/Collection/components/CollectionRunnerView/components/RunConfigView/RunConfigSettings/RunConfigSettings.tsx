@@ -32,54 +32,6 @@ export const RunConfigSettings: React.FC = () => {
     }
   };
 
-  // Stub: This function will parse the file and return status
-  // const parseFile = async (fileInfo: {
-  //   name: string;
-  //   path: string;
-  //   size: number;
-  // }): Promise<{ status: "success" | "error"; count?: number }> => {
-  //   // TODO: Implement actual file parsing logic
-  //   // This should:
-  //   // 1. Read the file content
-  //   // 2. Parse JSON/CSV
-  //   // 3. Validate structure
-  //   // 4. Count rows
-  //   // 5. Return status and count
-
-  //   return new Promise((resolve) => {
-  //     // Simulating parsing delay
-  //     setTimeout(() => {
-  //       // Mock response - replace with actual parsing logic
-  //       resolve({
-  //         status: "success",
-  //         count: 850, // Mock count
-  //       });
-  //     }, 2000);
-  //   });
-  // };
-
-  // const handleSelectFile = () => {
-  //   openFileSelector(async (file) => {
-  //     if (file.size > 100 * 1024 * 1024) {
-  //       setModalContext("largeFile");
-  //       setShowDataFileModal(true);
-  //     } else {
-  //       //show loading modal
-  //       setModalContext("loading");
-  //       setShowDataFileModal(true);
-
-  //       //parsing stub
-  //       const parseResult = await parseFile(file);
-  //       if (parseResult.status === "success") {
-  //         setFileRowsCount(parseResult.count);
-  //         setModalContext("success");
-  //       } else {
-  //         setModalContext("error");
-  //       }
-  //     }
-  //   });
-  // };
-
   return (
     <div className="run-config-settings">
       <div className="base-settings">

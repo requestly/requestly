@@ -75,7 +75,6 @@ export const CommonFileInfo: React.FC<{
 };
 
 interface PreviewModalProps {
-  // initialViewMode: "success" | "error" | "view" | "largeFile" | "loading";
   onClose: () => void;
   onFileSelected?: () => void;
   handleSelectFile?: () => void;

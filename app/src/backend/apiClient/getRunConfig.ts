@@ -40,9 +40,9 @@ async function _getRunConfigFromFirebase(
       data: {
         id: runConfigId,
         runOrder: data.runOrder,
-        delay: data.delay,
-        iterations: data.iterations,
-        dataFile: data.dataFile,
+        delay: data.delay ?? 0,
+        iterations: data.iterations ?? 1,
+        dataFile: data.dataFile ?? null,
       },
     };
   } catch (e) {

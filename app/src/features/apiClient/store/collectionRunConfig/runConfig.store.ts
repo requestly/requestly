@@ -142,6 +142,10 @@ export function createRunConfigStore(data: {
     },
 
     setDataFile(dataFile: RQAPI.RunConfig["dataFile"]) {
+      if (!dataFile) {
+        return;
+      }
+
       const apiClientFile: Omit<ApiClientFile, "isFileValid"> = {
         name: dataFile.name,
         path: dataFile.path,
