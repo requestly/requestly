@@ -14,7 +14,7 @@ import {
 import { isEmpty } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { HttpRequestScriptExecutionService } from "./httpRequestScriptExecutionService";
-import { Err, Result, Try } from "utils/try";
+import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 
 enum RQErrorHeaderValue {
@@ -30,6 +30,50 @@ type PreparedRequest = {
   renderedVariables: Record<string, any>;
 };
 
+function buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiClientErrorType): RQAPI.ExecutionError {
+  const errorObject: RQAPI.ExecutionError = {
+    type,
+    source,
+    name: error.name || "Error",
+    message: error.message,
+  };
+
+  if (error.context?.reason) {
+    errorObject.reason = error.context.reason;
+  }
+
+  if (error instanceof UserAbortError) {
+    errorObject.reason = AbortReason.USER_CANCELLED;
+  }
+
+  return errorObject;
+}
+
+function buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.ExecutionError): RQAPI.ExecutionResult {
+  return {
+    status: RQAPI.ExecutionStatus.ERROR,
+    executedEntry: { ...entry, response: null },
+    error,
+  };
+}
+
+class ExecutionError extends NativeError {
+  result: RQAPI.ExecutionResult;
+  constructor(entry: RQAPI.HttpApiEntry, error: Error) {
+    super(error.message);
+
+
+    const executionError = buildExecutionErrorObject(
+      error,
+      (error as any).context?.source || "request",
+      (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
+    );
+
+    this.result = buildErroredExecutionResult(entry, executionError);
+
+  }
+}
+
 export class HttpRequestExecutor {
   private abortController: AbortController;
   constructor(
@@ -38,7 +82,7 @@ export class HttpRequestExecutor {
     private scriptExecutor: HttpRequestScriptExecutionService,
     private postScriptExecutionCallback: (state: any) => Promise<void>,
     private appMode: string
-  ) {}
+  ) { }
 
   private getEmptyRenderedVariables(renderedVariables: Record<string, any>): string[] {
     if (isEmpty(renderedVariables)) {
@@ -50,37 +94,10 @@ export class HttpRequestExecutor {
     );
   }
 
-  private buildExecutionErrorObject(error: any, source: string, type: RQAPI.ApiClientErrorType): RQAPI.ExecutionError {
-    const errorObject: RQAPI.ExecutionError = {
-      type,
-      source,
-      name: error.name || "Error",
-      message: error.message,
-    };
-
-    if (error.context?.reason) {
-      errorObject.reason = error.context.reason;
-    }
-
-    if (error instanceof UserAbortError) {
-      errorObject.reason = AbortReason.USER_CANCELLED;
-    }
-
-    return errorObject;
-  }
-
-  private buildErroredExecutionResult(entry: RQAPI.HttpApiEntry, error: RQAPI.ExecutionError): RQAPI.ExecutionResult {
-    return {
-      status: RQAPI.ExecutionStatus.ERROR,
-      executedEntry: { ...entry, response: null },
-      error,
-    };
-  }
-
   private buildErrorObjectFromHeader(header: KeyValuePair): RQAPI.ExecutionError {
     switch (header.value) {
       case RQErrorHeaderValue.DNS_RESOLUTION_ERROR:
-        return this.buildExecutionErrorObject(
+        return buildExecutionErrorObject(
           {
             name: "Error",
             message: RequestErrorMessage.DNS_RESOLUTION_ERROR,
@@ -91,7 +108,7 @@ export class HttpRequestExecutor {
           RQAPI.ApiClientErrorType.CORE
         );
       default:
-        return this.buildExecutionErrorObject(
+        return buildExecutionErrorObject(
           {
             name: "Error",
             message: "Failed to fetch",
@@ -104,28 +121,23 @@ export class HttpRequestExecutor {
     }
   }
 
-  async validateMultiPartForm(preparedEntry: RQAPI.HttpApiEntry): Promise<Result<RQAPI.HttpApiEntry>> {
-    const validationResult = await Try(async () => {
-      const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
-      const isInvalid = invalidFiles.length > 0;
+  async validateMultiPartForm(preparedEntry: RQAPI.HttpApiEntry) {
+    if (preparedEntry.request.contentType !== RequestContentType.MULTIPART_FORM) {
+      return;
+    }
+    const { invalidFiles } = await this.requestValidator.validateMultipartFormBodyFiles(preparedEntry);
+    const isInvalid = invalidFiles.length > 0;
 
-      if (isInvalid) {
-        const error = new NativeError("Request not sent -- some files are missing").addContext({
-          invalidFiles,
-          reason:
-            invalidFiles.length > 1
-              ? "Some files appear to be missing or unavailable on your device. Please upload them again to proceed."
-              : "The file seems to have been moved or deleted from your device. Please upload it again to continue.",
-          type: RQAPI.ApiClientErrorType.MISSING_FILE,
-        });
-
-        throw error;
-      }
-
-      return preparedEntry;
-    });
-
-    return validationResult;
+    if (isInvalid) {
+      throw new NativeError("Request not sent -- some files are missing").addContext({
+        invalidFiles,
+        reason:
+          invalidFiles.length > 1
+            ? "Some files appear to be missing or unavailable on your device. Please upload them again to proceed."
+            : "The file seems to have been moved or deleted from your device. Please upload it again to continue.",
+        type: RQAPI.ApiClientErrorType.MISSING_FILE,
+      });
+    }
   }
 
   async prepareRequestWithValidation(recordId: string, entry: RQAPI.HttpApiEntry): Promise<Result<PreparedRequest>> {
@@ -134,28 +146,22 @@ export class HttpRequestExecutor {
       result.preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
       return result;
     });
+    const result = await preparationResult.andThenAsync(async ({ preparedEntry, renderedVariables }) => {
+      const generalValidationResult = Try(() => this.requestValidator.validateRequest(preparedEntry));
+      const multiPartvalidationResult = await Try(() => this.validateMultiPartForm(preparedEntry));
 
-    if (preparationResult.isError()) {
-      return new Err(preparationResult.unwrapError());
-    }
-
-    const { preparedEntry, renderedVariables } = preparationResult.unwrap();
-
-    if (preparedEntry.request.contentType === RequestContentType.MULTIPART_FORM) {
-      const validationResult = await this.validateMultiPartForm(preparedEntry);
-
-      if (validationResult.isError()) {
+      multiPartvalidationResult.inspectError(() => {
         trackRequestFailed(RQAPI.ApiClientErrorType.MISSING_FILE);
-        return new Err(validationResult.unwrapError());
-      }
-    }
+      });
 
-    const requestValidationResult = Try<PreparedRequest>(() => {
-      this.requestValidator.validateRequest(preparedEntry);
-      return { preparedEntry, renderedVariables };
-    });
+      return generalValidationResult.and(multiPartvalidationResult).and(new Ok({
+        preparedEntry,
+        renderedVariables
+      }));
+    })
 
-    return requestValidationResult.mapError((err) => {
+
+    return result.mapError((err) => {
       trackRequestFailed(RQAPI.ApiClientErrorType.PRE_VALIDATION);
       return new NativeError(err.message).addContext({ type: RQAPI.ApiClientErrorType.PRE_VALIDATION });
     });
@@ -168,17 +174,11 @@ export class HttpRequestExecutor {
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const preparationResult = await this.prepareRequestWithValidation(recordId, entry);
+    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry))
+      .mapError(error => new ExecutionError(entry, error));
 
     if (preparationResult.isError()) {
-      const error = preparationResult.unwrapError();
-      const executionError = this.buildExecutionErrorObject(
-        error,
-        (error as any).context?.source || "request",
-        (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
-      );
-
-      return this.buildErroredExecutionResult(entry, executionError);
+      return preparationResult.unwrapError().result;
     }
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
@@ -204,27 +204,21 @@ export class HttpRequestExecutor {
           preRequestScriptResult.error.type,
           preRequestScriptResult.error.message
         );
-        const error = this.buildExecutionErrorObject(
+        const error = buildExecutionErrorObject(
           preRequestScriptResult.error,
           "Pre-request script",
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return this.buildErroredExecutionResult(preparedEntry, error);
+        return buildErroredExecutionResult(preparedEntry, error);
       }
 
       // Re-prepare the request as pre-request script might have modified it.
-      const rePreparationResult = await this.prepareRequestWithValidation(recordId, entry);
+      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry))
+        .mapError(error => new ExecutionError(entry, error));
 
       if (rePreparationResult.isError()) {
-        const error = rePreparationResult.unwrapError();
-        const executionError = this.buildExecutionErrorObject(
-          error,
-          (error as any).context?.source || "request",
-          (error as any).context?.type || RQAPI.ApiClientErrorType.PRE_VALIDATION
-        );
-
-        return this.buildErroredExecutionResult(preparedEntry, executionError);
+        return rePreparationResult.unwrapError().result;
       }
 
       const rePreparation = rePreparationResult.unwrap();
@@ -238,10 +232,10 @@ export class HttpRequestExecutor {
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
-        return this.buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader));
+        return buildErroredExecutionResult(preparedEntry, this.buildErrorObjectFromHeader(rqErrorHeader));
       }
     } catch (err) {
-      const error = this.buildExecutionErrorObject(
+      const error = buildExecutionErrorObject(
         {
           ...err,
           message:
@@ -253,7 +247,7 @@ export class HttpRequestExecutor {
         RQAPI.ApiClientErrorType.CORE
       );
 
-      return this.buildErroredExecutionResult(preparedEntry, error);
+      return buildErroredExecutionResult(preparedEntry, error);
     }
 
     if (
@@ -278,13 +272,13 @@ export class HttpRequestExecutor {
           responseScriptResult.error.type,
           responseScriptResult.error.message
         );
-        const error = this.buildExecutionErrorObject(
+        const error = buildExecutionErrorObject(
           responseScriptResult.error,
           "Post-response script",
           RQAPI.ApiClientErrorType.SCRIPT
         );
 
-        return this.buildErroredExecutionResult(preparedEntry, error);
+        return buildErroredExecutionResult(preparedEntry, error);
       }
     }
 
@@ -317,11 +311,11 @@ export class HttpRequestExecutor {
     const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
       recordId,
       entry,
-      async () => {},
+      async () => { },
       this.abortController
     );
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
-      const error = this.buildExecutionErrorObject(
+      const error = buildExecutionErrorObject(
         preRequestScriptResult.error,
         "Rerun Pre-request script",
         RQAPI.ApiClientErrorType.SCRIPT
@@ -335,12 +329,12 @@ export class HttpRequestExecutor {
     const responseScriptResult = await this.scriptExecutor.executePostResponseScript(
       recordId,
       entry,
-      async () => {},
+      async () => { },
       this.abortController
     );
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
-      const error = this.buildExecutionErrorObject(
+      const error = buildExecutionErrorObject(
         responseScriptResult.error,
         "Rerun Post-response script",
         RQAPI.ApiClientErrorType.SCRIPT
