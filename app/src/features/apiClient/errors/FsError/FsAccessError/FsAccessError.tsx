@@ -1,5 +1,5 @@
 import { FsAccessTroubleshoot } from "features/apiClient/errors/FsError/FsAccessError/components/FsAccessTroubleshoot/FsAccessTroubleshoot";
-import { ErrorCode } from "../../../../../errors/types";
+import { ErrorCode, ErrorSeverity } from "errors/types";
 import { RenderableError } from "errors/RenderableError";
 
 export class FsAccessError extends RenderableError {
@@ -9,6 +9,7 @@ export class FsAccessError extends RenderableError {
     this.addContext({
       path,
     });
+    this.severity = ErrorSeverity.FATAL;
   }
 
   static from(message: string, path: string) {
