@@ -14,6 +14,8 @@ import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
 import { ApiClientFile, FileId, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { DataFileModals } from "../ParseFileModal/DataFileModals";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 
 const UploadedFileView: React.FC<{
   dataFile: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
@@ -95,6 +97,7 @@ const SelectFileToUpload: React.FC<{
 };
 
 export const RunConfigSettings: React.FC = () => {
+  const appMode = useSelector(getAppMode);
   const [iterations, setIterations, delay, setDelay, dataFile, removeDataFile] = useRunConfigStore((s) => [
     s.iterations,
     s.setIterations,
@@ -111,7 +114,9 @@ export const RunConfigSettings: React.FC = () => {
 
   const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
   //this single state is handling the which viewtype should be shown in modal
-  const [modalContext, setModalContext] = useState<"success" | "view" | "largeFile" | "loading" | "error">("success");
+  const [dataFileModalViewMode, setDataFileModalViewMode] = useState<
+    "success" | "view" | "largeFile" | "loading" | "error"
+  >("success");
   const [fileRowsCount, setFileRowsCount] = useState<number>(0);
 
   const handleIterationsChange = (value: number) => {
@@ -159,20 +164,20 @@ export const RunConfigSettings: React.FC = () => {
   const handleSelectFile = () => {
     openFileSelector(async (file) => {
       if (file.size > 100 * 1024 * 1024) {
-        setModalContext("largeFile");
+        setDataFileModalViewMode("largeFile");
         setShowDataFileModal(true);
       } else {
         //show loading modal
-        setModalContext("loading");
+        setDataFileModalViewMode("loading");
         setShowDataFileModal(true);
 
         //parsing stub
         const parseResult = await parseFile(file);
         if (parseResult.status === "success") {
           setFileRowsCount(parseResult.count);
-          setModalContext("success");
+          setDataFileModalViewMode("success");
         } else {
-          setModalContext("error");
+          setDataFileModalViewMode("error");
         }
       }
     });
@@ -217,34 +222,36 @@ export const RunConfigSettings: React.FC = () => {
           />
         </div>
 
-        <div className="setting-container">
-          <label htmlFor="file-upload">Select data file</label>
+        {appMode === "DESKTOP" && (
+          <div className="setting-container">
+            <label htmlFor="file-upload">Select data file</label>
 
-          {/* File uploading button section */}
-          {!dataFile ? (
-            <SelectFileToUpload handleSelectFile={handleSelectFile} />
-          ) : (
-            <>
-              <UploadedFileView
-                dataFile={dataFile}
-                setShowDataFileModal={setShowDataFileModal}
-                setModalContext={setModalContext}
-                file={file}
-                removeDataFile={removeDataFile}
+            {/* File uploading button section */}
+            {!dataFile ? (
+              <SelectFileToUpload handleSelectFile={handleSelectFile} />
+            ) : (
+              <>
+                <UploadedFileView
+                  dataFile={dataFile}
+                  setShowDataFileModal={setShowDataFileModal}
+                  setModalContext={setDataFileModalViewMode}
+                  file={file}
+                  removeDataFile={removeDataFile}
+                />
+              </>
+            )}
+
+            {showDataFileModal && (
+              <DataFileModals
+                viewMode={dataFileModalViewMode}
+                count={fileRowsCount}
+                onClose={() => setShowDataFileModal(false)}
+                onFileSelected={() => setShowDataFileModal(true)}
+                handleSelectFile={handleSelectFile}
               />
-            </>
-          )}
-
-          {showDataFileModal && (
-            <DataFileModals
-              status={modalContext}
-              count={fileRowsCount}
-              onClose={() => setShowDataFileModal(false)}
-              onFileSelected={() => setShowDataFileModal(true)}
-              handleSelectFile={handleSelectFile}
-            />
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* TODO: for later */}

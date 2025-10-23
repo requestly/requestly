@@ -15,35 +15,34 @@
   }
 
   .warning-state-messaging-container {
-    padding: var(--space-5, 12px) var(--space-6, 16px);
+    padding: 12px 16px;
     .warning-state-banner-container {
       display: flex;
-      padding: var(--space-4, 8px) var(--space-9, 32px) var(--space-4, 8px) var(--space-5, 12px);
+      padding: 8px 32px 8px 12px;
       border-radius: 4px;
-      border: 1px solid var(--map-tokens-warning-warning-800, #5c3111);
-      background: var(--map-tokens-warning-warning-900, #2e1b00);
+      border: 1px solid var(--requestly-color-warning-800);
+      background: var(--requestly-color-warning-900);
 
       .warning-state-banner-fields {
         display: flex;
         justify-content: center;
-        gap: var(--space-4, 8px);
+        gap: 8px;
         align-self: stretch;
 
         .warning-icon {
           svg {
-            color: var(--alias-tokens-color-warning, #e09400);
+            color: var(--requestly-color-warning-500);
           }
         }
 
         .warning-text {
-          color: var(--alias-tokens-color-text-default, #fff);
+          color: var(--requestly-color-text-default);
 
-          /* body/medium */
-          font-family: var(--font-family-default, Inter);
-          font-size: var(--font-size-sm, 12px);
+          font-family: var(--requestly-font-family-default);
+          font-size: var(--requestly-font-size-sm);
           font-style: normal;
           font-weight: 500;
-          line-height: 18px; /* 150% */
+          line-height: 18px;
         }
       }
     }
@@ -51,44 +50,44 @@
 
   .error-state-messaging-container {
     display: flex;
-    padding: var(--space-8, 24px) var(--space-6, 16px);
+    padding: 24px 16px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: var(--space-4, 8px);
+    gap: 8px;
     align-self: stretch;
 
     .detail-label {
       color: var(--requestly-color-text-subtle);
       text-align: center;
-      /* body/default */
-      font-family: var(--font-family-default, Inter);
-      font-size: var(--font-size-sm, 12px);
+
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-sm);
       font-style: normal;
       font-weight: 400;
-      line-height: 18px; /* 150% */
+      line-height: 18px;
     }
 
     .error-state-fix-suggestion {
       display: flex;
-      padding: var(--space-5, 12px) var(--space-6, 16px);
+      padding: 12px 16px;
       flex-direction: column;
       align-items: flex-start;
       gap: 8px;
       align-self: stretch;
       border-radius: 8px;
-      background: var(--alias-tokens-color-background-dark, #141414);
+      background: var(--requestly-color-neutral-1100);
 
       .example-label {
-        color: var(--alias-tokens-color-text-placeholder, #8f8f8f);
+        color: var(--requestly-color-text-placeholder);
         text-align: center;
 
         /* overline/medium */
-        font-family: var(--font-family-default, Inter);
-        font-size: var(--font-size-2xs, 9px);
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-size-2xs);
         font-style: normal;
         font-weight: 500;
-        line-height: 13px; /* 144.444% */
+        line-height: 13px;
         letter-spacing: 1px;
         text-transform: uppercase;
       }
@@ -140,29 +139,29 @@
       color: var(--alias-tokens-color-text-default, #fff);
 
       /* body/default */
-      font-family: var(--font-family-default, Inter);
-      font-size: var(--font-size-sm, 12px);
+      font-family: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-sm);
       font-style: normal;
       font-weight: 400;
-      line-height: 18px; /* 150% */
+      line-height: 18px;
     }
   }
 
   .preview-modal-body-container {
     display: flex;
-    padding: var(--space-5, 12px) var(--space-6, 16px);
+    padding: 12px 16px;
     flex-direction: column;
-    gap: var(--space-4, 8px);
+    gap: 8px;
 
     .preview-file-details {
       display: flex;
       align-items: center;
-      gap: var(--space-8, 24px);
+      gap: 24px;
       align-self: stretch;
 
-      color: var(--alias-tokens-color-text-default, #fff);
-      font-family: var(--font-family-default, Inter);
-      font-size: var(--font-size-sm, 12px);
+      color: var(--requestly-color-text-default);
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-sm);
       font-style: normal;
       font-weight: 400;
       line-height: 18px;
@@ -177,7 +176,7 @@
     display: flex;
     padding: 12px 16px 16px 8px;
     justify-content: flex-end;
-    gap: var(--space-4, 8px);
+    gap: 8px;
     align-items: center;
   }
 
@@ -187,8 +186,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--space-10, 40px) var(--space-6, 16px);
-    gap: var(--space-6, 16px);
+    padding: 40px 16px;
+    gap: 16px;
     min-height: 200px;
 
     .loading-spinner {
@@ -198,7 +197,7 @@
 
       .spinner-placeholder {
         .spinner-icon {
-          color: var(--alias-tokens-color-primary, #4285f4);
+          color: var(--requestly-color-primary-400);
           animation: spin 1s linear infinite;
 
           .spinner-circle {
@@ -217,9 +216,9 @@
       text-align: center;
 
       .loading-title {
-        color: var(--alias-tokens-color-text-default, #fff);
-        font-family: var(--font-family-default, Inter);
-        font-size: var(--font-size-md, 14px);
+        color: var(--requestly-color-text-default);
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-size-md);
         font-style: normal;
         font-weight: 500;
         line-height: 20px;
@@ -227,8 +226,8 @@
 
       .loading-description {
         color: var(--requestly-color-text-subtle);
-        font-family: var(--font-family-default, Inter);
-        font-size: var(--font-size-sm, 12px);
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-line-height-sm);
         font-style: normal;
         font-weight: 400;
         line-height: 18px;
