@@ -1,5 +1,5 @@
 import { RQButton } from "lib/design-system-v2/components";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./DataFileModal.scss";
 import { useRunConfigStore } from "../../../run.context";
 import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
@@ -98,7 +98,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
   isPreviewMode = false,
 }) => {
   const [viewMode, setViewMode] = useState<DataFileModalViewMode>(DataFileModalViewMode.LOADING);
-  const parsedDataRef = React.useRef<{ data: Record<string, any>[]; count: number } | null>(null);
+  const [parsedData, setParsedData] = useState<{ data: Record<string, any>[]; count: number } | null>(null);
 
   const [removeDataFile, setDataFile] = useRunConfigStore((s) => [s.removeDataFile, s.setDataFile]);
 
@@ -115,22 +115,23 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
     });
   }, [dataFileMetadata.name, dataFileMetadata.path, dataFileMetadata.size, setDataFile]);
 
-  // Parse file on mount using useState lazy initializer (runs only once)
-  React.useState(() => {
+  useEffect(() => {
+    setViewMode(DataFileModalViewMode.LOADING);
+    setParsedData(null);
+
     parseCollectionRunnerDataFile(dataFileMetadata.path)
       .then((data) => {
         const processedData = {
           data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
           count: data.count,
         };
-        parsedDataRef.current = processedData;
+        setParsedData(processedData);
         setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
       })
       .catch(() => {
         setViewMode(DataFileModalViewMode.ERROR);
       });
-    return true;
-  });
+  }, [dataFileMetadata.path, isPreviewMode]);
 
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
@@ -151,7 +152,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
         };
 
       case DataFileModalViewMode.PREVIEW:
-        if (parsedDataRef.current?.count > 1000) {
+        if (parsedData?.count > 1000) {
           return {
             primaryButton: {
               label: "Replace file",
@@ -229,25 +230,25 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          parsedData={parsedDataRef.current?.data}
+          parsedData={parsedData?.data}
           viewMode={viewMode}
         />
       )}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedDataRef.current?.count > 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count > 1000 && (
         <WarningModal
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          parsedData={parsedDataRef.current?.data}
-          count={parsedDataRef.current?.count}
+          parsedData={parsedData?.data}
+          count={parsedData?.count}
         />
       )}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedDataRef.current?.count < 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count < 1000 && (
         <DataFileViewModal
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
           onClose={onClose}
-          parsedData={parsedDataRef.current?.data}
+          parsedData={parsedData?.data}
           viewMode={viewMode}
         />
       )}

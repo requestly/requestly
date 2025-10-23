@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
@@ -23,10 +23,28 @@ export const DataFileSelector: React.FC = () => {
   const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
   const { openFileSelector } = useFileSelection();
 
-  // Derive dataFileMetadata: use dataFile if available, otherwise use temp metadata
-  const dataFileMetadata = dataFile
-    ? { name: dataFile.name, path: dataFile.path, size: dataFile.size }
-    : tempDataFileMetadata;
+  // Use a ref to track if we've initialized from dataFile
+  const hasInitializedRef = useRef(false);
+
+  // Derive dataFileMetadata: initialize from dataFile once, then use temp metadata for any new uploads
+  const dataFileMetadata = useMemo(() => {
+    // If we have temp metadata (from a new file selection), use that
+    if (tempDataFileMetadata) {
+      return tempDataFileMetadata;
+    }
+
+    // Otherwise, if dataFile exists and we haven't initialized yet, use dataFile
+    if (dataFile && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      return {
+        name: dataFile.name,
+        path: dataFile.path,
+        size: dataFile.size,
+      };
+    }
+
+    return null;
+  }, [tempDataFileMetadata, dataFile]);
 
   const handleFileSelection = useCallback(() => {
     openFileSelector((file) => {
@@ -40,6 +58,19 @@ export const DataFileSelector: React.FC = () => {
       setShowDataFileModal(true);
     });
   }, [openFileSelector]);
+
+  const handleModalClose = useCallback(() => {
+    // If there's a dataFile and we have temp metadata that differs from it,
+    // it means user cancelled a new file selection - restore the original
+    if (dataFile && tempDataFileMetadata && tempDataFileMetadata.path !== dataFile.path) {
+      setTempDataFileMetadata({
+        name: dataFile.name,
+        path: dataFile.path,
+        size: dataFile.size,
+      });
+    }
+    setShowDataFileModal(false);
+  }, [dataFile, tempDataFileMetadata]);
 
   useEffect(() => {
     return () => {
@@ -62,7 +93,7 @@ export const DataFileSelector: React.FC = () => {
         </div>
         {showDataFileModal && (
           <DataFileModalWrapper
-            onClose={() => setShowDataFileModal(false)}
+            onClose={handleModalClose}
             onFileSelected={() => setShowDataFileModal(true)}
             handleSelectFile={handleFileSelection}
             dataFileMetadata={dataFileMetadata}
@@ -118,7 +149,7 @@ export const DataFileSelector: React.FC = () => {
       </div>
       {showDataFileModal && (
         <DataFileModalWrapper
-          onClose={() => setShowDataFileModal(false)}
+          onClose={handleModalClose}
           onFileSelected={() => setShowDataFileModal(true)}
           handleSelectFile={handleFileSelection}
           dataFileMetadata={dataFileMetadata}
