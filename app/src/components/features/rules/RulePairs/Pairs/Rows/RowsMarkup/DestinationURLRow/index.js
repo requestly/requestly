@@ -58,7 +58,8 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     );
   };
 
-  const handleFileSelectCallback = (filePath) => {
+  const handleFileSelectCallback = (file) => {
+    const filePath = file?.path;
     trackSelectMapLocalFile(filePath);
     dispatch(
       globalActions.updateRulePairAtGivenPath({

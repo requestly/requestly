@@ -284,7 +284,7 @@ class Runner {
   }
 
   private onError(error: any) {
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+    this.runContext.runResultStore.getState().setError(error);
     this.runContext.runResultStore.getState().setEndtime(null);
   }
 
@@ -399,6 +399,12 @@ class Runner {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
+      } else if (e instanceof DataFileNotFound) {
+        e.name = "DataFileNotFoundError";
+        return e;
+      } else if (e instanceof DataFileParseError) {
+        e.name = "DataFileParseError";
+        return e;
       }
 
       this.onError(e);

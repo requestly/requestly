@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { InputNumber } from "antd";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
@@ -6,20 +6,118 @@ import { useRunConfigStore } from "../../../run.context";
 import { toast } from "utils/Toast";
 import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import "./runConfigSettings.scss";
-import { getAppMode } from "store/selectors";
+import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
+import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
+import { BiError } from "@react-icons/all-files/bi/BiError";
+import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
+import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
+import { ApiClientFile, FileId, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { DataFileModals } from "../ParseFileModal/DataFileModals";
+import { useFileSelection } from "../hooks/useFileSelection.hook";
 import { useSelector } from "react-redux";
-import { displayMultiFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
+import { getAppMode } from "store/selectors";
+
+const UploadedFileView: React.FC<{
+  dataFile: Omit<ApiClientFile, "isFileValid"> & { id: FileId };
+  setShowDataFileModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalContext: React.Dispatch<React.SetStateAction<"success" | "view">>;
+  file: ApiClientFile;
+  removeDataFile: () => void;
+}> = ({ dataFile, setShowDataFileModal, setModalContext, file, removeDataFile }) => {
+  return (
+    <>
+      <div className="file-uploaded-section">
+        {/* File uploaded view button sectipon */}
+        <RQButton
+          size="small"
+          type="secondary"
+          className="file-uploaded-button"
+          onClick={() => {
+            setModalContext("view");
+            setShowDataFileModal(true);
+          }}
+        >
+          {file.isFileValid ? (
+            <MdOutlineRemoveRedEye className="eye-icon" />
+          ) : (
+            <>
+              <RQTooltip
+                title={"The file you selected is not available. Please remove and upload a new file to continue."}
+                placement="top"
+              >
+                <BiError className="invalid-icon" />
+              </RQTooltip>
+            </>
+          )}
+          {/*needs to be fixed according to design */}
+          <span className={`button-text ${file.isFileValid ? "" : "file-invalid"}`}>
+            {truncateString(dataFile.name, 35) + getFileExtension(dataFile.name)}
+          </span>
+        </RQButton>
+
+        {/*Clear File or Delete File */}
+        <RQTooltip title={`clear file`}>
+          <RQButton
+            size="small"
+            className="clear-file-btn"
+            onClick={() => {
+              removeDataFile();
+            }}
+            type="transparent"
+          >
+            {dataFile && <RxCross2 />}
+          </RQButton>
+        </RQTooltip>
+      </div>
+    </>
+  );
+};
+
+const SelectFileToUpload: React.FC<{
+  handleSelectFile: () => void;
+}> = ({ handleSelectFile }) => {
+  return (
+    <>
+      <RQButton
+        size="small"
+        icon={<MdOutlineFileUpload />}
+        onClick={() => {
+          handleSelectFile();
+        }}
+      >
+        Select file
+      </RQButton>
+
+      <div className="file-upload-info">
+        <MdOutlineInfo className="file-info-icon" />
+        <span className="file-type-info">Supports JSON & CSV files (max 100MB)</span>
+      </div>
+    </>
+  );
+};
 
 export const RunConfigSettings: React.FC = () => {
-  const [iterations, setIterations, delay, setDelay, setDataFile] = useRunConfigStore((s) => [
+  const appMode = useSelector(getAppMode);
+  const [iterations, setIterations, delay, setDelay, dataFile, removeDataFile] = useRunConfigStore((s) => [
     s.iterations,
     s.setIterations,
     s.delay,
     s.setDelay,
-    s.setDataFile,
+    s.dataFile,
+    s.removeDataFile,
   ]);
 
-  const appMode = useSelector(getAppMode);
+  const { openFileSelector } = useFileSelection();
+  const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
+
+  const [file] = getFilesByIds([dataFile?.id]);
+
+  const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
+  //this single state is handling the which viewtype should be shown in modal
+  const [dataFileModalViewMode, setDataFileModalViewMode] = useState<
+    "success" | "view" | "largeFile" | "loading" | "error"
+  >("success");
+  const [fileRowsCount, setFileRowsCount] = useState<number>(0);
 
   const handleIterationsChange = (value: number) => {
     try {
@@ -35,6 +133,54 @@ export const RunConfigSettings: React.FC = () => {
     } catch (error) {
       toast.error(error);
     }
+  };
+
+  // Stub: This function will parse the file and return status
+  const parseFile = async (fileInfo: {
+    name: string;
+    path: string;
+    size: number;
+  }): Promise<{ status: "success" | "error"; count?: number }> => {
+    // TODO: Implement actual file parsing logic
+    // This should:
+    // 1. Read the file content
+    // 2. Parse JSON/CSV
+    // 3. Validate structure
+    // 4. Count rows
+    // 5. Return status and count
+
+    return new Promise((resolve) => {
+      // Simulating parsing delay
+      setTimeout(() => {
+        // Mock response - replace with actual parsing logic
+        resolve({
+          status: "success",
+          count: 850, // Mock count
+        });
+      }, 2000);
+    });
+  };
+
+  const handleSelectFile = () => {
+    openFileSelector(async (file) => {
+      if (file.size > 100 * 1024 * 1024) {
+        setDataFileModalViewMode("largeFile");
+        setShowDataFileModal(true);
+      } else {
+        //show loading modal
+        setDataFileModalViewMode("loading");
+        setShowDataFileModal(true);
+
+        //parsing stub
+        const parseResult = await parseFile(file);
+        if (parseResult.status === "success") {
+          setFileRowsCount(parseResult.count);
+          setDataFileModalViewMode("success");
+        } else {
+          setDataFileModalViewMode("error");
+        }
+      }
+    });
   };
 
   return (
@@ -76,28 +222,36 @@ export const RunConfigSettings: React.FC = () => {
           />
         </div>
 
-        <div className="setting-container">
-          <label htmlFor="data-file">
-            Data file
-            <RQTooltip title={`Max limit is ${DELAY_MAX_LIMIT} (in ms)`}>
-              <MdOutlineInfo />
-            </RQTooltip>
-          </label>
+        {appMode === "DESKTOP" && (
+          <div className="setting-container">
+            <label htmlFor="file-upload">Select data file</label>
 
-          <RQButton
-            onClick={async () => {
-              // Dummy code: TODO to be removed
-              if (appMode === "DESKTOP") {
-                displayMultiFileSelector((files) => {
-                  setDataFile(files?.[0]);
-                });
-              }
-            }}
-            size="small"
-          >
-            Upload
-          </RQButton>
-        </div>
+            {/* File uploading button section */}
+            {!dataFile ? (
+              <SelectFileToUpload handleSelectFile={handleSelectFile} />
+            ) : (
+              <>
+                <UploadedFileView
+                  dataFile={dataFile}
+                  setShowDataFileModal={setShowDataFileModal}
+                  setModalContext={setDataFileModalViewMode}
+                  file={file}
+                  removeDataFile={removeDataFile}
+                />
+              </>
+            )}
+
+            {showDataFileModal && (
+              <DataFileModals
+                viewMode={dataFileModalViewMode}
+                count={fileRowsCount}
+                onClose={() => setShowDataFileModal(false)}
+                onFileSelected={() => setShowDataFileModal(true)}
+                handleSelectFile={handleSelectFile}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* TODO: for later */}
