@@ -150,7 +150,7 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
   }));
 };
 
-export const createDummyVariablesStore = (variables: Record<string, any>) => {
+export const createDummyVariablesStore = (variables: Record<string, VariableValueType>) => {
   return create<VariablesState>()((_, get) => ({
     data: parsePrimitiveVariables(variables),
 
@@ -177,7 +177,9 @@ export const createDummyVariablesStore = (variables: Record<string, any>) => {
 
     search(value) {
       const { data } = get();
-      const searchResults = Object.entries(data).filter(([key]) => key.toLowerCase().includes(value.toLowerCase()));
+      const searchResults = Array.from(data.entries()).filter(([key]) =>
+        key.toLowerCase().includes(value.toLowerCase())
+      );
       return new Map(searchResults);
     },
   }));

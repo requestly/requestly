@@ -139,8 +139,9 @@ class Runner {
       throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
     }
 
-    const fileExtension = getFileExtension(dataFile.path);
+    let fileExtension: string | undefined = undefined;
     try {
+      fileExtension = getFileExtension(dataFile.path)?.toLocaleLowerCase();
       const fileContents = await getFileContents(dataFile.path);
 
       switch (fileExtension) {
@@ -161,6 +162,7 @@ class Runner {
         collectionId,
         error: e,
         fileExtension,
+        dataFilePath: dataFile.path,
       });
     }
   }
