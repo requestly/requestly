@@ -130,16 +130,16 @@
 
   .large-file-messaging-container {
     display: flex;
-    padding: var(--space-4, 8px) 16px 16px 16px;
+    padding: 8px 16px 16px 16px;
     align-items: flex-start;
     gap: 64px;
     align-self: stretch;
 
     .large-file-text {
-      color: var(--alias-tokens-color-text-default, #fff);
+      color: var(--requestly-color-text-default);
 
       /* body/default */
-      font-family: var(--requestly-color-text-default);
+      font-family: var(--requestly-font-family-default);
       font-size: var(--requestly-font-size-sm);
       font-style: normal;
       font-weight: 400;
@@ -212,7 +212,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 4px);
+      gap: 4px;
       text-align: center;
 
       .loading-title {

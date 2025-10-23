@@ -2,12 +2,15 @@ import { displayFileSelector } from "components/mode-specific/desktop/misc/FileD
 import { useRunConfigStore } from "../../../run.context";
 import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 
+type SelectedFile = {
+  name: string;
+  path: string;
+  size: number;
+};
+
 export const useFileSelection = () => {
   const [setDataFile] = useRunConfigStore((s) => [s.setDataFile]);
-  const handleFileSelection = (
-    file: { name: string; path: string; size: number },
-    success: (file: { name: string; path: string; size: number }) => void
-  ) => {
+  const handleFileSelection = (file: SelectedFile, success: (file: SelectedFile) => void) => {
     if (file.size >= 100 * 1024 * 1024) {
       success(file);
       return;
