@@ -987,6 +987,10 @@ const CollectionRunnerAjvSchema: SchemaObject = {
   },
 };
 export const parseCollectionRunnerDataFile = async (filePath: string) => {
+  if (!filePath) {
+    throw new NativeError("File path is empty!");
+  }
+
   const fileExtension = getFileExtension(filePath);
   const fileContents = await getFileContents(filePath);
 

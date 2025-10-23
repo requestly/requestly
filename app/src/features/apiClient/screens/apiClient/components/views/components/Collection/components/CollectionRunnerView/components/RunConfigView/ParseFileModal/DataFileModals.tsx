@@ -1,5 +1,5 @@
 import { RQButton } from "lib/design-system-v2/components";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import "./DataFileModal.scss";
 import { useRunConfigStore } from "../../../run.context";
 import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
@@ -62,58 +62,67 @@ export const CommonFileInfo: React.FC<{
   return (
     <>
       <div>
-        <span className="detail-label">File Name:</span> {dataFile.name}
+        <span className="detail-label">File Name:</span> {dataFileMetadata.name}
       </div>
       <div>
-        <span className="detail-label">File type:</span> {getFileExtension(dataFile.name).toUpperCase().slice(1)}
+        <span className="detail-label">File type:</span>{" "}
+        {getFileExtension(dataFileMetadata.name).toUpperCase().slice(1)}
       </div>
     </>
   );
 };
 
 interface PreviewModalProps {
-  initialViewMode: "success" | "error" | "view" | "largeFile" | "loading";
+  // initialViewMode: "success" | "error" | "view" | "largeFile" | "loading";
   onClose: () => void;
   onFileSelected?: () => void;
   handleSelectFile?: () => void;
-  dataFile: RunConfigState["dataFile"];
-  isDataFileValid: boolean;
+  dataFileMetadata: { name: string; path: string; size: number };
+  isPreviewMode: boolean;
 }
 
 export const DataFileModals: React.FC<PreviewModalProps> = ({
-  initialViewMode,
   onClose,
   onFileSelected,
   handleSelectFile,
-  dataFile,
+  dataFileMetadata,
+  isPreviewMode = false,
 }) => {
-  const [viewMode, setViewMode] = React.useState<"success" | "error" | "view" | "largeFile" | "loading">(
-    initialViewMode
-  );
-  const [count, setCount] = React.useState<number>(0);
-  const [removeDataFile] = useRunConfigStore((s) => [s.removeDataFile]);
-  const [parsedData, setParsedData] = React.useState<Record<string, any>[] | null>(null);
+  const [viewMode, setViewMode] = React.useState<"success" | "error" | "view" | "largeFile" | "loading">("loading");
+  const parsedDataRef = React.useRef<{ data: Record<string, any>[]; count: number } | null>(null);
 
-  const parseDataFile = useCallback(async () => {
-    if (!dataFile) return;
+  const [removeDataFile, setDataFile] = useRunConfigStore((s) => [s.removeDataFile, s.setDataFile]);
 
-    try {
-      const parsedData = await parseCollectionRunnerDataFile(dataFile.path);
-      if (parsedData) {
-        setViewMode("success"); //TODO @nafees also handle view mode here
-        setCount(parsedData.count);
-        setParsedData(parsedData.data);
-      }
-    } catch (err) {
-      setViewMode("error");
-    }
-  }, [dataFile]);
+  const setDataFileInStore = useCallback(() => {
+    const fileId = dataFileMetadata.name + "-" + Date.now();
 
-  useEffect(() => {
-    parseDataFile();
-  }, [parseDataFile]);
+    setDataFile({
+      id: fileId,
+      name: dataFileMetadata.name,
+      path: dataFileMetadata.path,
+      size: dataFileMetadata.size,
+      source: "desktop",
+      fileFeature: FileFeature.COLLECTION_RUNNER,
+    });
+  }, [dataFileMetadata.name, dataFileMetadata.path, dataFileMetadata.size, setDataFile]);
 
-  //stubs: footer buttton options
+  // Parse file on mount using useState lazy initializer (runs only once)
+  React.useState(() => {
+    parseCollectionRunnerDataFile(dataFileMetadata.path)
+      .then((data) => {
+        const processedData = {
+          data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
+          count: data.count,
+        };
+        parsedDataRef.current = processedData;
+        setViewMode(isPreviewMode ? "view" : "success");
+      })
+      .catch(() => {
+        setViewMode("error");
+      });
+    return true;
+  });
+
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
       case "error":
@@ -128,31 +137,23 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
             label: "Select Again",
             onClick: () => {
               handleSelectFile?.();
-              /*
-                 // delete the existing file from store
-                 // SO THAT DATAFILE GETS EMPTY
-                 // then move to re-upload screen again
-              */
             },
           },
         };
 
       case "success":
-        if (count > 1000) {
+        if (parsedDataRef.current?.count > 1000) {
           return {
             primaryButton: {
               label: "Replace file",
               onClick: () => {
-                //remove the existing file from store and open file selector again
-                //if cancel/cross is done then is should not remove the existing file & retain the existing file
                 handleSelectFile?.();
               },
             },
             secondaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
-                //use first 1000 entries
-                //close modal
+                setDataFileInStore();
                 onClose();
               },
             },
@@ -164,16 +165,12 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
               onClick: () => {
                 removeDataFile();
                 onClose();
-                //remove the file from store
-                //SO THAT DATAFILE GETS EMPTY
-                //just close the modal without saving
               },
             },
             secondaryButton: {
               label: "Use File",
               onClick: () => {
-                //use this file and add it to store
-                //and also now on click the file name on button should open the file in viewModal component
+                setDataFileInStore();
                 onClose();
               },
             },
@@ -185,7 +182,6 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           primaryButton: {
             label: "Remove",
             onClick: () => {
-              //remove the file from store and close the modal
               removeDataFile();
               onClose();
             },
@@ -193,7 +189,6 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           secondaryButton: {
             label: "Change data file",
             onClick: () => {
-              //remove the existing file from store and open file selector again
               handleSelectFile?.();
             },
           },
@@ -231,8 +226,14 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
           viewMode={viewMode}
         />
       )}
-      {viewMode === "success" && count > 1000 && (
-        <WarningModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} parsedData={parsedData} />
+      {viewMode === "success" && parsedDataRef.current?.count > 1000 && (
+        <WarningModal
+          buttonOptions={buttonOptions}
+          dataFileMetadata={dataFileMetadata}
+          onClose={onClose}
+          parsedData={parsedDataRef.current?.data}
+          count={parsedDataRef.current?.count}
+        />
       )}
       {viewMode === "error" && <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />}
       {viewMode === "success" && count < 1000 && (
@@ -245,7 +246,7 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
         />
       )}
       {viewMode === "largeFile" && (
-        <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />
+        <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
       )}
     </>
   );

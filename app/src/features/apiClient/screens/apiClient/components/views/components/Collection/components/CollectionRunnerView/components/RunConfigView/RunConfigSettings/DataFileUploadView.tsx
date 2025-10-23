@@ -1,53 +1,45 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FileFeature, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
 import { BiError } from "@react-icons/all-files/bi/BiError";
 import { getFileExtension, truncateString } from "features/apiClient/screens/apiClient/utils";
 import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
 import { DataFileModals } from "../ParseFileModal/DataFileModals";
-import { displayFileSelector } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { useRunConfigStore } from "../../../run.context";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import { useFileSelection } from "../hooks/useFileSelection.hook";
 
 export const DataFileUploadView: React.FC = () => {
   const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
-  //this single state is handling the which viewtype should be shown in modal
-  const [modalContext, setModalContext] = useState<"success" | "view" | "largeFile" | "loading" | "error">("success");
-  // const [dataFileMetadata, setDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(null);
+  const [openModalInPreviewMode, setOpenModalInPreviewMode] = useState<boolean>(true);
+  const [tempDataFileMetadata, setTempDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(
+    null
+  );
 
-  const [dataFile, removeDataFile, setDataFile] = useRunConfigStore((s) => [
-    s.dataFile,
-    s.removeDataFile,
-    s.setDataFile,
-  ]);
-  const [getFilesByIds, files1] = useApiClientFileStore((s) => [s.getFilesByIds, s.files]);
+  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile, s.setDataFile]);
+  const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
   const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
+  const { openFileSelector } = useFileSelection();
 
-  console.log("!!!debug", "files1", files1);
+  // Derive dataFileMetadata: use dataFile if available, otherwise use temp metadata
+  const dataFileMetadata = dataFile
+    ? { name: dataFile.name, path: dataFile.path, size: dataFile.size }
+    : tempDataFileMetadata;
 
   const handleFileSelection = useCallback(() => {
-    displayFileSelector(
-      (file: { name: string; path: string; size: number }) => {
-        const fileId = file.name + "-" + Date.now();
-        setDataFile({
-          id: fileId,
-          name: file.name,
-          path: file.path,
-          size: file.size,
-          source: "desktop",
-          fileFeature: FileFeature.COLLECTION_RUNNER,
-        });
+    openFileSelector((file) => {
+      setTempDataFileMetadata({
+        name: file.name,
+        path: file.path,
+        size: file.size,
+      });
 
-        setModalContext("loading");
-        setShowDataFileModal(true);
-      },
-      {
-        filters: [{ name: "File formats allowed", extensions: ["json", "csv"] }],
-      }
-    );
-  }, [setDataFile]);
+      setOpenModalInPreviewMode(false);
+      setShowDataFileModal(true);
+    });
+  }, [openFileSelector]);
 
   useEffect(() => {
     return () => {
@@ -68,6 +60,15 @@ export const DataFileUploadView: React.FC = () => {
           <MdOutlineInfo className="file-info-icon" />
           <span className="file-type-info">Supports JSON & CSV files (max 100MB)</span>
         </div>
+        {showDataFileModal && (
+          <DataFileModals
+            onClose={() => setShowDataFileModal(false)}
+            onFileSelected={() => setShowDataFileModal(true)}
+            handleSelectFile={handleFileSelection}
+            dataFileMetadata={dataFileMetadata}
+            isPreviewMode={openModalInPreviewMode}
+          />
+        )}
       </>
     );
   }
@@ -80,8 +81,7 @@ export const DataFileUploadView: React.FC = () => {
           type="secondary"
           className="file-uploaded-button"
           onClick={() => {
-            //TODO@nafees: handle preview. Differentiate between success and view mode
-            setModalContext("loading");
+            setOpenModalInPreviewMode(true);
             setShowDataFileModal(true);
           }}
         >
@@ -118,12 +118,11 @@ export const DataFileUploadView: React.FC = () => {
       </div>
       {showDataFileModal && (
         <DataFileModals
-          initialViewMode={modalContext}
           onClose={() => setShowDataFileModal(false)}
           onFileSelected={() => setShowDataFileModal(true)}
           handleSelectFile={handleFileSelection}
-          dataFile={dataFile}
-          isDataFileValid={file.isFileValid ?? true}
+          dataFileMetadata={dataFileMetadata}
+          isPreviewMode={openModalInPreviewMode}
         />
       )}
     </>
