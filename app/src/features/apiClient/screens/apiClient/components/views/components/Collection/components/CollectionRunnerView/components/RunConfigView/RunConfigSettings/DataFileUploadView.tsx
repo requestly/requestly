@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FileFeature, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
@@ -22,8 +22,10 @@ export const DataFileUploadView: React.FC = () => {
     s.removeDataFile,
     s.setDataFile,
   ]);
-  const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
+  const [getFilesByIds, files1] = useApiClientFileStore((s) => [s.getFilesByIds, s.files]);
   const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
+
+  console.log("!!!debug", "files1", files1);
 
   const handleFileSelection = useCallback(() => {
     displayFileSelector(
@@ -47,7 +49,13 @@ export const DataFileUploadView: React.FC = () => {
     );
   }, [setDataFile]);
 
-  console.log("!!!debug", "file", file);
+  useEffect(() => {
+    return () => {
+      if (dataFile) {
+        removeDataFile();
+      }
+    };
+  }, [dataFile, removeDataFile]);
 
   if (!dataFile) {
     return (
