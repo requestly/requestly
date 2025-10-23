@@ -72,7 +72,8 @@ export const DataFileUploadView: React.FC = () => {
           type="secondary"
           className="file-uploaded-button"
           onClick={() => {
-            setModalContext("view");
+            //TODO@nafees: handle preview. Differentiate between success and view mode
+            setModalContext("loading");
             setShowDataFileModal(true);
           }}
         >
@@ -109,7 +110,7 @@ export const DataFileUploadView: React.FC = () => {
       </div>
       {showDataFileModal && (
         <DataFileModals
-          initialStatus={modalContext}
+          initialViewMode={modalContext}
           onClose={() => setShowDataFileModal(false)}
           onFileSelected={() => setShowDataFileModal(true)}
           handleSelectFile={handleFileSelection}

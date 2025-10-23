@@ -37,7 +37,7 @@ const CommonFileInfo: React.FC<{
   );
 };
 
-const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
+const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData }) => {
   return (
     <RQModal
       width={680}
@@ -58,7 +58,7 @@ const ParsingModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
         <div className="preview-file-details">
           <CommonFileInfo dataFile={dataFile} />
         </div>
-        <PreviewTableView />
+        <PreviewTableView datasource={parsedData} />
       </div>
 
       <div className="preview-modal-footer-container">
@@ -77,9 +77,10 @@ interface ModalProps {
   buttonOptions: () => buttonTypes;
   dataFile: RunConfigState["dataFile"];
   onClose: () => void;
+  parsedData?: Record<string, any>[];
 }
 
-const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
+const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData }) => {
   return (
     <RQModal
       width={680}
@@ -101,7 +102,7 @@ const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
             {dataFile.size < 1024 ? `${dataFile.size} B` : `${(dataFile.size / 1024).toFixed(2)} KB`}
           </div>
         </div>
-        <PreviewTableView />
+        <PreviewTableView datasource={parsedData} />
       </div>
 
       <div className="preview-modal-footer-container">
@@ -116,7 +117,7 @@ const PreviewModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
   );
 };
 
-const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }) => {
+const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose, parsedData }) => {
   return (
     <RQModal
       width={680}
@@ -156,7 +157,7 @@ const WarningModal: React.FC<ModalProps> = ({ buttonOptions, dataFile, onClose }
           </div>
           <CommonFileInfo dataFile={dataFile} />
         </div>
-        <PreviewTableView />
+        <PreviewTableView datasource={parsedData} />
       </div>
 
       <div className="preview-modal-footer-container">
@@ -370,6 +371,7 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
   );
   const [count, setCount] = React.useState<number>(0);
   const [removeDataFile] = useRunConfigStore((s) => [s.removeDataFile]);
+  const [parsedData, setParsedData] = React.useState<Record<string, any>[] | null>(null);
 
   const parseDataFile = useCallback(async () => {
     if (!dataFile) return;
@@ -377,8 +379,9 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
     try {
       const parsedData = await parseCollectionRunnerDataFile(dataFile.path);
       if (parsedData) {
-        setViewMode("success");
+        setViewMode("success"); //TODO @nafees also handle view mode here
         setCount(parsedData.count);
+        setParsedData(parsedData.data);
       }
     } catch (err) {
       setViewMode("error");
@@ -498,13 +501,15 @@ export const DataFileModals: React.FC<PreviewModalProps> = ({
   return (
     <>
       {viewMode === "loading" && <LoadingModal onClose={onClose} />}
-      {viewMode === "view" && <PreviewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />}
+      {viewMode === "view" && (
+        <PreviewModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} parsedData={parsedData} />
+      )}
       {viewMode === "success" && count > 1000 && (
-        <WarningModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />
+        <WarningModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} parsedData={parsedData} />
       )}
       {viewMode === "error" && <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />}
       {viewMode === "success" && count < 1000 && (
-        <ParsingModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} />
+        <ParsingModal buttonOptions={buttonOptions} dataFile={dataFile} onClose={onClose} parsedData={parsedData} />
       )}
       {viewMode === "largeFile" && (
         <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFile={dataFile} />
