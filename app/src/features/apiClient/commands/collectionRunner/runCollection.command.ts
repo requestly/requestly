@@ -25,6 +25,7 @@ import { Scope } from "features/apiClient/helpers/variableResolver/variable-reso
 import { VariableScope } from "backend/environment/types";
 import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/RunnerFileMissingError/RunnerFileMissingError";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -76,7 +77,6 @@ function prepareExecutionResult(params: {
 }
 
 class RunCancelled extends NativeError {}
-class DataFileNotFound extends NativeError {}
 class DataFileParseError extends NativeError {}
 
 class Runner {
@@ -118,8 +118,14 @@ class Runner {
     const apiClientFilesStore = apiClientFileStore.getState();
 
     const collectionId = this.runContext.collectionId;
+    console.log("!!!debug", "datafile", dataFile);
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
-      throw new DataFileNotFound("Data file not found!").addContext({ collectionId });
+      throw new RunnerFileMissingError(
+        `Data file "${dataFile.name}" is missing! Please re-add the file to proceed.`
+      ).addContext({
+        collectionId,
+        filePath: dataFile.path,
+      });
     }
 
     try {
@@ -250,7 +256,7 @@ class Runner {
     }
   }
 
-  private onError(error: any) {
+  private onError(error: Error) {
     this.runContext.runResultStore.getState().setError(error);
     this.runContext.runResultStore.getState().setEndtime(null);
   }
@@ -366,12 +372,6 @@ class Runner {
       if (e instanceof RunCancelled) {
         this.onRunCancelled();
         return;
-      } else if (e instanceof DataFileNotFound) {
-        e.name = "DataFileNotFoundError";
-        return e;
-      } else if (e instanceof DataFileParseError) {
-        e.name = "DataFileParseError";
-        return e;
       }
 
       this.onError(e);

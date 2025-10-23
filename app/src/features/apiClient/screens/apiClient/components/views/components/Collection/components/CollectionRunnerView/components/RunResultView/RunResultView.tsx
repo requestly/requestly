@@ -11,7 +11,8 @@ import { useCollectionView } from "../../../../collectionView.context";
 import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
 import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
 import { RenderableError } from "errors/RenderableError";
-import DefaultErrorComponent from "./DefaultErrorComponent/DefaultErrorComponent";
+import DefaultErrorComponent from "./DefaultCollectionRunnerErrorComponent/DefaultErrorComponent";
+
 export const RunResultView: React.FC = () => {
   const [iterations, startTime, getRunSummary, runStatus, historySaveStatus, error] = useRunResultStore((s) => [
     s.iterations,
@@ -23,16 +24,6 @@ export const RunResultView: React.FC = () => {
   ]);
   const [totalIterationCount] = useRunConfigStore((s) => [s.iterations]);
 
-  if (runStatus === RunStatus.ERRORED && error) {
-    // Handle error state here, possibly render an error component
-    if (error instanceof RenderableError) {
-      error.render();
-    } else {
-      //default error component
-      //LOOK ERROR BOUNDARY FOR CREATING THIS
-      <DefaultErrorComponent error={error} />;
-    }
-  }
   const testResults = useMemo(
     () => getRunSummary(),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- need `iterations` for reactivity
@@ -62,7 +53,15 @@ export const RunResultView: React.FC = () => {
       </div>
 
       {historySaveStatus === HistorySaveStatus.FAILED ? <HistoryNotSavedBanner /> : null}
-      <RunResultContainer result={testResults} ranAt={startTime} totalIterationCount={totalIterationCount} />
+      {runStatus === RunStatus.ERRORED ? (
+        error instanceof RenderableError ? (
+          error.render()
+        ) : (
+          <DefaultErrorComponent error={error} />
+        )
+      ) : (
+        <RunResultContainer result={testResults} ranAt={startTime} totalIterationCount={totalIterationCount} />
+      )}
       {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}
       <HistoryDrawer isHistoryDrawerOpen={isHistoryDrawerOpen} setIsHistoryDrawerOpen={setIsHistoryDrawerOpen} />
     </div>

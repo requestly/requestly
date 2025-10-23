@@ -1,7 +1,7 @@
 import LINKS from "config/constants/sub/links";
 import { RunnerFileMissingError } from "../RunnerFileMissingError";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import "./RunnerFsMissing.scss";
+import "./runnerFsMissing.scss";
 import React from "react";
 
 interface Props {
@@ -12,7 +12,7 @@ export const RunnerFileMissing: React.FC<Props> = ({ error }) => {
     <>
       <div className="api-client-error-placeholder-container">
         <div className="api-client-error-placeholder-content">
-          <img src={"assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
+          <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
           <div className="api-client-error-placeholder-content__title">{error.getErrorHeading()}</div>
           <div className="file-error-container">
             <span className="error-message">
