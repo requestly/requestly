@@ -80,73 +80,63 @@ export const DataFileSelector: React.FC = () => {
     };
   }, [dataFile, removeDataFile]);
 
-  if (!dataFile) {
-    return (
-      <>
-        <RQButton size="small" icon={<MdOutlineFileUpload />} onClick={handleFileSelection}>
-          Select file
-        </RQButton>
-
-        <div className="file-upload-info">
-          <MdOutlineInfo className="file-info-icon" />
-          <span className="file-type-info">Supports JSON & CSV files (max 100MB)</span>
-        </div>
-        {showDataFileModal && (
-          <DataFileModalWrapper
-            onClose={handleModalClose}
-            onFileSelected={() => setShowDataFileModal(true)}
-            handleSelectFile={handleFileSelection}
-            dataFileMetadata={dataFileMetadata}
-            isPreviewMode={openModalInPreviewMode}
-          />
-        )}
-      </>
-    );
-  }
-
   return (
     <>
-      <div className="file-uploaded-section">
-        <RQButton
-          size="small"
-          type="secondary"
-          className="file-uploaded-button"
-          onClick={() => {
-            setOpenModalInPreviewMode(false);
-            setShowDataFileModal(true);
-          }}
-        >
-          {file?.isFileValid ? (
-            <MdOutlineRemoveRedEye className="eye-icon" />
-          ) : (
-            <>
-              <RQTooltip
-                title={"The file you selected is not available. Please remove and upload a new file to continue."}
-                placement="top"
-              >
-                <BiError className="invalid-icon" />
-              </RQTooltip>
-            </>
-          )}
-          <span className={`button-text ${file?.isFileValid ? "" : "file-invalid"}`}>
-            {file ? truncateString(file.name, 35) + getFileExtension(file.name) : "file unavailable"}
-          </span>
-        </RQButton>
+      {!dataFile ? (
+        <>
+          <RQButton size="small" icon={<MdOutlineFileUpload />} onClick={handleFileSelection}>
+            Select file
+          </RQButton>
 
-        {/*Clear File or Delete File */}
-        <RQTooltip title={`clear file`}>
+          <div className="file-upload-info">
+            <MdOutlineInfo className="file-info-icon" />
+            <span className="file-type-info">Supports JSON & CSV files (max 100MB)</span>
+          </div>
+        </>
+      ) : (
+        <div className="file-uploaded-section">
           <RQButton
             size="small"
-            className="clear-file-btn"
+            type="secondary"
+            className="file-uploaded-button"
             onClick={() => {
-              removeDataFile();
+              setOpenModalInPreviewMode(false);
+              setShowDataFileModal(true);
             }}
-            type="transparent"
           >
-            {dataFile && <RxCross2 />}
+            {file?.isFileValid ? (
+              <MdOutlineRemoveRedEye className="eye-icon" />
+            ) : (
+              <>
+                <RQTooltip
+                  title={"The file you selected is not available. Please remove and upload a new file to continue."}
+                  placement="top"
+                >
+                  <BiError className="invalid-icon" />
+                </RQTooltip>
+              </>
+            )}
+            <span className={`button-text ${file?.isFileValid ? "" : "file-invalid"}`}>
+              {file ? truncateString(file.name, 35) + getFileExtension(file.name) : "file unavailable"}
+            </span>
           </RQButton>
-        </RQTooltip>
-      </div>
+
+          {/*Clear File or Delete File */}
+          <RQTooltip title={`clear file`}>
+            <RQButton
+              size="small"
+              className="clear-file-btn"
+              onClick={() => {
+                removeDataFile();
+              }}
+              type="transparent"
+            >
+              {dataFile && <RxCross2 />}
+            </RQButton>
+          </RQTooltip>
+        </div>
+      )}
+
       {showDataFileModal && (
         <DataFileModalWrapper
           onClose={handleModalClose}
