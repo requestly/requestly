@@ -206,7 +206,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
 
   return (
     <RQModal
-      width={680}
+      width={[DataFileModalViewMode.LARGE_FILE, DataFileModalViewMode.LOADING].includes(viewMode) ? 480 : 680}
       open={true}
       closable={true}
       closeIcon={<MdOutlineClose />}
