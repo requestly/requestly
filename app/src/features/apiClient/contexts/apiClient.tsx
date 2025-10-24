@@ -1,6 +1,14 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { RQAPI } from "../types";
-import { addToHistoryInStore, clearHistoryFromStore, getHistoryFromStore } from "../screens/apiClient/historyStore";
+import { 
+  addToHistoryInStore, 
+  clearHistoryFromStore,
+  deleteHistoryItemFromStore,
+  deleteHistoryByDateFromStore,
+  getHistoryFromStore,
+  HistoryEntry,
+} from "../screens/apiClient/historyStore";
+
 import {
   trackNewEnvironmentClicked,
   trackHistoryCleared,
@@ -26,10 +34,11 @@ import { CollectionViewTabSource } from "../screens/apiClient/components/views/c
 import { createEnvironment as _createEnvironment } from "../commands/environments";
 
 interface ApiClientContextInterface {
-  history: RQAPI.ApiEntry[];
+  history: HistoryEntry[];
   addToHistory: (apiEntry: RQAPI.ApiEntry) => void;
   clearHistory: () => void;
-
+  deleteHistoryItem: (id: string) => void;
+  deleteHistoryByDate: (dateKey: string) => void;
   isRecordBeingCreated: RQAPI.RecordType | null;
   setIsRecordBeingCreated: (recordType: RQAPI.RecordType | null) => void;
 
@@ -61,6 +70,8 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
   history: [],
   addToHistory: () => {},
   clearHistory: () => {},
+  deleteHistoryItem: () => {},
+  deleteHistoryByDate: () => {},
 
   isRecordBeingCreated: null,
   setIsRecordBeingCreated: () => {},
@@ -102,13 +113,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     state.updateRecords,
     state.getData,
   ]);
-  const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
+  const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null);
 
-  const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
-  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(undefined);
+  const [history, setHistory] = useState<HistoryEntry[]>(getHistoryFromStore());
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number | undefined>(undefined); 
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
+  const [isRecordBeingCreated, setIsRecordBeingCreated] = useState<RQAPI.RecordType | null>(null);
+
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
 
@@ -119,8 +131,13 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   }, [apiClientRecords, debouncedTrackUserProperties]);
 
   const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
-    setHistory((history) => [...history, apiEntry]);
-    addToHistoryInStore(apiEntry);
+    const entryWithMeta: HistoryEntry = {
+      ...apiEntry,
+      historyId: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+      createdTs: Date.now(),
+    };
+    setHistory((history) => [...history, entryWithMeta]);
+    addToHistoryInStore(entryWithMeta);
   }, []);
 
   const clearHistory = useCallback(() => {
@@ -128,6 +145,21 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     setSelectedHistoryIndex(undefined);
     clearHistoryFromStore();
     trackHistoryCleared();
+  }, []);
+
+  const deleteHistoryItem = useCallback((id: string) => {
+    setHistory((prevHistory) => prevHistory.filter((entry) => entry.historyId !== id));
+    deleteHistoryItemFromStore(id);
+  }, []);
+
+  const deleteHistoryByDate = useCallback((dateKey: string) => {
+    setHistory((prevHistory) => {
+      return prevHistory.filter((entry) => {
+        const entryDate = new Date(entry.createdTs).toISOString().slice(0, 10);
+        return entryDate !== dateKey;
+      });
+    });
+    deleteHistoryByDateFromStore(dateKey);
   }, []);
 
   const setCurrentHistoryIndex = useCallback((index?: number) => {
@@ -158,6 +190,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
       setOnNewClickContextId(contextId);
       const context = getApiClientFeatureContext(contextId);
+       if (!context) {
+      toast.error("Failed to get API client context");
+      return;
+    }
       const recordsRepository = context.repositories.apiClientRecordsRepository;
 
       switch (recordType) {
@@ -275,6 +311,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
       }
 
       const context = getApiClientFeatureContext();
+       if (!context) {
+      toast.error("Failed to get API client context");
+      return;
+    }
       return onNewClickV2({
         contextId: context.id,
         analyticEventSource,
@@ -292,6 +332,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     history,
     addToHistory,
     clearHistory,
+    deleteHistoryItem,
+    deleteHistoryByDate,
     setCurrentHistoryIndex,
     selectedHistoryIndex,
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ApiClientImporterType, RQAPI } from "../../../../../types";
 import { useLocation, useParams } from "react-router-dom";
-import { notification, Tabs, TabsProps, Tooltip } from "antd";
+import { Button, notification, Tabs, TabsProps, Tooltip } from "antd";
 import { CgStack } from "@react-icons/all-files/cg/CgStack";
 import { MdOutlineHistory } from "@react-icons/all-files/md/MdOutlineHistory";
 import { CollectionsList } from "../components/collectionsList/CollectionsList";
@@ -20,6 +20,9 @@ import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { MdOutlineSpaceDashboard } from "@react-icons/all-files/md/MdOutlineSpaceDashboard";
 import { RuntimeVariables } from "features/apiClient/screens/environment/components/RuntimeVariables/runtimevariables";
+import HistoryDeleteConfirmationModal from "features/apiClient/components/HistoryDeleteConfirmationModal";
+import { DeleteOutlined } from "@ant-design/icons";
+
 
 interface Props {}
 
@@ -48,6 +51,58 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     onImportRequestModalClose,
     setIsImportModalOpen,
   } = useApiClientContext();
+const [deleteModalState, setDeleteModalState] = useState<{
+  isOpen: boolean;
+  type: "item" | "date" | null;
+  target: string | null;
+  message: string;
+}>({
+  isOpen: false,
+  type: null,
+  target: null,
+  message: "",
+});
+const { deleteHistoryItem, deleteHistoryByDate } = useApiClientContext();
+const handleDeleteHistoryItem = (id: string) => {
+  setDeleteModalState({
+    isOpen: true,
+    type: "item",
+    target: id,
+    message: "Are you sure you want to delete this request from history?",
+  });
+};
+
+const handleDeleteHistoryByDate = (dateKey: string, dateLabel: string) => {
+  setDeleteModalState({
+    isOpen: true,
+    type: "date",
+    target: dateKey,
+    message: `Are you sure you want to delete all requests from ${dateLabel}?`,
+  });
+};
+
+const handleConfirmDelete = () => {
+  if (deleteModalState.type === "item" && deleteModalState.target) {
+    deleteHistoryItem(deleteModalState.target);
+  } else if (deleteModalState.type === "date" && deleteModalState.target) {
+    deleteHistoryByDate(deleteModalState.target);
+  }
+  setDeleteModalState({
+    isOpen: false,
+    type: null,
+    target: null,
+    message: "",
+  });
+};
+
+const handleToggleModal = () => {
+  setDeleteModalState({
+    isOpen: false,
+    type: null,
+    target: null,
+    message: "",
+  });
+};
 
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
@@ -104,6 +159,34 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     }
   }, [requestId, collectionId]);
 
+// Add this new handler for deleting history items
+const handleDeleteHistory = useCallback((indices: number[]) => {
+  if (!indices || indices.length === 0) return;
+
+  // Filter out deleted indices
+  const omitSet = new Set(indices);
+  const newHistory = history.filter((_, idx) => !omitSet.has(idx));
+  
+  // Update history in context
+  // Note: You'll need to check if useApiClientContext has a setter for history
+  // If not, you may need to update the context provider
+  
+  // For now, log it (you'll wire this to the actual context setter)
+  console.log('Delete indices:', indices);
+  console.log('New history:', newHistory);
+  
+  // Adjust selected index if needed
+  if (selectedHistoryIndex !== undefined && omitSet.has(selectedHistoryIndex)) {
+    setCurrentHistoryIndex(undefined);
+  } else if (selectedHistoryIndex !== undefined) {
+    const deletedBefore = indices.filter(i => i < selectedHistoryIndex).length;
+    if (deletedBefore > 0) {
+      setCurrentHistoryIndex(Math.max(0, selectedHistoryIndex - deletedBefore));
+    }
+  }
+}, [history, selectedHistoryIndex, setCurrentHistoryIndex]);
+
+
   const items: TabsProps["items"] = [
     {
       key: ApiClientSidebarTabKey.COLLECTIONS,
@@ -149,11 +232,15 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         </Tooltip>
       ),
       children: (
-        <HistoryList
-          history={history}
-          selectedHistoryIndex={selectedHistoryIndex}
-          onSelectionFromHistory={setCurrentHistoryIndex}
-        />
+      <HistoryList
+  history={history}
+  selectedHistoryIndex={selectedHistoryIndex}
+  onSelectionFromHistory={setCurrentHistoryIndex}
+  onDeleteHistoryItem={handleDeleteHistoryItem}     
+  onDeleteHistoryByDate={handleDeleteHistoryByDate}    
+/>
+
+
       ),
     },
     {
@@ -260,11 +347,14 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
       </div>
 
       {isDeleteModalOpen ? (
+        <>
         <DeleteApiRecordModal
           open={isDeleteModalOpen}
           onClose={onDeleteModalClose}
           getRecordsToDelete={getSelectedRecords}
         />
+    
+        </>
       ) : null}
 
       <ImportFromCurlModal
@@ -276,6 +366,14 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
         handleImportRequest={handleImportRequest}
         onClose={onImportRequestModalClose}
       />
+        <HistoryDeleteConfirmationModal
+      isOpen={deleteModalState.isOpen}
+      toggle={handleToggleModal}
+      onConfirm={handleConfirmDelete}
+      title="Confirm Deletion"
+      message={deleteModalState.message}
+    />
+
     </>
   );
 };
