@@ -9,6 +9,7 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
 import { VariableData } from "features/apiClient/store/variables/types";
+import { BiSearchAlt } from "@react-icons/all-files/bi/BiSearchAlt";
 
 interface VariablesListProps {
   variables: VariableRow[];
@@ -16,6 +17,7 @@ interface VariablesListProps {
   onVariablesChange: (variables: VariableRow[]) => void;
   isReadOnly?: boolean;
   container: "environments" | "runtime";
+  onSearchValueChange?: (value: string) => void;
 }
 
 export type VariableRow = VariableData & { key: string };
@@ -35,6 +37,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   onVariablesChange,
   isReadOnly = false,
   container = "environments",
+  onSearchValueChange = () => {},
 }) => {
   const [dataSource, setDataSource] = useState<VariableRow[]>([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState<number[]>([]);
@@ -48,6 +51,10 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }),
     [dataSource, searchValue]
   );
+
+  // Show "no results" only when search is active and no non-empty keys match.
+  const nonEmptyResults = filteredDataSource.filter((item) => item.key !== "");
+  const noSearchResultsFound = searchValue !== "" && nonEmptyResults.length === 0;
 
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
@@ -181,6 +188,19 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     trackAddVariableClicked(EnvironmentAnalyticsContext.API_CLIENT, EnvironmentAnalyticsSource.VARIABLES_LIST);
     handleAddNewRow(dataSource);
   };
+
+  if (noSearchResultsFound) {
+    return (
+      <div className="variables-list-no-results-container">
+        <div className="variables-list-no-results-icon">
+          <BiSearchAlt size={48} />
+        </div>
+        <p>No variables found for "{searchValue}".</p>
+        <p>Try clearing your search or adding variables.</p>
+        <RQButton onClick={() => onSearchValueChange("")}>Clear search</RQButton>
+      </div>
+    );
+  }
 
   return (
     <ContentListTable

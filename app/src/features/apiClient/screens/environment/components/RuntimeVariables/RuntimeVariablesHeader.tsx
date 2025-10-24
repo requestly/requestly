@@ -1,6 +1,7 @@
 import React from "react";
 import { Input } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
+import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import "./runtimevariableHeader.scss";
 import InfoIcon from "components/misc/InfoIcon";
 import { MdOutlineDeleteForever } from "@react-icons/all-files/md/MdOutlineDeleteForever";
@@ -45,9 +46,15 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
       <div className="runtime-variables-list-action-container">
         <Input
           placeholder="Search variables"
+          prefix={<MdOutlineSearch />}
           className="runtime-variables-list-search-input"
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              onSearchValueChange("");
+            }
+          }}
         />
         <div className="runtime-variables-list-action-btn">
           <RQButton
