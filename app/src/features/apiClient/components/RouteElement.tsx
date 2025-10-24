@@ -27,7 +27,7 @@ export const ApiClientRouteElement = () => {
   return (
     <WindowsAndLinuxGatedHoc featureName="API client">
       {isApiClientCompatible ? (
-        <ApiClientErrorBoundary>
+        <ApiClientErrorBoundary boundaryId="api-client-error-boundary">
           <ApiClientFeatureContainer />
         </ApiClientErrorBoundary>
       ) : (

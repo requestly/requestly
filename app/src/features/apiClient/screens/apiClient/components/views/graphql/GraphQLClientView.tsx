@@ -512,7 +512,7 @@ const GraphQLClientView: React.FC<Props> = ({
 const WithGraphQLRecordProvider = (Component: React.ComponentType<any>) => {
   return (props: any) => {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary boundaryId="graphql-client-view-error-boundary">
         <GraphQLRecordProvider entry={props.apiEntryDetails.data} recordId={props.apiEntryDetails.id}>
           <Component {...props} />
         </GraphQLRecordProvider>

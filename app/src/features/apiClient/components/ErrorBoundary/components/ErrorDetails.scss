@@ -1,0 +1,108 @@
+.error-boundary__icon {
+  width: 80px;
+}
+
+.api-client-error-boundary-content__error-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .error-boundary__header {
+    font-size: var(--requestly-font-size-md);
+    color: var(--requestly-color-text-default);
+    font-weight: var(--requestly-font-weight-medium);
+    text-align: center;
+  }
+
+  .error-boundary__error-message {
+    margin-top: var(--requestly-space-4);
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-error-200);
+    background: var(--requestly-color-error-800);
+    padding: var(--requestly-space-4) var(--requestly-space-6);
+    border-radius: var(--requestly-space-3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    max-width: 570px;
+    width: 100%;
+
+    code {
+      display: block;
+      text-align: center;
+    }
+
+    .error-boundary__collapse {
+      background: transparent;
+      width: 100%;
+
+      .ant-collapse-item {
+        border: none;
+
+        .ant-collapse-header {
+          padding: 0;
+          color: var(--requestly-color-error-200);
+          width: 100%;
+          display: flex;
+          align-items: center;
+          text-align: left;
+
+          code {
+            text-align: left;
+          }
+
+          .ant-collapse-arrow {
+            color: var(--requestly-color-error-200);
+            font-size: 12px;
+            margin-right: var(--requestly-space-3);
+          }
+        }
+
+        .ant-collapse-content {
+          border: none;
+          background: transparent;
+          width: 100%;
+
+          .ant-collapse-content-box {
+            padding: 0;
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .error-boundary__stacktrace {
+      font-size: var(--requestly-font-size-xs);
+      background: var(--requestly-color-surface-1);
+      padding: var(--requestly-space-5);
+      border-radius: var(--requestly-space-3);
+      overflow: auto;
+      max-height: 300px;
+      margin-top: var(--requestly-space-5);
+      color: var(--requestly-color-text-default);
+      width: 100%;
+      box-sizing: border-box;
+      line-height: 1.6;
+      font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace;
+      text-align: left;
+    }
+  }
+}
+
+.error-boundary__troubleshoot {
+  background: var(--requestly-color-surface-1);
+  border-radius: var(--requestly-space-3);
+  padding: var(--requestly-space-6);
+  margin-top: var(--requestly-space-6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 570px;
+
+  .error-boundary__troubleshoot-header {
+    font-size: var(--requestly-font-size-md);
+    font-weight: var(--requestly-font-weight-semibold);
+    color: var(--requestly-color-text-default);
+    margin-bottom: var(--requestly-space-4);
+    text-align: center;
+  }
+}
+

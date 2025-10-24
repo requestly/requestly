@@ -821,7 +821,7 @@ const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC 
     const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
 
     return (
-      <ErrorBoundary>
+      <ErrorBoundary boundaryId="http-client-view-error-boundary">
         <PathVariablesProvider pathVariables={entry.request?.pathVariables}>
           <QueryParamsProvider entry={entry}>
             <Component {...props} />
