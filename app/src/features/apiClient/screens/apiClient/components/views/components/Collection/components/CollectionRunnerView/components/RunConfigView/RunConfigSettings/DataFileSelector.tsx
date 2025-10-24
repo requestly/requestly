@@ -10,10 +10,10 @@ import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUplo
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
 import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
-import { useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 
 export const DataFileSelector: React.FC = () => {
-  const { parseFile, fileMetadata, setFileMetadata } = useDataFileModalContext();
+  const { parseFile, setFileMetadata, setViewMode } = useDataFileModalContext();
 
   const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
   const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
@@ -30,10 +30,16 @@ export const DataFileSelector: React.FC = () => {
         size: file.size,
       };
       setFileMetadata(metadata);
+
+      if (file.size > 100 * 1024 * 1024) {
+        setViewMode(DataFileModalViewMode.LARGE_FILE);
+        setShowModal(true);
+        return;
+      }
       setShowModal(true);
       parseFile(file.path, true);
     });
-  }, [openFileSelector, setFileMetadata, setShowModal, parseFile]);
+  }, [openFileSelector, setFileMetadata, parseFile, setViewMode]);
 
   const handleModalClose = useCallback(() => {
     // Clear metadata when modal closes
@@ -102,9 +108,7 @@ export const DataFileSelector: React.FC = () => {
         </div>
       )}
 
-      {showModal && fileMetadata && (
-        <DataFileModalWrapper onClose={handleModalClose} onFileSelected={handleFileSelection} />
-      )}
+      {showModal && <DataFileModalWrapper onClose={handleModalClose} onFileSelected={handleFileSelection} />}
     </>
   );
 };
