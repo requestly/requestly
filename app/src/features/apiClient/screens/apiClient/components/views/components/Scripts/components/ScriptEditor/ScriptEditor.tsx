@@ -11,9 +11,16 @@ import Editor from "componentsV2/CodeEditor";
 interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
   onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
+  focusPostResponse?: boolean;
+  onFocusComplete?: () => void;
 }
 // FIX: Editor does not re-render when scripts are undefined
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsChange }) => {
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({
+  scripts,
+  onScriptsChange,
+  focusPostResponse,
+  onFocusComplete,
+}) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -21,6 +28,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
+  const [shouldAutoFocus, setShouldAutoFocus] = useState(false);
+
+  React.useEffect(() => {
+    if (focusPostResponse && scripts?.[RQAPI.ScriptType.POST_RESPONSE]) {
+      setScriptType(RQAPI.ScriptType.POST_RESPONSE);
+      setShouldAutoFocus(true);
+      onFocusComplete?.();
+    }
+  }, [focusPostResponse, scripts, onFocusComplete]);
+
+  React.useEffect(() => {
+    if (shouldAutoFocus) {
+      const timer = setTimeout(() => {
+        setShouldAutoFocus(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAutoFocus]);
 
   const scriptTypeOptions = useMemo(() => {
     return (
@@ -60,6 +85,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
           options: [scriptTypeOptions],
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
+        autoFocus={scriptType === RQAPI.ScriptType.POST_RESPONSE && shouldAutoFocus}
       />
     </div>
   );

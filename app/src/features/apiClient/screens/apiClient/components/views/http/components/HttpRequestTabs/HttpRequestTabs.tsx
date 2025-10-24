@@ -32,6 +32,8 @@ interface Props {
   setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
   setContentType: (contentType: RequestContentType) => void;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
+  focusPostResponseScriptEditor?: boolean;
+  onFocusPostResponseComplete?: () => void;
 }
 
 const HttpRequestTabs: React.FC<Props> = ({
@@ -41,6 +43,8 @@ const HttpRequestTabs: React.FC<Props> = ({
   setRequestEntry,
   setContentType,
   handleAuthChange,
+  focusPostResponseScriptEditor,
+  onFocusPostResponseComplete,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
@@ -150,6 +154,8 @@ const HttpRequestTabs: React.FC<Props> = ({
             onScriptsChange={(newScripts) => {
               setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
             }}
+            focusPostResponse={focusPostResponseScriptEditor}
+            onFocusComplete={onFocusPostResponseComplete}
           />
         ),
       },
@@ -169,6 +175,8 @@ const HttpRequestTabs: React.FC<Props> = ({
     setContentType,
     setRequestEntry,
     pathVariables.length,
+    focusPostResponseScriptEditor,
+    onFocusPostResponseComplete,
   ]);
 
   return (
