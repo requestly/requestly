@@ -5,6 +5,8 @@ import "./pageError.scss";
 import LINKS from "config/constants/sub/links";
 import { trackErrorBoundaryShown } from "modules/analytics/events/common/error-boundaries";
 import { useRouteError } from "react-router-dom";
+import { prepareError, sendErrorToSentry } from "features/apiClient/components/ErrorBoundary/utils";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {}
 
@@ -14,10 +16,7 @@ const RouterError: React.FC<Props> = () => {
   useEffect(() => {
     console.log("RouterError", error);
     trackErrorBoundaryShown(error.toString(), "");
-    Sentry.withScope((scope) => {
-      scope.setTag("errorType", "react-router");
-      Sentry.captureException(error);
-    });
+    sendErrorToSentry(prepareError(error, ErrorSeverity.FATAL), "react-router-error-boundary");
   }, [error]);
 
   return (
