@@ -31,13 +31,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const [shouldAutoFocus, setShouldAutoFocus] = useState(false);
   const hasFocusCompleted = React.useRef(false);
 
+  const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
+
   React.useEffect(() => {
-    if (focusPostResponse && scripts?.[RQAPI.ScriptType.POST_RESPONSE]) {
+    if (focusPostResponse && hasPostResponseScript) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
       setShouldAutoFocus(true);
       hasFocusCompleted.current = false;
     }
-  }, [focusPostResponse, scripts]);
+  }, [focusPostResponse, hasPostResponseScript]);
 
   React.useEffect(() => {
     if (shouldAutoFocus) {
