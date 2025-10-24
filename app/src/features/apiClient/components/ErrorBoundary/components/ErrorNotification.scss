@@ -1,0 +1,31 @@
+.error-boundary-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--requestly-space-6);
+  padding: var(--requestly-space-8);
+  align-items: center;
+}
+
+.error-notification {
+  .error-notification__heading {
+    font-size: var(--requestly-font-size-md);
+    font-weight: var(--requestly-font-weight-semibold);
+    color: var(--requestly-color-text-default);
+    line-height: 1.4;
+  }
+  .error-notification__icon {
+    color: var(--requestly-color-warning-500);
+    font-size: 18px;
+  }
+
+  .error-notification__subheading {
+    font-size: var(--requestly-font-size-xs);
+    color: var(--requestly-color-text-subtle);
+    line-height: 1.6;
+    padding: var(--requestly-space-3);
+    background: var(--requestly-color-surface-2);
+    border-radius: var(--requestly-space-2);
+    border: 1px solid var(--requestly-color-surface-3);
+    margin-top: var(--requestly-space-3);
+  }
+}
