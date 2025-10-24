@@ -13,7 +13,7 @@
     align-items: center;
     gap: var(--space-8, 24px);
 
-    .file-error-container {
+    .default-file-error-container {
       display: flex;
       padding: var(--space-5, 12px) var(--space-6, 16px);
       justify-content: center;
@@ -28,6 +28,11 @@
       letter-spacing: 0.25px;
       max-width: 400px;
       text-align: center;
+
+      .stack-trace {
+        padding: 12px;
+        background-color: var(--requestly-color-background-dark);
+      }
     }
   }
 

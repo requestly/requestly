@@ -13,7 +13,7 @@
     align-items: center;
     gap: var(--space-8, 24px);
 
-    .error-container {
+    .runner-error-container {
       display: flex;
       padding: var(--space-5, 12px) var(--space-6, 16px);
       justify-content: center;
@@ -21,27 +21,16 @@
       gap: var(--space-4, 8px);
       align-self: stretch;
       border-radius: 8px;
-      background: var(--requestly-color-background);
-      border: 1px solid var(--requestly-color-white-t-10);
       font-size: var(--requestly-font-size-xs, 11px);
       line-height: 18px;
       letter-spacing: 0.25px;
       max-width: 400px;
       text-align: center;
 
-      .error-name {
-        color: var(--requestly-color-error-text);
-      }
-
-      .error-message {
+      .runner-error-message {
         color: var(--requestly-color-subtle);
         display: inline;
         gap: 4px;
-
-        svg {
-          width: 16px;
-          height: 16px;
-        }
       }
     }
   }

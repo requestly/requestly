@@ -14,8 +14,8 @@ export const RunnerFileMissing: React.FC<Props> = ({ error }) => {
         <div className="api-client-error-placeholder-content">
           <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
           <div className="api-client-error-placeholder-content__title">{error.getErrorHeading()}</div>
-          <div className="error-container">
-            <span className="error-message">
+          <div className="runner-error-container">
+            <span className="runner-error-message">
               The selected data file was moved, renamed, or deleted from your computer. Choose the correct file again to
               continue testing.
             </span>
