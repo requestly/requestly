@@ -116,7 +116,7 @@ export const DataFileSelector: React.FC = () => {
             setShowDataFileModal(true);
           }}
         >
-          {file.isFileValid ? (
+          {file?.isFileValid ? (
             <MdOutlineRemoveRedEye className="eye-icon" />
           ) : (
             <>
@@ -128,8 +128,8 @@ export const DataFileSelector: React.FC = () => {
               </RQTooltip>
             </>
           )}
-          <span className={`button-text ${file.isFileValid ? "" : "file-invalid"}`}>
-            {truncateString(file.name, 35) + getFileExtension(file.name)}
+          <span className={`button-text ${file?.isFileValid ? "" : "file-invalid"}`}>
+            {file ? truncateString(file.name, 35) + getFileExtension(file.name) : "file unavailable"}
           </span>
         </RQButton>
 

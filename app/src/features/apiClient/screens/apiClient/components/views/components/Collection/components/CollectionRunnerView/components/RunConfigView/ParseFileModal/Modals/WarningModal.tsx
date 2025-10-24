@@ -20,7 +20,6 @@ export const WarningModal: React.FC<ModalProps & { count: number }> = ({
       closeIcon={<MdOutlineClose />}
       onCancel={() => {
         onClose();
-        // removeDataFile();
       }}
       className="preview-modal"
     >

@@ -27,7 +27,6 @@ export const DataFileViewModal: React.FC<ModalProps> = ({
       closeIcon={<MdOutlineClose />}
       onCancel={() => {
         onClose();
-        // removeDataFile();
       }}
       className="preview-modal"
     >

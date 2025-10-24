@@ -24,7 +24,7 @@ export interface ModalProps {
   dataFileMetadata: { name: string; path: string; size: number };
   onClose: () => void;
   parsedData?: Record<string, any>[];
-  viewMode?: any;
+  viewMode?: DataFileModalViewMode;
 }
 
 export const FooterButtons: React.FC<{
@@ -52,7 +52,7 @@ export const ModalHeader: React.FC<{ dataFileMetadata: { name: string; path: str
       {dataFileMetadata?.name ? (
         <div className="preview-modal-title">Preview: {dataFileMetadata.name}</div>
       ) : (
-        <div className="preview-modal-title">Preview data use locally</div>
+        <div className="preview-modal-title">Preview data and use locally</div>
       )}
     </div>
   );
@@ -243,7 +243,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           count={parsedData?.count}
         />
       )}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count < 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count <= 1000 && (
         <DataFileViewModal
           buttonOptions={buttonOptions}
           dataFileMetadata={dataFileMetadata}
@@ -252,10 +252,10 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           viewMode={viewMode}
         />
       )}
-      {viewMode === "error" && (
+      {viewMode === DataFileModalViewMode.ERROR && (
         <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
       )}
-      {viewMode === "largeFile" && (
+      {viewMode === DataFileModalViewMode.LARGE_FILE && (
         <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={dataFileMetadata} />
       )}
     </>
