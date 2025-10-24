@@ -4,6 +4,7 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { DataFileModalViewMode, useDataFileModalContext } from "./DataFileModalContext";
+import { NativeError } from "errors/NativeError";
 
 export const getformattedFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -13,6 +14,12 @@ export const getformattedFileSize = (bytes: number): string => {
 
 export const DataFileView: React.FC<ModalProps> = ({ buttonOptions, viewMode }) => {
   const { dataFileMetadata, parsedData } = useDataFileModalContext();
+
+  if (!parsedData) {
+    throw new NativeError("Parsed data is required for DataFileView").addContext({
+      dataFileMetadata,
+    });
+  }
 
   return (
     <>

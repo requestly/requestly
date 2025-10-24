@@ -149,7 +149,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
             primaryButton: {
               label: "Use File",
               onClick: () => {
-                console.log("!!!debug", "useFile clike");
                 confirmUseDataFile();
               },
             },
@@ -175,6 +174,21 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
         };
 
       case DataFileModalViewMode.LARGE_FILE:
+        return {
+          secondaryButton: {
+            label: "Cancel",
+            onClick: () => {
+              onClose();
+            },
+          },
+          primaryButton: {
+            label: "Reselect File",
+            onClick: () => {
+              onFileSelected();
+            },
+          },
+        };
+      default:
         return {
           secondaryButton: {
             label: "Cancel",

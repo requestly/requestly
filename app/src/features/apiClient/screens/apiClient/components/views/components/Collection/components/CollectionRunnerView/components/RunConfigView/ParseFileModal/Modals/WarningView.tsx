@@ -3,11 +3,18 @@ import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTr
 import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { useDataFileModalContext } from "./DataFileModalContext";
+import { NativeError } from "errors/NativeError";
 
 type WarningModalProps = ModalProps;
 
 export const WarningView: React.FC<WarningModalProps> = ({ buttonOptions }) => {
   const { dataFileMetadata, parsedData } = useDataFileModalContext();
+
+  if (!parsedData) {
+    throw new NativeError("Parsed data is required for WarningView").addContext({
+      dataFileMetadata,
+    });
+  }
 
   return (
     <>
