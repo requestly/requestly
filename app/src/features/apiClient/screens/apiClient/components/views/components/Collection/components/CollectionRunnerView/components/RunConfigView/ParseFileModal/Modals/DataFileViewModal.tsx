@@ -43,7 +43,8 @@ export const DataFileViewModal: React.FC<DataFileViewModalProps> = ({
           <CommonFileInfo dataFileMetadata={dataFileMetadata} />
           {viewMode === DataFileModalViewMode.ACTIVE && (
             <div>
-              <span className="detail-label">File size: {getformattedFileSize(dataFileMetadata.size)}</span>
+              <span className="detail-label">File size: </span>
+              {getformattedFileSize(dataFileMetadata.size)}
             </div>
           )}
         </div>
