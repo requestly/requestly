@@ -8,6 +8,7 @@
 
   .ant-table {
     overflow: visible;
+    table-layout: fixed;
   }
 
   // Make header sticky
@@ -15,6 +16,27 @@
     position: sticky;
     top: 0;
     z-index: 10;
+    width: 150px; // Fixed width for all columns
+    min-width: 150px;
+    max-width: 150px;
+  }
+
+  //prevent overflow
+  .ant-table-tbody > tr > td {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // First column (Iteration) can be smaller
+  .ant-table-thead > tr > th:first-child,
+  .ant-table-tbody > tr > td:first-child {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
   }
 }
 

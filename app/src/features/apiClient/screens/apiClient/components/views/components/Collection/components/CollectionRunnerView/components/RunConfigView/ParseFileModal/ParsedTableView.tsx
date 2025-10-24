@@ -49,7 +49,7 @@ export const PreviewTableView: React.FC<{
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
-  const totalSize = rowVirtualizer.getTotalSize();
+  // const totalSize = rowVirtualizer.getTotalSize();
 
   const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
 
@@ -70,7 +70,7 @@ export const PreviewTableView: React.FC<{
     >
       <div
         style={{
-          height: `${totalSize}px`,
+          height: "100%",
           width: "fit-content",
           minWidth: "100%",
         }}
