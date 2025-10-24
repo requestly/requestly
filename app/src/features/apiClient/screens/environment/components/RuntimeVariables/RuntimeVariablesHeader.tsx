@@ -5,7 +5,7 @@ import { MdOutlineSearch } from "@react-icons/all-files/md/MdOutlineSearch";
 import "./runtimevariableHeader.scss";
 import InfoIcon from "components/misc/InfoIcon";
 import { MdOutlineDeleteForever } from "@react-icons/all-files/md/MdOutlineDeleteForever";
-import { KEYBOARD_SHORTCUTS } from "constants/keyboardShortcuts";
+import { KEYBOARD_SHORTCUTS } from "../../../../../../constants/keyboardShortcuts";
 interface RuntimeVariablesHeaderProps {
   searchValue: string;
   variables: any[];
