@@ -52,8 +52,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     [dataSource, searchValue]
   );
 
-  const hideFooter = isReadOnly || filteredDataSource.length === 0;
-
   // Search value should not be empty, and the filtered list should be empty.
   // Search value should not be empty, and the first item in the filtered list should have an empty key. (Default row with empty key)
   const noSearchResultsFound =
@@ -222,7 +220,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        hideFooter
+        isReadOnly
           ? undefined
           : () => (
               <div className="variables-list-footer">
