@@ -16,7 +16,7 @@ export const DataFileSelector: React.FC = () => {
   const { parseFile, setDataFileMetadata, setViewMode } = useDataFileModalContext();
 
   const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
-  const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
+  const [getFilesByIds, isFilePresentLocally] = useApiClientFileStore((s) => [s.getFilesByIds, s.isFilePresentLocally]);
   const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
   const { openFileSelector } = useFileSelection();
 
@@ -47,8 +47,13 @@ export const DataFileSelector: React.FC = () => {
     setShowModal(false);
   }, [setDataFileMetadata, setShowModal]);
 
-  const handleViewExistingFile = useCallback(() => {
+  const handleViewExistingFile = useCallback(async () => {
     if (dataFile) {
+      const isFilePresent = await isFilePresentLocally(dataFile.id);
+      if (!isFilePresent) {
+        return;
+      }
+
       setDataFileMetadata({
         name: dataFile.name,
         path: dataFile.path,
@@ -57,7 +62,7 @@ export const DataFileSelector: React.FC = () => {
       setShowModal(true);
       parseFile(dataFile.path, false);
     }
-  }, [dataFile, setDataFileMetadata, setShowModal, parseFile]);
+  }, [dataFile, isFilePresentLocally, setDataFileMetadata, parseFile]);
 
   return (
     <>
