@@ -3,13 +3,6 @@
     overflow: visible !important;
   }
 
-  // Make header sticky
-  .ant-table-thead > tr > th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
   //prevent overflow
   .ant-table-tbody > tr > td {
     width: 150px;
