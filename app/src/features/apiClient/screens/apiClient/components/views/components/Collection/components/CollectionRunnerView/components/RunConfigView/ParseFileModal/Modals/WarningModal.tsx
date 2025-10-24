@@ -5,7 +5,12 @@ import { PreviewTableView } from "../ParsedTableView";
 import React from "react";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
 
-export const WarningModal: React.FC<ModalProps & { count: number }> = ({
+type WarningModalProps = ModalProps & {
+  count: number;
+  parsedData: Record<string, any>[];
+};
+
+export const WarningModal: React.FC<WarningModalProps> = ({
   buttonOptions,
   dataFileMetadata,
   onClose,

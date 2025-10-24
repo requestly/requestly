@@ -12,7 +12,11 @@ export const getformattedFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 };
 
-export const DataFileViewModal: React.FC<ModalProps> = ({
+type DataFileViewModalProps = ModalProps & {
+  parsedData: Record<string, any>[];
+};
+
+export const DataFileViewModal: React.FC<DataFileViewModalProps> = ({
   buttonOptions,
   dataFileMetadata,
   onClose,
