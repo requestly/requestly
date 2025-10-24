@@ -51,6 +51,8 @@ export const DataFileSelector: React.FC = () => {
     if (dataFile) {
       const isFilePresent = await isFilePresentLocally(dataFile.id);
       if (!isFilePresent) {
+        // setting view mode to rerender and show error state through isValud
+        setViewMode(DataFileModalViewMode.ERROR);
         return;
       }
 
@@ -62,7 +64,7 @@ export const DataFileSelector: React.FC = () => {
       setShowModal(true);
       parseFile(dataFile.path, false);
     }
-  }, [dataFile, isFilePresentLocally, setDataFileMetadata, parseFile]);
+  }, [dataFile, isFilePresentLocally, setDataFileMetadata, parseFile, setViewMode]);
 
   return (
     <>
