@@ -1,17 +1,17 @@
-type RawResult<T> = {
+type RawResult<T, E extends Error = Error> = {
   success: true,
   result: T
 } | {
   success: false,
-  error: Error,
+  error: E,
 };
 
-export abstract class Result<T> {
-  constructor(readonly result: RawResult<T>) {
+export abstract class Result<T, E extends Error = Error> {
+  constructor(readonly result: RawResult<T, E>) {
 
   }
 
-  isOk() {
+  isOk(): this is Ok<T> {
     return this.result.success;
   }
 
@@ -19,11 +19,11 @@ export abstract class Result<T> {
     return !this.result.success ? false : fn(this.result.result);
   }
 
-  isError() {
+  isError(): this is Err<E> {
     return !this.isOk();
   }
 
-  isErrorAnd(fn: (arg: Error) => boolean) {
+  isErrorAnd(fn: (arg: E) => boolean) {
     return this.result.success ? false : fn(this.result.error);
   }
 
@@ -47,7 +47,7 @@ export abstract class Result<T> {
   }
 
   mapOrElse<U>(
-    def: (arg: Error) => U,
+    def: (arg: E) => U,
     fn: (arg: T) => U,
   ) {
     if (!this.result.success) {
@@ -57,29 +57,35 @@ export abstract class Result<T> {
     return fn(this.result.result);
   }
 
-  mapError(fn: (arg: Error) => Error) {
+  mapError<F extends Error>(fn: (arg: E) => F): Result<T, F> {
     if (this.result.success) {
+      return this as unknown as Result<T, F>;
+    }
+
+    return new Err(fn(this.result.error)) as Result<T, F>;
+  }
+
+  inspect(fn: (arg: T) => void): this {
+    if (this.result.success) {
+      fn(this.result.result);
       return this;
     }
 
-    return new Err(fn(this.result.error));
-  }
-
-  inspect(fn: (arg: T) => void) {
-    if (this.result.success) {
-      fn(this.result.result);
-    }
-
     return this;
   }
 
-  inspectError(fn: (arg: Error) => void) {
+  
+
+  inspectError(fn: (arg: E) => void): this {
     if (!this.result.success) {
       fn(this.result.error);
+      return this;
     }
 
     return this;
   }
+
+  
 
   expect(message: string) {
     if (!this.result.success) {
@@ -113,28 +119,36 @@ export abstract class Result<T> {
     return this.result.error;
   }
 
-  and<U>(res: Result<U>) {
-    if (!this.isOk()) {
-      return this;
+  and<U>(res: Result<U>): Result<U> {
+    if (this.isOk() && res.isOk()) {
+      return res;
     }
 
-    if (!res.isOk()) {
-      return res;
+    if(this.isError()) {
+      return this;
     }
 
     return res;
   }
 
-  andThen<U>(fn: (arg: T) => Result<U>) {
-    if(this.result.success) {
+  andThen<U>(fn: (arg: T) => Result<U>): Result<U> {
+    if(this.isOk()) {
       return fn(this.result.result);
     }
 
-    return this;
+    return this as Err;
+  }
+
+  async andThenAsync<U>(fn: (arg: T) => Promise<Result<U>>): Promise<Result<U>> {
+    if(this.isOk()) {
+      return fn(this.result.result);
+    }
+
+    return this as Err;
   }
 
   
-  or<U>(res: Result<U>) {
+  or(res: Result<T>): Result<T> {
     if (this.isOk()) {
       return this;
     }
@@ -158,7 +172,7 @@ export abstract class Result<T> {
     return this.result.result;
   }
 
-  unwrapOrElse(fn: (arg: Error) => T) {
+  unwrapOrElse(fn: (arg: E) => T) {
     if(this.result.success) {
       return this.result.result;
     }
