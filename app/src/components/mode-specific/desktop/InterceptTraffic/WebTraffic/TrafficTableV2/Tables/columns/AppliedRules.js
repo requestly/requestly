@@ -1,10 +1,38 @@
-import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import React, { useCallback } from "react";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
+import { getRecordById } from "store/features/rules/selectors";
 
 const { RULE_TYPES_CONFIG, RULE_EDITOR_CONFIG } = APP_CONSTANTS;
+
+const RenderRule = ({ ruleId, ruleType, onRuleClick }) => {
+  const rule = useSelector((state) => getRecordById(state, ruleId));
+  const ruleDisplayName = rule?.name || ruleId;
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onRuleClick(e, ruleId);
+    }
+  };
+
+  return (
+    <Tooltip title={ruleDisplayName}>
+      <span 
+        style={{ paddingRight: "8px", cursor: "pointer" }} 
+        onClick={(e) => onRuleClick(e, ruleId)}
+        onKeyDown={handleKeyPress}
+        role="button"
+        tabIndex={0}
+        aria-label={`Open rule editor for ${ruleDisplayName}`}
+      >
+        {RULE_TYPES_CONFIG[ruleType]?.ICON?.() || null}
+      </span>
+    </Tooltip>
+  );
+};
 
 const AppliedRules = ({ actions }) => {
   const dispatch = useDispatch();
@@ -36,19 +64,6 @@ const AppliedRules = ({ actions }) => {
     [dispatch]
   );
 
-  const render_rule_icon = (rule) => {
-    if (!rule) {
-      return null;
-    }
-
-    return (
-      <Tooltip title={rule.rule_id} key={rule.rule_id}>
-        <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => handleRuleIconClick(e, rule.rule_id)}>
-          {RULE_TYPES_CONFIG[rule.rule_type].ICON()}
-        </span>
-      </Tooltip>
-    );
-  };
 
   const get_rules_from_actions = (actions) => {
     const rules = actions.map((action) => {
@@ -63,7 +78,7 @@ const AppliedRules = ({ actions }) => {
   const rules = get_rules_from_actions(actions);
   const deduped_rules = dedup_rules(rules);
 
-  return <>{deduped_rules.map((rule) => render_rule_icon(rule))}</>;
+  return <>{deduped_rules.map((rule) => <RenderRule key={rule.rule_id} ruleId={rule.rule_id} ruleType={rule.rule_type} onRuleClick={handleRuleIconClick} />)}</>;
 };
 
 export default AppliedRules;
