@@ -46,7 +46,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const { collectionId, requestId } = useParams();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords, childParentMap] = useAPIRecords((state) => [state.apiClientRecords, state.childParentMap]);
+  const [apiClientRecords] = useAPIRecords((state) => [state.apiClientRecords]);
   const { isRecordBeingCreated } = useApiClientContext();
   const { onSaveRecord, onSaveBulkRecords } = useNewApiClientContext();
 
@@ -54,7 +54,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   const {
     api: { moveRecords },
   } = useCommand();
- 
+
   const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.ApiClientRecord[]>([]);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
@@ -66,6 +66,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
   const [searchValue, setSearchValue] = useState("");
   const [isAllRecordsSelected, setIsAllRecordsSelected] = useState(false);
+
+  const [childParentMap] = useAPIRecords((state) => [state.childParentMap]);
 
   useEffect(() => {
     const handleUpdates = () => {
@@ -347,7 +349,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           collectionId: "",
           recordsToMove: [item.record],
         });
-        
+
         toast.success(`Moved "${item.record.name}" to workspace root`);
       } catch (error) {
         toast.error((error as any)?.message || "Failed to move item. Please try again.");
@@ -356,34 +358,25 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     [moveRecords]
   );
 
-  // Drop zone for the entire content area (background drops)
-  const [, dropBackground] = useDrop(
-    () => ({
-      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: DraggableApiRecord, monitor) => {
-        // Only handle if dropped on the background (not on a child component)
-        if (!monitor.isOver({ shallow: true })) return;
-        handleDropToRoot(item);
-      },
-      canDrop: (item: DraggableApiRecord) => {
-        // Only allow if item is inside a collection (not already at top-level)
-        return Boolean(item.record.collectionId);
-      },
-    }),
-    [handleDropToRoot]
-  );
+  // Shared drop configuration for all drop zones
+  const dropConfig = {
+    accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+    drop: (item: DraggableApiRecord, monitor: any) => {
+      if (!monitor.isOver({ shallow: true })) return;
+      handleDropToRoot(item);
+    },
+    canDrop: (item: DraggableApiRecord) => {
+      return Boolean(item.record.collectionId);
+    },
+  };
 
-  // Top drop zone indicator
+  // Background drop zone (entire content area)
+  const [, dropBackground] = useDrop(() => dropConfig, [handleDropToRoot]);
+
+  // Top drop zone with hover indicator
   const [{ isOverTopLevel }, dropTopLevel] = useDrop(
     () => ({
-      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: DraggableApiRecord, monitor) => {
-        if (!monitor.isOver({ shallow: true })) return;
-        handleDropToRoot(item);
-      },
-      canDrop: (item: DraggableApiRecord) => {
-        return Boolean(item.record.collectionId);
-      },
+      ...dropConfig,
       collect: (monitor) => ({
         isOverTopLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
       }),
@@ -391,17 +384,10 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     [handleDropToRoot]
   );
 
-  // Bottom drop zone indicator
+  // Bottom drop zone with hover indicator
   const [{ isOverBottomLevel }, dropBottomLevel] = useDrop(
     () => ({
-      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-      drop: (item: DraggableApiRecord, monitor) => {
-        if (!monitor.isOver({ shallow: true })) return;
-        handleDropToRoot(item);
-      },
-      canDrop: (item: DraggableApiRecord) => {
-        return Boolean(item.record.collectionId);
-      },
+      ...dropConfig,
       collect: (monitor) => ({
         isOverBottomLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
       }),
@@ -474,7 +460,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
                   <SidebarPlaceholderItem name="New Request" />
                 </div>
               )}
-              
+
               <div ref={dropBottomLevel} className={`bottom-level-drop-zone ${isOverBottomLevel ? "active" : ""}`} />
             </div>
           ) : (
