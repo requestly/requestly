@@ -1,6 +1,6 @@
 import React from "react";
 
-export const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const LoadingView: React.FC = () => {
   return (
     <>
       <div className="preview-modal-header-container">

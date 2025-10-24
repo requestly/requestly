@@ -13,7 +13,7 @@ import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrap
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 
 export const DataFileSelector: React.FC = () => {
-  const { parseFile, setFileMetadata, setViewMode } = useDataFileModalContext();
+  const { parseFile, setDataFileMetadata, setViewMode } = useDataFileModalContext();
 
   const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
   const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
@@ -29,7 +29,7 @@ export const DataFileSelector: React.FC = () => {
         path: file.path,
         size: file.size,
       };
-      setFileMetadata(metadata);
+      setDataFileMetadata(metadata);
 
       if (file.size > 100 * 1024 * 1024) {
         setViewMode(DataFileModalViewMode.LARGE_FILE);
@@ -39,17 +39,17 @@ export const DataFileSelector: React.FC = () => {
       setShowModal(true);
       parseFile(file.path, true);
     });
-  }, [openFileSelector, setFileMetadata, parseFile, setViewMode]);
+  }, [openFileSelector, setDataFileMetadata, parseFile, setViewMode]);
 
   const handleModalClose = useCallback(() => {
     // Clear metadata when modal closes
-    setFileMetadata(null);
+    setDataFileMetadata(null);
     setShowModal(false);
-  }, [setFileMetadata, setShowModal]);
+  }, [setDataFileMetadata, setShowModal]);
 
   const handleViewExistingFile = useCallback(() => {
     if (dataFile) {
-      setFileMetadata({
+      setDataFileMetadata({
         name: dataFile.name,
         path: dataFile.path,
         size: dataFile.size,
@@ -57,7 +57,7 @@ export const DataFileSelector: React.FC = () => {
       setShowModal(true);
       parseFile(dataFile.path, false);
     }
-  }, [dataFile, setFileMetadata, setShowModal, parseFile]);
+  }, [dataFile, setDataFileMetadata, setShowModal, parseFile]);
 
   return (
     <>

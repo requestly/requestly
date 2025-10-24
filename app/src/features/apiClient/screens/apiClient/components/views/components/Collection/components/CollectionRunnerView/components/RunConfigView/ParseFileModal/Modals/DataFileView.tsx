@@ -3,7 +3,7 @@ import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
-import { DataFileModalViewMode } from "./DataFileModalContext";
+import { DataFileModalViewMode, useDataFileModalContext } from "./DataFileModalContext";
 
 export const getformattedFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -11,17 +11,9 @@ export const getformattedFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 };
 
-type DataFileViewModalProps = ModalProps & {
-  parsedData: Record<string, any>[];
-};
+export const DataFileView: React.FC<ModalProps> = ({ buttonOptions, viewMode }) => {
+  const { dataFileMetadata, parsedData } = useDataFileModalContext();
 
-export const DataFileViewModal: React.FC<DataFileViewModalProps> = ({
-  buttonOptions,
-  dataFileMetadata,
-  onClose,
-  parsedData,
-  viewMode,
-}) => {
   return (
     <>
       <ModalHeader dataFileMetadata={dataFileMetadata} />
@@ -37,7 +29,7 @@ export const DataFileViewModal: React.FC<DataFileViewModalProps> = ({
             </div>
           )}
         </div>
-        <PreviewTableView datasource={parsedData} />
+        <PreviewTableView datasource={parsedData.data} />
       </div>
 
       {viewMode === DataFileModalViewMode.ACTIVE ? (

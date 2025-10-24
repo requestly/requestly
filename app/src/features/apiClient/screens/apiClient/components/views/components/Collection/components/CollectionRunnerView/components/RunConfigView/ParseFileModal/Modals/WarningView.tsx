@@ -2,19 +2,13 @@ import React from "react";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
+import { useDataFileModalContext } from "./DataFileModalContext";
 
-type WarningModalProps = ModalProps & {
-  count: number;
-  parsedData: Record<string, any>[];
-};
+type WarningModalProps = ModalProps;
 
-export const WarningModal: React.FC<WarningModalProps> = ({
-  buttonOptions,
-  dataFileMetadata,
-  onClose,
-  parsedData,
-  count,
-}) => {
+export const WarningView: React.FC<WarningModalProps> = ({ buttonOptions }) => {
+  const { dataFileMetadata, parsedData } = useDataFileModalContext();
+
   return (
     <>
       <ModalHeader dataFileMetadata={dataFileMetadata} />
@@ -36,11 +30,11 @@ export const WarningModal: React.FC<WarningModalProps> = ({
         <div className="preview-file-details">
           <div>
             <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of </span>
-            {count} entries
+            {parsedData.count} entries
           </div>
           <CommonFileInfo dataFileMetadata={dataFileMetadata} />
         </div>
-        <PreviewTableView datasource={parsedData} />
+        <PreviewTableView datasource={parsedData.data} />
       </div>
 
       <FooterButtons buttonOptions={buttonOptions} />

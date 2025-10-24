@@ -3,11 +3,11 @@ import React, { useCallback } from "react";
 import "./dataFileModalWrapper.scss";
 import { useRunConfigStore } from "../../../../run.context";
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
-import { DataFileViewModal } from "./DataFileViewModal";
-import { WarningModal } from "./WarningModal";
-import { ErroredModal } from "./ErroredModal";
-import { LargeFileModal } from "./LargeFileModal";
-import { LoadingModal } from "./LoadingModal";
+import { DataFileView } from "./DataFileView";
+import { WarningView } from "./WarningView";
+import { ErroredStateView } from "./ErroredStateView";
+import { LargeFileView } from "./LargeFileView";
+import { LoadingView } from "./LoadingView";
 import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 import { useDataFileModalContext, DataFileModalViewMode } from "./DataFileModalContext";
 import { RQModal } from "lib/design-system/components";
@@ -25,9 +25,6 @@ interface buttonTypes {
 
 export interface ModalProps {
   buttonOptions: () => buttonTypes;
-  dataFileMetadata: { name: string; path: string; size: number };
-  onClose: () => void;
-  parsedData?: Record<string, any>[];
   viewMode?: DataFileModalViewMode;
 }
 
@@ -84,7 +81,7 @@ interface PreviewModalProps {
 }
 
 export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onFileSelected }) => {
-  const { viewMode, parsedData, fileMetadata } = useDataFileModalContext();
+  const { viewMode, parsedData, dataFileMetadata } = useDataFileModalContext();
 
   const [removeDataFile, setDataFile, setIterations] = useRunConfigStore((s) => [
     s.removeDataFile,
@@ -94,27 +91,18 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
 
   const confirmUseDataFile = useCallback(() => {
     removeDataFile();
-    const fileId = fileMetadata.name + "-" + Date.now();
+    const fileId = dataFileMetadata.name + "-" + Date.now();
     setDataFile({
       id: fileId,
-      name: fileMetadata.name,
-      path: fileMetadata.path,
-      size: fileMetadata.size,
+      name: dataFileMetadata.name,
+      path: dataFileMetadata.path,
+      size: dataFileMetadata.size,
       source: "desktop",
       fileFeature: FileFeature.COLLECTION_RUNNER,
     });
     setIterations(parsedData.data.length);
     onClose(); // Close modal immediately after confirming
-  }, [
-    fileMetadata.name,
-    fileMetadata.path,
-    fileMetadata.size,
-    parsedData?.data?.length,
-    setDataFile,
-    setIterations,
-    removeDataFile,
-    onClose,
-  ]);
+  }, [removeDataFile, dataFileMetadata, setDataFile, setIterations, onClose, parsedData?.data?.length]);
 
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
@@ -215,40 +203,16 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
       }}
       className="preview-modal"
     >
-      {viewMode === DataFileModalViewMode.LOADING && <LoadingModal onClose={onClose} />}
-      {viewMode === DataFileModalViewMode.ACTIVE && (
-        <DataFileViewModal
-          buttonOptions={buttonOptions}
-          dataFileMetadata={fileMetadata}
-          onClose={onClose}
-          parsedData={parsedData?.data}
-          viewMode={viewMode}
-        />
-      )}
+      {viewMode === DataFileModalViewMode.LOADING && <LoadingView />}
+      {viewMode === DataFileModalViewMode.ACTIVE && <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />}
       {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count > 1000 && (
-        <WarningModal
-          buttonOptions={buttonOptions}
-          dataFileMetadata={fileMetadata}
-          onClose={onClose}
-          parsedData={parsedData?.data}
-          count={parsedData?.count}
-        />
+        <WarningView buttonOptions={buttonOptions} />
       )}
       {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count <= 1000 && (
-        <DataFileViewModal
-          buttonOptions={buttonOptions}
-          dataFileMetadata={fileMetadata}
-          onClose={onClose}
-          parsedData={parsedData?.data}
-          viewMode={viewMode}
-        />
+        <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />
       )}
-      {viewMode === DataFileModalViewMode.ERROR && (
-        <ErroredModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={fileMetadata} />
-      )}
-      {viewMode === DataFileModalViewMode.LARGE_FILE && (
-        <LargeFileModal buttonOptions={buttonOptions} onClose={onClose} dataFileMetadata={fileMetadata} />
-      )}
+      {viewMode === DataFileModalViewMode.ERROR && <ErroredStateView buttonOptions={buttonOptions} />}
+      {viewMode === DataFileModalViewMode.LARGE_FILE && <LargeFileView buttonOptions={buttonOptions} />}
     </RQModal>
   );
 };

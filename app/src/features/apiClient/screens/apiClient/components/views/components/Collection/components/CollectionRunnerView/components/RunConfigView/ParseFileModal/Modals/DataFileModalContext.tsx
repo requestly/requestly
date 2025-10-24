@@ -12,10 +12,10 @@ export enum DataFileModalViewMode {
 interface DataFileModalContextType {
   viewMode: DataFileModalViewMode;
   parsedData: { data: Record<string, any>[]; count: number } | null;
-  fileMetadata: { name: string; path: string; size: number } | null;
+  dataFileMetadata: { name: string; path: string; size: number } | null;
   setViewMode: (mode: DataFileModalViewMode) => void;
   setParsedData: (data: { data: Record<string, any>[]; count: number } | null) => void;
-  setFileMetadata: (metadata: { name: string; path: string; size: number } | null) => void;
+  setDataFileMetadata: (metadata: { name: string; path: string; size: number } | null) => void;
   parseFile: (filePath: string, isPreviewMode: boolean) => Promise<void>;
 }
 
@@ -36,7 +36,7 @@ interface DataFileModalProviderProps {
 export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ children }) => {
   const [viewMode, setViewMode] = useState<DataFileModalViewMode>(DataFileModalViewMode.LOADING);
   const [parsedData, setParsedData] = useState<{ data: Record<string, any>[]; count: number } | null>(null);
-  const [fileMetadata, setFileMetadata] = useState<{ name: string; path: string; size: number } | null>(null);
+  const [dataFileMetadata, setDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(null);
 
   const parseFile = useCallback(async (filePath: string, isPreviewMode: boolean) => {
     setViewMode(DataFileModalViewMode.LOADING);
@@ -58,10 +58,10 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
   const value: DataFileModalContextType = {
     viewMode,
     parsedData,
-    fileMetadata,
+    dataFileMetadata,
     setViewMode,
     setParsedData,
-    setFileMetadata,
+    setDataFileMetadata,
     parseFile,
   };
 

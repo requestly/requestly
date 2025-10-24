@@ -1,7 +1,7 @@
 import React from "react";
 import { FooterButtons, ModalProps } from "./DataFileModalWrapper";
 
-export const LargeFileModal: React.FC<ModalProps> = ({ buttonOptions, onClose }) => {
+export const LargeFileView: React.FC<ModalProps> = ({ buttonOptions }) => {
   return (
     <>
       <div className="preview-modal-header-container">

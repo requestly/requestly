@@ -2,8 +2,11 @@ import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew
 import React from "react";
 import { FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
+import { useDataFileModalContext } from "./DataFileModalContext";
 
-export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, dataFileMetadata }) => {
+export const ErroredStateView: React.FC<ModalProps> = ({ buttonOptions }) => {
+  const { dataFileMetadata } = useDataFileModalContext();
+
   const fileExtension = getFileExtension(dataFileMetadata.path)?.toUpperCase()?.split(".")?.pop() ?? "JSON";
   const isJSON = fileExtension === "JSON";
 
