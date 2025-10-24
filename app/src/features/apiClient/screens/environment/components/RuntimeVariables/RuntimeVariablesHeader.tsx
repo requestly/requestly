@@ -50,6 +50,11 @@ export const RuntimeVariablesHeader: React.FC<RuntimeVariablesHeaderProps> = ({
           className="runtime-variables-list-search-input"
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              onSearchValueChange("");
+            }
+          }}
         />
         <div className="runtime-variables-list-action-btn">
           <RQButton
