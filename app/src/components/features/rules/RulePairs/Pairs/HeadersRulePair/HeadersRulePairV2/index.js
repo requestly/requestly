@@ -8,7 +8,9 @@ import { EditOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
+import LINKS from "config/constants/sub/links";
+import "./HeadersRulePairV2.css";
 
 const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) => {
   const dispatch = useDispatch();
@@ -29,7 +31,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
 
   const addEmptyModification = (modificationType, type) => {
     dispatch(
-      actions.addValueInRulePairArray({
+      globalActions.addValueInRulePairArray({
         pairIndex,
         arrayPath: ["modifications", modificationType],
         value: stableGetEmptyModification(type),
@@ -40,7 +42,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
   const stableGetEmptyModification = useCallback(getEmptyModification, [ruleDetails.EMPTY_MODIFICATION_FORMAT]);
 
   useEffect(() => {
-    if (!pair.modifications.Request?.length && pair.modifications.Response?.length) {
+    if (!pair.modifications?.Request?.length && pair.modifications?.Response?.length) {
       setActiveTab("Response");
     }
   }, [pair.modifications]);
@@ -55,6 +57,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
           onChange={setActiveTab}
           tabBarStyle={{ margin: 0 }}
           data-tour-id="rule-editor-header-modification-types"
+          className="rule-editor-header-modification-types-tabs"
         >
           {["Request", "Response"].map((modificationType) => (
             <Tabs.TabPane
@@ -62,7 +65,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                 <span>
                   {`${modificationType} Headers`}
                   <Badge
-                    count={pair.modifications[modificationType]?.length}
+                    count={pair.modifications?.[modificationType]?.length}
                     size="small"
                     style={{ margin: "0 5px" }}
                   />
@@ -71,7 +74,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
               key={modificationType}
             >
               <Card bordered={false} className="headers-rule-pair-card">
-                {pair.modifications[modificationType]?.map((modification, modificationIndex) => (
+                {pair.modifications?.[modificationType]?.map((modification, modificationIndex) => (
                   <HeadersPairModificationRowV2
                     modification={modification}
                     modificationIndex={modificationIndex}
@@ -82,8 +85,16 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                   />
                 ))}
                 <Row span={24} align="middle">
-                  {pair.modifications[modificationType]?.length ? (
-                    <Col offset={3} span={21}>
+                  {pair.modifications?.[modificationType]?.length ? (
+                    <Col
+                      lg={{
+                        offset: 3,
+                      }}
+                      xs={{
+                        offset: 0,
+                      }}
+                      span={21}
+                    >
                       <Button
                         type="dashed"
                         onClick={() => addEmptyModification(activeTab)}
@@ -125,7 +136,16 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                   <Row className="margin-top-one line-clamp">
                     <Alert
                       className="alert"
-                      message="Response Headers modification done by Requestly are not visible in Browsers devtool but they are actually modified."
+                      message={
+                        <>
+                          Response Headers modification done by Requestly are not visible in Browsers devtool but they
+                          are actually modified.{" "}
+                          <a target="_blank" href={LINKS.REQUESTLY_HEADERS_RULE_FAQ_LINK} rel="noreferrer">
+                            click here
+                          </a>{" "}
+                          to know more.
+                        </>
+                      }
                       type="info"
                       showIcon
                       style={{

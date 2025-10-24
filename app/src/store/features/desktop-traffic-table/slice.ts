@@ -1,5 +1,6 @@
 import { createSlice, createEntityAdapter, EntityState, PayloadAction, prepareAutoBatched } from "@reduxjs/toolkit";
 import { ReducerKeys } from "store/constants";
+import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 // TODO: @wrongsahil, add types here when send_network_logs is moved to new events schema
 
@@ -24,12 +25,14 @@ interface TrafficTableFilters {
   app: string[];
   domain: string[];
   search: SearchFilters;
+  showOnlyModifiedRequests: boolean;
 }
 
 interface DesktopTrafficTableState {
   logs: EntityState<any>;
   responses: ResponsesState; // Stores all the bodies in different state key
   filters: TrafficTableFilters;
+  isInterceptionPaused: boolean;
 }
 
 export const logsAdapter = createEntityAdapter<any>({
@@ -50,7 +53,9 @@ const initialState: DesktopTrafficTableState = {
       term: "",
       regex: false,
     },
+    showOnlyModifiedRequests: false,
   },
+  isInterceptionPaused: false,
 };
 
 const slice = createSlice({
@@ -118,9 +123,20 @@ const slice = createSlice({
         method: initialState.filters.method,
         resourceType: initialState.filters.resourceType,
         statusCode: initialState.filters.statusCode,
+        showOnlyModifiedRequests: initialState.filters.showOnlyModifiedRequests,
       };
+    },
+    toggleIsInterceptionPaused: (state: DesktopTrafficTableState) => {
+      state.isInterceptionPaused = !state.isInterceptionPaused;
     },
   },
 });
 
-export const { actions: desktopTrafficTableActions, reducer: desktopTrafficTableReducer } = slice;
+const { actions, reducer } = slice;
+
+export const desktopTrafficTableActions = actions;
+export const desktopTrafficTableReducerWithLocalSync = getReducerWithLocalStorageSync(
+  ReducerKeys.DESKTOP_TRAFFIC_TABLE,
+  reducer,
+  ["filters"]
+);

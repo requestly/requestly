@@ -5,14 +5,15 @@
 .traffic-table-sidebar {
   overflow: auto;
   padding-bottom: 1rem;
-  border-right: 1px solid var(--border-dark);
+  border-right: 1px solid var(--requestly-color-white-t-10);
+  background-color: var(--requestly-color-surface-0);
   height: calc(100vh - 4.5rem);
 }
 
 .traffic-table-sidebar,
 .traffic-table-sidebar .ant-menu.ant-menu-dark,
 .traffic-table-sidebar .ant-menu.ant-menu-dark ul.ant-menu-sub {
-  background-color: var(--app-secondary-sidebar-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-root:not(.filter-applied) > .ant-menu-item:first-child {
@@ -42,13 +43,13 @@
   > .ant-menu-item:first-child
   .clear-all-filter-option
   .anticon {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item.ant-menu-item-selected {
-  color: var(--primary);
-  border: 1px solid var(--primary);
-  background-color: var(--component-background);
+  color: var(--requestly-color-primary);
+  border: 1px solid var(--requestly-color-primary);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-submenu:not(:last-child) {
@@ -66,7 +67,7 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item {
   width: 96%;
   height: 1.875rem;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 20px;
   margin: 0 4px 2px 4px;
   background-color: transparent;
@@ -77,7 +78,7 @@
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:hover,
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item:focus {
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content {
@@ -93,7 +94,7 @@
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .log-name {
-  width: 7.3rem;
+  width: 10rem;
   margin-right: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -111,26 +112,34 @@
 }
 
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item .ant-menu-title-content .clear-log-filter-btn .anticon {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .traffic-table-content {
   padding-top: 24px;
-  padding-right: 24px;
 }
 
-.hide-traffic-table-split-gutter .traffic-table-split-container .gutter.gutter-vertical {
-  height: 0 !important;
+.traffic-table-split-container .gutter.gutter-vertical {
   transition: none;
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: row-resize;
+  transition: 0.3s all;
+}
+
+.traffic-table-split-container .gutter.gutter-vertical:hover {
+  border: 2px solid var(--requestly-color-primary, #004eeb);
 }
 
 .traffic-table-split-container {
-  height: calc(100vh - 140px);
+  height: calc(100vh - 157px);
 }
 
-.traffic-table-split-container .gutter-vertical,
 .traffic-table-split-container .ant-row.request-log-pane-container {
-  margin-left: 1.25rem;
+  overflow: hidden;
+  height: 100%;
+  border-top: 1px solid var(--requestly-color-white-t-10);
+  background-color: var(--requestly-color-surface-0);
 }
 
 /* table */
@@ -138,9 +147,20 @@
   background-color: #1e69ffdb;
 }
 
+.traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="false"][data-modified="true"] {
+  background-color: var(--requestly-color-success-800);
+  color: var(--requestly-color-success-200);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.traffic-table-split-container table[class*="Table-chrome"] tbody tr[aria-selected="true"][data-modified="true"] {
+  background-color: var(--requestly-color-primary-700);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .network-table-wrapper-override {
   height: 100%;
   border-style: none !important;
+  padding-right: 24px;
 }
 .network-table-wrapper-override .ant-pro-card-body {
   padding-right: 0;
@@ -154,8 +174,23 @@
   display: flex;
   max-height: 100%;
   overflow: hidden;
+  padding-bottom: 3.5rem;
 }
 
 .previewData .rdt_TableRow {
   min-height: fit-content;
+}
+
+.mock-rules-count-badge {
+  padding: 3px 5px;
+  font-size: 10px;
+  line-height: 10px;
+  color: var(--requestly-color-text-default);
+  background-color: transparent;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--requestly-color-white);
+}
+
+.ant-checkbox-wrapper.modified-requests-checkbox {
+  margin-bottom: 0.37rem;
 }

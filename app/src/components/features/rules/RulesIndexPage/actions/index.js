@@ -5,17 +5,29 @@ import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
-// Handle Rules whose Groups are missing!
+/**
+ * Handle Rules whose Groups are missing!
+ *
+ * @param {{
+ *  rules: import("@requestly/shared/types/entities/rules").Rule[],
+ *  groups: import("@requestly/shared/types/entities/rules").Group[],
+ *  appMode: string
+ * }}
+ * @returns {Promise<{
+ *  success: boolean,
+ *  updatedRules: import("@requestly/shared/types/entities/rules").Rule[]
+ * }>}
+ */
 export const isGroupsSanitizationPassed = async ({ rules = [], groups = [], appMode }) => {
   return new Promise((resolve) => {
-    const updatedRules = [...rules];
     let result = true; // This is tell the invoker to fetch rules again!
-    rules.forEach(async (rule, index) => {
+    const updatedRules = rules.map((rule) => {
       const groupId = rule.groupId;
       if (groupId !== UNGROUPED_GROUP_ID) {
         // This group id should exist in Groups array. If not, something is wrong - Ungroup that Rule!
         if (groups.some((group) => group.id === groupId)) {
           // All Good!
+          return rule;
         } else {
           // Flag
           result = false;
@@ -28,10 +40,11 @@ export const isGroupsSanitizationPassed = async ({ rules = [], groups = [], appM
 
           // Save the rule
           Logger.log("Writing to storage in RulesIndexPage actions");
-          await StorageService(appMode).saveRuleOrGroup(ruleToSave);
-          // Save to in-memory Rules array
-          updatedRules[index] = ruleToSave;
+          StorageService(appMode).saveRuleOrGroup(ruleToSave);
+          return ruleToSave;
         }
+      } else {
+        return rule;
       }
     });
     return resolve({

@@ -9,13 +9,15 @@ import {
 } from "modules/analytics/events/misc/productWalkthrough";
 
 interface TourProps {
-  startWalkthrough: boolean;
+  completeTourOnUnmount?: boolean;
+  startWalkthrough?: boolean;
   tourFor: string;
   context?: any;
   onTourComplete: () => void;
 }
 
 export const ProductWalkthrough: React.FC<TourProps> = ({
+  completeTourOnUnmount = true,
   startWalkthrough = false,
   tourFor,
   context,
@@ -61,12 +63,12 @@ export const ProductWalkthrough: React.FC<TourProps> = ({
     // complete the tour is  TOUR_END does not trigger after last step
     // eg. clicking on create rule button in rule editor tour
     return () => {
-      if (hasReachedLastStep) {
+      if (hasReachedLastStep && completeTourOnUnmount) {
         trackWalkthroughCompleted(tourFor);
         onTourComplete();
       }
     };
-  }, [hasReachedLastStep, onTourComplete, tourFor]);
+  }, [hasReachedLastStep, onTourComplete, tourFor, completeTourOnUnmount]);
 
   return (
     <>

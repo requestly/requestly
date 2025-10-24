@@ -23,12 +23,14 @@ FEATURES.EXECUTION_LOGS = "execution_logs";
 FEATURES.CHARACTER_LIMIT = "characters";
 FEATURES.RESPONSE_RULE = "response_rule";
 FEATURES.REQUEST_RULE = "request_rule";
-FEATURES.SCRIPT_RULE = "script_rule";
 FEATURES.RESPONSE_MAP_LOCAL = "RESPONSE_MAP_LOCAL";
 FEATURES.REDIRECT_MAP_LOCAL = "REDIRECT_MAP_LOCAL";
 FEATURES.ASYNC_MODIFY_RESPONSE_BODY = "ASYNC_MODIFY_RESPONSE_BODY";
 FEATURES.ASYNC_MODIFY_REQUEST_BODY = "ASYNC_MODIFY_REQUEST_BODY";
 FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST = "SERVE_RESPONSE_WITHOUT_REQUEST";
+FEATURES.TEST_THIS_RULE = "test_this_rule";
+FEATURES.TEST_THIS_RULE_SESSION = "test_this_rule_session";
+FEATURES.IMPLICIT_TEST_THIS_RULE = "implicit_test_this_rule";
 FEATURES.DESKTOP_APP_TERMINAL_PROXY = "DESKTOP_APP_TERMINAL_PROXY";
 FEATURES.DESKTOP_APP_SSL_PROXYING = "DESKTOP_APP_SSL_PROXYING";
 FEATURES.DESKTOP_APP_TRAFFIC_TABLE = "DESKTOP_APP_TRAFFIC_TABLE";
@@ -38,8 +40,24 @@ FEATURES.FEAT_PRESERVE_REDIRECT_COOKIES = "preserve_redirect_cookies";
 FEATURES.ENABLE_TRACKING = "enable_tracking";
 FEATURES.REDIRECT_RULE_DEMO_VIDEO_IN_EDITOR = "redirect-rule-tutorial-video-in-editor-experiment";
 FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
+FEATURES.REGENERATE_SSL_CERTS = "regenerate_ssl_certs";
+FEATURES.LOCAL_LOG_FILE = "local_log_file";
 FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
+FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR = "graphql-payload-filter-operator";
+FEATURES.CUSTOM_LAUNCH_OPTIONS = "custom-launch-options";
+FEATURES.RELAY_AUTH_HEADER = "relay-auth-header";
+FEATURES.BLOCK_LIST = "block_list";
+FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT = "desktop-android-emulator-support";
+FEATURES.DESKTOP_IOS_SIMULATOR_SUPPORT = "desktop-ios-simulator-support";
+FEATURES.SCRIPT_RULE_SOURCE_FILTER = "script-rule-source-filter";
+FEATURES.FRAMELESS_DESKTOP_APP = "frameless-desktop-app";
+FEATURES.EXTENSION_STATUS_NOTIFICATION = "extension-status-notification";
+FEATURES.REQUEST_RULE_GRAPHQL_PAYLOAD = "request-rule-graphql-payload";
+FEATURES.POPUP_CONFIG = "popup_config";
+
+FEATURES.SCRIPT_RULE = {};
+FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";
 
 // MARKETING
 FEATURES.INTERCEPTOR = {};
@@ -51,15 +69,39 @@ FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 // WORKSPACES
 FEATURES.WORKSPACES = "workspaces";
 FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
+FEATURES.LOCAL_WORKSPACE_REFRESH = "local_workspace_refresh";
 
 // PERSONA SURVEY
 FEATURES.PERSONA_SURVEY = "persona-survey";
 
-FEATURES.NETWORK_SESSIONS = "network-sessions";
+FEATURES.NETWORK_SESSIONS = "network-sessions"; // todo: replace redundancy
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
+FEATURES.API_CLIENT_INCLUDE_CREDENTIALS = "api-client-include-credentials";
+FEATURES.API_CLIENT_MULTIPART_FORM = "api-client-multipart-form";
 
 // session recording
 FEATURES.SESSION_ONBOARDING = "session_onboarding";
+FEATURES.SESSION_RECORDING = "session_recording";
+
+// saved network logs
+FEATURES.SAVED_NETWORK_LOGS = "saved_network_logs";
+FEATURES.DESKTOP_SESSIONS = "all_desktop_session_features";
+
+FEATURES.COMPRESS_RULE_PAIRS = "compress_rule_pairs";
+
+FEATURES.OVERRIDE_TEAM_SYNC_STATUS = "override_team_sync_status";
+FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
+
+FEATURES.CONNECT_EXTENSION = "connect_extension";
+FEATURES.EDIT_LOCAL_FILE_PATH = "edit_local_file_path";
+FEATURES.LOCAL_FILE_SYNC = "local_file_sync";
+
+FEATURES.COMPATIBLE_DESKTOP_APP = "compatible_desktop_app";
+FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
+
+FEATURES.GRAPHQL_SUPPORT = "graphql_support";
+FEATURES.LOCAL_FIRST_DESKTOP_APP = "local_first_desktop_app";
+FEATURES.LOCAL_WORKSPACE_COMPATIBILITY = "local_workspace_compatibility";
 
 export default FEATURES;

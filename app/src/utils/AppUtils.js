@@ -1,6 +1,6 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-
+import { getUserOS } from "./osUtils";
 export const getAppDetails = () => {
   let app_mode = null;
   let app_version = null;
@@ -17,17 +17,50 @@ export const getAppDetails = () => {
     app_mode = GLOBAL_CONSTANTS.APP_MODES.EXTENSION;
     app_version = "0.0.1"; // DUMMY VERSION for compatibility check
   }
-
-  return { app_mode, app_version, ext_id };
+  const os = getUserOS();
+  return { app_mode, app_version, ext_id, os };
 };
 
 export const isDesktopMode = () => {
   return getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 };
 export const isProductionUI =
-  (window.location.host.includes("app.requestly.io") || window.location.host.includes("beta.requestly.io")) &&
+  (window.location.host.includes("app.requestly.io") ||
+    window.location.host.includes("beta.requestly.io") ||
+    window.location.host.includes("app.sessionbear.com") ||
+    window.location.host.includes("beta.sessionbear.com")) &&
   !window.testMode;
 
 export const isLocalStoragePresent = (appMode) => {
   return !(appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled());
+};
+
+export const isAppOpenedInIframe = () => {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // Browsers can block access to window.top due to same origin policy.
+    return true;
+  }
+};
+
+export const getAppFlavour = () => {
+  if (isSetappBuild()) {
+    return GLOBAL_CONSTANTS.APP_FLAVOURS.SETAPP;
+  }
+  // TEMP: ADDED PARAMS FOR SESSIONBEAR, FOR TESTING ON LOCAL ENV. TO BE REMOVED BEFORE RELEASE
+  const queryParams = new URLSearchParams(window.location.search);
+  if (
+    window.location.host.includes("app.sessionbear.com") ||
+    window.location.host.includes("beta.sessionbear.com") ||
+    queryParams.get("flavour") === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+  ) {
+    return GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR;
+  }
+
+  return GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY;
+};
+
+export const isSetappBuild = () => {
+  return isDesktopMode() && !!window.RQ?.DESKTOP?.IS_SETAPP_BUILD;
 };

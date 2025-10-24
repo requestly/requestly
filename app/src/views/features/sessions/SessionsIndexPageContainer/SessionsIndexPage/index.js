@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import firebaseApp from "../../../../../firebase";
 import {
   getFirestore,
@@ -21,10 +21,9 @@ import { filterUniqueObjects } from "utils/FormattingHelper";
 import ShareRecordingModal from "../../ShareRecordingModal";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RecordingsList from "./RecordingsList";
-import OnboardingView from "./OnboardingView";
-import { actions } from "../../../../../store";
+import OnboardingView, { SessionOnboardingView } from "./OnboardingView";
+import { globalActions } from "store/slices/global/slice";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getOwnerId } from "backend/utils";
 import PageLoader from "components/misc/PageLoader";
 import { useHasChanged } from "hooks";
@@ -34,7 +33,17 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../../SessionViewer/constants";
-import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackNewSessionClicked,
+  trackSessionRecordingUpload,
+} from "modules/analytics/events/features/sessionRecording";
+import "./index.scss";
+import { ImportWebSessionModalButton } from "./ImportWebSessionModalButton";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { redirectToSessionSettings } from "utils/RedirectionUtils";
+import { getActiveWorkspaceId, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -44,8 +53,8 @@ const SessionsIndexPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
 
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
@@ -56,6 +65,7 @@ const SessionsIndexPage = () => {
   const [qs, setQs] = useState(null);
   const [reachedEnd, setReachedEnd] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isNewSessionModalOpen, setIsNewSessionModalOpen] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
 
   const fetchRecordings = (lastDoc = null) => {
@@ -65,7 +75,7 @@ const SessionsIndexPage = () => {
     const records = [];
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
-    const ownerId = getOwnerId(user?.details?.profile?.uid, workspace?.id);
+    const ownerId = getOwnerId(user?.details?.profile?.uid, activeWorkspaceId);
 
     let query = null;
 
@@ -90,16 +100,18 @@ const SessionsIndexPage = () => {
       if (!documentSnapshots.empty) {
         documentSnapshots.forEach((doc) => {
           const recordData = doc.data();
-          records.push({
-            id: doc.id,
-            name: recordData.name,
-            duration: recordData.sessionAttributes.duration,
-            startTime: recordData.sessionAttributes.startTime,
-            url: recordData.sessionAttributes.url,
-            visibility: recordData.visibility,
-            eventsFilePath: recordData.eventsFilePath,
-            createdBy: recordData.createdBy || recordData.author,
-          });
+          if (!recordData?.isInternal && !recordData?.testThisRuleMetadata) {
+            records.push({
+              id: doc.id,
+              name: recordData.name,
+              duration: recordData.sessionAttributes.duration,
+              startTime: recordData.sessionAttributes.startTime,
+              url: recordData.sessionAttributes.url,
+              visibility: recordData.visibility,
+              eventsFilePath: recordData.eventsFilePath,
+              createdBy: recordData.createdBy || recordData.author,
+            });
+          }
         });
 
         setSessionRecordings(records);
@@ -114,30 +126,30 @@ const SessionsIndexPage = () => {
     });
   };
 
-  const stableFetchRecordings = useCallback(fetchRecordings, [user?.details?.profile?.uid, workspace]);
+  const stableFetchRecordings = useCallback(fetchRecordings, [user?.details?.profile?.uid, activeWorkspaceId]);
   const redirectToSettingsPage = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
             redirectURL: window.location.href,
-            callback: () => navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE),
-            eventSource: AUTH.SOURCE.SESSION_RECORDING,
+            callback: () => redirectToSessionSettings(navigate, window.location.pathname, "sessions"),
+            eventSource: SOURCE.SESSION_RECORDING,
           },
         })
       );
       return;
     }
 
-    navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE);
+    redirectToSessionSettings(navigate, window.location.pathname, "sessions");
   }, [dispatch, navigate, user?.loggedIn]);
 
   const configureBtn = useMemo(
     () => (
       <>
-        <Button type="primary" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
+        <Button type="default" onClick={redirectToSettingsPage} icon={<SettingOutlined />}>
           Settings
         </Button>
       </>
@@ -155,24 +167,24 @@ const SessionsIndexPage = () => {
         stableFetchRecordings();
       }
     }
-  }, [hasUserChanged, workspace, stableFetchRecordings, user?.details?.profile?.uid]);
+  }, [hasUserChanged, activeWorkspaceId, stableFetchRecordings, user?.details?.profile?.uid]);
 
   const filteredRecordings = filterUniqueObjects(sessionRecordings);
 
   useEffect(() => {
-    if (filteredRecordings?.length >= 0 && !isWorkspaceMode) {
+    if (filteredRecordings?.length >= 0 && !isSharedWorkspaceMode) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS, filteredRecordings?.length);
     }
-  }, [filteredRecordings?.length, isWorkspaceMode]);
+  }, [filteredRecordings?.length, isSharedWorkspaceMode]);
 
   const toggleImportSessionModal = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
           newProps: {
-            eventSource: AUTH.SOURCE.SESSION_RECORDING,
+            eventSource: SOURCE.SESSION_RECORDING,
           },
         })
       );
@@ -226,13 +238,29 @@ const SessionsIndexPage = () => {
     [navigate, toggleImportSessionModal, dispatch]
   );
 
-  const openDownloadedSessionModalBtn = useMemo(
-    () => (
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
+
+  const openDownloadedSessionModalBtn = useMemo(() => {
+    return isDesktopSessionsCompatible ? (
+      <ImportWebSessionModalButton />
+    ) : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
-        Open downloaded session
+        Upload & view downloaded sessions
       </RQButton>
-    ),
-    [toggleImportSessionModal]
+    );
+  }, [toggleImportSessionModal, isDesktopSessionsCompatible]);
+
+  const newSessionButton = (
+    <RQButton
+      type="primary"
+      onClick={() => {
+        setIsNewSessionModalOpen(true);
+        trackNewSessionClicked();
+      }}
+    >
+      New Session
+    </RQButton>
   );
 
   if (isTableLoading) {
@@ -243,15 +271,24 @@ const SessionsIndexPage = () => {
     <>
       <RQModal open={isOpen} onCancel={toggleImportSessionModal}>
         <div className="rq-modal-content">
-          <div className="header mb-16 text-center">Open downloaded session</div>
+          <div className="header mb-16 text-center">Upload & view downloaded session</div>
 
           <FilePicker
             onFilesDrop={onSessionRecordingFileDrop}
             isProcessing={processingDataToImport}
             loaderMessage="Importing session..."
-            title="Drag and drop your downloaded session recording file"
+            title="Drag and drop your downloaded SessionBook file"
           />
         </div>
+      </RQModal>
+
+      <RQModal
+        open={isNewSessionModalOpen}
+        onCancel={() => setIsNewSessionModalOpen(false)}
+        wrapClassName="create-new-session-modal"
+        centered
+      >
+        <SessionOnboardingView isModalView />
       </RQModal>
 
       {user?.loggedIn && filteredRecordings?.length ? (
@@ -267,6 +304,7 @@ const SessionsIndexPage = () => {
                   setIsShareModalVisible={setIsShareModalVisible}
                   fetchRecordings={fetchRecordings}
                   configureBtn={configureBtn}
+                  newSessionButton={newSessionButton}
                   openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
                   callbackOnDeleteSuccess={() => {
                     setSessionRecordings([]);
@@ -316,6 +354,8 @@ const SessionsIndexPage = () => {
             />
           ) : null}
         </>
+      ) : isDesktopSessionsCompatible ? (
+        <SessionOnboardingView />
       ) : (
         <OnboardingView
           redirectToSettingsPage={redirectToSettingsPage}

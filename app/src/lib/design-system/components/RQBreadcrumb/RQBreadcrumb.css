@@ -1,5 +1,5 @@
 .rq-breadcrumb.ant-breadcrumb ol {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   max-width: 25ch;
   flex-wrap: nowrap;
 }
@@ -12,7 +12,7 @@
 
 .rq-breadcrumb-item:hover,
 .rq-breadcrumb-item:focus {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .rq-breadcrumb-item + .ant-breadcrumb-separator {

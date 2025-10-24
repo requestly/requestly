@@ -13,27 +13,21 @@ import SHARED_LISTS_TABLE_CONSTANTS from "./sub/shared-lists-table-constants";
 import FILES_TABLE_CONSTANTS from "./sub/files-table-constants";
 import THEME_COLORS from "./sub/theme-colors";
 import AUTH from "./sub/auth";
-import PRICING from "./sub/pricing";
 import LIMIT_REACHED_MODAL from "./sub/limit-reached-modal";
-import EMAIL_DOMAINS from "./sub/email-domains";
 import STYLES from "./sub/styles";
 import COOKIES from "./sub/cookies";
 import THEMES from "./sub/themes";
 import HEADER_SUGGESTIONS from "./sub/header-suggestions";
 import TEAM_WORKSPACES from "./sub/team-workspaces";
 import { GA_EVENTS } from "./sub/analytics";
+import STORAGE from "./sub/storage";
 
 const APP_CONSTANTS = {};
 
 /** FEATURES */
 APP_CONSTANTS.FEATURES = FEATURES;
 
-/** PRICING */
-APP_CONSTANTS.PRICING = PRICING;
-
 /** STORAGE KEYS */
-APP_CONSTANTS.MIGRATED_TO_NEW_SOURCE_FILTER_FORMAT = "migrated-to-new-source-filter-format";
-APP_CONSTANTS.STORAGE_MIGRATED_TO_LOCAL = "storage-migrated-to-local";
 APP_CONSTANTS.LAST_BACKUP_TIMESTAMP = "last-backup-timestamp";
 APP_CONSTANTS.LAST_SYNC_TARGET = "last-sync-target";
 APP_CONSTANTS.LAST_SYNCED_TS = "last-synced-ts";
@@ -98,9 +92,6 @@ APP_CONSTANTS.BETA = "beta";
 APP_CONSTANTS.LOCAL = "local";
 APP_CONSTANTS.PROD = "prod";
 
-// LIST OF PERSONAL EMAIL DOMAINS
-APP_CONSTANTS.EMAIL_DOMAINS = EMAIL_DOMAINS;
-
 //List of known headers used for suggestion
 APP_CONSTANTS.HEADER_SUGGESTIONS = HEADER_SUGGESTIONS;
 
@@ -112,19 +103,18 @@ APP_CONSTANTS.TRIAL_MODE_START_DATE = "2022-02-28";
 // COOKIES
 APP_CONSTANTS.COOKIES = COOKIES;
 
-// Desktop App
-// Controls the blocking update dialog
-APP_CONSTANTS.DESKTOP_APP_MIN_COMPATIBLE_VERSION = "1.4.20";
-APP_CONSTANTS.DESKTOP_APP_MIN_NON_BREAKING_VERSION = "1.4.20";
-
 APP_CONSTANTS.PROD_RULES_URL = "https://app.requestly.io/rules";
 
 APP_CONSTANTS.TEAM_WORKSPACES = TEAM_WORKSPACES;
 
+APP_CONSTANTS.STORAGE = STORAGE;
+
 // Moved from global constants
 APP_CONSTANTS.SUBSCRIPTION_STATUS = {
   ACTIVE: "active",
-  CANCELLED: "cancelled",
+  CANCELLED: "canceled",
+  TRIALING: "trialing",
+  PAST_DUE: "past_due",
 };
 
 APP_CONSTANTS.PATH_FROM_PAIR = {
@@ -139,7 +129,9 @@ APP_CONSTANTS.PATH_FROM_PAIR = {
   SOURCE_REQUEST_METHOD: "source.filters.requestMethod",
   SOURCE_REQUEST_PAYLOAD: "source.filters.requestPayload",
   SOURCE_REQUEST_PAYLOAD_KEY: "source.filters.requestPayload.key",
+  SOURCE_REQUEST_PAYLOAD_OPERATOR: "source.filters.requestPayload.operator",
   SOURCE_REQUEST_PAYLOAD_VALUE: "source.filters.requestPayload.value",
+  SOURCE_PAGE_DOMAINS: "source.filters.pageDomains",
 };
 
 APP_CONSTANTS.GA_EVENTS = GA_EVENTS;
@@ -151,7 +143,7 @@ APP_CONSTANTS.url = {
 };
 
 APP_CONSTANTS.mock_base_url = {
-  prod: "https://requestly.dev/api/mockv2",
+  prod: "https://requestly.tech/api/mockv2",
   beta: "https://beta.requestly.io/api/mockv2",
   local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2", // Change port depending upon you firebase functions emulator port
 };

@@ -1,12 +1,13 @@
 import { Dropdown, Row, Steps } from "antd";
 import { useMemo, useState } from "react";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import TestProxyInstructions from "../common/TestProxy";
 import CertificateDownloadInstructions from "./CertificateDownload";
 import CertificateTrustInstructions from "./CertificateTrust";
 import { ANDROID_DEVICES } from "./constants";
 import WifiInstructions from "./Wifi";
 import InstructionsHeader from "../InstructionsHeader";
+import ConfigureAndroidApps from "./ConfigureAndroidApps";
 
 const AndroidInstructionModal = ({ setShowInstructions }) => {
   const [selectedDevice, setSelectedDevice] = useState(ANDROID_DEVICES.ONEPLUS);
@@ -45,7 +46,7 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
       {
         title: "Test HTTP Proxy",
         status: "process",
-        description: <TestProxyInstructions />,
+        description: <TestProxyInstructions device="android" />,
       },
       {
         title: "Download certificate",
@@ -57,13 +58,18 @@ const AndroidInstructionModal = ({ setShowInstructions }) => {
         status: "process",
         description: <CertificateTrustInstructions device_id={selectedDevice} />,
       },
+      {
+        title: "Ignore SSL pinning",
+        status: "process",
+        description: <ConfigureAndroidApps />,
+      },
     ];
   }, [selectedDevice]);
 
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/android.png"}
+        icon={window.location.origin + "/assets/media/components/android.png"}
         heading="Android setup"
         description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
         setShowInstructions={setShowInstructions}

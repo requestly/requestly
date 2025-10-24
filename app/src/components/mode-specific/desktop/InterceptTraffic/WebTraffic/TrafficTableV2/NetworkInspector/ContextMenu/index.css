@@ -12,14 +12,14 @@
 .traffic-table-context-menu .ant-dropdown-menu-item-active,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item-active,
 .traffic-table-context-menu .ant-dropdown-menu-submenu-title:hover {
-  background: var(--hover-color);
+  background: var(--requestly-color-surface-2);
 }
 .traffic-table-context-menu .ant-dropdown-menu-submenu {
   padding: 0 8px;
 }
 .traffic-table-context-menu .ant-dropdown-menu-submenu span,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 .traffic-table-context-menu .ant-dropdown-menu-submenu-title,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item {

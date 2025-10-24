@@ -1,11 +1,32 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ConsoleLog } from "../types";
 import LogIcon from "./LogIcon";
-import SessionDetailsPanelRow from "../SessionDetailsPanelRow";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
-import { Space } from "antd";
+import { Col, Collapse, Row, Space } from "antd";
+import { RQButton } from "lib/design-system/components";
+import { isAppOpenedInIframe } from "utils/AppUtils";
+import "./console.scss";
+interface LogRowProps extends ConsoleLog {
+  isPending: () => boolean;
+  isRecentLog: boolean;
+}
 
-const ConsoleLogRow: React.FC<ConsoleLog> = ({ timeOffset, level, payload, trace = [] }) => {
+const ConsoleLogRow: React.FC<LogRowProps> = ({
+  id,
+  timeOffset,
+  level,
+  payload,
+  trace = [],
+  isPending,
+  isRecentLog,
+}) => {
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+  const [showFullMessage, setShowFullMessage] = useState(false);
+
+  const toggleFullMessage = () => {
+    setShowFullMessage(!showFullMessage);
+  };
+
   const parsedLevel = useMemo(() => {
     if (level === "assert" && payload[0] === "false") {
       return "error";
@@ -46,48 +67,116 @@ const ConsoleLogRow: React.FC<ConsoleLog> = ({ timeOffset, level, payload, trace
   }, [trace]);
 
   const message = useMemo(() => {
+    const parsedObjects = parsedPayload.reduce((acc, value, index) => {
+      try {
+        let parsedValue = JSON.parse(value);
+        if (parsedValue === "undefined") {
+          parsedValue = undefined;
+        }
+
+        if (typeof parsedValue === "object") {
+          acc.push(<ObjectInspector key={index} data={parsedValue} includePrototypes={false} />);
+        }
+      } catch (e) {
+        // Do nothing for values that can't be parsed
+      }
+
+      return acc;
+    }, []);
+
+    if (parsedObjects.length === 0) {
+      return (
+        <Space wrap align="start">
+          {parsedPayload.map((value, index) => (
+            <span key={index}>{value}</span>
+          ))}
+        </Space>
+      );
+    }
+
     return (
       <Space wrap align="start">
-        {parsedPayload.map((value, index) => {
-          try {
-            let parsedValue = JSON.parse(value);
-            if (parsedValue === "undefined") {
-              parsedValue = undefined;
-            }
-
-            if (parsedLevel === "error" && typeof parsedValue === "string") {
-              return <span key={index}>{parsedValue}</span>;
-            }
-
-            return <ObjectInspector key={index} data={parsedValue} includePrototypes={false} />;
-          } catch (e) {
-            return <span key={index}>{value}</span>;
-          }
-        })}
+        {parsedObjects}
       </Space>
     );
-  }, [parsedLevel, parsedPayload]);
+  }, [parsedPayload]);
 
   return parsedPayload.length === 0 ? null : (
-    <SessionDetailsPanelRow
-      className="console-log-row"
-      timeOffset={timeOffset}
-      rightInfo={logSource}
-      secondaryMessage={
-        logSource === null && trace.length > 0 ? (
-          <div className={`trace-logs ${parsedLevel}`}>
-            {trace.map((traceRow, i) => (
-              <div key={i}>
-                <span>{traceRow}</span>
-              </div>
-            ))}
-          </div>
-        ) : null
-      }
+    <Row
+      className={`session-details-panel-row console-log-row ${
+        parsedLevel === "error" ? "error-log" : parsedLevel === "warn" ? "warning-log" : "default-log"
+      } ${isPending() ? "pending-log" : ""} ${isRecentLog ? "recent-log-border" : ""}`}
+      data-resource-id={id}
     >
-      <LogIcon level={parsedLevel} style={{ marginRight: 8 }} />
-      <span className={`console-log-message ${parsedLevel}`}>{message}</span>
-    </SessionDetailsPanelRow>
+      <Col span={24} className="display-flex">
+        <Col span={logSource ? 17 : 24}>
+          {parsedLevel === "error" || parsedLevel === "warn" ? (
+            <Collapse ghost className="console-log-collapse">
+              <Collapse.Panel
+                className="console-log-panel"
+                key={id}
+                header={
+                  <div className="primary-message" style={{ display: "flex", alignItems: "flex-start" }}>
+                    <LogIcon level={parsedLevel} className="log-icon" />
+                    <span className={`console-log-message ${parsedLevel}`}>{message}</span>
+                  </div>
+                }
+              >
+                <>
+                  {!isInsideIframe && (
+                    <div className="secondary-message">
+                      {logSource === null && trace.length > 0 ? (
+                        <div className={`trace-logs-wrapper ${parsedLevel}`}>
+                          {trace.map((traceRow, index) => (
+                            <div key={index} className="trace-log">
+                              <span>at {traceRow}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </>
+              </Collapse.Panel>
+            </Collapse>
+          ) : (
+            <div className="primary-message" style={{ display: "flex", alignItems: "flex-start" }}>
+              <LogIcon level={parsedLevel} className="log-icon" />
+              <span className={`console-log-message ${parsedLevel}`}>
+                {parsedPayload.length > 2 && !showFullMessage ? (
+                  <>
+                    <div className="message-preview">
+                      {parsedPayload.slice(0, 2).map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))}
+                    </div>
+                    <RQButton type="link" onClick={toggleFullMessage} className="see-more-button">
+                      (See more)
+                    </RQButton>
+                  </>
+                ) : (
+                  <>
+                    {parsedPayload.map((line, index) => (
+                      <div key={index}>{line}</div>
+                    ))}
+                    {parsedPayload.length > 2 && (
+                      <RQButton type="link" onClick={toggleFullMessage} className="see-more-button">
+                        (See less)
+                      </RQButton>
+                    )}
+                  </>
+                )}
+              </span>
+            </div>
+          )}
+        </Col>
+        {!isInsideIframe && logSource && (
+          <Col span={6} className="right-info">
+            {logSource}
+          </Col>
+        )}
+      </Col>
+    </Row>
   );
 };
 

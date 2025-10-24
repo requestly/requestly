@@ -1,0 +1,12 @@
+.import-modal {
+  .curl-import-errror {
+    background: var(--requestly-color-error-800);
+    padding: 6px 8px;
+    border-radius: 4px;
+
+    code {
+      color: var(--requestly-color-error-200);
+      font-size: var(--requestly-font-size-sm);
+    }
+  }
+}

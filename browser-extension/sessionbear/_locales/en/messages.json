@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "SessionBear - Capture & Kill bugs in seconds!!",
+    "description": "SessionBear browser extension name which is visible in Web Stores"
+  },
+  "extDesc": {
+    "message": "The easiest way to capture and share complete bugs information to developers",
+    "description": "Requestly browser extension description visible in Web Stores"
+  },
+  "extIconTitle": {
+    "message": "SessionBear - Create developer friendly bug reports",
+    "description": "Tooltip text shown on hovering Requestly browser extension icon"
+  }
+}

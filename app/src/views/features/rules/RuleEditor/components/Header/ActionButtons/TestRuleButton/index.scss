@@ -1,0 +1,12 @@
+.header-test-rule-btn {
+  color: var(--text-light);
+  position: relative;
+
+  &.ant-btn {
+    gap: 6px;
+
+    & svg {
+      font-size: 1rem;
+    }
+  }
+}

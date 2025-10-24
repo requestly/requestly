@@ -8,10 +8,6 @@ import { Modal, Space, Tag, Tooltip, Typography } from "antd";
 import { DeleteOutlined, DownloadOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { deleteNetworkSession, getNetworkSession } from "./actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
-import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
-import { toast } from "utils/Toast";
-import { redirectToNetworkSession } from "utils/RedirectionUtils";
-import { useCallback, useMemo } from "react";
 import {
   ActionSource,
   trackDeleteNetworkSessionCanceled,
@@ -21,6 +17,15 @@ import {
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
+import { ImportHarModalButton } from "./ImportHarModalButton";
+import { useCallback, useMemo } from "react";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { ImportFromWebSessionsButton } from "./ImportFromWebSessionsButton";
 
 const { Text } = Typography;
 
@@ -45,13 +50,16 @@ export const confirmAndDeleteRecording = (id, callback) => {
 };
 
 const NetworkSessionsList = ({ networkSessionsMetadata }) => {
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
   const navigate = useNavigate();
+
   const stableOnSuccessfulHarImport = useCallback(
     (sessionId) => {
       toast.success("Successfully imported the HAR file");
-      redirectToNetworkSession(navigate, sessionId);
+      redirectToNetworkSession(navigate, sessionId, isDesktopSessionsCompatible);
     },
-    [navigate]
+    [navigate, isDesktopSessionsCompatible]
   );
 
   const columns = [
@@ -60,8 +68,12 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
       dataIndex: "name",
       width: "40%",
       render: (name, record) => {
+        let path = PATHS.NETWORK_LOGS.VIEWER.ABSOLUTE + "/" + record.id;
+        if (isDesktopSessionsCompatible) {
+          path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + "/" + record.id;
+        }
         return (
-          <Link to={PATHS.SESSIONS.NETWORK.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
+          <Link to={path} state={{ fromApp: true }}>
             {name}
           </Link>
         );
@@ -155,9 +167,16 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
         headerTitle={
           <Space align="center" className="network-session-list-header">
             <Typography.Title level={4} className="network-session-list-heading">
-              Network Session Recordings
+              Network Sessions
             </Typography.Title>
-            <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
+            {isDesktopSessionsCompatible ? (
+              <ImportHarModalButton />
+            ) : (
+              <div className="import-btn-group">
+                <ImportFromWebSessionsButton onSaved={stableOnSuccessfulHarImport} btnText="Import .RQLY File" />
+                <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
+              </div>
+            )}
           </Space>
         }
       />

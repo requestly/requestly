@@ -1,10 +1,5 @@
-/* eslint-disable no-undef */
-const CONSTANTS = require("./common/constants");
-const LOGGER = require("./common/logger");
-const RULE_PROCESSOR = require("./common/rule-processor/dist/ruleprocessors");
+import CONSTANTS from "./common/constants";
+import LOGGER from "./common/logger";
+import RULE_PROCESSOR from "./common/rule-processor/dist/";
 
-module.exports = {
-  CONSTANTS,
-  LOGGER,
-  RULE_PROCESSOR,
-};
+export { CONSTANTS, LOGGER, RULE_PROCESSOR };

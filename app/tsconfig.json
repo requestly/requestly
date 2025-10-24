@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "build",
-    "target": "es5",
-    "lib": ["es2021", "dom"],
-    "module": "esnext",
+    "target": "ESNext",
+    "lib": ["es2021", "dom", "dom.iterable"],
+    "module": "ESNext",
     "jsx": "react-jsx",
     "allowJs": true,
     "checkJs": false,
@@ -12,14 +12,27 @@
     "noUnusedLocals": true,
     "noImplicitAny": true,
     "noImplicitReturns": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": false,
+    "strictNullChecks": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
-    "paths": {}
+    "paths": {},
+    "types": [
+      "vite/client",
+      "vite-plugin-svgr/client",
+      "chrome"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "exclude": ["node_modules", "build"],
-  "include": ["./src/**/*"]
+  "exclude": [
+    "node_modules",
+    "build"
+  ],
+  "include": [
+    "./src/**/*"
+  ]
 }

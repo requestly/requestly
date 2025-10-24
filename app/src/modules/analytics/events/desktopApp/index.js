@@ -9,7 +9,10 @@ import {
   USER_DENIED_CLOSING_LAUNCHED_APPS,
   PROXY_PORT_CHANGE_REQUESTED,
   TRAFFIC_TABLE,
+  AUTH,
+  UPDATE_DIALOG,
 } from "./constants";
+import { getUserOS } from "utils/osUtils";
 
 export const trackProxyServerStartedEvent = () => {
   const params = {};
@@ -27,7 +30,8 @@ export const trackProxyReStartedEvent = () => {
 };
 
 export const trackDesktopAppStartedEvent = () => {
-  const params = {};
+  const detectedOS = getUserOS();
+  const params = { detectedOS };
   trackEvent(DESKTOP_APP_STARTED, params);
 };
 
@@ -51,8 +55,8 @@ export const trackProxyPortChangeRequested = () => {
   trackEvent(PROXY_PORT_CHANGE_REQUESTED, params);
 };
 
-export const trackTrafficInterceptionStarted = (app_name) => {
-  const params = { app_name };
+export const trackTrafficInterceptionStarted = (connectedApps) => {
+  const params = { connectedApps };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_STARTED, params);
 };
 
@@ -96,4 +100,37 @@ export const trackTrafficTableFilterApplied = (filter_type, filter_value, count)
     count,
   };
   trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_APPLIED, params);
+};
+
+export const trackSavingTooManyLogsAlertShown = (logsCount, src) => {
+  const params = { logsCount, src };
+  trackEvent(TRAFFIC_TABLE.TRAFFIC_TABLE_SAVING_EXCESS_LOGS_ALERT_SHOWN, params);
+};
+
+export const trackAuthRedirectedFromDesktopApp = () => {
+  trackEvent(AUTH.REDIRECTED, {});
+};
+
+export const trackAuthRedirectUrlCopied = () => {
+  trackEvent(AUTH.REDIRECT_URL_COPIED, {});
+};
+
+export const trackUpdateAvailable = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.UPDATE_AVAILABLE, params);
+};
+
+export const trackUpdateDownloadComplete = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.UPDATE_DONWLOADED, params);
+};
+
+export const trackTriggeredRedirectedToManuallyInstall = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.TRIGGERED_REDIRECT_FOR_MANUAL_INSTALL, params);
+};
+
+export const trackTriggerManualClickAndInstall = () => {
+  const params = { detectedOS: getUserOS() };
+  trackEvent(UPDATE_DIALOG.TRIGGERED_REDIRECT_FOR_MANUAL_INSTALL, params);
 };

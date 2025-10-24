@@ -4,7 +4,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
 import { isDesktopMode } from "utils/AppUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "../sub/features";
+import FEATURES from "./features";
 
 const getSourceFormat = () => ({
   filters: [],
@@ -211,7 +211,7 @@ const RULE_TYPES_CONFIG = {
     HIDE_IN_EXTENSION: false,
     SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW: false,
     ALLOW_APPLY_RULE_TO_ALL_URLS: true,
-    ALLOW_REQUEST_SOURCE_FILTERS: false,
+    ALLOW_REQUEST_SOURCE_FILTERS: true,
     CUSTOM_SCRIPT_CHARACTER_LIMIT: 500,
     REMOVE_CSP_HEADER: true,
   },
@@ -251,7 +251,7 @@ const RULE_TYPES_CONFIG = {
     ID: 10,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.REQUEST,
     NAME: "Modify Request Body",
-    DESCRIPTION: "Modify Body of POST Requests",
+    DESCRIPTION: "Override API request body with static or programmatic data",
     ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.REQUEST} />,
     PRIMARY_COLOR: "#880e4f",
     SECONDARY_COLOR: "#710C42",
@@ -264,7 +264,7 @@ const RULE_TYPES_CONFIG = {
       request: {
         type: "static",
         value: "",
-        statusCode: "",
+        resourceType: "",
       },
     },
     ALLOW_ADD_PAIR: false,

@@ -1,10 +1,14 @@
-@import "../../../node_modules/codemirror/lib/codemirror.css";
-@import "../../../node_modules/codemirror/theme/eclipse.css";
+// @import "../../../node_modules/codemirror/lib/codemirror.css";
+// @import "../../../node_modules/codemirror/theme/eclipse.css";
 @import "../../lib/design-system/custom/variables.css";
 @import "../../lib/design-system/custom/base.css";
 
 $theme-primary-color: #0a48b3;
 $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
+
+body {
+  background-color: var(--requestly-color-background-dark) !important;
+}
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -24,28 +28,23 @@ li {
   list-style: none;
 }
 
-input.ant-input {
+input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
   padding: 8px;
 }
 
 button.ant-btn {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 button.ant-btn-lg {
-  font-size: 16px;
+  font-size: var(--requestly-font-size-lg, 16px);
 }
 
 button.ant-input-search-button {
   height: auto;
-}
-
-.typeform-btn {
-  background-color: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%) !important;
-  border-radius: 7px !important;
 }
 
 .has-no-box-shadow,
@@ -104,19 +103,19 @@ button.ant-input-search-button {
   }
 
   .ml-1 {
-    margin-left: calc(var(--space) * 1);
+    margin-left: calc(var(--requestly-space-1) * 1);
   }
 
   .ml-2 {
-    margin-left: calc(var(--space) * 2);
+    margin-left: calc(var(--requestly-space-1) * 2);
   }
 
   .ml-3 {
-    margin-left: calc(var(--space) * 3);
+    margin-left: calc(var(--requestly-space-1) * 3);
   }
 
   .ml-4 {
-    margin-left: calc(var(--space) * 4);
+    margin-left: calc(var(--requestly-space-1) * 4);
   }
 }
 
@@ -264,7 +263,7 @@ button.ant-input-search-button {
 // Dropdown
 .ant-dropdown-menu-item .ant-dropdown-menu-title-content span {
   display: inline-block;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .ant-table-tbody > tr.ant-table-row-selected > td {
@@ -373,7 +372,7 @@ input[id^="react-select-"] {
   font-weight: 500;
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
-  background: var(--component-background);
+  background: var(--requestly-color-surface-1);
   padding: 5px;
 }
 
@@ -381,10 +380,10 @@ input[id^="react-select-"] {
   padding: 3px 5px;
   font-size: 10px;
   line-height: 10px;
-  color: var(--success);
+  color: var(--requestly-color-success);
   background-color: transparent;
   border-radius: var(--border-radius-sm);
-  border: 1px solid var(--success);
+  border: 1px solid var(--requestly-color-success);
 }
 
 /* spinner & skeleton */
@@ -437,22 +436,6 @@ input[id^="react-select-"] {
   z-index: 500;
   transform: translate(-50%, -50%) !important;
   width: 80% !important;
-}
-
-.gutter {
-  background-repeat: no-repeat;
-  background-position: 50%;
-  transition: 0.3s all;
-}
-
-/* Gutter on rule editor splitter pane - execution logs */
-.gutter:hover {
-  opacity: 0.8;
-}
-
-.gutter.gutter-vertical {
-  background-color: #1c1d21;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=");
 }
 
 /* header */
@@ -519,14 +502,14 @@ input[id^="react-select-"] {
 }
 
 .ant-dropdown-menu.ant-dropdown-menu-root .ant-dropdown-menu-item.ant-dropdown-menu-item-active {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 /* react multi email */
 div.react-multi-email {
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 div.react-multi-email:hover {
@@ -536,24 +519,24 @@ div.react-multi-email:hover {
 }
 
 div.react-multi-email > input {
-  color: var(--white);
-  background-color: var(--component-dark-background);
+  color: var(--requestly-color-text-default);
+  background-color: var(--requestly-color-surface-0);
 }
 
 div.react-multi-email.focused {
-  border: 1px solid var(--primary);
+  border: 1px solid var(--requestly-color-primary);
   box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 }
 
 div.react-multi-email .multi-email-tag {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 400;
   padding: 4px 8px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .records-table.ant-pro-table .ant-table-tbody tr td a:hover,
@@ -565,7 +548,74 @@ div.react-multi-email .multi-email-tag {
 
 .ant-btn.ant-btn-default:focus:not(.ant-btn-icon-only),
 .ant-btn.ant-btn-default:hover:not(.ant-btn-icon-only) {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border: 1px solid #343434;
-  background-color: var(--hover-color);
+  background-color: var(--requestly-color-surface-2);
+}
+
+.upgrade-workspace-selector-dropdown {
+  & .ant-dropdown-menu {
+    overflow: auto;
+    max-height: 400px;
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--requestly-color-surface-1);
+    }
+  }
+
+  & .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+  }
+}
+
+#credential_picker_container {
+  top: 45px !important;
+}
+
+// TODO: Update modal design system and remove this class
+.custom-rq-modal {
+  & .ant-modal {
+    & .ant-modal-content {
+      background: var(--requestly-color-surface-0);
+      & .ant-modal-header {
+        background: var(--requestly-color-surface-0);
+        & .ant-modal-title {
+          color: var(--requestly-color-text-default);
+        }
+      }
+      & .ant-modal-footer {
+        background: var(--requestly-color-surface-0);
+      }
+    }
+  }
+}
+
+.ant-message .ant-message-notice-content {
+  background: var(--requestly-color-black);
+}
+
+// TEMPORARY: To be removed after TOOLTIP component is added in design system
+.rq-tooltip .ant-tooltip-inner {
+  background: var(--requestly-color-black);
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-sm);
+}
+
+.rq-tooltip .ant-tooltip-arrow .ant-tooltip-arrow-content {
+  color: var(--requestly-color-text-default);
+  --antd-arrow-background-color: var(--requestly-color-black);
+}
+
+// All tooltips to have sm font size
+.ant-tooltip-inner {
+  // Our new -sm token has 13px value while DS has 12px
+  font-size: var(--requestly-font-size-sm, 12px);
+}
+
+.fc-widget-normal {
+  bottom: 8px !important;
+  right: 8px !important;
 }

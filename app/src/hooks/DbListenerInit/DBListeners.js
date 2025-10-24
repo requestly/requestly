@@ -1,19 +1,17 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
-import { getAppMode, getUserAuthDetails } from "../../store/selectors";
-import availableTeamsListener from "./availableTeamsListener";
+import { getAppMode, getAuthInitialization } from "../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
-import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
-import { teamsActions } from "store/features/teams/slice";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { getAuth } from "firebase/auth";
 import firebaseApp from "../../firebase";
 import Logger from "lib/logger";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
+import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
+import { getActiveWorkspaceId, getActiveWorkspacesMembers } from "store/slices/workspaces/selectors";
 
 window.isFirstSyncComplete = false;
 
@@ -21,11 +19,13 @@ const DBListeners = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+
+  const currentTeamMembers = useSelector(getActiveWorkspacesMembers);
+  const hasAuthInitialized = useSelector(getAuthInitialization);
+
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
-  let unsubscribeAvailableTeams = useRef(null);
 
   const hasAuthStateChanged = useHasChanged(user?.loggedIn);
 
@@ -34,15 +34,16 @@ const DBListeners = () => {
     if (unsubscribeUserNodeRef.current) unsubscribeUserNodeRef.current(); // Unsubscribe existing user node listener before creating a new one
     if (user?.loggedIn) {
       unsubscribeUserNodeRef.current = userNodeListener(dispatch, user?.details?.profile.uid, appMode);
-
-      userSubscriptionNodeListener(dispatch);
+      /* CAN BE MOVED TO SEPARATE USE EFFECT AND SHOULD HAVE AN UNSUBSCRIBER TOO, will be useful when actually implementing premium */
+      userSubscriptionDocListener(dispatch, user?.details?.profile.uid);
     }
-  }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
+  }, [dispatch, user?.details?.profile?.uid, user?.loggedIn, appMode]);
 
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
   useEffect(() => {
+    if (!hasAuthInitialized) return;
     if (hasAuthStateChanged || !window.isFirstSyncComplete) {
-      dispatch(actions.updateIsRulesListLoading(true));
+      dispatch(globalActions.updateIsRulesListLoading(true));
     }
 
     // Unsubscribe any existing listener
@@ -53,55 +54,36 @@ const DBListeners = () => {
     }
 
     if (user?.loggedIn && user?.details?.profile?.uid) {
-      if (currentlyActiveWorkspace.id || user?.details?.isSyncEnabled) {
+      if (activeWorkspaceId || user?.details?.isSyncEnabled) {
         // This is a team or individual sync
         // Set the db node listener
         window.unsubscribeSyncingNodeRef.current = syncingNodeListener(
           dispatch,
           user?.details?.profile.uid,
-          currentlyActiveWorkspace?.id,
+          activeWorkspaceId,
           appMode,
           user?.details?.isSyncEnabled
         );
       } else {
         // Do it here if syncing is not enabled. Else syncing would have triggered this.
         window.isFirstSyncComplete = true;
-        dispatch(actions.updateIsRulesListLoading(false));
+        dispatch(globalActions.updateIsRulesListLoading(false));
       }
     } else {
       // Do it here if syncing is not enabled. Else syncing would have triggered this.
       window.isFirstSyncComplete = true;
-      dispatch(actions.updateIsRulesListLoading(false));
+      dispatch(globalActions.updateIsRulesListLoading(false));
     }
   }, [
+    hasAuthInitialized,
     appMode,
-    currentlyActiveWorkspace.id,
+    activeWorkspaceId,
     dispatch,
     user?.loggedIn,
-    user?.details?.profile.uid,
+    user?.details?.profile?.uid,
     user?.details?.isSyncEnabled,
     hasAuthStateChanged,
   ]);
-
-  // Listens to teams available to the user
-  // Also listens to changes to the currently active workspace
-  useEffect(() => {
-    if (unsubscribeAvailableTeams.current) unsubscribeAvailableTeams.current(); // Unsubscribe any existing listener
-    if (user?.loggedIn && user?.details?.profile?.uid) {
-      unsubscribeAvailableTeams.current = availableTeamsListener(
-        dispatch,
-        user?.details?.profile?.uid,
-        currentlyActiveWorkspace,
-        appMode
-      );
-    } else {
-      dispatch(teamsActions.setAvailableTeams(null));
-      // Very edge case
-      if (currentlyActiveWorkspace.id) {
-        clearCurrentlyActiveWorkspace(dispatch, appMode);
-      }
-    }
-  }, [appMode, currentlyActiveWorkspace, dispatch, user?.details?.profile?.uid, user?.loggedIn]);
 
   /* Force refresh custom claims in auth token */
   useEffect(() => {
@@ -110,7 +92,7 @@ const DBListeners = () => {
       ?.then((status) => {
         Logger.log("force updated auth token");
       });
-  }, [user?.details?.profile?.uid, user?.loggedIn, currentlyActiveWorkspace, currentTeamMembers, dispatch]);
+  }, [user?.details?.profile?.uid, user?.loggedIn, activeWorkspaceId, currentTeamMembers, dispatch]);
 
   return null;
 };

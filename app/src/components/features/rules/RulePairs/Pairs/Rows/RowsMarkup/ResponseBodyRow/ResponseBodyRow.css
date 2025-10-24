@@ -2,24 +2,18 @@
   margin-top: 1.25rem;
   font-weight: 500;
   margin-bottom: 12px;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   display: inline-block;
 }
 
-.response-body-type-radio-group.ant-radio-group {
-  margin-left: 1.25rem;
-}
-
-.response-body-type-radio-group.ant-radio-group .ant-radio-wrapper {
-  margin-right: 1.75rem;
-}
-
-.response-body-type-radio-group.ant-radio-group .ant-radio-wrapper .ant-radio {
-  padding-right: 4px;
+.response-body-type-info-icon {
+  font-size: 15px;
+  margin-right: 5px;
+  margin-left: 4px;
 }
 
 .ant-row .local-file-selector-row {
-  background: #26272a;
+  background: var(--requestly-color-surface-0);
   box-shadow: var(--input-box-shadow);
   border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
   border-top: 1px solid var(--border-dark);
@@ -33,8 +27,36 @@
   font-size: 1rem;
   cursor: pointer;
   color: var(--text-gray);
+  margin-left: 8px;
 }
 
 .serve-without-request-setting {
   margin-top: 10px;
+}
+
+.serve-without-request-setting .ant-checkbox-wrapper {
+  font-size: var(--requestly-font-size-sm);
+}
+
+.response-rule-local-file-content {
+  margin-top: 8px;
+}
+.response-rule-local-file-content .response-body-type-radio-group .ant-radio-wrapper {
+  font-size: var(--requestly-font-size-xs);
+  margin: 0;
+}
+.response-rule-local-file-content .response-body-type-radio-group .ant-radio {
+  transform: scale(0.9);
+}
+.response-rule-local-file-content .response-rule-local-file-content-header {
+  color: var(--requestly-color-text-placeholder);
+  font-size: var(--requestly-font-size-xs);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.response-rule-local-file-content .response-rule-local-file-content-body {
+  font-size: var(--requestly-font-size-xs);
+  margin-top: 5px;
 }

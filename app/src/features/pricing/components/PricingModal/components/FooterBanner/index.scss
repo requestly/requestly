@@ -1,0 +1,33 @@
+.pricing-modal-footer-banner {
+  width: 100%;
+  padding: 4px 0 8px 0;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+
+  &-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  &-text {
+    color: var(--requestly-color-text-subtle, #bbb);
+    font-size: var(--requestly-font-size-sm, 12px);
+    line-height: 18px; /* 150% */
+  }
+
+  &-link,
+  &-link:hover,
+  &-link:active,
+  &-link:focus {
+    font-size: var(--requestly-font-size-sm, 12px);
+    line-height: 18px;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    color: var(--requestly-color-primary-300, #639ff9);
+  }
+}

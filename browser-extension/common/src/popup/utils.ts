@@ -5,3 +5,7 @@ export const isExtensionManifestV3 = (): boolean => {
 export const updateItemInCollection = <T extends { id: string }>(collection: T[], updatedItem: T): T[] => {
   return collection.map((item) => (item.id === updatedItem.id ? updatedItem : item));
 };
+
+export const getExtensionVersion = (): string => {
+  return chrome.runtime.getManifest().version;
+};

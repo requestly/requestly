@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Modal, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -10,29 +11,33 @@ import {
   CloseOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "./sessionEventsUtils";
 import ShareButton from "../ShareButton";
 import PageLoader from "components/misc/PageLoader";
-import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
+import { getAuthInitialization, getUserAttributes } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getIsRequestedByOwner, getSessionRecordingEventsFilePath } from "store/features/session-recording/selectors";
 import PermissionError from "../errors/PermissionError";
 import NotFoundError from "../errors/NotFoundError";
 import { getRecording } from "backend/sessionRecording/getRecording";
 import { deleteRecording } from "../api";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import {
-  trackSavedSessionViewedFromApp,
-  trackSavedSessionViewedFromLink,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackSavedSessionViewed } from "modules/analytics/events/features/sessionRecording";
+import { getAppFlavour, isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
+import BadSessionError from "../errors/BadSessionError";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -43,6 +48,7 @@ interface SessionCreatedOnboardingPromptProps {
 }
 
 const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ onClose }) => {
+  const appFlavour = getAppFlavour();
   return (
     <div className="session-onboarding-prompt">
       <div className="display-flex">
@@ -57,7 +63,14 @@ const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptPro
         </div>
       </div>
       <div className="session-onboarding-prompt-actions">
-        <Link to={PATHS.SESSIONS.SETTINGS.RELATIVE} className="session-onboarding-prompt-settings-link">
+        <Link
+          to={
+            appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+              ? PATHS.SETTINGS.SESSIONS_SETTINGS.RELATIVE
+              : PATHS.SESSIONS.SETTINGS.RELATIVE
+          }
+          className="session-onboarding-prompt-settings-link"
+        >
           <SettingOutlined />
           <span>Open settings</span>
         </Link>
@@ -72,21 +85,28 @@ const SavedSessionViewer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isMobileScreen = useMediaQuery({ query: "(max-width: 550px)" });
 
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const hasAuthInitialized = useSelector(getAuthInitialization);
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const userAttributes = useSelector(getUserAttributes);
 
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
+
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
+  const [showBadSessionError, setShowBadSessionError] = useState(false);
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
   const [isDownloadPopupVisible, setIsDownloadPopupVisible] = useState(false);
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
+  const appFlavour = getAppFlavour();
 
   const confirmDeleteAction = useCallback(() => {
     Modal.confirm({
@@ -111,11 +131,23 @@ const SavedSessionViewer: React.FC = () => {
     });
   }, [id, eventsFilePath, navigateToList]);
 
+  const hasUserCreatedSessions = useMemo(
+    () =>
+      userAttributes?.num_sessions > 0 ||
+      userAttributes?.num_sessions_saved_online - 1 > 0 ||
+      userAttributes?.num_sessions_saved_offline > 0,
+    [
+      userAttributes?.num_sessions,
+      userAttributes?.num_sessions_saved_online,
+      userAttributes?.num_sessions_saved_offline,
+    ]
+  );
+
   useEffect(() => {
-    if ((location.state as NavigationState)?.viewAfterSave && !userAttributes?.num_sessions) {
+    if ((location.state as NavigationState)?.viewAfterSave && !hasUserCreatedSessions) {
       setShowOnboardingPrompt(true);
     }
-  }, [location.state, userAttributes?.num_sessions]);
+  }, [location.state, hasUserCreatedSessions]);
 
   useEffect(
     () => () => {
@@ -125,64 +157,84 @@ const SavedSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if ((location.state as NavigationState)?.fromApp) {
-      trackSavedSessionViewedFromApp();
-    } else {
-      trackSavedSessionViewedFromLink();
+    if (isInsideIframe) {
+      trackSavedSessionViewed("embed");
+      return;
     }
-  }, [id, location.state]);
+
+    if ((location.state as NavigationState)?.fromApp) {
+      trackSavedSessionViewed("app");
+    } else {
+      trackSavedSessionViewed("link");
+    }
+  }, [id, location.state, isInsideIframe]);
 
   useEffect(() => {
     if (!hasAuthInitialized) return;
 
     setIsFetching(true);
 
-    getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
+    getRecording(id, user?.details?.profile?.uid, activeWorkspaceId, user?.details?.profile?.email)
       .then((res) => {
         setShowPermissionError(false);
         dispatch(sessionRecordingActions.setSessionRecordingMetadata({ id, ...res.payload }));
-
-        const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
-        dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
-        setIsFetching(false);
+        try {
+          const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
+          dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+        } catch (e) {
+          const err = new Error("Failed to decompress session events");
+          err.name = "BadSessionEvents";
+          throw err;
+        } finally {
+          setIsFetching(false);
+        }
       })
       .catch((err) => {
         switch (err.name) {
           case "NotFound":
             setShowNotFoundError(true);
             break;
+          case "BadSessionEvents":
+            setShowBadSessionError(true);
+            break;
           case "PermissionDenied":
           default:
             setShowPermissionError(true);
         }
       });
-  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, workspace?.id]);
+  }, [dispatch, hasAuthInitialized, id, user?.details?.profile?.uid, user?.details?.profile?.email, activeWorkspaceId]);
 
   const hideOnboardingPrompt = () => {
     setShowOnboardingPrompt(false);
   };
 
-  if (showPermissionError) return <PermissionError />;
+  if (showPermissionError) return <PermissionError isInsideIframe={isInsideIframe} />;
+  if (showBadSessionError) return <BadSessionError />;
   if (showNotFoundError) return <NotFoundError />;
 
   return isFetching ? (
     <PageLoader message="Fetching session details..." />
   ) : (
     <>
-      <div className="session-viewer-page">
-        {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
+      <div className={`session-viewer-page ${isInsideIframe ? "inside-iframe" : ""}`}>
+        {showOnboardingPrompt && appFlavour !== GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR && (
+          <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />
+        )}
         <div className="session-viewer-header">
           <div className="display-row-center w-full">
-            <RQButton
-              iconOnly
-              type="default"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToSessionRecordingHome(navigate)}
-              className="back-button"
-            />
-            <SessionViewerTitle isReadOnly={!isRequestedByOwner} />
+            {!isMobileScreen && (
+              <RQButton
+                iconOnly
+                type="default"
+                icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
+                onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
+                className="back-button"
+              />
+            )}
+
+            <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />
           </div>
-          {isRequestedByOwner ? (
+          {isRequestedByOwner && !isInsideIframe && !isMobileScreen ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
@@ -199,7 +251,7 @@ const SavedSessionViewer: React.FC = () => {
             </div>
           ) : null}
         </div>
-        <SessionDetails key={id} />
+        <SessionDetails key={id} isInsideIframe={isInsideIframe} isMobileView={isMobileScreen} />
       </div>
     </>
   );

@@ -11,6 +11,10 @@ export const getDesktopSignInAuthPath = (authCode, source) => {
   return `${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?ot-auth-code=${authCode}&source=${source}`;
 };
 
+export const isSettingsPage = (pathname = window.location.pathname) => {
+  return pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.RELATIVE);
+};
+
 export const isPricingPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.PRICING.RELATIVE);
 };
@@ -31,12 +35,8 @@ export const isInterceptTrafficPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
 };
 
-export const isMobileInterceptorPage = (pathname = window.location.pathname) => {
-  return (
-    pathname !== APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.RELATIVE &&
-    pathname.includes(APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.RELATIVE) &&
-    !pathname.includes(APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.NEW.RELATIVE)
-  );
+export const isGithubStudentPackPage = (pathname = window.location.pathname) => {
+  return pathname.includes(APP_CONSTANTS.PATHS.GITHUB_STUDENT_DEVELOPER.RELATIVE);
 };
 
 export const getSessionRecordingSharedLink = (recordingId) => {
@@ -44,7 +44,7 @@ export const getSessionRecordingSharedLink = (recordingId) => {
 };
 
 export const getSharedListURL = (shareId, sharedListName) => {
-  const formattedSharedListName = sharedListName.replace(new RegExp(" +|/+", "g"), "-").replace(/-+/g, "-");
+  const formattedSharedListName = sharedListName?.replace(new RegExp(" +|/+", "g"), "-").replace(/-+/g, "-");
   return (
     window.location.origin +
     APP_CONSTANTS.PATHS.RULES.RELATIVE +

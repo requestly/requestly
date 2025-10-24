@@ -1,2 +1,0 @@
-import "./ajaxRequestInterceptor";
-import "./sessionRecorderHelper";

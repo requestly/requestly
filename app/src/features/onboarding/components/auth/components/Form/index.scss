@@ -1,0 +1,152 @@
+.onboarding-auth-form-container {
+  .variant3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
+.onboarding-auth-form-header {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--requestly-color-text-default);
+}
+
+.onboarding-auth-mode-switch-wrapper {
+  font-size: var(--requestly-font-size-sm, 13px);
+  color: var(--requestly-color-text-subtle);
+
+  .onboarding-auth-mode-switcher {
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  &.variant3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 14px;
+  }
+}
+
+.onboarding-google-auth-button.ant-btn-default.ant-btn {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 14px;
+  background-color: #383838;
+  border: none;
+  padding: 8px;
+  height: auto;
+
+  & span {
+    font-size: var(--requestly-font-size-md, 14px);
+  }
+
+  &:hover,
+  &:active,
+  &:focus {
+    border: none !important;
+  }
+
+  &:hover {
+    background-color: var(--surface-3) !important;
+  }
+}
+.onboarding-auth-form-divider .ant-divider-inner-text {
+  font-size: 1rem;
+  color: var(--requestly-color-text-default);
+}
+
+.why-work-email {
+  color: var(--text-light);
+  font-size: var(--requestly-font-size-xs, 11px);
+}
+
+.onboarding-form-input {
+  & label {
+    font-weight: 500;
+    font-size: var(--requestly-font-size-sm, 13px);
+  }
+  & input::placeholder {
+    font-weight: 500;
+    color: var(--neutrals-gray-400);
+  }
+
+  & input {
+    font-weight: 500;
+    margin-top: 4px;
+    border: 1px solid var(--neutrals-gray-600);
+  }
+}
+
+.persona-input-byline {
+  font-size: var(--requestly-font-size-xs, 11px);
+  color: var(--neutrals-gray-300);
+  margin-top: 4px;
+}
+
+.onboarding-terms-text {
+  font-size: var(--requestly-font-size-xs, 11px);
+  color: var(--text-light);
+  margin-top: 1rem;
+  & a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  & a:hover {
+    color: var(--requestly-color-text-default);
+    text-decoration: underline;
+  }
+}
+
+.onboarding-continue-button.ant-btn {
+  font-weight: 500;
+  & span {
+    font-size: var(--requestly-font-size-md, 14px);
+  }
+}
+
+.auth-screen-sso-btn.ant-btn {
+  margin-top: 24px;
+  font-weight: 500;
+
+  & span {
+    font-size: var(--requestly-font-size-md, 14px);
+  }
+}
+
+.auth-screen-forgot-password-btn.ant-btn {
+  text-decoration: underline;
+  color: var(--requestly-color-text-default);
+  padding: 0;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: var(--requestly-color-text-default);
+    text-decoration: underline;
+  }
+}
+
+.auth-email-disposable-error {
+  color: var(--requestly-color-error-300);
+  font-size: var(--requestly-font-size-xs);
+  font-style: normal;
+  font-weight: var(--requestly-font-weight-normal);
+  line-height: var(--requestly-font-line-height-xs);
+  margin-top: 8px;
+}
+
+.auth-form-footer {
+  font-size: var(--requestly-font-size-xs);
+  color: var(--requestly-color-text-placeholder);
+  margin-top: 20px;
+}

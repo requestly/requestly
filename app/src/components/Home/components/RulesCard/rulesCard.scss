@@ -1,0 +1,39 @@
+.add-cta {
+  height: 100%;
+  width: 100%;
+  line-height: 20px;
+  font-size: var(--requestly-font-size-md, 14px);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+  }
+}
+
+.content-container {
+  &.rules-card {
+    .new-rule-button {
+      background: #1e69ff;
+      border: 0;
+      &:hover {
+        background: var(--requestly-color-primary);
+      }
+    }
+    .middle-section {
+      .list {
+        .list-item {
+          &-icon {
+            svg {
+              height: 16px;
+              width: auto;
+            }
+          }
+        }
+      }
+    }
+  }
+}

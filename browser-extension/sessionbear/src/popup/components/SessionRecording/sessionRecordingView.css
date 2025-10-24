@@ -1,0 +1,78 @@
+.session-view-content {
+  padding: 12px 16px;
+  background: var(--surface-1);
+  border-radius: var(--border-radius-sm);
+}
+
+.session-view-content .title {
+  line-height: 20px;
+}
+
+.session-view-content .configure-btn {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  column-gap: 4px;
+  align-items: center;
+  color: var(--text-default);
+}
+
+.session-view-content .action-btns {
+  margin: 8px 0;
+  column-gap: 12px;
+}
+
+.session-view-content .action-btns .stop-btn {
+  background: var(--danger);
+}
+
+.session-view-content .session-replay-security-msg {
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  column-gap: 4px;
+  padding-top: 4px;
+}
+
+.session-view-content .session-replay-security-msg svg {
+  align-self: flex-start;
+}
+
+.session-view-content .session-replay-security-msg .msg {
+  width: 100%;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+}
+
+/* tooltip */
+.ant-tooltip.action-btn-tooltip.watch-replay-btn .ant-tooltip-inner {
+  max-width: 239px;
+}
+
+.ant-tooltip .watch-replay-btn-tooltip-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ant-tooltip .watch-replay-btn-tooltip-content svg {
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 20px;
+  height: 20px;
+}
+
+.ant-tooltip .watch-replay-btn-tooltip-content button {
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  border: none;
+  text-decoration: underline;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}

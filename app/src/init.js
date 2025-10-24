@@ -1,4 +1,3 @@
-import PSMH from "./config/PageScriptMessageHandler";
 import StorageServiceWrapper from "./utils/StorageServiceWrapper";
 
 //Initialize StorageService
@@ -7,6 +6,3 @@ export const StorageService = (appMode) => {
     appMode: appMode,
   });
 };
-
-//Initialize PageScriptMessageHandler
-PSMH.init();

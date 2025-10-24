@@ -3,14 +3,21 @@
   font-size: 1.25rem; /* 20px */
   line-height: 1.465rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
+}
+
+.subheader {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.565rem;
+  font-weight: 500;
+  color: var(--requestly-color-text-default);
 }
 
 .title {
   font-size: 1rem; /* 16px */
   line-height: 1.625rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .subtitle {
@@ -48,8 +55,12 @@
   text-transform: uppercase;
 }
 
+.text-capitalize {
+  text-transform: capitalize;
+}
+
 .text-white {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .text-gray {
@@ -64,19 +75,28 @@
   font-weight: 500;
 }
 
+.text-subtle {
+  color: var(--requestly-color-text-subtle);
+}
+
 .text-primary {
-  color: var(--primary);
+  color: var(--requestly-color-primary);
 }
 
 .text-center {
   text-align: center;
 }
+
 .text-left {
   text-align: left;
 }
 
+.text-right {
+  text-align: right;
+}
+
 .text-sm {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 14.06px;
 }
 
@@ -130,6 +150,14 @@
   visibility: hidden;
 }
 
+.align-self-center {
+  align-self: center;
+}
+
+.align-self-start {
+  align-self: flex-start;
+}
+
 .items-center {
   display: flex;
   align-items: center;
@@ -143,9 +171,16 @@
 .w-full {
   width: 100%;
 }
+.h-full {
+  height: 100%;
+}
 
 .shrink-0 {
   flex-shrink: 0;
+}
+
+.flex-1 {
+  flex: 1;
 }
 
 .ml-auto {
@@ -172,6 +207,18 @@
   margin-top: 1.25rem;
 }
 
+.mt-24 {
+  margin-top: 1.5rem;
+}
+
+.mt-48 {
+  margin-top: 3rem;
+}
+
+.mr-4 {
+  margin-right: 0.25rem;
+}
+
 .mr-8 {
   margin-right: 0.5rem;
 }
@@ -194,11 +241,7 @@
 
 .field-error-prompt {
   color: #fa2828cb;
-  font-size: 12px;
-}
-
-.success {
-  color: var(--success);
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 
 .relative {
@@ -230,11 +273,21 @@
   max-width: 90%;
 }
 .external-link {
-  color: var(--text-gray);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
   transition: 0.2s ease-in-out;
 }
 .external-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
+}
+
+.link-button {
+  color: var(--link-color);
+}
+
+.link-button:hover {
+  color: var(--link-color);
+  cursor: pointer;
+  opacity: 0.8;
 }

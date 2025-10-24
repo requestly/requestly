@@ -1,0 +1,63 @@
+.sharedlists-table-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .sharedlist-name {
+    color: var(--requestly-color-primary-text);
+    cursor: pointer;
+    transition: 0.2s all;
+    font-size: var(--requestly-font-size-sm);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .shared-list-created-on,
+  .shared-list-import-count {
+    font-size: var(--requestly-font-size-sm);
+  }
+
+  .shared-list-import-count {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6, 16px);
+    color: var(--requestly-color-text-subtle);
+
+    .import-count {
+      flex-shrink: 0;
+      min-width: 64px;
+    }
+
+    .notification-status {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 4px);
+
+      svg {
+        --size: 14px;
+        width: var(--size);
+        height: var(--size);
+      }
+    }
+  }
+
+  .sharedlist-table-actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+
+    & .ant-btn {
+      color: var(--requestly-color-neutral-0);
+    }
+  }
+
+  .rq-content-list-table-header {
+    .ant-table-cell:nth-child(2),
+    .ant-table-cell:nth-child(3) {
+      text-align: center;
+    }
+  }
+}

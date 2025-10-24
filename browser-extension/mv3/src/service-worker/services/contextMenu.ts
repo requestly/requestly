@@ -1,11 +1,14 @@
-import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
-import { disableExtensionIcon, enableExtensionIcon } from "./extensionIcon";
-
-// TODO: fix circular dependency
-// import { sendMessageToApp } from "./messageHandler";
+import { setVariable, Variable } from "../variable";
+import { isExtensionEnabled } from "../../utils";
+import extensionIconManager from "./extensionIconManager";
+import { sendMessageToApp } from "./messageHandler/sender";
+import { CLIENT_MESSAGES } from "common/constants";
+import { stopRecordingOnAllTabs } from "./sessionRecording";
+import { triggerOpenCurlModalMessage } from "./utils";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
+  RUN_CURL_REQUEST = "run-curl-request",
 }
 
 enum ToggleActivationStatusLabel {
@@ -18,13 +21,25 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
     title: isExtensionEnabled ? ToggleActivationStatusLabel.DEACTIVATE : ToggleActivationStatusLabel.ACTIVATE,
   });
 
+  console.log(`[updateActivationStatus] starting...`, {
+    isExtensionEnabled,
+    extensionIconState: extensionIconManager.getState(),
+  });
+
   if (isExtensionEnabled) {
-    enableExtensionIcon();
+    extensionIconManager.markExtensionEnabled();
   } else {
-    disableExtensionIcon();
+    extensionIconManager.markExtensionDisabled();
   }
 
-  // sendMessageToApp({ isExtensionEnabled });
+  console.log(`[updateActivationStatus] finished...`, {
+    isExtensionEnabled,
+    extensionIconState: extensionIconManager.getState(),
+  });
+
+  if (isExtensionEnabled === false) {
+    stopRecordingOnAllTabs();
+  }
 };
 
 export const initContextMenu = async () => {
@@ -36,15 +51,32 @@ export const initContextMenu = async () => {
     contexts: ["action"],
   });
 
-  chrome.contextMenus.onClicked.addListener(async (info) => {
+  chrome.contextMenus.create({
+    id: MenuItem.RUN_CURL_REQUEST,
+    title: "Run cURL Request",
+    contexts: ["selection"],
+  });
+
+  chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData) => {
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
-      const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
-      setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionEnabled);
+      const isExtensionStatusEnabled = await isExtensionEnabled();
+      const extensionStatus = !isExtensionStatusEnabled;
+
+      await setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, extensionStatus);
+      updateActivationStatus(extensionStatus);
+      sendMessageToApp({
+        action: CLIENT_MESSAGES.NOTIFY_EXTENSION_STATUS_UPDATED,
+        isExtensionEnabled: extensionStatus,
+        extensionIconState: extensionIconManager.getState(),
+      });
+    } else if (info.menuItemId === MenuItem.RUN_CURL_REQUEST) {
+      // Handle the cURL request action
+      await triggerOpenCurlModalMessage({ selectedText: info.selectionText, pageURL: info.pageUrl }, "context_menu");
     }
   });
 
-  const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
-  updateActivationStatus(isExtensionEnabled);
+  const isExtensionStatusEnabled = await isExtensionEnabled();
+  updateActivationStatus(isExtensionStatusEnabled);
 
-  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
+  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
 };

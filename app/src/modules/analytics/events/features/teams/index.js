@@ -1,18 +1,18 @@
 import { trackEvent } from "modules/analytics";
 import { TEAMS } from "../constants";
 
-export const trackNewTeamCreateSuccess = (id, name, source) => {
-  const params = { id, name, source };
+export const trackNewTeamCreateSuccess = (id, name, source, workspace_type, notify_all_teammates = false) => {
+  const params = { id, name, source, workspace_type, notify_all_teammates };
   trackEvent(TEAMS.NEW_TEAM_CREATE_SUCCESS, params);
 };
 
-export const trackNewTeamCreateFailure = (name) => {
-  const params = { name };
+export const trackNewTeamCreateFailure = (name, workspace_type) => {
+  const params = { name, workspace_type };
   trackEvent(TEAMS.NEW_TEAM_CREATE_FAILURE, params);
 };
 
-export const trackAddTeamMemberSuccess = (team_id, email, is_admin, source) => {
-  const params = { team_id, email, is_admin, source };
+export const trackAddTeamMemberSuccess = ({ team_id, email, is_admin, source, num_users_added, workspace_type }) => {
+  const params = { team_id, email, is_admin, source, num_users_added, workspace_type };
   trackEvent(TEAMS.ADD_TEAM_MEMBER_SUCCESS, params);
 };
 
@@ -41,8 +41,8 @@ export const trackWorkspaceInviteScreenError = (error_type, team_id, invite_id) 
   trackEvent(TEAMS.WORKSPACE_INVITE_SCREEN_ERROR, params);
 };
 
-export const trackWorkspaceJoiningModalOpened = (pending_invites) => {
-  const params = { pending_invites };
+export const trackWorkspaceJoiningModalOpened = (pending_invites, source) => {
+  const params = { pending_invites, source };
   trackEvent(TEAMS.WORKSPACE_JOINING_MODAL_OPENED, params);
 };
 

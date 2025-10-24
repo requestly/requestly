@@ -11,9 +11,14 @@ import PATHS from "config/constants/sub/paths";
 import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecordingModal";
 import { deleteRecording } from "../../../api";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { UserIcon } from "components/common/UserIcon";
+import { UserAvatar } from "componentsV2/UserAvatar";
 import Favicon from "components/misc/Favicon";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { getAppFlavour } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -38,6 +43,7 @@ const confirmDeleteAction = (id, eventsFilePath, callback) => {
   });
 };
 
+// not renedered
 const RecordingsList = ({
   isTableLoading,
   filteredRecordings,
@@ -45,12 +51,15 @@ const RecordingsList = ({
   setSelectedRowVisibility,
   setIsShareModalVisible,
   configureBtn,
+  newSessionButton,
   openDownloadedSessionModalBtn,
   callbackOnDeleteSuccess,
   TableFooter,
   _renderTableFooter,
 }) => {
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const getColumns = () => {
     let columns = [
@@ -59,7 +68,14 @@ const RecordingsList = ({
         dataIndex: "name",
         width: "30%",
         render: (name, record) => {
-          return (
+          return isDesktopSessionsCompatible ? (
+            <Link
+              to={PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + "/" + record.id}
+              state={{ fromApp: true }}
+            >
+              {name}
+            </Link>
+          ) : (
             <Link to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
               {name}
             </Link>
@@ -103,7 +119,7 @@ const RecordingsList = ({
         dataIndex: "createdBy",
         textAlign: "center",
         render: (creatorUserID) => {
-          return <UserIcon uid={creatorUserID} />;
+          return <UserAvatar uid={creatorUserID} />;
         },
       },
       {
@@ -112,7 +128,7 @@ const RecordingsList = ({
         align: "center",
         width: "10%",
         render: (visibility) => (
-          <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>
+          <Tooltip title={getPrettyVisibilityName(visibility, isSharedWorkspaceMode)}>
             {renderHeroIcon(visibility, "1em")}
           </Tooltip>
         ),
@@ -170,7 +186,7 @@ const RecordingsList = ({
       },
     ];
 
-    if (!isWorkspaceMode) {
+    if (!isSharedWorkspaceMode) {
       columns = columns.filter((colObj) => {
         return colObj.title !== "Created by";
       });
@@ -180,11 +196,12 @@ const RecordingsList = ({
   };
 
   const getStableColumns = useCallback(getColumns, [
-    isWorkspaceMode,
+    isSharedWorkspaceMode,
     callbackOnDeleteSuccess,
     setIsShareModalVisible,
     setSelectedRowVisibility,
     setSharingRecordId,
+    isDesktopSessionsCompatible,
   ]);
 
   return (
@@ -199,11 +216,15 @@ const RecordingsList = ({
         search={false}
         pagination={false}
         options={false}
-        toolBarRender={() => [openDownloadedSessionModalBtn, configureBtn]}
+        toolBarRender={() =>
+          isDesktopSessionsCompatible
+            ? [openDownloadedSessionModalBtn]
+            : [configureBtn, openDownloadedSessionModalBtn, newSessionButton]
+        }
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
-              Session Recordings
+              {getAppFlavour() === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "Sessions" : "SessionBook"}
             </Typography.Title>
           </>
         }

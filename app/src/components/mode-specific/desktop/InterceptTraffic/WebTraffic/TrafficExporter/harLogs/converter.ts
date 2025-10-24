@@ -1,6 +1,9 @@
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
-
+import { HTTPSnippet } from "@readme/httpsnippet";
 import { v4 as uuidv4 } from "uuid";
+import { getGraphQLDetails } from "./utils";
+import { cloneDeep } from "lodash";
+import Logger from "lib/logger";
 
 const createHarHeaders = (headersObject: HeaderMap) => {
   const headers: HarHeaderEntry[] = [];
@@ -76,6 +79,31 @@ export function createLogsHar(logs: RQNetworkLog[]) {
   return result;
 }
 
+const generateCurlFromHarObject = (requestHarObject: HarRequest) => {
+  if (!requestHarObject) {
+    return "";
+  }
+  let requestCurl = "";
+  try {
+    const harObject = cloneDeep(requestHarObject);
+
+    const snippetResult = new HTTPSnippet({
+      ...harObject,
+      postData: {
+        ...harObject.postData,
+        mimeType: harObject.postData?.mimeType || "text/plain",
+      },
+    }).convert("shell", "curl", {
+      indent: " ",
+    });
+
+    requestCurl = Array.isArray(snippetResult) ? snippetResult[0]?.toString() ?? "" : "";
+  } catch (err) {
+    Logger.log(`LoggerMiddleware.generate_curl_from_har Error: ${err}`);
+  }
+  return requestCurl;
+};
+
 /**
  * The optional chaining is so that this function is able
  * to convert all sources of network har objects
@@ -120,7 +148,10 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
             ? entry.response.content?.text
             : JSON.stringify(entry.response.content?.text),
       },
-      requestShellCurl: entry?._RQDetails?.requestShellCurl || "",
+      requestShellCurl: generateCurlFromHarObject(entry.request),
+      metadata: {
+        GQLDetails: getGraphQLDetails(entry),
+      },
       actions: entry?._RQDetails?.actions || [],
       requestState: entry?._RQDetails?.requestState || "",
       consoleLogs: entry?._RQDetails?.consoleLogs || [],

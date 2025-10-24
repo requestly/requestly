@@ -8,12 +8,13 @@ import { StorageService } from "../../../../init";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 // REDUCER ACTIONS
-import { actions } from "../../../../store";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
+import { globalActions } from "store/slices/global/slice";
+import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 //FUNCTIONS
 import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { trackGroupCreatedEvent } from "modules/analytics/events/common/groups";
+import { trackGroupCreatedEvent } from "features/rules/analytics";
 import Logger from "lib/logger";
 
 const CreateNewRuleGroupModal = (props) => {
@@ -54,7 +55,7 @@ const CreateNewRuleGroupModal = (props) => {
         trackGroupCreatedEvent("rules_table");
 
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })

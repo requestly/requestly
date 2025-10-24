@@ -1,0 +1,24 @@
+.notify-on-import-checkbox.ant-checkbox-wrapper {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm, 12px);
+  display: flex;
+  align-items: center;
+
+  .ant-checkbox {
+    margin-top: -2px;
+  }
+
+  .notify-on-import-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      --size: 14px;
+
+      width: var(--size);
+      height: var(--size);
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+}

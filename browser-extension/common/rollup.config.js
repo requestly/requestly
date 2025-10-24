@@ -6,7 +6,7 @@ import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
 import postcss from "rollup-plugin-postcss";
 import svgr from "@svgr/rollup";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import svg from "rollup-plugin-svg";
 
 const OUTPUT_DIR = "dist";
@@ -18,8 +18,21 @@ if (isProductionBuildMode) {
   commonPlugins.push(terser());
 }
 
+const commonConfig = {
+  // https://github.com/vitejs/vite-plugin-react/pull/144
+  onwarn(warning, defaultHandler) {
+    // console.log({warning});
+    if (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use client")) {
+      return;
+    } else {
+      defaultHandler(warning);
+    }
+  },
+};
+
 export default [
   {
+    ...commonConfig,
     input: "src/popup/index.tsx",
     output: {
       file: `${OUTPUT_DIR}/popup/popup.js`,
@@ -33,6 +46,10 @@ export default [
             src: "src/popup/index.html",
             dest: `${OUTPUT_DIR}/popup`,
             rename: "popup.html",
+          },
+          {
+            src: "resources/images/apiclient-container-bg.png",
+            dest: `${OUTPUT_DIR}/popup`,
           },
         ],
       }),
@@ -50,6 +67,7 @@ export default [
     ],
   },
   {
+    ...commonConfig,
     input: "src/devtools/index.tsx",
     output: {
       file: `${OUTPUT_DIR}/devtools/index.js`,
@@ -80,6 +98,7 @@ export default [
     ],
   },
   {
+    ...commonConfig,
     input: "src/constants.ts",
     output: {
       file: `${OUTPUT_DIR}/constants.js`,
@@ -89,6 +108,7 @@ export default [
     plugins: commonPlugins,
   },
   {
+    ...commonConfig,
     input: "src/rulesStore.ts",
     output: {
       file: `${OUTPUT_DIR}/rulesStore.js`,
@@ -98,6 +118,7 @@ export default [
     plugins: commonPlugins,
   },
   {
+    ...commonConfig,
     input: "src/utils.ts",
     output: {
       file: `${OUTPUT_DIR}/utils.js`,
@@ -107,6 +128,7 @@ export default [
     plugins: [...commonPlugins, nodeResolve()],
   },
   {
+    ...commonConfig,
     input: "src/custom-elements/index.ts",
     output: {
       file: `${OUTPUT_DIR}/lib/customElements.js`,

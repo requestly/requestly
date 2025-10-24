@@ -1,25 +1,23 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import MyTeams from "components/user/AccountIndexPage/ManageAccount/ManageTeams/MyTeams";
+import MyTeams from "features/settings/components/WorkspaceSettings/components/MyTeams";
 import CreateWorkspace from "components/user/Teams/CreateWorkspace";
-import PersonalSubscription from "components/user/AccountIndexPage/ManageAccount/PersonalSubscription";
+import PersonalSubscription from "features/settings/components/Profile/PersonalSubscription";
 import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
-import RefreshSubscription from "components/payments/RefreshSubscription";
 import UpdatePaymentMethod from "components/payments/UpdatePaymentMethod";
-import BackupPage from "components/user/BackupPage";
-import ManageAccount from "components/user/AccountIndexPage/ManageAccount";
-import TeamViewer from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer";
+import ManageAccount from "features/settings/components/Profile";
+import TeamViewer from "features/settings/components/Profile/ManageTeams/TeamViewer";
 import APP_CONSTANTS from "config/constants";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 
 export const accountRoutes: RouteObject[] = [
   {
     path: PATHS.ACCOUNT.MY_TEAMS.RELATIVE,
-    element: <ProtectedRoute component={MyTeams} />,
+    element: <MyTeams />,
   },
   {
     path: PATHS.ACCOUNT.TEAMS.RELATIVE + "/:teamId",
-    element: <ProtectedRoute component={TeamViewer} />,
+    element: <TeamViewer />,
   },
   {
     path: PATHS.ACCOUNT.TEAMS.ABSOLUTE,
@@ -46,10 +44,6 @@ export const accountRoutes: RouteObject[] = [
     element: <ProtectedRoute component={UpdatePaymentMethod} />,
   },
   {
-    path: PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.RELATIVE,
-    element: <ProtectedRoute component={RefreshSubscription} />,
-  },
-  {
     path: PATHS.ACCOUNT.CHECKOUT.RELATIVE,
     //@ts-ignore
     component: () => {
@@ -62,22 +56,8 @@ export const accountRoutes: RouteObject[] = [
     element: <ProtectedRoute component={ManageAccount} />,
   },
   {
-    path: PATHS.ACCOUNT.MY_BACKUPS.RELATIVE,
-    element: (
-      <ProtectedRoute
-        premiumRequired
-        component={BackupPage}
-        premiumMessage="Get Requestly Premium to auto backup your data at periodic intervals so that you don't ever lose them while switching devices."
-      />
-    ),
-  },
-  {
     path: PATHS.ACCOUNT.RELATIVE,
     element: <Navigate to={PATHS.ACCOUNT.MY_ACCOUNT.ABSOLUTE} />,
-  },
-  {
-    path: PATHS.BACKUP.RELATIVE,
-    element: <Navigate to={PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE} />,
   },
   {
     path: PATHS.ACCOUNT.SUPPORT.RELATIVE,

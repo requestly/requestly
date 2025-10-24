@@ -2,10 +2,15 @@ import { Button } from "antd";
 
 export function displayFileSelector(callback) {
   const handleDialogPromise = (result) => {
-    const { canceled, filePaths } = result;
+    const { canceled, filePaths, files } = result;
     if (!canceled) {
       if (callback) {
-        return callback(filePaths[0]);
+        if (filePaths) {
+          // for compatibility with how the UI expected open-file-dialog to respond earlier
+          return callback(filePaths[0]);
+        } else {
+          return callback(files[0]?.path);
+        }
       }
     }
   };
@@ -16,6 +21,45 @@ export function displayFileSelector(callback) {
     });
   }
 }
+
+export function displayMultiFileSelector(callback, config = {}) {
+  const handleDialogPromise = (result) => {
+    const { canceled, files } = result;
+    if (!canceled) {
+      if (callback) {
+        return callback(files);
+      }
+    }
+  };
+
+  if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {
+      properties: ["openFile", "multiSelections"],
+    }).then((result) => {
+      handleDialogPromise(result);
+    });
+  }
+}
+
+export const displayFolderSelector = (callback, onCancelCallback) => {
+  const handleDialogPromise = (result) => {
+    const { canceled, filePaths } = result;
+    if (!canceled) {
+      if (callback) {
+        return callback(filePaths[0]);
+      }
+    } else {
+      if (onCancelCallback) {
+        return onCancelCallback();
+      }
+    }
+  };
+  if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-folder-dialog", {}).then((result) => {
+      handleDialogPromise(result);
+    });
+  }
+};
 
 export const handleOpenLocalFileInBrowser = (link) => {
   window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {

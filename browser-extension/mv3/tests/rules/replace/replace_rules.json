@@ -1,0 +1,154 @@
+{
+  "Replace_1": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719973895348,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "regexSubstitution": "\\1\\2requestly.readme\\3\\4"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "regexFilter": "(.*?)(/)readme(\\.io)(.*)"
+        },
+        "priority": 1
+      }
+    ],
+    "groupId": "",
+    "id": "Replace_1",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719973955600,
+    "name": "change subdomain",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "from": "readme",
+        "id": "jterh",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "/readme.io"
+        },
+        "to": "requestly.readme"
+      }
+    ],
+    "ruleType": "Replace",
+    "schemaVersion": "3.0.1",
+    "status": "Active"
+  },
+  "Replace_2": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719973830495,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "regexSubstitution": "\\1example1\\2\\3"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "regexFilter": "(.*?)example(\\.com)(.*)"
+        },
+        "priority": 1
+      }
+    ],
+    "groupId": "",
+    "id": "Replace_2",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719973856767,
+    "name": "example -> example1",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "from": "example",
+        "id": "7sx2w",
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        },
+        "to": "example1"
+      }
+    ],
+    "ruleType": "Replace",
+    "schemaVersion": "3.0.1",
+    "status": "Active"
+  },
+  "Replace_3": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719973873290,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "regexSubstitution": "\\1\\3#__rq_marker=\\1\\3"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "regexFilter": "^(.*example\\.com.*)(#__rq_marker.*)$|(.*example\\.com.*)"
+        },
+        "priority": 1
+      },
+      {
+        "action": {
+          "redirect": {
+            "regexSubstitution": "\\1nothing\\2"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "regexFilter": "^(.*)some(.*)#__rq_marker=(?:.*example\\.com.*)$"
+        },
+        "priority": 2
+      }
+    ],
+    "groupId": "",
+    "id": "Replace_3",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719973881948,
+    "name": "some -> nothing",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "from": "some",
+        "id": "7sx2w",
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        },
+        "to": "nothing"
+      }
+    ],
+    "ruleType": "Replace",
+    "schemaVersion": "3.0.1",
+    "status": "Inactive"
+  }
+}

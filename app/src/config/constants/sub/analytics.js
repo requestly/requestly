@@ -123,27 +123,39 @@ export const GA_EVENTS = {
     COUPON_VALUE: "coupon_value",
     LICENSE: "licensekey",
     COMPANY: "company",
+    REF: "ref",
+    COUNTRY: "country",
 
+    DISPLAY_NAME: "display_name",
     PROFILE: "profile",
 
     NUM_RULES: "NUM_RULES",
+    NUM_PREMIUM_ACTIVE_RULES: "num_premium_active_rules",
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
+    NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
-    NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES",
+    NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES", // TODO: should be in smallcase
+
+    NUM_RULES_EXCLUDING_HEADERS: "num_rules_excluding_headers",
+    NUM_ACTIVE_RULES_EXCLUDING_HEADERS: "num_active_rules_excluding_headers",
+    NUM_RULES_EXCLUDING_FREE_RULES: "num_rules_excluding_free_rules",
+    NUM_ACTIVE_RULES_EXCLUDING_FREE_RULES: "num_active_rules_excluding_free_rules",
+
     NUM_GROUPS: "NUM_GROUPS",
     NUM_ACTIVE_GROUPS: "NUM_ACTIVE_GROUPS",
     NUM_SHARED_LISTS: "NUM_SHARED_LISTS",
     NUM_FILES: "num_files",
     NUM_MOCKS: "num_mocks",
     NUM_SESSIONS: "num_sessions",
+    NUM_SESSIONS_SAVED_ONLINE: "num_sessions_saved_online",
+    NUM_SESSIONS_SAVED_OFFLINE: "num_sessions_saved_offline",
+    NUM_NETWORK_SESSIONS: "num_network_sessions",
+    NUM_LOCAL_WORKSPACES: "num_local_workspaces",
+
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 
-    ONBOARDING_V1_DONE: "ONBOARDING_V1_DONE",
-
     PERSONA: "persona",
-    USE_CASES: "use_cases",
-    REFERRAL_CHANNEL: "referral_channel",
-    NUMBER_OF_EMPLOYEES: "number_of_employees",
+    INDUSTRY: "industry",
 
     SIGNUP_DATE: "SIGNUP_DATE",
     DAYS_SINCE_SIGNUP: "days_since_signup",
@@ -157,12 +169,21 @@ export const GA_EVENTS = {
     EMAIL_DOMAIN: "EMAIL_DOMAIN",
     EMAIL_VERIFIED: "email_verified",
     IS_PREMIUM: "IS_PREMIUM",
+    IS_TRIAL: "is_trial",
 
-    HAS_AVAILED_TWITTER_TRIAL: "HAS_AVAILED_TWITTER_TRIAL",
-    HAS_AVAILED_CHROME_STORE_TRIAL: "HAS_AVAILED_CHROME_STORE_TRIAL",
-    HAS_AVAILED_GITHUB_TRIAL: "HAS_AVAILED_GITHUB_TRIAL",
-    TRIAL_MODE_ENABLED: "trial_mode_enabled",
     NUM_WORKSPACES: "num_workspaces",
+    SESSION_REPLAY_LIFETIME_REDEEMED: "session_replay_lifetime_redeemed",
+    COMPANY_USER_SERIAL: "company_user_serial",
+    APP_FLAVOUR: "app_flavour",
+    SESSIONBEAR_INSTALLED: "sessionbear_installed",
+
+    NUM_REQUESTS: "num_requests",
+    NUM_COLLECTIONS: "num_collections",
+    NUM_ENVIRONMENTS: "num_environments",
+    RQ_SUBSCRIPTION_TYPE: "rq_subscription_type",
+    SUBSCRIPTION_STATUS: "subscription_status",
+    IS_ACCELERATOR_AVAILABLE: "is_accelerator_available",
+    BROWSERSTACK_ID: "browserstack_id",
   },
   VALUES: {
     PAYPAL: "paypal",

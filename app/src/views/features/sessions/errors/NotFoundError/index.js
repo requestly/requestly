@@ -3,7 +3,6 @@ import { Button, Col, Row } from "antd";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import React from "react";
 
-import img from "../../../../../assets/images/pages/error/404.svg";
 import { useNavigate } from "react-router-dom";
 import PATHS from "../../../../../config/constants/sub/paths";
 
@@ -19,7 +18,7 @@ const NotFoundError = () => {
               <Col>
                 <img
                   className="hp-position-relative hp-d-block hp-m-auto"
-                  src={img}
+                  src={"/assets/media/views/404.svg"}
                   alt="403"
                   style={{ maxHeight: "30vh" }}
                 />
@@ -31,7 +30,7 @@ const NotFoundError = () => {
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
             <Jumbotron style={{ background: "transparent" }} className="text-center">
-              <h1 className="display-3">The session recording you were looking for does not exist.</h1>
+              <h1 className="display-3">The session replay you were looking for does not exist.</h1>
               <center>
                 <Button
                   type="primary"

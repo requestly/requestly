@@ -13,3 +13,22 @@ export const getRouteFromCurrentPath = (path) => {
   const route = significantPathParts.join("/");
   return route;
 };
+
+export const prefixUrlWithHttps = (url) => {
+  let newUrl = url.trim();
+  if (newUrl && !newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
+    newUrl = "https://" + newUrl;
+  }
+  return newUrl;
+};
+
+export const getDomainFromURL = (url) => {
+  if (!url) return "";
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname;
+  } catch (error) {
+    // If URL parsing fails, return empty string
+    return "";
+  }
+};

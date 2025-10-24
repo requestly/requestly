@@ -1,5 +1,7 @@
 {
   "WEB_URL": "https://app.requestly.io",
-  "OTHER_WEB_URLS": ["https://app.requestly.com"],
+  "SESSIONS_URL": "https://app.requestly.io/sessions",
+  "OTHER_WEB_URLS": ["https://app.requestly.com", "https://requestly.com"],
+  "LANDING_PAGE_BASE_URL": "https://requestly.com",
   "logLevel": "info"
 }

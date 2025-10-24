@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "environments": [
+    {
+      "id": "b75d6dad-4aa8-4818-ae7c-7919b25d2169",
+      "name": "Sample Environment",
+      "variables": {},
+      "isGlobal": false
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Tooltip, Dropdown } from "antd";
 import { ButtonType } from "antd/lib/button";
 import "./splitButtons.scss";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import classNames from "classnames";
 
 interface CommonButtonProps {

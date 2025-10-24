@@ -24,6 +24,10 @@ export const getUserSharedListsPath = (uid) => {
   return currentUserPath;
 };
 
+export const getTeamSharedListsPath = (teamId) => {
+  return ["teamSync", teamId, FIREBASE_NODES.SHARED_LISTS];
+};
+
 export const getSpecificUserSharedListPath = (userId, sharedListId) => {
   return getUserSharedListsPath(userId).concat(sharedListId);
 };
@@ -46,3 +50,7 @@ export const getUserSpecificFilePath = (uid, fileId) => {
 export const getMigrationPath = (uid) => {
   return ["customProfile", uid];
 };
+
+export function getUserProfilePath(userId) {
+  return "users/" + userId + "/profile";
+}

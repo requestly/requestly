@@ -1,0 +1,25 @@
+.desktop-setting-port-input-label {
+  color: var(--requestly-color-text-default);
+  margin-bottom: 8px;
+}
+
+.desktop-setting-port-input.ant-input {
+  border-color: transparent;
+  box-shadow: var(--input-box-shadow);
+}
+
+.desktop-port-update-btn {
+  margin-top: 8px;
+}
+
+.desktop-settings-container {
+  display: flex;
+  justify-content: center;
+}
+
+.desktop-settings-wrapper {
+  padding: 2rem;
+  padding-top: 1rem;
+  width: 100%;
+  max-width: 1000px;
+}

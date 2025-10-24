@@ -1,0 +1,91 @@
+.bottom-sheet-container.ant-col {
+  width: 100%;
+  transition: bottom 0.2s ease-out;
+}
+
+.bottom-sheet-panel-container.ant-col {
+  position: relative;
+  height: 100% !important;
+  transition: none;
+
+  & .ant-tabs.ant-tabs-card {
+    height: 100%;
+  }
+}
+
+.bottomsheet-layout-container.vertical-split .gutter-container + .ant-row,
+.bottomsheet-layout-container.horizontal-split .gutter-container + .ant-row {
+  flex-grow: 1;
+}
+
+.vertical-split .bottom-sheet-container.ant-col,
+.bottomsheet-layout-container.vertical-split .bottom-sheet-panel-container.ant-col {
+  background: var(--requestly-color-surface-0);
+  border-top: 1px solid var(--requestly-color-white-t-10);
+}
+
+.horizontal-split .bottom-sheet-container.ant-col,
+.bottomsheet-layout-container.horizontal-split .bottom-sheet-panel-container.ant-col {
+  background: var(--requestly-color-surface-0);
+  border-left: 1px solid var(--requestly-color-white-t-10);
+}
+
+.bottom-sheet-container.ant-col,
+.bottom-sheet-panel-container.ant-col {
+  & .ant-tabs-nav {
+    padding: 8px;
+    padding-top: 2px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  & .ant-tabs-nav-list .ant-tabs-tab {
+    padding: 4px 0;
+    background: none;
+    transition: all 0.2s ease-out;
+    font-size: var(--requestly-font-size-sm);
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  & .ant-tabs-tab.ant-tabs-tab-active {
+    & .ant-tabs-tab-btn {
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  & .ant-tabs-content-holder {
+    padding: 8px 8px 28px 8px;
+    overflow: hidden;
+  }
+
+  & .ant-tabs-content {
+    height: 100%;
+  }
+  & .ant-tabs-tabpane {
+    height: inherit;
+  }
+}
+
+.bottom-sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bottom-sheet-tab-extra-content {
+  &,
+  .bottom-sheet-utilites {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .bottom-sheet-toggle-btn.ant-btn {
+    color: var(--requestly-color-text-subtle);
+  }
+}

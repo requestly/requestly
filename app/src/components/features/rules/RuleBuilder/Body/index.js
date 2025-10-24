@@ -1,64 +1,84 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CardBody } from "reactstrap";
 import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
+import { useRBAC } from "features/rbac";
 import "./RuleBuilderBody.css";
 
-const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
+const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
+  const isSampleRule = currentlySelectedRuleData?.isSample;
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
-  const handleRuleNameChange = (name) => {
-    const event = getEventObject("name", name);
-    onChangeHandler(currentlySelectedRuleData, dispatch, event);
-  };
+  const handleRuleNameChange = useCallback(
+    (name, warnForUnsavedChanges = true) => {
+      const event = getEventObject("name", name);
+      onChangeHandler(currentlySelectedRuleData, dispatch, event, warnForUnsavedChanges);
+    },
+    [dispatch, currentlySelectedRuleData]
+  );
 
-  const handleDescriptionChange = (description) => {
-    const event = getEventObject("description", description);
-    onChangeHandler(currentlySelectedRuleData, dispatch, event);
-  };
+  const handleDescriptionChange = useCallback(
+    (description) => {
+      const event = getEventObject("description", description);
+      onChangeHandler(currentlySelectedRuleData, dispatch, event);
+    },
+    [dispatch, currentlySelectedRuleData]
+  );
+
+  const generateRuleName = useCallback((ruleType) => {
+    return `${ruleType.toLowerCase()}-${Date.now()}`;
+  }, []);
+
+  const defaultRuleName = useMemo(() => generateRuleName(currentlySelectedRuleData.ruleType), [
+    generateRuleName,
+    currentlySelectedRuleData.ruleType,
+  ]);
 
   return (
     <>
-      {!isSharedListView && (
-        <RQEditorTitle
-          mode={mode}
-          errors={ruleErrors}
-          showDocs={showDocs}
-          name={currentlySelectedRuleData.name}
-          namePlaceholder="Enter rule name"
-          nameChangeCallback={handleRuleNameChange}
-          descriptionPlaceholder="Add description (optional)"
-          description={currentlySelectedRuleData.description}
-          descriptionChangeCallback={handleDescriptionChange}
-        />
-      )}
-      <Row className="rule-builder-body">
-        <Col
-          span={22}
-          offset={1}
-          md={{
-            offset: showDocs ? 1 : 2,
-            span: showDocs ? 22 : 20,
-          }}
-          lg={{
-            offset: isSharedListView ? 2 : showDocs ? 1 : 4,
-            span: isSharedListView ? 20 : showDocs ? 22 : 16,
-          }}
-        >
+      <div className="rule-editor-title-container">
+        {!isSharedListView && (
+          <RQEditorTitle
+            isSampleRule={isSampleRule}
+            disabled={isSampleRule || !isValidPermission}
+            mode={mode}
+            errors={ruleErrors}
+            showDocs={showDocs}
+            defaultName={defaultRuleName}
+            name={currentlySelectedRuleData.name}
+            namePlaceholder="Enter rule name"
+            nameChangeCallback={handleRuleNameChange}
+            descriptionPlaceholder="Add description (optional)"
+            description={currentlySelectedRuleData.description}
+            descriptionChangeCallback={handleDescriptionChange}
+          />
+        )}
+      </div>
+      <Row
+        className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
+        id="rule-builder-body"
+      >
+        {isSampleRule && (
+          <div className="sample-rule-overlay">
+            <div className="view-only-message">Sample rules are view only</div>
+          </div>
+        )}
+        <Col span={24} style={{ minWidth: "300px" }} className={`${isSampleRule ? "sample-rule-card-body" : ""}`}>
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />
@@ -69,7 +89,10 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
               <Row justify="end">
                 <Col span={24}>
                   {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                    <AddPairButton
+                      disabled={isSampleRule || !isValidPermission}
+                      currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+                    />
                   ) : null}
                 </Col>
               </Row>

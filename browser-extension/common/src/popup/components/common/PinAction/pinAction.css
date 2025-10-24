@@ -1,16 +1,17 @@
 .pin-icon {
   font-size: 15px;
-  color: var(--color-secondary);
-  padding: 14px;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--text-light);
 }
 
 .pin-icon:hover {
   cursor: pointer;
-  border-radius: var(--border-radius);
-  background-color: var(--background-color-row-hover);
+  border-radius: 4px;
+  background-color: var(--background);
   transition: background-color 0.2s ease;
 }
 
 .pin-icon.active {
-  color: var(--color-link);
+  color: var(--blue-400);
 }

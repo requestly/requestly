@@ -1,0 +1,37 @@
+.example-collections-nudge-container {
+  display: flex;
+  padding: var(--space-3, 6px) var(--space-4, 8px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  border-radius: 6px;
+  background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+  .content {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+
+    img {
+      --size: 14px;
+      width: var(--size);
+      height: var(--size);
+      flex-shrink: 0;
+    }
+
+    .description {
+      color: var(--requestly-color-text-subtle, #bbb);
+      font-size: var(--requestly-font-size-xs);
+      line-height: 17px; /* 154.545% */
+    }
+  }
+
+  .actions {
+    display: flex;
+    padding: var(--space-3, 6px) 0px var(--space-2, 4px) 0px;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+}

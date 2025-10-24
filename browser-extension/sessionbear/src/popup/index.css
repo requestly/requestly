@@ -1,0 +1,100 @@
+:root {
+  --border-radius: 4px;
+  --border-radius-md: 8px;
+  --color-primary: #ffffff;
+  --color-secondary: #b0b0b5;
+  --color-success: #069d4f;
+  --color-danger: #fa2828e2;
+  --color-link: #1e69ff;
+  --color-icon: #b0b0b5;
+  --border-color: #3e4044;
+  --background-color-primary: #1c1d21;
+  --background-color-secondary: #242529;
+  --background-color-row-hover: #2c2d31;
+  --background-color-component: #323337;
+
+  /* new colors */
+  --red-100: #ffc7c7;
+  --red-200: #ffa7a7;
+  --red-300: #ff8080;
+  --red-400: #f95e5e;
+  --red-500: #e43434;
+  --red-600: #cf2a2a;
+  --red-700: #a41f1f;
+  --red-800: #591a1a;
+  --red-900: #271111;
+
+  --green-100: #a6e9c8;
+  --green-200: #6fdaa6;
+  --green-300: #4dcc8f;
+  --green-400: #28c07a;
+  --green-500: #0baa60;
+  --green-600: #0a9c55;
+  --green-700: #0c7844;
+  --green-800: #104b2f;
+  --green-900: #0d1f11;
+
+  --blue-100: #cbe2fe;
+  --blue-200: #97c3fd;
+  --blue-300: #639ff9;
+  --blue-400: #3c7ff3;
+  --blue-500: #004eeb;
+  --blue-600: #003cca;
+  --blue-700: #002ca9;
+  --blue-800: #001f88;
+  --blue-900: #001670;
+
+  --neutrals-gray-100: #e8e8e9;
+  --neutrals-gray-200: #d0d1d3;
+  --neutrals-gray-300: #b9babe;
+  --neutrals-gray-400: #8b8d92;
+  --neutrals-gray-500: #73767c;
+  --neutrals-gray-600: #555963;
+  --neutrals-gray-700: #3b404e;
+  --neutrals-gray-800: #262b37;
+  --neutrals-gray-900: #161a25;
+
+  --neutrals-white: #ffffff;
+  --neutrals-black: #000000;
+
+  /* Tokens */
+  --white: var(--neutrals-white);
+  --black: var(--neutrals-black);
+
+  --primary-color: var(--blue-500);
+  --danger: var(--red-500);
+  --success: var(--green-500);
+  --disable: var(--neutrals-gray-500);
+
+  --surface-1: #282828;
+  --surface-2: #383838;
+  --surface-3: var(--neutrals-gray-600);
+
+  --text-light: var(--neutrals-gray-300);
+  --text-default: var(--neutrals-white);
+
+  --background: #1b1b1b;
+
+  --border-radius-sm: 4px;
+}
+
+/* reset */
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--background);
+}
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

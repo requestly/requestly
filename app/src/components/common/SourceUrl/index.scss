@@ -5,11 +5,11 @@
   padding: 4px 6px;
   box-shadow: var(--input-box-shadow);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-dark-background);
+  background-color: var(--requestly-color-surface-0);
 
   .source-condition-selector {
     .ant-select-selector {
-      background: var(--input-background) !important;
+      background: var(--requestly-color-surface-1) !important;
       border-color: var(--border-dark) !important;
 
       &:hover {

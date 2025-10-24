@@ -1,0 +1,30 @@
+.settings-primary-sidebar {
+  width: 184px;
+  padding: 12px;
+  background: var(--requestly-color-surface-0);
+  border-right: 1px solid var(--requestly-color-surface-2);
+  height: 100vh;
+
+  &.app-mode-desktop {
+    padding-top: 40px;
+  }
+}
+
+.settings-primary-sidebar-title-icon {
+  margin-top: 5px;
+  color: var(--requestly-color-text-default);
+  font-size: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.settings-primary-sidebar-title {
+  color: var(--requestly-color-text-default);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.settings-primary-sidebar-section:not(:first-child) {
+  margin-top: 1rem;
+}

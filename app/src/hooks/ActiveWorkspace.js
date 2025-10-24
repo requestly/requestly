@@ -2,13 +2,15 @@ import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions
 import { isEmpty } from "lodash";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import {
   getTeamUserRuleAllConfigsPath,
   getTeamUserRuleConfigPath,
   getRecordsSyncPath,
 } from "utils/syncing/syncDataUtils";
+import { useCurrentWorkspaceUserRole } from "./useCurrentWorkspaceUserRole";
+import { trackAttr } from "modules/analytics";
 
 // Broadcast channel setup
 window.activeWorkspaceBroadcastChannel = new BroadcastChannel("active-workspace");
@@ -18,18 +20,19 @@ window.activeWorkspaceBroadcastChannel.addEventListener("message", (_event) => {
 });
 
 const ActiveWorkspace = () => {
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const activeWorkspace = useSelector(getActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
+  const { role } = useCurrentWorkspaceUserRole();
 
   const performCleanup = async () => {
     if (window.workspaceCleanupDone) return;
 
     window.workspaceCleanupDone = true;
 
-    if (currentlyActiveWorkspace.id) {
+    if (activeWorkspace?.id) {
       // Fetch fresh rule configs from Firebase
       const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath(
-        currentlyActiveWorkspace.id,
+        activeWorkspace?.id,
         user?.details?.profile?.uid
       );
       if (!teamUserRuleAllConfigsPath) return;
@@ -38,6 +41,7 @@ const ActiveWorkspace = () => {
       if (!allRulesConfig) return; // It's already empty - No cleanup required
       const allRulesConfigIds = Object.keys(allRulesConfig);
 
+      /* @nsr: should decompress target, but since only working with record keys so ignoring for now */
       // Fetch fresh rule definitions from Firebase
       const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
       const remoteRecords = {};
@@ -65,10 +69,14 @@ const ActiveWorkspace = () => {
   }
 
   useEffect(() => {
-    window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
-    window.keySetDonecurrentlyActiveWorkspaceTeamId = true;
+    trackAttr("active_workspace_id", activeWorkspace?.id || "NONE");
+    window.currentlyActiveWorkspaceTeamRole = role;
+    window.currentlyActiveWorkspaceTeamId = activeWorkspace?.id;
+    window.currentlyActiveWorkspaceType = activeWorkspace?.workspaceType;
+    window.workspaceMembersCount = activeWorkspace?.accessCount ?? null;
+    window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE
     window.workspaceCleanupDone = false;
-  }, [currentlyActiveWorkspace.id]);
+  }, [activeWorkspace?.accessCount, activeWorkspace?.id, role, activeWorkspace?.workspaceType]);
 };
 
 export default ActiveWorkspace;

@@ -3,7 +3,7 @@
 }
 
 .team-feature-coming-soon-caption {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 22px;
   margin: 8px 0 16px 0;
 }
@@ -16,7 +16,7 @@
   flex-direction: column;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
-  background-color: var(--component-background);
+  background-color: var(--requestly-color-surface-1);
 }
 
 .team-feature-banner .file-icon {

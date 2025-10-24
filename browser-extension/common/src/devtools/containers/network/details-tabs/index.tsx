@@ -1,13 +1,14 @@
 import React from "react";
-import { DetailsTab } from "../../../components/ResourceTable";
-import { NetworkEvent } from "../../../types";
+import { DetailsTab } from "@requestly-ui/resource-table";
+import { RQNetworkEvent } from "../../../types";
 import GeneralTabContent from "./GeneralTabContent/GeneralTabContent";
 import HeadersTabContent from "./HeadersTabContent/HeadersTabContent";
 import PayloadTabContent from "./PayloadTabContent/PayloadTabContent";
 // @ts-ignore
 import { ObjectInspector } from "@devtools-ds/object-inspector";
+import ResponseTabContent from "./ResponseTabContent/ResponseTabContent";
 
-const networkEventDetailsTabs: DetailsTab<NetworkEvent>[] = [
+const networkEventDetailsTabs: DetailsTab<RQNetworkEvent>[] = [
   {
     key: "general",
     label: "General",
@@ -22,6 +23,11 @@ const networkEventDetailsTabs: DetailsTab<NetworkEvent>[] = [
     key: "payload",
     label: "Payload",
     render: (networkEvent) => <PayloadTabContent networkEvent={networkEvent} />,
+  },
+  {
+    key: "response",
+    label: "Response",
+    render: (networkEvent) => <ResponseTabContent networkEvent={networkEvent} />,
   },
   {
     key: "har",

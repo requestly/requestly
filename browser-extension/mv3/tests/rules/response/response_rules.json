@@ -1,0 +1,286 @@
+{
+  "CORS_Bypass": {
+    "createdBy": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "creationDate": 1643755328278,
+    "currentOwner": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "description": "You can Bypass CORS by turning this on",
+    "extensionRules": [
+      {
+        "action": {
+          "responseHeaders": [
+            {
+              "header": "Access-Control-Allow-Methods",
+              "operation": "set",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Headers",
+              "operation": "set",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Credentials",
+              "operation": "set",
+              "value": "true"
+            }
+          ],
+          "type": "modifyHeaders"
+        },
+        "condition": {
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "*"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Headers_0bylc",
+    "isSample": false,
+    "lastModifiedBy": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "modificationDate": 1721644314201,
+    "name": "Bypass CORS",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "z3v66",
+        "modifications": {
+          "Request": [],
+          "Response": [
+            {
+              "header": "Access-Control-Allow-Origin",
+              "type": "Add",
+              "value": "rq_request_initiator_origin()"
+            },
+            {
+              "header": "Access-Control-Allow-Methods",
+              "type": "Add",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Headers",
+              "type": "Add",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Credentials",
+              "type": "Add",
+              "value": "true"
+            }
+          ]
+        },
+        "source": {
+          "filters": null,
+          "key": "Url",
+          "operator": "Contains",
+          "value": "requestly"
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "schemaVersion": "3.0.0",
+    "status": "Active",
+    "version": 2
+  },
+  "Response_1": {
+    "createdBy": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "creationDate": 1721631222828,
+    "currentOwner": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "description": "",
+    "groupId": "",
+    "id": "Response_1",
+    "isSample": false,
+    "lastModifiedBy": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "modificationDate": 1721631245411,
+    "name": "Response_1",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "otnch",
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "",
+          "type": "static",
+          "value": "{\"response_modified\":true}"
+        },
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Response_2": {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1715153617702,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Response_2",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1716787584422,
+    "name": "3.a. Static Modification",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "9ni7q",
+        "isCompressed": false,
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "201",
+          "statusText": "Created",
+          "type": "static",
+          "value": "{\"hello\":\"world\",\"testing\":\"response rule\"}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Response_3": {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1715153617702,
+    "currentOwner": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "description": "",
+    "groupId": "",
+    "id": "Response_x9tek",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1715155582738,
+    "name": "3.b. Static Modification without server",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "9ni7q",
+        "isCompressed": false,
+        "response": {
+          "resourceType": "restApi",
+          "serveWithoutRequest": true,
+          "statusCode": "201",
+          "statusText": "Created",
+          "type": "static",
+          "value": "{\"hello\":\"world\",\"testing\":\"response rule\"}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Response_4": {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1715153617702,
+    "currentOwner": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "description": "",
+    "groupId": "",
+    "id": "Response_zpdcz",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1720434591838,
+    "name": "3.c. Dynamic Modification - Sync",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "lybbw",
+        "isCompressed": false,
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "201",
+          "statusText": "Created",
+          "type": "code",
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  console.log({ args });\n  // Change response below depending upon request attributes received in args\n  return {\"dynamic\": \"modification\"};\n}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Response_5": {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1715153617702,
+    "currentOwner": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "description": "",
+    "groupId": "",
+    "id": "Response_5",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1716787719241,
+    "name": "3.d. Async Dynamic Modification",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "lybbw",
+        "isCompressed": false,
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "202",
+          "statusText": "Accepted",
+          "type": "code",
+          "value": "async function modifyResponse(args) {\n  const delay = (delayInms) => {\n    return new Promise(resolve => setTimeout(resolve, delayInms));\n  };\n\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  console.log({args});\n  console.log(\"BEFORE\");\n  await delay(10000);\n  console.log(\"AFTER\");\n  return {\"dynamic\": \"response\"};\n}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Response_8": {
+    "createdBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "creationDate": 1724666497201,
+    "currentOwner": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "description": "",
+    "groupId": "",
+    "id": "Response_8",
+    "isSample": false,
+    "lastModifiedBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "modificationDate": 1724666967446,
+    "name": "[XHR] response-sharedState",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "0ciik",
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  if($sharedState.count>1){\n    return {isSharedStateCountGteOne:true}\n  }\n  let count=$sharedState.count??0;\n  count++;\n  $sharedState.count=count;\n  return response;\n}"
+        },
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  }
+}

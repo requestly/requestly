@@ -1,11 +1,13 @@
 //CONFIG
 import { MODES } from "components/misc/VerifyEmail/modes";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
+import { isFeatureCompatible } from "./CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { getAppFlavour } from "./AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 //CONSTANTS
 const { PATHS, LINKS } = APP_CONSTANTS;
-const { APP_MODES } = GLOBAL_CONSTANTS;
 
 /* LAYOUTS */
 
@@ -25,11 +27,14 @@ export const redirectToRules = (navigate, hardRedirect) => {
 };
 
 /* FEATURE - RULES - Create New Rule */
-export const redirectToCreateNewRule = (navigate, ruleType, source) => {
+export const redirectToCreateNewRule = (navigate, ruleType, source, groupId = "") => {
   if (ruleType) {
-    navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`, {
-      state: { source },
-    });
+    navigate(
+      groupId
+        ? `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}?groupId=${groupId}`
+        : `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`,
+      { state: { source } }
+    );
   } else {
     navigate(PATHS.RULES.CREATE);
   }
@@ -41,10 +46,30 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 };
 
 /* FEATURE - RULES - Edit a Rule */
-export const redirectToRuleEditor = (navigate, ruleId, source) => {
-  navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
-    state: { source },
-  });
+/**
+ * Redirects the user to the rule editor for a specific rule.
+ *
+ * @param {function} navigate - The navigation function from react-router.
+ * @param {string} ruleId - The ID of the rule to edit.
+ * @param {string} source - The source of the navigation (for analytics or state management).
+ * @param {boolean} [newTab=false] - If true, opens the rule editor in a new tab.
+ * @param {boolean} [replaceCurrentRouteInHistory=false] - If true, replaces the current route in history instead of adding a new one.
+ */
+export const redirectToRuleEditor = (
+  navigate,
+  ruleId,
+  source,
+  newTab = false,
+  replaceCurrentRouteInHistory = false
+) => {
+  if (newTab) {
+    window.open(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, "_blank");
+  } else {
+    navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
+      state: { source },
+      replace: replaceCurrentRouteInHistory,
+    });
+  }
 };
 
 /* FEATURE - SHARED LIST */
@@ -70,12 +95,6 @@ export const redirectToMocks = (navigate) => {
 };
 
 /* FEATURE - FILES LIBRARY */
-
-/* FEATURE - FILES LIBRARY - List of All Files */
-export const redirectToFiles = (navigate) => {
-  navigate(PATHS.FILES.MY_FILES.ABSOLUTE);
-};
-
 /* FEATURE - FILES LIBRARY - View a File */
 export const redirectToFileViewer = (navigate, fileId, url = null) => {
   navigate({
@@ -96,21 +115,109 @@ export const redirectToTemplates = (navigate) => {
 };
 
 /* FEATURE - SESSION RECORDINGS */
-export const redirectToSessionRecordingHome = (navigate) => {
-  navigate(PATHS.SESSIONS.ABSOLUTE);
+export const redirectToSessionRecordingHome = (navigate, isDesktopSessionsEnabled = false) => {
+  if (isFeatureCompatible(FEATURES.DESKTOP_SESSIONS) && isDesktopSessionsEnabled) {
+    navigate(PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE);
+    return;
+  } else {
+    navigate(PATHS.SESSIONS.ABSOLUTE);
+    return;
+  }
 };
 
-export const redirectToNetworkSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
+export const redirectToSavedSession = (navigate, id) => {
+  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
+};
+
+export const redirectToSessionSettings = (navigate, redirectUrl, source) => {
+  const appFlavour = getAppFlavour();
+  if (appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR) {
+    navigate(PATHS.SETTINGS.SESSIONS_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
+  } else {
+    navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl, source } });
+  }
+};
+
+export const redirectToNetworkSessionHome = (navigate, isDesktopSessionsCompatible = false) => {
+  if (isDesktopSessionsCompatible) {
+    navigate(PATHS.SESSIONS.DESKTOP.SAVED_LOGS.ABSOLUTE);
+    return;
+  } else {
+    navigate(PATHS.SESSIONS.ABSOLUTE);
+    return;
+  }
+};
+
+export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
+  if (isDesktopSessionsCompatible) {
+    if (id) {
+      const path = "/" + PATHS.SESSIONS.DESKTOP.NETWORK.RELATIVE + `/${id}`;
+      navigate(path);
+      return;
+    }
+    const path = "/" + PATHS.SESSIONS.DESKTOP.NETWORK.RELATIVE;
+    navigate(path);
+    return;
+  } else {
+    if (id) {
+      const path = "/" + PATHS.NETWORK_LOGS.VIEWER.RELATIVE + `/${id}`;
+      navigate(path);
+      return;
+    }
+    const path = PATHS.SESSIONS.ABSOLUTE;
+    navigate(path);
+    return;
+  }
+};
+
+/* FEATURE - API client */
+export const redirectToApiClient = (navigate) => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}`);
+};
+
+export const redirectToRequest = (navigate, requestId = "new") => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/request/${requestId}`);
+};
+
+export const redirectToCollection = (navigate, collectionId) => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
+};
+
+export const redirectToApiClientCollection = (navigate, collectionId = "new") => {
+  navigate(`${PATHS.API_CLIENT.ABSOLUTE}/collection/${collectionId}`);
 };
 
 /* Settings */
-export const redirectToSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.ABSOLUTE);
+export const redirectToSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
-export const redirectToDesktopPreferences = (navigate) => {
-  navigate(PATHS.SETTINGS.DESKTOP_PREFERENCES.ABSOLUTE);
+export const redirectToGlobalSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToDesktopSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToWorkspaceSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.BILLING.RELATIVE + `/${id}`, { state: { redirectUrl, source } });
+};
+
+export const redirectToBillingTeamSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.BILLING.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToMyPlan = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.MY_PLAN.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToProfileSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.PROFILE.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
 /* Product updates */
@@ -229,13 +336,6 @@ export const redirectToGDPRPage = (navigate, { newTab }) => {
   }
 };
 
-/* USER */
-
-/* USER - Unlock Premium */
-export const redirectToUnlockPremium = (navigate) => {
-  navigate(PATHS.UNLOCK_PREMIUM.ABSOLUTE);
-};
-
 /* ACCOUNT */
 
 /* ACCOUNT - View Account Details */
@@ -244,32 +344,6 @@ export const redirectToAccountDetails = (navigate, hardRedirect) => {
     window.location.href = PATHS.ACCOUNT.ABSOLUTE;
   } else {
     navigate(PATHS.ACCOUNT.ABSOLUTE);
-  }
-};
-
-/* ACCOUNT - My Organization*/
-export const redirectToMyOrganization = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.MY_ORGANIZATION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.MY_ORGANIZATION.ABSOLUTE);
-  }
-};
-/* ACCOUNT - Create new Org */
-export const redirectToCreateOrg = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.CREATE_ORGANIZATION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.CREATE_ORGANIZATION.ABSOLUTE);
-  }
-};
-
-/* ACCOUNT - View Backups */
-export const redirectToBackups = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE);
   }
 };
 
@@ -293,6 +367,10 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
   }
 };
 
+export const redirectToManageWorkspace = (navigate, teamId) => {
+  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`);
+};
+
 export const redirectToMyTeams = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE;
@@ -300,6 +378,7 @@ export const redirectToMyTeams = (navigate, hardRedirect) => {
     navigate(PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE);
   }
 };
+
 export const redirectToCreateNewTeamWorkspace = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.CREATE_NEW_TEAM_WORKSPACE.ABSOLUTE;
@@ -322,35 +401,6 @@ export const redirectToPersonalSubscription = (navigate, hardRedirect, autoRefre
   }
 };
 
-/* ACCOUNT - CHECKOUT */
-export const redirectToCheckout = ({ mode, teamId, planType: planName, days, quantity }) => {
-  const url = new URL(window.location.href);
-  url.pathname = PATHS.CHECKOUT.ABSOLUTE;
-  url.searchParams.set("m", mode);
-  if (teamId) {
-    url.searchParams.set("t", teamId);
-  }
-  url.searchParams.set("p", planName);
-  url.searchParams.set("d", days);
-  if (quantity) {
-    url.searchParams.set("q", quantity);
-  }
-  if (window?.RQ?.MODE === APP_MODES.DESKTOP) {
-    window.open(url.href, "_blank");
-  } else {
-    window.location = url.href;
-  }
-};
-
-/* MARKETPLACE REDIRECT */
-export const redirectToMarketplace = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.MARKETPLACE.ABSOLUTE;
-  } else {
-    navigate(PATHS.MARKETPLACE.ABSOLUTE);
-  }
-};
-
 /* ACCOUNT - UPDATE SUBSCRIPTION */
 export const redirectToUpdateSubscription = ({ mode, teamId, planType, isRenewal }) => {
   const url = new URL(window.location.href);
@@ -362,43 +412,6 @@ export const redirectToUpdateSubscription = ({ mode, teamId, planType, isRenewal
   url.searchParams.set("p", planType);
   if (isRenewal) url.searchParams.set("r", true);
   window.location = url.href;
-};
-
-/* ACCOUNT - UPDATE SUBSCRIPTION Contact Us */
-export const redirectToUpdateSubscriptionContactUs = () => {
-  const url = new URL(window.location.href);
-  url.pathname = PATHS.ACCOUNT.UPDATE_SUBSCRIPTION_CONTACT_US.ABSOLUTE;
-  window.location = url.href;
-};
-
-/* ACCOUNT - UPDATE PAYMENT METHOD */
-export const redirectToUpdatePaymentMethod = () => {
-  redirectToUpdateSubscriptionContactUs();
-};
-
-/* ACCOUNT - PAYMENT FAILED */
-export const redirectToPaymentFailed = (errorCode) => {
-  let qp = "?ref=stripe&paymentId=5357551a-e2d7";
-  if (errorCode && typeof errorCode === "string") qp = qp.concat("err=" + errorCode);
-  window.location.href = PATHS.PAYMENT_FAIL.ABSOLUTE + qp;
-};
-
-/* ACCOUNT - REFRESH SUBSCRIPTION */
-export const redirectToRefreshSubscription = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.ABSOLUTE);
-  }
-};
-
-/* ONBOARDING PAGE */
-export const redirectToOnboardingPage = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ONBOARDING.ABSOLUTE;
-  } else {
-    navigate(PATHS.ONBOARDING.ABSOLUTE);
-  }
 };
 
 /* MISC */
@@ -436,19 +449,26 @@ export const redirectToSupportEmail = (navigate, { newTab }) => {
   }
 };
 
-/* Change App Mode */
-export const redirectToAppMode = (navigate) => {
-  navigate(PATHS.APP_MODE.ABSOLUTE);
-};
-
 /* App Mode Specific Pages - Desktop - Home Page */
 export const redirectToDesktopHomepage = (navigate) => {
   navigate(PATHS.DESKTOP.ABSOLUTE);
 };
 
+export const redirectToWebAppHomePage = (navigate) => {
+  navigate(PATHS.HOME.ABSOLUTE);
+};
+
+export function redirectToHome(appMode, navigate) {
+  if (appMode === "DESKTOP") {
+    redirectToDesktopHomepage(navigate);
+  } else {
+    redirectToWebAppHomePage(navigate);
+  }
+}
+
 // route should be choosen from APP_CONSTANTS.PATH.<your-route>.ABSOLUTE
-export const redirectToDesktopApp = (route) => {
-  let redirectedRoute = "requestly://open-url";
+export const redirectToDesktopApp = (route, redirectToSetappBuild = false) => {
+  let redirectedRoute = redirectToSetappBuild ? "requestly-setapp://open-url" : "requestly://open-url";
   if (route) {
     redirectedRoute = `${redirectedRoute}?route=${route}`;
   }
@@ -466,47 +486,59 @@ export const redirectToTraffic = (navigate) => {
   navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
 };
 
-export const redirectToCreateNewApp = (navigate) => {
-  navigate(PATHS.MOBILE_DEBUGGER.NEW.ABSOLUTE);
-};
-
-export const redirectToMobileDebuggerHome = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}`);
-};
-
-export const redirectToMobileDebuggerInterceptor = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}/interceptor`);
-};
-
-export const redirectToMobileDebuggerUnauthorized = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}/unauthorized`);
-};
-
 export const redirectToDownloadPage = () => {
   window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOWNLOAD_PAGE, "_blank");
 };
 
-export const redirectToMockEditorEditMock = (navigate, mockId) => {
+/**
+ * Redirects to the mock editor for editing an existing mock.
+ *
+ * @param {function} navigate - The navigation function from react-router.
+ * @param {string} mockId - The ID of the mock to edit.
+ * @param {boolean} [replaceCurrentRouteInHistory=false] - If true, replaces the current route in history instead of adding a new one.
+ */
+export const redirectToMockEditorEditMock = (navigate, mockId, replaceCurrentRouteInHistory = false) => {
   const mockEditUrl = `${PATHS.MOCK_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
-  navigate(mockEditUrl);
+  navigate(mockEditUrl, { replace: replaceCurrentRouteInHistory });
 };
 
-export const redirectToFileMockEditorEditMock = (navigate, mockId) => {
+/**
+ * Redirects to the file mock editor for editing an existing file mock.
+ *
+ * @param {function} navigate - The navigation function from react-router.
+ * @param {string} mockId - The ID of the file mock to edit.
+ * @param {boolean} [replaceCurrentRouteInHistory=false] - If true, replaces the current route in history instead of adding a new one.
+ */
+export const redirectToFileMockEditorEditMock = (navigate, mockId, replaceCurrentRouteInHistory = false) => {
   const mockEditUrl = `${PATHS.FILE_SERVER_V2.EDIT.ABSOLUTE}`.replace(":mockId", mockId);
-  navigate(mockEditUrl);
+  navigate(mockEditUrl, { replace: replaceCurrentRouteInHistory });
 };
 
-export const redirectToMockEditorCreateMock = (navigate, newTab = false) => {
+export const redirectToMockEditorCreateMock = (navigate, newTab = false, collectionId = "") => {
+  const URL = collectionId
+    ? `${PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE}?collectionId=${collectionId}`
+    : PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE;
+
   if (newTab) {
-    window.open(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE, "_blank");
+    window.open(URL, "_blank");
     return;
   }
-  navigate(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE);
+
+  navigate(URL);
 };
 
-export const redirectToFileMockEditorCreateMock = (navigate, fileType) => {
-  const queryParam = fileType ? "file_type=" + fileType : "";
-  navigate(`${PATHS.FILE_SERVER_V2.CREATE.ABSOLUTE}?${queryParam}`);
+export const redirectToFileMockEditorCreateMock = (navigate, fileType, collectionId = "") => {
+  const queryParams = new URLSearchParams();
+
+  if (fileType) {
+    queryParams.set("file_type", fileType);
+  }
+
+  if (collectionId) {
+    queryParams.set("collectionId", collectionId);
+  }
+
+  navigate(`${PATHS.FILE_SERVER_V2.CREATE.ABSOLUTE}?${queryParams.toString()}`);
 };
 
 export const redirectToMocksList = (navigate, newTab = false) => {
@@ -520,10 +552,31 @@ export const redirectToFileMocksList = (navigate) => {
   navigate(PATHS.FILE_SERVER_V2.ABSOLUTE);
 };
 
+export const redirectToEnvironment = (navigate, environment) => {
+  navigate(`${PATHS.API_CLIENT.ENVIRONMENTS.ABSOLUTE}/${environment}`);
+};
+
 export const redirectToUrl = (url, newTab = false) => {
   if (newTab) {
     return window.open(url, "_blank");
   }
 
-  return window.open(url);
+  return window.open(url, "_self");
+};
+
+export const navigateBack = (navigate, location, fallback) => {
+  // if the location key is not default, it means that the user has navigated to the page within the app and we can navigate back
+  if (location.key !== "default") {
+    navigate(-1);
+  } else {
+    fallback();
+  }
+};
+
+export const redirectToProductSpecificPricing = (navigate, product) => {
+  navigate(`${PATHS.PRICING.RELATIVE}?product=${product}`);
+};
+
+export const redirectToOAuthUrl = (navigate) => {
+  redirectToUrl(LINKS.OAUTH_REDIRECT_URL);
 };

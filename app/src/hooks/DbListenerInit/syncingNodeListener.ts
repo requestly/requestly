@@ -2,9 +2,9 @@ import { Dispatch } from "redux";
 import { DataSnapshot, DatabaseReference } from "firebase/database";
 import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
-import { actions } from "../../store";
+import { globalActions } from "store/slices/global/slice";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import _ from "lodash";
+import { throttle } from "lodash";
 import Logger from "lib/logger";
 import {
   parseRemoteRecords,
@@ -19,25 +19,30 @@ import {
   getTeamUserRuleAllConfigsPath,
 } from "utils/syncing/syncDataUtils";
 import { trackSyncCompleted } from "modules/analytics/events/features/syncing";
-import { StorageService } from "init";
 import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { decompressRecords } from "../../utils/Compression";
+import clientSessionRecordingStorageService from "services/clientStorageService/features/session-recording";
+import { clientStorageService } from "services/clientStorageService";
 
 type NodeRef = DatabaseReference;
 type Snapshot = DataSnapshot;
 
 declare global {
   interface Window {
-    syncDebounceTimerStart: any;
+    syncThrottleTimerStart: any;
     isFirstSyncComplete: any;
     skipSyncListenerForNextOneTime: any;
   }
 }
 
-export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
-resetSyncDebounceTimerStart();
+export const resetSyncThrottleTimerStart = () => (window.syncThrottleTimerStart = Date.now());
+resetSyncThrottleTimerStart();
+
 const waitPeriod = 5000; // allow bulk sync calls in this time
 
 /**
@@ -57,9 +62,7 @@ const setLastSyncTarget = async (
   team_id: string
 ): Promise<void> => {
   const desiredValue: string = syncTarget === "teamSync" ? team_id : uid;
-
-  const storageService = StorageService(appMode);
-  await storageService.saveRecord({
+  await clientStorageService.saveStorageObject({
     [APP_CONSTANTS.LAST_SYNC_TARGET]: desiredValue,
   });
 };
@@ -77,9 +80,13 @@ export const mergeRecordsAndSaveToFirebase = async (
 ): Promise<Record<string, any>[]> => {
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
+  // todo @nsr: remove, just tracking count for now
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of recordsOnFirebase", recordsOnFirebase?.length ?? 0);
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of merged", mergedRecords?.length ?? 0);
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -113,6 +120,9 @@ const resolveLocalConflictsAndSaveToFirebase = async (
   const localRecords: any[] = await getAllLocalRecords(appMode, false);
   const resolvedRecords: any[] = handleLocalConflicts(recordsOnFirebase, localRecords);
 
+  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
+  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of resolved", resolvedRecords?.length ?? 0);
+
   // Write to firebase
   const formattedObject: { [key: string]: any } = {};
   resolvedRecords.forEach((object) => {
@@ -143,12 +153,12 @@ export const doSync = async (
   syncTarget: "teamSync" | "sync",
   team_id: string
 ): Promise<void> => {
+  console.log("DEBUG", "doSync");
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
   // Consistency check. Merge records if inconsistent
-  const storageService = StorageService(appMode);
-  const lastSyncTarget: string = await storageService.getRecord(APP_CONSTANTS.LAST_SYNC_TARGET);
+  const lastSyncTarget: string = await clientStorageService.getStorageObject(APP_CONSTANTS.LAST_SYNC_TARGET);
 
   let consistencyCheckPassed: boolean =
     (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
@@ -177,33 +187,48 @@ export const doSync = async (
   window.isFirstSyncComplete = true;
 
   // Refresh Rules
-  dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-  dispatch(actions.updateIsRulesListLoading(false));
+  dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
+  dispatch(globalActions.updateIsRulesListLoading(false));
 
   // Fetch Session Recording
-  const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
-  saveSessionRecordingPageConfigLocallyWithoutSync(
-    sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : {},
-    appMode
-  );
+  if (appMode === "EXTENSION") {
+    const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
+    const localSessionRecordingConfig = await clientSessionRecordingStorageService.getSessionRecordingConfig();
+    saveSessionRecordingPageConfigLocallyWithoutSync(
+      sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
+      appMode
+    );
 
-  // Refresh Session Recording Config
-  dispatch(
-    actions.updateRefreshPendingStatus({
-      type: "sessionRecordingConfig",
-    })
-  );
+    // Refresh Session Recording Config
+    dispatch(
+      globalActions.updateRefreshPendingStatus({
+        type: "sessionRecordingConfig",
+      })
+    );
+  }
 };
 
-/** Debounced version of the doSync function */
-export const doSyncDebounced = _.debounce(doSync, 5000);
+/** Trottled version of the doSync function */
+export const doSyncThrottled = throttle((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+  console.log("[DEBUG] doSyncThrottled in action");
+  doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+}, 5000);
+
+export const resetSyncThrottle = () => {
+  try {
+    doSyncThrottled?.cancel();
+    console.log("[Debug] Sync Throttle Canceled");
+  } catch (err) {
+    Logger.log("Sync Trottle cancel failed");
+  }
+};
 
 /**
  * Initiates the syncing process if conditions are met
  *
  * @param {Object} params - The parameters for the function.
  * @param {Function} params.dispatch - Dispatch function to manage the state.
- * @param {Array} params.latestFirebaseRecords - Most recent records fetched from Firebase.
+ * @param {Record<string, any>} params.latestFirebaseRecords - Most recent records fetched from Firebase.
  * @param {string} params.uid - User ID.
  * @param {string} params.team_id - Team ID.
  * @param {('EXTENSION' | 'DESKTOP')}  params.appMode - Current mode of the app.
@@ -220,7 +245,7 @@ export const invokeSyncingIfRequired = async ({
   isSyncEnabled,
 }: {
   dispatch: Function;
-  latestFirebaseRecords?: any[];
+  latestFirebaseRecords?: Record<string, any>;
   uid?: string;
   team_id?: string;
   appMode?: "EXTENSION" | "DESKTOP";
@@ -231,7 +256,7 @@ export const invokeSyncingIfRequired = async ({
   if (window.skipSyncListenerForNextOneTime) {
     window.skipSyncListenerForNextOneTime = false;
     window.isFirstSyncComplete = true; // Just in case!
-    dispatch(actions.updateIsRulesListLoading(false));
+    dispatch(globalActions.updateIsRulesListLoading(false));
     return;
   }
 
@@ -243,14 +268,17 @@ export const invokeSyncingIfRequired = async ({
 
   if (!isLocalStoragePresent(appMode)) {
     // Just refresh the rules table in this case
-    dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+    dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
     window.isFirstSyncComplete = true;
-    dispatch(actions.updateIsRulesListLoading(false));
+    dispatch(globalActions.updateIsRulesListLoading(false));
     return;
   }
-  if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+
+  if (Date.now() - window.syncThrottleTimerStart > waitPeriod) {
+    console.log("[DEBUG] invokeSyncingIfRequired - doSyncThrottled");
+    doSyncThrottled(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
+    resetSyncThrottle();
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
 };
@@ -262,16 +290,16 @@ export const invokeSyncingIfRequired = async ({
  * @param {string} uid - User ID.
  * @param {string} team_id - Team ID.
  *
- * @returns {Promise<any[]>} - Returns a Promise that resolves to the fetched Firebase records.
+ * @returns {Promise<Record<string, any>>} - Returns a Promise that resolves to the fetched Firebase records.
  */
 const fetchInitialFirebaseRecords = async (
   syncTarget: "teamSync" | "sync",
   uid: string,
   team_id: string
-): Promise<any[]> => {
+): Promise<Record<string, any>> => {
   const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
   const syncNodeRefNode = await get(syncNodeRef);
-  return syncNodeRefNode.val();
+  return decompressRecords(syncNodeRefNode.val());
 };
 
 /**
@@ -345,7 +373,7 @@ const syncingNodeListener = (
         onValue(syncNodeRef, async (snap: Snapshot) => {
           await invokeSyncingIfRequired({
             dispatch,
-            latestFirebaseRecords: snap.val(),
+            latestFirebaseRecords: decompressRecords(snap.val()),
             uid,
             team_id,
             appMode,
@@ -361,7 +389,7 @@ const syncingNodeListener = (
         onValue(syncNodeRef, async (snap: Snapshot) => {
           await callInvokeSyncingIfRequiredIfNotCalledRecently({
             dispatch,
-            latestFirebaseRecords: snap.val(),
+            latestFirebaseRecords: decompressRecords(snap.val()),
             uid,
             team_id,
             appMode,

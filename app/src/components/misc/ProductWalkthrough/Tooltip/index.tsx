@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { CustomTooltipProps } from "../types";
-//@ts-ignore
-import TooltipPointer from "../../../../assets/icons/tooltip-pointer.svg";
 import "./index.css";
 
 export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
@@ -24,13 +22,16 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
   }, [context, step]);
   return (
     <div {...tooltipProps} className="tour-tooltip-container">
-      <img
-        className={`tour-tooltip-pointer tour-tooltip-pointer-${
-          step.pointerPlacement.includes("bottom") ? "bottom" : "top"
-        } tour-tooltip-pointer-${step.pointerPlacement}`}
-        src={TooltipPointer}
-        alt="tooltip pointer"
-      />
+      {!step?.hidePointer && (
+        <img
+          className={`tour-tooltip-pointer tour-tooltip-pointer-${
+            step.pointerPlacement.includes("bottom") ? "bottom" : "top"
+          } tour-tooltip-pointer-${step.pointerPlacement}`}
+          src={"/assets/media/components/tooltip-pointer.svg"}
+          alt="tooltip pointer"
+        />
+      )}
+
       <CloseOutlined className="tour-close-icon" {...skipProps} />
       {/* show steps counter only when no of steps > 1 */}
       {size > 1 && <div className="tour-tooltip-progress">{index + 1 + "/" + size}</div>}
@@ -51,7 +52,7 @@ export const WalkthroughTooltip: React.FC<CustomTooltipProps> = ({
               "Finish"
             ) : (
               <>
-                Next <img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />
+                Next <img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />
               </>
             ))}
         </Button>

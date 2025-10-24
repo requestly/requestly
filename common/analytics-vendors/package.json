@@ -1,0 +1,23 @@
+{
+  "name": "analytics-vendors",
+  "version": "1.0.0",
+  "description": "\"List of popular analytics vendors, their Identifiers and helps you test, debug and validate the analytics implementation\"",
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=8.0.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && webpack"
+  },
+  "author": "Requestlers",
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "@types/chrome": "^0.0.271",
+    "raw-loader": "^4.0.2",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

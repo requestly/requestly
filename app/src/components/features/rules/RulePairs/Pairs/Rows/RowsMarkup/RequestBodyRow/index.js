@@ -1,127 +1,119 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { Row, Col, Radio, Button } from "antd";
+import { Row, Col, Radio, Tooltip } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-import { Popconfirm } from "antd";
-import CodeEditor from "components/misc/CodeEditor";
-import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
+import { EditorLanguage } from "componentsV2/CodeEditor";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RuleType } from "@requestly/shared/types/entities/rules";
+import Editor from "componentsV2/CodeEditor";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
-  const [requestTypePopupVisible, setRequestTypePopupVisible] = useState(false);
-  const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
-    pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
-  );
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
-  const [isCodeMinified, setIsCodeMinified] = useState(true);
-  const [editorStaticValue, setEditorStaticValue] = useState(
-    pair?.request?.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC && pair.request.value
-  );
 
-  const codeFormattedFlag = useRef(null);
+  /*
+  useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
+  state - this needs to be fixed
+  */
 
-  const onChangeRequestType = (requestType) => {
-    if (Object.values(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES).includes(requestType)) {
-      let value = "{}";
-      if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
-        value = ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"];
-      } else if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-        setIsCodeMinified(true);
-        setEditorStaticValue(value);
-      }
+  const requestBodyValues = useRef({
+    static: pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? pair.request.value : "{}",
+    code:
+      pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
+        ? pair.request.value
+        : ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"],
+  });
 
+  const onChangeRequestType = useCallback(
+    (requestType) => {
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
+          triggerUnsavedChangesIndication: false,
           updates: {
             "request.type": requestType,
-            "request.value": value,
+            "request.value": requestBodyValues.current[requestType],
           },
         })
       );
-    }
-  };
+    },
+    [dispatch, pairIndex]
+  );
 
-  const showPopup = (e) => {
-    const requestType = e.target.value;
-
-    setRequestTypePopupSelection(requestType);
-    setRequestTypePopupVisible(true);
-  };
-
-  const requestBodyChangeHandler = (value) => {
+  const getEditorDefaultValue = useCallback(() => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-      setEditorStaticValue(value);
+      return "{}";
     }
+    return null;
+  }, [pair.request.type]);
 
+  const requestBodyChangeHandler = (value, triggerUnsavedChanges) => {
+    requestBodyValues.current[pair.request.type] = value;
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
-        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: triggerUnsavedChanges,
         updates: {
           "request.type": pair.request.type,
-          "request.value":
-            pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+          "request.value": requestBodyValues.current[pair.request.type],
         },
       })
     );
   };
 
-  const handleCodeFormattedFlag = () => {
-    setIsCodeFormatted(true);
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      setIsCodeFormatted(false);
-      codeFormattedFlag.current = false;
-    }, 2000);
-  };
-
-  const handleCodePrettifyToggle = () => {
-    if (!isCodeMinified) {
-      setEditorStaticValue(minifyCode(editorStaticValue));
-    }
-    setIsCodeMinified((isMinified) => !isMinified);
-    handleCodeFormattedFlag();
-  };
-
-  useEffect(() => {
-    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
-      setIsCodeMinified(false);
-    }
-  }, [pair.request.type]);
+  const EditorRadioGroupOptions = useMemo(() => {
+    return (
+      <Radio.Group
+        onChange={(e) => onChangeRequestType(e.target.value)}
+        value={pair.request.type}
+        disabled={isInputDisabled}
+        data-tour-id="rule-editor-requestbody-types"
+        className="response-body-type-radio-group"
+      >
+        <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>
+          <Row align="middle">
+            Static Data{" "}
+            <Tooltip
+              title={
+                <>
+                  Enter the static JSON that you want to send in the request body.{" "}
+                  {/* <a target="_blank" rel="noreferrer" href={LINKS.REQUESTLY_REQUEST_RULE_DOCS}>
+                      Click here
+                    </a>{" "}
+                    to know more. */}
+                </>
+              }
+              overlayClassName="rq-tooltip"
+            >
+              <MdInfoOutline className="response-body-type-info-icon" />
+            </Tooltip>
+          </Row>
+        </Radio>
+        <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
+          <Row align="middle">
+            Dynamic (JavaScript)
+            <Tooltip
+              title={
+                <>
+                  Write the JavaScript code to modify the existing request body.{" "}
+                  {/* <a target="_blank" rel="noreferrer" href={LINKS.REQUESTLY_REQUEST_RULE_DOCS}>
+                      Click here
+                    </a>{" "}
+                    to know more. */}
+                </>
+              }
+              overlayClassName="rq-tooltip"
+            >
+              <MdInfoOutline className="response-body-type-info-icon" />
+            </Tooltip>
+          </Row>
+        </Radio>
+      </Radio.Group>
+    );
+  }, [pair.request.type, isInputDisabled, onChangeRequestType]);
 
   return (
     <Col span={24} data-tour-id="code-editor">
-      <div className="subtitle response-body-row-header">Request Body</div>
-      <Row key={rowIndex} align="middle" className="code-editor-header-row">
-        <Col span={24}>
-          <Popconfirm
-            title="This will clear the existing body content"
-            onConfirm={() => {
-              onChangeRequestType(requestTypePopupSelection);
-              setRequestTypePopupVisible(false);
-            }}
-            onCancel={() => setRequestTypePopupVisible(false)}
-            okText="Confirm"
-            cancelText="Cancel"
-            open={requestTypePopupVisible}
-          >
-            <Radio.Group
-              onChange={showPopup}
-              value={pair.request.type}
-              disabled={isInputDisabled}
-              data-tour-id="rule-editor-requestbody-types"
-              className="response-body-type-radio-group"
-            >
-              <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
-              <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>Programmatic (JavaScript)</Radio>
-            </Radio.Group>
-          </Popconfirm>
-        </Col>
-      </Row>
-
       {pair.request.type !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.LOCAL_FILE ? (
         <>
           <Row
@@ -132,39 +124,24 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
-                key={pair.request.type}
-                language={pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? "javascript" : "json"}
-                value={
-                  pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
-                    ? editorStaticValue
-                    : pair.request.value
+              <Editor
+                // key={pair.request.type}
+                language={
+                  pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
+                    ? EditorLanguage.JAVASCRIPT
+                    : EditorLanguage.JSON
                 }
+                value={requestBodyValues.current[pair.request.type] ?? getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
-                readOnly={isInputDisabled}
-                validation={pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? "off" : "editable"}
-                unlockJsonPrettify={true}
-                isCodeMinified={isCodeMinified}
-                isCodeFormatted={isCodeFormatted}
+                prettifyOnInit={true}
+                isReadOnly={isInputDisabled}
+                analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}
+                toolbarOptions={{
+                  title: "Request Body",
+                  options: [EditorRadioGroupOptions],
+                }}
+                isResizable
               />
-            </Col>
-          </Row>
-          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
-            <Col align="left">
-              {pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? (
-                <Button type="link" onClick={handleCodeFormattedFlag}>
-                  Pretty Print {"{ }"}
-                </Button>
-              ) : (
-                <>
-                  <Button type="link" onClick={handleCodePrettifyToggle}>
-                    {isCodeMinified ? <span>Pretty Print {"{ }"}</span> : <span>View Raw</span>}
-                  </Button>
-                </>
-              )}
-            </Col>
-            <Col span={6} align="right" className="text-gray code-editor-character-count-row">
-              <span>{getByteSize(pair.request.value)} characters</span>
             </Col>
           </Row>
         </>

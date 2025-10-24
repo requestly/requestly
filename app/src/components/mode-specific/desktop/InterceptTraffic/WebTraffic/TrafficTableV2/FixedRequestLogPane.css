@@ -1,5 +1,6 @@
 .request-log-main-wrapper {
   position: relative;
+  height: 100%;
 }
 
 .request-log-pane-header {
@@ -8,14 +9,26 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background-color: var(--body-background);
 }
-
+.request-log-pane-header .request-method {
+  font-size: 10px;
+  font-weight: var(--requestly-font-weight-semibold);
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  width: 38px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2px;
+}
 .request-log-pane {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   background-color: transparent;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
+  height: 100%;
+  overflow: hidden;
 }
 
 .request-log-pane div[class*="Navigation-controls"] {
@@ -27,15 +40,28 @@
 .request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"] {
   border: none;
   margin-right: 2px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-weight: normal;
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   border-radius: var(--border-radius-sm);
 }
 
 .request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"]:hover,
 .request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"][class*="Navigation-selected"] {
   background-color: #3e404497;
+}
+.request-log-pane div[data-reach-tabs] {
+  height: 100%;
+  overflow: hidden;
+}
+
+.request-log-pane div[data-reach-tab-panels] {
+  overflow-y: auto;
+  height: calc(100% - 45px);
+}
+
+.request-log-pane div[data-reach-tab-panel] {
+  height: 100%;
 }
 
 /* log table */
@@ -51,7 +77,7 @@
 }
 
 .request-log-pane .log-table {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .request-log-pane .log-table thead tr {
@@ -79,7 +105,7 @@
 
 .request-log-pane-url {
   width: 800px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 @media only screen and (max-width: 1200px) {
@@ -105,7 +131,7 @@
 .action-header-input .traffic-table-regex-btn-active,
 .traffic-table-filter-btn-active.ant-btn {
   background: var(--border-dark);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .ant-btn span.traffic-table-filter-btn-content {
@@ -131,7 +157,7 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 1.25rem;
-  padding: 0 25px;
+  padding: 0 10px 0 25px;
 }
 
 .traffic-table-filters-container section {
@@ -140,14 +166,14 @@
 }
 
 .clear-logs-filter-btn.ant-btn {
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
   font-weight: 500;
   margin-top: 1.6rem;
-  color: var(--primary);
+  color: var(--requestly-color-primary);
 }
 
 .traffic-table-filter-label {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   font-weight: 500;
 }
 
@@ -164,4 +190,8 @@
   overflow-y: auto;
   height: 100%;
   padding: 12px;
+}
+
+.navigation-panel-wrapper .react-resizable {
+  height: calc(100% - 35px) !important;
 }

@@ -12,10 +12,13 @@ import {
   trackNetworkSessionSaved,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getIsNetworkTooltipShown } from "store/selectors";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 interface Props {
   har: Har;
@@ -30,6 +33,9 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
   const networkSessionTooltipShown = useSelector(getIsNetworkTooltipShown);
   const [name, setName] = useState<string>("");
 
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
+
   const handleSaveRecording = useCallback(async () => {
     const id = await saveNetworkSession(name, har);
     if (onSave) {
@@ -43,7 +49,7 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
             <span
               className="text-primary cursor-pointer"
               onClick={() => {
-                redirectToNetworkSession(navigate, id);
+                redirectToNetworkSession(navigate, id, isDesktopSessionsCompatible);
                 toast.hide("view_network_session");
               }}
             >
@@ -55,16 +61,16 @@ const SessionSaveModal: React.FC<Props> = ({ har, isVisible, closeModal, onSave 
     }
     setName("");
     if (!networkSessionTooltipShown) {
-      dispatch(actions.updateNetworkSessionSaveInProgress(true));
-      dispatch(actions.updateNetworkSessionTooltipShown());
+      dispatch(globalActions.updateNetworkSessionSaveInProgress(true));
+      dispatch(globalActions.updateNetworkSessionTooltipShown());
       setTimeout(() => {
-        dispatch(actions.updateNetworkSessionSaveInProgress(false));
+        dispatch(globalActions.updateNetworkSessionSaveInProgress(false));
       }, 2500);
     }
     trackNetworkSessionSaved();
     trackRQDesktopLastActivity(SESSION_RECORDING.network.save.saved);
     closeModal();
-  }, [closeModal, dispatch, navigate, har, name, networkSessionTooltipShown, onSave]);
+  }, [name, har, onSave, networkSessionTooltipShown, closeModal, navigate, isDesktopSessionsCompatible, dispatch]);
 
   return (
     <RQModal

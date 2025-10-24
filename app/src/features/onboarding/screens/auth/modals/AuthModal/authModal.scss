@@ -1,0 +1,12 @@
+.rq-auth-modal-wrapper .ant-modal-content {
+  background: transparent;
+  box-shadow: none;
+}
+
+.rq-auth-modal {
+  .ant-modal-content {
+    .ant-modal-body {
+      padding: 0;
+    }
+  }
+}

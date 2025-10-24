@@ -1,14 +1,20 @@
 import firebaseApp from "../../firebase";
 import { getFirestore, Timestamp, updateDoc, addDoc, collection } from "firebase/firestore";
-import { RQMockSchema } from "components/features/mocksV2/types";
+import { MockRecordType, RQMockSchema } from "components/features/mocksV2/types";
 import { getOwnerId } from "backend/utils";
 import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
-import { createResponseBodyFilepath } from "./utils";
+import { createMockDataPath, createResponseBodyFilepath } from "./utils";
 import { updateMockFromFirebase } from "./updateMock";
 import Logger from "lib/logger";
 
-export const createMock = async (uid: string, mockData: RQMockSchema, teamId?: string): Promise<string> => {
+export const createMock = async (
+  uid: string,
+  mockData: RQMockSchema,
+  teamId?: string,
+  collectionId?: string,
+  collectionPath?: string
+): Promise<string> => {
   if (!uid) {
     return null;
   }
@@ -23,12 +29,13 @@ export const createMock = async (uid: string, mockData: RQMockSchema, teamId?: s
       responsesWithBody.push({ ...response });
       response.body = null;
     });
+    mockData.storagePath = createMockDataPath(uid, mockData.id, teamId);
   }
 
   const mockId = await createMockFromFirebase(uid, mockData, teamId);
 
   if (mockId) {
-    await updateUserMockSelectorsMap(ownerId, mockId, mockData);
+    await updateUserMockSelectorsMap(ownerId, mockId, mockData, collectionId);
     if (BODY_IN_BUCKET_ENABLED) {
       await uploadResponseBodyFiles(responsesWithBody, uid, mockId, teamId);
       mockData.id = mockId;
@@ -48,22 +55,23 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
   const ownerId = getOwnerId(uid, teamId);
 
   const mockId: string | null = await addDoc(rootMocksCollectionRef, {
+    collectionId: "",
     ...mockData,
+    recordType: MockRecordType.MOCK,
     createdBy: uid,
     ownerId: ownerId,
     deleted: false,
     createdTs: Timestamp.now().toMillis(),
     updatedTs: Timestamp.now().toMillis(),
   })
-    .then((docRef) => {
-      // TODO: Remove this. Only for testing the mocks bug in VPN
-      console.log(`Mock document created ${docRef.id}`);
-      updateDoc(docRef, {
+    .then(async (docRef) => {
+      Logger.log(`Mock document created ${docRef.id}`);
+      await updateDoc(docRef, {
         id: docRef.id,
       });
       return docRef.id;
     })
-    .catch((err) => {
+    .catch((err): null => {
       Logger.error("error while creating mock", err);
       return null;
     });
@@ -72,9 +80,8 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
 };
 
 const updateResponseFilePath = async (uid: string, mockData: RQMockSchema, teamId?: string) => {
-  mockData.responses.map((response) => {
+  mockData.responses.forEach((response) => {
     response.filePath = createResponseBodyFilepath(uid, mockData.id, response.id, teamId);
-    return null;
   });
 
   await updateMockFromFirebase(uid, mockData.id, mockData);

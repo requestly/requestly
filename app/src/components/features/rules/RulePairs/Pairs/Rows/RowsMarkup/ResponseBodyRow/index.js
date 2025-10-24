@@ -1,75 +1,77 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "antd";
-import { actions } from "store";
+import { useTheme } from "styled-components";
+import { Row, Col, Radio, Popover, Space, Checkbox, Tooltip, Input } from "antd";
+import { globalActions } from "store/slices/global/slice";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-import CodeEditor from "components/misc/CodeEditor";
 import {
   displayFileSelector,
   handleOpenLocalFileInBrowser,
 } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
-import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import APP_CONSTANTS from "config/constants";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { InfoTag } from "components/misc/InfoTag";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import LINKS from "config/constants/sub/links";
+import { EditorLanguage } from "componentsV2/CodeEditor";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RuleType } from "@requestly/shared/types/entities/rules";
+import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./ResponseBodyRow.css";
+import Editor from "componentsV2/CodeEditor";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
+  const theme = useTheme();
   const dispatch = useDispatch();
-  const { MODE } = getModeData(window.location);
-  const isServeWithoutRequestSupported = useMemo(
-    () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
-    []
-  );
+  const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
 
-  const [responseTypePopupVisible, setResponseTypePopupVisible] = useState(false);
-  const [responseTypePopupSelection, setResponseTypePopupSelection] = useState(
-    pair?.response?.type ?? GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-  );
-  const [editorStaticValue, setEditorStaticValue] = useState(
-    pair?.response?.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC && pair.response.value
-  );
-  const [isCodeMinified, setIsCodeMinified] = useState(true);
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
+  /*
+  useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
+  state - this needs to be fixed
+  */
+  const responseBodyValues = useRef({
+    static: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? pair.response.value : "{}",
+    code:
+      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+        ? pair.response.value
+        : ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"],
+    local_file: pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? pair.response.value : "",
+  });
 
-  const codeFormattedFlag = useRef(null);
+  const isServeWithoutRequestSupported = useMemo(() => {
+    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+      return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST);
+    } else if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
+      return isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST_LOCAL_FILE);
+    } else {
+      return false;
+    }
+  }, [pair.response.type]);
 
-  const onChangeResponseType = (responseBodyType) => {
-    if (Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(responseBodyType)) {
-      let value = "{}";
-      if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
-        value = ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"];
-      } else if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
-        value = "";
-      } else {
-        setIsCodeMinified(true);
-        setEditorStaticValue(value);
-      }
+  const onChangeResponseType = useCallback(
+    (responseBodyType) => {
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
+          triggerUnsavedChangesIndication: false,
           updates: {
             "response.type": responseBodyType,
-            "response.value": value,
+            "response.value": responseBodyValues.current[responseBodyType],
             "response.serveWithoutRequest": undefined,
           },
         })
       );
-    }
-  };
+    },
+    [dispatch, pairIndex]
+  );
 
   const handleFileSelectCallback = (selectedFile) => {
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
@@ -79,13 +81,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         },
       })
     );
-  };
-
-  const showPopup = (e) => {
-    const responseType = e.target.value;
-
-    setResponseTypePopupSelection(responseType);
-    setResponseTypePopupVisible(true);
   };
 
   const renderFileSelector = () => {
@@ -105,7 +100,69 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               >
                 {pair.response.value ? "Change file" : " Select file"}
               </RQButton>
-              <span className="file-path"> {pair.response.value ? pair.response.value : " No file chosen"}</span>{" "}
+              {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ||
+              pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ? (
+                <>
+                  {isSelectedFileInputVisible ? (
+                    <Input
+                      autoFocus
+                      onBlur={() => setIsSelectedFileInputVisible(false)}
+                      style={{
+                        width: 350,
+                      }}
+                      value={pair.response.value}
+                      onChange={(e) => {
+                        dispatch(
+                          globalActions.updateRulePairAtGivenPath({
+                            pairIndex,
+                            updates: { "response.value": e.target.value },
+                          })
+                        );
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <span className="file-path">{pair.response.value ? pair.response.value : " No file chosen"}</span>
+                      {pair.response.value ? (
+                        <>
+                          {isFeatureCompatible(FEATURES.EDIT_LOCAL_FILE_PATH) ? (
+                            <Tooltip
+                              color={theme?.colors?.black}
+                              placement="top"
+                              title={
+                                <>
+                                  You can use the captured group expressions from the request to dynamically set the
+                                  file path (using $1, $2, etc).
+                                  <br />
+                                  <a
+                                    href="https://docs.requestly.com/general/http-rules/advanced-usage/rule-operators#regex-match-operator"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    click here
+                                  </a>{" "}
+                                  to learn more.
+                                </>
+                              }
+                            >
+                              <RQButton
+                                size="small"
+                                type="link"
+                                onClick={() => {
+                                  setIsSelectedFileInputVisible(true);
+                                }}
+                                icon={<MdOutlineEdit />}
+                              />
+                            </Tooltip>
+                          ) : null}
+                        </>
+                      ) : null}
+                    </>
+                  )}
+                </>
+              ) : (
+                <span className="file-path"> {pair.response.value ? pair.response.value : " No file chosen"}</span>
+              )}
             </Space>
             {pair.response.value && isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) && (
               <HiOutlineExternalLink
@@ -138,43 +195,25 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     return null;
   };
 
-  const responseBodyChangeHandler = (value) => {
-    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      setEditorStaticValue(value);
-    }
-
+  const responseBodyChangeHandler = (value, triggerUnsavedChanges) => {
+    responseBodyValues.current[pair.response.type] = value;
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           "response.type": pair.response.type,
-          "response.value":
-            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+          "response.value": responseBodyValues.current[pair.response.type],
         },
-        triggerUnsavedChangesIndication: !codeFormattedFlag.current,
+        triggerUnsavedChangesIndication: triggerUnsavedChanges,
       })
     );
   };
 
-  const handleCodePrettifyToggle = () => {
-    if (!isCodeMinified) {
-      setEditorStaticValue(minifyCode(editorStaticValue));
-    }
-    setIsCodeMinified((isMinified) => !isMinified);
-    handleCodeFormattedFlag();
-  };
-
-  const handleCodeFormattedFlag = () => {
-    setIsCodeFormatted(true);
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      setIsCodeFormatted(false);
-      codeFormattedFlag.current = false;
-    }, 2000);
-  };
-
   const handleServeWithoutRequestFlagChange = (event) => {
-    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
+    if (
+      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ||
+      pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE
+    ) {
       const flag = event.target.checked;
 
       if (flag) {
@@ -182,7 +221,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       }
 
       dispatch(
-        actions.updateRulePairAtGivenPath({
+        globalActions.updateRulePairAtGivenPath({
           pairIndex,
           updates: {
             "response.serveWithoutRequest": flag,
@@ -194,68 +233,87 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
 
   const getEditorDefaultValue = useCallback(() => {
     // handle unsaved changes trigger
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      codeFormattedFlag.current = false;
-    }, 2000);
-
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-        return "{}";
-      }
-      return pair.response.value ?? "{}";
+      return "{}";
     }
     return null;
-  }, [MODE, pair.response.type, pair.response.value]);
-
-  useEffect(() => {
-    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
-      setIsCodeMinified(false);
-    }
   }, [pair.response.type]);
+
+  const EditorRadioGroupOptions = useMemo(() => {
+    return (
+      <Radio.Group
+        onChange={(e) => onChangeResponseType(e.target.value)}
+        value={pair.response.type}
+        disabled={isInputDisabled}
+        className="response-body-type-radio-group"
+        data-tour-id="rule-editor-responsebody-types"
+        size="small"
+      >
+        <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>
+          <Row align="middle">
+            Static Data{" "}
+            <Tooltip
+              title={
+                <>
+                  Enter the response body that you want as a response to the request.{" "}
+                  {/* <a href={LINKS.REQUESTLY_RESPONSE_RULE_DOCS} target="_blank" rel="noreferrer">
+                      Click here
+                    </a>{" "}
+                    to know more. */}
+                </>
+              }
+              overlayClassName="rq-tooltip"
+            >
+              <MdInfoOutline className="response-body-type-info-icon" />
+            </Tooltip>
+          </Row>
+        </Radio>
+        <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
+          <Row align="middle">
+            Dynamic (JavaScript){" "}
+            <Tooltip
+              title={
+                <>
+                  Write JavaScript code to modify the existing response body.{" "}
+                  {/* <a href={LINKS.REQUESTLY_RESPONSE_RULE_DOCS} target="_blank" rel="noreferrer">
+                      Click here
+                    </a>{" "}
+                    to know more. */}
+                </>
+              }
+              overlayClassName="rq-tooltip"
+            >
+              <MdInfoOutline className="response-body-type-info-icon" />
+            </Tooltip>
+          </Row>
+        </Radio>
+        {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
+            <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}>Local File</Radio>
+          ) : (
+            <Popover placement="left" content={"Update to latest version of app to enjoy this feature"}>
+              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE} disabled={true}>
+                Local File
+              </Radio>
+            </Popover>
+          )
+        ) : null}
+      </Radio.Group>
+    );
+  }, [pair.response.type, isInputDisabled, onChangeResponseType]);
 
   return (
     <Col span={24} data-tour-id="code-editor" key={rowIndex}>
-      <div className="subtitle response-body-row-header">Response Body</div>
-      <Row key={rowIndex} span={24} align="middle" className="code-editor-header-row">
-        <Col span={24}>
-          <Popconfirm
-            title="This will clear the existing body content"
-            onConfirm={() => {
-              onChangeResponseType(responseTypePopupSelection);
-              setResponseTypePopupVisible(false);
-            }}
-            onCancel={() => setResponseTypePopupVisible(false)}
-            okText="Confirm"
-            cancelText="Cancel"
-            open={responseTypePopupVisible}
-          >
-            <Radio.Group
-              onChange={showPopup}
-              value={pair.response.type}
-              disabled={isInputDisabled}
-              className="response-body-type-radio-group"
-              data-tour-id="rule-editor-responsebody-types"
-            >
-              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
-              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>Dynamic (JavaScript)</Radio>
-              {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-                isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
-                  <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}>Local File</Radio>
-                ) : (
-                  <Popover placement="left" content={"Update to latest version of app to enjoy this feature"}>
-                    <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE} disabled={true}>
-                      Local File
-                    </Radio>
-                  </Popover>
-                )
-              ) : null}
-            </Radio.Group>
-          </Popconfirm>
-        </Col>
-      </Row>
-      {renderFileSelector()}
-      {pair.response.type !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
+      {/* <div className="subtitle response-body-row-header">Response Body</div> */}
+      {pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE ? (
+        <div className="response-rule-local-file-content">
+          <div className="response-rule-local-file-content-header">
+            Response Body
+            {EditorRadioGroupOptions}
+          </div>
+          <div className="response-rule-local-file-content-body">{renderFileSelector()}</div>
+        </div>
+      ) : (
         <>
           <Row
             span={24}
@@ -265,58 +323,45 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
-                key={pair.response.type}
-                language={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? "javascript" : "json"}
-                value={
-                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-                    ? editorStaticValue
-                    : pair.response.value
+              <Editor
+                // key={pair.response.type}
+                language={
+                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+                    ? EditorLanguage.JAVASCRIPT
+                    : EditorLanguage.JSON
                 }
-                defaultValue={getEditorDefaultValue()}
+                value={responseBodyValues.current[pair.response.type] ?? getEditorDefaultValue()}
+                isReadOnly={isInputDisabled}
+                prettifyOnInit={true}
                 handleChange={responseBodyChangeHandler}
-                readOnly={isInputDisabled}
-                validation={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? "off" : "editable"}
-                unlockJsonPrettify={true}
-                isCodeMinified={isCodeMinified}
-                isCodeFormatted={isCodeFormatted}
+                isResizable
+                analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
+                toolbarOptions={{
+                  title: "Response Body",
+                  options: [EditorRadioGroupOptions],
+                }}
               />
             </Col>
           </Row>
-          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
-            <Col align="left">
-              {pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
-                <>
-                  <Button type="link" onClick={handleCodePrettifyToggle}>
-                    {isCodeMinified ? <span>Pretty Print {"{ }"}</span> : <span>View Raw</span>}
-                  </Button>
-                </>
-              ) : (
-                <Button type="link" onClick={handleCodeFormattedFlag}>
-                  Pretty Print {"{ }"}
-                </Button>
-              )}
-            </Col>
-            <Col span={6} align="right">
-              <span className="codemirror-character-count text-gray">
-                {getByteSize(pair.response.value)} characters
-              </span>
-            </Col>
-          </Row>
-          {isServeWithoutRequestSupported && pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
-            <Row className="serve-without-request-setting">
-              <Col xl="12" span={24}>
-                <Checkbox onChange={handleServeWithoutRequestFlagChange} checked={pair.response.serveWithoutRequest}>
-                  Serve this response body without making a call to the server.
-                </Checkbox>
-                <InfoIcon
-                  tooltipPlacement="right"
-                  text="When enabled, response is served directly from Requestly and hence Developer Tools won't show this request in network table."
-                />
-              </Col>
-            </Row>
-          ) : null}
         </>
+      )}
+      {isServeWithoutRequestSupported ? (
+        <Row className="serve-without-request-setting">
+          <Col xl="12" span={24}>
+            <Checkbox onChange={handleServeWithoutRequestFlagChange} checked={pair.response.serveWithoutRequest}>
+              Serve this response body without making a call to the server.
+            </Checkbox>
+            <InfoIcon
+              tooltipPlacement="right"
+              showArrow={false}
+              text="When enabled, response is served directly from Requestly and hence Developer Tools won't show this request in network table."
+              style={{
+                position: "relative",
+                top: "3px",
+              }}
+            />
+          </Col>
+        </Row>
       ) : null}
     </Col>
   );

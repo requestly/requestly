@@ -1,0 +1,99 @@
+{
+  "Request_1": {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1715153617702,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Request_1",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1715155157388,
+    "name": "Request_1",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "s756i",
+        "isCompressed": false,
+        "request": {
+          "statusCode": "",
+          "type": "static",
+          "value": "{\"request\":\"rule\",\"static\":\"modification\"}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/request_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Request",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Request_2": {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1715153617702,
+    "currentOwner": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "description": "",
+    "groupId": "",
+    "id": "Request_jj73r",
+    "isFavourite": false,
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1715153617702,
+    "name": "2. Request Rule - Dynamic Sync Modification Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "s756i",
+        "isCompressed": false,
+        "request": {
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyRequestBody(args) {\n  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n\n  console.log({ args });\n  return { dynamic: \"modification\" };\n}\n"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/request_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Request",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Request_3": {
+    "createdBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "creationDate": 1724684876238,
+    "currentOwner": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "description": "",
+    "groupId": "",
+    "id": "Request_3",
+    "isSample": false,
+    "lastModifiedBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "modificationDate": 1724685255949,
+    "name": "request-sharedState",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "7uvej",
+        "request": {
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyRequestBody(args) {\n  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n  if($sharedState.count>1){\n    return {isSharedStateCountGteOne:true};\n  }\n  \n  let count=$sharedState.count??0;\n  count++;\n  $sharedState.count=count;\n  return body;\n}"
+        },
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/"
+        }
+      }
+    ],
+    "ruleType": "Request",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  }
+}

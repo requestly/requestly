@@ -1,14 +1,13 @@
 import { Typography, Row, Col } from "antd";
-import { HiArrowRight } from "react-icons/hi";
+import { HiArrowRight } from "@react-icons/all-files/hi/HiArrowRight";
 import { CompanyMarquee } from "components/misc/Marquee";
-import quoteIcon from "../../../assets/img/icons/common/quote.svg";
-import underlineIcon from "../../../assets/img/icons/common/underline.svg";
+import { OnboardingAuthBanner } from "features/onboarding";
 
-export const AuthFormHero = ({ currentTestimonialIndex }) => {
+export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) => {
   const workEmailsBenefits = [
     "Use Requestly with your colleagues",
     "Access to Team Workspaces",
-    "Access to Session Recording",
+    "Access to SessionBook",
     "Organization level access controls",
   ];
 
@@ -40,7 +39,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
 
     return (
       <Col className="signup-modal-testimonial-wrapper">
-        <img src={quoteIcon} alt="quote" />
+        <img src={"/assets/media/components/quote.svg"} alt="quote" />
         <Row>
           <Typography.Text type="primary">{testimonials[currentTestimonialIndex].body}</Typography.Text>
         </Row>
@@ -55,6 +54,13 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
     );
   };
 
+  if (!isOnboarding)
+    return (
+      <div className="new-auth-banner-wrapper">
+        <OnboardingAuthBanner />
+      </div>
+    );
+
   return (
     <Col span={13} className="signup-modal-section-wrapper signup-modal-hero">
       <Typography.Title type="primary" className="signup-modal-hero-title w-full text-bold">
@@ -64,7 +70,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
         <Typography.Text type="primary" className="text-bold header">
           Use{" "}
           <span className="work-email-highlight-wrapper">
-            work email <img src={underlineIcon} alt="work email" />
+            work email <img src={"/assets/media/common/underline.svg"} alt="work email" />
           </span>{" "}
           to get access to
         </Typography.Text>
@@ -77,7 +83,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
         ))}
       </div>
       <Typography.Text className="signup-modal-secondary-text">
-        Trusted by developers from 5000+ Organizations
+        Trusted by developers from 50,000+ Organizations
       </Typography.Text>
       <CompanyMarquee />
       <TestimonialSection />

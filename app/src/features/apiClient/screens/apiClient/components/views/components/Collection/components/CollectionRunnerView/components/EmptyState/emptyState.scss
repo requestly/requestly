@@ -1,0 +1,42 @@
+.runResultEmptyState {
+  display: flex;
+  width: 100%;
+  margin-top: 24px;
+  padding: 32px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+
+  .title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    align-self: stretch;
+    overflow: hidden;
+    color: var(--requestly-color-text-default, #fff);
+    text-align: center;
+    text-overflow: ellipsis;
+    font-size: var(--requestly-font-size-sm, 12px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px; /* 150% */
+    margin-top: 16px;
+    margin-bottom: 4px;
+  }
+
+  .description {
+    color: var(--requestly-color-text-subtle, #bbb);
+    text-align: center;
+    font-style: normal;
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-weight: 400;
+    line-height: 17px; /* 154.545% */
+  }
+}

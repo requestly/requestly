@@ -1,9 +1,15 @@
 .session-viewer-page {
   width: 100%;
   height: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   padding: 24px;
+
+  &.inside-iframe {
+    position: relative;
+    overflow: hidden;
+  }
 
   .session-recording-player-row {
     display: flex;
@@ -21,8 +27,53 @@
       iframe {
         background: white;
       }
-      .rr-player .rr-player_frame {
+      .rr-player .rr-player__frame {
         width: auto;
+        .overlay-frame {
+          display: flex;
+          height: 100%;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 4rem;
+          .blur {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            backdrop-filter: blur(4px);
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+          }
+          .overlay-content {
+            z-index: 10;
+          }
+        }
+      }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
       }
     }
 
@@ -37,7 +88,7 @@
       .ant-input,
       .ant-input-number-input {
         box-shadow: var(--input-box-shadow);
-        background: var(--component-dark-background);
+        background: var(--requestly-color-surface-0);
       }
 
       .session-property-label {
@@ -60,7 +111,7 @@
           width: 100%;
 
           .ant-input-number-wrapper .ant-input-number-group-addon {
-            background: var(--component-dark-background);
+            background: var(--requestly-color-surface-0);
           }
         }
       }
@@ -68,8 +119,9 @@
         border: 1px solid var(--border);
         box-shadow: var(--input-box-shadow);
         border-radius: var(--border-radius-sm);
-        background: var(--component-background);
+        background: var(--requestly-color-surface-1);
         padding: 1rem;
+        white-space: pre-wrap;
       }
     }
   }
@@ -99,9 +151,9 @@
       }
       .ant-input {
         &:focus {
-          border-bottom: 1px solid var(--primary);
+          border-bottom: 1px solid var(--requestly-color-primary);
         }
-        color: var(--white);
+        color: var(--requestly-color-text-default);
         font-size: 1.25rem;
         font-weight: 500;
       }
@@ -109,9 +161,10 @@
         display: flex;
         gap: 4px;
         width: 460px;
-        color: var(--white);
+        color: var(--requestly-color-text-default);
         font-size: 1.25rem;
         font-weight: 500;
+
         svg {
           align-self: center;
           cursor: pointer;
@@ -120,8 +173,17 @@
           min-width: 16px;
           color: var(--text-gray);
         }
+
+        &.inside-iframe {
+          width: 100%;
+
+          svg {
+            color: inherit;
+          }
+        }
       }
     }
+
     .editor-title-container {
       .session-title-name {
         min-height: 33px;
@@ -170,6 +232,23 @@
       padding-top: 0;
     }
 
+    &.inside-iframe,
+    &.expand-panels-container {
+      max-width: 94vw;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      z-index: 10;
+      transform: translate(-50%, calc(100% - 50px));
+    }
+
+    &.expand-panels-container {
+      bottom: 20px;
+      transform: translate(-50%, 0);
+    }
+    & .ant-tabs-top > .ant-tabs-nav {
+      margin-bottom: 6px;
+    }
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
     .ant-tabs-ink-bar {
       display: none;
@@ -191,7 +270,7 @@
     .session-panel-content {
       height: 300px;
       overflow: auto;
-      font-size: 12px;
+      font-size: var(--requestly-font-size-sm, 12px);
 
       .placeholder {
         height: 100%;
@@ -201,39 +280,14 @@
       }
 
       span.ant-typography.recording-options-message {
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
       }
 
-      .session-details-panel-row {
-        display: flex;
-        flex-direction: column;
-        padding: 6px 10px 4px 10px;
-
-        span,
-        a,
-        .right-info,
-        .secondary-message {
-          line-height: 12px;
-        }
-
-        .primary-message {
-          // object-inspector button
-          li > div {
-            line-height: 12px;
-            width: auto !important; // overriding inline style
-          }
-        }
-
-        .right-info {
-          margin-left: 8px;
-          width: 200px;
-          text-align: right;
-          flex: 0 0 auto;
-        }
-
-        .secondary-message {
-          padding-left: 40px;
-        }
+      .empty-table-view {
+        background: var(--requestly-color-surface-0);
+        height: 100%;
+        border: 1px solid var(--border-dark);
+        border-radius: var(--border-radius-sm);
       }
     }
   }
@@ -242,10 +296,8 @@
     .primary-message,
     .secondary-message {
       white-space: pre-wrap;
-      font-family: Menlo, monospace;
-
-      span {
-        font-family: Menlo, monospace;
+      font-family: var(--requestly-font-family-code, monospace), span {
+        font-family: var(--requestly-font-family-code, monospace);
       }
     }
 
@@ -260,65 +312,6 @@
     }
   }
 
-  .network-logs-panel {
-    .network-logs-table {
-      overflow: auto;
-      height: 100%;
-
-      .network-log-row {
-        cursor: pointer;
-
-        &.selected {
-          background-color: #0948b2;
-          color: #fff;
-        }
-
-        .network-log-url {
-          &.failed {
-            color: #ff4d4f;
-          }
-        }
-
-        .request-method-tag {
-          font-size: 11px;
-          padding: 2px 8px;
-          margin-right: 10px;
-          margin-top: -2px;
-          min-width: 48px;
-          text-align: center;
-          flex-shrink: 0;
-        }
-      }
-    }
-
-    .gutter {
-      background-color: #0000000f;
-      margin: 0 8px;
-      cursor: col-resize;
-    }
-
-    .network-log-details {
-      .ant-tabs-tab {
-        padding: 6px 0;
-
-        + .ant-tabs-tab {
-          margin: 0 0 0 20px;
-        }
-      }
-
-      .network-log-details-tab-content {
-        overflow: auto;
-        height: 244px;
-      }
-
-      .network-payload-object {
-        span {
-          font-size: 11px;
-        }
-      }
-    }
-  }
-
   .session-properties-wrapper {
     display: flex;
     gap: 1rem;
@@ -329,11 +322,11 @@
       width: auto;
 
       .ant-input-affix-wrapper {
-        background: var(--component-background);
+        background: var(--requestly-color-surface-1);
       }
     }
     & .ant-input-group-addon {
-      background: var(--component-background);
+      background: var(--requestly-color-surface-1);
       color: var(--text-gray);
     }
 
@@ -342,17 +335,17 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      background: var(--component-background);
+      background: var(--requestly-color-surface-1);
     }
 
     .session-duration-property .ant-input-wrapper .ant-input {
       width: 75px;
-      background: var(--component-background);
+      background: var(--requestly-color-surface-1);
     }
 
     .session-recorded-at-property .ant-input-wrapper .ant-input {
       width: 155px;
-      background: var(--component-background);
+      background: var(--requestly-color-surface-1);
     }
   }
 
@@ -360,7 +353,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--primary);
+    background: var(--requestly-color-primary);
     border-radius: var(--border-radius-sm);
     margin-bottom: 1rem;
     padding: 12px 16px;
@@ -378,7 +371,7 @@
       }
     }
     &-message {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
 
       > p {
         margin-bottom: 0;
@@ -399,14 +392,14 @@
         height: 16px;
       }
       &:hover {
-        color: var(--white);
+        color: var(--requestly-color-text-default);
       }
     }
     &-settings-link {
       display: flex;
       align-items: center;
       gap: 4px;
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       font-weight: 500;
 
       & span:not(.anticon) {
@@ -423,7 +416,7 @@
     z-index: 10;
     border: 1px solid var(--border-dark);
     border-radius: var(--border-radius-md);
-    background-color: var(--component-background);
+    background-color: var(--requestly-color-surface-1);
 
     // ant-design modal's default box shadow
     box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48), 0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
@@ -432,10 +425,10 @@
       padding: 8px 8px 8px 20px;
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
-      background-color: var(--component-dark-background);
+      background-color: var(--requestly-color-surface-0);
 
       .header {
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         font-weight: 700;
       }
 
@@ -463,7 +456,7 @@
       }
 
       .config-label {
-        font-size: 14px;
+        font-size: var(--requestly-font-size-md, 14px);
         line-height: 25px;
         margin-bottom: 12px;
         color: var(--text-gray);
@@ -475,7 +468,7 @@
       border-bottom-left-radius: inherit;
       border-bottom-right-radius: inherit;
       border-top: 1px solid var(--border-dark);
-      background-color: var(--component-dark-background);
+      background-color: var(--requestly-color-surface-0);
     }
   }
 }
@@ -491,6 +484,22 @@
   }
 }
 
+.save-session-btns-container {
+  display: flex;
+  align-items: center;
+
+  .session-viewer-save-action-btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid #ffffff55;
+  }
+
+  .save-popup-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
 body.dark {
   .session-viewer-page {
     .session-recording-name {
@@ -500,6 +509,9 @@ body.dark {
     .rr-controller {
       color: white !important;
 
+      .rr-timeline {
+        width: 100% !important;
+      }
       .rr-timeline__time {
         color: white !important;
       }
@@ -507,16 +519,16 @@ body.dark {
       svg {
         fill: white !important;
       }
-    }
 
-    .network-logs-panel .gutter {
-      background-color: #313a46;
+      .rr-controller__btns {
+        gap: 8px;
+      }
     }
 
     .ant-pro-card,
     .rr-player {
-      background: var(--component-background) !important;
-      border: 1px solid var(--border);
+      background: var(--requestly-color-surface-1) !important;
+      border: 1px solid var(--border-dark);
       border-radius: var(--border-radius-sm);
       box-sizing: content-box;
     }
@@ -531,7 +543,7 @@ body.dark {
     }
 
     .ant-input-number-group-addon {
-      color: var(--white);
+      color: var(--requestly-color-text-default);
       border-color: #313a46;
       background-color: #313a46;
     }
@@ -579,11 +591,130 @@ body.dark {
         min-height: auto;
       }
     }
+    .right-info {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 680px) {
+  .session-viewer-page {
+    .session-properties-wrapper {
+      .ant-input-group-wrapper.session-page-url-property {
+        .ant-input {
+          width: 100% !important;
+        }
+      }
+      .ant-input-group-wrapper {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .app-header,
+  .app-sidebar {
+    display: none;
+  }
+
+  .session-viewer-page {
+    padding-inline: 10px;
+    overflow-x: hidden;
+
+    .rr-controller {
+      .rr-controller__btns {
+        gap: 0px !important;
+      }
+    }
   }
 }
 
 @media screen and (max-width: 520px) {
   .session-viewer-page .session-properties-wrapper .session-page-url-property .ant-input-wrapper .ant-input {
     width: 100px;
+  }
+}
+
+@media screen and (min-width: 520px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 28rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 20rem;
+          word-break: break-all;
+        }
+
+        .right-info {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 850px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 26rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 34rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 48rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 64rem;
+        }
+      }
+    }
   }
 }

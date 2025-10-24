@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { Popconfirm } from "antd";
 import APP_CONSTANTS from "config/constants";
 import {
@@ -10,6 +10,8 @@ import {
   trackPopoverForAuthCancelled,
 } from "modules/analytics/events/common/auth/authPopover";
 
+import { TooltipPlacement } from "antd/lib/tooltip";
+import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/signup";
 import "./popover.scss";
 
 interface Props {
@@ -21,6 +23,7 @@ interface Props {
   source?: string;
   children: any;
   isChinaUser?: boolean;
+  placement?: TooltipPlacement;
 }
 
 export const AuthConfirmationPopover: React.FC<Props> = ({
@@ -31,6 +34,7 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
   callback = null,
   source,
   children,
+  placement = "top",
 }) => {
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
@@ -38,8 +42,9 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
   flag.current = false;
 
   const openAuthModal = () => {
+    trackSignUpButtonClicked(source);
     dispatch(
-      actions.toggleActiveModal({
+      globalActions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
         newProps: {
@@ -61,6 +66,7 @@ export const AuthConfirmationPopover: React.FC<Props> = ({
 
   return (
     <Popconfirm
+      placement={placement}
       title={title}
       okText={okText}
       cancelButtonProps={{ style: { display: "none" } }}

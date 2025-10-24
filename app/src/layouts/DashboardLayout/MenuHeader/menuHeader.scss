@@ -1,0 +1,106 @@
+.app-primary-header {
+  &.ant-layout-header {
+    height: inherit;
+    line-height: unset;
+    padding: var(--requestly-space-1, 2px) var(--requestly-space-4, 8px) var(--requestly-space-1, 2px)
+      var(--requestly-space-4, 8px);
+    background: transparent;
+  }
+
+  .github-star-button {
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 3px;
+    margin-right: 4px;
+  }
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    width: 312px;
+
+    .app-primary-header-link {
+      height: 30px;
+      flex-shrink: 0;
+      font-size: var(--requestly-font-size-sm);
+      line-height: 22px;
+      padding: 4px 11px;
+      color: var(--requestly-color-text-subtle);
+      border-radius: var(--border-radius-sm);
+
+      &:hover {
+        color: var(--requestly-color-text-default);
+      }
+    }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: var(--requestly-space-4, 16px);
+
+    .header-proxy-server-status-icon {
+      img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .header-search-btn.ant-btn {
+      display: flex;
+      align-items: center;
+      width: 105px;
+      height: 28px;
+      border: none;
+      color: var(--requestly-color-text-subtle);
+      font-weight: 500;
+      padding: 4px 0;
+
+      .header-search-btn-content {
+        display: flex;
+        align-items: center;
+        gap: var(--requestly-space-2, 4px);
+      }
+
+      &:hover {
+        border: none;
+      }
+    }
+    .header-gap-wide {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .auth-button-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .ant-btn {
+        font-weight: var(--requestly-font-weight-medium);
+      }
+    }
+
+    &-section {
+      display: flex;
+      align-items: center;
+      gap: var(--requestly-space-2, 4px);
+
+      .ant-btn.rq-custom-btn.ant-btn-ghost,
+      .ant-btn.rq-custom-btn.ant-btn-text,
+      .ant-btn.rq-custom-btn.rq-btn-transparent {
+        color: var(--requestly-color-text-subtle);
+
+        &:hover {
+          color: var(--requestly-color-text-default);
+        }
+      }
+    }
+  }
+}

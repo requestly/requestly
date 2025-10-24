@@ -1,0 +1,411 @@
+:host {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  top: 16px;
+  right: 16px;
+}
+
+#container {
+  border-radius: 1rem;
+  padding: 12px 1rem;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  font-family: system-ui;
+  background: #1a1a1a;
+  box-shadow: 0px 0px 0px 4px rgba(255, 255, 255, 0.16), 0px 16px 32px 0px rgba(0, 0, 0, 0.24);
+  border: 1px solid #5c5b5b;
+  cursor: move;
+  width: 420px;
+  transition: all 0.2s;
+  position: relative;
+  overflow-x: hidden;
+}
+
+#container.minimized {
+  width: fit-content;
+  height: 56px;
+  padding: 6px;
+  border-radius: 20px;
+}
+
+#container.minimized #test-rule-container,
+#container.minimized #heading-container,
+#container.minimized #info-container {
+  display: none;
+}
+
+#rule-name {
+  font-size: 12px;
+  margin: 4px 0;
+  font-weight: bolder;
+  line-height: 1.4;
+  max-width: 290px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#heading-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+#logo-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#heading-container div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+#actions-container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+#actions-container button {
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: #fff;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+#actions-container #close-button svg {
+  width: 10px;
+  height: 10px;
+}
+
+#actions-container button:hover {
+  background: #383838;
+}
+
+#explicit-widget-container {
+  background: #282828;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+#implicit-widget-container {
+  padding: 0 4px;
+  margin-top: 8px;
+}
+
+#rule-status-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#test-rule-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+#info-container {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 0px;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+#info-icon {
+  align-self: flex-start;
+  width: 16px;
+  height: 16px;
+  color: #bbb;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#info-text {
+  color: #fff;
+  font-size: 11px;
+  line-height: 17px;
+}
+
+#info-text .link {
+  color: #639ff9;
+  font-size: inherit;
+  line-height: 17px;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+}
+
+#rule-status-comment {
+  align-self: center;
+}
+
+#heading-logo {
+  height: 16px;
+  width: 16px;
+}
+
+#logo-text {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+#view-result-btn {
+  all: unset;
+  background: #1e69ff;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+#view-result-btn:hover {
+  cursor: pointer;
+  border-color: #0f4cd9;
+  background: #0f4cd9;
+}
+
+#rule-status {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+#rule-applied-status,
+#rule-not-applied-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 1px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: -3px;
+}
+
+#rule-applied-status {
+  color: #28c07a;
+}
+
+#rule-not-applied-status {
+  color: #e09400;
+}
+
+#minimized-details {
+  display: none;
+  pointer-events: none;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 3px;
+}
+
+#minimized-details.visible {
+  display: flex;
+  pointer-events: auto;
+}
+
+#minimized-logo svg {
+  height: 16px;
+  width: 16px;
+}
+
+#test-rule-minimized-btn {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+#test-rule-minimized-btn span {
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+#test-rule-minimized-btn span svg {
+  height: 20px;
+  width: 20px;
+}
+
+.secondary-text {
+  font-size: 11px;
+  color: #b0b0b5b3;
+}
+
+.hidden {
+  display: none !important;
+}
+
+a {
+  color: #9370db;
+}
+
+.warning {
+  background: #5c3111;
+}
+
+.success {
+  background: #104b2f;
+}
+
+#applied-rules-list {
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#applied-rules-list::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+#applied-rules-list::-webkit-scrollbar-thumb {
+  background: #353535;
+  border-radius: 8px;
+}
+
+#applied-rules-list-header {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.applied-rule-list-item {
+  border-radius: 8px;
+  background: #282828;
+  padding: 12px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.applied-rule-list-item:hover {
+  background: #383838;
+}
+
+.applied-rule-list-item:hover .applied-rule-arrow-icon {
+  opacity: 1;
+}
+
+.applied-rule-list-item:first-child {
+  margin-top: 0;
+}
+
+.applied-rule-item-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.applied-rule-icon {
+  align-self: center;
+}
+
+.applied-rule-icon svg {
+  width: 14px;
+  height: 14px;
+  position: relative;
+  top: 2px;
+}
+
+.applied-rule-arrow-icon {
+  transform: scale(1.2);
+  align-self: center;
+  transition: 0.2s all;
+  opacity: 0;
+}
+
+.applied-rule-name {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#settings-button {
+  position: relative;
+}
+
+#settings-button[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+
+  position: absolute;
+  z-index: 1;
+  right: 0px;
+  top: 34px;
+  width: 158px;
+  max-width: 232px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  border-radius: 4px;
+  background: #000;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
+}
+
+.test-rule-widget-progress-bar {
+  height: 6px;
+  background: #3c7ff3;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+
+  animation-name: progressBar;
+  animation-delay: 50ms;
+  animation-direction: normal;
+  animation-duration: 5s;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+  animation-timing-function: linear;
+}
+
+#container:hover .test-rule-widget-progress-bar {
+  animation-play-state: paused;
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}

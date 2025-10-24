@@ -2,7 +2,7 @@ import { generateObjectId } from "../../../../../utils/FormattingHelper";
 //UTILS
 import { redirectToRoot } from "../../../../../utils/RedirectionUtils";
 //REDUCER ACTIONS
-import { actions } from "../../../../../store";
+import { globalActions } from "store/slices/global/slice";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -13,15 +13,13 @@ import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
 export const setIsCurrentlySelectedRuleHasUnsavedChanges = (dispatch, hasUnsavedChanges) => {
-  dispatch(actions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges));
+  dispatch(globalActions.updateCurrentlySelectedRuleHasUnsavedChanges(hasUnsavedChanges));
 };
 
 export const setCurrentlySelectedRule = (dispatch, newRule, warnForUnsavedChanges = false) => {
-  if (warnForUnsavedChanges) {
-    setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, true);
-  }
+  setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, warnForUnsavedChanges);
 
-  dispatch(actions.updateCurrentlySelectedRuleData(newRule));
+  dispatch(globalActions.updateCurrentlySelectedRuleData(newRule));
 };
 
 export const getEmptyPair = (currentlySelectedRuleConfig) => {
@@ -31,7 +29,7 @@ export const getEmptyPair = (currentlySelectedRuleConfig) => {
   };
 };
 
-const getEmptyPairUsingRuleType = (ruleType) => {
+export const getEmptyPairUsingRuleType = (ruleType) => {
   return {
     ...RULE_TYPES_CONFIG[ruleType].EMPTY_PAIR_FORMAT,
     id: generateObjectId(),
@@ -42,14 +40,15 @@ export const initiateBlankCurrentlySelectedRule = (
   dispatch,
   currentlySelectedRuleConfig,
   RULE_TYPE_TO_CREATE,
-  setCurrentlySelectedRule
+  setCurrentlySelectedRule,
+  groupId = ""
 ) => {
   if (currentlySelectedRuleConfig) {
     const extraRuleConfig = getRuleLevelInitialConfigs(RULE_TYPE_TO_CREATE);
     let blankRuleFormat = {
       creationDate: generateObjectCreationDate(),
       description: "",
-      groupId: "",
+      groupId: groupId,
       id: `${RULE_TYPE_TO_CREATE}_${generateObjectId()}`,
       isSample: false,
       name: "",
@@ -57,6 +56,7 @@ export const initiateBlankCurrentlySelectedRule = (
       pairs: [],
       ruleType: RULE_TYPE_TO_CREATE,
       status: GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
+      schemaVersion: "3.0.0",
       ...extraRuleConfig,
     };
 
@@ -107,16 +107,30 @@ export const getNewRule = (ruleType) => {
   return newRule;
 };
 
+export const getNewGroup = (newGroupName) => {
+  const newGroupId = `Group_${generateObjectId()}`;
+  const newGroup = {
+    creationDate: generateObjectCreationDate(),
+    description: "",
+    id: newGroupId,
+    name: newGroupName,
+    objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP,
+    status: GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
+  };
+
+  return newGroup;
+};
+
 export const setCurrentlySelectedRuleConfig = (dispatch, config, navigate) => {
   if (config === undefined) {
     redirectToRoot(navigate);
   } else {
-    dispatch(actions.updateCurrentlySelectedRuleConfig(config));
+    dispatch(globalActions.updateCurrentlySelectedRuleConfig(config));
   }
 };
 
 export const cleanup = (dispatch) => {
-  dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+  dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
 };
 
 export const getModeData = (location, isSharedListViewRule) => {
@@ -134,8 +148,4 @@ export const getModeData = (location, isSharedListViewRule) => {
     RULE_TYPE_TO_CREATE: URL_PARTS[URL_PARTS.length - 1], //Eg: RULE_TYPE_TO_CREATE="Cancel" (while creating new rule), RULE_TYPE_TO_CREATE="Cancel_SOME-ID" (while editing a rule, we dont need it)
     RULE_TO_EDIT_ID: URL_PARTS[URL_PARTS.length - 1],
   };
-};
-
-export const getSelectedRules = (rulesSelection) => {
-  return Object.keys(rulesSelection).filter((ruleId) => rulesSelection[ruleId]);
 };

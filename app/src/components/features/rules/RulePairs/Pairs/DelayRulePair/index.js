@@ -3,8 +3,8 @@ import DelayRow from "../Rows/RowsMarkup/DelayRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 
 const DelayRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => (
-  <Row gutter={16} align="middle">
-    <Col span={15} lg={17}>
+  <Row gutter={[16, 16]} align="middle">
+    <Col span={24} xl={15}>
       <RequestSourceRow
         rowIndex={1}
         pair={pair}
@@ -14,7 +14,7 @@ const DelayRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => (
       />
     </Col>
 
-    <Col span={9} lg={7}>
+    <Col span={24} md={11} xl={9}>
       <DelayRow
         rowIndex={2}
         pair={pair}

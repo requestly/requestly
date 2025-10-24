@@ -2,9 +2,6 @@ import { ChangeType, getRecord, onRecordChange, saveRecord } from "common/storag
 
 export enum Variable {
   IS_EXTENSION_ENABLED = "isExtensionEnabled",
-  EXTENSION_RULES_COUNT = "extensionRulesCount",
-  TEST_SCRIPT = "testScript",
-  ENABLED_RULE_IDS_MAP = "enabledRuleIdsMap",
 }
 
 const getStorageKey = (variableName: Variable): string => `rq_var_${variableName}`;

@@ -1,7 +1,8 @@
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
+  navigateBack,
   redirectToFileMockEditorEditMock,
   redirectToFileMocksList,
   redirectToMockEditorEditMock,
@@ -10,80 +11,127 @@ import {
 import { toast } from "utils/Toast";
 import MockEditor from "./Editor/index";
 import { MockEditorDataSchema } from "./types";
-import { editorDataToMockDataConverter, mockDataToEditorDataAdapter } from "../utils";
+import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAdapter } from "../utils";
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
-import { FileType, MockType } from "../types";
+import { FileType, MockType, RQMockCollection } from "../types";
 import { getMock } from "backend/mocks/getMock";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
-import {
-  trackCreateMockEvent,
-  trackMockEditorClosed,
-  trackUpdateMockEvent,
-} from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { useRBAC } from "features/rbac";
 
 interface Props {
   isNew?: boolean;
   mockType?: MockType;
   fileType?: FileType;
+  //for mockpicker
+  isEditorOpenInModal?: boolean;
+  selectOnSave?: (url: string) => void;
+  handleCloseEditorFromPicker?: () => void;
 }
 
-const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
+const MockEditorIndex: React.FC<Props> = ({
+  isNew,
+  mockType,
+  fileType,
+  selectOnSave,
+  handleCloseEditorFromPicker,
+  isEditorOpenInModal = false,
+}) => {
   const { mockId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("mock_api", "create");
 
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
+  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
+  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
+
+  const [searchParams] = useSearchParams();
+  const collectionId = searchParams.get("collectionId") || "";
 
   useEffect(() => {
-    if (mockId) {
-      setIsMockLoading(true);
-      getMock(uid, mockId, teamId).then((data: any) => {
-        if (data) {
-          const editorData = mockDataToEditorDataAdapter(data);
-          setMockEditorData(editorData);
-        } else {
-          // TODO: Handle case when No mock is found. Show a message that mock now found
-          // Right now the UI will break
-          setMockEditorData(null);
-        }
-        setIsMockLoading(false);
-      });
+    if (!mockId) {
+      return;
     }
-  }, [mockId, uid, teamId]);
+
+    setIsMockLoading(true);
+    getMock(uid, mockId, activeWorkspaceId).then((data: any) => {
+      if (data) {
+        const editorData = mockDataToEditorDataAdapter(data);
+        setMockEditorData(editorData);
+      } else {
+        // TODO: Handle case when No mock is found. Show a message that mock now found
+        // Right now the UI will break
+        setMockEditorData(null);
+      }
+
+      setIsMockLoading(false);
+    });
+  }, [mockId, uid, activeWorkspaceId]);
+
+  useEffect(() => {
+    if (!mockEditorData?.collectionId) {
+      return;
+    }
+
+    setIsMockCollectionLoading(true);
+    getMock(uid, mockEditorData.collectionId, activeWorkspaceId)
+      .then((data: any) => {
+        if (data) {
+          setMockCollectionData(data);
+        }
+      })
+      .finally(() => {
+        setIsMockCollectionLoading(false);
+      });
+  }, [mockEditorData?.collectionId, activeWorkspaceId, uid]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
 
     const finalMockData = editorDataToMockDataConverter(data);
     if (isNew) {
-      return createMock(uid, finalMockData, teamId).then((mockId) => {
+      return createMock(uid, { ...finalMockData, collectionId }, activeWorkspaceId, collectionId).then((mockId) => {
         setSavingInProgress(false);
         if (mockId) {
-          toast.success("Mock Created Successfully");
+          toast.success("File created successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
-          if (mockType === MockType.FILE) {
-            return redirectToFileMockEditorEditMock(navigate, mockId);
+
+          if (selectOnSave) {
+            const url = generateFinalUrl({
+              endpoint: finalMockData.endpoint,
+              uid: user?.details?.profile?.uid,
+              username: null,
+              teamId: activeWorkspaceId,
+              password: data?.password,
+            });
+            selectOnSave(url);
+            return;
           }
-          return redirectToMockEditorEditMock(navigate, mockId);
+          if (mockType === MockType.FILE) {
+            return redirectToFileMockEditorEditMock(navigate, mockId, true);
+          }
+          return redirectToMockEditorEditMock(navigate, mockId, true);
         }
         toast.error("Mock Create Error");
       });
     }
 
-    updateMock(uid, mockId, finalMockData, teamId).then((success) => {
+    updateMock(uid, mockId, finalMockData, activeWorkspaceId).then((success) => {
       setSavingInProgress(false);
       if (success) {
         toast.success("Mock Updated Successfully");
-        trackUpdateMockEvent(mockId, mockType, finalMockData?.fileType);
+        trackUpdateMockEvent(mockId, mockType, finalMockData?.fileType, finalMockData?.collectionId);
         return setMockEditorData(data);
       }
       toast.error("Mock Update Error");
@@ -93,13 +141,11 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
   };
 
   const handleOnClose = () => {
-    // TODO: Create a constant for this
-    trackMockEditorClosed(mockType, "cancel_button");
     if (mockType === MockType.FILE) {
-      return redirectToFileMocksList(navigate);
+      return navigateBack(navigate, location, () => redirectToFileMocksList(navigate));
     }
 
-    return redirectToMocksList(navigate);
+    return navigateBack(navigate, location, () => redirectToMocksList(navigate));
   };
 
   if (isNew) {
@@ -126,9 +172,11 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
         onSave={onMockSave}
         isNew
         mockType={mockType}
-        onClose={handleOnClose}
+        onClose={handleCloseEditorFromPicker ?? handleOnClose}
         mockData={mockData}
         savingInProgress={savingInProgress}
+        isEditorOpenInModal={isEditorOpenInModal}
+        isEditorReadOnly={!isValidPermission}
       />
     );
   } else {
@@ -144,8 +192,12 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType }) => {
         mockType={mockType}
         onSave={onMockSave}
         mockData={mockEditorData}
-        onClose={handleOnClose}
+        mockCollectionData={mockCollectionData}
+        onClose={handleCloseEditorFromPicker ?? handleOnClose}
         savingInProgress={savingInProgress}
+        isEditorOpenInModal={isEditorOpenInModal}
+        isMockCollectionLoading={isMockCollectionLoading}
+        isEditorReadOnly={!isValidPermission}
       />
     );
   }

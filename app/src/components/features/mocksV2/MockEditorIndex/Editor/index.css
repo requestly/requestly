@@ -1,33 +1,77 @@
-.mock-editor-container {
-  overflow-y: auto;
-  height: 80vh;
+.mock-parent {
+  height: 100vh;
 }
+
+.mock-editor-layout-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.mock-editor-layout-container .read-only-mode-alert {
+  display: none;
+}
+
+.mock-editor-layout-container:hover .read-only-mode-alert {
+  display: flex;
+}
+
+.mock-editor-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  overflow-y: auto;
+  /*height: calc(100vh - 225px); /* 225px is the height of the header, title and the footer */
+  padding: 1rem;
+}
+
+.mock-editor-container {
+  width: 100%;
+  height: 100%;
+}
+
+.mock-editor-title-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.mock-editor-title-container .editor-title-container {
+  width: 100%;
+}
+
 .mock-editor-body {
   padding: 1.25rem;
   border: 1px solid var(--border);
-  background: var(--component-background);
+  background: var(--requestly-color-surface-1);
   border-radius: var(--border-radius-md);
 }
+
 .mock-editor-body .meta-data-option {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
 .mock-editor-body .mock-editor-meta-data-row {
   width: 100%;
 }
 
 .meta-data-option .meta-data-option-label {
-  color: var(--white);
-  font-weight: 500;
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-sm);
+  font-weight: var(--requestly-font-weight-medium);
 }
+
 .meta-data-option .ant-select-selector,
 .meta-data-option .ant-input-group-wrapper .ant-input-group,
 .meta-data-option .ant-input-number-group .ant-input-number-input {
-  background: var(--component-dark-background);
+  background: var(--requestly-color-surface-0);
   border-radius: var(--border-radius-sm);
   box-shadow: var(--input-box-shadow);
-  color: var(--white);
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-sm);
 }
 
 .mock-editor-body .addon-option {
@@ -35,24 +79,41 @@
 }
 
 .mock-editor-body .ant-input-group-addon,
+.mock-editor-body .ant-input-number.ant-input-number-disabled .ant-input-number-input,
 .mock-editor-body .ant-input-number-group-addon {
   background: #3e3f42;
   color: var(--text-gray);
+  font-size: var(--requestly-font-size-sm);
 }
+
+.mock-editor-body .ant-input-wrapper input.ant-input {
+  font-size: var(--requestly-font-size-sm);
+}
+
 .mock-editor-body .ant-tabs {
   width: 100%;
 }
+
+.mock-editor-body .ant-tabs > .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
 .mock-editor-body .ant-tabs-tab:hover {
   color: var(--text-gray);
 }
 
+.mock-editor-body .ant-tabs-tab .ant-tabs-tab-btn {
+  font-size: var(--requestly-font-size-sm);
+}
+
 .mock-editor-body .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .mock-editor-body .ant-tabs-nav-wrap {
   border-bottom: 1px solid var(--border-dark);
 }
+
 .mock-editor-body .editor-row {
   width: 100%;
   margin: 0.5rem 0;
@@ -60,7 +121,8 @@
 
 .meta-data-option .ant-input-disabled,
 .meta-data-option .ant-input-group-wrapper .ant-input {
-  background: var(--component-dark-background);
+  background: #3e3f42;
+  color: var(--text-gray);
   box-shadow: var(--input-box-shadow);
 }
 

@@ -1,0 +1,10 @@
+.email-entry-form-input {
+  box-shadow: var(--input-box-shadow);
+  min-height: 38px;
+  width: 80%;
+}
+
+.email-entry-form-container {
+  margin: 20px 50px;
+  padding: 0 50px;
+}

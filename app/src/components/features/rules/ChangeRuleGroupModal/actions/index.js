@@ -6,9 +6,9 @@ import { StorageService } from "../../../../../init";
 //CONSTANT
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //ACTIONS
-import { getSelectedRules } from "../../actions";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 export const createNewGroup = (appMode, newGroupName, callback, user, status = GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE) => {
   const newGroupId = `Group_${generateObjectId()}`;
@@ -30,33 +30,29 @@ export const createNewGroup = (appMode, newGroupName, callback, user, status = G
     });
 };
 
-export const updateGroupOfSelectedRules = (appMode, rulesSelection, newGroupId, user) => {
+export const updateGroupOfSelectedRules = (appMode, selectedRuleIds, newGroupId, user) => {
   return new Promise((resolve, reject) => {
     // Filter only Selected Rules
 
-    const selectedRules = getSelectedRules(rulesSelection);
-
-    if (isEmpty(selectedRules)) {
+    if (isEmpty(selectedRuleIds)) {
       reject();
     }
 
     Logger.log("Reading storage in updateGroupOfSelectedRules");
     // Fetch all records to get rule data
-    StorageService(appMode)
-      .getAllRecords()
-      .then((allRecords) => {
-        //Update Rules
-        const newRules = [];
-        selectedRules.forEach(async (selectedRuleId) => {
-          const newRule = {
-            ...allRecords[selectedRuleId],
-            groupId: newGroupId,
-          };
-          newRules.push(newRule);
-        });
-        StorageService(appMode)
-          .saveMultipleRulesOrGroups(newRules)
-          .then(() => resolve());
+    clientRuleStorageService.getAllRulesAndGroups().then((allRecords) => {
+      //Update Rules
+      const newRules = [];
+      selectedRuleIds.forEach(async (selectedRuleId) => {
+        const newRule = {
+          ...allRecords[selectedRuleId],
+          groupId: newGroupId,
+        };
+        newRules.push(newRule);
       });
+      StorageService(appMode)
+        .saveMultipleRulesOrGroups(newRules)
+        .then(() => resolve());
+    });
   });
 };

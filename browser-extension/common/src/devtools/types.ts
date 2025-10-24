@@ -22,13 +22,27 @@ export enum NetworkResourceType {
   OTHER = "other",
 }
 
-export type NetworkEvent = chrome.devtools.network.Request & {
+export type NetworkEvent = Omit<chrome.devtools.network.Request, "_resourceType"> & {
   _resourceType?: NetworkResourceType;
 };
 export type NetworkRequest = Request;
 export type NetworkResponse = Response;
 export type NetworkHeader = Header;
 export type NetworkRequestQueryParam = QueryString;
+
+export type RQNetworkEvent = NetworkEvent & {
+  metadata?: Metadata;
+};
+
+interface Metadata {
+  graphQLDetails: GraphQLDetails | null;
+}
+
+interface GraphQLDetails {
+  query: string;
+  variables: any; // TBD @nsr
+  operationName: string;
+}
 
 export enum RuleEditorUrlFragment {
   HEADERS = "Headers",
@@ -39,6 +53,8 @@ export enum RuleEditorUrlFragment {
   QUERY_PARAM = "QueryParam",
   SCRIPT = "Script",
   USER_AGENT = "UserAgent",
+  REQUEST = "Request",
+  RESPONSE = "Response",
 }
 
 export interface ResourceFilters {
@@ -62,4 +78,13 @@ export interface ExecutionEvent {
   rule: Rule;
   modification: string;
   _resourceType?: NetworkResourceType;
+}
+
+export enum RequestMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
+  OPTIONS = "OPTIONS",
 }

@@ -1,6 +1,6 @@
 import firebaseApp from "../../firebase";
 import { doc, getFirestore, Timestamp, updateDoc } from "firebase/firestore";
-import { RQMockSchema } from "components/features/mocksV2/types";
+import { MockRecordType, RQMockSchema } from "components/features/mocksV2/types";
 import { getOwnerId } from "backend/utils";
 import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
@@ -18,20 +18,23 @@ export const updateMock = async (
   const ownerId = getOwnerId(uid, teamId);
 
   let responsesWithBody: any[] = [];
-  if (BODY_IN_BUCKET_ENABLED) {
+  if (BODY_IN_BUCKET_ENABLED && mockData?.recordType !== MockRecordType.COLLECTION) {
     responsesWithBody = [];
     // Update body to null and filePath
-    mockData.responses.map((response) => {
+    mockData.responses.forEach((response) => {
       response.filePath = createResponseBodyFilepath(uid, mockId, response.id, teamId);
       responsesWithBody.push({ ...response });
       response.body = null;
-      return null;
     });
   }
 
   const success = await updateMockFromFirebase(uid, mockId, mockData).catch(() => false);
 
   if (success) {
+    if (mockData?.recordType === MockRecordType.COLLECTION) {
+      return true;
+    }
+
     await updateUserMockSelectorsMap(ownerId, mockId, mockData);
     if (BODY_IN_BUCKET_ENABLED) {
       await uploadResponseBodyFiles(responsesWithBody, uid, mockId, teamId);
@@ -51,8 +54,9 @@ export const updateMockFromFirebase = async (
   const docRef = doc(db, "mocks", mockId);
 
   const success = await updateDoc(docRef, {
-    lastUpdatedBy: updaterId,
+    recordType: MockRecordType.MOCK,
     ...mockData,
+    lastUpdatedBy: updaterId,
     updatedTs: Timestamp.now().toMillis(),
   })
     .then(() => {

@@ -2,6 +2,7 @@ import config from "common/config";
 import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
 import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
 import { isAppURL } from "../../utils";
+import { getVariable, setVariable, Variable } from "../../service-worker/variable";
 
 interface ContentScriptMessage {
   action: string;
@@ -67,6 +68,15 @@ const sendResponse = (originalEventData: ContentScriptMessage, response?: unknow
   });
 };
 
+const clearAllRecordsExpectExtensionEnabledVariable = async () => {
+  const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED);
+
+  await clearAllRecords();
+  if (isExtensionEnabled !== undefined) {
+    await setVariable(Variable.IS_EXTENSION_ENABLED, isExtensionEnabled);
+  }
+};
+
 export const initMessageHandler = () => {
   window.addEventListener(
     "message",
@@ -117,11 +127,17 @@ export const initMessageHandler = () => {
             return;
           }
           case APP_MESSAGES.CLEAR_STORAGE: {
-            await clearAllRecords();
+            await clearAllRecordsExpectExtensionEnabledVariable();
             sendResponse(event.data);
             return;
           }
           case EXTENSION_MESSAGES.GET_TAB_SESSION:
+          case EXTENSION_MESSAGES.GET_API_RESPONSE:
+          case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
+          case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
+          case EXTENSION_MESSAGES.IS_PROXY_APPLIED:
+          case EXTENSION_MESSAGES.DISCONNECT_FROM_DESKTOP_APP:
+          case EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED:
             delegateMessageToBackground(event.data);
         }
       }

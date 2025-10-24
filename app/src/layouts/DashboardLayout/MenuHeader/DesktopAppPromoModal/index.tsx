@@ -4,8 +4,7 @@ import LINKS from "config/constants/sub/links";
 import { UAParser } from "ua-parser-js";
 import { Button } from "antd";
 import { AppleFilled, WindowsFilled } from "@ant-design/icons";
-import { ReactComponent as BlueUnderline } from "./blue-underline.svg";
-import { ReactComponent as LinuxIcon } from "./linux.svg";
+import BlueUnderline from "./blue-underline.svg?react";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./desktopAppPromoModal.css";
 
@@ -43,10 +42,10 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
 
       default:
         return {
-          os: "linux",
-          displayName: "Linux",
-          icon: <LinuxIcon />,
-          link: LINKS.DOWNLOAD_DESKTOP_APP.LINUX,
+          os: "mac",
+          displayName: "Mac",
+          icon: <AppleFilled />,
+          link: LINKS.DOWNLOAD_DESKTOP_APP.MACOS,
         };
     }
   }, []);
@@ -87,7 +86,7 @@ export const DesktopAppPromoModal: React.FC<DesktopAppPromoModalProps> = ({ open
         </a>
       </div>
       <div className="right-section">
-        <img width={480} height={360} alt="Desktop banner" src="/assets/img/banners/desktop-promo.png" />
+        <img width={480} height={360} alt="Desktop banner" src="/assets/media/Dashboard/desktop-promo.png" />
       </div>
     </RQModal>
   );

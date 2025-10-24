@@ -1,0 +1,114 @@
+.home-templates-wrapper {
+  margin: 20px 0;
+  position: relative;
+}
+
+.home-templates-title.ant-typography {
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
+  margin-bottom: 4px;
+  color: var(--requestly-color-text-default);
+}
+
+.home-templates-row {
+  max-width: 1200px;
+  overflow-x: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  width: calc(100% - 2px);
+  padding: 4px;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & .home-templates-row-card {
+    position: relative;
+    padding: 1rem;
+    width: 256px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: hidden;
+
+    &:hover .home-templates-card-action-bar {
+      bottom: 0;
+    }
+  }
+
+  & .home-templates-row-card-title {
+    font-size: var(--requestly-font-size-sm);
+    font-weight: 500;
+    color: var(--requestly-color-text-default);
+    line-height: 18px;
+    letter-spacing: 0.25px;
+  }
+
+  & .home-templates-row-card-icon {
+    height: 16px;
+    transform: scale(0.85);
+    margin-top: 0;
+  }
+
+  & .home-templates-row-card-tag {
+    color: var(--neutrals-gray-300);
+    align-items: flex-end;
+    margin-top: 8px;
+
+    & .home-templates-row-card-ruletype {
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+      font-size: 10px;
+    }
+  }
+}
+
+.home-templates-card-action-bar {
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  background: var(--requestly-color-surface-1);
+  padding: 8px 1rem;
+  display: flex;
+  gap: 8px;
+  transition: 0.25s all ease-in-out;
+  display: flex;
+  justify-content: center;
+
+  & .home-templates-card-action-btn.ant-btn {
+    font-weight: 500;
+    font-size: var(--requestly-font-size-sm, 12px);
+  }
+}
+
+.templates-right-inset-shadow,
+.templates-left-inset-shadow {
+  position: absolute;
+  width: 30px;
+  height: 96px;
+  right: 0;
+  bottom: 0;
+  top: 32px;
+  background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & svg {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+}
+
+.templates-left-inset-shadow {
+  left: 0;
+  background: linear-gradient(270deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
+}

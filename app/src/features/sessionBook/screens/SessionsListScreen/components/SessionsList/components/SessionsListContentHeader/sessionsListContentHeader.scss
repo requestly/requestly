@@ -1,0 +1,14 @@
+.sessions-table-title {
+  padding-block-start: 1rem;
+  margin-inline-start: 1rem;
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-sm, 12px);
+}
+
+.sessions-table-header {
+  .rq-content-list-header-actions {
+    .ant-btn {
+      gap: 6px;
+    }
+  }
+}

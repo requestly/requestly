@@ -3,10 +3,12 @@
   border-spacing: 0 4px !important;
 }
 .rq-table-row {
-  background: var(--component-background);
-  font-size: 13px;
+  background: var(--requestly-color-surface-1);
+  font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
 }
+
+/* TODO: cleanup - remove this after new mock server table is live */
 .rq-table-header .ant-table-cell {
   background: transparent;
   padding-left: 20px;
@@ -21,7 +23,7 @@
   gap: 8px;
   color: var(--text-gray);
   font-weight: 400;
-  font-size: 12px;
+  font-size: var(--requestly-font-size-sm, 12px);
 }
 .rq-table-header .ant-table-cell .rq-col-title svg {
   width: 16px;
@@ -55,6 +57,7 @@
   border-color: var(--border);
 }
 
+/* TODO: cleanup after new mock server table is live */
 .rq-table-row .mock-actions-container {
   opacity: 0;
   pointer-events: none;

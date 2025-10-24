@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CloseOutlined } from "@ant-design/icons";
@@ -15,39 +16,53 @@ import {
 } from "./sessionEventsUtils";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAuthDetails } from "store/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { actions } from "store";
+import { getUserAttributes, getAppMode } from "store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
-import { saveRecording } from "backend/sessionRecording/saveRecording";
-import PATHS from "config/constants/sub/paths";
-import {
-  trackDraftSessionSaveFailed,
-  trackDraftSessionSaved,
-} from "modules/analytics/events/features/sessionRecording";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { trackDraftSessionSaved } from "modules/analytics/events/features/sessionRecording";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
+import { DraftSessionViewerProps } from "./DraftSessionViewer";
+import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
+import Logger from "../../../../../../common/logger";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
+  setIsSaveSessionClicked?: (value: boolean) => void;
+  testRuleDraftSession?: DraftSessionViewerProps["testRuleDraftSession"];
+  source?: string;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({
+  onClose,
+  setIsSaveSessionClicked,
+  testRuleDraftSession,
+  source,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const userAttributes = useSelector(getUserAttributes);
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
+  const appMode = useSelector(getAppMode);
+
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession = pathname.includes("draft");
-  const isSessionLogOptionsAlreadySaved = tabId === "imported" || !isDraftSession;
+  const isDraftSession =
+    pathname.includes("draft") || !!testRuleDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isSessionLogOptionsAlreadySaved =
+    tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetadata?.options), [
     sessionRecordingMetadata?.options,
@@ -64,17 +79,33 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
     }
   }, [isSessionLogOptionsAlreadySaved, savedSessionRecordingOptions]);
 
-  const saveDraftSession = useCallback(
+  const trackSessionsCreatedCount = useCallback(
+    (didCreateLocally = false) => {
+      const numSessionsSavedOffline = userAttributes?.num_sessions_saved_offline || 0;
+      const numSessionsSavedOnline = userAttributes?.num_sessions_saved_online || 0;
+
+      if (didCreateLocally) {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_OFFLINE, numSessionsSavedOffline + 1);
+      } else {
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_SESSIONS_SAVED_ONLINE, numSessionsSavedOnline + 1);
+      }
+    },
+    [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
+  );
+
+  // CURRENTLY THIS FUNCTION IS REDUNDANT, USED BY DRAFT SESSION VIEWER AND SAVE POPUP
+  // TODO: REFACTOR THIS WHEN REVAMP TASK IS PICKED
+  const handleSaveDraftSession = useCallback(
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
-          actions.toggleActiveModal({
+          globalActions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
             newProps: {
               authMode: AUTH_ACTION_LABELS.SIGN_UP,
               src: window.location.href,
-              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
+              eventSource: SOURCE.SAVE_DRAFT_SESSION,
             },
           })
         );
@@ -90,66 +121,49 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
         return;
       }
 
-      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-
       setIsSaving(true);
-      saveRecording(
-        user?.details?.profile?.uid,
-        workspace?.id,
+      setIsSaveSessionClicked?.(true);
+      saveDraftSession(
+        user,
+        userAttributes,
+        appMode,
+        dispatch,
+        navigate,
+        activeWorkspaceId,
         sessionRecordingMetadata,
-        compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
-        recordingOptionsToSave
-      ).then((response) => {
-        if (response?.success) {
-          onClose();
-          toast.success("Recording saved successfully");
-          trackDraftSessionSaved(
-            sessionRecordingMetadata?.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.ONLINE
-          );
-          navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
-            replace: true,
-            state: { fromApp: true, viewAfterSave: true },
-          });
-        } else {
-          toast.error(response?.message);
-          trackDraftSessionSaveFailed(response?.message);
+        sessionEvents,
+        includedDebugInfo,
+        source
+      )
+        .then(() => {
+          onClose?.();
+        })
+        .catch((err) => {
+          Logger.log("Failed to save draft session", err);
+        })
+        .finally(() => {
           setIsSaving(false);
-        }
-      });
+        });
     },
     [
-      user?.loggedIn,
-      user?.details?.profile?.uid,
-      workspace?.id,
+      user,
       isSaving,
-      includedDebugInfo,
-      sessionEvents,
       sessionRecordingMetadata,
+      includedDebugInfo,
+      setIsSaveSessionClicked,
+      activeWorkspaceId,
+      sessionEvents,
       dispatch,
+      appMode,
       navigate,
+      source,
+      userAttributes,
       onClose,
     ]
   );
 
   const handleDownloadFileClick = useCallback(
     (e: React.MouseEvent) => {
-      if (!user?.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: {
-              authMode: AUTH_ACTION_LABELS.SIGN_UP,
-              src: window.location.href,
-              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
-            },
-          })
-        );
-        return;
-      }
-
       setIsSaving(true);
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
       const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
@@ -157,6 +171,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
         name: sessionRecordingMetadata.name,
         options: { ...recordingOptionsToSave },
         sessionAttributes: { ...sessionRecordingMetadata.sessionAttributes },
+        recordingMode: sessionRecordingMetadata?.recordingMode || null,
       };
 
       prepareSessionToExport(events, metadata)
@@ -165,20 +180,32 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
           toast.success("Recording downloaded successfully.");
           onClose();
           setIsSaving(false);
-          trackDraftSessionSaved(
-            sessionRecordingMetadata.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.LOCAL
-          );
+          trackDraftSessionSaved({
+            session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
+            options: recordingOptionsToSave,
+            type: SessionSaveMode.LOCAL,
+            source,
+            recording_mode: sessionRecordingMetadata?.recordingMode,
+          });
+          testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
+          trackSessionsCreatedCount(true);
         });
     },
-    [dispatch, user?.loggedIn, sessionEvents, sessionRecordingMetadata, includedDebugInfo, onClose]
+    [
+      sessionEvents,
+      sessionRecordingMetadata,
+      includedDebugInfo,
+      onClose,
+      trackSessionsCreatedCount,
+      testRuleDraftSession,
+      source,
+    ]
   );
 
   return (
     <div className="save-recording-config-popup">
       <Row align="middle" justify="space-between" className="w-full header-container">
-        <div className="header">{isDraftSession ? "Save" : "Download"} your session recording</div>
+        <div className="header">{isDraftSession ? "Save" : "Download"} your session</div>
         <Button onClick={onClose}>
           <CloseOutlined />
         </Button>
@@ -224,7 +251,9 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose }) => {
           className="ml-auto"
           loading={isSaving}
           onClick={
-            isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? saveDraftSession : handleDownloadFileClick
+            isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE
+              ? handleSaveDraftSession
+              : handleDownloadFileClick
           }
         >
           {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Save" : "Download"}

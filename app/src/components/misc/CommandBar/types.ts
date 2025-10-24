@@ -1,3 +1,4 @@
+import { Rule } from "@requestly/shared/types/entities/rules";
 import { ReactNode } from "react";
 
 export enum CommandItemType {
@@ -25,13 +26,14 @@ export interface CommandBarItem {
 export interface PageConfig {
   id: Page;
   items: CommandBarItem[];
-  itemsFetcher?: (rules: any) => CommandBarItem[];
+  itemsFetcher?: ({ rules }: any) => CommandBarItem[];
 }
 
 export interface TitleProps {
   user?: any;
   appMode?: string;
   rules?: any;
+  num_sessions?: number;
 }
 
 export interface ActionProps {
@@ -39,5 +41,5 @@ export interface ActionProps {
   dispatch?: any;
   user?: any;
   appMode?: string;
-  rules?: any;
+  rules?: Rule[];
 }

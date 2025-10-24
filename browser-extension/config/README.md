@@ -18,9 +18,6 @@ At project root, run `npm run build`.
 It will generate a file `config.js` in `dist` directory.
 A temporary file `config.build.json` is also created inside `dist` directory. To add custom configs for local testing, directly edit `dist/config.build.json` file.
 
-In MV2, include `config.js` in any module which needs it and access as `RQ.configs.configKey`.
-For instance, to access current environment, read `RQ.configs.env`.
-
 #### Updating browser in config
 
 ```sh

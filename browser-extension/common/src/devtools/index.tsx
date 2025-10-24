@@ -1,15 +1,24 @@
+// Import Libraries
 import React, { useEffect, useMemo, useState } from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { ConfigProvider, Tabs, theme } from "antd";
-import { ThemeProvider } from "@devtools-ds/themes";
-import NetworkContainer from "./containers/network/NetworkContainer";
-import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
-import { ColorScheme } from "./types";
-import { getCurrentColorScheme, isExtensionManifestV3, onColorSchemeChange } from "./utils";
-import useLocalStorageState from "./hooks/useLocalStorageState";
+
+// Import Styles
 import "./index.scss";
+import { ThemeProvider } from "@devtools-ds/themes";
+
+// Import Custom Components
+import { ColorScheme } from "./types";
+import { getCurrentColorScheme, onColorSchemeChange } from "./utils";
+import useLocalStorageState from "./hooks/useLocalStorageState";
 import { EVENT, sendEvent } from "./events";
 
+// Import All Containers
+import NetworkContainer from "./containers/network/NetworkContainer";
+import ExecutionsContainer from "./containers/executions/ExecutionsContainer";
+import AnalyticsInspectorContainer from "./containers/analytics-inspector/AnalyticsInspectorContainer";
+
+// Todo @Sachin: Remove this after confirming with team that this is not needed
 sendEvent(EVENT.DEVTOOL_OPENED);
 
 const token = {
@@ -20,6 +29,7 @@ const token = {
 enum DevtoolsTabKeys {
   NETWORK = "network",
   EXECUTIONS = "executions",
+  ANALYTICS_INSPECTOR = "analytics-inspector",
 }
 
 const App: React.FC = () => {
@@ -44,40 +54,40 @@ const App: React.FC = () => {
     return { token, algorithm };
   }, [colorScheme]);
 
-  const isManifestV3 = useMemo(isExtensionManifestV3, []);
-
   return (
     <ConfigProvider theme={antDesignTheme}>
       <ThemeProvider theme={"chrome"} colorScheme={colorScheme}>
-        {isManifestV3 ? (
-          <NetworkContainer />
-        ) : (
-          <Tabs
-            className="devtools-tabs"
-            activeKey={selectedTab}
-            onChange={setSelectedTab}
-            tabPosition="left"
-            tabBarStyle={{ minWidth: 150 }}
-            tabBarGutter={0}
-            items={[
-              {
-                label: "Network Traffic",
-                key: DevtoolsTabKeys.NETWORK,
-                children: <NetworkContainer />,
-                forceRender: true,
-              },
-              {
-                label: "Rule Executions",
-                key: DevtoolsTabKeys.EXECUTIONS,
-                children: <ExecutionsContainer />,
-                forceRender: true,
-              },
-            ]}
-          />
-        )}
+        <Tabs
+          className="devtools-tabs"
+          activeKey={selectedTab}
+          onChange={setSelectedTab}
+          tabPosition="left"
+          tabBarStyle={{ minWidth: 150 }}
+          tabBarGutter={0}
+          items={[
+            {
+              label: "Network Traffic",
+              key: DevtoolsTabKeys.NETWORK,
+              children: <NetworkContainer />,
+              forceRender: true,
+            },
+            {
+              label: "Rule Executions",
+              key: DevtoolsTabKeys.EXECUTIONS,
+              children: <ExecutionsContainer />,
+              forceRender: true,
+            },
+            {
+              label: "Analytics Inspector",
+              key: DevtoolsTabKeys.ANALYTICS_INSPECTOR,
+              children: <AnalyticsInspectorContainer />,
+              forceRender: true,
+            },
+          ]}
+        />
       </ThemeProvider>
     </ConfigProvider>
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);

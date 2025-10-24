@@ -11,20 +11,29 @@
 
 .editor-title-container .editor-title-name,
 .editor-title-container .editor-description {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 4px;
 }
+
 .editor-title-name .editor-title-name-wrapper {
   width: 100%;
 }
+
 .editor-title-container .editor-title-name {
-  min-height: 33px;
+  min-height: 28px;
 }
+
+.editor-title-container .editor-title-name .editor-title-input.ant-input {
+  padding: 0;
+}
+
 .editor-title-container .editor-title-description .ant-input {
   min-height: 30px !important;
   transition: 0.2s ease-in-out;
 }
+
 .editor-description .ant-typography {
   margin-bottom: 0;
   color: #86868b;
@@ -45,25 +54,27 @@
   border-radius: 0;
   transition: 0.05s ease-in-out;
 }
-.editor-title-name .editor-title-name-wrapper .ant-input {
+.editor-title-name .editor-title-name-wrapper input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
   max-width: 360px;
+  padding-left: 0;
 }
 
 .editor-title-description .ant-input,
 .editor-title-description .ant-typography {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 22px;
 }
 
 .editor-title-name .ant-input:focus,
 .editor-title-description .ant-input:focus {
-  border-bottom: 1px solid var(--primary);
+  border-bottom: 1px solid var(--requestly-color-primary);
 }
 .editor-title-name .editor-title {
   display: flex;
   gap: 4px;
   width: 360px;
 }
+
 .editor-title-name .editor-title svg {
   align-self: center;
   cursor: pointer;
@@ -73,9 +84,9 @@
 }
 .editor-title-name .ant-input,
 .editor-title-name .editor-title {
-  color: var(--white);
-  font-size: 1.25rem;
-  font-weight: 500;
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
 }
 .editor-title-container .editor-description {
   max-width: 600px;

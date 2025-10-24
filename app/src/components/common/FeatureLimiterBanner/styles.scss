@@ -1,0 +1,23 @@
+.feature-limit-banner-container {
+  justify-content: center;
+  margin: 1rem;
+  margin-bottom: 0;
+
+  .feature-limit-banner {
+    padding: 8px;
+    background-color: rgba(var(--danger-rgb), 0.1);
+    border: 1px dashed rgba(var(--danger-rgb), 0.6);
+    border-radius: var(--border-radius-sm);
+
+    .feature-limit-banner-icon {
+      color: rgba(var(--danger-rgb), 0.6);
+    }
+
+    .feature-limit-banner-btn {
+      background-color: rgba(var(--danger-rgb), 0.6);
+      &:hover {
+        background-color: rgba(var(--danger-rgb), 0.3);
+      }
+    }
+  }
+}

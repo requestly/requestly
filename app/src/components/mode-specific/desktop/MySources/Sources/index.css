@@ -1,6 +1,6 @@
 .connected-apps-modal .connected-apps-modal-content {
   padding: 20px;
-  background: var(--body-background);
+  background: var(--requestly-color-surface-0);
   min-height: 450px;
   max-height: 700px;
   overflow: auto;
@@ -17,7 +17,7 @@
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn,
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn:hover,
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .source-tabs-container .ant-tabs-nav .ant-tabs-nav-wrap {
@@ -34,7 +34,7 @@
   padding: 11px 16px;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 0.5fr;
+  grid-template-columns: 1fr minmax(auto, 1fr) minmax(auto, 0.5fr);
   align-items: center;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-sm);
@@ -50,6 +50,7 @@
 }
 .connected-apps-modal .source-grid .source-item .source-description {
   padding-left: 10px;
+  word-break: break-word;
 }
 .connected-apps-modal .source-grid .source-item .danger-btn,
 .connected-apps-modal .rq-modal-footer .danger-btn {
@@ -74,12 +75,12 @@
   margin-left: auto;
 }
 .connected-apps-modal .source-modal-footer-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 
 .connected-apps-modal .system-wide-check-icon {
-  color: var(--success);
+  color: var(--requestly-color-success);
 }
 
 .setup-instructions-back-btn.ant-row {
@@ -118,7 +119,7 @@
 }
 
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-container .ant-steps-icon {
-  color: var(--primary);
+  color: var(--requestly-color-primary);
   font-size: 2.25rem;
 }
 
@@ -144,7 +145,7 @@
 
 .connected-apps-secondary-link,
 .connected-apps-secondary-link:hover {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
   text-decoration: underline;
 }
 
@@ -156,4 +157,19 @@
 .rq-btn.troubleshoot-btn.ant-btn:hover {
   color: var(--text-gray);
   text-decoration: underline;
+}
+
+.no-simulators-message {
+  padding: 8px 0;
+  max-width: 260px;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.mobile-connect-btn {
+  width: 145px;
+}
+
+.mobile-connect-btn > .ant-btn-compact-item {
+  flex: auto;
 }

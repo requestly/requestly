@@ -1,115 +1,181 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-// import { Redirect } from "react-router-dom";
-import { Form, FormGroup, Input } from "reactstrap";
-import { Col, Row, Container, Card, Button, CardBody } from "reactstrap";
-// ICONS
-import { FaSpinner } from "react-icons/fa";
-//UTILS
-import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
-import { getQueryParamsAsMap } from "../../../utils/URLUtils";
+import { Row, Typography } from "antd";
+import SpinnerColumn from "../SpinnerColumn";
+import { RQButton, RQInput } from "lib/design-system/components";
+import { globalActions } from "store/slices/global/slice";
+import { getAppMode } from "../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
-// ACTIONS
 import { signInWithEmailLink } from "../../../actions/FirebaseActions";
-import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
-import { toast } from "utils/Toast.js";
-import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import { actions } from "store";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
+import { redirectToRoot } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+
+import {
+  trackSignInWithLinkCustomFormSeen,
+  trackSignInWithLinkCustomFormSubmitted,
+} from "modules/analytics/events/common/auth/emailLinkSignin";
+import "./index.css";
+import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
+import Logger from "../../../../../common/logger";
+import { getAppFlavour } from "utils/AppUtils";
+import { isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
 
 const SignInViaEmailLink = () => {
   //Component State
-  const [userEmail, setUserEmail] = useState(
-    isEmailValid(window.localStorage.getItem("RQEmailForSignIn"))
-      ? window.localStorage.getItem("RQEmailForSignIn")
-      : null
-  );
+  const [userEmailfromLocalStorage, setUserEmailfromLocalStorage] = useState("");
+  const [emailInput, setEmailInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCustomLoginFlow, setIsCustomLoginFlow] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
 
   //Global State
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
+  const wasUserAlreadyLoggedIn = useRef(user.loggedIn);
 
-  const handleLogin = (e) => {
-    setIsProcessing(true);
-    e.preventDefault();
+  const logOutUser = useCallback(() => {
+    handleLogoutButtonOnClick(appMode, isSharedWorkspaceMode, dispatch).then(() => {
+      dispatch(globalActions.updateRefreshPendingStatus({ type: "rules" }));
+    });
+  }, [appMode, dispatch, isSharedWorkspaceMode]);
 
-    if (user.loggedIn) {
-      handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
-        dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-      });
+  const renderAlreadyLoggedInWarning = useCallback(() => {
+    const shouldLogout = window.confirm(
+      `You are already signed in${
+        user.email ? ` as ${user.email}` : ""
+      }. Do you want to continue sign in as ${userEmailfromLocalStorage}?`
+    );
+    if (shouldLogout === true) {
+      logOutUser();
     }
+    return <SpinnerColumn />;
+  }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
-    const params = getQueryParamsAsMap();
-    if (params[`oobCode`] && isEmailValid(userEmail)) {
-      signInWithEmailLink(userEmail)
-        .then((resp) => {
-          if (resp) {
-            setIsProcessing(false);
-          } else throw new Error("Failed");
+  useEffect(() => {
+    if (user.loggedIn) {
+      const appFlavour = getAppFlavour();
+      const name = user?.displayName?.split(" ")[0];
+      let message = isLogin
+        ? "Welcome back!"
+        : `Welcome to ${appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "SessionBear" : "Requestly"}!`;
+      if (name) {
+        message = isLogin ? `Welcome back ${name}!` : `Welcome ${name}!`;
+      }
+      toast.success(message);
+      if (isLogin) {
+        dispatch(globalActions.updateAppOnboardingCompleted());
+      } else {
+        dispatch(globalActions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+      }
+      redirectToRoot(navigate);
+    }
+  }, [dispatch, user.loggedIn, navigate, isLogin, user.displayName, user.email, user.details?.profile?.displayName]);
+
+  const handleLogin = useCallback((emailToUseForLogin) => {
+    const loginEmail = emailToUseForLogin;
+    if (loginEmail) {
+      setIsProcessing(true);
+      signInWithEmailLink(loginEmail)
+        .then((response) => {
+          if (response) {
+            const { authData, isNewUser } = response;
+            if (authData.uid) {
+              window.localStorage.removeItem("RQEmailForSignIn");
+              setIsLogin(!isNewUser);
+              if (isNewUser) {
+                window.localStorage.setItem("isNewUser", Boolean(isNewUser));
+              }
+            } else throw new Error("Failed");
+          }
         })
-        .catch((err) => {
-          toast.error("URL seems invalid. Please contact support");
+        .catch((e) => {
+          Logger.log("[SignInViaEmailLink] handleLogin.catch", { e });
           setIsProcessing(false);
-          setUserEmail(null);
+          setUserEmailfromLocalStorage(null);
         });
     } else {
-      toast.error("Please recheck the email entered, or this URL is invalid.");
-      setIsProcessing(false);
+      window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
     }
+  }, []);
+
+  const renderEmailInputForm = () => {
+    return (
+      <div className="email-entry-form-container">
+        <Row justify="center">
+          <Typography.Title level={2}>
+            Hey, it appears that you are accessing Requestly from a new web browser
+          </Typography.Title>
+        </Row>
+        <Row justify="center" className="mb-2">
+          <Typography.Text strong style={{ fontSize: "1rem" }}>
+            Kindly re-enter your email address to proceed.
+          </Typography.Text>
+        </Row>
+        <Row className="w-100 mb-16" justify="center">
+          <RQInput
+            id="SignInViaEmailLinkInputField"
+            className="email-entry-form-input"
+            placeholder="name@example.com"
+            type="email"
+            required
+            value={emailInput}
+            onChange={(e) => {
+              setEmailInput(e.target.value);
+            }}
+          />
+        </Row>
+        <Row className="w-100" justify="center">
+          <RQButton
+            id="SignInViaEmailLinkLoginBtn"
+            type="primary"
+            size="large"
+            onClick={(e) => {
+              e.preventDefault();
+              trackSignInWithLinkCustomFormSubmitted();
+              handleLogin(emailInput);
+            }}
+            loading={isProcessing}
+          >
+            Sign in
+          </RQButton>
+        </Row>
+      </div>
+    );
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      document.getElementById("SignInViaEmailLinkLoginBtn").click();
-    }, 300);
-  }, []);
+    const emailFromStorage = window.localStorage.getItem("RQEmailForSignIn");
 
-  return (
-    <Container className=" mt--7 sm-margin-top-negative-3" fluid>
-      <Row>
-        <Col>
-          <Card className="shadow">
-            <CardBody>
-              <Jumbotron style={{ background: "transparent" }} className="text-center">
-                <Row className="justify-content-md-center">
-                  <Col lg="3">
-                    <Form>
-                      <FormGroup>
-                        <label htmlFor="SignInViaEmailLinkInputField">Confirm email address</label>
-                        <Input
-                          id="SignInViaEmailLinkInputField"
-                          placeholder="name@example.com"
-                          type="email"
-                          value={userEmail ? userEmail : ""}
-                          onChange={(e) => {
-                            setUserEmail(e.target.value);
-                          }}
-                        />
-                      </FormGroup>
-                      <FormGroup>
-                        {userEmail && isProcessing ? (
-                          <Button color="primary" type="button" disabled>
-                            <FaSpinner className="icon-spin mr-2" />
-                            Login
-                          </Button>
-                        ) : (
-                          <Button color="primary" type="button" onClick={handleLogin} id="SignInViaEmailLinkLoginBtn">
-                            Login
-                          </Button>
-                        )}
-                      </FormGroup>
-                    </Form>
-                  </Col>
-                </Row>
-              </Jumbotron>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+    if (!emailFromStorage) setIsCustomLoginFlow(true);
+    else {
+      const email = isEmailValid(emailFromStorage) ? emailFromStorage : null;
+
+      setUserEmailfromLocalStorage(email);
+      if (!user.loggedIn && email) {
+        handleLogin(email);
+      }
+    }
+  }, [handleLogin, user.loggedIn]);
+
+  useEffect(() => {
+    if (isCustomLoginFlow) trackSignInWithLinkCustomFormSeen();
+  }, [isCustomLoginFlow]);
+
+  return isCustomLoginFlow ? (
+    renderEmailInputForm()
+  ) : wasUserAlreadyLoggedIn.current ? (
+    renderAlreadyLoggedInWarning()
+  ) : (
+    <SpinnerColumn />
   );
 };
 

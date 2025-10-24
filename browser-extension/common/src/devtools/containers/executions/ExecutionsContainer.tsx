@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ExecutionEvent, NetworkSettings, ExecutionFilters } from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
-import "./executionsContainer.scss";
-import { ResourceTable } from "../../components/ResourceTable";
+import { ResourceTable } from "@requestly-ui/resource-table";
 import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
 import executionTableColumns, { EXECUTION_TABLE_COLUMN_IDS } from "./columns";
 import executionDetailsTabs from "./details-tabs";
 import { getResourceType } from "./utils";
-import { matchResourceTypeFilter } from "../../utils";
+import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
+import "./executionsContainer.scss";
 
 const ExecutionsContainer: React.FC = () => {
   const [executionEvents, setExecutionEvents] = useState<ExecutionEvent[]>([]);
@@ -31,9 +31,14 @@ const ExecutionsContainer: React.FC = () => {
   }, [settings]);
 
   useEffect(() => {
-    const port = chrome.runtime.connect({ name: "rq_devtools" });
+    const bgPortConnection = chrome.runtime.connect({ name: "rq_devtools" });
 
-    port.onMessage.addListener((executionEvent: ExecutionEvent) => {
+    // Send a heartbeat message to the background script every 15 seconds to keep the connection alive
+    setInterval(() => {
+      bgPortConnection.postMessage("heartbeat");
+    }, 15000);
+
+    bgPortConnection.onMessage.addListener((executionEvent: ExecutionEvent) => {
       setExecutionEvents((executionEvents) => [
         ...executionEvents,
         {
@@ -49,7 +54,7 @@ const ExecutionsContainer: React.FC = () => {
       }
     });
 
-    port.postMessage({
+    bgPortConnection.postMessage({
       action: "registerDevTool",
       tabId: chrome.devtools.inspectedWindow.tabId,
     });
@@ -81,6 +86,7 @@ const ExecutionsContainer: React.FC = () => {
         <>
           <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
           <ResourceTable
+            colorScheme={getCurrentColorScheme()}
             resources={executionEvents}
             columns={executionTableColumns}
             primaryColumnKeys={[EXECUTION_TABLE_COLUMN_IDS.URL]}

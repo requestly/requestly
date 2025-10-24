@@ -1,41 +1,36 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Row, message, Dropdown, Menu, Typography } from "antd";
 import { MoreOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import {
-  getActiveModals,
-  getAppMode,
-  getCurrentlySelectedRuleConfig,
-  getCurrentlySelectedRuleData,
-} from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
+import { getActiveModals } from "store/slices/global/modals/selectors";
 import { RQButton, RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
-import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
-import DeleteButton from "components/features/rules/RuleBuilder/Header/ActionButtons/DeleteButton";
-import ExportButton from "components/features/rules/RuleBuilder/Header/ActionButtons/ExportButton";
-import PinButton from "components/features/rules/RuleBuilder/Header/ActionButtons/PinButton";
-import RuleStatusButton from "components/features/rules/RuleBuilder/Header/ActionButtons/Status";
+import CreateRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/CreateRuleButton";
+import DeleteButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/DeleteButton";
+import PinButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/PinButton";
+import RuleStatusButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/Status";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import {
   setCurrentlySelectedRule,
   setCurrentlySelectedRuleConfig,
   initiateBlankCurrentlySelectedRule,
 } from "components/features/rules/RuleBuilder/actions";
 import { RULE_EDITOR_FIELD_SELECTOR } from "./dom-selectors";
-import { StorageService } from "init";
 import { prefillRuleData } from "./prefill";
 import { generateRuleDescription, getEventObject } from "./utils";
 import { getRuleConfigInEditMode } from "utils/rules/misc";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
-import { Rule, Status } from "types";
-import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
+import { RecordStatus, Rule, ResponseRule, RuleType, RuleSourceOperator } from "@requestly/shared/types/entities/rules";
+import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
+import { RoleBasedComponent, useRBAC } from "features/rbac";
 import "./RuleEditorModal.css";
-import ShareRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/ShareRuleButton";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 enum EditorMode {
   EDIT = "edit",
@@ -51,13 +46,14 @@ interface props {
 const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEventEditorViewedSource }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const { ruleEditorModal } = useSelector(getActiveModals);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isLoading, setIsLoading] = useState(false);
   const [isRuleNotFound, setIsRuleNotFound] = useState(false);
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
   const { ruleData, ruleType = "", ruleId = "", mode = EditorMode.CREATE } = ruleEditorModal.props;
 
   const ruleMenuOptions = useMemo(
@@ -65,9 +61,6 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       <Menu className="editor-rule-options-menu">
         <Menu.Item key="1" className="editor-rule-options-menu-item">
           <PinButton rule={currentlySelectedRuleData} isRuleEditorModal={true} />
-        </Menu.Item>
-        <Menu.Item key="2" className="editor-rule-options-menu-item">
-          <ExportButton rule={currentlySelectedRuleData} isDisabled={false} isRuleEditorModal={true} />
         </Menu.Item>
         <Menu.Item key="3" className="editor-rule-options-menu-item">
           <ShareRuleButton isRuleEditorModal={true} />
@@ -81,8 +74,8 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     if (mode === EditorMode.CREATE || !ruleId) return;
 
     setIsLoading(true);
-    StorageService(appMode)
-      .getRecord(ruleId)
+    clientRuleStorageService
+      .getRecordById(ruleId)
       .then((rule) => {
         if (rule === undefined) {
           setIsRuleNotFound(true);
@@ -94,15 +87,13 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       .finally(() => setIsLoading(false));
 
     return () => {
-      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+      dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
     };
   }, [mode, appMode, ruleId, dispatch, navigate]);
 
-  useEffect(() => {
-    if (mode === EditorMode.EDIT) return;
-
+  const initializeEditorWithPrefilledData = useCallback(() => {
     const ruleConfig = RULE_TYPES_CONFIG[ruleType];
-    const newRule = initiateBlankCurrentlySelectedRule(dispatch, ruleConfig, ruleType, setCurrentlySelectedRule);
+    const newRule: any = initiateBlankCurrentlySelectedRule(dispatch, ruleConfig, ruleType, setCurrentlySelectedRule);
     setCurrentlySelectedRuleConfig(dispatch, ruleConfig, navigate);
 
     if (newRule) {
@@ -110,16 +101,55 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
         ...prefillRuleData(ruleData, newRule),
         name: `${ruleType}_untitled`,
         description: generateRuleDescription(ruleType, ruleData),
-        status: Status.ACTIVE,
+        status: RecordStatus.ACTIVE,
       };
+
+      if (ruleType === RuleType.RESPONSE && prefilledRule.ruleType === RuleType.RESPONSE) {
+        // Handling prefill for graphql resource type response rule
+        const { GQLDetails } = ruleData.metadata || {};
+        const pair = prefilledRule.pairs[0];
+        const sourceFilters = pair.source.filters;
+        if (GQLDetails?.operationName) {
+          pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
+          pair.source.filters = [
+            ...sourceFilters,
+            {
+              requestPayload: {
+                key: "operationName",
+                operator: RuleSourceOperator.EQUALS,
+                value: GQLDetails.operationName,
+              },
+            },
+          ];
+          prefilledRule.pairs[0] = pair;
+        } else if (GQLDetails?.query) {
+          pair.response.resourceType = ResponseRule.ResourceType.GRAPHQL_API;
+          pair.source.filters = [
+            ...sourceFilters,
+            {
+              requestPayload: {
+                key: "query",
+                operator: RuleSourceOperator.CONTAINS,
+                value: GQLDetails.query,
+              },
+            },
+          ];
+          prefilledRule.pairs[0] = pair;
+        }
+      }
 
       setCurrentlySelectedRule(dispatch, prefilledRule);
     }
+  }, [ruleData, ruleType, dispatch, navigate]);
+
+  useEffect(() => {
+    if (mode === EditorMode.EDIT) return;
+    initializeEditorWithPrefilledData();
 
     return () => {
-      dispatch(actions.clearCurrentlySelectedRuleAndConfig());
+      dispatch(globalActions.clearCurrentlySelectedRuleAndConfig());
     };
-  }, [mode, dispatch, ruleData, ruleType, navigate]);
+  }, [mode, initializeEditorWithPrefilledData, dispatch]);
 
   useEffect(() => {
     if (mode === EditorMode.EDIT) return;
@@ -176,10 +206,6 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
     [handleModalClose, showRuleCreatedFromModalToast]
   );
 
-  useEffect(() => {
-    trackRuleEditorViewed(analyticEventEditorViewedSource, ruleType);
-  }, [analyticEventEditorViewedSource, ruleType]);
-
   return (
     <RQModal
       centered
@@ -204,6 +230,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               <RQEditorTitle
                 mode={mode}
                 name={currentlySelectedRuleData?.name ?? ""}
+                disabled={!isValidPermission}
                 nameChangeCallback={(name) => handleRuleTitleChange("name", name)}
                 namePlaceholder="Enter rule name"
                 description={currentlySelectedRuleData?.description ?? ""}
@@ -211,33 +238,34 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                 descriptionPlaceholder="Add description (optional)"
               />
 
-              <Col span={7}>
-                <Row align="middle" justify="space-evenly" wrap={false}>
-                  <RuleStatusButton location={window.location} isRuleEditorModal={true} />
-                  {mode === EditorMode.EDIT && (
-                    <>
-                      <DeleteButton
-                        rule={currentlySelectedRuleData}
-                        isDisabled={mode === EditorMode.CREATE}
-                        isRuleEditorModal={true}
-                        ruleDeletedCallback={() => handleModalClose()}
-                      />
+              <RoleBasedComponent resource="http_rule" permission="create">
+                <Col span={7}>
+                  <Row align="middle" justify="end" wrap={false} className="rule-editor-modal-actions">
+                    <RuleStatusButton isRuleEditorModal={true} mode={mode} />
+                    {mode === EditorMode.EDIT && (
+                      <>
+                        <DeleteButton
+                          rule={currentlySelectedRuleData}
+                          isDisabled={mode === EditorMode.CREATE}
+                          isRuleEditorModal={true}
+                          ruleDeletedCallback={() => handleModalClose()}
+                        />
 
-                      <Dropdown overlay={ruleMenuOptions} trigger={["click"]} placement="bottomRight">
-                        <RQButton iconOnly type="default" icon={<MoreOutlined />} />
-                      </Dropdown>
-                    </>
-                  )}
+                        <Dropdown overlay={ruleMenuOptions} trigger={["click"]} placement="bottomRight">
+                          <RQButton iconOnly type="default" icon={<MoreOutlined />} />
+                        </Dropdown>
+                      </>
+                    )}
 
-                  <CreateRuleButton
-                    location={location}
-                    isRuleEditorModal={true}
-                    ruleEditorModalMode={mode}
-                    analyticEventRuleCreatedSource={"rule_editor_modal_header"}
-                    ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
-                  />
-                </Row>
-              </Col>
+                    <CreateRuleButton
+                      isRuleEditorModal={true}
+                      ruleEditorModalMode={mode}
+                      analyticEventRuleCreatedSource={"rule_editor_modal_header"}
+                      ruleCreatedFromEditorModalCallback={ruleCreatedCallback}
+                    />
+                  </Row>
+                </Col>
+              </RoleBasedComponent>
             </Row>
 
             <div className="rule-editor-modal-container">
@@ -246,7 +274,10 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               {currentlySelectedRuleConfig?.ALLOW_ADD_PAIR ? (
                 <Row justify="end">
                   <Col span={24}>
-                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                    <AddPairButton
+                      disabled={!isValidPermission}
+                      currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+                    />
                   </Col>
                 </Row>
               ) : null}

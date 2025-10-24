@@ -2,63 +2,69 @@
 // On changes, this should call onSave() which is passed as props to this component.
 // onSave should actually do all the interaction with the database.
 
-import { AutoComplete, Button, Col, InputNumber, Row, Select } from "antd";
+import { AutoComplete, Col, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
-import CodeEditor from "components/misc/CodeEditor";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { BsStars } from "react-icons/bs";
-import { getUserAuthDetails } from "store/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { toast } from "utils/Toast";
-import { FileType, MockType } from "../../types";
+import { FileType, MockType, RQMockCollection } from "../../types";
 import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
-import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
+import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateHeaders, validateStatusCode } from "../utils";
 import "./index.css";
-import {
-  trackAiResponseButtonClicked,
-  trackMockEditorOpened,
-  trackTestMockClicked,
-} from "modules/analytics/events/features/mocksV2";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import AIResponseModal from "./AIResponseModal";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { APIClient, APIClientRequest } from "components/common/APIClient";
+import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
+import { APIClientModal, APIClientRequest } from "features/apiClient/components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
+import { EditorLanguage } from "componentsV2/CodeEditor";
+import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import MockLogs from "./BottomSheet/MockLogs";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { ExportMocksModalWrapper } from "features/mocks/modals";
+import { globalActions } from "store/slices/global/slice";
+import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import Editor from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
   isEditorReadOnly?: boolean;
   savingInProgress?: boolean;
   mockData?: MockEditorDataSchema;
+  mockCollectionData?: RQMockCollection;
   onSave: Function;
   onClose: Function;
   mockType?: MockType;
+  isEditorOpenInModal?: boolean;
+  isMockCollectionLoading?: boolean;
 }
 
 const MockEditor: React.FC<Props> = ({
   isNew = false,
   isEditorReadOnly = false,
+  isEditorOpenInModal = false,
+  isMockCollectionLoading = false,
   savingInProgress = false,
   mockData,
+  mockCollectionData,
   onSave = () => {},
   onClose = () => {},
   mockType,
 }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const username = user?.details?.username;
 
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
+  const activeWorkspaceId = useSelector(getActiveWorkspaceId);
 
-  const isAiResponseActive = useFeatureValue("ai_mock_response", false);
+  const areLogsVisible = useFeatureValue("mock_logs", false);
 
   const [id] = useState<string>(mockData.id); // No need to edit this. Set by firebase
   const [type] = useState<MockType>(mockData?.type || mockType);
@@ -71,23 +77,32 @@ const MockEditor: React.FC<Props> = ({
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
   const [body, setBody] = useState<string>(mockData.body);
+  const [password, setPassword] = useState<string>(mockData.password ?? "");
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
   const [errors, setErrors] = useState<ValidationErrors>({
     name: null,
     statusCode: null,
     endpoint: null,
+    headers: null,
   });
 
-  const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
-  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId), [
-    endpoint,
-    teamId,
-    user?.details?.profile?.uid,
-    username,
-  ]);
+  const collectionPath = mockCollectionData?.path ?? "";
+
+  const finalUrl = useMemo(
+    () =>
+      generateFinalUrl({
+        endpoint,
+        uid: user?.details?.profile?.uid,
+        username,
+        teamId: activeWorkspaceId,
+        password,
+        collectionPath,
+      }),
+    [endpoint, activeWorkspaceId, user?.details?.profile?.uid, username, password, collectionPath]
+  );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
     return {
@@ -111,14 +126,16 @@ const MockEditor: React.FC<Props> = ({
     setLatency(0);
   };
 
-  const createMockEditorData = () => {
+  const createMockEditorData = useCallback(() => {
     let headersDict: { [key: string]: string } = {};
     try {
       headersDict = JSON.parse(headersString);
     } catch (err) {
       // TODO: Improve this toast message
       toast.error("Error while parsing headers. Creating with empty headers");
+      setErrors((prev) => ({ ...prev, headers: "Error while parsing headers" }));
       headersDict = {};
+      return;
     }
 
     const cleanedEndpoint = cleanupEndpoint(endpoint);
@@ -138,51 +155,86 @@ const MockEditor: React.FC<Props> = ({
       headers: headersDict,
       body: body || "{}",
       responseId: mockData.responseId,
+      password: password,
     };
 
     return tempMockData;
-  };
+  }, [
+    id,
+    type,
+    fileType,
+    name,
+    desc,
+    method,
+    latency,
+    endpoint,
+    statusCode,
+    contentType,
+    headersString,
+    body,
+    mockData.responseId,
+    password,
+  ]);
 
-  const validateMockEditorData = (data: MockEditorDataSchema): boolean => {
-    const updatedErrors: ValidationErrors = {};
-    let focusedInvalidFieldRef = null;
+  const validateMockEditorData = useCallback(
+    (data: MockEditorDataSchema): boolean => {
+      if (!data) return false;
+      const updatedErrors: ValidationErrors = {};
+      let focusedInvalidFieldRef = null;
 
-    if (!data.name) {
-      updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
-    }
-    const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
-    if (statusCodeValidationError) {
-      updatedErrors.statusCode = statusCodeValidationError;
-      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
-    }
+      if (!data.name) {
+        updatedErrors.name = `${mockType === MockType.FILE ? "File" : "Mock"} name is required`;
+      }
+      const statusCodeValidationError = validateStatusCode(data.statusCode.toString());
+      if (statusCodeValidationError) {
+        updatedErrors.statusCode = statusCodeValidationError;
+        if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
+      }
 
-    // TODO: Add more validations here for special characters, //, etc.
-    const endpointValidationError = validateEndpoint(data.endpoint);
-    if (endpointValidationError) {
-      updatedErrors.endpoint = endpointValidationError;
-      if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
-    }
+      const headersValidationError = validateHeaders(data.headers);
+      if (headersValidationError) {
+        updatedErrors.headers = headersValidationError;
+      }
 
-    // No errors found.
-    if (Object.keys(updatedErrors).length === 0) {
-      setErrors(updatedErrors);
-      return true;
-    }
-    focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
-    setErrors(updatedErrors);
-    return false;
-  };
+      // TODO: Add more validations here for special characters, //, etc.
+      const endpointValidationError = validateEndpoint(data.endpoint);
+      if (endpointValidationError) {
+        updatedErrors.endpoint = endpointValidationError;
+        if (!focusedInvalidFieldRef) focusedInvalidFieldRef = endpointRef;
+      }
 
-  const handleOnSave = () => {
+      // No errors found.
+      if (Object.keys(updatedErrors).length === 0) {
+        setErrors((prev) => ({ ...prev, ...updatedErrors }));
+        return true;
+      }
+      focusedInvalidFieldRef?.current?.focus({ cursor: "end" });
+      setErrors((prev) => ({ ...prev, ...updatedErrors }));
+      return false;
+    },
+    [mockType]
+  );
+
+  const handleOnSave = useCallback(() => {
     const finalMockData = createMockEditorData();
     const success = validateMockEditorData(finalMockData);
 
     if (success) {
       onSave(finalMockData);
     } else {
-      toast.error("Please fix the highlighted fields");
+      if (errors.headers) {
+        dispatch(
+          globalActions.triggerToastForEditor({
+            id: `headers-${id}`,
+            message: errors.headers,
+            type: "error",
+          })
+        );
+      } else {
+        toast.error("Please fix the highlighted fields");
+      }
     }
-  };
+  }, [onSave, errors, createMockEditorData, validateMockEditorData, id, dispatch]);
 
   const handleTest = useCallback(() => {
     setIsTestModalOpen(true);
@@ -205,6 +257,7 @@ const MockEditor: React.FC<Props> = ({
           Method
         </label>
         <Select
+          disabled={isEditorReadOnly}
           id="method"
           size="large"
           options={requestMethodDropdownOptions}
@@ -223,6 +276,7 @@ const MockEditor: React.FC<Props> = ({
           Latency
         </label>
         <InputNumber
+          disabled={isEditorReadOnly}
           id="latency"
           size="large"
           type="text"
@@ -232,7 +286,6 @@ const MockEditor: React.FC<Props> = ({
           value={latency}
           name="latency"
           onChange={handleMockLatencyChange}
-          // @ts-ignore: TS2322
           addonAfter="ms"
         />
       </Col>
@@ -246,6 +299,7 @@ const MockEditor: React.FC<Props> = ({
           Status code
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           ref={statusCodeRef}
           id="status-code"
           size="large"
@@ -272,14 +326,12 @@ const MockEditor: React.FC<Props> = ({
           Content type
         </label>
         <AutoComplete
+          disabled={isEditorReadOnly}
           id="content-type"
           size="large"
-          // @ts-ignore
-          type="text"
           placeholder="content"
           value={contentType}
           options={APP_CONSTANTS.CONTENT_TYPE}
-          name="type"
           onChange={(e) => setContentType(e)}
         />
       </Col>
@@ -290,11 +342,15 @@ const MockEditor: React.FC<Props> = ({
     return (
       <MockEditorEndpoint
         isNew={isNew}
+        disabled={isEditorReadOnly}
         errors={errors}
+        collectionPath={collectionPath}
         endpoint={endpoint}
         setEndpoint={setEndpoint}
         mockType={mockType}
         ref={endpointRef}
+        password={password}
+        isMockCollectionLoading={isMockCollectionLoading}
       />
     );
   };
@@ -323,33 +379,38 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {/* @ts-ignore */}
-          <CodeEditor
+          <Editor
+            scriptId={`headers-${id}`} // used to show error toasts created because header invalidation
+            isResizable
             height={220}
-            language="json"
             value={headersString}
-            readOnly={false}
             handleChange={setHeadersString}
+            language={EditorLanguage.JSON}
+            analyticEventProperties={{ source: "mocks", mock_type: type }}
+            isReadOnly={isEditorReadOnly}
           />
         </Col>
       </Row>
     );
-  }, [headersString, type]);
+  }, [headersString, type, id, isEditorReadOnly]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {mockType === MockType.FILE && <h4>File Content</h4>}
-          {/* @ts-ignore */}
-          <CodeEditor
-            language={getEditorLanguage(fileType)}
-            value={body}
+          <Editor
+            isResizable
             height={220}
-            readOnly={isEditorReadOnly}
+            value={body}
             handleChange={setBody}
-            // HACK TO PREVENT AUTO FORMAT
-            isCodeMinified={true}
+            language={getEditorLanguage(fileType)}
+            isReadOnly={isEditorReadOnly}
+            prettifyOnInit={true}
+            analyticEventProperties={{ source: "mocks", mock_type: mockType }}
+            toolbarOptions={{
+              title: mockType === MockType.FILE ? "File content" : "",
+              options: null,
+            }}
           />
         </Col>
       </Row>
@@ -376,25 +437,7 @@ const MockEditor: React.FC<Props> = ({
     if (mockType === MockType.API) {
       return (
         <>
-          <Tabs
-            defaultActiveKey="1"
-            items={editors}
-            tabBarExtraContent={
-              isAiResponseActive ? (
-                <Button
-                  className="generate-ai-response-button"
-                  type="ghost"
-                  onClick={() => {
-                    trackAiResponseButtonClicked();
-                    setIsAiResponseModalOpen(true);
-                  }}
-                >
-                  <BsStars />
-                  &nbsp;AI Response
-                </Button>
-              ) : null
-            }
-          />
+          <Tabs defaultActiveKey="1" items={editors} />
         </>
       );
     } else {
@@ -404,48 +447,105 @@ const MockEditor: React.FC<Props> = ({
 
   return (
     <>
-      <MockEditorHeader
-        isNewMock={isNew}
-        mockType={mockType}
-        savingInProgress={savingInProgress}
-        handleClose={onClose}
-        handleSave={handleOnSave}
-        handleTest={handleTest}
-      />
-      <RQEditorTitle
-        name={name}
-        description={desc}
-        namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
-        descriptionPlaceholder="Add your description here."
-        nameChangeCallback={onNameChange}
-        descriptionChangeCallback={onDescriptionChange}
-        tagText={fileType}
-        errors={errors}
-      />
-      <Row className="mock-editor-container">
-        <Col span={22} offset={1} md={{ offset: 2, span: 20 }} lg={{ offset: 4, span: 16 }}>
-          <Row className="mock-editor-body">
-            {renderMetadataRow()}
-            {renderMockCodeEditor()}
-            <AIResponseModal
-              isOpen={isAiResponseModalOpen}
-              toggleOpen={(open) => setIsAiResponseModalOpen(open)}
-              handleAiResponseUsed={(responseText) => {
-                setBody(responseText);
-              }}
+      <ExportMocksModalWrapper />
+
+      {areLogsVisible ? (
+        <div className="mock-parent mock-editor-layout-container">
+          <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+            <MockEditorHeader
+              isNewMock={isNew}
+              mockType={mockType}
+              savingInProgress={savingInProgress}
+              handleClose={onClose}
+              handleSave={handleOnSave}
+              handleTest={handleTest}
+              setPassword={setPassword}
+              password={password}
+              isEditorReadOnly={isEditorReadOnly}
             />
-          </Row>
-        </Col>
-      </Row>
-      {!isNew ? (
-        <APIClient
-          request={apiRequest}
-          openInModal
-          modalTitle="Test mock endpoint"
-          isModalOpen={isTestModalOpen}
-          onModalClose={() => setIsTestModalOpen(false)}
-        />
-      ) : null}
+            <BottomSheetLayout
+              layout={SheetLayout.SPLIT}
+              bottomSheet={<MockLogs mockId={id} />}
+              minSize={0}
+              hideBottomSheet={!id}
+            >
+              <Col className="mock-editor-title-container">
+                <RQEditorTitle
+                  name={name}
+                  mode={isNew ? "create" : "edit"}
+                  description={desc}
+                  namePlaceholder="File name"
+                  descriptionPlaceholder="Add your description here."
+                  nameChangeCallback={onNameChange}
+                  descriptionChangeCallback={onDescriptionChange}
+                  tagText={fileType}
+                  errors={errors}
+                />
+              </Col>
+              <div className="mock-editor-wrapper">
+                <div className="mock-editor-container">
+                  <Row className="mock-editor-body">
+                    {renderMetadataRow()}
+                    {renderMockCodeEditor()}
+                  </Row>
+                </div>
+              </div>
+            </BottomSheetLayout>
+            {!isNew ? (
+              <APIClientModal
+                request={apiRequest}
+                modalTitle="Test mock endpoint"
+                isModalOpen={isTestModalOpen}
+                onModalClose={() => setIsTestModalOpen(false)}
+              />
+            ) : null}
+          </BottomSheetProvider>
+        </div>
+      ) : (
+        <div className="overflow-hidden mock-editor-layout-container">
+          <MockEditorHeader
+            isNewMock={isNew}
+            mockType={mockType}
+            savingInProgress={savingInProgress}
+            handleClose={onClose}
+            handleSave={handleOnSave}
+            handleTest={handleTest}
+            setPassword={setPassword}
+            password={password}
+            isEditorReadOnly={isEditorReadOnly}
+          />
+          <Col className="mock-editor-title-container">
+            <RQEditorTitle
+              disabled={isEditorReadOnly}
+              name={name}
+              mode={isNew ? "create" : "edit"}
+              description={desc}
+              namePlaceholder="File name"
+              descriptionPlaceholder="Add your description here."
+              nameChangeCallback={onNameChange}
+              descriptionChangeCallback={onDescriptionChange}
+              tagText={fileType}
+              errors={errors}
+            />
+          </Col>
+          <div className="mock-editor-wrapper">
+            <div className="mock-editor-container">
+              <Row className="mock-editor-body">
+                {renderMetadataRow()}
+                {renderMockCodeEditor()}
+              </Row>
+            </div>
+          </div>
+          {!isNew ? (
+            <APIClientModal
+              request={apiRequest}
+              modalTitle="Test mock endpoint"
+              isModalOpen={isTestModalOpen}
+              onModalClose={() => setIsTestModalOpen(false)}
+            />
+          ) : null}
+        </div>
+      )}
     </>
   );
 };

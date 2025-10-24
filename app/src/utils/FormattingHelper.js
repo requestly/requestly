@@ -1,6 +1,8 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "../config/constants";
+import { PRICING } from "features/pricing";
+import { capitalize } from "lodash";
+import { isSetappBuild } from "./AppUtils";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -22,9 +24,13 @@ export const getPrettyString = (string) => {
 
 export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE) return "Free";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.GOLD) return "Professional";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
+  if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
+  if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
+  if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
+  if (planName === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT) return "Professional (Student Program)";
+  if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) return "API Client Enterprise";
 
   return planName
     .toLowerCase()
@@ -61,31 +67,13 @@ export const getDomainFromEmail = (email) => {
   return email.split("@")[1];
 };
 
-export const isCompanyEmail = (email) => {
-  const domain = getDomainFromEmail(email);
-  if (!domain) {
-    return false;
-  }
-  return !(
-    APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain) || APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)
-  );
+export const getCompanyNameFromEmail = (email) => {
+  if (!email) return;
+  return capitalize(getDomainFromEmail(email).split(".")[0]);
 };
 
 export const getByteSize = (inputString) => {
   return new Blob([inputString]).size;
-};
-
-export const getEmailType = (email) => {
-  const domain = getDomainFromEmail(email);
-  if (!domain) {
-    return "UNDEFINED";
-  } else if (APP_CONSTANTS.EMAIL_DOMAINS.PERSONAL.includes(domain)) {
-    return "PERSONAL";
-  } else if (APP_CONSTANTS.EMAIL_DOMAINS.DESTROYABLE.includes(domain)) {
-    return "DESTROYABLE";
-  } else if (isCompanyEmail(email)) {
-    return "BUSINESS";
-  } else return "UNDEFINED";
 };
 
 export const getGreeting = () => {
@@ -107,7 +95,7 @@ export const filterUniqueObjects = (myArr) => {
 };
 
 export const getCountryNameFromISOCode = (ISOCode) => {
-  const countryCodeObject = APP_CONSTANTS.PRICING.COUNTRY_CODES.find((object) => object.value === ISOCode);
+  const countryCodeObject = PRICING.COUNTRY_CODES.find((object) => object.value === ISOCode);
 
   if (countryCodeObject) {
     return countryCodeObject.label;
@@ -149,7 +137,7 @@ export const removeTrailingSlash = (url) => {
 };
 
 export const isEmailValid = (email) => {
-  return email && typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return email && typeof email === "string" && !/\s/.test(email) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
 // [[...],[...]] -> {id:[],id:[]}

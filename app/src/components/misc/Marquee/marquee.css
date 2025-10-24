@@ -1,9 +1,3 @@
-.marquee {
-  display: flex;
-  align-items: center;
-  gap: 1.8rem;
-}
-
 .marquee-container {
   max-width: 600px;
 }
@@ -15,5 +9,6 @@
 }
 
 .marquee-icons {
-  width: 60px;
+  width: 65px;
+  margin: 0 8px;
 }

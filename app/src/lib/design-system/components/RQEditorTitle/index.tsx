@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Input, Typography, InputRef } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { BiPencil } from "react-icons/bi";
+import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
 import { TextAreaRef } from "antd/lib/input/TextArea";
 import "./RQEditorTitle.css";
 
@@ -14,23 +14,29 @@ interface TitleProps {
   description: string;
   namePlaceholder: string;
   descriptionPlaceholder: string;
-  nameChangeCallback: (name: string) => void;
+  nameChangeCallback: (name: string, warnForUnsavedChanges?: boolean) => void;
   descriptionChangeCallback: (desc: string) => void;
   errors?: ValidationErrors;
   mode?: "create" | "edit";
   tagText?: string;
+  defaultName?: string;
+  disabled?: boolean;
+  isSampleRule?: boolean;
 }
 
 const { TextArea } = Input;
 
 export const RQEditorTitle: React.FC<TitleProps> = ({
   name,
+  disabled = false,
+  isSampleRule = false,
   showDocs = false,
   description,
   nameChangeCallback,
   namePlaceholder,
   descriptionPlaceholder,
   descriptionChangeCallback,
+  defaultName,
   mode = "edit",
   tagText,
   errors,
@@ -54,57 +60,59 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
     }
   }, [isDescriptionEditable]);
 
+  useEffect(() => {
+    if (!defaultName || mode === "edit") return;
+
+    nameChangeCallback(defaultName, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, defaultName]);
+
   return (
-    <Col
-      span={22}
-      offset={1}
-      md={{
-        offset: showDocs ? 1 : 2,
-        span: showDocs ? 22 : 20,
-      }}
-      lg={{
-        offset: showDocs ? 1 : 4,
-        span: showDocs ? 22 : 16,
-      }}
-    >
-      <Row className="editor-title-container">
-        <Col span={20}>
-          <Row className="editor-title-name">
-            {name.length === 0 || isNameEditable ? (
-              <div className="editor-title-name-wrapper">
-                <Input
-                  ref={nameInputRef}
-                  data-tour-id="rule-editor-title"
-                  className={`${errors?.name && !name ? "error" : null}`}
-                  autoFocus={true || mode === "create"}
-                  onFocus={() => setIsNameEditable(true)}
-                  onBlur={() => setIsNameEditable(false)}
-                  bordered={false}
-                  spellCheck={false}
-                  value={name}
-                  onChange={(e) => nameChangeCallback(e.target.value)}
-                  placeholder={namePlaceholder}
-                  onPressEnter={() => setIsNameEditable(false)}
-                />
-                <div className="field-error-prompt">{errors?.name && !name ? errors?.name : null}</div>
-              </div>
-            ) : (
-              <div className="editor-title" data-tour-id="rule-editor-title">
-                <Typography.Text
-                  ellipsis={true}
-                  onClick={() => {
-                    setIsNameEditable(true);
-                  }}
-                >
-                  {name ? name : namePlaceholder}
-                </Typography.Text>
-                <BiPencil onClick={() => setIsNameEditable(true)} />
-              </div>
-            )}
-          </Row>
+    <Row className="editor-title-container">
+      <Col className="flex-1">
+        <Row className="editor-title-name">
+          {name.length === 0 || isNameEditable ? (
+            <div className="editor-title-name-wrapper">
+              <Input
+                disabled={disabled}
+                ref={nameInputRef}
+                data-tour-id="rule-editor-title"
+                className={`${errors?.name && !name ? "error" : null} editor-title-input`}
+                autoFocus={true}
+                onFocus={() => setIsNameEditable(true)}
+                onBlur={() => setIsNameEditable(false)}
+                bordered={false}
+                spellCheck={false}
+                value={name}
+                onChange={(e) => nameChangeCallback(e.target.value)}
+                placeholder={namePlaceholder}
+                onPressEnter={() => setIsNameEditable(false)}
+              />
+              <div className="field-error-prompt">{errors?.name && !name ? errors?.name : null}</div>
+            </div>
+          ) : (
+            <div className="editor-title" data-tour-id="rule-editor-title">
+              <Typography.Text
+                ellipsis={true}
+                onClick={() => {
+                  if (disabled) {
+                    return;
+                  }
+
+                  setIsNameEditable(true);
+                }}
+              >
+                {name ? name : namePlaceholder}
+              </Typography.Text>
+              {disabled ? null : <BiPencil onClick={() => setIsNameEditable(true)} />}
+            </div>
+          )}
+        </Row>
+        {isSampleRule ? null : (
           <Row className="editor-title-description">
             {isDescriptionEditable ? (
               <TextArea
+                disabled={disabled}
                 ref={textAreaRef}
                 autoSize={{ minRows: 1, maxRows: 3 }}
                 // onFocus={() => setIsDescriptionEditable(true)}
@@ -119,6 +127,8 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
             ) : (
               <div className="editor-description">
                 <Typography.Paragraph
+                  disabled={disabled}
+                  style={{ width: "100%" }}
                   ellipsis={{
                     rows: 3,
                   }}
@@ -126,7 +136,10 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                     icon:
                       description.length > 0 ? (
                         <RQButton
-                          onClick={() => setIsDescriptionEditable(true)}
+                          disabled={disabled}
+                          onClick={() => {
+                            setIsDescriptionEditable(true);
+                          }}
                           className="edit-description-btn"
                           type="text"
                         >
@@ -137,16 +150,18 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                       ),
                     tooltip: false,
                   }}
-                  onClick={() => setIsDescriptionEditable(true)}
+                  onClick={() => {
+                    setIsDescriptionEditable(true);
+                  }}
                 >
                   <span>{description ? description : descriptionPlaceholder}</span>
                 </Typography.Paragraph>
               </div>
             )}
           </Row>
-        </Col>
-        <>{tagText?.length && <Col className="mock-tag editor-title-tag">{tagText}</Col>}</>
-      </Row>
-    </Col>
+        )}
+      </Col>
+      <Row justify="end">{tagText?.length && <Col className="mock-tag editor-title-tag">{tagText}</Col>}</Row>
+    </Row>
   );
 };

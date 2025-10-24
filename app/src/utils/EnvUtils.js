@@ -20,3 +20,15 @@ export const isEnvBeta = () => {
 export const isEnvDevWithBeta = () => {
   return process.env.NODE_ENV === "development" && !isEnvEmulator();
 };
+
+const detectHeadless = () => {
+  return /HeadlessChrome/.test(window.navigator.userAgent) === true;
+};
+
+function bypassAutomation() {
+  return localStorage.getItem("__BYPASS_AUTOMATION___");
+}
+
+export const isEnvAutomation = () => {
+  return !bypassAutomation() && (window.navigator.webdriver === true || detectHeadless());
+};

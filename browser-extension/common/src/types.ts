@@ -42,13 +42,56 @@ export enum SourceOperator {
   WILDCARD_MATCHES = "Wildcard_Matches",
 }
 
+export enum SourceFilterTypes {
+  PAGE_DOMAINS = "pageDomains",
+  REQUEST_METHOD = "requestMethod",
+  RESOURCE_TYPE = "resourceType",
+  REQUEST_PAYLOAD = "requestPayload",
+}
+
 export interface UrlSource {
   id?: string;
   isActive?: boolean;
   key: SourceKey;
   operator: SourceOperator;
   value: string;
-  filters?: unknown[];
+  filters?: RuleSourceFilter[];
+}
+
+export interface RuleSourceFilter {
+  pageDomains: string[];
+  requestMethod: HttpRequestMethod[];
+  resourceType: ResourceType[];
+  requestPayload?: RequestPayloadFilter;
+}
+
+export interface RequestPayloadFilter {
+  key: string;
+  operator?: "Contains" | "Equals";
+  value: string;
+}
+
+export enum ResourceType {
+  XHR = "xmlhttprequest",
+  JS = "script",
+  CSS = "stylesheet",
+  Image = "image",
+  Media = "media",
+  Font = "font",
+  WebSocket = "websocket",
+  MainDocument = "main_frame",
+  IFrameDocument = "sub_frame",
+}
+
+enum HttpRequestMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE",
+  PATCH = "PATCH",
+  OPTIONS = "OPTIONS",
+  CONNECT = "CONNECT",
+  HEAD = "HEAD",
 }
 
 export enum AutoRecordingMode {
@@ -63,10 +106,22 @@ export interface SessionRecordingConfig {
     isActive: boolean;
     mode: AutoRecordingMode;
   };
+  notify?: boolean;
+  explicit?: boolean;
+  showWidget?: boolean;
+  markRecordingIcon?: boolean;
+  widgetPosition?: { top?: number; bottom?: number; left?: number; right?: number };
+  recordingStartTime?: number;
+  previousSession?: any;
 }
 
 export interface RulePair {
+  id: string;
   source: UrlSource;
+  destination?: string;
+  to?: string;
+  from?: string;
+  modifications?: any;
 }
 
 export interface Rule extends Record<string, unknown> {
@@ -107,23 +162,39 @@ export enum ScriptType {
   CODE = "code",
 }
 
+export interface ScriptAttributes {
+  name: string;
+  value: string;
+}
+
 export interface ScriptObject {
   codeType: ScriptCodeType;
   type: ScriptType;
   value: string;
-  loadTime?: "afterPageLoad" | "beforePageLoad";
+  loadTime?: "afterPageLoad" | "beforePageLoad" | "asSoonAsPossible";
+  attributes?: ScriptAttributes[];
 }
 
 export interface ScriptRulePair extends RulePair {
   scripts: ScriptObject[];
 }
 
-export interface ModifyResponseObject {
+export interface ModifyRequestResponseObject {
   statusCode?: string;
   type: "static" | "code";
   value: string;
 }
 
 export interface ResponseRulePair extends RulePair {
-  response: ModifyResponseObject;
+  response: ModifyRequestResponseObject;
+  serveWithoutRequest?: boolean;
+}
+
+export interface RequestRulePair extends RulePair {
+  request: ModifyRequestResponseObject;
+}
+
+export interface UpdateDynamicRuleOptions {
+  addRules?: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[];
+  removeRuleIds?: chrome.declarativeNetRequest.UpdateRuleOptions["removeRuleIds"];
 }

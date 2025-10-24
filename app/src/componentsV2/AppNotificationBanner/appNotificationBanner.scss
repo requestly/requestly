@@ -1,0 +1,142 @@
+.app-banner + .app-layout {
+  height: calc(100vh - 48px);
+}
+
+.app-banner {
+  padding: 8px 16px;
+  width: 100%;
+  height: 48px;
+  font-size: var(--requestly-font-size-sm, 13px);
+  color: var(--requestly-color-text-default) !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 8px;
+
+  .close-button-container {
+    width: 5%;
+  }
+
+  .app-banner-text {
+    p {
+      margin-bottom: 0px;
+    }
+  }
+
+  .right-arrow-icon {
+    transition: 0.3s transform;
+  }
+
+  &:hover .right-arrow-icon {
+    transform: translateX(5px);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .close-btn:hover,
+  .close-btn:focus {
+    background: transparent;
+  }
+
+  .rq-btn.ant-btn.view-users-button {
+    background-color: rgb(179 60 157);
+    border: rgb(179 60 157);
+
+    &:hover {
+      background-color: rgb(179 60 157);
+      border: rgb(179 60 157);
+      opacity: 0.6;
+    }
+  }
+
+  .app-banner-badge {
+    text-transform: uppercase;
+    font-size: 10px;
+    color: var(--requestly-color-text-default);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .app-banner-action-buttons {
+    display: flex;
+    gap: 4px;
+
+    .ant-btn-default,
+    .ant-btn-default:hover {
+      border-color: var(--requestly-color-text-default) !important;
+      background: transparent !important;
+    }
+
+    .ant-btn {
+      font-weight: 500 !important;
+    }
+  }
+}
+
+.rq-modal-content .user-list {
+  overflow: auto;
+  max-height: 300px;
+}
+
+.user-list-card {
+  align-items: center;
+  padding: 6px;
+  margin: 8px 0;
+  gap: 0.5em;
+}
+
+.app-banner__warning {
+  background: var(--requestly-color-warning) !important;
+  color: black !important;
+
+  a {
+    color: black;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: black;
+      text-decoration: underline;
+    }
+  }
+
+  .ant-btn-primary {
+    background: #5c3111 !important;
+    border: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: #5c3111 !important;
+      border: none;
+    }
+  }
+
+  .ant-btn-default {
+    border: none !important;
+    color: black !important;
+    text-decoration: underline;
+    background: none;
+    font-weight: 400 !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: none;
+      border: none;
+      color: black;
+      text-decoration: underline !important;
+    }
+  }
+}

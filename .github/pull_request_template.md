@@ -6,6 +6,23 @@ Closes issue: <!-- Link to Github issue -->
 
 <!-- Summarize your changes -->
 
+## 🎥 Demo Video:
+
+<!-- 
+📹 Please provide a video demonstration of your changes in action.
+This helps reviewers understand the functionality and verify the implementation.
+
+You can:
+- Record a screen recording showing the feature/fix working
+- Upload the video directly to this PR (drag & drop) or share a link (YouTube, Loom, etc.)
+- For small UI changes, GIFs are also acceptable
+
+If your changes are not user-facing (e.g., refactoring, build improvements), 
+please explain why a video is not applicable.
+-->
+
+**Video/Demo:** <!-- Add your video link or upload here -->
+
 ## ✅ Checklist:
 
 - [ ] Make sure linting and unit tests pass.
@@ -13,9 +30,9 @@ Closes issue: <!-- Link to Github issue -->
 - [ ] Verified UI in browser.
 - [ ] For UI changes, added/updated analytics events (if applicable).
 - [ ] For changes in extension's code, manually tested in Chrome and Firefox.
-- [ ] For changes in extension's code, both MV2 and MV3 are covered.
 - [ ] Added/updated unit tests for this change.
 - [ ] Raised pull request to update corresponding documentation (if already exists).
+- [ ] **Added demo video showing the changes in action** (if applicable).
 
 ## 🧪 Test instructions:
 

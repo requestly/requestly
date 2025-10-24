@@ -1,0 +1,245 @@
+{
+  "QueryParam_1": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715931404947,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "transform": {
+              "query": ""
+            }
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "regexFilter": "example.com"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "QueryParam_1",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1716785900377,
+    "name": "3. Remove all",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "d92eq",
+        "modifications": [
+          {
+            "actionWhenParamExists": "Overwrite",
+            "id": "ge89m",
+            "param": "",
+            "type": "Remove All",
+            "value": ""
+          }
+        ],
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        }
+      }
+    ],
+    "ruleType": "QueryParam",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  },
+  "QueryParam_2": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719970860375,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "transform": {
+              "queryTransform": {
+                "addOrReplaceParams": [
+                  {
+                    "key": "foo",
+                    "value": "bar"
+                  }
+                ],
+                "removeParams": []
+              }
+            }
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "example.com"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "QueryParam_2",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719970876299,
+    "name": "add foo bar to example",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "46t54",
+        "modifications": [
+          {
+            "actionWhenParamExists": "Overwrite",
+            "id": "hp8i2",
+            "param": "foo",
+            "type": "Add",
+            "value": "bar"
+          }
+        ],
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        }
+      }
+    ],
+    "ruleType": "QueryParam",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  },
+  "QueryParam_3": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715154660049,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "transform": {
+              "queryTransform": {
+                "addOrReplaceParams": [
+                  {
+                    "key": "foo1",
+                    "value": "bar1"
+                  },
+                  {
+                    "key": "ping",
+                    "value": "updatedPong"
+                  }
+                ]
+              }
+            }
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "example.com"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "QueryParam_3",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719893107855,
+    "name": "Add multiple params",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "5ncf5",
+        "modifications": [
+          {
+            "actionWhenParamExists": "Overwrite",
+            "id": "5xstm",
+            "param": "foo1",
+            "type": "Add",
+            "value": "bar1"
+          },
+          {
+            "actionWhenParamExists": "Overwrite",
+            "id": "4jmnl",
+            "param": "ping",
+            "type": "Add",
+            "value": "updatedPong"
+          }
+        ],
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        }
+      }
+    ],
+    "ruleType": "QueryParam",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  },
+  "QueryParam_4": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719970926249,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "transform": {
+              "queryTransform": {
+                "addOrReplaceParams": [],
+                "removeParams": ["foo"]
+              }
+            }
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "example.com"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "QueryParam_4",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719970965779,
+    "name": "remove foo param",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "43dyz",
+        "modifications": [
+          {
+            "actionWhenParamExists": "Overwrite",
+            "id": "5i1zj",
+            "param": "foo",
+            "type": "Remove",
+            "value": ""
+          }
+        ],
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        }
+      }
+    ],
+    "ruleType": "QueryParam",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  }
+}

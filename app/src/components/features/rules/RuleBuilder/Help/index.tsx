@@ -1,29 +1,25 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Button, Col, Row, Skeleton, Collapse } from "antd";
-import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { YouTubePlayer } from "components/misc/YoutubeIframe";
-import { NotionRenderer } from "react-notion";
-import Zoom from "react-medium-image-zoom";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Col, Row, DrawerProps } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import "react-medium-image-zoom/dist/styles.css";
-import { RQCollapse } from "lib/design-system/components/RQCollapse";
-import { ReactComponent as Cross } from "assets/icons/cross.svg";
-import { ReactComponent as LeftArrow } from "assets/icons/left-arrow.svg";
-import { ReactComponent as RightArrow } from "assets/icons/right-arrow.svg";
-import { RuleType } from "types/rules";
-import { TocItem, ExternalLink } from "./types";
-import { snakeCase } from "lodash";
+import LeftArrow from "assets/icons/left-arrow.svg?react";
+import RightArrow from "assets/icons/right-arrow.svg?react";
+import { ExternalLink } from "./types";
 import APP_CONSTANTS from "config/constants";
-import { rulesData } from "components/landing/ruleSelection/rules-data";
 import {
-  trackDocsSidebarClosed,
-  trackDocsSidebarPrimaryCategoryClicked,
-  trackDocsSidebarSecondaryCategoryClicked,
-  trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
+  trackDocsSidebarSecondaryCategoryClicked,
 } from "modules/analytics/events/common/rules";
-import "./Help.css";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
+import "./Help.scss";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
+import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { getCurrentlySelectedRuleData } from "store/selectors";
+import { useSelector } from "react-redux";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 const externalLinks: ExternalLink[] = [
   {
@@ -80,23 +76,16 @@ const defaultMockUrls = {
 
 interface HelpProps {
   ruleType: RuleType;
-  setShowDocs: (showDocs: boolean) => void;
+  onClose: DrawerProps["onClose"];
 }
 
-const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
+const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
-  const [notionPageData, setNotionPageData] = useState(null);
-  const [tableOfContents, setTableOfContents] = useState(null);
+  const [_notionPageData, setNotionPageData] = useState(null);
+  const [_tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
-
-  const handleScrollToSection = useCallback((id: string) => {
-    const target = document.getElementById(id);
-    if (target) {
-      const { offsetTop } = target;
-      const parentContainer = target.parentNode.parentNode as HTMLElement;
-      parentContainer.scrollTop = offsetTop - 87;
-    }
-  }, []);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const toggleDocs = () => {
     if (isDocsVisible) {
@@ -107,16 +96,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
       }, 0);
     }
     setIsDocsVisible((prev) => !prev);
-  };
-
-  const handleDemoVideoPlay = () => {
-    trackDocsSidebarDemovideoWatched(ruleType);
-  };
-
-  const handleDocumentationListItemClick = (title: string, handler: () => void) => {
-    toggleDocs();
-    setTimeout(() => handler(), 0);
-    trackDocsSidebarPrimaryCategoryClicked(ruleType, snakeCase(title));
   };
 
   const updateDocTableOfContent = (data: any[]) => {
@@ -148,137 +127,65 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
       });
   }, [ruleType]);
 
+  // TODO: cleanup
+
   return (
     <div className="rule-editor-help-container">
-      <div className="rule-editor-help-content">
+      <div className="rule-editor-help-content-container">
         <Row align="middle" justify="space-between" className="w-full rule-editor-help-header">
           <Col className="title items-center">
             {isDocsVisible && (
               <Button onClick={toggleDocs} icon={<LeftArrow />} className="rule-editor-help-back-btn" />
             )}
-            Help
+            Help and guide
           </Col>
-
-          <Button
-            title="Close"
-            icon={<Cross />}
-            className="rule-editor-docs-close-btn"
-            onClick={() => {
-              setShowDocs(false);
-              trackDocsSidebarClosed(ruleType);
-            }}
-          />
+          <Col>
+            <Button onClick={onClose} icon={<MdClose className="anticon" />} className="rule-editor-help-close-btn" />
+          </Col>
         </Row>
 
-        {isDocsVisible ? (
-          <>
-            <div className="rule-editor-docs">
-              <NotionRenderer
-                blockMap={notionPageData}
-                customBlockComponents={{
-                  image: ({ blockValue }) => {
-                    return (
-                      <Zoom classDialog="rule-editor-docs-image">
-                        <img
-                          width="260px"
-                          height="100px"
-                          alt="rule editor example"
-                          src={blockValue?.properties?.source[0][0]}
-                        />
-                      </Zoom>
-                    );
-                  },
-                  header: ({ blockValue }) => {
-                    return (
-                      <h1 className="notion-h1" id={blockValue?.id}>
-                        {blockValue?.properties?.title[0][0]}
-                      </h1>
-                    );
-                  },
-                  video: ({ blockValue }) => {
-                    return (
-                      <YouTubePlayer
-                        width="320"
-                        height="160"
-                        handleOnPlay={handleDemoVideoPlay}
-                        src={blockValue?.properties?.source[0][0]}
-                      />
-                    );
-                  },
-                  toggle: ({ blockValue, blockMap }) => {
-                    return (
-                      <RQCollapse accordion className="rule-editor-docs-faqs-collapse">
-                        <Collapse.Panel key={0} header={blockValue?.properties?.title[0][0]}>
-                          <NotionRenderer blockMap={{ [blockValue?.content[0]]: blockMap[blockValue?.content[0]] }} />
-                        </Collapse.Panel>
-                      </RQCollapse>
-                    );
-                  },
-                }}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* internal links */}
-            <div ref={documentationListRef} className="rule-editor-help-lists">
-              <div className="caption text-gray text-bold rule-editor-help-title">
-                <CompassOutlined />
-                Documentation for {rulesData[ruleType]?.name}
-              </div>
-              <ul className="rule-editor-help-list">
-                <>
-                  {tableOfContents?.length ? (
-                    <>
-                      {" "}
-                      {tableOfContents.map(({ title, id }: TocItem) => (
-                        <li
-                          key={id}
-                          id={id}
-                          onClick={() => handleDocumentationListItemClick(title, () => handleScrollToSection(id))}
-                        >
-                          <Button>{title}</Button>
-                        </li>
-                      ))}
-                    </>
-                  ) : (
-                    <Skeleton
-                      active
-                      paragraph={{ rows: 4, width: ["90%", "90%", "90%", "90%"] }}
-                      className="rule-editor-doc-skeleton"
-                    />
-                  )}
-                </>
-              </ul>
+        <div className="rule-editor-help-content">
+          {!isDocsVisible ? (
+            <RuleDetailsPanel
+              isSample={isSampleRule}
+              ruleDetails={
+                isSampleRule ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details : RULE_DETAILS[ruleType]
+              }
+              source="docs_sidebar"
+            />
+          ) : null}
 
-              {/* external links */}
-              <div className="caption text-gray text-bold rule-editor-help-title">
-                <InfoCircleOutlined />
-                Help categories
+          {isDocsVisible ? null : (
+            <>
+              {/* internal links */}
+              <div ref={documentationListRef} className="rule-editor-help-lists">
+                {/* external links */}
+                <div className="caption text-gray text-bold rule-editor-help-title">
+                  <InfoCircleOutlined />
+                  Help categories
+                </div>
+                <ul className="rule-editor-help-list external-links">
+                  {externalLinks.map(({ title, link }) => (
+                    <li key={title}>
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => trackDocsSidebarSecondaryCategoryClicked(ruleType, title.toLowerCase())}
+                      >
+                        {title} <RightArrow />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="rule-editor-help-list external-links">
-                {externalLinks.map(({ title, link }) => (
-                  <li key={title}>
-                    <a
-                      href={link}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => trackDocsSidebarSecondaryCategoryClicked(ruleType, title.toLowerCase())}
-                    >
-                      {title} <RightArrow />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
-
       {/* footer */}
       <Row className="rule-editor-help-footer">
         <Button
-          className="ml-auto"
           onClick={() => {
             trackDocsSidebarContactUsClicked(ruleType);
             window.open(APP_CONSTANTS.LINKS.CONTACT_US_PAGE, "_blank");

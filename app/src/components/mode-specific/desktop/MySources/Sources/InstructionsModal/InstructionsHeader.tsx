@@ -1,11 +1,11 @@
+import React from "react";
 import { Avatar, Col, Row, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
-import React from "react";
 
 interface InstructionsHeaderProps {
   icon: string;
   heading: string;
-  description: string;
+  description: React.ReactNode;
   setShowInstructions: (value: boolean) => void;
   ExtraContentOnRight?: React.ReactNode;
 }
@@ -29,7 +29,7 @@ const InstructionsHeader: React.FC<InstructionsHeaderProps> = ({
             iconOnly
             type="default"
             data-dismiss="modal"
-            icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+            icon={<img alt="back" width="14px" height="12px" src="/assets/media/common/left-arrow.svg" />}
             className="header-icon-btn"
           />
         </Col>

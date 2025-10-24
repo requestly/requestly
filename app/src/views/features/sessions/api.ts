@@ -3,12 +3,11 @@ import { collection, deleteDoc, doc, getDoc, getFirestore, updateDoc } from "fir
 import { deleteObject, getStorage, ref } from "firebase/storage";
 import { toast } from "utils/Toast";
 import {
-  trackSessionRecordingDeleted,
   trackSessionRecordingDescriptionUpdated,
   trackSessionRecordingNameUpdated,
   trackSessionRecordingStartTimeOffsetUpdated,
-  trackSessionRecordingVisibilityUpdated,
 } from "modules/analytics/events/features/sessionRecording";
+import { trackSessionRecordingDeleted, trackSessionRecordingVisibilityUpdated } from "features/sessionBook/analytics";
 import { SessionRecordingMetadata, Visibility } from "./SessionViewer/types";
 import Logger from "lib/logger";
 

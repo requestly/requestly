@@ -1,3 +1,4 @@
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { FileType } from "../types";
 
 // Remove leading & trailing slash
@@ -6,24 +7,36 @@ export const cleanupEndpoint = (endpoint: string) => {
   return cleanedEndpoint;
 };
 
-export const validateEndpoint = (endpoint: string) => {
+export const validateHeaders = (headers: { [key: string]: string }) => {
+  const ACCEPTED_CONTENT_TYPES = ["application/json", "text/plain"];
+  if (!Object.keys(headers).length) return null;
+
+  const contentType = headers["Content-Type"] || headers["content-type"];
+
+  if (contentType && !ACCEPTED_CONTENT_TYPES.includes(contentType)) {
+    return "Only application/json or text/plain are allowed as content-type";
+  }
+  return null;
+};
+
+export const validateEndpoint = (endpoint: string, messagePrefix = "Endpoint") => {
   if (!endpoint) {
-    return "Endpoint is required";
+    return `${messagePrefix} is required`;
   }
 
   if (endpoint.startsWith("/")) {
-    return "Endpoint cannot start with '/'";
+    return `${messagePrefix} cannot start with '/'`;
   }
 
   if (endpoint.endsWith("/")) {
-    return "Endpoint cannot end with '/'";
+    return `${messagePrefix} cannot end with '/'`;
   }
 
-  const pattern = /^[A-Za-z0-9_.\-/]+$/;
+  const pattern = /^[A-Za-z0-9_:.\-/]+$/;
   if (endpoint.match(pattern)) {
     return null;
   } else {
-    return "Endpoint can only contain letters, numbers, '_', '-' & '/'";
+    return `${messagePrefix} can only contain letters, numbers, '_', '-' & '/'`;
   }
 };
 
@@ -39,12 +52,12 @@ export const validateStatusCode = (statusCode: string) => {
 export const getEditorLanguage = (fileType?: FileType) => {
   switch (fileType) {
     case FileType.JS:
-      return "javascript";
+      return EditorLanguage.JAVASCRIPT;
     case FileType.CSS:
-      return "css";
+      return EditorLanguage.CSS;
     case FileType.HTML:
-      return "html";
+      return EditorLanguage.HTML;
     default:
-      return "json";
+      return EditorLanguage.JSON;
   }
 };

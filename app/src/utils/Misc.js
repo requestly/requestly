@@ -6,6 +6,10 @@ import { getAttrFromFirebase, submitAttrUtil } from "./AnalyticsUtils";
 import { dateObjToDateString, getOldestDate } from "./DateTimeUtils";
 import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installation";
 import { getValueAsPromise } from "actions/FirebaseActions";
+import { isEmailVerified } from "./AuthUtils";
+import moment from "moment";
+import { EmailType } from "@requestly/shared/types/common";
+import { getEmailType } from "./mailCheckerUtils";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -13,16 +17,46 @@ export const generateUUID = () => {
   return Math.random().toString(36).substr(2, 5);
 };
 
-export const copyToClipBoard = (textToCopy, prompt) => {
-  prompt = prompt || "Copied to clipboard!";
-  navigator.clipboard.writeText(textToCopy).then(
-    () => {
-      toast.info(prompt);
-    },
-    (err) => {
-      toast.error("Oops something went wrong");
+export const generateSupportTicketNumber = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+export const copyToClipBoard = async (textToCopy, prompt) => {
+  const showSuccess = () => {
+    if (prompt) toast.info(prompt);
+  };
+  const showError = () => toast.error("Oops something went wrong while copying");
+
+  try {
+    if (document.hasFocus()) {
+      await navigator.clipboard.writeText(textToCopy);
+      showSuccess();
+      return { success: true };
+    } else throw new Error("Document is not focused");
+  } catch (error) {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = textToCopy;
+      textArea.setAttribute("readonly", "");
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      const ok = typeof document.execCommand === "function" && document.execCommand("copy");
+      document.body.removeChild(textArea);
+      if (ok) {
+        showSuccess();
+        return { success: true };
+      }
+      showError();
+      return { success: false };
+    } catch (_) {
+      showError();
+      return { success: false };
     }
-  );
+  }
 };
 
 export const isUserRegisteredOnInstallationDate = async (user, appMode) => {
@@ -63,6 +97,9 @@ export const getAndUpdateInstallationDate = async (appMode, doUpdate, isUserLogg
       // User is not logged in - return/set date in local storage
       const localInstallationDate = getLocalInstallationDate(attrName, doUpdate, appMode);
       submitAttrUtil(attrName, localInstallationDate);
+      const installDate = moment(localInstallationDate);
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.DAYS_SINCE_INSTALL, moment().diff(installDate, "days"));
+
       resolve(localInstallationDate);
     }
   });
@@ -115,46 +152,6 @@ export const parseGravatarImage = (urlString) => {
   return url.href;
 };
 
-export const fetchUserCountry = async () => {
-  const defaultCountry = "US";
-  const country = await fetch("https://api.country.is/")
-    .then((res) => res.json())
-    .then((location) => {
-      if (location.country) {
-        return location.country;
-      } else {
-        return defaultCountry;
-      }
-    })
-    .catch(() => {
-      return defaultCountry;
-    });
-  return country;
-};
-
-export const getUserOS = () => {
-  let userAgent = window.navigator.userAgent,
-    platform = window.navigator.platform,
-    macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
-    windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"],
-    iosPlatforms = ["iPhone", "iPad", "iPod"],
-    os = null;
-
-  if (macosPlatforms.indexOf(platform) !== -1) {
-    os = "macOS";
-  } else if (iosPlatforms.indexOf(platform) !== -1) {
-    os = "iOS";
-  } else if (windowsPlatforms.indexOf(platform) !== -1) {
-    os = "Windows";
-  } else if (/Android/.test(userAgent)) {
-    os = "Android";
-  } else if (!os && /Linux/.test(platform)) {
-    os = "Linux";
-  }
-
-  return os;
-};
-
 // Modifies the original object! Deep clone prior if required
 export const sanitizeDataForFirebase = (myObject) => {
   // Remove undefined values, if any
@@ -168,6 +165,28 @@ export const getSignupDate = async (uid) => {
   return await getValueAsPromise(["customProfile", uid, "signup", "signup_date"]);
 };
 
+const getConnectedApps = (appsListArray) => {
+  return appsListArray?.filter((app) => app.isActive);
+};
+
+export const getConnectedAppNames = (appsListArray) => {
+  return getConnectedApps(appsListArray).map((app) => app.name);
+};
+
 export const getConnectedAppsCount = (appsListArray) => {
-  return appsListArray?.filter((app) => app.isActive).length;
+  return getConnectedApps(appsListArray).length;
+};
+
+export const isVerifiedBusinessDomainUser = async (email, uid) => {
+  if (!email || !uid) return false;
+
+  const result = await isEmailVerified(uid);
+  const email_type = await getEmailType(email);
+  const isCompanyEmail = email_type === EmailType.BUSINESS;
+
+  return result && isCompanyEmail;
+};
+
+export const openEmailClientWithDefaultEmailBody = (email, subject, body) => {
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };

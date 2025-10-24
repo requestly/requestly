@@ -1,4 +1,4 @@
-module.exports.colors = {
+export const colors = {
   white: "rgba(255, 255, 255, 0.87)",
   primary: "#1e69ff",
   secondary: "#323337",

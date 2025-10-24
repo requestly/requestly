@@ -1,8 +1,8 @@
 import React from "react";
 import { ExecutionEvent } from "../../../types";
-import PropertyRow from "../../../components/PropertyRow/PropertyRow";
-import "./executionDetails.scss";
+import { PropertyRow } from "@requestly-ui/resource-table";
 import config from "../../../../config";
+import "./executionDetails.scss";
 
 interface Props {
   execution: ExecutionEvent;
@@ -20,7 +20,7 @@ const ExecutionDetails: React.FC<Props> = ({ execution }) => {
           </a>
         }
       />
-      <PropertyRow name="Modification" value={execution.modification} />
+      {/* <PropertyRow name="Modification" value={execution.modification} /> */}
     </div>
   );
 };

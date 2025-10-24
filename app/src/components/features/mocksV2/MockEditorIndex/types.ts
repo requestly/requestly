@@ -14,6 +14,8 @@ export interface MockEditorDataSchema {
   headers: { [key: string]: string };
   body: string;
   responseId?: string; // Keeping it separate as we only support 1 response
+  password?: string;
+  collectionId?: string;
   // TODO: Response should ideally be an array
 }
 
@@ -21,6 +23,7 @@ export interface ValidationErrors {
   name?: string;
   statusCode?: string;
   endpoint?: string;
+  headers?: string;
 }
 
 // TODO: Remove this. Fetch this from @requestly/mock-server or APP_CONSTANTS

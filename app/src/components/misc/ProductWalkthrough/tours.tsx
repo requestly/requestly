@@ -1,10 +1,20 @@
-import { Rule } from "types";
 import { CustomSteps, PointerPlacement } from "./types";
 import { generateRuleEditorTour, getTourTarget } from "./utils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import FEATURES from "config/constants/sub/features";
 import { MISC_TOURS } from "./constants";
+import LINKS from "config/constants/sub/links";
+import {
+  DelayRule,
+  HeaderRule,
+  RedirectRule,
+  ReplaceRule,
+  RequestRule,
+  ResponseRule,
+  Rule,
+  UserAgentRule,
+} from "@requestly/shared/types/entities/rules";
 
 const tourTooltipPresets = {
   disableBeacon: true,
@@ -13,6 +23,7 @@ const tourTooltipPresets = {
   pointerPlacement: PointerPlacement.TOP_50,
 };
 
+//@ts-expect-error -> Placement type is defined inside react-joyride there is no export
 export const productTours: Record<string, CustomSteps[]> = {
   // TOURS FOR RULE EDITORS STARTS HERE
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: generateRuleEditorTour([
@@ -22,7 +33,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Add Destination URL",
       content: "The destination to which the users will be redirected to based on the source condition",
       placement: "bottom-start",
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].destination?.length,
+      disableNext: (ruleData: RedirectRule.Record) => !ruleData.pairs[0].destination?.length,
     },
   ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.HEADERS]: generateRuleEditorTour([
@@ -41,7 +52,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       showNext: false,
       autoMoveToNext: true,
       offset: 20,
-      disableNext: (ruleData: Rule) =>
+      disableNext: (ruleData: HeaderRule.Record) =>
         !ruleData.pairs[0].modifications.Request?.length && !ruleData.pairs[0].modifications.Response?.length,
     },
     {
@@ -112,7 +123,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "bottom-start",
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.resourceType.length,
+      disableNext: (ruleData: ResponseRule.Record) => !ruleData.pairs[0].response.resourceType.length,
       offset: 0,
       showNext: false,
       autoMoveToNext: true,
@@ -172,7 +183,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "top",
       pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 16,
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].response.value?.length,
+      disableNext: (ruleData: ResponseRule.Record) => !ruleData.pairs[0].response.value?.length,
     },
     {
       ...tourTooltipPresets,
@@ -209,7 +220,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       placement: "top",
       pointerPlacement: PointerPlacement.BOTTOM_50,
       offset: 16,
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].request.value?.length,
+      disableNext: (ruleData: RequestRule.Record) => !ruleData.pairs[0].request.value?.length,
     },
   ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT]: generateRuleEditorTour([
@@ -247,7 +258,7 @@ export const productTours: Record<string, CustomSteps[]> = {
         </>
       ),
       placement: "bottom",
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].from?.length,
+      disableNext: (ruleData: ReplaceRule.Record) => !ruleData.pairs[0].from?.length,
     },
     {
       ...tourTooltipPresets,
@@ -255,7 +266,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       title: "Replace with",
       content: <>Add the new string here which you want to replace with.</>,
       placement: "bottom-start",
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].to?.length,
+      disableNext: (ruleData: ReplaceRule.Record) => !ruleData.pairs[0].to?.length,
     },
   ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.CANCEL]: generateRuleEditorTour([]),
@@ -273,7 +284,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 8,
       placement: "bottom-start",
       pointerPlacement: PointerPlacement.TOP_25,
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].delay?.length,
+      disableNext: (ruleData: DelayRule.Record) => !ruleData.pairs[0].delay?.length,
     },
   ]),
   [GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT]: generateRuleEditorTour([
@@ -290,7 +301,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       offset: 20,
       pointerPlacement: PointerPlacement.BOTTOM_75,
       placement: "top",
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].envType?.length,
+      disableNext: (ruleData: UserAgentRule.Record) => !ruleData.pairs[0].envType?.length,
     },
     {
       ...tourTooltipPresets,
@@ -301,7 +312,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       ),
       placement: "top",
       pointerPlacement: PointerPlacement.BOTTOM_50,
-      disableNext: (ruleData: Rule) => !ruleData.pairs[0].userAgent?.length,
+      disableNext: (ruleData: UserAgentRule.Record) => !ruleData.pairs[0].userAgent?.length,
     },
   ]),
   // TOUR FOR RULE EDITORS ENDS HERE
@@ -329,27 +340,65 @@ export const productTours: Record<string, CustomSteps[]> = {
       showNext: false,
     },
   ],
-  [MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE]: [
+  [MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION]: [
     {
       ...tourTooltipPresets,
-      target: getTourTarget("rule-table-switch-status"),
-      title: "Activate/Deactivate rule easily",
-      content: "You can switch off the rule in case the rule is not in use.",
+      title: "Click here to save your recording",
+      target: getTourTarget("save-draft-session-btn"),
+      content: (
+        <>
+          You can save online or download locally as a file. You can learn more about how we ensure the safety and
+          security of your session recordings by visiting this{" "}
+          <a
+            className="external-link"
+            href={LINKS.REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE}
+            target="_blank"
+            rel="noreferrer"
+          >
+            link
+          </a>
+          .
+        </>
+      ),
       placement: "bottom",
       spotlightPadding: 0,
       offset: 20,
+      pointerPlacement: PointerPlacement.TOP_100,
       customNextButtonText: "Got it!",
     },
   ],
-  [MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE]: [
+  [MISC_TOURS.PRICING.UPGRADE_WORKSPACE_MENU]: [
     {
       ...tourTooltipPresets,
-      target: getTourTarget("rule-table-create-group-btn"),
-      title: "Create groups for the rules",
-      content: "Organize your rules into logical groups and enable/disable in one go!",
+      title: "Select workspace to upgrade",
+      target: getTourTarget("upgrade-workspace-menu"),
+      content: (
+        <>
+          💡 Choose the workspace you want to upgrade. For instance, you can choose a private workspace for a personal
+          upgrade.
+        </>
+      ),
       placement: "bottom",
       spotlightPadding: 0,
+      offset: 20,
+      pointerPlacement: PointerPlacement.TOP_50,
       customNextButtonText: "Got it!",
+      disableOverlay: true,
+    },
+  ],
+  [MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE]: [
+    {
+      ...tourTooltipPresets,
+      title: "Test this Rule",
+      target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE),
+      content:
+        "Check if the rule is configured correctly and is working as expected on the intended web page. Earn $35 in credit on completing this step.",
+      pointerPlacement: PointerPlacement.BOTTOM_100,
+      placement: "left",
+      showNext: false,
+      hidePointer: true,
+      disableOverlay: true,
+      offset: 0,
     },
   ],
 };

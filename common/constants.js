@@ -3,7 +3,7 @@
  * Right now the imports are defined using require, once changed to ES6 module we can move to import module
  */
 if (typeof isReactApp === "undefined") {
-  var isReactApp = typeof require !== "undefined";
+  var isReactApp = document?.getElementById("root") !== null;
 }
 const CONSTANTS = {};
 
@@ -13,6 +13,12 @@ CONSTANTS.APP_MODES = {
   WORDPRESS: "WORDPRESS",
   CLOUDFLARE: "CLOUDFLARE",
   REMOTE: "REMOTE",
+};
+
+CONSTANTS.APP_FLAVOURS = {
+  REQUESTLY: "REQUESTLY",
+  SESSIONBEAR: "SESSIONBEAR",
+  SETAPP: "SETAPP",
 };
 
 CONSTANTS.COMPANY_INFO = {
@@ -27,6 +33,11 @@ CONSTANTS.ONBOARDING_DAYS_TO_EXPIRE = 7;
 CONSTANTS.PUBLIC_NAMESPACE = "__REQUESTLY__";
 
 CONSTANTS.CONSOLE_LOGGER_ENABLED = "console-logger-enabled";
+
+CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY = {
+  ALL: "all",
+  SPECIFIC: "specific",
+};
 
 /**
  * We are calling them as BLACK_LIST_DOMAINS
@@ -117,6 +128,7 @@ CONSTANTS.RULE_SOURCE_FILTER_TYPES = {
   RESOURCE_TYPE: "resourceType",
   REQUEST_METHOD: "requestMethod",
   REQUEST_DATA: "requestPayload",
+  PAGE_DOMAINS: "pageDomains",
 };
 
 CONSTANTS.MODIFICATION_TYPES = {
@@ -141,12 +153,20 @@ CONSTANTS.EXTENSION_MESSAGES = {
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
   STOP_RECORDING: "stopRecording",
+  WATCH_RECORDING: "watchRecording",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
   SEND_EXTENSION_EVENTS: "sendExtensionEvents",
   NOTIFY_APP_LOADED: "notifyAppLoaded",
   NOTIFY_RECORD_UPDATED: "notifyRecordUpdated",
   START_RECORDING_ON_URL: "startRecordingOnUrl",
   NOTIFY_EXTENSION_UPDATED: "notifyExtensionUpdated",
+  TEST_RULE_ON_URL: "testRuleOnUrl",
+  SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
+  NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
+  IS_PROXY_APPLIED: "isProxyApplied",
+  DISCONNECT_FROM_DESKTOP_APP: "disconnectFromDesktopApp",
+  DESKTOP_APP_CONNECTION_STATUS_UPDATED: "desktopAppConnectionStatusUpdated",
+  OPEN_CURL_IMPORT_MODAL: "openCurlImportModal",
 };
 
 CONSTANTS.HEADERS_TARGET = {
@@ -172,6 +192,7 @@ CONSTANTS.SCRIPT_CODE_TYPES = {
 CONSTANTS.SCRIPT_LOAD_TIME = {
   BEFORE_PAGE_LOAD: "beforePageLoad",
   AFTER_PAGE_LOAD: "afterPageLoad",
+  AS_SOON_AS_POSSIBLE: "asSoonAsPossible",
 };
 
 CONSTANTS.SCRIPT_LIBRARIES = {
@@ -200,6 +221,11 @@ CONSTANTS.STORAGE_KEYS = {
   SESSION_RECORDING_CONFIG: "sessionRecordingConfig",
   USE_EVENTS_ENGINE: "useEventsEngine",
   SEND_EXECUTION_EVENTS: "sendExecutionEvents",
+  TEST_REPORTS: "testReports",
+  IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
+  BLOCKED_DOMAINS: "blocked_domains",
+  REFRESH_TOKEN: "refreshToken",
+  ACTIVE_WORKSPACE_ID: "activeWorkspaceId",
 };
 
 CONSTANTS.REQUEST_STATE = {
@@ -207,9 +233,13 @@ CONSTANTS.REQUEST_STATE = {
   COMPLETE: "COMPLETE",
 };
 
-if (isReactApp) {
-  module.exports = CONSTANTS;
-} else {
+CONSTANTS.CLIENT_SOURCE = {
+  REQUESTLY: "requestly:client",
+  SESSIONBEAR: "sessionbear:client",
+};
+
+export default CONSTANTS;
+if (!isReactApp) {
   /** For legacy apps- browser extension */
   Object.assign(window.RQ, CONSTANTS);
 }

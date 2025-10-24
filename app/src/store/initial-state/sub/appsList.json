@@ -1,4 +1,16 @@
 {
+  "existing-browser": {
+    "id": "existing-browser",
+    "type": "browser",
+    "name": "Existing Browser",
+    "description": "Existing Profile",
+    "icon": "chrome.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": false
+  },
   "fresh-chrome": {
     "id": "fresh-chrome",
     "type": "browser",
@@ -8,7 +20,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-chrome": {
     "id": "existing-chrome",
@@ -41,7 +54,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-chrome-beta": {
     "id": "existing-chrome-beta",
@@ -62,7 +76,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-chrome-dev": {
     "id": "existing-chrome-dev",
@@ -83,7 +98,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-chromium": {
     "id": "fresh-chromium",
@@ -94,7 +110,20 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
+  },
+  "existing-chromium": {
+    "id": "existing-chromium",
+    "type": "browser",
+    "name": "Chromium",
+    "description": "Existing Profile",
+    "icon": "chromium.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": false
   },
   "fresh-chromium-dev": {
     "id": "fresh-chromium-dev",
@@ -105,7 +134,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-edge": {
     "id": "fresh-edge",
@@ -116,10 +146,12 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-edge": {
     "id": "existing-edge",
+    "type": "browser",
     "name": "Microsoft Edge",
     "description": "Existing Profile",
     "icon": "edge.png",
@@ -137,7 +169,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-edge-dev": {
     "id": "fresh-edge-dev",
@@ -148,7 +181,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-edge-canary": {
     "id": "fresh-edge-canary",
@@ -159,7 +193,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-brave": {
     "id": "fresh-brave",
@@ -170,7 +205,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-opera": {
     "id": "fresh-opera",
@@ -181,7 +217,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-opera-gx": {
     "id": "fresh-opera-gx",
@@ -192,7 +229,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-opera-crypto": {
     "id": "fresh-opera-crypto",
@@ -203,13 +241,25 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-firefox": {
     "id": "fresh-firefox",
     "type": "browser",
     "name": "Mozilla Firefox",
     "description": "New Profile",
+    "icon": "firefox.png",
+    "isActive": false,
+    "comingSoon": false,
+    "isScanned": false,
+    "isAvailable": false
+  },
+  "existing-firefox": {
+    "id": "existing-firefox",
+    "type": "browser",
+    "name": "Mozilla Firefox",
+    "description": "Existing Profile",
     "icon": "firefox.png",
     "isActive": false,
     "comingSoon": false,
@@ -247,7 +297,7 @@
     "isScanned": false,
     "comingSoon": false,
     "isAvailable": true,
-    "isDocAvailable": "https://docs.requestly.io/desktop-app/how-to.../terminal-setup"
+    "isDocAvailable": "https://docs.requestly.com/general/http-interceptor/terminal"
   },
   "system-wide": {
     "id": "system-wide",
@@ -282,7 +332,20 @@
     "comingSoon": false,
     "isAvailable": true
   },
-
+  "ios-simulator": {
+    "id": "ios-simulator",
+    "type": "hack to not show it automatically",
+    "name": "Simulator",
+    "description": "iOS",
+    "icon": "ios-simulator.png",
+    "metadata": {
+      "devices": {}
+    },
+    "isActive": false,
+    "isScanned": false,
+    "comingSoon": false,
+    "isAvailable": true
+  },
   "raspberry-pi": {
     "id": "raspberry-pi",
     "name": "Raspberry Pi",

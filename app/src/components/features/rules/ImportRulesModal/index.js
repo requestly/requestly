@@ -1,17 +1,19 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
-import { AiOutlineWarning } from "react-icons/ai";
-import { BsFileEarmarkCheck } from "react-icons/bs";
-import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules } from "../../../../store/selectors";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
+import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
+import { getIsRefreshRulesPending, getAppMode } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
-import { actions } from "../../../../store";
+import { globalActions } from "store/slices/global/slice";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRulesToV2";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { ImportFromCharlesModal } from "features/rules/screens/rulesList/components/RulesList/components";
 import { RQModal } from "lib/design-system/components";
 import Logger from "lib/logger";
 import {
@@ -90,7 +92,7 @@ const ImportRulesModal = (props) => {
         onFilesDrop={onDrop}
         loaderMessage="Processing rules..."
         isProcessing={processingDataToImport}
-        title="Drag and drop your exported file"
+        title="Drag and drop your JSON file"
       />
     );
   };
@@ -138,12 +140,10 @@ const ImportRulesModal = (props) => {
 
   const doImportRules = (natureOfImport) => {
     setIsImporting(true);
-    const migratedDataToImport = migrateHeaderRulesToV2(dataToImport);
-
-    addRulesAndGroupsToStorage(appMode, migratedDataToImport)
+    addRulesAndGroupsToStorage(appMode, dataToImport)
       .then(async () => {
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })
@@ -253,7 +253,7 @@ const ImportRulesModal = (props) => {
     if (isImportFromCharlesModalOpen) {
       toggleModal();
     } else {
-      trackCharlesSettingsImportStarted(AUTH.SOURCE.RULES_LIST);
+      trackCharlesSettingsImportStarted(SOURCE.RULES_LIST);
     }
 
     setIsImportFromCharlesModalOpen((prev) => !prev);
@@ -263,7 +263,8 @@ const ImportRulesModal = (props) => {
     setShowImportOptions(false);
   };
 
-  const modifyModalContentForCharlesImportOption = isCharlesImportFeatureFlagOn && showImportOptions;
+  const modifyModalContentForCharlesImportOption =
+    isCharlesImportFeatureFlagOn && showImportOptions && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   return (
     <>
@@ -271,7 +272,7 @@ const ImportRulesModal = (props) => {
         <ImportFromCharlesModal
           isOpen={isImportFromCharlesModalOpen}
           toggle={toggleImportFromCharlesModal}
-          triggeredBy={AUTH.SOURCE.RULES_LIST}
+          triggeredBy={SOURCE.RULES_LIST}
         />
       ) : null}
 

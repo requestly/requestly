@@ -1,0 +1,40 @@
+.billing-team-card {
+  background: var(--requestly-color-surface-1);
+  border: 1px solid var(--requestly-color-surface-2);
+  border-bottom: none;
+  padding: 15px 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.85fr;
+
+  &:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom: 1px solid var(--requestly-color-surface-2);
+  }
+
+  &-request-btn-wrapper {
+    justify-content: flex-end;
+  }
+
+  .billing-team-card-title {
+    color: var(--requestly-color-text-default);
+    font-weight: var(--requestly-font-weight-medium);
+    font-size: var(--requestly-font-size-sm);
+  }
+
+  .billing-team-card-role {
+    font-size: var(--requestly-font-size-2xs);
+    color: var(--requestly-color-text-subtle);
+  }
+
+  .billing-team-card-description {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-xs);
+    margin-top: 8px;
+  }
+}

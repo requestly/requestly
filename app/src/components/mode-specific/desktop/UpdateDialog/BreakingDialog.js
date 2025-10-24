@@ -1,12 +1,14 @@
 import { Button, Modal, Typography, Row, Col } from "antd";
 import "./BreakingDialog.scss";
+import { getLinkWithMetadata } from "modules/analytics/metadata";
 
 const { Text, Title } = Typography;
 
+/* NOT BEING USED */
 const BreakingDialog = () => {
   const handleUpdateClick = () => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-      link: "https://requestly.io/desktop",
+      link: getLinkWithMetadata("https://requestly.com/desktop"),
     });
   };
 

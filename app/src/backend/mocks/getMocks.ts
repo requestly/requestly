@@ -10,8 +10,12 @@ export const getMocks = async (uid: string, type: MockType, teamId?: string): Pr
   }
 
   const ownerId = getOwnerId(uid, teamId);
-  const mocks = await getMocksFromFirebase(ownerId, type).catch(() => []);
-  return mocks;
+
+  try {
+    return await getMocksFromFirebase(ownerId, type);
+  } catch {
+    return [];
+  }
 };
 
 const getMocksFromFirebase = async (ownerId: string, type?: MockType): Promise<RQMockMetadataSchema[]> => {
@@ -36,9 +40,8 @@ const getMocksFromFirebase = async (ownerId: string, type?: MockType): Promise<R
     const data = doc.data();
     if (!data?.id) {
       erroredMockIds.push(doc.id);
-    } else {
-      result.push(doc.data());
     }
+    result.push({ ...data, id: doc.id });
   });
 
   if (erroredMockIds.length > 0) {

@@ -6,13 +6,20 @@ import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
 import { RecordingOptions, SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
+import { getAppFlavour } from "utils/AppUtils";
+import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const saveRecording = async (
   uid: string,
   workspaceId: string | null,
   payload: SessionRecordingMetadata,
   events: any,
-  options: RecordingOptions
+  options: RecordingOptions,
+  source: string,
+  testThisRuleMetadata: {
+    appliedStatus: boolean;
+    ruleType: RuleType;
+  }
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
   const ownerId = getOwnerId(uid, workspaceId);
@@ -36,13 +43,16 @@ export const saveRecording = async (
     lastUpdatedBy: uid,
     updatedTs: Date.now(),
     createdTs: Date.now(),
+    source,
+    testThisRuleMetadata,
+    appFlavour: getAppFlavour(),
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)
     .then((docRef) => {
       return docRef.id;
     })
-    .catch((err) => {
+    .catch((err): null => {
       return null;
     });
 

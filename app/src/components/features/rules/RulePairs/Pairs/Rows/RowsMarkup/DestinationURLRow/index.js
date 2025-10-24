@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Radio, Popconfirm } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Row, Col, Input, Radio, Popconfirm, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getCurrentlySelectedRuleConfig } from "store/selectors";
-import { RQButton } from "lib/design-system/components";
+import { RQButton } from "lib/design-system-v2/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
-import { RedirectDestinationType } from "types/rules";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
-import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import {
   displayFileSelector,
   handleOpenLocalFileInBrowser,
@@ -27,13 +25,18 @@ import { trackDesktopActionInterestCaptured } from "modules/analytics/events/mis
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import LINKS from "config/constants/sub/links";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
+import { MockPickerModal } from "features/mocks/modals";
+import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.css";
+import { RedirectRule } from "@requestly/shared/types/entities/rules";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
   const [destinationPopupSelection, setDestinationPopupSelection] = useState(null);
+  const [isSelectedFileInputVisible, setIsSelectedFileInputVisible] = useState(false);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
@@ -48,7 +51,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     trackSelectMock(url);
     setIsMockPickerVisible(false);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: { destination: url },
       })
@@ -58,7 +61,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const handleFileSelectCallback = (filePath) => {
     trackSelectMapLocalFile(filePath);
     dispatch(
-      actions.updateRulePairAtGivenPath({
+      globalActions.updateRulePairAtGivenPath({
         pairIndex,
         updates: {
           destination: `file://${filePath}`,
@@ -79,7 +82,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         !currentDestinationURL.startsWith("file://")
       ) {
         dispatch(
-          actions.updateRulePairAtGivenPath({
+          globalActions.updateRulePairAtGivenPath({
             pairIndex,
             updates: {
               destination: "http://" + currentDestinationURL,
@@ -104,15 +107,16 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
 
   const getDestinationTypeForExistingRule = (destination) => {
     if (destination.startsWith("file://")) {
-      return RedirectDestinationType.MAP_LOCAL;
+      return RedirectRule.DestinationType.MAP_LOCAL;
     } else if (
       /* check for both new and old mocks */
       destination.includes("requestly.dev/api/mockv2/") ||
-      destination.includes("requestly.me")
+      destination.includes("requestly.me") ||
+      destination.includes("requestly.tech/api/mockv2/")
     ) {
-      return RedirectDestinationType.MOCK_OR_FILE_PICKER;
+      return RedirectRule.DestinationType.MOCK_OR_FILE_PICKER;
     } else {
-      return RedirectDestinationType.URL;
+      return RedirectRule.DestinationType.URL;
     }
   };
 
@@ -121,19 +125,22 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     setDestinationTypePopupVisible(true);
   };
 
-  const handleDestinationTypeChange = () => {
-    dispatch(
-      actions.updateRulePairAtGivenPath({
-        pairIndex,
-        updates: {
-          destination: "",
-          destinationType: destinationPopupSelection,
-        },
-      })
-    );
-
-    setDestinationType(destinationPopupSelection);
-  };
+  const handleDestinationTypeChange = useCallback(
+    (destinationPopupSelection) => {
+      dispatch(
+        globalActions.updateRulePairAtGivenPath({
+          pairIndex,
+          triggerUnsavedChangesIndication: false,
+          updates: {
+            destination: "",
+            destinationType: destinationPopupSelection,
+          },
+        })
+      );
+      setDestinationType(destinationPopupSelection);
+    },
+    [pairIndex, dispatch]
+  );
 
   const renderRedirectURLInput = () => {
     return (
@@ -145,7 +152,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         type="text"
         onChange={(event) =>
           dispatch(
-            actions.updateRulePairAtGivenPath({
+            globalActions.updateRulePairAtGivenPath({
               pairIndex,
               updates: {
                 destination: event?.target?.value,
@@ -173,11 +180,9 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           }}
           disabled={isInputDisabled}
         >
-          {pair.destination ? "Change file" : " Select mock/file"}
+          {pair.destination ? "Change file" : " Select file"}
         </RQButton>
-        <span className="destination-file-path">
-          {pair.destination.length ? pair.destination : " No mock or file chosen"}
-        </span>
+        <span className="destination-file-path">{pair.destination.length ? pair.destination : " No file chosen"}</span>
         {pair.destination && (
           <a href={pair.destination} target="_blank" rel="noreferrer">
             <HiOutlineExternalLink className="external-link-icon" />
@@ -207,8 +212,70 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           } destination-file-path`}
         >
           {" "}
-          {pair.destination.length ? pair.destination : " No file chosen"}
         </span>{" "}
+        {pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES ||
+        pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES ? (
+          <>
+            {isSelectedFileInputVisible ? (
+              <Input
+                autoFocus
+                onBlur={() => setIsSelectedFileInputVisible(false)}
+                style={{
+                  width: 350,
+                }}
+                value={pair.destination}
+                onChange={(e) => {
+                  dispatch(
+                    globalActions.updateRulePairAtGivenPath({
+                      pairIndex,
+                      updates: { destination: e.target.value },
+                    })
+                  );
+                }}
+              />
+            ) : (
+              <>
+                <span className="file-path">{pair.destination.length ? pair.destination : " No file chosen"}</span>
+                {pair.destination ? (
+                  <>
+                    {isFeatureCompatible(FEATURES.EDIT_LOCAL_FILE_PATH) ? (
+                      <Tooltip
+                        color={"#000"}
+                        placement="top"
+                        title={
+                          <>
+                            You can use the captured group expressions from the request to dynamically set the file path
+                            (using $1, $2, etc).
+                            <br />
+                            <a
+                              href="https://docs.requestly.com/general/http-rules/advanced-usage/source-conditions#testing-url-with-wildcard-condition"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              click here
+                            </a>{" "}
+                            to learn more.
+                          </>
+                        }
+                      >
+                        <RQButton
+                          size="small"
+                          type="link"
+                          onClick={() => {
+                            setIsSelectedFileInputVisible(true);
+                          }}
+                          icon={<MdOutlineEdit />}
+                        />
+                      </Tooltip>
+                    ) : null}
+                  </>
+                ) : null}
+              </>
+            )}
+          </>
+        ) : (
+          <span className="file-path"> {pair.destination.length ? pair.destination : " No file chosen"}</span>
+        )}
         {pair.destination && isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL) && (
           <HiOutlineExternalLink
             className="external-link-icon"
@@ -238,11 +305,11 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
 
   const renderDestinationRow = () => {
     switch (pair.destinationType) {
-      case RedirectDestinationType.URL:
+      case RedirectRule.DestinationType.URL:
         return renderRedirectURLInput();
-      case RedirectDestinationType.MOCK_OR_FILE_PICKER:
+      case RedirectRule.DestinationType.MOCK_OR_FILE_PICKER:
         return renderMockOrFilePicker();
-      case RedirectDestinationType.MAP_LOCAL:
+      case RedirectRule.DestinationType.MAP_LOCAL:
         return renderLocalFileSelector();
       default:
         return renderRedirectURLInput();
@@ -266,44 +333,77 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           alignItems: "center",
         }}
       >
-        <Col span={3} className="redirect-rule-destination-label">
+        <Col className="redirect-rule-destination-label">
           <MoreInfo
             showIcon
             text="Define the destination URL where you want to redirect the original request."
             analyticsContext="redirect_to_icon"
             source={currentlySelectedRuleConfig.TYPE}
           >
-            <span className="white text-bold">Redirect to</span>
+            <span className="white text-bold">Redirects to</span>
           </MoreInfo>
         </Col>
         <Col span={24}>
           <Row className="redirect-destination-container">
             <Col span={24} className="destination-options">
-              <Popconfirm
-                title="This will clear the existing changes"
-                okText="Confirm"
-                cancelText="Cancel"
-                onConfirm={() => {
-                  handleDestinationTypeChange();
-                  setDestinationTypePopupVisible(false);
-                }}
-                onCancel={() => setDestinationTypePopupVisible(false)}
-                open={destinationTypePopupVisible}
-              >
-                <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
-                  <MoreInfo
-                    text="Redirect URL to another URL"
-                    analyticsContext="url_destination"
-                    source={currentlySelectedRuleConfig.TYPE}
-                  >
-                    <Radio value={RedirectDestinationType.URL}>URL</Radio>
-                  </MoreInfo>
+              {pair.destination ? (
+                <Popconfirm
+                  title="This will clear the existing changes"
+                  okText="Confirm"
+                  cancelText="Cancel"
+                  onConfirm={() => {
+                    handleDestinationTypeChange(destinationPopupSelection);
+                    setDestinationTypePopupVisible(false);
+                  }}
+                  onCancel={() => setDestinationTypePopupVisible(false)}
+                  open={destinationTypePopupVisible}
+                >
+                  <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
+                    <Radio value={RedirectRule.DestinationType.URL}>Another URL</Radio>
+                    <MoreInfo
+                      trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+                      tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
+                      analyticsContext="map_local"
+                      source={currentlySelectedRuleConfig.TYPE}
+                      text={
+                        <>
+                          Map Local file option is available only in desktop app.{" "}
+                          <a
+                            href={LINKS.REQUESTLY_DOWNLOAD_PAGE}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="tooltip-link"
+                            onClick={() => trackMoreInfoClicked("map_local", currentlySelectedRuleConfig.TYPE)}
+                          >
+                            Download now
+                          </a>
+                        </>
+                      }
+                    >
+                      <Radio
+                        value={RedirectRule.DestinationType.MAP_LOCAL}
+                        disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
+                      >
+                        Local file
+                      </Radio>
+                    </MoreInfo>
+                    <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
+                  </Radio.Group>
+                </Popconfirm>
+              ) : (
+                <Radio.Group
+                  value={destinationType}
+                  onChange={(e) => {
+                    handleDestinationTypeChange(e.target.value);
+                  }}
+                  disabled={isInputDisabled}
+                >
+                  <Radio value={RedirectRule.DestinationType.URL}>Another URL</Radio>
                   <MoreInfo
                     trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                     tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
                     analyticsContext="map_local"
                     source={currentlySelectedRuleConfig.TYPE}
-                    keepActive={true}
                     text={
                       <>
                         Map Local file option is available only in desktop app.{" "}
@@ -320,21 +420,15 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                     }
                   >
                     <Radio
-                      value={RedirectDestinationType.MAP_LOCAL}
+                      value={RedirectRule.DestinationType.MAP_LOCAL}
                       disabled={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                     >
                       Local file
                     </Radio>
                   </MoreInfo>
-                  <MoreInfo
-                    text=" Redirect to endpoint from Requestly Mock Server or File Server"
-                    analyticsContext="pick_mock_or_file_destination"
-                    source={currentlySelectedRuleConfig.TYPE}
-                  >
-                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
-                  </MoreInfo>
+                  <Radio value={RedirectRule.DestinationType.MOCK_OR_FILE_PICKER}>Pick from File server</Radio>
                 </Radio.Group>
-              </Popconfirm>
+              )}
             </Col>
             <Col span={24} className="destination-action">
               {renderDestinationRow()}

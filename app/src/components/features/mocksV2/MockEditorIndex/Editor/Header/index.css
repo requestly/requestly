@@ -1,8 +1,7 @@
 .mock-editor-layout-header.ant-layout-header {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border-dark);
-  background-color: var(--body-background);
+  background-color: var(--requestly-color-background);
 }
 
 .mock-editor-layout-header .ant-row {
@@ -13,11 +12,18 @@
 
 .mock-editor-layout-header .header-left-section {
   display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mock-editor-layout-header .header-left-section .rq-breadcrumb {
+  margin-left: 0;
 }
 
 .mock-editor-layout-header .header-right-section {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only svg {
@@ -26,9 +32,27 @@
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn-icon-only:hover svg {
-  color: var(--white);
+  color: var(--requestly-color-text-default);
 }
 
 .mock-editor-layout-header .header-right-section .ant-btn {
   font-weight: 500;
+}
+.mock-editor-options-trigger-icon {
+  margin-left: 5px;
+}
+
+.mock-editor-options-dropdown-trigger {
+  font-size: var(--requestly-font-size-sm, 13px);
+  cursor: pointer;
+  user-select: none;
+  padding: 7px 8px 6px 8px;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--requestly-color-surface-0);
+  border: 1px solid transparent;
+  transition: border 0.3s;
+}
+
+.mock-editor-options-dropdown-trigger.mock-editor-options-dropdown-active {
+  border-color: var(--dropdown-active-border-color);
 }

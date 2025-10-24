@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Select, AutoComplete } from "antd";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
 import { statusCodes } from "config/constants/sub/statusCode";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import "./ResponseStatusCodeRow.css";
 
 const { Option, OptGroup } = Select;
@@ -27,7 +26,7 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
           dropdownMatchSelectWidth={false}
           onChange={(value) => {
             dispatch(
-              actions.updateRulePairAtGivenPath({
+              globalActions.updateRulePairAtGivenPath({
                 pairIndex,
                 updates: {
                   "response.statusCode": value,
@@ -55,9 +54,6 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
             </OptGroup>
           ))}
         </AutoComplete>
-        <span className="response-status-code-select-icon">
-          <DownArrow />
-        </span>
       </Col>
     </Row>
   );

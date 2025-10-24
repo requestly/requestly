@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Tag } from "antd";
-import _ from "lodash";
+import { isEqual } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
 import { createResponseRule, updateResponseRule } from "../../../../../../features/rules/RuleBuilder/actions/utils";
@@ -12,6 +12,7 @@ import { getAppMode } from "store/selectors";
 const JSON_CONTENT_TYPE = "application/json";
 
 const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAction }) => {
+  const dispatch = useDispatch();
   //Global State
   const appMode = useSelector(getAppMode);
 
@@ -43,7 +44,7 @@ const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAct
       upsertRequestAction(log_id, createResponseAction(rule.id));
       toast.success("Rule Created Successfully");
     } else {
-      updateResponseRule(appMode, responseActions[0].rule_id, url, modifiedData);
+      updateResponseRule(appMode, responseActions[0].rule_id, url, modifiedData, dispatch);
       toast.success("Rule Modified Successfully");
     }
     // setUpdateAllowed(false);
@@ -67,7 +68,7 @@ const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAct
    * so as to avoid loosing ungoing modification
    */
   useEffect(() => {
-    if (!_.isEqual(currentData, data) && !isUpdating) {
+    if (!isEqual(currentData, data) && !isUpdating) {
       setCurrentData(data);
       setModifiedData(data);
     }
@@ -82,7 +83,7 @@ const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAct
    * modifiedData != currentData
    */
   useEffect(() => {
-    if (_.isEqual(currentData, modifiedData)) {
+    if (isEqual(currentData, modifiedData)) {
       setIsUpdating(false);
     } else {
       setIsUpdating(true);

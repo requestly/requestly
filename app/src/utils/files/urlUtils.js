@@ -1,27 +1,4 @@
-// import axios from "axios";
-
 export function getShortenedUrl(longUrl) {
-  /*  const environment = {
-    production: true,
-    urlShortnerKey: "AIzaSyC2WOxTtgKH554wCezEJ4plxnMNXaUSFXY",
-    urlShortnerDomain: "requestly.page.link"
-  };
-
-  const body = {
-    dynamicLinkInfo: {
-      dynamicLinkDomain: environment.urlShortnerDomain,
-      link: longUrl
-    }
-  };
-
-  const urlShortenerApi =
-    "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=" +
-    environment.urlShortnerKey;
-
-  return axios.post(urlShortenerApi, body).then(response => {
-    // console.log(response);
-    return response.data.shortLink;
-  });*/
   return new Promise(function (resolve, reject) {
     resolve(longUrl);
   });

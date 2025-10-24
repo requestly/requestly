@@ -1,33 +1,35 @@
 :root {
-  /* colors */
-  --white: #ffffff;
-  --text-gray: #b0b0b5;
-  --text-dark-gray: #b0b0b5b3;
+  --neutrals-gray-200: #d0d1d3;
+  --neutrals-gray-300: #b9babe;
+  --neutrals-gray-400: #8b8d92;
+  --neutrals-gray-600: #555963;
+  --neutrals-gray-700: #3b404e;
+  --neutrals-gray-800: #262b37;
+  --neutrals-gray-900: #161a25;
+
+  /* Old Color scheme but new tokens */
+  --text-light: #b0b0b5b3;
+  --surface-0: #1b1b1b;
+  --surface-3: var(--neutrals-gray-600);
+  --background: #1b1b1b;
+
+  /* old tokens */
+  --text-gray: var(--text-light);
+  --text-dark-gray: var(--text-light);
   --gray-dark: #3b3b3b;
-  --gray-light: #a6a6a6;
+  --gray-light: var(--text-light);
   --border: #4f5053;
   --border-dark: #303030;
-  --danger: #fc5f5f;
   --danger-rgb: 252, 95, 95;
-  --success: #069d4f;
-  --primary: #1e69ff;
   --link-color: #3ba0ff;
-  --background: #141414;
-  --background-dark: #1c1d21;
-  --body-background: #212121;
-  --app-secondary-sidebar-background: #262626;
-  --component-background: #262626;
-  --component-dark-background: var(--body-background);
-  --input-background: #2b2b2b;
+  --background-dark: var(--background);
   --component-header-background: #2d2d2d;
-  --hover-color: #3b3b3b74;
   --dropdown-active-border-color: #0361ff;
   --input-hover-border-color: #2051b4;
   --input-focus-border-color: #1e69ff;
   --input-focus-box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
 
   /* utils */
-  --space: 2px;
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
 

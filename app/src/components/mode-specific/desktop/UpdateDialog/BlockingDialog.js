@@ -1,9 +1,10 @@
 import { Button, Modal, Progress, Typography, Row, Col } from "antd";
-import { FiSun } from "react-icons/fi";
+import { FiSun } from "@react-icons/all-files/fi/FiSun";
 import "./BlockingDialog.scss";
 
 const { Text, Title } = Typography;
 
+/* NOT BEING USED */
 const BlockingDialog = ({ updateDetails, isUpdateAvailable, isUpdateDownloaded, quitAndInstall, updateProgress }) => {
   const handleUpdateClick = () => {
     quitAndInstall();

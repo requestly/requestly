@@ -1,0 +1,11 @@
+.secondary-sidebar-layout-container {
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+
+  .secondary-sidebar-content-container {
+    flex-grow: 1;
+    height: 100%;
+    overflow: auto !important;
+  }
+}

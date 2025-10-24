@@ -1,11 +1,18 @@
 import { EXTENSION_MESSAGES } from "common/constants";
-import { initRuleExecutionHandler } from "./ruleExecution";
-import { initSessionRecording } from "./sessionRecorder";
+import { initSessionRecording } from "../common/sessionRecorder";
+import { getVariable, Variable } from "../../service-worker/variable";
+import { initPageScriptMessageListener } from "./pageScriptMessageListener";
+import { initTestRuleHandler } from "./testRuleHandler";
+import { initExtensionMessageListener } from "../common/extensionMessageListener";
 
-console.log("Hello from Requestly!");
-
-if (document.doctype?.name === "html") {
-  chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.HANDSHAKE_CLIENT });
-  initSessionRecording();
-  initRuleExecutionHandler();
+if (document.doctype?.name === "html" || document.contentType?.includes("html")) {
+  initExtensionMessageListener();
+  getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true).then((isExtensionStatusEnabled) => {
+    if (isExtensionStatusEnabled) {
+      chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.HANDSHAKE_CLIENT });
+      initSessionRecording();
+      initPageScriptMessageListener();
+      initTestRuleHandler();
+    }
+  });
 }

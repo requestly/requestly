@@ -6,16 +6,19 @@ import { toast } from "utils/Toast.js";
 import SpinnerColumn from "../../../misc/SpinnerColumn";
 //SERVICES
 import { StorageService } from "../../../../init";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../../../store/selectors";
-import { actions } from "../../../../store";
+import { getAppMode, getIsRefreshRulesPending } from "../../../../store/selectors";
+import { getUserAuthDetails } from "store/slices/global/user/selectors";
+import { globalActions } from "store/slices/global/slice";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
+import { trackGroupRenamed } from "features/rules/analytics";
 
 import "./index.scss";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   //Load props
-  const groupIdFromProps = groupId.groupId;
+  const groupIdFromProps = groupId;
 
   //Global State
   const dispatch = useDispatch();
@@ -88,9 +91,10 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
       .then(async () => {
         //Push Notify
         toast.info(`Renamed Group`);
+        trackGroupRenamed();
         //Refresh List
         dispatch(
-          actions.updateRefreshPendingStatus({
+          globalActions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
           })
@@ -101,16 +105,14 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
 
   useEffect(() => {
     Logger.log("Writing to storage in RenameGroupModal useEffect");
-    StorageService(appMode)
-      .getRecord(groupIdFromProps)
-      .then((group) => {
-        if (group && group.name) {
-          setOriginalGroup(group);
-          setGroupName(group.name);
-          setIsLoading(false);
-        }
-      });
-  }, [groupIdFromProps, appMode]);
+    clientRuleStorageService.getRecordById(groupIdFromProps).then((group) => {
+      if (group && group.name) {
+        setOriginalGroup(group);
+        setGroupName(group.name);
+        setIsLoading(false);
+      }
+    });
+  }, [groupIdFromProps]);
 
   return (
     <Modal

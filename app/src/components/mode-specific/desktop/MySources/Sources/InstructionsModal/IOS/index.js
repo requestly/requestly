@@ -1,6 +1,6 @@
 import { Dropdown, Row, Steps } from "antd";
 import { useMemo, useState } from "react";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import TestProxyInstructions from "../common/TestProxy";
 import CertificateDownloadInstructions from "./CertificateDownload";
 import CertificateTrustInstructions from "./CertificateTrust";
@@ -45,7 +45,7 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
       {
         title: "Test HTTP Proxy",
         status: "process",
-        description: <TestProxyInstructions />,
+        description: <TestProxyInstructions device="ios" />,
       },
       {
         title: "Download certificate",
@@ -63,7 +63,7 @@ const IOSInstructionModal = ({ setShowInstructions }) => {
   return (
     <>
       <InstructionsHeader
-        icon={window.location.origin + "/assets/img/thirdPartyAppIcons/ios.svg"}
+        icon={window.location.origin + "/assets/media/components/ios.svg"}
         heading="iOS setup"
         description="Note: Follow the below mentioned steps to complete the setup. Steps may vary depending upon your device. Select your device first."
         setShowInstructions={setShowInstructions}

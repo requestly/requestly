@@ -1,0 +1,55 @@
+.move-mock-into-collection-modal.rq-modal.ant-modal {
+  min-width: 400px !important;
+
+  .ant-modal-body {
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--requestly-color-surface-0);
+    border: 1px solid var(--requestly-color-white-t-10);
+
+    .header {
+      color: var(--requestly-color-text-default);
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    .collection-select-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      & > span {
+        color: var(--requestly-color-text-default);
+        font-size: var(--requestly-font-size-sm, 13px);
+        font-weight: 500;
+        line-height: 18px;
+        letter-spacing: 0.25px;
+      }
+    }
+
+    .actions {
+      align-self: flex-end;
+      padding-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.collection-not-found-container {
+  color: var(--requestly-color-white);
+
+  .create-new-collection-btn.ant-btn {
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}

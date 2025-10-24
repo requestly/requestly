@@ -1,0 +1,71 @@
+ol.rq-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding-left: 0;
+  margin: 8px 16px;
+  max-height: 24px;
+
+  .ant-skeleton {
+    opacity: 0.6;
+    max-width: 250px;
+
+    .ant-skeleton-input {
+      height: 16px;
+      border-radius: 4px;
+    }
+  }
+
+  a.rq-breadcrumb-item,
+  .rq-breadcrumb-separator {
+    flex-shrink: 0;
+    cursor: pointer;
+    font-weight: var(--requestly-font-weight-normal);
+    color: var(--requestly-color-text-subtle);
+    line-height: var(--requestly-font-line-height-xs, 15px);
+    font-size: var(--requestly-font-size-xs, 11px);
+    padding: 0;
+    height: auto;
+  }
+
+  a.rq-breadcrumb-item:hover {
+    background-color: transparent !important;
+    text-decoration: underline;
+  }
+
+  a.rq-breadcrumb-item:last-child {
+    color: var(--requestly-color-text-default);
+  }
+
+  .rq-breadcrumb-separator {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  input.ant-input.rq-breadcrumb-input {
+    min-height: 24px;
+    max-width: 166px;
+    padding: 2px 4px !important;
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-weight: var(--requestly-font-weight-medium);
+    border-radius: 4px;
+  }
+
+  .rq-breadcrumb-record-name {
+    display: flex;
+    align-items: center;
+    max-width: 166px;
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-weight: var(--requestly-font-weight-medium);
+
+    .edit-icon {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      margin-left: 2px;
+    }
+  }
+}

@@ -1,0 +1,87 @@
+.bottomsheet-layout-container {
+  height: calc(100% - 53px);
+  position: relative;
+
+  .ant-tabs {
+    height: 100%;
+  }
+
+  &.drawer-layout {
+    .bottom-sheet-container {
+      position: absolute;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  &.horizontal-split {
+    display: flex;
+  }
+
+  &.vertical-split {
+    display: flex;
+    flex-direction: column;
+
+    & .ant-tabs-content-holder {
+      padding: 8px;
+      overflow: hidden;
+    }
+  }
+
+  .content {
+    height: 100%;
+    overflow: auto;
+  }
+
+  .bottom-sheet-container-resizer {
+    height: 5px;
+    width: 100%;
+    cursor: ns-resize;
+  }
+
+  .bottom-sheet-wrapper {
+    height: inherit;
+    width: 100%;
+  }
+
+  .bottomsheet-layout-gutter .gutter {
+    z-index: 1;
+    position: absolute;
+    transition: 0.3s all;
+    background: transparent;
+    border: 2px solid transparent;
+    width: inherit !important;
+    height: inherit !important;
+
+    &.gutter-horizontal {
+      cursor: col-resize;
+    }
+
+    &.gutter-vertical {
+      cursor: row-resize;
+    }
+
+    &:hover,
+    &:active {
+      background: var(--requestly-color-surface-0, #212121);
+      border: 2px solid var(--requestly-color-primary, #004eeb);
+    }
+  }
+
+  // NETWORK TABLE SPECIFC STYLE IN VERTICAL SPLIT VIEW
+  &.vertical-split {
+    .bottom-sheet-container.ant-col {
+      height: 100% !important;
+
+      .ant-tabs {
+        height: 100%;
+
+        .rq-network-table-container {
+          .network-container {
+            height: calc(100% - 20px);
+          }
+        }
+      }
+    }
+  }
+}

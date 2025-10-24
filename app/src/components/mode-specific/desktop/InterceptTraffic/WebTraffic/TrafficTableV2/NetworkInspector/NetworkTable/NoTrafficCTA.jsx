@@ -11,22 +11,28 @@ import {
   trackSystemWideConnected,
 } from "modules/analytics/events/desktopApp/apps";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
+import { globalActions } from "store/slices/global/slice";
 import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
 import { getDesktopSpecificDetails } from "store/selectors";
 import { getConnectedAppsCount } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getUserOS } from "utils/osUtils";
 
-const NoTrafficCTA = ({ isStaticPreview }) => {
+const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { appsList } = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const systemWideSource = appsList["system-wide"];
+  const platformsForSystemWideProxy = useFeatureValue("show_systemwide_source", {
+    whitelist: ["Windows"],
+  });
 
+  const isSystemWideSourceVisible = platformsForSystemWideProxy.whitelist?.includes(getUserOS());
   const [numberOfConnectedApps, setNumberOfConnectedApps] = useState(0);
 
   useEffect(() => {
@@ -36,7 +42,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
   const openConnectedAppsModal = useCallback(
     (props = {}) => {
       dispatch(
-        actions.toggleActiveModal({
+        globalActions.toggleActiveModal({
           modalName: "connectedAppsModal",
           newValue: true,
           newProps: { ...props, source: "traffic_table" },
@@ -57,7 +63,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         if (res.success) {
           toast.success(`Connected ${systemWideSource.name}`);
           dispatch(
-            actions.updateDesktopSpecificAppProperty({
+            globalActions.updateDesktopSpecificAppProperty({
               appId: systemWideSource.id,
               property: "isActive",
               value: true,
@@ -89,7 +95,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
           toast.info(`Disconnected ${systemWideSource.name}`);
 
           dispatch(
-            actions.updateDesktopSpecificAppProperty({
+            globalActions.updateDesktopSpecificAppProperty({
               appId: systemWideSource.id,
               property: "isActive",
               value: false,
@@ -113,6 +119,14 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       }).some((prop) => prop.length > 0)
     ) {
       return <Typography.Text>No request matches the filter you applied</Typography.Text>;
+    }
+
+    if (showMockFilters) {
+      return (
+        <Typography.Title level={5}>
+          No request contains the operation key you specified, try changing it.
+        </Typography.Title>
+      );
     }
 
     if (isStaticPreview) {
@@ -162,7 +176,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
         <RQButton type="primary" onClick={openConnectedAppsModal}>
           Connect apps
         </RQButton>
-        {systemWideSource.isAvailable ? (
+        {systemWideSource.isAvailable && isSystemWideSourceVisible ? (
           <>
             <Typography.Text>Or</Typography.Text>
             <Typography.Text>Capture all the requests from this device</Typography.Text>
@@ -174,6 +188,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       </>
     );
   }, [
+    isSystemWideSourceVisible,
     connectSystemWide,
     disconnectSystemWide,
     isStaticPreview,
@@ -183,6 +198,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
     systemWideSource.isAvailable,
     systemWideSource.isActive,
     trafficTableFilters,
+    showMockFilters,
   ]);
 
   return (

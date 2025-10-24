@@ -1,0 +1,55 @@
+.auth-banner {
+  & h5.ant-typography {
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  & h3.ant-typography {
+    font-weight: 500;
+    line-height: 36px;
+  }
+
+  .banner-title-highlight {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  .banner-text-small {
+    font-size: var(--requestly-font-size-sm, 12px);
+    color: var(--neutrals-gray-300);
+    font-weight: 500;
+  }
+
+  .banner-premium-feature-list-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1rem;
+    color: var(--neutrals-gray-300);
+    font-size: var(--requestly-font-size-md, 14px);
+    flex-wrap: nowrap;
+
+    & svg {
+      align-self: start;
+      color: var(--requestly-color-text-default);
+      width: 14px;
+      margin-top: 2px;
+    }
+
+    .feature-text {
+      max-width: 320px;
+    }
+  }
+}
+.banner-company-logo {
+  width: 70px;
+  align-self: center;
+  height: min-content;
+}
+
+.banner-no-cc-required {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--requestly-color-warning);
+}
