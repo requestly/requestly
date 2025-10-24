@@ -266,3 +266,20 @@ export const trackCollectionRunnerConfigSaveFailed = (params) => {
   const { collection_id, request_count, iteration_count, delay } = params;
   trackEvent(API_CLIENT.COLLECTION_RUNNER_CONFIG_SAVE_FAILED, { collection_id, request_count, iteration_count, delay });
 };
+
+// Tests Autogeneration
+export const trackTestGenerationClicked = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_CLICKED, params);
+};
+
+export const trackTestGenerationStarted = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_STARTED, params);
+};
+
+export const trackTestGenerationCompleted = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_COMPLETED, params);
+};
+
+export const trackTestGenerationFailed = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_FAILED, params);
+};

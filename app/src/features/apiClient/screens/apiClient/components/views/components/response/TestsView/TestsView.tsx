@@ -11,11 +11,20 @@ import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scrip
 interface TestsViewProps {
   handleTestResultRefresh: () => Promise<void>;
   testResults: TestResult[];
+  onGenerateTests?: () => void;
+  isGeneratingTests?: boolean;
+  canGenerateTests?: boolean;
 }
 
 type TestsFilter = TestResult["status"] | "all";
 
-export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestResultRefresh }) => {
+export const TestsView: React.FC<TestsViewProps> = ({
+  testResults,
+  handleTestResultRefresh,
+  onGenerateTests,
+  isGeneratingTests = false,
+  canGenerateTests = false,
+}) => {
   const theme = useTheme();
   const [testsFilter, setTestsFilter] = useState<TestsFilter>("all");
 
@@ -40,7 +49,13 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
   }, [testResults, testsFilter]);
 
   if (!testResults?.length) {
-    return <EmptyTestsView />;
+    return (
+      <EmptyTestsView
+        onGenerateTests={onGenerateTests}
+        isGeneratingTests={isGeneratingTests}
+        canGenerateTests={canGenerateTests}
+      />
+    );
   }
 
   return (

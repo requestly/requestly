@@ -279,6 +279,12 @@ export const API_CLIENT = {
   COLLECTION_RUNNER_VIEWED: "api_client_collection_runner_viewed",
   COLLECTION_RUNNER_CONFIG_SAVED: "api_client_collection_runner_config_saved",
   COLLECTION_RUNNER_CONFIG_SAVE_FAILED: "api_client_collection_runner_config_save_failed",
+
+  // Tests Autogeneration
+  TEST_GENERATION_CLICKED: "api_client_test_generation_clicked",
+  TEST_GENERATION_STARTED: "api_client_test_generation_started",
+  TEST_GENERATION_COMPLETED: "api_client_test_generation_completed",
+  TEST_GENERATION_FAILED: "api_client_test_generation_failed",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
