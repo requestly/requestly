@@ -41,7 +41,7 @@ export const WarningModal: React.FC<ModalProps & { count: number }> = ({
       <div className="preview-modal-body-container">
         <div className="preview-file-details">
           <div>
-            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of</span>
+            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of </span>
             {count} entries
           </div>
           <CommonFileInfo dataFileMetadata={dataFileMetadata} />
