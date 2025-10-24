@@ -18,8 +18,6 @@ import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
 
 interface Props {
-  onActiveTabChange?: (activeKey: string) => void;
-  forceActiveTabKey?: string;
   onGenerateTests?: () => void;
   isGeneratingTests?: boolean;
   canGenerateTests?: boolean;
