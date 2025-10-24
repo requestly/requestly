@@ -52,10 +52,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     [dataSource, searchValue]
   );
 
-  // Search value should not be empty, and the filtered list should be empty.
-  // Search value should not be empty, and the first item in the filtered list should have an empty key. (Default row with empty key)
-  const noSearchResultsFound =
-    searchValue !== "" && (filteredDataSource.length === 0 || filteredDataSource[0].key === "");
+  // Show "no results" only when search is active and no non-empty keys match.
+  const nonEmptyResults = filteredDataSource.filter((item) => item.key !== "");
+  const noSearchResultsFound = searchValue !== "" && nonEmptyResults.length === 0;
 
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
