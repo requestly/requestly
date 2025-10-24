@@ -9,6 +9,7 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
 import { VariableData } from "features/apiClient/store/variables/types";
+import { BiSearchAlt } from "@react-icons/all-files/bi/BiSearchAlt";
 
 interface VariablesListProps {
   variables: VariableRow[];
@@ -16,6 +17,7 @@ interface VariablesListProps {
   onVariablesChange: (variables: VariableRow[]) => void;
   isReadOnly?: boolean;
   container: "environments" | "runtime";
+  onSearchValueChange?: (value: string) => void;
 }
 
 export type VariableRow = VariableData & { key: string };
@@ -35,6 +37,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   onVariablesChange,
   isReadOnly = false,
   container = "environments",
+  onSearchValueChange = () => {},
 }) => {
   const [dataSource, setDataSource] = useState<VariableRow[]>([]);
   const [visibleSecretsRowIds, setVisibleSecrets] = useState<number[]>([]);
@@ -48,6 +51,13 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }),
     [dataSource, searchValue]
   );
+
+  const hideFooter = isReadOnly || filteredDataSource.length === 0;
+
+  // Search value should not be empty, and the filtered list should be empty.
+  // Search value should not be empty, and the first item in the filtered list should have an empty key. (Default row with empty key)
+  const noSearchResultsFound =
+    searchValue !== "" && (filteredDataSource.length === 0 || filteredDataSource[0].key === "");
 
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
@@ -182,6 +192,19 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     handleAddNewRow(dataSource);
   };
 
+  if (noSearchResultsFound) {
+    return (
+      <div className="variables-list-no-results-container">
+        <div className="variables-list-no-results-icon">
+          <BiSearchAlt size={48} />
+        </div>
+        <p>No variables found for "{searchValue}".</p>
+        <p>Try clearing your search or adding variables.</p>
+        <RQButton onClick={() => onSearchValueChange("")}>Clear search</RQButton>
+      </div>
+    );
+  }
+
   return (
     <ContentListTable
       id="variables-list"
@@ -199,7 +222,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        isReadOnly
+        hideFooter
           ? undefined
           : () => (
               <div className="variables-list-footer">

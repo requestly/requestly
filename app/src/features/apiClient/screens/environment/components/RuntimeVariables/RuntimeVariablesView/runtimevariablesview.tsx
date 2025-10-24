@@ -120,6 +120,7 @@ export const RuntimeVariablesView: React.FC = () => {
           searchValue={searchValue}
           variables={variables}
           onVariablesChange={handleSetPendingVariables}
+          onSearchValueChange={setSearchValue}
         />
       </div>
     </div>
