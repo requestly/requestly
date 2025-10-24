@@ -3,8 +3,6 @@ import React, { useMemo, useRef } from "react";
 import "./ParsedTableView.scss";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-const ITEM_SIZE = 40; // Height of each row in pixels
-
 //logic to create iteration column in table
 const addIterationColumnToTable = (dataSource: any[]) => {
   return dataSource.map((row, index) => ({
@@ -43,12 +41,12 @@ export const PreviewTableView: React.FC<{
   const rowVirtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => ITEM_SIZE,
-    overscan: 10,
+    estimateSize: () => 33, // Height of each row in pixels
+    overscan: 4,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
-  // const totalSize = rowVirtualizer.getTotalSize();
+  const totalSize = rowVirtualizer.getTotalSize();
 
   const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
 
@@ -56,7 +54,6 @@ export const PreviewTableView: React.FC<{
     return virtualItems.map((virtualRow) => data[virtualRow.index]);
   }, [virtualItems, data]);
 
-  //x -> direction should be scrolling till the last columm
   return (
     <div
       ref={parentRef}
@@ -69,7 +66,7 @@ export const PreviewTableView: React.FC<{
     >
       <div
         style={{
-          height: "100%",
+          height: `${totalSize}px`,
           width: "fit-content",
           minWidth: "100%",
         }}
