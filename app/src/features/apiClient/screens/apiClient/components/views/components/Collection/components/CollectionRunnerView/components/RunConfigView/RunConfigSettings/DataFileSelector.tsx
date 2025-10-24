@@ -10,18 +10,20 @@ import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUplo
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
 import { DataFileModalWrapper } from "../ParseFileModal/DataFileModalWrapper";
+import { useDataFileModalContext } from "../ParseFileModal/DataFileModalContext";
 
 export const DataFileSelector: React.FC = () => {
-  const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
-  const [openModalInPreviewMode, setOpenModalInPreviewMode] = useState<boolean>(true);
-  const [tempDataFileMetadata, setTempDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(
-    null
-  );
+  const { parseFile } = useDataFileModalContext();
 
   const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile, s.setDataFile]);
   const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
   const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
   const { openFileSelector } = useFileSelection();
+
+  const [tempDataFileMetadata, setTempDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(
+    null
+  );
+  const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
 
   // Use a ref to track if we've initialized from dataFile
   const hasInitializedRef = useRef(false);
@@ -48,16 +50,17 @@ export const DataFileSelector: React.FC = () => {
 
   const handleFileSelection = useCallback(() => {
     openFileSelector((file) => {
-      setTempDataFileMetadata({
+      const metadata = {
         name: file.name,
         path: file.path,
         size: file.size,
-      });
-
-      setOpenModalInPreviewMode(true);
+      };
+      setTempDataFileMetadata(metadata);
       setShowDataFileModal(true);
+
+      parseFile(file.path, true);
     });
-  }, [openFileSelector]);
+  }, [openFileSelector, setTempDataFileMetadata, setShowDataFileModal, parseFile]);
 
   const handleModalClose = useCallback(() => {
     // If there's a dataFile and we have temp metadata that differs from it,
@@ -70,7 +73,14 @@ export const DataFileSelector: React.FC = () => {
       });
     }
     setShowDataFileModal(false);
-  }, [dataFile, tempDataFileMetadata]);
+  }, [dataFile, tempDataFileMetadata, setTempDataFileMetadata, setShowDataFileModal]);
+
+  const handleViewExistingFile = useCallback(() => {
+    if (dataFileMetadata) {
+      setShowDataFileModal(true);
+      parseFile(dataFileMetadata.path, false);
+    }
+  }, [dataFileMetadata, setShowDataFileModal, parseFile]);
 
   useEffect(() => {
     return () => {
@@ -95,15 +105,7 @@ export const DataFileSelector: React.FC = () => {
         </>
       ) : (
         <div className="file-uploaded-section">
-          <RQButton
-            size="small"
-            type="secondary"
-            className="file-uploaded-button"
-            onClick={() => {
-              setOpenModalInPreviewMode(false);
-              setShowDataFileModal(true);
-            }}
-          >
+          <RQButton size="small" type="secondary" className="file-uploaded-button" onClick={handleViewExistingFile}>
             {file?.isFileValid ? (
               <MdOutlineRemoveRedEye className="eye-icon" />
             ) : (
@@ -140,10 +142,8 @@ export const DataFileSelector: React.FC = () => {
       {showDataFileModal && (
         <DataFileModalWrapper
           onClose={handleModalClose}
-          onFileSelected={() => setShowDataFileModal(true)}
-          handleSelectFile={handleFileSelection}
+          onFileSelected={handleFileSelection}
           dataFileMetadata={dataFileMetadata}
-          isPreviewMode={openModalInPreviewMode}
         />
       )}
     </>

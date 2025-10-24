@@ -9,6 +9,7 @@ import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
+import { DataFileModalProvider } from "../ParseFileModal/DataFileModalContext";
 
 export const RunConfigSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
@@ -77,7 +78,9 @@ export const RunConfigSettings: React.FC = () => {
         {appMode === "DESKTOP" && (
           <div className="setting-container">
             <label htmlFor="file-upload">Select data file</label>
-            <DataFileSelector />
+            <DataFileModalProvider>
+              <DataFileSelector />
+            </DataFileModalProvider>
           </div>
         )}
       </div>

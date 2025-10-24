@@ -3,7 +3,8 @@ import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "../ParsedTableView";
-import { CommonFileInfo, DataFileModalViewMode, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
+import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
+import { DataFileModalViewMode } from "../DataFileModalContext";
 import React from "react";
 
 export const getformattedFileSize = (bytes: number): string => {

@@ -1,14 +1,15 @@
 import { RQButton } from "lib/design-system-v2/components";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import "./DataFileModal.scss";
 import { useRunConfigStore } from "../../../run.context";
-import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
+import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
 import { DataFileViewModal } from "./Modals/DataFileViewModal";
 import { WarningModal } from "./Modals/WarningModal";
 import { ErroredModal } from "./Modals/ErroredModal";
 import { LargeFileModal } from "./Modals/LargeFileModal";
 import { LoadingModal } from "./Modals/LoadingModal";
 import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
+import { useDataFileModalContext, DataFileModalViewMode } from "./DataFileModalContext";
 interface buttonSchema {
   label: string;
   onClick: () => void;
@@ -76,29 +77,12 @@ export const CommonFileInfo: React.FC<{
 
 interface PreviewModalProps {
   onClose: () => void;
-  onFileSelected?: () => void;
-  handleSelectFile?: () => void;
+  onFileSelected: () => void;
   dataFileMetadata: { name: string; path: string; size: number };
-  isPreviewMode: boolean;
 }
 
-export enum DataFileModalViewMode {
-  LOADING = "loading",
-  PREVIEW = "preview",
-  ACTIVE = "active",
-  ERROR = "error",
-  LARGE_FILE = "largeFile",
-}
-
-export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
-  onClose,
-  onFileSelected,
-  handleSelectFile,
-  dataFileMetadata,
-  isPreviewMode = false,
-}) => {
-  const [viewMode, setViewMode] = useState<DataFileModalViewMode>(DataFileModalViewMode.LOADING);
-  const [parsedData, setParsedData] = useState<{ data: Record<string, any>[]; count: number } | null>(null);
+export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onFileSelected, dataFileMetadata }) => {
+  const { viewMode, parsedData } = useDataFileModalContext();
 
   const [removeDataFile, setDataFile, setIterations] = useRunConfigStore((s) => [
     s.removeDataFile,
@@ -127,24 +111,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
     setIterations,
   ]);
 
-  useEffect(() => {
-    setViewMode(DataFileModalViewMode.LOADING);
-    setParsedData(null);
-
-    parseCollectionRunnerDataFile(dataFileMetadata.path)
-      .then((data) => {
-        const processedData = {
-          data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
-          count: data.count,
-        };
-        setParsedData(processedData);
-        setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
-      })
-      .catch(() => {
-        setViewMode(DataFileModalViewMode.ERROR);
-      });
-  }, [dataFileMetadata.path, isPreviewMode]);
-
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
       case DataFileModalViewMode.ERROR:
@@ -158,7 +124,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           primaryButton: {
             label: "Select Again",
             onClick: () => {
-              handleSelectFile?.();
+              onFileSelected();
             },
           },
         };
@@ -169,7 +135,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
             secondaryButton: {
               label: "Replace file",
               onClick: () => {
-                handleSelectFile?.();
+                onFileSelected();
               },
             },
             primaryButton: {
@@ -211,7 +177,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           primaryButton: {
             label: "Change data file",
             onClick: () => {
-              handleSelectFile?.();
+              onFileSelected();
             },
           },
         };
@@ -227,7 +193,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
           primaryButton: {
             label: "Reselect File",
             onClick: () => {
-              handleSelectFile?.();
+              onFileSelected();
             },
           },
         };
