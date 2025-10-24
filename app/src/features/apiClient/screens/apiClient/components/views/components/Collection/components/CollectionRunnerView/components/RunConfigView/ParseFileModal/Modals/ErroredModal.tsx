@@ -79,7 +79,7 @@ export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, dat
           {isJSON ? jsonExample : csvExample}
         </div>
 
-        <FooterButtons buttonOptions={buttonOptions} primaryIcon={<MdOutlineOpenInNew />} />
+        <FooterButtons buttonOptions={buttonOptions} secondaryIcon={<MdOutlineOpenInNew />} />
       </div>
     </RQModal>
   );
