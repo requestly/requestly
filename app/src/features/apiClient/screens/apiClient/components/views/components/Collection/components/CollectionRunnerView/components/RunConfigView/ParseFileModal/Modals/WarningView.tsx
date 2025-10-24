@@ -1,29 +1,23 @@
-import { RQModal } from "lib/design-system/components";
-import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
+import React from "react";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { PreviewTableView } from "../ParsedTableView";
-import React from "react";
-import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
+import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
+import { useDataFileModalContext } from "./DataFileModalContext";
+import { NativeError } from "errors/NativeError";
 
-export const WarningModal: React.FC<ModalProps & { count: number }> = ({
-  buttonOptions,
-  dataFileMetadata,
-  onClose,
-  parsedData,
-  count,
-}) => {
+type WarningModalProps = ModalProps;
+
+export const WarningView: React.FC<WarningModalProps> = ({ buttonOptions }) => {
+  const { dataFileMetadata, parsedData } = useDataFileModalContext();
+
+  if (!parsedData) {
+    throw new NativeError("Parsed data is required for WarningView").addContext({
+      dataFileMetadata,
+    });
+  }
+
   return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-        // removeDataFile();
-      }}
-      className="preview-modal"
-    >
+    <>
       <ModalHeader dataFileMetadata={dataFileMetadata} />
 
       <div className="warning-state-messaging-container">
@@ -42,15 +36,15 @@ export const WarningModal: React.FC<ModalProps & { count: number }> = ({
       <div className="preview-modal-body-container">
         <div className="preview-file-details">
           <div>
-            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of</span>
-            {count} entries
+            <span className="detail-label">Showing</span> first 1000 <span className="detail-label">of </span>
+            {parsedData.count} entries
           </div>
           <CommonFileInfo dataFileMetadata={dataFileMetadata} />
         </div>
-        <PreviewTableView datasource={parsedData} />
+        <PreviewTableView datasource={parsedData.data} />
       </div>
 
       <FooterButtons buttonOptions={buttonOptions} />
-    </RQModal>
+    </>
   );
 };

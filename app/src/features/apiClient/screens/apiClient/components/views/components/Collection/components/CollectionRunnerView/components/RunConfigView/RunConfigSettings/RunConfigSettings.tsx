@@ -7,8 +7,12 @@ import { toast } from "utils/Toast";
 import { DELAY_MAX_LIMIT, ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import "./runConfigSettings.scss";
 import { DataFileSelector } from "./DataFileSelector";
+import { getAppMode } from "store/selectors";
+import { useSelector } from "react-redux";
+import { DataFileModalProvider } from "../ParseFileModal/Modals/DataFileModalContext";
 
 export const RunConfigSettings: React.FC = () => {
+  const appMode = useSelector(getAppMode);
   const [iterations, setIterations, delay, setDelay] = useRunConfigStore((s) => [
     s.iterations,
     s.setIterations,
@@ -71,10 +75,14 @@ export const RunConfigSettings: React.FC = () => {
           />
         </div>
 
-        <div className="setting-container">
-          <label htmlFor="file-upload">Select data file</label>
-          <DataFileSelector />
-        </div>
+        {appMode === "DESKTOP" && (
+          <div className="setting-container">
+            <label htmlFor="file-upload">Select data file</label>
+            <DataFileModalProvider>
+              <DataFileSelector />
+            </DataFileModalProvider>
+          </div>
+        )}
       </div>
 
       {/* TODO: for later */}

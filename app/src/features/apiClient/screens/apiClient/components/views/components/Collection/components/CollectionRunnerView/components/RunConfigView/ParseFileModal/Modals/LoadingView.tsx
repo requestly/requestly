@@ -1,17 +1,8 @@
-import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
-import { RQModal } from "lib/design-system/components";
 import React from "react";
 
-export const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const LoadingView: React.FC = () => {
   return (
-    <RQModal
-      width={480}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={onClose}
-      className="preview-modal loading-modal"
-    >
+    <>
       <div className="preview-modal-header-container">
         <div className="preview-modal-title">Processing File</div>
       </div>
@@ -58,6 +49,6 @@ export const LoadingModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
           </div>
         </div>
       </div>
-    </RQModal>
+    </>
   );
 };

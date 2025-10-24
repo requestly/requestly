@@ -6,7 +6,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 const ITEM_SIZE = 40; // Height of each row in pixels
 
 //logic to create iteration column in table
-
 const addIterationColumnToTable = (dataSource: any[]) => {
   return dataSource.map((row, index) => ({
     ...row,

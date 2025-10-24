@@ -1,13 +1,15 @@
 import { Button } from "antd";
 
 export function displayFileSelector(callback, config = {}) {
-  if (config.properties && config.properties.includes("multiSelections")) {
+  //do not mutate incoming config
+  const newConfig = { ...config };
+  if (newConfig.properties && newConfig.properties.includes("multiSelections")) {
     /*
     This function is meant to select a single file only.
     Hence removing multiSelections property from config.
     Use displayMultiFileSelector for multiple file selection.
     */
-    config.properties = config.properties.filter((prop) => prop !== "multiSelections");
+    newConfig.properties = newConfig.properties.filter((prop) => prop !== "multiSelections");
   }
   const handleDialogPromise = (result) => {
     //this selector will always have only one single file
@@ -22,7 +24,7 @@ export function displayFileSelector(callback, config = {}) {
   };
 
   if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", config).then((result) => {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", newConfig).then((result) => {
       handleDialogPromise(result);
     });
   }

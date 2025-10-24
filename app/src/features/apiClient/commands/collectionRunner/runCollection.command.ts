@@ -118,7 +118,6 @@ class Runner {
     const apiClientFilesStore = apiClientFileStore.getState();
 
     const collectionId = this.runContext.collectionId;
-    console.log("!!!debug", "datafile", dataFile);
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
       throw new RunnerFileMissingError(
         `Data file "${dataFile.name}" is missing! Please re-add the file to proceed.`
@@ -362,7 +361,6 @@ class Runner {
           this.runContext.runResultStore.getState().abortController,
           scopes
         );
-        console.log("!!!debug", "result", result);
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }

@@ -991,7 +991,7 @@ export const parseCollectionRunnerDataFile = async (filePath: string) => {
     throw new NativeError("File path is empty!");
   }
 
-  const fileExtension = getFileExtension(filePath);
+  const fileExtension = getFileExtension(filePath).toLowerCase();
   const fileContents = await getFileContents(filePath);
 
   switch (fileExtension) {

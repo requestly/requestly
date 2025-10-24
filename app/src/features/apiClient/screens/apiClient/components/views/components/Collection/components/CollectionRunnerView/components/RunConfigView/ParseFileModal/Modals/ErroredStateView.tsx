@@ -1,11 +1,12 @@
-import { RQModal } from "lib/design-system/components";
-import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import React from "react";
-import { FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
+import { FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
+import { useDataFileModalContext } from "./DataFileModalContext";
 
-export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, dataFileMetadata }) => {
+export const ErroredStateView: React.FC<ModalProps> = ({ buttonOptions }) => {
+  const { dataFileMetadata } = useDataFileModalContext();
+
   const fileExtension = getFileExtension(dataFileMetadata.path)?.toUpperCase()?.split(".")?.pop() ?? "JSON";
   const isJSON = fileExtension === "JSON";
 
@@ -53,16 +54,7 @@ export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, dat
   );
 
   return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-      }}
-      className="preview-modal"
-    >
+    <>
       <ModalHeader dataFileMetadata={dataFileMetadata} />
       <div className="error-state-messaging-container">
         <div>
@@ -79,8 +71,8 @@ export const ErroredModal: React.FC<ModalProps> = ({ buttonOptions, onClose, dat
           {isJSON ? jsonExample : csvExample}
         </div>
 
-        <FooterButtons buttonOptions={buttonOptions} primaryIcon={<MdOutlineOpenInNew />} />
+        <FooterButtons buttonOptions={buttonOptions} secondaryIcon={<MdOutlineOpenInNew />} />
       </div>
-    </RQModal>
+    </>
   );
 };
