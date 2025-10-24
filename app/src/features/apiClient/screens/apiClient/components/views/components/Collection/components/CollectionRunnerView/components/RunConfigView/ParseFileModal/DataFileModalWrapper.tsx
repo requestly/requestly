@@ -100,9 +100,13 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
   const [viewMode, setViewMode] = useState<DataFileModalViewMode>(DataFileModalViewMode.LOADING);
   const [parsedData, setParsedData] = useState<{ data: Record<string, any>[]; count: number } | null>(null);
 
-  const [removeDataFile, setDataFile] = useRunConfigStore((s) => [s.removeDataFile, s.setDataFile]);
+  const [removeDataFile, setDataFile, setIterations] = useRunConfigStore((s) => [
+    s.removeDataFile,
+    s.setDataFile,
+    s.setIterations,
+  ]);
 
-  const setDataFileInStore = useCallback(() => {
+  const confirmUseDataFile = useCallback(() => {
     const fileId = dataFileMetadata.name + "-" + Date.now();
 
     setDataFile({
@@ -113,7 +117,15 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
       source: "desktop",
       fileFeature: FileFeature.COLLECTION_RUNNER,
     });
-  }, [dataFileMetadata.name, dataFileMetadata.path, dataFileMetadata.size, setDataFile]);
+    setIterations(parsedData.data.length);
+  }, [
+    dataFileMetadata.name,
+    dataFileMetadata.path,
+    dataFileMetadata.size,
+    parsedData?.data?.length,
+    setDataFile,
+    setIterations,
+  ]);
 
   useEffect(() => {
     setViewMode(DataFileModalViewMode.LOADING);
@@ -163,7 +175,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
             primaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
-                setDataFileInStore();
+                confirmUseDataFile();
                 onClose();
               },
             },
@@ -173,14 +185,13 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
             secondaryButton: {
               label: "Cancel",
               onClick: () => {
-                removeDataFile();
                 onClose();
               },
             },
             primaryButton: {
               label: "Use File",
               onClick: () => {
-                setDataFileInStore();
+                confirmUseDataFile();
                 onClose();
               },
             },
@@ -193,6 +204,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({
             label: "Remove",
             onClick: () => {
               removeDataFile();
+              setIterations(1);
               onClose();
             },
           },
