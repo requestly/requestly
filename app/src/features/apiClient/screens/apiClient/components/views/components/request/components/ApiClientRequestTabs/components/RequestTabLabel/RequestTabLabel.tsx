@@ -1,15 +1,35 @@
 import { Tag } from "antd";
 import React from "react";
 
-export const RequestTabLabel: React.FC<{ label: string; count?: number; showDot?: boolean }> = ({
-  label,
-  count,
-  showDot,
-}) => {
+interface RequestTabLabelProps {
+  label: string;
+  count?: number;
+  showDot?: boolean;
+  dotIndicator?: "success" | "error";
+}
+
+export const RequestTabLabel: React.FC<RequestTabLabelProps> = ({ label, count, showDot, dotIndicator }) => {
   return (
     <div className="request-tab-label">
       <span>{label}</span>
-      {count ? showDot ? <span className="request-tab-dot" /> : <Tag className="count">{count}</Tag> : null}
+      <RequestTabLabelIndicator count={count} showDot={showDot} dotIndicator={dotIndicator} />
     </div>
   );
+};
+
+const RequestTabLabelIndicator: React.FC<{ count?: number; showDot?: boolean; dotIndicator?: "success" | "error" }> = ({
+  count,
+  showDot,
+  dotIndicator,
+}) => {
+  if (!count) return null;
+
+  if (showDot) {
+    if (dotIndicator === "error") 
+      return <span className="request-tab-dot-error" />;
+    else 
+      return <span className="request-tab-dot-success" />;
+  }
+
+  return <Tag className="count">{count}</Tag>;
 };
