@@ -29,14 +29,15 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [shouldAutoFocus, setShouldAutoFocus] = useState(false);
+  const hasFocusCompleted = React.useRef(false);
 
   React.useEffect(() => {
     if (focusPostResponse && scripts?.[RQAPI.ScriptType.POST_RESPONSE]) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
       setShouldAutoFocus(true);
-      onFocusComplete?.();
+      hasFocusCompleted.current = false;
     }
-  }, [focusPostResponse, scripts, onFocusComplete]);
+  }, [focusPostResponse, scripts]);
 
   React.useEffect(() => {
     if (shouldAutoFocus) {
@@ -46,6 +47,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       return () => clearTimeout(timer);
     }
   }, [shouldAutoFocus]);
+
+  const handleEditorFocus = React.useCallback(() => {
+    if (shouldAutoFocus && !hasFocusCompleted.current) {
+      hasFocusCompleted.current = true;
+      onFocusComplete?.();
+    }
+  }, [shouldAutoFocus, onFocusComplete]);
 
   const scriptTypeOptions = useMemo(() => {
     return (
@@ -86,6 +94,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={scriptType === RQAPI.ScriptType.POST_RESPONSE && shouldAutoFocus}
+        onFocus={handleEditorFocus}
       />
     </div>
   );
