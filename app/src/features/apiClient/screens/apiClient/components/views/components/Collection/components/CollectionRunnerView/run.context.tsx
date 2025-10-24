@@ -44,6 +44,10 @@ export const RunViewContextProvider: React.FC<{
 
   useEffect(() => {
     runConfigStore.getState().patchRunOrder(requestIds);
+
+    return () => {
+      runConfigStore.getState().removeDataFile();
+    };
   }, [requestIds, runConfigStore]);
 
   const value = useMemo(() => {

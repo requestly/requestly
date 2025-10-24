@@ -1,9 +1,7 @@
-import { RQModal } from "lib/design-system/components";
-import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
+import React from "react";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { PreviewTableView } from "../ParsedTableView";
-import React from "react";
-import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
+import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 
 type WarningModalProps = ModalProps & {
   count: number;
@@ -18,16 +16,7 @@ export const WarningModal: React.FC<WarningModalProps> = ({
   count,
 }) => {
   return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-      }}
-      className="preview-modal"
-    >
+    <>
       <ModalHeader dataFileMetadata={dataFileMetadata} />
 
       <div className="warning-state-messaging-container">
@@ -55,6 +44,6 @@ export const WarningModal: React.FC<WarningModalProps> = ({
       </div>
 
       <FooterButtons buttonOptions={buttonOptions} />
-    </RQModal>
+    </>
   );
 };

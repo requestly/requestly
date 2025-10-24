@@ -1,11 +1,9 @@
-import { RQModal } from "lib/design-system/components";
+import React from "react";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "../ParsedTableView";
-import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "../DataFileModalWrapper";
-import { DataFileModalViewMode } from "../DataFileModalContext";
-import React from "react";
+import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
+import { DataFileModalViewMode } from "./DataFileModalContext";
 
 export const getformattedFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -25,16 +23,7 @@ export const DataFileViewModal: React.FC<DataFileViewModalProps> = ({
   viewMode,
 }) => {
   return (
-    <RQModal
-      width={680}
-      open={true}
-      closable={true}
-      closeIcon={<MdOutlineClose />}
-      onCancel={() => {
-        onClose();
-      }}
-      className="preview-modal"
-    >
+    <>
       <ModalHeader dataFileMetadata={dataFileMetadata} />
 
       {/*conditional rendering based on viewMode */}
@@ -60,6 +49,6 @@ export const DataFileViewModal: React.FC<DataFileViewModalProps> = ({
       ) : (
         <FooterButtons buttonOptions={buttonOptions} />
       )}
-    </RQModal>
+    </>
   );
 };

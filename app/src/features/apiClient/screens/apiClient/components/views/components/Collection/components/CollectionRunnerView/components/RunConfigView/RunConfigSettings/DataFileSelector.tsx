@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
@@ -9,44 +9,18 @@ import { useRunConfigStore } from "../../../run.context";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
-import { DataFileModalWrapper } from "../ParseFileModal/DataFileModalWrapper";
-import { useDataFileModalContext } from "../ParseFileModal/DataFileModalContext";
+import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
+import { useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 
 export const DataFileSelector: React.FC = () => {
-  const { parseFile } = useDataFileModalContext();
+  const { parseFile, fileMetadata, setFileMetadata } = useDataFileModalContext();
 
-  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile, s.setDataFile]);
+  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
   const [getFilesByIds] = useApiClientFileStore((s) => [s.getFilesByIds]);
   const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
   const { openFileSelector } = useFileSelection();
 
-  const [tempDataFileMetadata, setTempDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(
-    null
-  );
-  const [showDataFileModal, setShowDataFileModal] = useState<boolean>(false);
-
-  // Use a ref to track if we've initialized from dataFile
-  const hasInitializedRef = useRef(false);
-
-  // Derive dataFileMetadata: initialize from dataFile once, then use temp metadata for any new uploads
-  const dataFileMetadata = useMemo(() => {
-    // If we have temp metadata (from a new file selection), use that
-    if (tempDataFileMetadata) {
-      return tempDataFileMetadata;
-    }
-
-    // Otherwise, if dataFile exists and we haven't initialized yet, use dataFile
-    if (dataFile && !hasInitializedRef.current) {
-      hasInitializedRef.current = true;
-      return {
-        name: dataFile.name,
-        path: dataFile.path,
-        size: dataFile.size,
-      };
-    }
-
-    return null;
-  }, [tempDataFileMetadata, dataFile]);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleFileSelection = useCallback(() => {
     openFileSelector((file) => {
@@ -55,40 +29,29 @@ export const DataFileSelector: React.FC = () => {
         path: file.path,
         size: file.size,
       };
-      setTempDataFileMetadata(metadata);
-      setShowDataFileModal(true);
-
+      setFileMetadata(metadata);
+      setShowModal(true);
       parseFile(file.path, true);
     });
-  }, [openFileSelector, setTempDataFileMetadata, setShowDataFileModal, parseFile]);
+  }, [openFileSelector, setFileMetadata, setShowModal, parseFile]);
 
   const handleModalClose = useCallback(() => {
-    // If there's a dataFile and we have temp metadata that differs from it,
-    // it means user cancelled a new file selection - restore the original
-    if (dataFile && tempDataFileMetadata && tempDataFileMetadata.path !== dataFile.path) {
-      setTempDataFileMetadata({
+    // Clear metadata when modal closes
+    setFileMetadata(null);
+    setShowModal(false);
+  }, [setFileMetadata, setShowModal]);
+
+  const handleViewExistingFile = useCallback(() => {
+    if (dataFile) {
+      setFileMetadata({
         name: dataFile.name,
         path: dataFile.path,
         size: dataFile.size,
       });
+      setShowModal(true);
+      parseFile(dataFile.path, false);
     }
-    setShowDataFileModal(false);
-  }, [dataFile, tempDataFileMetadata, setTempDataFileMetadata, setShowDataFileModal]);
-
-  const handleViewExistingFile = useCallback(() => {
-    if (dataFileMetadata) {
-      setShowDataFileModal(true);
-      parseFile(dataFileMetadata.path, false);
-    }
-  }, [dataFileMetadata, setShowDataFileModal, parseFile]);
-
-  useEffect(() => {
-    return () => {
-      if (dataFile) {
-        removeDataFile();
-      }
-    };
-  }, [dataFile, removeDataFile]);
+  }, [dataFile, setFileMetadata, setShowModal, parseFile]);
 
   return (
     <>
@@ -139,12 +102,8 @@ export const DataFileSelector: React.FC = () => {
         </div>
       )}
 
-      {showDataFileModal && (
-        <DataFileModalWrapper
-          onClose={handleModalClose}
-          onFileSelected={handleFileSelection}
-          dataFileMetadata={dataFileMetadata}
-        />
+      {showModal && fileMetadata && (
+        <DataFileModalWrapper onClose={handleModalClose} onFileSelected={handleFileSelection} />
       )}
     </>
   );
