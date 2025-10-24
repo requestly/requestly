@@ -3,6 +3,8 @@ import { setupContextWithoutMarkingLoaded } from "../context";
 import { markWorkspaceLoaded } from "./markWorkspaceLoaded.command";
 
 export async function loadWorkspaces(userId?: string) {
+  apiClientMultiWorkspaceViewStore.getState().setIsLoaded(false);
+
   const workspacesToLoad = apiClientMultiWorkspaceViewStore
     .getState()
     .selectedWorkspaces.filter((w) => !w.getState().state.loading);
