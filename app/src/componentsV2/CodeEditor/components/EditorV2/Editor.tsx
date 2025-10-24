@@ -28,6 +28,12 @@ import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+
+enum ResponseMode {
+  RAW,
+  PREVIEW,
+}
+
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -45,6 +51,7 @@ interface EditorProps {
     enablePrettify?: boolean;
   };
   hideToolbar?: boolean;
+  responseMode?: ResponseMode;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -57,10 +64,11 @@ const Editor: React.FC<EditorProps> = ({
   toolbarOptions,
   analyticEventProperties = {},
   scriptId = "",
-  prettifyOnInit = false,
+  prettifyOnInit = true,
   envVariables,
   showOptions = { enablePrettify: true },
   hideToolbar = false,
+  responseMode = ResponseMode.PREVIEW,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -72,7 +80,7 @@ const Editor: React.FC<EditorProps> = ({
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[scriptId], [allEditorToast, scriptId]); // todo: rename
-  const [isCodePrettified, setIsCodePrettified] = useState(false);
+  const [isCodePrettified, setIsCodePrettified] = useState(prettifyOnInit);
   const isDefaultPrettificationDone = useRef(false);
   const isUnsaveChange = useRef(false);
   const [isFullScreen, setFullScreen] = useState(false);
@@ -171,6 +179,15 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
 
+  // If initial prettify is off, just return the raw value
+  const initialEditorValue = useMemo(() => {
+    if (!isCodePrettified && language === EditorLanguage.JSON) {
+      return JSON.stringify(JSON.parse(value));
+    }
+
+    return value;
+  }, [isCodePrettified, value, language]);
+
   // Reinitializing the fullscreen editor
   useEffect(() => {
     isDefaultPrettificationDone.current = false;
@@ -253,59 +270,66 @@ const Editor: React.FC<EditorProps> = ({
     ]
   );
 
-  const editor = (
-    <CodeMirror
-      ref={editorRefCallback}
-      className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
-        !isEditorInitialized ? "not-visible" : ""
-      }`}
-      width="100%"
-      readOnly={isReadOnly}
-      value={value ?? ""}
-      onKeyDown={() => (isUnsaveChange.current = true)}
-      onChange={debouncedhandleEditorBodyChange}
-      theme={vscodeDark}
-      extensions={[
-        editorLanguage,
-        customKeyBinding,
-        EditorView.lineWrapping,
-        envVariables
-          ? highlightVariablesPlugin(
-              {
-                setHoveredVariable,
-                setPopupPosition,
-              },
-              envVariables
-            )
-          : null,
-        generateCompletionsForVariables(envVariables),
-      ].filter(Boolean)}
-      basicSetup={{
-        highlightActiveLine: false,
-        bracketMatching: true,
-        closeBrackets: true,
-        allowMultipleSelections: true,
-      }}
-      data-enable-grammarly="false"
-      data-gramm_editor="false"
-      data-gramm="false"
-    >
-      {envVariables && (
-        <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
-          {hoveredVariable && (
-            <VariablePopover
-              editorRef={{
-                current: editorRef.current?.editor ?? null,
-              }}
-              hoveredVariable={hoveredVariable}
-              popupPosition={popupPosition}
-              variables={envVariables}
-            />
-          )}
+  const editor =
+    responseMode === ResponseMode.RAW ? (
+      <div className="api-response-body-raw-content code-editor">
+        <div className="api-response-body-raw-content__body">
+          {isCodePrettified ? <pre>{value}</pre> : <>{value}</>}
         </div>
-      )}
-    </CodeMirror>
-  );
+      </div>
+    ) : (
+      <CodeMirror
+        ref={editorRefCallback}
+        className={`code-editor ${envVariables ? "code-editor-with-env-variables" : ""} ${
+          !isEditorInitialized ? "not-visible" : ""
+        }`}
+        width="100%"
+        readOnly={isReadOnly}
+        value={initialEditorValue ?? ""}
+        onKeyDown={() => (isUnsaveChange.current = true)}
+        onChange={debouncedhandleEditorBodyChange}
+        theme={vscodeDark}
+        extensions={[
+          editorLanguage,
+          customKeyBinding,
+          EditorView.lineWrapping,
+          envVariables
+            ? highlightVariablesPlugin(
+                {
+                  setHoveredVariable,
+                  setPopupPosition,
+                },
+                envVariables
+              )
+            : null,
+          generateCompletionsForVariables(envVariables),
+        ].filter(Boolean)}
+        basicSetup={{
+          highlightActiveLine: false,
+          bracketMatching: true,
+          closeBrackets: true,
+          allowMultipleSelections: true,
+        }}
+        data-enable-grammarly="false"
+        data-gramm_editor="false"
+        data-gramm="false"
+      >
+        {envVariables && (
+          <div className="editor-popup-container ant-input" onMouseLeave={() => setHoveredVariable(null)}>
+            {hoveredVariable && (
+              <VariablePopover
+                editorRef={{
+                  current: editorRef.current?.editor ?? null,
+                }}
+                hoveredVariable={hoveredVariable}
+                popupPosition={popupPosition}
+                variables={envVariables}
+              />
+            )}
+          </div>
+        )}
+      </CodeMirror>
+    );
 
   const toastContainer = toastOverlay && (
     <EditorToastContainer
