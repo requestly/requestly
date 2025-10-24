@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: var(--requestly-space-8, 24px);
   padding: 56px 32px;
   height: 100%;
 
@@ -11,14 +11,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: var(--space-8, 24px);
+    gap: var(--requestly-space-6, 16px);
 
     .error-container {
       display: flex;
-      padding: var(--space-5, 12px) var(--space-6, 16px);
+      padding: var(--requestly-space-5, 12px) var(--requestly-space-6, 16px);
       justify-content: center;
       align-items: center;
-      gap: var(--space-4, 8px);
+      gap: var(--requestly-space-4, 8px);
       align-self: stretch;
       border-radius: 8px;
       background: var(--requestly-color-background);
@@ -28,6 +28,8 @@
       letter-spacing: 0.25px;
       max-width: 400px;
       text-align: center;
+      margin-top: calc(var(--requestly-space-4, 8px) * -1);
+      margin-bottom: var(--requestly-space-4, 8px);
 
       .error-name {
         color: var(--requestly-color-error-text);
@@ -36,21 +38,22 @@
       .error-message {
         color: var(--requestly-color-subtle);
         display: inline;
-        gap: 4px;
+        gap: var(--requestly-space-2, 4px);
+        margin-bottom: var(--requestly-space-1, 2px);
 
         svg {
-          width: 16px;
-          height: 16px;
+          width: var(--requestly-space-6, 16px);
+          height: var(--requestly-space-6, 16px);
         }
       }
     }
 
     .file-error-container {
       display: flex;
-      padding: var(--space-5, 12px) var(--space-6, 16px);
+      padding: var(--requestly-space-5, 12px) var(--requestly-space-6, 16px);
       justify-content: center;
       align-items: center;
-      gap: var(--space-4, 8px);
+      gap: var(--requestly-space-4, 8px);
       align-self: stretch;
       border-radius: 8px;
       color: var(--requestly-color-text-subtle);
@@ -64,8 +67,8 @@
   }
 
   img {
-    width: 80px;
-    height: 80px;
+    width: var(--requestly-space-15, 80px);
+    height: var(--requestly-space-15, 80px);
   }
 
   &__title {
@@ -78,9 +81,9 @@
 
   .documentation-link {
     display: flex;
-    padding-top: 16px;
+    padding-top: var(--requestly-space-1, 2px);
     align-items: center;
-    gap: 4px;
+    gap: var(--requestly-space-2, 4px);
     color: var(--requestly-color-primary-text, #639ff9);
     font-size: var(--requestly-font-size-xs);
   }
