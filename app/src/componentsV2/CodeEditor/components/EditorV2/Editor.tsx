@@ -177,6 +177,15 @@ const Editor: React.FC<EditorProps> = ({
     setIsEditorInitialized(false);
   }, [isFullScreen]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setEditorHeight(Math.max(window.innerHeight - 600, height));
+    };
+    handleResize(); // updates immediately after mount
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleEditorClose = useCallback(
     (scriptId: string) => {
       dispatch(globalActions.removeToastForEditor({ scriptId }));
@@ -355,7 +364,6 @@ const Editor: React.FC<EditorProps> = ({
         }
         axis="y"
         style={{
-          minHeight: `${height}px`,
           marginBottom: isResizable ? "25px" : 0,
         }}
       >
