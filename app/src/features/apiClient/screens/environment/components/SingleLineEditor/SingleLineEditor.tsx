@@ -193,7 +193,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
         />
       </Conditional>
       {isSecret ? (
-        <button className="eye-icon" onClick={() => setIsHidden((prev) => !prev)}>
+        <button type="button" className="eye-icon" onClick={() => setIsHidden((prev) => !prev)}>
           {isHidden ? <EyeInvisibleOutlined /> : <EyeOutlined />}
         </button>
       ) : null}

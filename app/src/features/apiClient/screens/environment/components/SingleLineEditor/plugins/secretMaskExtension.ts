@@ -6,6 +6,8 @@ class MaskCharWidget extends WidgetType {
     const el = document.createElement("span");
     el.textContent = "•";
     el.style.userSelect = "none";
+    el.setAttribute("aria-hidden", "true");
+    el.setAttribute("role", "presentation");
     return el;
   }
 
@@ -32,7 +34,7 @@ export function maskInput(hidden: boolean) {
       }
 
       createMask(view: EditorView) {
-        const widget: Range<Decoration>[] = [];
+        const ranges: Range<Decoration>[] = [];
 
         for (let { from, to } of view.visibleRanges) {
           const text = view.state.doc.sliceString(from, to);
@@ -43,11 +45,11 @@ export function maskInput(hidden: boolean) {
               widget: maskWidget,
             }).range(from + i, from + i + 1);
 
-            widget.push(deco);
+            ranges.push(deco);
           }
         }
 
-        return Decoration.set(widget);
+        return Decoration.set(ranges);
       }
     },
     {
