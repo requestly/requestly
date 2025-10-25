@@ -7,3 +7,16 @@
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
   z-index: 10;
 }
+
+.relative {
+  position: relative;
+}
+
+.eye-icon {
+  all: unset;
+  cursor: pointer;
+  position: relative;
+  right: 4px;
+  float: right;
+  padding-left: 10px;
+}

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
-import { EditorState, Prec } from "@codemirror/state";
+import { Compartment, EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
@@ -10,6 +10,9 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
+import { maskInput } from "./plugins/secretMaskExtension";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -19,9 +22,10 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onPressEnter,
   onBlur,
   variables,
+  isSecret,
 }) => {
-  const editorRef = useRef(null);
-  const editorViewRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
   which causes the editor to be recreated when onKeyDown changes
@@ -31,6 +35,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
+  const maskSecretCompartment = useRef(new Compartment()).current;
+  // It reconfigures the extension on dependency change
 
   useEffect(() => {
     onBlurRef.current = onBlur;
@@ -39,8 +45,13 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isHidden, setIsHidden] = useState<boolean>(false);
 
   useEffect(() => {
+    if (isSecret) {
+      setIsHidden(true);
+    }
+
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
       editorViewRef.current = null;
@@ -126,6 +137,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           ),
           generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
+          maskSecretCompartment.of(maskInput(isHidden)),
         ],
       }),
     });
@@ -163,10 +175,18 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
+  useEffect(() => {
+    if (editorViewRef.current) {
+      editorViewRef.current.dispatch({
+        effects: maskSecretCompartment.reconfigure(maskInput(isHidden)),
+      });
+    }
+  }, [isHidden]);
+
   return (
     <div
       ref={editorRef}
-      className={`${className ?? ""} editor-popup-container ant-input`}
+      className={`${className ?? ""} relative editor-popup-container ant-input`}
       onMouseLeave={() => setHoveredVariable(null)}
     >
       <Conditional condition={hoveredVariable}>
@@ -177,6 +197,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           variables={variables}
         />
       </Conditional>
+      {isSecret ? (
+        <button className="eye-icon" onClick={() => setIsHidden((prev) => !prev)}>
+          {isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+        </button>
+      ) : null}
     </div>
   );
 };
