@@ -208,14 +208,19 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
 
   return (
     <RQModal
-      width={[DataFileModalViewMode.LARGE_FILE, DataFileModalViewMode.LOADING].includes(viewMode) ? 480 : 680}
+      className={
+        [DataFileModalViewMode.LARGE_FILE, DataFileModalViewMode.LOADING, DataFileModalViewMode.ERROR].includes(
+          viewMode
+        )
+          ? "preview-modal-fixed-width"
+          : "preview-modal"
+      }
       open={true}
       closable={true}
       closeIcon={<MdOutlineClose />}
       onCancel={() => {
         onClose();
       }}
-      className="preview-modal"
     >
       {viewMode === DataFileModalViewMode.LOADING && <LoadingView />}
       {viewMode === DataFileModalViewMode.ACTIVE && <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />}
