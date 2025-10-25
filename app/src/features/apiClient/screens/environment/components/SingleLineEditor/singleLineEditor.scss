@@ -13,10 +13,10 @@
 }
 
 .eye-icon {
-  all: unset;
   cursor: pointer;
+  background: none;
+  border: none;
   position: relative;
-  right: 4px;
   float: right;
-  padding-left: 10px;
+  right: 0;
 }

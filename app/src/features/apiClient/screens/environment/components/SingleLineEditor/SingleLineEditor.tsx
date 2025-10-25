@@ -12,7 +12,6 @@ import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
 import { maskInput } from "./plugins/secretMaskExtension";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
-import { RiEyeLine } from "@react-icons/all-files/ri/RiEyeLine";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -45,13 +44,9 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [isHidden, setIsHidden] = useState<boolean>(isSecret ?? false);
 
   useEffect(() => {
-    if (isSecret) {
-      setIsHidden(true);
-    }
-
     if (editorViewRef.current) {
       editorViewRef.current.destroy();
       editorViewRef.current = null;
@@ -199,7 +194,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       </Conditional>
       {isSecret ? (
         <button className="eye-icon" onClick={() => setIsHidden((prev) => !prev)}>
-          {isHidden ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+          {isHidden ? <EyeInvisibleOutlined /> : <EyeOutlined />}
         </button>
       ) : null}
     </div>

@@ -14,7 +14,7 @@ class MaskCharWidget extends WidgetType {
   }
 }
 
-export function maskInput(hidden: Boolean) {
+export function maskInput(hidden: boolean) {
   const maskWidget = new MaskCharWidget();
 
   return ViewPlugin.fromClass(
