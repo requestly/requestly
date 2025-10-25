@@ -2,7 +2,6 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
-import { isSetappBuild } from "./AppUtils";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -24,13 +23,14 @@ export const getPrettyString = (string) => {
 
 export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
-  if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
-  if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.BRONZE || planName === PRICING.PLAN_NAMES.FREE) return "Free";
+  if (planName === PRICING.PLAN_NAMES.GOLD || planName === PRICING.PLAN_NAMES.PROFESSIONAL) return "Professional";
   if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
-  if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
+  if (planName === PRICING.PLAN_NAMES.BASIC_V2 || planName === PRICING.PLAN_NAMES.BASIC) return "Basic";
   if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
   if (planName === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT) return "Professional (Student Program)";
   if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) return "API Client Enterprise";
+  if (planName === PRICING.PLAN_NAMES.SESSION_PROFESSIONAL) return "Plus";
 
   return planName
     .toLowerCase()
