@@ -31,7 +31,7 @@ import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/s
 import { setRedirectMetadata } from "features/onboarding/utils";
 import { LoggedOutPopover } from "./LoggedOutPopover/LoggedOutPopover";
 
-export default function HeaderUser() {
+export default function HeaderUser({ showUpgradeButton = true }) {
   const navigate = useNavigate();
   const location = useLocation();
   //Global State
@@ -178,7 +178,8 @@ export default function HeaderUser() {
             </Dropdown>
           </Col>
           <Col>
-            {!isSafariBrowser() &&
+            {showUpgradeButton &&
+            !isSafariBrowser() &&
             (!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
             appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
               <RQButton
