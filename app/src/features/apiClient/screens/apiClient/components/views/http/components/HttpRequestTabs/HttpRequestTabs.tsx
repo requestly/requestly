@@ -49,11 +49,19 @@ const HttpRequestTabs: React.FC<Props> = ({
   const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
+  const enabledQueryParams = queryParams.filter((qp) => qp.isEnabled === true);
+
+  const showCountOrNot = useMemo(() => {
+    if (enabledQueryParams.length || pathVariables.length) return 1;
+
+    return 0;
+  }, [queryParams.length, pathVariables, enabledQueryParams]);
+
   const items = useMemo(() => {
     return [
       {
         key: RequestTab.QUERY_PARAMS,
-        label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
+        label: <RequestTabLabel label="Params" count={showCountOrNot} showDot={true} />,
         children: (
           <>
             <div className="params-table-title">Query Params</div>
@@ -84,7 +92,11 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          <RequestTabLabel
+            label="Body"
+            count={requestEntry.request.body?.length ? 1 : 0}
+            showDot={isRequestBodySupported}
+          />
         ),
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
@@ -159,7 +171,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     collectionId,
     handleAuthChange,
     isRequestBodySupported,
-    queryParams.length,
+    showCountOrNot,
     requestEntry.auth,
     requestEntry.request.body,
     requestEntry.request.bodyContainer,
@@ -168,7 +180,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     requestEntry.scripts,
     setContentType,
     setRequestEntry,
-    pathVariables.length,
   ]);
 
   return (
