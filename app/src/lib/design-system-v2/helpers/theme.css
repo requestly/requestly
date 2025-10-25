@@ -114,38 +114,38 @@
   --requestly-font-weight-bold: 700;
   --requestly-font-weight-extrabold: 800;
   --requestly-font-weight-black: 900;
-  --requestly-font-size-2xs: 0.563rem;
-  --requestly-font-size-xs: 0.688rem;
-  --requestly-font-size-sm: 0.75rem;
-  --requestly-font-size-md: 0.875rem;
-  --requestly-font-size-lg: 1rem;
-  --requestly-font-size-xl: 1.125rem;
-  --requestly-font-line-height-2xs: 0.813rem;
-  --requestly-font-line-height-xs: 0.938rem;
-  --requestly-font-line-height-sm: 1.25rem;
-  --requestly-font-line-height-md: 1.438rem;
-  --requestly-font-line-height-lg: 1.875rem;
-  --requestly-font-line-height-xl: 2.25rem;
-  --requestly-font-line-height-2xl: 2.813rem;
-  --requestly-font-line-height-3xl: 3.375rem;
-  --requestly-font-line-height-4xl: 4.5rem;
-  --requestly-font-line-height-5xl: 5.625rem;
+  --requestly-font-size-2xs: 0.563rem; /* 9px */
+  --requestly-font-size-xs: 0.688rem; /* 11px */
+  --requestly-font-size-sm: 0.75rem; /* 12px */
+  --requestly-font-size-md: 0.875rem; /* 14px */
+  --requestly-font-size-lg: 1rem; /* 16px */
+  --requestly-font-size-xl: 1.125rem; /* 18px */
+  --requestly-font-line-height-2xs: 0.813rem; /* 13px */
+  --requestly-font-line-height-xs: 0.938rem; /* 15px */
+  --requestly-font-line-height-sm: 1.25rem; /* 20px */
+  --requestly-font-line-height-md: 1.438rem; /* 23px */
+  --requestly-font-line-height-lg: 1.875rem; /* 30px */
+  --requestly-font-line-height-xl: 2.25rem; /* 36px */
+  --requestly-font-line-height-2xl: 2.813rem; /* 45px */
+  --requestly-font-line-height-3xl: 3.375rem; /* 54px */
+  --requestly-font-line-height-4xl: 4.5rem; /* 72px */
+  --requestly-font-line-height-5xl: 5.625rem; /* 90px */
   --requestly-font-family-code: Roboto Mono;
   --requestly-font-family-default: Inter;
-  --requestly-space-0: 0rem;
-  --requestly-space-1: 0.125rem;
-  --requestly-space-2: 0.25rem;
-  --requestly-space-3: 0.375rem;
-  --requestly-space-4: 0.5rem;
-  --requestly-space-5: 0.75rem;
-  --requestly-space-6: 1rem;
-  --requestly-space-7: 1.25rem;
-  --requestly-space-8: 1.5rem;
-  --requestly-space-9: 2rem;
-  --requestly-space-10: 2.5rem;
-  --requestly-space-11: 3rem;
-  --requestly-space-12: 3.5rem;
-  --requestly-space-13: 4rem;
-  --requestly-space-14: 4.5rem;
-  --requestly-space-15: 5rem;
+  --requestly-space-0: 0rem; /* 0px */
+  --requestly-space-1: 0.125rem; /* 2px */
+  --requestly-space-2: 0.25rem; /* 4px */
+  --requestly-space-3: 0.375rem; /* 6px */
+  --requestly-space-4: 0.5rem; /* 8px */
+  --requestly-space-5: 0.75rem; /* 12px */
+  --requestly-space-6: 1rem; /* 16px */
+  --requestly-space-7: 1.25rem; /* 20px */
+  --requestly-space-8: 1.5rem; /* 24px */
+  --requestly-space-9: 2rem; /* 32px */
+  --requestly-space-10: 2.5rem; /* 40px */
+  --requestly-space-11: 3rem; /* 48px */
+  --requestly-space-12: 3.5rem; /* 56px */
+  --requestly-space-13: 4rem; /* 64px */
+  --requestly-space-14: 4.5rem; /* 72px */
+  --requestly-space-15: 5rem; /* 80px */
 }
