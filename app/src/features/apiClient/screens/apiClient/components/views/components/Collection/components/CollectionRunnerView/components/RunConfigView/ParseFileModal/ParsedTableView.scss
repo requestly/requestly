@@ -1,6 +1,17 @@
 .parsed-table-view-container {
-  max-height: 335px; // Header (55px) + 8 rows (8 × 35px = 280px)
-  overflow: auto;
+  .ant-table-content {
+    overflow: visible !important;
+  }
+
+  //prevent overflow
+  .ant-table-tbody > tr > td {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .preview-modal-body-container .rq-content-list-table-container {

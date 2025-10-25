@@ -14,18 +14,18 @@ const addIterationColumnToTable = (dataSource: any[]) => {
 export const PreviewTableView: React.FC<{
   datasource: Record<string, any>[];
 }> = ({ datasource }) => {
-  const parentRef = useRef(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
-  const data = addIterationColumnToTable(datasource);
-  const limitedData = data.length > 1000 ? data.slice(0, 1000) : data;
+  const data = useMemo(() => addIterationColumnToTable(datasource), [datasource]);
 
   const columns = useMemo(() => {
-    const keys = Object.keys(limitedData[0] || {});
+    const keys = Object.keys(data[0] || {});
     return [
       {
         title: "Iteration",
         dataIndex: "iteration",
         key: "iteration",
+        width: 100,
       },
       ...keys
         .filter((k) => k !== "iteration")
@@ -33,29 +33,61 @@ export const PreviewTableView: React.FC<{
           title: k.charAt(0).toUpperCase() + k.slice(1),
           dataIndex: k,
           key: k,
+          width: 150,
         })),
     ];
-  }, [limitedData]);
+  }, [data]);
 
   const rowVirtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => data.length,
-    overscan: 5,
+    estimateSize: () => 33, // Height of each row in pixels
+    overscan: 4,
   });
 
-  //x -> direction should be scrolling till the last columm
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
+
+  const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
+
+  const virtualizedData = useMemo(() => {
+    return virtualItems.map((virtualRow) => data[virtualRow.index]);
+  }, [virtualItems, data]);
+
   return (
-    <div ref={parentRef} className="parsed-table-view-container">
-      <ContentListTable
-        id="parsed-file-preview-table"
-        data={limitedData}
-        columns={columns}
-        className="parsed-values-table"
-        locale={{ emptyText: `No entries found` }}
-        scroll={{ x: "max-content" }}
-        pagination={false}
-      />
+    <div
+      ref={parentRef}
+      className="parsed-table-view-container"
+      style={{
+        height: "100%",
+        maxHeight: "335px",
+        overflow: "auto",
+      }}
+    >
+      <div
+        style={{
+          height: `${totalSize}px`,
+          width: "fit-content",
+          minWidth: "100%",
+        }}
+      >
+        <div
+          style={{
+            transform: `translateY(${paddingTop}px)`,
+          }}
+        >
+          <ContentListTable
+            id="parsed-file-preview-table-body"
+            data={virtualizedData}
+            columns={columns}
+            className="parsed-values-table"
+            locale={{ emptyText: `No entries found` }}
+            scroll={{ x: "max-content" }}
+            pagination={false}
+            showHeader={paddingTop === 0}
+          />
+        </div>
+      </div>
     </div>
   );
 };
