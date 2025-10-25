@@ -105,7 +105,7 @@ function generateFields(
           value={formState[field.id]}
           options={field.options}
           defaultValue={field.defaultValue}
-          className={field.className ?? ""}
+          className={`${field.className ?? ""} select-full`}
           onChange={(value: any) => onChangeHandler(value, field.id)}
         />
       );
