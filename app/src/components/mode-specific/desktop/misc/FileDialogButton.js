@@ -1,22 +1,30 @@
 import { Button } from "antd";
 
-export function displayFileSelector(callback) {
+export function displayFileSelector(callback, config = {}) {
+  //do not mutate incoming config
+  const newConfig = { ...config };
+  if (newConfig.properties && newConfig.properties.includes("multiSelections")) {
+    /*
+    This function is meant to select a single file only.
+    Hence removing multiSelections property from config.
+    Use displayMultiFileSelector for multiple file selection.
+    */
+    newConfig.properties = newConfig.properties.filter((prop) => prop !== "multiSelections");
+  }
   const handleDialogPromise = (result) => {
-    const { canceled, filePaths, files } = result;
+    //this selector will always have only one single file
+    const { canceled, files } = result;
     if (!canceled) {
       if (callback) {
-        if (filePaths) {
-          // for compatibility with how the UI expected open-file-dialog to respond earlier
-          return callback(filePaths[0]);
-        } else {
-          return callback(files[0]?.path);
+        if (files && files[0]) {
+          return callback(files[0]);
         }
       }
     }
   };
 
   if (window.RQ && window.RQ.DESKTOP && window.RQ.DESKTOP.SERVICES && window.RQ.DESKTOP.SERVICES.IPC) {
-    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", {}).then((result) => {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("open-file-dialog", newConfig).then((result) => {
       handleDialogPromise(result);
     });
   }

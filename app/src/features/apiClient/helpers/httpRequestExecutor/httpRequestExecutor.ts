@@ -14,6 +14,7 @@ import {
 import { isEmpty } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { HttpRequestScriptExecutionService } from "./httpRequestScriptExecutionService";
+import { Scope } from "../variableResolver/variable-resolver";
 import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 
@@ -138,9 +139,13 @@ export class HttpRequestExecutor {
     }
   }
 
-  async prepareRequestWithValidation(recordId: string, entry: RQAPI.HttpApiEntry): Promise<Result<PreparedRequest>> {
+  async prepareRequestWithValidation(
+    recordId: string,
+    entry: RQAPI.HttpApiEntry,
+    scopes?: Scope[]
+  ): Promise<Result<PreparedRequest>> {
     const preparationResult = Try(() => {
-      const result = this.requestPreparer.prepareRequest(recordId, entry);
+      const result = this.requestPreparer.prepareRequest(recordId, entry, scopes);
       result.preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
       return result;
     });
@@ -169,11 +174,12 @@ export class HttpRequestExecutor {
   async execute(
     recordId: string,
     entry: RQAPI.HttpApiEntry,
-    abortController?: AbortController
+    abortController?: AbortController,
+    scopes?: Scope[]
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry)).mapError(
+    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
       (error) => new ExecutionError(entry, error)
     );
 

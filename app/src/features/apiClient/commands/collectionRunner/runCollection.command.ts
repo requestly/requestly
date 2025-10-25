@@ -9,7 +9,7 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
+import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -21,6 +21,11 @@ import {
 import { GenericState } from "hooks/useGenericState";
 import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
+import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { VariableScope } from "backend/environment/types";
+import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/RunnerFileMissingError/RunnerFileMissingError";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -72,8 +77,10 @@ function prepareExecutionResult(params: {
 }
 
 class RunCancelled extends NativeError {}
+class DataFileParseError extends NativeError {}
 
 class Runner {
+  private variables: Record<string, any>[] = [];
   constructor(
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
@@ -102,16 +109,50 @@ class Runner {
     return request;
   }
 
-  private beforeStart() {
+  private async parseDataFile() {
+    const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+    if (!dataFile) {
+      return;
+    }
+
+    const apiClientFilesStore = apiClientFileStore.getState();
+
+    const collectionId = this.runContext.collectionId;
+    if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
+      throw new RunnerFileMissingError(
+        `Data file "${dataFile.name}" is missing! Please re-add the file to proceed.`
+      ).addContext({
+        collectionId,
+        filePath: dataFile.path,
+      });
+    }
+
+    try {
+      const parsedData = await parseCollectionRunnerDataFile(dataFile.path);
+      return parsedData.data;
+    } catch (e) {
+      throw new DataFileParseError("Failed to read or parse data file!").addContext({
+        collectionId,
+        error: e,
+        filePath: dataFile.path,
+      });
+    }
+  }
+
+  private async beforeStart() {
     this.genericState.setPreview(false);
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
     this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.IDLE);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
+    this.variables = [];
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
+    const variables = await this.parseDataFile();
+    this.variables = variables ?? [];
+
     trackCollectionRunStarted({
       collection_id: collectionId,
       iteration_count: runConfig.iterations,
@@ -147,8 +188,22 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
+    const scopes: Scope[] = [];
+    if (iteration <= this.variables.length) {
+      scopes.push([
+        {
+          scope: VariableScope.DATA_FILE,
+          scopeId: "data_file",
+          name: "Data File",
+          level: 0,
+        },
+        createDummyVariablesStore(this.variables[iteration - 1]),
+      ]);
+    }
+
     return {
       currentExecutingRequest,
+      scopes,
     };
   }
 
@@ -200,8 +255,8 @@ class Runner {
     }
   }
 
-  private onError(error: any) {
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+  private onError(error: Error) {
+    this.runContext.runResultStore.getState().setError(error);
     this.runContext.runResultStore.getState().setEndtime(null);
   }
 
@@ -296,14 +351,15 @@ class Runner {
 
   async run() {
     try {
-      this.beforeStart();
+      await this.beforeStart();
 
       for await (const { request, iteration, startTime } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           request.id,
           request.data,
-          this.runContext.runResultStore.getState().abortController
+          this.runContext.runResultStore.getState().abortController,
+          scopes
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
@@ -315,6 +371,7 @@ class Runner {
         this.onRunCancelled();
         return;
       }
+
       this.onError(e);
       return e;
     } finally {
