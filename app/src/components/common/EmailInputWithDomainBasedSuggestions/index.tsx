@@ -68,6 +68,10 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
       if (!trimmed) return;
 
       if (isEmailValid(trimmed)) {
+        if (selectedEmails.some((e) => e.value === trimmed)) {
+          toast.error(`Email already added: ${trimmed}`);
+          return;
+        }
         const newEntry = { label: trimmed, value: trimmed };
         const updated = [...selectedEmails, newEntry];
         setSelectedEmails(updated);
