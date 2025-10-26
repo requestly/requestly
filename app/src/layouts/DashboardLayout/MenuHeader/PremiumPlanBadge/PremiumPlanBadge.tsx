@@ -22,7 +22,6 @@ const PremiumPlanBadge = () => {
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
 
   const userPlanDetails = user?.details?.planDetails;
-  const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status ?? "";
   const planEndDateString = userPlanDetails?.subscription?.endDate ?? "";
   const planName = userPlanDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
@@ -73,7 +72,6 @@ const PremiumPlanBadge = () => {
 
   if (
     isAppSumoDeal ||
-    !planId ||
     [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus) ||
     daysLeft > 30
   ) {

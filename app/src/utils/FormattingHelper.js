@@ -23,22 +23,36 @@ export const getPrettyString = (string) => {
 
 export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
-  if (planName === PRICING.PLAN_NAMES.BRONZE || planName === PRICING.PLAN_NAMES.FREE) return "Free";
-  if (planName === PRICING.PLAN_NAMES.GOLD || planName === PRICING.PLAN_NAMES.PROFESSIONAL) return "Professional";
-  if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
-  if (planName === PRICING.PLAN_NAMES.BASIC_V2 || planName === PRICING.PLAN_NAMES.BASIC) return "Basic";
-  if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
-  if (planName === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT) return "Professional (Student Program)";
-  if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) return "API Client Enterprise";
-  if (planName === PRICING.PLAN_NAMES.SESSION_PROFESSIONAL) return "Plus";
-
-  return planName
-    .toLowerCase()
-    .split(" ")
-    .map(function (word) {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(" ");
+  switch (planName) {
+    case PRICING.PLAN_NAMES.BRONZE:
+    case PRICING.PLAN_NAMES.FREE:
+    case PRICING.PLAN_NAMES.SESSION_FREE:
+      return "Free";
+    case PRICING.PLAN_NAMES.GOLD:
+    case PRICING.PLAN_NAMES.PROFESSIONAL:
+      return "Professional";
+    case PRICING.PLAN_NAMES.ENTERPRISE:
+      return "Enterprise";
+    case PRICING.PLAN_NAMES.BASIC_V2:
+    case PRICING.PLAN_NAMES.BASIC:
+      return "Basic";
+    case PRICING.PLAN_NAMES.LITE:
+      return "Lite";
+    case PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT:
+      return "Professional (Student Program)";
+    case PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE:
+      return "API Client Enterprise";
+    case PRICING.PLAN_NAMES.SESSION_PROFESSIONAL:
+      return "Plus";
+    default:
+      return planName
+        .toLowerCase()
+        .split(" ")
+        .map(function (word) {
+          return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(" ");
+  }
 };
 
 export const isValidUrl = (string) => {
