@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Spin, Row } from "antd";
@@ -227,3 +228,7 @@ export default function HeaderUser({ showUpgradeButton = true }) {
     </section>
   );
 }
+
+HeaderUser.propTypes = {
+  showUpgradeButton: PropTypes.bool,
+};
