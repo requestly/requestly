@@ -22,7 +22,14 @@ const UpgradePlanBadge: React.FC<UpgradePlanBadgeProps> = ({
     <div className={clsx("premium-plan-badge-container", containerClassName)}>
       {icon}
       <span className="premium-plan-name-info">{planStatusInfo}</span>
-      <RQButton type="primary" shape="round" className="upgrade-button" onClick={handleBadgeClick}>
+      <RQButton
+        type="primary"
+        shape="round"
+        className="upgrade-button"
+        onClick={handleBadgeClick}
+        aria-label={badgeText}
+        data-testid="upgrade-plan-badge-cta"
+      >
         {badgeText}
       </RQButton>
     </div>
