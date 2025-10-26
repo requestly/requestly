@@ -39,6 +39,12 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
             return;
           }
           onImportCurlRequest(requestFromCurl);
+
+          const urlWithoutQueryParams = requestFromCurl.url.split("?")[0];
+          const finalQueryParams: KeyValuePair[] = (requestFromCurl as any).queryParams || [];
+
+          onUrlChange(urlWithoutQueryParams, finalQueryParams);
+          return;
         } catch (error) {
           toast.error(error.message || "Failed to parse cURL command. Please ensure it is valid.");
           return;
@@ -80,7 +86,7 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
   return (
     <ApiClientUrl
       url={queryParamsToURLString(queryParams, url)}
-      placeholder="Enter or paste HTTP URL"
+      placeholder="Enter or paste HTTP URL or cURL command"
       currentEnvironmentVariables={currentEnvironmentVariables}
       onEnterPress={onEnterPress}
       onUrlChange={handleUrlChange}
