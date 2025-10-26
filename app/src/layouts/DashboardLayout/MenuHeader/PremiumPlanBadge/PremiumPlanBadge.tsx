@@ -24,20 +24,15 @@ const PremiumPlanBadge = () => {
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status ?? "";
-  const planEndDateString = userPlanDetails?.subscription?.endDate;
+  const planEndDateString = userPlanDetails?.subscription?.endDate ?? "";
   const planName = userPlanDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
   const prettyPlanName = planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "Pro" : getPrettyPlanName(planName);
   const daysLeft = useMemo(() => {
-    try {
-      const planEndDate = new Date(planEndDateString ?? "");
-      const currentDate = new Date();
-      // @ts-ignore
-      let diffTime: any = planEndDate - currentDate;
-      return Number(Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-    } catch (err) {
-      Logger.log(err);
-      return 0;
-    }
+    const endMs = Date.parse(planEndDateString);
+    if (!Number.isFinite(endMs)) return 0;
+
+    const days = Math.ceil((endMs - Date.now()) / (1000 * 60 * 60 * 24));
+    return Number.isFinite(days) ? days : 0;
   }, [planEndDateString]);
 
   const handleBadgeClick = useCallback(() => {
