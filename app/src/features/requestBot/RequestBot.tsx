@@ -24,8 +24,7 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
       const target = e.target as HTMLElement;
 
       // Check if click is on Ask AI button or its children
-      const isClickOnAskAIButton =
-        target.closest("[data-ask-ai-trigger]") !== null || target.textContent?.includes("Ask AI");
+      const isClickOnAskAIButton = target.closest("[data-ask-ai-trigger]") !== null;
 
       // Only close if click is outside dialog AND not on Ask AI button
       if (element && !element.contains(target) && !isClickOnAskAIButton) {
