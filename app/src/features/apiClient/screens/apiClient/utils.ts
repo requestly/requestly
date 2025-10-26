@@ -1,3 +1,4 @@
+import isNil from "lodash/isNil";
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
 import { AbortReason, FormDropDownOptions, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
@@ -627,47 +628,70 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
   const harRequest: HarRequest = {
     method: apiRequest.method,
     url: apiRequest.url,
-    headers: apiRequest.headers.map(({ key, value }) => ({ name: key, value })),
-    queryString: apiRequest.queryParams.map(({ key, value }) => ({ name: key, value })),
+    headers: apiRequest.headers?.map(({ key, value }) => ({ name: key || "", value: String(value || "") })) || [],
+    queryString:
+      apiRequest.queryParams?.map(({ key, value }) => ({ name: key || "", value: String(value || "") })) || [],
     httpVersion: "HTTP/1.1",
     cookies: [],
     bodySize: -1,
     headersSize: -1,
   };
 
-  if (apiRequest?.contentType === RequestContentType.RAW) {
-    harRequest.postData = {
-      mimeType: RequestContentType.RAW,
-      text: apiRequest.body as string,
-    };
-  } else if (apiRequest?.contentType === RequestContentType.JSON) {
-    harRequest.postData = {
-      mimeType: RequestContentType.JSON,
-      text: apiRequest.body as string,
-    };
-  } else if (apiRequest?.contentType === RequestContentType.FORM) {
-    harRequest.postData = {
-      mimeType: RequestContentType.FORM,
-      params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
-    };
-  } else if (apiRequest?.contentType === RequestContentType.MULTIPART_FORM) {
-    harRequest.postData = {
-      mimeType: RequestContentType.MULTIPART_FORM,
-      params: (apiRequest.body as KeyValuePair[])
-        .filter((pair) => typeof pair.value === "string")
-        .map(({ key, value }) => ({ name: key, value: value as string })),
-    };
-  } else if (
-    apiRequest?.contentType === RequestContentType.HTML ||
-    apiRequest?.contentType === RequestContentType.JAVASCRIPT ||
-    apiRequest?.contentType === RequestContentType.XML
-  ) {
-    harRequest.postData = {
-      mimeType: apiRequest.contentType,
-      text: apiRequest.body as string,
-    };
+  if (isNil(apiRequest?.body)) {
+    return harRequest;
   }
 
+  switch (apiRequest?.contentType) {
+    case RequestContentType.RAW: {
+      harRequest.postData = {
+        mimeType: RequestContentType.RAW,
+        text: String(apiRequest.body),
+      };
+      break;
+    }
+    case RequestContentType.JSON: {
+      harRequest.postData = {
+        mimeType: RequestContentType.JSON,
+        text: typeof apiRequest.body === "string" ? apiRequest.body : JSON.stringify(apiRequest.body),
+      };
+      break;
+    }
+    case RequestContentType.FORM: {
+      const formBody = Array.isArray(apiRequest.body) ? apiRequest.body : [];
+      harRequest.postData = {
+        mimeType: RequestContentType.FORM,
+        params: formBody.map((pair) => ({
+          name: pair?.key || "",
+          value: String(pair?.value || ""),
+        })),
+      };
+      break;
+    }
+    case RequestContentType.MULTIPART_FORM: {
+      const multipartBody = Array.isArray(apiRequest.body) ? apiRequest.body : [];
+      harRequest.postData = {
+        mimeType: RequestContentType.MULTIPART_FORM,
+        params: multipartBody
+          .filter((pair) => pair && typeof pair.value === "string")
+          .map((pair) => ({
+            name: pair?.key || "",
+            value: pair.value,
+          })),
+      };
+      break;
+    }
+    case RequestContentType.HTML:
+    case RequestContentType.JAVASCRIPT:
+    case RequestContentType.XML: {
+      harRequest.postData = {
+        mimeType: apiRequest.contentType,
+        text: String(apiRequest.body),
+      };
+      break;
+    }
+    default:
+      break;
+  }
   return harRequest;
 };
 
