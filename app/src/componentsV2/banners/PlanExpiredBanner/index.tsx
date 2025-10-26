@@ -58,7 +58,11 @@ export const PlanExpiredBanner = () => {
         <RQButton
           type="transparent"
           className="plan-expired-banner-close-btn"
-          icon={<IoMdClose onClick={() => dispatch(globalActions.updatePlanExpiredBannerClosed(true))} />}
+          icon={<IoMdClose />}
+          onClick={() => {
+            setIsBannerVisible(false);
+            dispatch(globalActions.updateIsAppBannerVisible(true));
+          }}
         />
       </div>
     );
