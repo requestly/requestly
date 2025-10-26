@@ -80,6 +80,8 @@ const PremiumPlanBadge = () => {
 
   switch (planName) {
     case PRICING.PLAN_NAMES.FREE:
+    case PRICING.PLAN_NAMES.SESSION_FREE:
+    case PRICING.PLAN_NAMES.BRONZE:
       // User is on free plan
       return (
         <UpgradePlanBadge
