@@ -61,7 +61,7 @@ export const PlanExpiredBanner = () => {
           icon={<IoMdClose />}
           onClick={() => {
             setIsBannerVisible(false);
-            dispatch(globalActions.updateIsAppBannerVisible(true));
+            dispatch(globalActions.updatePlanExpiredBannerClosed(true));
           }}
         />
       </div>
