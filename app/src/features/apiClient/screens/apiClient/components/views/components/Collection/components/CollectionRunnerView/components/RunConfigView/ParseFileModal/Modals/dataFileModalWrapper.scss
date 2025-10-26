@@ -40,6 +40,36 @@
     }
   }
 
+  .warning-state-messaging-container {
+    padding: 12px 16px;
+    .warning-state-banner-container {
+      display: flex;
+      padding: 8px 32px 8px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--requestly-color-warning-800);
+      background: var(--requestly-color-warning-900);
+      .warning-state-banner-fields {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        align-self: stretch;
+        .warning-icon {
+          svg {
+            color: var(--requestly-color-warning-500);
+          }
+        }
+        .warning-text {
+          color: var(--requestly-color-text-default);
+          font-family: var(--requestly-font-family-default);
+          font-size: var(--requestly-font-size-sm);
+          font-style: normal;
+          font-weight: 500;
+          line-height: 18px;
+        }
+      }
+    }
+  }
+
   .preview-modal-footer-container {
     display: flex;
     padding: 12px 16px 16px 8px;
