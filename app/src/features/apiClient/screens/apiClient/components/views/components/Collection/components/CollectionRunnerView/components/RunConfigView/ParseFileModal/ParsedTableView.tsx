@@ -66,7 +66,7 @@ export const PreviewTableView: React.FC<{
     >
       <div
         style={{
-          height: data.length >= 9 ? `${totalSize}px` : "auto",
+          height: `${totalSize + 34}px`,
           width: "fit-content",
           minWidth: "100%",
         }}
