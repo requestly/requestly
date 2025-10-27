@@ -34,6 +34,7 @@ interface Props {
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
   focusPostResponseScriptEditor?: boolean;
   onFocusPostResponseComplete?: () => void;
+  scriptEditorVersion?: number;
 }
 
 const HttpRequestTabs: React.FC<Props> = ({
@@ -45,6 +46,7 @@ const HttpRequestTabs: React.FC<Props> = ({
   handleAuthChange,
   focusPostResponseScriptEditor,
   onFocusPostResponseComplete,
+  scriptEditorVersion,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
@@ -156,6 +158,7 @@ const HttpRequestTabs: React.FC<Props> = ({
             }}
             focusPostResponse={focusPostResponseScriptEditor}
             onFocusComplete={onFocusPostResponseComplete}
+            scriptEditorVersion={scriptEditorVersion}
           />
         ),
       },
@@ -177,6 +180,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     pathVariables.length,
     focusPostResponseScriptEditor,
     onFocusPostResponseComplete,
+    scriptEditorVersion,
   ]);
 
   return (
