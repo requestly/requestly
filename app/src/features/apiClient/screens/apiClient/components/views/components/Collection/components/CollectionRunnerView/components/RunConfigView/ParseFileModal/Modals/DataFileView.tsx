@@ -4,7 +4,7 @@ import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { DataFileModalViewMode, useDataFileModalContext } from "./DataFileModalContext";
 import { NativeError } from "errors/NativeError";
-import { FiUpload } from "@react-icons/all-files/Fi/FiUpload";
+import { FiUpload } from "@react-icons/all-files/fi/FiUpload";
 
 export const getformattedFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;

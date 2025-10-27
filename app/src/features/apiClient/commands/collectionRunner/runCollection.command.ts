@@ -94,7 +94,7 @@ class Runner {
 
   private throwIfRunCancelled() {
     if (this.abortController.signal.aborted) {
-      throw new RunCancelled();
+      throw new RunCancelled("Run has been cancelled by the user.");
     }
   }
 
