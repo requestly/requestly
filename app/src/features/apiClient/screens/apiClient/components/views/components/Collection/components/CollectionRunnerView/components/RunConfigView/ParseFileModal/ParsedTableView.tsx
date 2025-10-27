@@ -30,7 +30,7 @@ export const PreviewTableView: React.FC<{
       ...keys
         .filter((k) => k !== "__iteration")
         .map((k) => ({
-          title: k.charAt(0).toUpperCase() + k.slice(1),
+          title: k.charAt(0) + k.slice(1),
           dataIndex: k,
           key: k,
           width: 150,
