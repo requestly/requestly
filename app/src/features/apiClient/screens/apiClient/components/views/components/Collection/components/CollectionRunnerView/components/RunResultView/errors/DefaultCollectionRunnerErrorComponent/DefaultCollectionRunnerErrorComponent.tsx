@@ -1,5 +1,5 @@
 import React from "react";
-import "./defaultCollectionRunnerError.scss";
+import "../collectionRunnerErrors.scss";
 interface Props {
   error: Error;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { RenderableError } from "errors/RenderableError";
 import LINKS from "config/constants/sub/links";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import "./dataFileParseError.scss";
+import "../collectionRunnerErrors.scss";
 import { useRunConfigStore } from "../../../../run.context";
 import { DataFileFormatExample } from "../../../DataFileFormatExample/DataFileFormatExample";
 

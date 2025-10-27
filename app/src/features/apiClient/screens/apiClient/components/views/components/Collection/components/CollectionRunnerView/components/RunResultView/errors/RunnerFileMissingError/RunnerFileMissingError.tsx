@@ -2,7 +2,7 @@ import React from "react";
 import { RenderableError } from "errors/RenderableError";
 import LINKS from "config/constants/sub/links";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import "./runnerFileMissing.scss";
+import "../collectionRunnerErrors.scss";
 
 export class RunnerFileMissingError extends RenderableError {
   render() {
