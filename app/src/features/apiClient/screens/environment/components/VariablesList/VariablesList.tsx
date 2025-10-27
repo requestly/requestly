@@ -43,12 +43,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const [visibleSecretsRowIds, setVisibleSecrets] = useState<number[]>([]);
 
   const filteredDataSource = useMemo(
-    () =>
-      dataSource.filter((item) => {
-        // Show search results that match the search value.
-        // Also show empty keys so that when user clicks on Add more, the new row is visible.
-        return item.key.toLowerCase().includes(searchValue.toLowerCase()) || item.key === "";
-      }),
+    () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
     [dataSource, searchValue]
   );
 
@@ -56,9 +51,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const nonEmptyResults = filteredDataSource.filter((item) => item.key !== "");
   const noSearchResultsFound = searchValue !== "" && nonEmptyResults.length === 0;
 
-  console.log({ filteredDataSource, nonEmptyResults, noSearchResultsFound });
-
-  const hideFooter = isReadOnly || noSearchResultsFound;
+  const hideFooter = isReadOnly || searchValue !== "";
 
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
