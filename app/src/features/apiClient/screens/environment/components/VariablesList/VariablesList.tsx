@@ -9,7 +9,7 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
 import { VariableData } from "features/apiClient/store/variables/types";
-import { BiSearchAlt } from "@react-icons/all-files/bi/BiSearchAlt";
+import EmptySearchResultsView from "./components/emptySearchResultsView/EmptySearchResultsView";
 
 interface VariablesListProps {
   variables: VariableRow[];
@@ -55,6 +55,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   // Show "no results" only when search is active and no non-empty keys match.
   const nonEmptyResults = filteredDataSource.filter((item) => item.key !== "");
   const noSearchResultsFound = searchValue !== "" && nonEmptyResults.length === 0;
+
+  console.log({ filteredDataSource, nonEmptyResults, noSearchResultsFound });
 
   const hideFooter = isReadOnly || noSearchResultsFound;
 
@@ -200,21 +202,13 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       columns={columns}
       data={filteredDataSource}
       locale={{
-        emptyText: () => {
-          if (noSearchResultsFound) {
-            return (
-              <div className="variables-list-no-results-container">
-                <div className="variables-list-no-results-icon">
-                  <BiSearchAlt size={48} />
-                </div>
-                <p>No variables found for "{searchValue}".</p>
-                <p>Try clearing your search or adding variables.</p>
-                <RQButton onClick={() => onSearchValueChange("")}>Clear search</RQButton>
-              </div>
-            );
-          }
-          return null;
-        },
+        emptyText: (
+          <EmptySearchResultsView
+            searchValue={searchValue}
+            noSearchResultsFound={noSearchResultsFound}
+            onSearchValueChange={onSearchValueChange}
+          />
+        ),
       }}
       components={{
         body: {
