@@ -1,10 +1,10 @@
 import React from "react";
-import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { PreviewTableView } from "../ParsedTableView";
 import { CommonFileInfo, FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { DataFileModalViewMode, useDataFileModalContext } from "./DataFileModalContext";
 import { NativeError } from "errors/NativeError";
+import { FiUpload } from "@react-icons/all-files/Fi/FiUpload";
 
 export const getformattedFileSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -40,11 +40,7 @@ export const DataFileView: React.FC<ModalProps> = ({ buttonOptions, viewMode }) 
       </div>
 
       {viewMode === DataFileModalViewMode.ACTIVE ? (
-        <FooterButtons
-          buttonOptions={buttonOptions}
-          primaryIcon={<MdOutlineOpenInNew />}
-          secondaryIcon={<RiDeleteBin6Line />}
-        />
+        <FooterButtons buttonOptions={buttonOptions} primaryIcon={<FiUpload />} secondaryIcon={<RiDeleteBin6Line />} />
       ) : (
         <FooterButtons buttonOptions={buttonOptions} />
       )}
