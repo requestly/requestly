@@ -15,7 +15,6 @@ export const EmptyTestsView: React.FC<EmptyTestsViewProps> = ({
   canGenerateTests = false,
 }) => {
   const showGenerateCta = canGenerateTests;
-  console.log({ canGenerateTests });
   const title = canGenerateTests ? "No test results found for this request" : "Tests are setup but not run yet";
 
   const description = canGenerateTests
