@@ -92,12 +92,12 @@
           }
 
           .invalid-icon {
-            color: var(--alias-tokens-color-error-soft, #f95e5e);
+            color: var(--alias-tokens-color-error-soft);
           }
 
           .button-text {
             &.file-invalid {
-              color: var(--alias-tokens-color-error-soft, #f95e5e);
+              color: var(--alias-tokens-color-error-soft);
             }
           }
 
