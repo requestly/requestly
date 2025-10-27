@@ -12,6 +12,10 @@ import { FileFeature } from "features/apiClient/store/apiClientFilesStore";
 import { useDataFileModalContext, DataFileModalViewMode } from "./DataFileModalContext";
 import { RQModal } from "lib/design-system/components";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
+import {
+  trackCollectionRunFileCleared,
+  trackCollectionRunTruncatedFileUsed,
+} from "modules/analytics/events/features/apiClient";
 
 interface buttonSchema {
   label: string;
@@ -128,12 +132,14 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
             secondaryButton: {
               label: "Replace file",
               onClick: () => {
+                trackCollectionRunFileCleared(parsedData?.count);
                 onFileSelected();
               },
             },
             primaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
+                trackCollectionRunTruncatedFileUsed({ count: parsedData?.count });
                 confirmUseDataFile();
               },
             },
@@ -160,6 +166,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           secondaryButton: {
             label: "Remove",
             onClick: () => {
+              trackCollectionRunFileCleared();
               removeDataFile();
               setIterations(1);
               onClose();

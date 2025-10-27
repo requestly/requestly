@@ -11,6 +11,10 @@ import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
 import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import {
+  trackCollectionRunFileCleared,
+  trackCollectionRunSelectFileClicked,
+} from "modules/analytics/events/features/apiClient";
 
 export const DataFileSelector: React.FC = () => {
   const { parseFile, setDataFileMetadata, setViewMode } = useDataFileModalContext();
@@ -70,7 +74,14 @@ export const DataFileSelector: React.FC = () => {
     <>
       {!dataFile ? (
         <>
-          <RQButton size="small" icon={<MdOutlineFileUpload />} onClick={handleFileSelection}>
+          <RQButton
+            size="small"
+            icon={<MdOutlineFileUpload />}
+            onClick={() => {
+              trackCollectionRunSelectFileClicked();
+              handleFileSelection();
+            }}
+          >
             Select file
           </RQButton>
 
@@ -106,6 +117,7 @@ export const DataFileSelector: React.FC = () => {
               className="clear-file-btn"
               onClick={() => {
                 removeDataFile();
+                trackCollectionRunFileCleared();
               }}
               type="transparent"
             >

@@ -279,6 +279,14 @@ export const API_CLIENT = {
   COLLECTION_RUNNER_VIEWED: "api_client_collection_runner_viewed",
   COLLECTION_RUNNER_CONFIG_SAVED: "api_client_collection_runner_config_saved",
   COLLECTION_RUNNER_CONFIG_SAVE_FAILED: "api_client_collection_runner_config_save_failed",
+
+  //Data-File Support for Collection Runner
+  COLLECTION_RUN_SELECT_FILE_CLICKED: "api_client_collection_run_select_file_clicked",
+  COLLECTION_RUN_FILE_PARSED: "api_client_collection_run_file_parsed",
+  COLLECTION_RUN_FILE_PARSE_FAILED: "api_client_collection_run_file_parse_failed",
+  COLLECTION_RUN_FILE_RECORD_LIMIT_EXCEEDED: "api_client_collection_run_file_record_limit_exceeded",
+  COLLECTION_RUN_TRUNCATED_FILE_USED: "api_client_collection_run_truncated_file_used",
+  COLLECTION_RUN_FILE_CLEARED: "api_client_collection_run_file_cleared",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
