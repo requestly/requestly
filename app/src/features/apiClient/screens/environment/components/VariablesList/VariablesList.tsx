@@ -56,6 +56,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   const nonEmptyResults = filteredDataSource.filter((item) => item.key !== "");
   const noSearchResultsFound = searchValue !== "" && nonEmptyResults.length === 0;
 
+  const hideFooter = isReadOnly || noSearchResultsFound;
+
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
 
@@ -189,19 +191,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     handleAddNewRow(dataSource);
   };
 
-  if (noSearchResultsFound) {
-    return (
-      <div className="variables-list-no-results-container">
-        <div className="variables-list-no-results-icon">
-          <BiSearchAlt size={48} />
-        </div>
-        <p>No variables found for "{searchValue}".</p>
-        <p>Try clearing your search or adding variables.</p>
-        <RQButton onClick={() => onSearchValueChange("")}>Clear search</RQButton>
-      </div>
-    );
-  }
-
   return (
     <ContentListTable
       id="variables-list"
@@ -210,7 +199,23 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       rowKey="id"
       columns={columns}
       data={filteredDataSource}
-      locale={{ emptyText: "No variables found" }}
+      locale={{
+        emptyText: () => {
+          if (noSearchResultsFound) {
+            return (
+              <div className="variables-list-no-results-container">
+                <div className="variables-list-no-results-icon">
+                  <BiSearchAlt size={48} />
+                </div>
+                <p>No variables found for "{searchValue}".</p>
+                <p>Try clearing your search or adding variables.</p>
+                <RQButton onClick={() => onSearchValueChange("")}>Clear search</RQButton>
+              </div>
+            );
+          }
+          return null;
+        },
+      }}
       components={{
         body: {
           row: EditableRow,
@@ -219,7 +224,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        isReadOnly
+        hideFooter
           ? undefined
           : () => (
               <div className="variables-list-footer">

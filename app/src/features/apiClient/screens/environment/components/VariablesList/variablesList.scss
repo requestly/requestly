@@ -178,11 +178,11 @@
 }
 
 .variables-list-no-results-container {
+  height: 68vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-top: var(--requestly-space-15);
+  padding-top: var(--requestly-space-15);
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-sm);
 
