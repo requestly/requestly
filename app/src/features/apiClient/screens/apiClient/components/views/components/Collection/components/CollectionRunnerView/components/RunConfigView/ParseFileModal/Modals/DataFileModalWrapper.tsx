@@ -90,7 +90,9 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
   ]);
 
   const confirmUseDataFile = useCallback(() => {
+    // remove previously set data file
     removeDataFile();
+
     const fileId = dataFileMetadata.name + "-" + Date.now();
     setDataFile({
       id: fileId,
@@ -100,9 +102,17 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
       source: "desktop",
       fileFeature: FileFeature.COLLECTION_RUNNER,
     });
-    setIterations(parsedData.data.length);
+    if (parsedData) {
+      setIterations(parsedData.data.length);
+    }
     onClose(); // Close modal immediately after confirming
-  }, [removeDataFile, dataFileMetadata, setDataFile, setIterations, onClose, parsedData?.data?.length]);
+  }, [removeDataFile, dataFileMetadata, setDataFile, setIterations, onClose, parsedData]);
+
+  const handleDataFileRemoval = useCallback(() => {
+    removeDataFile();
+    setIterations(1);
+    onClose();
+  }, [onClose, removeDataFile, setIterations]);
 
   const buttonOptions = (): buttonTypes => {
     switch (viewMode) {
@@ -159,11 +169,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
         return {
           secondaryButton: {
             label: "Remove",
-            onClick: () => {
-              removeDataFile();
-              setIterations(1);
-              onClose();
-            },
+            onClick: handleDataFileRemoval,
           },
           primaryButton: {
             label: "Change data file",

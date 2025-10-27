@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
@@ -13,11 +13,30 @@ import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrap
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 
 export const DataFileSelector: React.FC = () => {
-  const { parseFile, setDataFileMetadata, setViewMode } = useDataFileModalContext();
+  const { parseFile, setDataFileMetadata, setViewMode, dataFileMetadata } = useDataFileModalContext();
 
-  const [dataFile, removeDataFile] = useRunConfigStore((s) => [s.dataFile, s.removeDataFile]);
-  const [getFilesByIds, isFilePresentLocally] = useApiClientFileStore((s) => [s.getFilesByIds, s.isFilePresentLocally]);
-  const file = getFilesByIds([dataFile?.id])?.[0] ?? null;
+  const [dataFile, removeDataFile, setIterations] = useRunConfigStore((s) => [
+    s.dataFile,
+    s.removeDataFile,
+    s.setIterations,
+  ]);
+  const [getFilesByIds, isFilePresentLocally, storeFiles] = useApiClientFileStore((s) => [
+    s.getFilesByIds,
+    s.isFilePresentLocally,
+    s.files,
+  ]);
+  const file = useMemo(
+    () => {
+      if (!dataFile) {
+        return null;
+      }
+      return getFilesByIds([dataFile?.id])?.[0] ?? null;
+    },
+
+    // Need storeFiles to check trigger rerender
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dataFile?.id, getFilesByIds, storeFiles]
+  );
   const { openFileSelector } = useFileSelection();
 
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -46,6 +65,12 @@ export const DataFileSelector: React.FC = () => {
     setDataFileMetadata(null);
     setShowModal(false);
   }, [setDataFileMetadata, setShowModal]);
+
+  const handleRemoveFile = useCallback(() => {
+    setDataFileMetadata(null);
+    removeDataFile();
+    setIterations(1);
+  }, [removeDataFile, setDataFileMetadata, setIterations]);
 
   const handleViewExistingFile = useCallback(async () => {
     if (dataFile) {
@@ -101,21 +126,16 @@ export const DataFileSelector: React.FC = () => {
 
           {/*Clear File or Delete File */}
           <RQTooltip title={`clear file`}>
-            <RQButton
-              size="small"
-              className="clear-file-btn"
-              onClick={() => {
-                removeDataFile();
-              }}
-              type="transparent"
-            >
+            <RQButton size="small" className="clear-file-btn" onClick={handleRemoveFile} type="transparent">
               {dataFile && <RxCross2 />}
             </RQButton>
           </RQTooltip>
         </div>
       )}
 
-      {showModal && <DataFileModalWrapper onClose={handleModalClose} onFileSelected={handleFileSelection} />}
+      {showModal && dataFileMetadata && (
+        <DataFileModalWrapper onClose={handleModalClose} onFileSelected={handleFileSelection} />
+      )}
     </>
   );
 };

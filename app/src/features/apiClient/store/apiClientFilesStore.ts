@@ -47,7 +47,10 @@ const createApiClientFilesStore = (appMode: "desktop") => {
             ...file,
             isFileValid: doesFileExist,
           };
-          set({ files });
+          const updatedFiles = {
+            ...files,
+          };
+          set({ files: updatedFiles });
           return doesFileExist;
         },
 

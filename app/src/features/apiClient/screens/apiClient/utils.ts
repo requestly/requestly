@@ -920,7 +920,7 @@ export const createBodyContainer = (params: {
 };
 
 type ParsedResult = {
-  data: Record<string, any>[] | null;
+  data: Record<string, any>[];
   count: number;
 };
 
