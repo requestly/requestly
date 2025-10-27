@@ -49,17 +49,22 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
 
     try {
       const data = await parseCollectionRunnerDataFile(filePath);
-      trackCollectionRunRecordLimitExceeded(data.count);
+      if (data.count > 1000) {
+        trackCollectionRunRecordLimitExceeded({ record_count: data.count });
+      }
       const processedData = {
         data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
         count: data.count,
       };
       setParsedData(processedData);
-      trackCollectionRunFileParsed({ count: processedData.count, fileType: getFileExtension(filePath).slice(1) });
+      trackCollectionRunFileParsed({
+        record_count: processedData.count,
+        format: getFileExtension(filePath).slice(1),
+      });
       setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
     } catch (error) {
       setViewMode(DataFileModalViewMode.ERROR);
-      trackCollectionRunFileParseFailed({ reason: error.message, file_type: getFileExtension(filePath).slice(1) });
+      trackCollectionRunFileParseFailed({ reason: error.message, format: getFileExtension(filePath).slice(1) });
     }
   }, []);
 

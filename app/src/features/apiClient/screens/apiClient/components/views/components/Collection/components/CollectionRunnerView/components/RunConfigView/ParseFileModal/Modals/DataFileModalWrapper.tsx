@@ -132,14 +132,14 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
             secondaryButton: {
               label: "Replace file",
               onClick: () => {
-                trackCollectionRunFileCleared(parsedData?.count);
+                trackCollectionRunFileCleared();
                 onFileSelected();
               },
             },
             primaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
-                trackCollectionRunTruncatedFileUsed({ count: parsedData?.count });
+                trackCollectionRunTruncatedFileUsed({ record_count: parsedData?.count });
                 confirmUseDataFile();
               },
             },
