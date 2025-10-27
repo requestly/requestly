@@ -1,6 +1,7 @@
 import React from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import { MdAutoFixHigh } from "@react-icons/all-files/md/MdAutoFixHigh";
+import { MdAutoAwesome } from "@react-icons/all-files/md/MdAutoAwesome";
+import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
 
 interface EmptyTestsViewProps {
   onGenerateTests?: () => void;
@@ -14,30 +15,41 @@ export const EmptyTestsView: React.FC<EmptyTestsViewProps> = ({
   canGenerateTests = false,
 }) => {
   const showGenerateCta = canGenerateTests;
+  console.log({ canGenerateTests });
+  const title = canGenerateTests ? "No test results found for this request" : "Tests are setup but not run yet";
+
+  const description = canGenerateTests
+    ? "Write a test script or generate one automatically based on the last response."
+    : "Send your request to execute your tests and view results here.";
 
   return (
     <div className="empty-tests-view-container">
-      <img src={"/assets/media/apiClient/tests.svg"} alt="test container" />
-      <div className="empty-tests-view-title">No test results found for this request</div>
-      <div className="empty-tests-view-description">
-        You can write a test script (
-        <a href="https://docs.requestly.com/general/api-client/tests" target="_blank" rel="noopener noreferrer">
-          Docs
-        </a>
-        ) or auto-generate a basic test suite for the last response.
-      </div>
+      <img src="/assets/media/apiClient/tests.svg" alt="test container" />
 
-      {showGenerateCta ? (
+      <div className="empty-tests-view-title">{title}</div>
+      <div className="empty-tests-view-description">{description}</div>
+
+      {showGenerateCta && (
         <RQButton
           type="secondary"
-          icon={<MdAutoFixHigh />}
+          icon={<MdAutoAwesome />}
           onClick={onGenerateTests}
           loading={isGeneratingTests}
           disabled={isGeneratingTests || !onGenerateTests}
         >
           {isGeneratingTests ? "Generating Tests" : "Generate Tests"}
         </RQButton>
-      ) : null}
+      )}
+
+      <a
+        className="empty-tests-doc-anchor"
+        href="https://docs.requestly.com/general/api-client/tests"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Read Documentation
+        <MdArrowOutward />
+      </a>
     </div>
   );
 };
