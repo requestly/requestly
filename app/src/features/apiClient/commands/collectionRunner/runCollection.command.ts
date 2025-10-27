@@ -25,7 +25,8 @@ import { Scope } from "features/apiClient/helpers/variableResolver/variable-reso
 import { VariableScope } from "backend/environment/types";
 import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
-import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/RunnerFileMissingError/RunnerFileMissingError";
+import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
+import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -77,7 +78,6 @@ function prepareExecutionResult(params: {
 }
 
 class RunCancelled extends NativeError {}
-class DataFileParseError extends NativeError {}
 
 class Runner {
   private variables: Record<string, any>[] = [];

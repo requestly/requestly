@@ -60,13 +60,13 @@ export const PreviewTableView: React.FC<{
       className="parsed-table-view-container"
       style={{
         height: "100%",
-        maxHeight: "333px",
+        maxHeight: "334px",
         overflow: "auto",
       }}
     >
       <div
         style={{
-          height: `${totalSize + 34}px`, //+34px to incorporate the header row
+          height: `${totalSize + 35}px`, //+34px to incorporate the header row
           width: "fit-content",
           minWidth: "100%",
         }}

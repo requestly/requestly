@@ -1,0 +1,55 @@
+.api-client-error-placeholder-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 56px 32px;
+  height: 100%;
+
+  .api-client-error-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-8, 24px);
+    max-width: 600px;
+
+    .runner-error-detail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4, 8px);
+      align-self: stretch;
+      text-align: center;
+
+      .runner-error-message {
+        color: var(--requestly-color-text-subtle);
+        font-size: var(--requestly-font-size-xs, 12px);
+        line-height: 18px;
+        letter-spacing: 0.25px;
+      }
+    }
+  }
+
+  img {
+    width: 80px;
+    height: 80px;
+  }
+
+  &__title {
+    text-align: center;
+    text-overflow: ellipsis;
+    font-weight: var(--requestly-font-weight-medium);
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-default);
+  }
+
+  .documentation-link {
+    display: flex;
+    padding-top: 16px;
+    align-items: center;
+    gap: 4px;
+    color: var(--requestly-color-primary-text, #639ff9);
+    font-size: var(--requestly-font-size-xs);
+  }
+}

@@ -3,59 +3,18 @@ import React from "react";
 import { FooterButtons, ModalHeader, ModalProps } from "./DataFileModalWrapper";
 import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
 import { useDataFileModalContext } from "./DataFileModalContext";
+import { DataFileFormatExample } from "../../../DataFileFormatExample/DataFileFormatExample";
 
 export const ErroredStateView: React.FC<ModalProps> = ({ buttonOptions }) => {
   const { dataFileMetadata } = useDataFileModalContext();
 
-  const fileExtension = getFileExtension(dataFileMetadata.path)?.toUpperCase()?.split(".")?.pop() ?? "JSON";
-  const isJSON = fileExtension === "JSON";
-
-  const jsonExample = (
-    <pre className="code-example">
-      <code>
-        <span className="punctuation">[</span>
-        {"\n  "}
-        <span className="punctuation">{"{"}</span>
-        <span className="key">"name"</span>
-        <span className="punctuation">: </span>
-        <span className="value">"Alice"</span>
-        <span className="punctuation">, </span>
-        <span className="key">"age"</span>
-        <span className="punctuation">: </span>
-        <span className="value">30</span>
-        <span className="punctuation">{"}"}</span>
-        <span className="punctuation">,</span>
-        {"\n  "}
-        <span className="punctuation">{"{"}</span>
-        <span className="key">"name"</span>
-        <span className="punctuation">: </span>
-        <span className="value">"Bob"</span>
-        <span className="punctuation">, </span>
-        <span className="key">"age"</span>
-        <span className="punctuation">: </span>
-        <span className="value">25</span>
-        <span className="punctuation">{"}"}</span>
-        {"\n"}
-        <span className="punctuation">]</span>
-      </code>
-    </pre>
-  );
-
-  const csvExample = (
-    <pre className="code-example">
-      <code>
-        <span className="key">name,age</span>
-        {"\n"}
-        <span className="value">Alice,30</span>
-        {"\n"}
-        <span className="value">Bob,25</span>
-      </code>
-    </pre>
-  );
+  const fileExtension =
+    (dataFileMetadata?.path ? getFileExtension(dataFileMetadata.path)?.toUpperCase()?.split(".")?.pop() : null) ??
+    "JSON";
 
   return (
     <>
-      <ModalHeader dataFileMetadata={dataFileMetadata} />
+      <ModalHeader dataFileMetadata={dataFileMetadata ?? { name: "", path: "", size: 0 }} />
       <div className="error-state-messaging-container">
         <div>
           <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
@@ -67,8 +26,7 @@ export const ErroredStateView: React.FC<ModalProps> = ({ buttonOptions }) => {
         </div>
 
         <div className="error-state-fix-suggestion">
-          <div className="example-label">EXAMPLE FORMAT:</div>
-          {isJSON ? jsonExample : csvExample}
+          <DataFileFormatExample fileExtension={fileExtension} showLabel={true} />
         </div>
 
         <FooterButtons buttonOptions={buttonOptions} secondaryIcon={<MdOutlineOpenInNew />} />

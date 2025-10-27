@@ -11,7 +11,7 @@ import { useCollectionView } from "../../../../collectionView.context";
 import { trackCollectionRunHistoryViewed } from "modules/analytics/events/features/apiClient";
 import { HistoryNotSavedBanner } from "./HistoryNotSavedBanner/HistoryNotSavedBanner";
 import { RenderableError } from "errors/RenderableError";
-import DefaultErrorComponent from "./DefaultCollectionRunnerErrorComponent/DefaultErrorComponent";
+import DefaultErrorComponent from "./errors/DefaultCollectionRunnerErrorComponent/DefaultCollectionRunnerErrorComponent";
 
 export const RunResultView: React.FC = () => {
   const [iterations, startTime, getRunSummary, runStatus, historySaveStatus, error] = useRunResultStore((s) => [
