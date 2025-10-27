@@ -85,13 +85,6 @@ const DashboardContent = () => {
     isFirstRenderRef.current = false;
   }, [location, previousLocation, searchParams]);
 
-  // Close RequestBot when navigating to different page
-  useEffect(() => {
-    if (previousLocation && previousLocation.pathname !== location.pathname && isRequestBotVisible) {
-      closeRequestBot();
-    }
-  }, [location, previousLocation, isRequestBotVisible, closeRequestBot]);
-
   return (
     <>
       <div id="dashboardMainContent" style={{ overflow: !disableOverflow && "auto !important" }}>
