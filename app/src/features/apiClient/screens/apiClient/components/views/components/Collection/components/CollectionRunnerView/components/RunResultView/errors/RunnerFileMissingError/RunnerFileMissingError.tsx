@@ -19,7 +19,7 @@ const RunnerFileMissing: React.FC<{ error: RunnerFileMissingError }> = ({ error 
     <>
       <div className="api-client-error-placeholder-container">
         <div className="api-client-error-placeholder-content">
-          <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
+          <img src={"/assets/media/apiClient/file-error.svg"} alt="file error illustration" width={80} height={80} />
           <div className="api-client-error-placeholder-content__title">{error.getErrorHeading()}</div>
           <div className="runner-error-container">
             <span className="runner-error-message">

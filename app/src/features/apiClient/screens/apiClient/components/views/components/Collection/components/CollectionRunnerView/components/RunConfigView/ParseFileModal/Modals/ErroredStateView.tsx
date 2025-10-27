@@ -17,7 +17,7 @@ export const ErroredStateView: React.FC<ModalProps> = ({ buttonOptions }) => {
       <ModalHeader dataFileMetadata={dataFileMetadata ?? { name: "", path: "", size: 0 }} />
       <div className="error-state-messaging-container">
         <div>
-          <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
+          <img src={"/assets/media/apiClient/file-error.svg"} alt="file error illustration" width={80} height={80} />
         </div>
         <div>Invalid {fileExtension} file uploaded</div>
         <div className="detail-label">
