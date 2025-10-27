@@ -25,7 +25,7 @@
 
       .setting-container {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: var(--space-6, 16px);
         align-self: stretch;
 
@@ -59,11 +59,15 @@
 
         .file-upload-info {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
+          margin-top: 2px;
           gap: 4px;
+          flex: 1;
 
           .file-info-icon {
             color: var(--requestly-color-text-placeholder);
+            flex-shrink: 0;
+            margin-top: 2px;
           }
 
           .file-type-info {
@@ -72,7 +76,9 @@
             font-size: var(--requestly-font-size-xs);
             font-style: normal;
             font-weight: var(--requestly-font-weight-normal);
-            line-height: 17px; /* 154.545% */
+            line-height: 17px;
+            word-wrap: break-word;
+            word-break: break-word;
           }
         }
 
