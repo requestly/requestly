@@ -9,11 +9,10 @@ import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
 import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore"; // ✅ ADD THIS
-import { RQAPI } from "features/apiClient/types"; // Keep this for ApiEntryType enum
 import "./HistoryList.scss";
-
+import { getDateKeyFromTimestamp } from "features/apiClient/screens/apiClient/historyStore";
 interface Props {
-  history: HistoryEntry[]; // ✅ CHANGED FROM RQAPI.ApiEntry[]
+  history: HistoryEntry[]; 
   selectedHistoryIndex?: number;
   onSelectionFromHistory: (index: number) => void;
   onDeleteHistoryItem: (id: string) => void;
@@ -26,8 +25,8 @@ const groupHistoryByDate = (history: HistoryEntry[]) => { // ✅ CHANGED TYPE
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   
-  const todayKey = today.toISOString().slice(0, 10);
-  const yesterdayKey = yesterday.toISOString().slice(0, 10);
+const todayKey = getDateKeyFromTimestamp(today.getTime());
+const yesterdayKey = getDateKeyFromTimestamp(yesterday.getTime());
   
   const grouped: Record<string, { 
     dateKey: string;
@@ -37,7 +36,7 @@ const groupHistoryByDate = (history: HistoryEntry[]) => { // ✅ CHANGED TYPE
   
   history.forEach((entry, index) => {
     const entryDate = new Date(entry.createdTs); // ✅ USE createdTs
-    const dateKey = entryDate.toISOString().slice(0, 10);
+  const dateKey = getDateKeyFromTimestamp(entry.createdTs);
     
     let label: string;
     if (dateKey === todayKey) {
@@ -221,5 +220,3 @@ export const HistoryList: React.FC<Props> = ({
     </div>
   );
 };
-//histoylist compo updated
-/// next needed some store settings 
