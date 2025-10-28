@@ -1,7 +1,16 @@
-.api-client-local-workspace-path-breadcrumb {
+.api-client-local-workspace-icon {
+  margin-right: 5px;
+}
+
+.workspace-breadcrumb-item {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 4px;
-  color: var(--requestly-color-text-subtle);
+  gap: 20px;
+  max-width: 160px;
+  padding: 2px 8px;
+  font-size: var(--requestly-font-size-xs, 11px);
+  font-weight: var(--requestly-font-weight-medium);
+  background-color: var(--requestly-color-surface-2);
+  border-radius: 12px;
+  border: 1px solid var(--requestly-color-border-default);
 }
