@@ -7,7 +7,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 const addIterationColumnToTable = (dataSource: any[]) => {
   return dataSource.map((row, index) => ({
     ...row,
-    iteration: index + 1,
+    __iteration: index + 1,
   }));
 };
 
@@ -23,14 +23,14 @@ export const PreviewTableView: React.FC<{
     return [
       {
         title: "Iteration",
-        dataIndex: "iteration",
-        key: "iteration",
+        dataIndex: "__iteration",
+        key: "__iteration",
         width: 100,
       },
       ...keys
-        .filter((k) => k !== "iteration")
+        .filter((k) => k !== "__iteration")
         .map((k) => ({
-          title: k.charAt(0).toUpperCase() + k.slice(1),
+          title: k,
           dataIndex: k,
           key: k,
           width: 150,
@@ -60,13 +60,13 @@ export const PreviewTableView: React.FC<{
       className="parsed-table-view-container"
       style={{
         height: "100%",
-        maxHeight: "335px",
+        maxHeight: "334px",
         overflow: "auto",
       }}
     >
       <div
         style={{
-          height: `${totalSize}px`,
+          height: totalSize > 0 ? `${totalSize + 35}px` : "auto", // +35px to incorporate the header row
           width: "fit-content",
           minWidth: "100%",
         }}

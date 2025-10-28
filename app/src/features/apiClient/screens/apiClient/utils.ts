@@ -920,7 +920,7 @@ export const createBodyContainer = (params: {
 };
 
 type ParsedResult = {
-  data: Record<string, any>[] | null;
+  data: Record<string, any>[];
   count: number;
 };
 
@@ -957,8 +957,20 @@ export const parseCsvText = async (content: string): Promise<ParsedResult> => {
       skipEmptyLines: true,
       dynamicTyping: true,
       complete: (results) => {
-        if (results.errors.length) {
-          Logger.log("[parseCsvText] Failed to parse CSV:", results.errors);
+        const isSingleColumn = results.meta.fields && results.meta.fields.length === 1;
+
+        // Refer: https://github.com/mholt/PapaParse/issues/165
+        // Filter out UndetectableDelimiter error only for single-column CSVs
+        const criticalErrors = results.errors.filter((error) => {
+          if (error.code === "UndetectableDelimiter" && isSingleColumn) {
+            return false; // Ignore this error for single-column CSVs
+          } else {
+            return true; // Keep all other errors
+          }
+        });
+
+        if (criticalErrors.length) {
+          Logger.log("[parseCsvText] Failed to parse CSV:", criticalErrors);
           reject(new Error("Failed to parse CSV"));
         } else {
           const data = results.data as Record<string, any>[];
@@ -986,7 +998,7 @@ const CollectionRunnerAjvSchema: SchemaObject = {
     },
   },
 };
-export const parseCollectionRunnerDataFile = async (filePath: string) => {
+export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?: number) => {
   if (!filePath) {
     throw new NativeError("File path is empty!");
   }
@@ -997,10 +1009,16 @@ export const parseCollectionRunnerDataFile = async (filePath: string) => {
   switch (fileExtension) {
     case ".csv": {
       const parsedData = await parseCsvText(fileContents);
+      if (maxlimit && parsedData.count > maxlimit) {
+        parsedData.data = parsedData.data.slice(0, maxlimit);
+      }
       return parsedData;
     }
     case ".json": {
       const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
+      if (maxlimit && parsedData.count > maxlimit) {
+        parsedData.data = parsedData.data.slice(0, maxlimit);
+      }
       return parsedData;
     }
     default: {

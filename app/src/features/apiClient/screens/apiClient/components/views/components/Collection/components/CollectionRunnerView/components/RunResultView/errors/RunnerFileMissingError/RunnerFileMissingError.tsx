@@ -1,18 +1,25 @@
-import LINKS from "config/constants/sub/links";
-import { RunnerFileMissingError } from "../RunnerFileMissingError";
-import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
-import "./runnerFileMissing.scss";
 import React from "react";
+import { RenderableError } from "errors/RenderableError";
+import LINKS from "config/constants/sub/links";
+import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
+import "../collectionRunnerErrors.scss";
 
-interface Props {
-  error: RunnerFileMissingError;
+export class RunnerFileMissingError extends RenderableError {
+  render() {
+    return <RunnerFileMissing error={this} />;
+  }
+
+  getErrorHeading() {
+    return "File missing. We couldn't run the test";
+  }
 }
-export const RunnerFileMissing: React.FC<Props> = ({ error }) => {
+
+const RunnerFileMissing: React.FC<{ error: RunnerFileMissingError }> = ({ error }) => {
   return (
     <>
       <div className="api-client-error-placeholder-container">
         <div className="api-client-error-placeholder-content">
-          <img src={"/assets/media/apiClient/file-error.svg"} alt="Error card" width={80} height={80} />
+          <img src={"/assets/media/apiClient/file-error.svg"} alt="file error illustration" width={80} height={80} />
           <div className="api-client-error-placeholder-content__title">{error.getErrorHeading()}</div>
           <div className="runner-error-container">
             <span className="runner-error-message">
