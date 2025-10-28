@@ -47,6 +47,7 @@ export const PreviewTableView: React.FC<{
 
   const virtualItems = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
+  console.log("!!!debug", "totalsize", totalSize);
 
   const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
 
@@ -66,7 +67,7 @@ export const PreviewTableView: React.FC<{
     >
       <div
         style={{
-          height: `${totalSize + 35}px`, //+34px to incorporate the header row
+          height: totalSize > 0 ? `${totalSize + 35}px` : "auto", // +35px to incorporate the header row
           width: "fit-content",
           minWidth: "100%",
         }}

@@ -103,7 +103,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
       fileFeature: FileFeature.COLLECTION_RUNNER,
     });
     if (parsedData) {
-      setIterations(parsedData.data.length);
+      setIterations(parsedData.data.length > 0 ? parsedData.data.length : 1);
     }
     onClose(); // Close modal immediately after confirming
   }, [removeDataFile, dataFileMetadata, setDataFile, setIterations, onClose, parsedData]);
