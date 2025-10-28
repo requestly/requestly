@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
+import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 
 export enum DataFileModalViewMode {
   LOADING = "loading",
@@ -43,12 +44,8 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
     setParsedData(null);
 
     try {
-      const data = await parseCollectionRunnerDataFile(filePath);
-      const processedData = {
-        data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
-        count: data.count,
-      };
-      setParsedData(processedData);
+      const data = await parseCollectionRunnerDataFile(filePath, ITERATIONS_MAX_LIMIT);
+      setParsedData(data);
       setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
     } catch (error) {
       setViewMode(DataFileModalViewMode.ERROR);

@@ -27,6 +27,7 @@ import { createDummyVariablesStore } from "features/apiClient/store/variables/va
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
 import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
+import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -128,7 +129,7 @@ class Runner {
     }
 
     try {
-      const parsedData = await parseCollectionRunnerDataFile(dataFile.path);
+      const parsedData = await parseCollectionRunnerDataFile(dataFile.path, ITERATIONS_MAX_LIMIT);
       return parsedData.data;
     } catch (e) {
       throw new DataFileParseError("Failed to read or parse data file!").addContext({
