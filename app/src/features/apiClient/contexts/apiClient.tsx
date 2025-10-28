@@ -135,7 +135,11 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     const entryWithMeta: HistoryEntry = {
       ...apiEntry,
-       historyId: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}-${performance.now()}`,
+    historyId:
+  (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random()}-${typeof performance !== "undefined" ? performance.now() : 0}`,
+
       createdTs: Date.now(),
     };
     setHistory((history) => [...history, entryWithMeta]);
