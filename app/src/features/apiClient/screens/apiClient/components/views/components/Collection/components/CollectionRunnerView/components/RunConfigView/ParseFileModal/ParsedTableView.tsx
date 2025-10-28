@@ -47,7 +47,6 @@ export const PreviewTableView: React.FC<{
 
   const virtualItems = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
-  console.log("!!!debug", "totalsize", totalSize);
 
   const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
 
