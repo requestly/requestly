@@ -268,30 +268,30 @@ export const trackCollectionRunnerConfigSaveFailed = (params) => {
 };
 
 // Data-File Support for Collection Runner
-export const trackCollectionRunSelectFileClicked = (params) => {
-  trackEvent(API_CLIENT.COLLECTION_RUN_SELECT_FILE_CLICKED, params);
+export const trackCollectionRunnerSelectFileClicked = (params) => {
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_SELECT_FILE_CLICKED, params);
 };
 
-export const trackCollectionRunFileParsed = (params) => {
+export const trackCollectionRunnerFileParsed = (params) => {
   const { record_count, format } = params;
-  trackEvent(API_CLIENT.COLLECTION_RUN_FILE_PARSED, { record_count, format });
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_PARSED, { record_count, format });
 };
 
-export const trackCollectionRunFileParseFailed = (params) => {
+export const trackCollectionRunnerFileParseFailed = (params) => {
   const { reason, format } = params;
-  trackEvent(API_CLIENT.COLLECTION_RUN_FILE_PARSE_FAILED, { reason, format });
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_PARSE_FAILED, { reason, format });
 };
 
-export const trackCollectionRunRecordLimitExceeded = (params) => {
+export const trackCollectionRunnerRecordLimitExceeded = (params) => {
   const { record_count } = params;
-  trackEvent(API_CLIENT.COLLECTION_RUN_FILE_RECORD_LIMIT_EXCEEDED, { record_count });
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_RECORD_LIMIT_EXCEEDED, { record_count });
 };
 
-export const trackCollectionRunTruncatedFileUsed = (params) => {
+export const trackCollectionRunnerTruncatedFileUsed = (params) => {
   const { record_count } = params;
-  trackEvent(API_CLIENT.COLLECTION_RUN_TRUNCATED_FILE_USED, { record_count });
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_TRUNCATED_FILE_USED, { record_count });
 };
 
-export const trackCollectionRunFileCleared = (params) => {
-  trackEvent(API_CLIENT.COLLECTION_RUN_FILE_CLEARED, params);
+export const trackCollectionRunnerFileCleared = (params) => {
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_CLEARED, params);
 };

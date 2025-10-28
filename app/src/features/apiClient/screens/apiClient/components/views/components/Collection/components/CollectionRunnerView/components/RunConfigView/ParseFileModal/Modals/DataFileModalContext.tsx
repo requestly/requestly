@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { getFileExtension, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import {
-  trackCollectionRunFileParsed,
-  trackCollectionRunFileParseFailed,
-  trackCollectionRunRecordLimitExceeded,
+  trackCollectionRunnerFileParsed,
+  trackCollectionRunnerFileParseFailed,
+  trackCollectionRunnerRecordLimitExceeded,
 } from "modules/analytics/events/features/apiClient";
 
 export enum DataFileModalViewMode {
@@ -50,21 +50,21 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
     try {
       const data = await parseCollectionRunnerDataFile(filePath);
       if (data.count > 1000) {
-        trackCollectionRunRecordLimitExceeded({ record_count: data.count });
+        trackCollectionRunnerRecordLimitExceeded({ record_count: data.count });
       }
       const processedData = {
         data: data.count > 1000 ? data.data.slice(0, 1000) : data.data,
         count: data.count,
       };
       setParsedData(processedData);
-      trackCollectionRunFileParsed({
+      trackCollectionRunnerFileParsed({
         record_count: processedData.count,
         format: getFileExtension(filePath).slice(1),
       });
       setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
     } catch (error) {
       setViewMode(DataFileModalViewMode.ERROR);
-      trackCollectionRunFileParseFailed({ reason: error.message, format: getFileExtension(filePath).slice(1) });
+      trackCollectionRunnerFileParseFailed({ reason: error.message, format: getFileExtension(filePath).slice(1) });
     }
   }, []);
 

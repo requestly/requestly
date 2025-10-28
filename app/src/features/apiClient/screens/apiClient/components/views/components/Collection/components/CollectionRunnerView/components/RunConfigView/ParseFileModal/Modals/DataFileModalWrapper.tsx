@@ -13,8 +13,9 @@ import { useDataFileModalContext, DataFileModalViewMode } from "./DataFileModalC
 import { RQModal } from "lib/design-system/components";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import {
-  trackCollectionRunFileCleared,
-  trackCollectionRunTruncatedFileUsed,
+  trackCollectionRunnerFileCleared,
+  trackCollectionRunnerSelectFileClicked,
+  trackCollectionRunnerTruncatedFileUsed,
 } from "modules/analytics/events/features/apiClient";
 
 interface buttonSchema {
@@ -121,6 +122,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Select Again",
             onClick: () => {
+              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
@@ -132,14 +134,14 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
             secondaryButton: {
               label: "Replace file",
               onClick: () => {
-                trackCollectionRunFileCleared();
+                trackCollectionRunnerSelectFileClicked();
                 onFileSelected();
               },
             },
             primaryButton: {
               label: "Use first 1000 entries",
               onClick: () => {
-                trackCollectionRunTruncatedFileUsed({ record_count: parsedData?.count });
+                trackCollectionRunnerTruncatedFileUsed({ record_count: parsedData?.count });
                 confirmUseDataFile();
               },
             },
@@ -166,7 +168,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           secondaryButton: {
             label: "Remove",
             onClick: () => {
-              trackCollectionRunFileCleared();
+              trackCollectionRunnerFileCleared();
               removeDataFile();
               setIterations(1);
               onClose();
@@ -175,6 +177,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Change data file",
             onClick: () => {
+              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
@@ -191,6 +194,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Reselect File",
             onClick: () => {
+              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
@@ -206,6 +210,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Reselect File",
             onClick: () => {
+              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
