@@ -5,16 +5,11 @@ import "./emptySearchResultsView.scss";
 
 interface EmptySearchResultsViewProps {
   searchValue: string;
-  noSearchResultsFound: boolean;
   onSearchValueChange: (value: string) => void;
 }
 
-const EmptySearchResultsView: React.FC<EmptySearchResultsViewProps> = ({
-  searchValue,
-  noSearchResultsFound,
-  onSearchValueChange,
-}) => {
-  if (!noSearchResultsFound) {
+const EmptySearchResultsView: React.FC<EmptySearchResultsViewProps> = ({ searchValue, onSearchValueChange }) => {
+  if (searchValue === "") {
     return null;
   }
   return (

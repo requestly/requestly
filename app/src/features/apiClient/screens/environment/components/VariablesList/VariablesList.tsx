@@ -47,10 +47,6 @@ export const VariablesList: React.FC<VariablesListProps> = ({
     [dataSource, searchValue]
   );
 
-  // Show "no results" only when search is active and no non-empty keys match.
-  const nonEmptyResults = filteredDataSource.filter((item) => item.key !== "");
-  const noSearchResultsFound = searchValue !== "" && nonEmptyResults.length === 0;
-
   const hideFooter = isReadOnly || searchValue !== "";
 
   const duplicateKeyIndices = useMemo(() => {
@@ -195,13 +191,7 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       columns={columns}
       data={filteredDataSource}
       locale={{
-        emptyText: (
-          <EmptySearchResultsView
-            searchValue={searchValue}
-            noSearchResultsFound={noSearchResultsFound}
-            onSearchValueChange={onSearchValueChange}
-          />
-        ),
+        emptyText: <EmptySearchResultsView searchValue={searchValue} onSearchValueChange={onSearchValueChange} />,
       }}
       components={{
         body: {

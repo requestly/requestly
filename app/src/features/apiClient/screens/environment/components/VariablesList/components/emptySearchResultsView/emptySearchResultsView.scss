@@ -1,6 +1,8 @@
-.ant-table-placeholder {
-  .ant-table-cell:hover {
-    background-color: transparent !important;
+.variables-list-table {
+  .ant-table-placeholder {
+    .ant-table-cell:hover {
+      background-color: transparent !important;
+    }
   }
 }
 
@@ -28,7 +30,7 @@
       height: var(--requestly-space-2);
       background: var(--requestly-color-surface-1);
       border-radius: 50%;
-      filter: blur(2px);
+      filter: blur(1px);
     }
   }
 }
