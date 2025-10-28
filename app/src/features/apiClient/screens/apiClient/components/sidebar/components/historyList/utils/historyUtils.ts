@@ -1,15 +1,15 @@
 import dayjs from 'dayjs';
-import { RQAPI } from 'features/apiClient/types';
+import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore";
 
 export interface GroupedHistory {
   dateLabel: string;
   date: string;
-  entries: RQAPI.ApiEntry[];
+  entries: HistoryEntry[];
   indices: number[]; 
 }
 
 
-export const groupHistoryByDate = (history: RQAPI.ApiEntry[]): GroupedHistory[] => {
+export const groupHistoryByDate = (history: HistoryEntry[]): GroupedHistory[] => {
   if (history.length === 0) return [];
 
 
