@@ -177,7 +177,10 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
         return {
           secondaryButton: {
             label: "Remove",
-            onClick: handleDataFileRemoval,
+            onClick: () => {
+              trackCollectionRunnerFileCleared();
+              handleDataFileRemoval();
+            },
           },
           primaryButton: {
             label: "Change data file",

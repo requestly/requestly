@@ -137,7 +137,15 @@ export const DataFileSelector: React.FC = () => {
 
           {/*Clear File or Delete File */}
           <RQTooltip title={`clear file`}>
-            <RQButton size="small" className="clear-file-btn" onClick={handleRemoveFile} type="transparent">
+            <RQButton
+              size="small"
+              className="clear-file-btn"
+              onClick={() => {
+                handleRemoveFile();
+                trackCollectionRunnerFileCleared();
+              }}
+              type="transparent"
+            >
               {dataFile && <RxCross2 />}
             </RQButton>
           </RQTooltip>
