@@ -8,7 +8,7 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
-import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore"; // ✅ ADD THIS
+import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore"; 
 import "./HistoryList.scss";
 import { getDateKeyFromTimestamp } from "features/apiClient/screens/apiClient/historyStore";
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
 }
 
 // Helper function to group history by date
-const groupHistoryByDate = (history: HistoryEntry[]) => { // ✅ CHANGED TYPE
+const groupHistoryByDate = (history: HistoryEntry[]) => {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -31,11 +31,11 @@ const yesterdayKey = getDateKeyFromTimestamp(yesterday.getTime());
   const grouped: Record<string, { 
     dateKey: string;
     label: string; 
-    items: Array<{ entry: HistoryEntry; originalIndex: number }>; // ✅ CHANGED TYPE
+    items: Array<{ entry: HistoryEntry; originalIndex: number }>;
   }> = {};
   
   history.forEach((entry, index) => {
-    const entryDate = new Date(entry.createdTs); // ✅ USE createdTs
+    const entryDate = new Date(entry.createdTs);
   const dateKey = getDateKeyFromTimestamp(entry.createdTs);
     
     let label: string;
@@ -71,7 +71,7 @@ export const HistoryList: React.FC<Props> = ({
 }) => {
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
   const [dismissNote, setDismissNote] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null); // ✅ CHANGED TO string
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null); 
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
 
   const groupedHistory = groupHistoryByDate(history);
@@ -87,7 +87,7 @@ export const HistoryList: React.FC<Props> = ({
     [onSelectionFromHistory, openTab]
   );
 
-  const getTimelineItemColor = (entry: HistoryEntry) => { // ✅ CHANGED TYPE
+  const getTimelineItemColor = (entry: HistoryEntry) => { 
     if (entry.type === RQAPI.ApiEntryType.HTTP) {
       return REQUEST_METHOD_COLORS[entry.request.method];
     }
@@ -97,7 +97,7 @@ export const HistoryList: React.FC<Props> = ({
     return REQUEST_METHOD_COLORS[(entry as RQAPI.HttpApiEntry).request.method];
   };
 
-  const getTimelineItemMethod = (entry: HistoryEntry) => { // ✅ CHANGED TYPE
+  const getTimelineItemMethod = (entry: HistoryEntry) => { 
     if (entry.type === RQAPI.ApiEntryType.HTTP) {
       return entry.request.method;
     }
@@ -140,9 +140,9 @@ export const HistoryList: React.FC<Props> = ({
 
         <Timeline className="api-history-group-timeline" mode="left">
           {group.items.map(({ entry, originalIndex }) => {
-            const entryId = entry.historyId; // ✅ USE historyId
+            const entryId = entry.historyId;
             const isSelected = selectedHistoryIndex === originalIndex;
-            const isHovered = hoveredItem === entryId; // ✅ COMPARE WITH historyId
+            const isHovered = hoveredItem === entryId; 
 
             return (
               <Timeline.Item key={entryId} color={getTimelineItemColor(entry)}>
@@ -150,7 +150,7 @@ export const HistoryList: React.FC<Props> = ({
                   className={`api-history-row ${entry.request.url ? "clickable" : ""} ${
                     isSelected ? "active" : ""
                   }`}
-                  onMouseEnter={() => setHoveredItem(entryId)} // ✅ USE historyId
+                  onMouseEnter={() => setHoveredItem(entryId)} 
                   onMouseLeave={() => setHoveredItem(null)}
                 >
                   <div className="api-history-row-content">
@@ -174,7 +174,7 @@ export const HistoryList: React.FC<Props> = ({
                         className="delete-item-icon"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDeleteHistoryItem(entryId); // ✅ USE historyId
+                          onDeleteHistoryItem(entryId); 
                         }}
                         title="Delete this item"
                       />
