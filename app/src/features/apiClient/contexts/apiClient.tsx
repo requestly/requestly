@@ -7,8 +7,9 @@ import {
   deleteHistoryByDateFromStore,
   getHistoryFromStore,
   HistoryEntry,
+  getDateKeyFromTimestamp
 } from "../screens/apiClient/historyStore";
-import { getDateKeyFromTimestamp } from "./historyStore";
+
 
 import {
   trackNewEnvironmentClicked,
