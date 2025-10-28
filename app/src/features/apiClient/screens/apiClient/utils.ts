@@ -25,6 +25,7 @@ import { utilityWorker } from "features/apiClient/helpers/utilityWorker";
 import Logger from "lib/logger";
 import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 import { NativeError } from "errors/NativeError";
+import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -1010,6 +1011,7 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
     case ".csv": {
       const parsedData = await parseCsvText(fileContents);
       if (maxlimit && parsedData.count > maxlimit) {
+        trackCollectionRunnerRecordLimitExceeded({ record_count: parsedData.count });
         parsedData.data = parsedData.data.slice(0, maxlimit);
       }
       return parsedData;
@@ -1017,6 +1019,7 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
     case ".json": {
       const parsedData = await parseJsonText(fileContents, CollectionRunnerAjvSchema);
       if (maxlimit && parsedData.count > maxlimit) {
+        trackCollectionRunnerRecordLimitExceeded({ record_count: parsedData.count });
         parsedData.data = parsedData.data.slice(0, maxlimit);
       }
       return parsedData;

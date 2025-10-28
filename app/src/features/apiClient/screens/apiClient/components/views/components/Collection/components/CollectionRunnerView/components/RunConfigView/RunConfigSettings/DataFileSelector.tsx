@@ -11,6 +11,10 @@ import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { useFileSelection } from "../hooks/useFileSelection.hook";
 import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
+import {
+  trackCollectionRunnerFileCleared,
+  trackCollectionRunnerSelectFileClicked,
+} from "modules/analytics/events/features/apiClient";
 
 export const DataFileSelector: React.FC = () => {
   const { parseFile, setDataFileMetadata, setViewMode, dataFileMetadata } = useDataFileModalContext();
@@ -42,6 +46,7 @@ export const DataFileSelector: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleFileSelection = useCallback(() => {
+    trackCollectionRunnerSelectFileClicked();
     openFileSelector((file) => {
       const metadata = {
         name: file.name,
@@ -95,7 +100,13 @@ export const DataFileSelector: React.FC = () => {
     <>
       {!dataFile ? (
         <>
-          <RQButton size="small" icon={<MdOutlineFileUpload />} onClick={handleFileSelection}>
+          <RQButton
+            size="small"
+            icon={<MdOutlineFileUpload />}
+            onClick={() => {
+              handleFileSelection();
+            }}
+          >
             Select file
           </RQButton>
 
@@ -126,7 +137,15 @@ export const DataFileSelector: React.FC = () => {
 
           {/*Clear File or Delete File */}
           <RQTooltip title={`clear file`}>
-            <RQButton size="small" className="clear-file-btn" onClick={handleRemoveFile} type="transparent">
+            <RQButton
+              size="small"
+              className="clear-file-btn"
+              onClick={() => {
+                handleRemoveFile();
+                trackCollectionRunnerFileCleared();
+              }}
+              type="transparent"
+            >
               {dataFile && <RxCross2 />}
             </RQButton>
           </RQTooltip>

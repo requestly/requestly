@@ -1,4 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { getFileExtension } from "features/apiClient/screens/apiClient/utils";
+import {
+  trackCollectionRunnerFileParsed,
+  trackCollectionRunnerFileParseFailed,
+} from "modules/analytics/events/features/apiClient";
 import { parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
 import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 
@@ -47,8 +52,10 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
       const data = await parseCollectionRunnerDataFile(filePath, ITERATIONS_MAX_LIMIT);
       setParsedData(data);
       setViewMode(isPreviewMode ? DataFileModalViewMode.PREVIEW : DataFileModalViewMode.ACTIVE);
+      trackCollectionRunnerFileParsed({ record_count: data.count, format: getFileExtension(filePath).slice(1) });
     } catch (error) {
       setViewMode(DataFileModalViewMode.ERROR);
+      trackCollectionRunnerFileParseFailed({ reason: error.message, format: getFileExtension(filePath).slice(1) });
     }
   }, []);
 
