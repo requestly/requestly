@@ -8,7 +8,6 @@ import {
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import "./ApiClientBreadCrumb.scss";
-// import { truncateString } from "features/apiClient/screens/apiClient/utils";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { Tooltip, Typography } from "antd";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
@@ -67,7 +66,7 @@ export const MultiWorkSpaceViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
             ? `/api-client/collection/${item?.id}`
             : `/api-client/request/${item?.id}`;
         return {
-          label: item.name,
+          label: item.name || "Untitled",
           pathname: path,
           isEditable: false,
         };
