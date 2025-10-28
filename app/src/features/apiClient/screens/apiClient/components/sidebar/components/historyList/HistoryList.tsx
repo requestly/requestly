@@ -8,25 +8,26 @@ import { API_CLIENT } from "modules/analytics/events/features/constants";
 import { TfiClose } from "@react-icons/all-files/tfi/TfiClose";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 import { HistoryViewTabSource } from "../../../views/components/request/HistoryView/historyViewTabSource";
-import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore"; 
+import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore";
+import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import "./HistoryList.scss";
 import { getDateKeyFromTimestamp } from "features/apiClient/screens/apiClient/historyStore";
+
 interface Props {
-  history: HistoryEntry[]; 
+  history: HistoryEntry[];
   selectedHistoryIndex?: number;
   onSelectionFromHistory: (index: number) => void;
   onDeleteHistoryItem: (id: string) => void;
   onDeleteHistoryByDate: (dateKey: string, dateLabel: string) => void;
 }
 
-// Helper function to group history by date
 const groupHistoryByDate = (history: HistoryEntry[]) => {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   
-const todayKey = getDateKeyFromTimestamp(today.getTime());
-const yesterdayKey = getDateKeyFromTimestamp(yesterday.getTime());
+  const todayKey = getDateKeyFromTimestamp(today.getTime());
+  const yesterdayKey = getDateKeyFromTimestamp(yesterday.getTime());
   
   const grouped: Record<string, { 
     dateKey: string;
@@ -36,7 +37,7 @@ const yesterdayKey = getDateKeyFromTimestamp(yesterday.getTime());
   
   history.forEach((entry, index) => {
     const entryDate = new Date(entry.createdTs);
-  const dateKey = getDateKeyFromTimestamp(entry.createdTs);
+    const dateKey = getDateKeyFromTimestamp(entry.createdTs);
     
     let label: string;
     if (dateKey === todayKey) {
@@ -70,11 +71,30 @@ export const HistoryList: React.FC<Props> = ({
   onDeleteHistoryByDate
 }) => {
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [dismissNote, setDismissNote] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null); 
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: 'single' | 'date',
+    idOrDateKey: string,
+    dateLabel?: string
+  } | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
 
   const groupedHistory = groupHistoryByDate(history);
+  
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    if (deleteTarget?.type === 'single') {
+      await onDeleteHistoryItem(deleteTarget.idOrDateKey);
+    } else if (deleteTarget?.type === 'date') {
+      await onDeleteHistoryByDate(deleteTarget.idOrDateKey, deleteTarget.dateLabel!);
+    }
+    setIsDeleting(false);
+    setDeleteModalOpen(false);
+    setDeleteTarget(null);
+  };
 
   const onHistoryLinkClick = useCallback(
     (globalIndex: number) => {
@@ -87,7 +107,7 @@ export const HistoryList: React.FC<Props> = ({
     [onSelectionFromHistory, openTab]
   );
 
-  const getTimelineItemColor = (entry: HistoryEntry) => { 
+  const getTimelineItemColor = (entry: HistoryEntry) => {
     if (entry.type === RQAPI.ApiEntryType.HTTP) {
       return REQUEST_METHOD_COLORS[entry.request.method];
     }
@@ -97,7 +117,7 @@ export const HistoryList: React.FC<Props> = ({
     return REQUEST_METHOD_COLORS[(entry as RQAPI.HttpApiEntry).request.method];
   };
 
-  const getTimelineItemMethod = (entry: HistoryEntry) => { 
+  const getTimelineItemMethod = (entry: HistoryEntry) => {
     if (entry.type === RQAPI.ApiEntryType.HTTP) {
       return entry.request.method;
     }
@@ -130,7 +150,10 @@ export const HistoryList: React.FC<Props> = ({
               danger
               size="small"
               icon={<DeleteOutlined />}
-              onClick={() => onDeleteHistoryByDate(group.dateKey, group.label)}
+              onClick={() => {
+                setDeleteTarget({ type: 'date', idOrDateKey: group.dateKey, dateLabel: group.label });
+                setDeleteModalOpen(true);
+              }}
               title={`Delete all items for ${group.label}`}
             >
               Delete All
@@ -142,7 +165,7 @@ export const HistoryList: React.FC<Props> = ({
           {group.items.map(({ entry, originalIndex }) => {
             const entryId = entry.historyId;
             const isSelected = selectedHistoryIndex === originalIndex;
-            const isHovered = hoveredItem === entryId; 
+            const isHovered = hoveredItem === entryId;
 
             return (
               <Timeline.Item key={entryId} color={getTimelineItemColor(entry)}>
@@ -150,7 +173,7 @@ export const HistoryList: React.FC<Props> = ({
                   className={`api-history-row ${entry.request.url ? "clickable" : ""} ${
                     isSelected ? "active" : ""
                   }`}
-                  onMouseEnter={() => setHoveredItem(entryId)} 
+                  onMouseEnter={() => setHoveredItem(entryId)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
                   <div className="api-history-row-content">
@@ -174,7 +197,8 @@ export const HistoryList: React.FC<Props> = ({
                         className="delete-item-icon"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDeleteHistoryItem(entryId); 
+                          setDeleteTarget({ type: 'single', idOrDateKey: entryId });
+                          setDeleteModalOpen(true);
                         }}
                         title="Delete this item"
                       />
@@ -212,6 +236,27 @@ export const HistoryList: React.FC<Props> = ({
           </Timeline.Item>
         </Timeline>
       </div>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        isDeleting={isDeleting}
+        title={
+          deleteTarget?.type === 'single'
+            ? 'Delete History Item?'
+            : `Delete history for ${deleteTarget?.dateLabel}?`
+        }
+        message={
+          deleteTarget?.type === 'single'
+            ? 'Are you sure you want to delete this history item? This action cannot be undone.'
+            : `Are you sure you want to delete all history items for "${deleteTarget?.dateLabel}"? This action cannot be undone.`
+        }
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setIsDeleting(false);
+          setDeleteTarget(null);
+        }}
+      />
     </>
   ) : (
     <div className="api-client-sidebar-placeholder">
