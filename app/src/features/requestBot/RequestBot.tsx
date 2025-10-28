@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { m } from "framer-motion";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { trackGetHumanSupportClicked } from "./analytics";
@@ -13,11 +13,8 @@ interface RequestBotProps {
 }
 
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelType = "app" }) => {
-  const botRef = useRef<HTMLDivElement>(null);
-
   return (
     <m.div
-      ref={botRef}
       initial={{ opacity: 0, right: -450 }}
       animate={{ opacity: isOpen ? 1 : 0, right: isOpen ? 65 : -450 }}
       transition={{ duration: 0.2 }}

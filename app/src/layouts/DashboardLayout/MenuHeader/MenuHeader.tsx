@@ -87,7 +87,6 @@ export const MenuHeader = () => {
           <RQButton
             type="transparent"
             icon={<BotIcon />}
-            data-ask-ai-trigger="true"
             onClick={(e) => {
               e.stopPropagation();
               const isCurrentlyActive = requestBotDetails?.isActive;
