@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { globalActions } from "store/slices/global/slice";
 import APP_CONSTANTS from "config/constants";
@@ -11,22 +11,11 @@ const RenderRule = ({ ruleId, ruleType, onRuleClick }) => {
   const rule = useSelector((state) => getRecordById(state, ruleId));
   const ruleDisplayName = rule?.name || ruleId;
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onRuleClick(e, ruleId);
-    }
-  };
-
   return (
     <Tooltip title={ruleDisplayName}>
       <span 
         style={{ paddingRight: "8px", cursor: "pointer" }} 
         onClick={(e) => onRuleClick(e, ruleId)}
-        onKeyDown={handleKeyPress}
-        role="button"
-        tabIndex={0}
-        aria-label={`Open rule editor for ${ruleDisplayName}`}
       >
         {RULE_TYPES_CONFIG[ruleType]?.ICON?.() || null}
       </span>
