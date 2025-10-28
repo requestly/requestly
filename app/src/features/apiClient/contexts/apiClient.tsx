@@ -8,6 +8,7 @@ import {
   getHistoryFromStore,
   HistoryEntry,
 } from "../screens/apiClient/historyStore";
+import { getDateKeyFromTimestamp } from "./historyStore";
 
 import {
   trackNewEnvironmentClicked,
@@ -133,7 +134,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const addToHistory = useCallback((apiEntry: RQAPI.ApiEntry) => {
     const entryWithMeta: HistoryEntry = {
       ...apiEntry,
-      historyId: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+       historyId: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}-${performance.now()}`,
       createdTs: Date.now(),
     };
     setHistory((history) => [...history, entryWithMeta]);
@@ -152,15 +153,10 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
     deleteHistoryItemFromStore(id);
   }, []);
 
-  const deleteHistoryByDate = useCallback((dateKey: string) => {
-    setHistory((prevHistory) => {
-      return prevHistory.filter((entry) => {
-        const entryDate = new Date(entry.createdTs).toISOString().slice(0, 10);
-        return entryDate !== dateKey;
-      });
-    });
-    deleteHistoryByDateFromStore(dateKey);
-  }, []);
+ const deleteHistoryByDate = useCallback((dateKey: string) => {
+  setHistory((prevHistory) => prevHistory.filter((entry) => getDateKeyFromTimestamp(entry.createdTs) !== dateKey));
+  deleteHistoryByDateFromStore(dateKey);
+}, []);
 
   const setCurrentHistoryIndex = useCallback((index?: number) => {
     setSelectedHistoryIndex(index);
