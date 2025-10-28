@@ -19,6 +19,10 @@ export interface ApiClientFile {
 
 export type FileId = string;
 
+export const shouldHydrate = (fileFeature: FileFeature) => {
+  return [FileFeature.FILE_BODY].includes(fileFeature);
+};
+
 export interface ApiClientFilesStore {
   files: Record<FileId, ApiClientFile>;
   appMode: "desktop" | "extension"; // Currently only "desktop" is supported
@@ -102,10 +106,12 @@ const createApiClientFilesStore = (appMode: "desktop") => {
       {
         name: "apiClientFilesStore",
         version: 1,
-        partialize: (state) => ({
-          files: state.files,
-          appMode: state.appMode,
-        }),
+        partialize: (state) => {
+          const filteredExistingFiles = Object.fromEntries(
+            Object.entries(state.files).filter(([_, file]) => shouldHydrate(file.fileFeature))
+          );
+          return { files: filteredExistingFiles, appMode: state.appMode };
+        },
       }
     )
   );
