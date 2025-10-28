@@ -20,7 +20,7 @@ export interface ApiClientFile {
 export type FileId = string;
 
 export const shouldHydrate = (fileFeature: FileFeature) => {
-  return [FileFeature.FILE_BODY].includes(fileFeature);
+  return fileFeature !== FileFeature.COLLECTION_RUNNER;
 };
 
 export interface ApiClientFilesStore {
