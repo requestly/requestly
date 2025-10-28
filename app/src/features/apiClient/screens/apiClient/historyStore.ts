@@ -41,8 +41,9 @@ export const deleteHistoryItemFromStore = (id: string): void => {
 export const deleteHistoryByDateFromStore = (dateKey: string): void => {
   const history = getHistoryFromStore();
   const updatedHistory = history.filter((entry) => {
-    const entryDate = new Date(entry.createdTs).toISOString().slice(0, 10);
-    return entryDate !== dateKey;
+    const entryDateKey = getDateKeyFromTimestamp(entry.createdTs);
+return entryDateKey !== dateKey;
+
   });
   saveHistoryToStore(updatedHistory);
 };
