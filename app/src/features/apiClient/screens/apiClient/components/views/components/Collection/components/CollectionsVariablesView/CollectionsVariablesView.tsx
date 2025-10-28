@@ -104,6 +104,7 @@ export const CollectionsVariablesView: React.FC<CollectionsVariablesViewProps> =
         variables={pendingVariables}
         onVariablesChange={handleSetPendingVariables}
         searchValue={searchValue}
+        onSearchValueChange={setSearchValue}
       />
     </div>
   );

@@ -7,6 +7,7 @@ import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import Logger from "lib/logger";
 
 interface Props {
   autoFocus?: boolean;
@@ -36,17 +37,22 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
   useEffect(() => {
     if (!isCompanyEmail(user.details?.emailType)) return;
 
-    getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
-      const users = res.data.users;
-      const emails = users.map((user: any) => user.email);
-      const suggestionOptionsFromEmails = without(emails, userEmail).map((suggestion) => {
-        return {
-          label: suggestion,
-          value: suggestion,
-        };
+    getOrganizationUsers({ domain: getDomainFromEmail(userEmail) })
+      .then((res: any) => {
+        const users = res.data.users;
+        const emails = users.map((user: any) => user.email);
+        const suggestionOptionsFromEmails = without(emails, userEmail).map((suggestion) => {
+          return {
+            label: suggestion,
+            value: suggestion,
+          };
+        });
+        setSuggestionOptions(suggestionOptionsFromEmails);
+      })
+      .catch((err) => {
+        Logger.log("Error fetching organization users", err);
+        setSuggestionOptions([]);
       });
-      setSuggestionOptions(suggestionOptionsFromEmails);
-    });
   }, [getOrganizationUsers, user.details?.emailType, userEmail]);
 
   useEffect(() => {
