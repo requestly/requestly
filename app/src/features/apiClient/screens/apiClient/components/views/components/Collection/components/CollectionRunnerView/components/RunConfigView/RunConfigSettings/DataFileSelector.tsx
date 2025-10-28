@@ -46,6 +46,7 @@ export const DataFileSelector: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleFileSelection = useCallback(() => {
+    trackCollectionRunnerSelectFileClicked();
     openFileSelector((file) => {
       const metadata = {
         name: file.name,
@@ -103,7 +104,6 @@ export const DataFileSelector: React.FC = () => {
             size="small"
             icon={<MdOutlineFileUpload />}
             onClick={() => {
-              trackCollectionRunnerSelectFileClicked();
               handleFileSelection();
             }}
           >

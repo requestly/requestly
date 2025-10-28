@@ -132,7 +132,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Select Again",
             onClick: () => {
-              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
@@ -144,7 +143,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
             secondaryButton: {
               label: "Replace file",
               onClick: () => {
-                trackCollectionRunnerSelectFileClicked();
                 onFileSelected();
               },
             },
@@ -185,7 +183,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Change data file",
             onClick: () => {
-              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
@@ -202,7 +199,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Reselect File",
             onClick: () => {
-              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
@@ -218,7 +214,6 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           primaryButton: {
             label: "Reselect File",
             onClick: () => {
-              trackCollectionRunnerSelectFileClicked();
               onFileSelected();
             },
           },
