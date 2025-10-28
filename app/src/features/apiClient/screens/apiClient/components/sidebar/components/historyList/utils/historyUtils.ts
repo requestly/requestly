@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import type { HistoryEntry } from "features/apiClient/screens/apiClient/historyStore";
-
+import { getDateKeyFromTimestamp } from "features/apiClient/screens/apiClient/historyStore";
 export interface GroupedHistory {
   dateLabel: string;
   date: string;
@@ -12,16 +12,39 @@ export interface GroupedHistory {
 export const groupHistoryByDate = (history: HistoryEntry[]): GroupedHistory[] => {
   if (history.length === 0) return [];
 
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
 
-  return [
-    {
-      dateLabel: 'Recent',
-      date: dayjs().format('YYYY-MM-DD'),
-      entries: history,
-      indices: history.map((_, index) => index)
+  const todayKey = getDateKeyFromTimestamp(today.getTime());
+  const yesterdayKey = getDateKeyFromTimestamp(yesterday.getTime());
+
+  const grouped: Record<string, GroupedHistory> = {};
+
+  history.forEach((entry, index) => {
+    const dateKey = getDateKeyFromTimestamp(entry.createdTs);
+    let dateLabel: string;
+    if (dateKey === todayKey) {
+      dateLabel = "Today";
+    } else if (dateKey === yesterdayKey) {
+      dateLabel = "Yesterday";
+    } else {
+      dateLabel = new Date(entry.createdTs).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
     }
-  ];
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = { dateLabel, date: dateKey, entries: [], indices: [] };
+    }
+    grouped[dateKey].entries.push(entry);
+    grouped[dateKey].indices.push(index);
+  });
+
+  return Object.values(grouped).sort((a, b) => b.date.localeCompare(a.date));
 };
+;
 
 // ----------------DEAD CODE ALERT!! ---------------//
 // export const groupHistoryByDateWithRecords = (
