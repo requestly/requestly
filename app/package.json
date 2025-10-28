@@ -155,7 +155,6 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@requestly-ui/resource-table": "^0.1.8",
     "@requestly/web-sdk": "^0.15.1",
-    "@rollup/plugin-typescript": "^12.3.0",
     "@sentry/vite-plugin": "^2.22.7",
     "@types/chai": "^5.0.1",
     "@types/chrome": "^0.0.217",
