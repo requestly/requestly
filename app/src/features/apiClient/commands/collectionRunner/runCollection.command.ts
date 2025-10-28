@@ -86,7 +86,8 @@ class Runner {
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
     readonly executor: BatchRequestExecutor,
-    readonly genericState: GenericState
+    readonly genericState: GenericState,
+    readonly appMode: "DESKTOP" | "EXTENSION"
   ) {}
 
   private get abortController() {
@@ -151,8 +152,11 @@ class Runner {
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
-    const variables = await this.parseDataFile();
-    this.variables = variables ?? [];
+
+    if (this.appMode === "DESKTOP") {
+      const variables = await this.parseDataFile();
+      this.variables = variables ?? [];
+    }
 
     trackCollectionRunStarted({
       collection_id: collectionId,
@@ -388,8 +392,9 @@ export async function runCollection(
     runContext: RunContext;
     executor: BatchRequestExecutor;
     genericState: GenericState;
+    appMode: "DESKTOP" | "EXTENSION";
   }
 ) {
-  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState);
+  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState, params.appMode);
   return runner.run();
 }
