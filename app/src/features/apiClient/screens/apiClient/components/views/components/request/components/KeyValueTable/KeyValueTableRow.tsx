@@ -33,6 +33,7 @@ interface EditableCellProps {
   variables: ScopedVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
   checkInvalidCharacter: boolean;
+  enableHeaderSuggestions?: boolean;
 }
 
 export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -76,25 +77,39 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
             }}
           />
         ) : dataIndex === "key" ? (
-          <AutoComplete
-            options={HEADER_SUGGESTIONS.Request}
-            filterOption={(input, option) => !!option?.value?.toLowerCase().includes(input.toLowerCase())}
-            value={record?.key}
-            onChange={(value) => {
-              if (!form) return;
-              form.setFieldsValue({ key: value });
-              save();
-            }}
-          >
-            <Input
-              placeholder="Key"
-              style={{
-                border: "none",
-                background: "transparent",
-                boxShadow: "none",
+          restProps.enableHeaderSuggestions ? (
+            <AutoComplete
+              options={HEADER_SUGGESTIONS.Request}
+              filterOption={(input, option) => !!option?.value?.toLowerCase().includes(input.toLowerCase())}
+              value={record?.key}
+              onChange={(value) => {
+                if (!form) return;
+                form.setFieldsValue({ key: value });
+                save();
               }}
+            >
+              <Input
+                placeholder="Key"
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  boxShadow: "none",
+                }}
+              />
+            </AutoComplete>
+          ) : (
+            <SingleLineEditor
+              className="key-value-table-input"
+              placeholder="Key"
+              defaultValue={record?.key as string}
+              onChange={(value) => {
+                if (!form) return;
+                form.setFieldsValue({ key: value });
+                save();
+              }}
+              variables={variables}
             />
-          </AutoComplete>
+          )
         ) : (
           <div
             className={`key-value-input-container
