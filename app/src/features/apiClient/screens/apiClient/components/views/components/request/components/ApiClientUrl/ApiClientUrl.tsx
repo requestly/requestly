@@ -7,8 +7,9 @@ interface ApiClientUrlProps {
   url: string;
   placeholder: string;
   currentEnvironmentVariables: ScopedVariables;
-  onEnterPress: (e: KeyboardEvent) => void;
+  onEnterPress: (e: KeyboardEvent, text: string) => void;
   onUrlChange: (value: string) => void;
+  onUrlPaste?: (pastedValue: string) => boolean;
 }
 
 export const ApiClientUrl = ({
@@ -17,6 +18,7 @@ export const ApiClientUrl = ({
   placeholder,
   onEnterPress,
   onUrlChange,
+  onUrlPaste,
 }: ApiClientUrlProps) => {
   const handleUrlChange = useCallback(
     (value: string) => {
@@ -35,6 +37,7 @@ export const ApiClientUrl = ({
         handleUrlChange(value);
       }}
       onPressEnter={onEnterPress}
+      onPaste={onUrlPaste}
       variables={currentEnvironmentVariables}
       // prefix={<Favicon size="small" url={entry.request.url} debounceWait={500} style={{ marginRight: 2 }} />}
     />

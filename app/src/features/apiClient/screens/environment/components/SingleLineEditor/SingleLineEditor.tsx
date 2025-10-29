@@ -19,6 +19,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onPressEnter,
   onBlur,
   variables,
+  onPaste,
 }) => {
   const editorRef = useRef(null);
   const editorViewRef = useRef(null);
@@ -30,12 +31,14 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   */
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
+  const onPasteRef = useRef(onPaste);
   const previousDefaultValueRef = useRef(defaultValue);
 
   useEffect(() => {
     onBlurRef.current = onBlur;
     onChangeRef.current = onChange;
-  }, [onBlur, onChange]);
+    onPasteRef.current = onPaste;
+  }, [onBlur, onChange, onPaste]);
 
   const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -114,6 +117,15 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             keypress: (event, view) => {
               if (event.key === "Enter") {
                 onPressEnter?.(event, view.state.doc.toString());
+              }
+            },
+            paste: (event: ClipboardEvent) => {
+              const pastedText = event.clipboardData?.getData("text/plain");
+              if (pastedText && onPasteRef.current) {
+                const wasHandled = onPasteRef.current(pastedText);
+                if (wasHandled) {
+                  event.preventDefault();
+                }
               }
             },
           }),
