@@ -11,17 +11,19 @@ import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { getEmptyApiEntry } from "features/apiClient/screens/apiClient/utils";
 
 interface ApiClientUrlProps {
   url: string;
   currentEnvironmentVariables: ScopedVariables;
   onEnterPress: (e: KeyboardEvent) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
-  onImportCurlRequest?: (request: RQAPI.Request) => void;
+  onFullEntryChange: (entry: RQAPI.HttpApiEntry) => void;
+  apiEntryDetails?: RQAPI.HttpApiEntry;
 }
 
 //prettier-ignore
-const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange, onImportCurlRequest }: ApiClientUrlProps) => {
+const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange, onFullEntryChange }: ApiClientUrlProps) => {
   const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
 
   const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
@@ -38,12 +40,11 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
             toast.error("Failed to parse cURL command. Please ensure it is valid.");
             return;
           }
-          onImportCurlRequest(requestFromCurl);
 
-          const urlWithoutQueryParams = requestFromCurl.url.split("?")[0];
-          const finalQueryParams: KeyValuePair[] = (requestFromCurl as any).queryParams || [];
-
-          onUrlChange(urlWithoutQueryParams, finalQueryParams);
+          const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, requestFromCurl) as RQAPI.HttpApiEntry;
+          onFullEntryChange(apiEntry); 
+          toast.success("cURL command imported successfully!");
+          
           return;
         } catch (error) {
           toast.error(error.message || "Failed to parse cURL command. Please ensure it is valid.");
@@ -80,7 +81,7 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
       setQueryParams(finalParams);
       onUrlChange(value, finalParams);
     },
-    [onUrlChange, queryParams, setQueryParams, updatePathVariableKeys]
+    [onUrlChange, queryParams, setQueryParams, updatePathVariableKeys, onFullEntryChange]
   );
 
   return (

@@ -689,33 +689,24 @@ const HttpClientView: React.FC<Props> = ({
     setUnsaved(true);
   };
 
-  const handleImportCurlRequest = useCallback(
-    (request: RQAPI.Request) => {
-      const newEntry: RQAPI.HttpApiEntry = {
-        ...entry,
-        request: {
-          ...entry.request,
-          ...request,
-        },
-        response: null,
-        testResults: undefined,
-      };
-      setEntry(newEntry);
+  const handleFullEntryChange = useCallback(
+    (fullEntry: RQAPI.HttpApiEntry) => {
+      setEntry(fullEntry);
+
+      setUnsaved(true);
 
       setError(null);
       setWarning(null);
       setIsFailed(false);
 
-      if (newEntry.request.queryParams) {
-        setQueryParams(newEntry.request.queryParams);
+      if (fullEntry.request.queryParams) {
+        setQueryParams(fullEntry.request.queryParams);
       }
 
-      const pathVariables = extractPathVariablesFromUrl(newEntry.request.url);
+      const pathVariables = extractPathVariablesFromUrl(fullEntry.request.url);
       updateVariableKeys(pathVariables);
-
-      toast.success("cURL command imported successfully!");
     },
-    [entry, setQueryParams, updateVariableKeys]
+    [setEntry, setUnsaved, setQueryParams, updateVariableKeys]
   );
 
   const enableHotkey = getIsActive();
@@ -767,7 +758,7 @@ const HttpClientView: React.FC<Props> = ({
                 url={entry.request.url}
                 onUrlChange={handleOnUrlChange}
                 onEnterPress={onUrlInputEnterPressed}
-                onImportCurlRequest={handleImportCurlRequest}
+                onFullEntryChange={handleFullEntryChange}
                 currentEnvironmentVariables={scopedVariables}
               />
             </Space.Compact>
