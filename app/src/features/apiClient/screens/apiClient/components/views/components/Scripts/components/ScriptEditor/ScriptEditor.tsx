@@ -13,7 +13,6 @@ interface ScriptEditorProps {
   onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
   focusPostResponse?: boolean;
   onFocusComplete?: () => void;
-  scriptEditorVersion?: number;
 }
 // FIX: Editor does not re-render when scripts are undefined
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({
@@ -21,7 +20,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   onScriptsChange,
   focusPostResponse,
   onFocusComplete,
-  scriptEditorVersion,
 }) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
@@ -88,7 +86,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">
       <Editor
-        key={`${scriptType}-${scriptEditorVersion || 0}`}
+        key={`${scriptType}`}
         value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
         handleChange={(value: string) => onScriptsChange({ ...scripts, [scriptType]: value })}
         language={EditorLanguage.JAVASCRIPT}
