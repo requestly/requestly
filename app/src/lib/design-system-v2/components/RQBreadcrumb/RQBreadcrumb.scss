@@ -48,7 +48,7 @@ ol.rq-breadcrumb {
 
   input.ant-input.rq-breadcrumb-input {
     min-height: 24px;
-    max-width: 166px;
+    max-width: 160px;
     padding: 2px 4px !important;
     font-size: var(--requestly-font-size-xs, 11px);
     font-weight: var(--requestly-font-weight-medium);
@@ -60,13 +60,9 @@ ol.rq-breadcrumb {
     display: flex;
     align-items: center;
     gap: 4px;
-    max-width: 200px;
+    max-width: 160px;
     font-size: var(--requestly-font-size-xs, 11px);
     font-weight: var(--requestly-font-weight-medium);
-
-    &.rq-breadcrumb-edit-name {
-      max-width: 220px;
-    }
 
     .record-icon {
       display: flex;

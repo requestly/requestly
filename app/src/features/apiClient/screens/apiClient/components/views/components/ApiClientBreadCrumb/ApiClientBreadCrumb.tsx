@@ -9,7 +9,7 @@ import {
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import "./ApiClientBreadCrumb.scss";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { Tooltip, Typography } from "antd";
+import { Typography } from "antd";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { FolderOutlined } from "@ant-design/icons";
 

@@ -167,7 +167,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
     if (isEditable) {
       return isEditRecord ? (
-        <div key={index} className="rq-breadcrumb-record-name rq-breadcrumb-edit-name">
+        <div key={index} className="rq-breadcrumb-record-name">
           {recordIcon && <span className="record-icon">{recordIcon}</span>}
           <Input
             autoFocus
