@@ -55,7 +55,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
       await renameEnvironment({ environmentId, newName: updatedName });
       setTitle(updatedName);
     } catch (error) {
-      toast.error(error.message || 'Could not rename environment!');
+      toast.error(error.message || "Could not rename environment!");
     }
   };
 
@@ -90,6 +90,11 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
           className="variables-list-search-input"
           value={searchValue}
           onChange={(e) => onSearchValueChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              onSearchValueChange("");
+            }
+          }}
         />
 
         <div className="variables-list-btn-actions-container">

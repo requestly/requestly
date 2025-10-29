@@ -13,7 +13,7 @@ import HeaderUser from "./HeaderUser";
 import { redirectToSettings } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { isSafariBrowser } from "actions/ExtensionActions";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getRequestBot } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Col } from "antd";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
@@ -26,6 +26,7 @@ export const MenuHeader = () => {
   const navigate = useNavigate();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const requestBotDetails = useSelector(getRequestBot);
 
   const gitHubStarButton = useMemo(() => {
     return (
@@ -86,7 +87,16 @@ export const MenuHeader = () => {
           <RQButton
             type="transparent"
             icon={<BotIcon />}
-            onClick={() => dispatch(globalActions.updateRequestBot({ isActive: true, modelType: "app" }))}
+            onClick={(e) => {
+              e.stopPropagation();
+              const isCurrentlyActive = requestBotDetails?.isActive;
+              dispatch(
+                globalActions.updateRequestBot({
+                  isActive: !isCurrentlyActive,
+                  modelType: "app",
+                })
+              );
+            }}
           >
             Ask AI
           </RQButton>
