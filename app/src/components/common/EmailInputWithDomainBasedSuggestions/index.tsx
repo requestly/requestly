@@ -53,15 +53,6 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
     });
   }, [getOrganizationUsers, user.details?.emailType, userEmail]);
 
-  useEffect(() => {
-    // Set default value if it is a valid email
-    if (isEmailValid(defaultValue)) {
-      const val = [{ label: defaultValue, value: defaultValue }];
-      setSelectedEmails(val);
-      onChange([defaultValue]);
-    }
-  }, [defaultValue, onChange]);
-
   const commitEmail = useCallback(
     (raw: string) => {
       const trimmed = raw.trim().replace(/,$/, "");
@@ -83,6 +74,12 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
     },
     [selectedEmails, onChange]
   );
+
+  useEffect(() => {
+    if (defaultValue) {
+      commitEmail(defaultValue);
+    }
+  }, [defaultValue, commitEmail]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (["Enter", " ", ","].includes(e.key)) {
