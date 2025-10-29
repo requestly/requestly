@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
@@ -85,15 +86,17 @@ export const CollectionRow: React.FC<Props> = ({
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
-  const [createNewField, setCreateNewField] = useState(null);
+  const [activeKey, setActiveKey] = useState<string | undefined>(
+    expandedRecordIds?.includes(record.id) ? record.id : undefined
+  );
+  const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-  const [collectionsToExport, setCollectionsToExport] = useState([]);
+const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
@@ -102,7 +105,7 @@ export const CollectionRow: React.FC<Props> = ({
   const activeWorkspace = useSelector(getActiveWorkspace);
   const handleCollectionExport = useCallback(
     (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-      const collectionRecordState = getRecordStore(record.id).getState() as CollectionRecordState;
+      const collectionRecordState = getRecordStore(record.id)?.getState() as CollectionRecordState;
       const collectionVariables = collectionRecordState.collectionVariables.getState().data;
 
       const removeLocalValue = (variables: Map<string, any>): Record<string, any> => {
@@ -241,8 +244,9 @@ export const CollectionRow: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : null);
+    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
   }, [expandedRecordIds, record.id]);
+
 
   useEffect(() => {
     /* Temporary Change-> To remove previous key from session storage
@@ -254,6 +258,10 @@ export const CollectionRow: React.FC<Props> = ({
     async (item: DraggableApiRecord, dropContextId: string) => {
       try {
         const sourceContext = getApiClientFeatureContext(item.contextId);
+        if (!sourceContext) {
+          console.error("Source context not found");
+          return;
+        }
 
         const destination = {
           contextId: dropContextId,
@@ -417,6 +425,7 @@ export const CollectionRow: React.FC<Props> = ({
                   onMouseLeave={() => setHoveredId("")}
                   onClick={(e) => {
                     if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                      e.stopPropagation();
                       onItemClick(record, e);
                       return;
                     }
@@ -584,3 +593,5 @@ export const CollectionRow: React.FC<Props> = ({
     </>
   );
 };
+
+

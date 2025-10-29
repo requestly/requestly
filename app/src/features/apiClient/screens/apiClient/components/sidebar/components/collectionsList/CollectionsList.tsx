@@ -33,7 +33,7 @@ import { EXPANDED_RECORD_IDS_UPDATED } from "features/apiClient/exampleCollectio
 import { ExampleCollectionsNudge } from "../ExampleCollectionsNudge/ExampleCollectionsNudge";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
-import { MultiSelectNudge } from "components/misc/MultiClickNudge/MultiClickNudge";
+import { MultiSelectNudge } from "features/apiClient/components/MultiSelectNudge/MultiSelectNudge";
 
 interface Props {
   onNewClick: (src: RQAPI.AnalyticsEventSource, recordType: RQAPI.RecordType) => Promise<void>;
@@ -265,11 +265,8 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     ]
   );
 
-  // Main toggle handler
-  const recordsSelectionHandler = useCallback(
-    (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => {
-      const checked = event.target.checked;
-
+  const handleRecordToggle = useCallback(
+    (record: RQAPI.ApiClientRecord, isChecked: boolean) => {
       const updateSelection = (
         record: RQAPI.ApiClientRecord,
         checked: boolean,
@@ -278,19 +275,18 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         const queue = [record];
         while (queue.length) {
           const current = queue.pop();
-          if (checked) {
+          if (checked && current) {
             newSelectedRecords.add(current.id);
-          } else {
+          } else if (current) {
             newSelectedRecords.delete(current.id);
           }
 
-          if (isApiCollection(current) && current.data.children) {
+          if (current && isApiCollection(current) && current.data.children) {
             queue.push(...current.data.children);
           }
         }
       };
 
-      // Ensure parents are selected/deselected as needed
       const checkParentSelection = (
         recordId: RQAPI.ApiClientRecord["id"],
         checked: boolean,
@@ -302,23 +298,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
           const parentRecord = recordsMap[parentId];
           if (!parentRecord || !isApiCollection(parentRecord)) break;
 
-          const allChildrenSelected = parentRecord.data.children.every((child) => newSelectedRecords.has(child.id));
+          const allChildrenSelected = parentRecord.data.children?.every((child) => newSelectedRecords.has(child.id));
           if (checked && allChildrenSelected) {
             newSelectedRecords.add(parentId);
-          } else if (!checked && parentRecord.data.children.some((child) => !newSelectedRecords.has(child.id))) {
+          } else if (!checked && parentRecord.data.children?.some((child) => !newSelectedRecords.has(child.id))) {
             newSelectedRecords.delete(parentId);
           }
           parentId = childParentMap.get(parentId);
         }
       };
 
-      // Keeping track of selected records to auto check/uncheck select all checkbox in bulk action menu
       let newSelection = new Set();
 
       setSelectedRecords((prevSelected) => {
         let newSelectedRecords = new Set(prevSelected);
-        updateSelection(record, checked, newSelectedRecords);
-        record.collectionId && checkParentSelection(record.id, checked, newSelectedRecords);
+        updateSelection(record, isChecked, newSelectedRecords);
+        record.collectionId && checkParentSelection(record.id, isChecked, newSelectedRecords);
         newSelection = newSelectedRecords;
         return newSelectedRecords;
       });
@@ -329,6 +324,13 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     [updatedRecords, childParentMap]
   );
 
+  const recordsSelectionHandler = useCallback(
+    (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => {
+      handleRecordToggle(record, event.target.checked);
+    },
+    [handleRecordToggle]
+  );
+
   const handleItemClick = useCallback(
     (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => {
       if (event.metaKey || event.ctrlKey) {
@@ -337,22 +339,19 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         if (!showSelection) {
           setShowSelection(true);
         }
-
-        const syntheticEvent = {
-          target: { checked: !selectedRecords.has(record.id) },
-        } as React.ChangeEvent<HTMLInputElement>;
-
-        recordsSelectionHandler(record, syntheticEvent);
+        handleRecordToggle(record, !selectedRecords.has(record.id));
       }
     },
-    [showSelection, selectedRecords, recordsSelectionHandler]
+    [showSelection, selectedRecords, handleRecordToggle]
   );
 
   useEffect(() => {
     const id = requestId || collectionId;
-    setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
-      union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
-    );
+    if (id) {
+      setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
+        union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
+      );
+    }
   }, [collectionId, requestId, apiClientRecords]);
 
   return (
@@ -469,3 +468,4 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     </>
   );
 };
+
