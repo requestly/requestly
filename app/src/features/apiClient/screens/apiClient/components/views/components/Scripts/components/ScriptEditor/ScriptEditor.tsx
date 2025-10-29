@@ -22,13 +22,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
+  const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   React.useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
     }
   }, [focusPostResponse, hasPostResponseScript]);
-  const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const scriptTypeOptions = useMemo(() => {
     return (
