@@ -152,13 +152,13 @@ const HttpRequestTabs: React.FC<Props> = ({
         ),
         children: (
           <ScriptEditor
+            key={`${scriptEditorVersion}`}
             scripts={requestEntry.scripts}
             onScriptsChange={(newScripts) => {
               setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
             }}
             focusPostResponse={focusPostResponseScriptEditor}
             onFocusComplete={onFocusPostResponseComplete}
-            scriptEditorVersion={scriptEditorVersion}
           />
         ),
       },
