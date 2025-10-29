@@ -19,6 +19,7 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose, modelTy
       animate={{ opacity: isOpen ? 1 : 0, right: isOpen ? 65 : -450 }}
       transition={{ duration: 0.2 }}
       className="request-bot"
+      style={{ pointerEvents: isOpen ? "auto" : "none" }}
     >
       <IoMdClose className="request-bot-close-btn" onClick={onClose} />
       <iframe title="RequestBot" className="request-bot-iframe" src={MODELS[modelType].src} />
