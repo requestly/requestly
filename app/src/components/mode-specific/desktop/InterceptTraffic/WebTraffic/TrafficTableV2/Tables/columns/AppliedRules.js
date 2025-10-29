@@ -13,7 +13,10 @@ const RenderRule = ({ ruleId, ruleType, onRuleClick }) => {
 
   return (
     <Tooltip title={ruleDisplayName}>
-      <span style={{ paddingRight: "8px", cursor: "pointer" }} onClick={(e) => onRuleClick(e, ruleId)}>
+      <span 
+        style={{ paddingRight: "8px", cursor: "pointer" }} 
+        onClick={(e) => onRuleClick(e, ruleId)}
+      >
         {RULE_TYPES_CONFIG[ruleType]?.ICON?.() || null}
       </span>
     </Tooltip>
@@ -50,6 +53,7 @@ const AppliedRules = ({ actions }) => {
     [dispatch]
   );
 
+
   const get_rules_from_actions = (actions) => {
     const rules = actions.map((action) => {
       return {
@@ -63,18 +67,7 @@ const AppliedRules = ({ actions }) => {
   const rules = get_rules_from_actions(actions);
   const deduped_rules = dedup_rules(rules);
 
-  return (
-    <>
-      {deduped_rules.map((rule) => (
-        <RenderRule
-          key={rule.rule_id}
-          ruleId={rule.rule_id}
-          ruleType={rule.rule_type}
-          onRuleClick={handleRuleIconClick}
-        />
-      ))}
-    </>
-  );
+  return <>{deduped_rules.map((rule) => <RenderRule key={rule.rule_id} ruleId={rule.rule_id} ruleType={rule.rule_type} onRuleClick={handleRuleIconClick} />)}</>;
 };
 
 export default AppliedRules;
