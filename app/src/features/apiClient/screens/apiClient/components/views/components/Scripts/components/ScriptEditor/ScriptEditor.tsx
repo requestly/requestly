@@ -12,15 +12,9 @@ interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
   onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
   focusPostResponse?: boolean;
-  onFocusComplete?: () => void;
 }
 // FIX: Editor does not re-render when scripts are undefined
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({
-  scripts,
-  onScriptsChange,
-  focusPostResponse,
-  onFocusComplete,
-}) => {
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsChange, focusPostResponse }) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -28,34 +22,12 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
-  const [shouldAutoFocus, setShouldAutoFocus] = useState(false);
-  const hasFocusCompleted = React.useRef(false);
-
-  const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   React.useEffect(() => {
-    if (focusPostResponse && hasPostResponseScript) {
+    if (focusPostResponse && scripts?.[RQAPI.ScriptType.POST_RESPONSE]) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
-      setShouldAutoFocus(true);
-      hasFocusCompleted.current = false;
     }
-  }, [focusPostResponse, hasPostResponseScript]);
-
-  React.useEffect(() => {
-    if (shouldAutoFocus) {
-      const timer = setTimeout(() => {
-        setShouldAutoFocus(false);
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldAutoFocus]);
-
-  const handleEditorFocus = React.useCallback(() => {
-    if (shouldAutoFocus && !hasFocusCompleted.current) {
-      hasFocusCompleted.current = true;
-      onFocusComplete?.();
-    }
-  }, [shouldAutoFocus, onFocusComplete]);
+  }, [focusPostResponse, scripts]);
 
   const scriptTypeOptions = useMemo(() => {
     return (
@@ -95,8 +67,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           options: [scriptTypeOptions],
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
-        autoFocus={scriptType === RQAPI.ScriptType.POST_RESPONSE && shouldAutoFocus}
-        onFocus={handleEditorFocus}
+        autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
       />
     </div>
   );

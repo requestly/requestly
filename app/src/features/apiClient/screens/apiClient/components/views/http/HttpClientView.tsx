@@ -755,10 +755,6 @@ const HttpClientView: React.FC<Props> = ({
     }
   }, [httpRequestExecutor, apiEntryDetails?.id, entry]);
 
-  const handleFocusPostResponseComplete = useCallback(() => {
-    setFocusPostResponseScriptEditor(false);
-  }, []);
-
   const handleRevertChanges = () => {
     setEntry(apiEntryDetails?.data);
   };
@@ -892,7 +888,6 @@ const HttpClientView: React.FC<Props> = ({
             setContentType={setContentType}
             handleAuthChange={handleAuthChange}
             focusPostResponseScriptEditor={focusPostResponseScriptEditor}
-            onFocusPostResponseComplete={handleFocusPostResponseComplete}
             scriptEditorVersion={scriptEditorVersion}
           />
         </div>
