@@ -4,20 +4,14 @@ import { ScriptEditor } from "../../../../../components/Scripts/components/Scrip
 
 interface GraphQLScriptsProps {
   focusPostResponse?: boolean;
-  onFocusComplete?: () => void;
 }
 
-export const GraphQLScripts: React.FC<GraphQLScriptsProps> = ({ focusPostResponse, onFocusComplete }) => {
+export const GraphQLScripts: React.FC<GraphQLScriptsProps> = ({ focusPostResponse }) => {
   const [scripts, updateScripts] = useGraphQLRecordStore((state) => [state.entry.scripts, state.updateEntryScripts]);
 
   return (
     <div className="graphql-request-tab-content" style={{ height: "inherit" }}>
-      <ScriptEditor
-        scripts={scripts}
-        onScriptsChange={updateScripts}
-        focusPostResponse={focusPostResponse}
-        onFocusComplete={onFocusComplete}
-      />
+      <ScriptEditor scripts={scripts} onScriptsChange={updateScripts} focusPostResponse={focusPostResponse} />
     </div>
   );
 };

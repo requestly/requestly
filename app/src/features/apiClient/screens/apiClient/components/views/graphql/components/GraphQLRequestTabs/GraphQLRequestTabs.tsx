@@ -22,7 +22,6 @@ interface Props {
   isSchemaBuilderOpen: boolean;
   setIsSchemaBuilderOpen: (isOpen: boolean) => void;
   focusPostResponseScriptEditor?: boolean;
-  onFocusPostResponseComplete?: () => void;
   scriptEditorVersion?: number;
 }
 
@@ -32,7 +31,6 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
   isSchemaBuilderOpen,
   setIsSchemaBuilderOpen,
   focusPostResponseScriptEditor,
-  onFocusPostResponseComplete,
   scriptEditorVersion,
 }) => {
   const tabItems = useMemo(() => {
@@ -57,13 +55,7 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
       {
         key: GraphQLRequestTab.SCRIPTS,
         label: <RequestTabLabel label="Scripts" />,
-        children: (
-          <GraphQLScripts
-            key={`${scriptEditorVersion}`}
-            focusPostResponse={focusPostResponseScriptEditor}
-            onFocusComplete={onFocusPostResponseComplete}
-          />
-        ),
+        children: <GraphQLScripts key={`${scriptEditorVersion}`} focusPostResponse={focusPostResponseScriptEditor} />,
       },
     ];
   }, [
@@ -73,7 +65,6 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
     isSchemaBuilderOpen,
     scriptEditorVersion,
     focusPostResponseScriptEditor,
-    onFocusPostResponseComplete,
   ]);
   return (
     <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>

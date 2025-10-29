@@ -460,10 +460,6 @@ const GraphQLClientView: React.FC<Props> = ({
     }
   }, [getEntry, record, graphQLRequestExecutor, recordId, updateEntryTestResults]);
 
-  const handleFocusPostResponseComplete = useCallback(() => {
-    setFocusPostResponseScriptEditor(false);
-  }, []);
-
   const handleCancelRequest = useCallback(() => {
     graphQLRequestExecutor.abort();
     setIsRequestCancelled(true);
@@ -592,7 +588,6 @@ const GraphQLClientView: React.FC<Props> = ({
             isSchemaBuilderOpen={isSchemaBuilderOpen}
             setIsSchemaBuilderOpen={setIsSchemaBuilderOpen}
             focusPostResponseScriptEditor={focusPostResponseScriptEditor}
-            onFocusPostResponseComplete={handleFocusPostResponseComplete}
             scriptEditorVersion={scriptEditorVersion}
           />
         </div>
