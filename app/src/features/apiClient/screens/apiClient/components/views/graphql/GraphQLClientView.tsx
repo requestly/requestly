@@ -35,6 +35,9 @@ import {
   trackInstallExtensionDialogShown,
   trackRequestRenamed,
   trackRequestSaved,
+  trackTestGenerationCompleted,
+  trackTestGenerationFailed,
+  trackTestGenerationStarted,
 } from "modules/analytics/events/features/apiClient";
 import { extractOperationNames } from "./utils";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
@@ -149,6 +152,9 @@ const GraphQLClientView: React.FC<Props> = ({
     }
 
     setIsGeneratingTests(true);
+    trackTestGenerationStarted({
+      src: "test_tab_response_panel",
+    });
     const method = "POST";
     const status = entry.response.status;
 
@@ -183,8 +189,14 @@ const GraphQLClientView: React.FC<Props> = ({
       });
 
       setScriptEditorVersion((prev) => prev + 1);
+      trackTestGenerationCompleted({
+        src: "test_tab_response_panel",
+      });
     } catch (e) {
       toast.error("Something went wrong while generating tests");
+      trackTestGenerationFailed({
+        src: "test_tab_response_panel",
+      });
     } finally {
       setIsGeneratingTests(false);
     }

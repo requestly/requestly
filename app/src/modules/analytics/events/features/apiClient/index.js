@@ -268,9 +268,6 @@ export const trackCollectionRunnerConfigSaveFailed = (params) => {
 };
 
 // Tests Autogeneration
-export const trackTestGenerationClicked = (params = {}) => {
-  trackEvent(API_CLIENT.TEST_GENERATION_CLICKED, params);
-};
 
 export const trackTestGenerationStarted = (params = {}) => {
   trackEvent(API_CLIENT.TEST_GENERATION_STARTED, params);

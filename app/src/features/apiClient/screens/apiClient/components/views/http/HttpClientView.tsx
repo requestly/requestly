@@ -29,6 +29,9 @@ import {
   trackRequestRenamed,
   trackApiRequestDone,
   trackAPIRequestSent,
+  trackTestGenerationStarted,
+  trackTestGenerationCompleted,
+  trackTestGenerationFailed,
 } from "modules/analytics/events/features/apiClient";
 import { useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
@@ -170,6 +173,9 @@ const HttpClientView: React.FC<Props> = ({
     }
 
     setIsGeneratingTests(true);
+    trackTestGenerationStarted({
+      src: "test_tab_response_panel",
+    });
     const method = entry.request.method;
     const status = entry.response.status;
     const responseTimeMs = entry.response.time;
@@ -208,8 +214,14 @@ const HttpClientView: React.FC<Props> = ({
       }));
 
       setScriptEditorVersion((prev) => prev + 1);
+      trackTestGenerationCompleted({
+        src: "test_tab_response_panel",
+      });
     } catch (e) {
       toast.error("Something went wrong while generating tests");
+      trackTestGenerationFailed({
+        src: "test_tab_response_panel",
+      });
     } finally {
       setIsGeneratingTests(false);
     }
