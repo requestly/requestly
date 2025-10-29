@@ -120,6 +120,7 @@ export const EnvironmentView: React.FC<EnvironmentViewProps> = ({ envId }) => {
           searchValue={searchValue}
           pendingVariables={pendingVariables}
           handleSetPendingVariables={handleSetPendingVariables}
+          onSearchValueChange={setSearchValue}
         />
         {isExportModalOpen && (
           <ApiClientExportModal
