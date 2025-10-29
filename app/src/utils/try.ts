@@ -200,9 +200,9 @@ export class Err<T extends Error = Error> extends Result<any> {
   }
 }
 
-type TryReturn<R> = R extends Promise<infer I> ? Promise<Result<I>> : Result<R>
+type TryReturn<R, E extends Error> = R extends Promise<infer I> ? Promise<Result<I, E>> : Result<R, E>
 
-export function Try<R = any>(fn: (...args: any[]) => R): TryReturn<R> {
+export function Try<R = any, E extends Error = Error>(fn: (...args: any[]) => R): TryReturn<R, E> {
   try {
     const possibleResultPromise = fn();
     const isPromiseLike = (typeof (possibleResultPromise as any)?.then === 'function');
