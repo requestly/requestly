@@ -652,7 +652,7 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
     case RequestContentType.JSON: {
       harRequest.postData = {
         mimeType: RequestContentType.JSON,
-        text: typeof apiRequest.body === "string" ? apiRequest.body : JSON.stringify(apiRequest.body),
+        text: String(apiRequest.body),
       };
       break;
     }
