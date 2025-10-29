@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
@@ -61,9 +61,9 @@ const DashboardContent = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
 
-  const closeRequestBot = () => {
+  const closeRequestBot = useCallback(() => {
     dispatch(globalActions.updateRequestBot({ isActive: false }));
-  };
+  }, [dispatch]);
 
   const previousLocation = usePrevious(location);
 
