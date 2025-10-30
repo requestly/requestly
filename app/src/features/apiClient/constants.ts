@@ -83,3 +83,8 @@ export enum Headers {
 }
 
 export const LARGE_FILE_SIZE = 104857600;
+
+export const API_CLIENT_DOCS = {
+  COLLECTION_RUNNER: "https://docs.requestly.com/general/api-client/collection-runner",
+  COLLECTION_RUNNER_DATA_FILE: "https://docs.requestly.com/general/api-client/collection-runner-data-file",
+};

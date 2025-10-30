@@ -1,8 +1,8 @@
 import React from "react";
 import { RenderableError } from "errors/RenderableError";
-import LINKS from "config/constants/sub/links";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import "../collectionRunnerErrors.scss";
+import { API_CLIENT_DOCS } from "features/apiClient/constants";
 
 export class RunnerFileMissingError extends RenderableError {
   render() {
@@ -31,7 +31,7 @@ const RunnerFileMissing: React.FC<{ error: RunnerFileMissingError }> = ({ error 
 
         <a
           className="documentation-link"
-          href={LINKS.REQUESTLY_API_CLIENT_DOCS}
+          href={API_CLIENT_DOCS.COLLECTION_RUNNER_DATA_FILE}
           target="_blank"
           rel="noopener noreferrer"
         >

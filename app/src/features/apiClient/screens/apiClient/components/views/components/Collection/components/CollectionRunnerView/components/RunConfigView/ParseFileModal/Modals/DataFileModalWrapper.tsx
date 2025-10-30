@@ -17,6 +17,7 @@ import {
   trackCollectionRunnerSelectFileClicked,
   trackCollectionRunnerTruncatedFileUsed,
 } from "modules/analytics/events/features/apiClient";
+import { API_CLIENT_DOCS } from "features/apiClient/constants";
 
 interface buttonSchema {
   label: string;
@@ -126,7 +127,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
           secondaryButton: {
             label: "Learn more",
             onClick: () => {
-              onClose();
+              window.open(API_CLIENT_DOCS.COLLECTION_RUNNER_DATA_FILE, "_blank");
             },
           },
           primaryButton: {

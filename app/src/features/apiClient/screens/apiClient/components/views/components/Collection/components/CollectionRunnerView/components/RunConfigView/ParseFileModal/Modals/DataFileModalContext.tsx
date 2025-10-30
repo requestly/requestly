@@ -23,6 +23,8 @@ interface DataFileModalContextType {
   setParsedData: (data: { data: Record<string, any>[]; count: number } | null) => void;
   setDataFileMetadata: (metadata: { name: string; path: string; size: number } | null) => void;
   parseFile: (filePath: string, isPreviewMode: boolean) => Promise<void>;
+  showModal: boolean;
+  setShowModal: (show: boolean) => void;
 }
 
 const DataFileModalContext = createContext<DataFileModalContextType | undefined>(undefined);
@@ -43,6 +45,7 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
   const [viewMode, setViewMode] = useState<DataFileModalViewMode>(DataFileModalViewMode.LOADING);
   const [parsedData, setParsedData] = useState<{ data: Record<string, any>[]; count: number } | null>(null);
   const [dataFileMetadata, setDataFileMetadata] = useState<{ name: string; path: string; size: number } | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const parseFile = useCallback(async (filePath: string, isPreviewMode: boolean) => {
     setViewMode(DataFileModalViewMode.LOADING);
@@ -67,6 +70,8 @@ export const DataFileModalProvider: React.FC<DataFileModalProviderProps> = ({ ch
     setParsedData,
     setDataFileMetadata,
     parseFile,
+    showModal,
+    setShowModal,
   };
 
   return <DataFileModalContext.Provider value={value}>{children}</DataFileModalContext.Provider>;

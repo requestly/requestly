@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineRemoveRedEye } from "@react-icons/all-files/md/MdOutlineRemoveRedEye";
@@ -17,7 +17,14 @@ import {
 } from "modules/analytics/events/features/apiClient";
 
 export const DataFileSelector: React.FC = () => {
-  const { parseFile, setDataFileMetadata, setViewMode, dataFileMetadata } = useDataFileModalContext();
+  const {
+    parseFile,
+    setDataFileMetadata,
+    setViewMode,
+    dataFileMetadata,
+    showModal,
+    setShowModal,
+  } = useDataFileModalContext();
 
   const [dataFile, removeDataFile, setIterations] = useRunConfigStore((s) => [
     s.dataFile,
@@ -43,8 +50,6 @@ export const DataFileSelector: React.FC = () => {
   );
   const { openFileSelector } = useFileSelection();
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-
   const handleFileSelection = useCallback(() => {
     trackCollectionRunnerSelectFileClicked();
     openFileSelector((file) => {
@@ -63,7 +68,7 @@ export const DataFileSelector: React.FC = () => {
       setShowModal(true);
       parseFile(file.path, true);
     });
-  }, [openFileSelector, setDataFileMetadata, parseFile, setViewMode]);
+  }, [openFileSelector, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
 
   const handleModalClose = useCallback(() => {
     // Clear metadata when modal closes
@@ -94,7 +99,7 @@ export const DataFileSelector: React.FC = () => {
       setShowModal(true);
       parseFile(dataFile.path, false);
     }
-  }, [dataFile, isFilePresentLocally, setDataFileMetadata, parseFile, setViewMode]);
+  }, [dataFile, isFilePresentLocally, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
 
   return (
     <>
@@ -117,23 +122,24 @@ export const DataFileSelector: React.FC = () => {
         </>
       ) : (
         <div className="file-uploaded-section">
-          <RQButton size="small" type="secondary" className="file-uploaded-button" onClick={handleViewExistingFile}>
-            {file?.isFileValid ? (
+          {!file?.isFileValid ? (
+            <RQTooltip
+              title={"The file you selected is not available. Please remove and upload a new file to continue."}
+              placement="top"
+            >
+              <RQButton size="small" type="secondary" className="file-uploaded-button" onClick={handleViewExistingFile}>
+                <BiError className="invalid-icon" />
+                <span className={`button-text file-invalid`}>
+                  {file ? truncateString(file.name, 35) + getFileExtension(file.name) : "file unavailable"}
+                </span>
+              </RQButton>
+            </RQTooltip>
+          ) : (
+            <RQButton size="small" type="secondary" className="file-uploaded-button" onClick={handleViewExistingFile}>
               <MdOutlineRemoveRedEye className="eye-icon" />
-            ) : (
-              <>
-                <RQTooltip
-                  title={"The file you selected is not available. Please remove and upload a new file to continue."}
-                  placement="top"
-                >
-                  <BiError className="invalid-icon" />
-                </RQTooltip>
-              </>
-            )}
-            <span className={`button-text ${file?.isFileValid ? "" : "file-invalid"}`}>
-              {file ? truncateString(file.name, 35) + getFileExtension(file.name) : "file unavailable"}
-            </span>
-          </RQButton>
+              <span className={`button-text`}>{truncateString(file.name, 35) + getFileExtension(file.name)}</span>
+            </RQButton>
+          )}
 
           {/*Clear File or Delete File */}
           <RQTooltip title={`clear file`}>

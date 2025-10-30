@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { RenderableError } from "errors/RenderableError";
 import LINKS from "config/constants/sub/links";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import "../collectionRunnerErrors.scss";
-import { useRunConfigStore } from "../../../../run.context";
-import { DataFileFormatExample } from "../../../DataFileFormatExample/DataFileFormatExample";
+import { RQButton } from "lib/design-system-v2/components";
+import { FiUpload } from "@react-icons/all-files/fi/FiUpload";
+import { useFileSelection } from "../../../RunConfigView/hooks/useFileSelection.hook";
+import { trackCollectionRunnerSelectFileClicked } from "modules/analytics/events/features/apiClient";
+import {
+  DataFileModalViewMode,
+  useDataFileModalContext,
+} from "../../../RunConfigView/ParseFileModal/Modals/DataFileModalContext";
 
 export class DataFileParseError extends RenderableError {
   render() {
@@ -12,13 +18,34 @@ export class DataFileParseError extends RenderableError {
   }
 
   getErrorHeading() {
-    return "Oops! We couldn't parse your file.";
+    return "File corrupted. Test results couldn't be generated.";
   }
 }
 
 const DataFileParseErrorComponent: React.FC<{ error: DataFileParseError }> = ({ error }) => {
-  const [dataFile] = useRunConfigStore((s) => [s.dataFile]);
-  const fileExtension = (dataFile?.path ? dataFile.path.split(".").pop()?.toUpperCase() : null) ?? "JSON";
+  const { setDataFileMetadata, setShowModal, setViewMode, parseFile } = useDataFileModalContext();
+
+  const { openFileSelector } = useFileSelection();
+
+  const handleFileSelection = useCallback(() => {
+    trackCollectionRunnerSelectFileClicked();
+    openFileSelector((file) => {
+      const metadata = {
+        name: file.name,
+        path: file.path,
+        size: file.size,
+      };
+      setDataFileMetadata(metadata);
+
+      if (file.size > 100 * 1024 * 1024) {
+        setViewMode(DataFileModalViewMode.LARGE_FILE);
+        setShowModal(true);
+        return;
+      }
+      setShowModal(true);
+      parseFile(file.path, true);
+    });
+  }, [openFileSelector, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
 
   return (
     <>
@@ -28,11 +55,13 @@ const DataFileParseErrorComponent: React.FC<{ error: DataFileParseError }> = ({ 
           <div className="api-client-error-placeholder-content__title">{error.getErrorHeading()}</div>
           <div className="runner-error-detail">
             <span className="runner-error-message">
-              The selected file must be a valid{" "}
-              {fileExtension === "JSON" ? "JSON array of key-value objects." : "CSV format with headers."}
+              The data file used for this collection appears to be damaged or unreadable. Upload a valid file and try
+              running the collection again.
             </span>
           </div>
-          <DataFileFormatExample fileExtension={fileExtension} showLabel={true} />
+          <RQButton type="secondary" icon={<FiUpload />} onClick={handleFileSelection}>
+            Upload file
+          </RQButton>
         </div>
 
         <a
