@@ -1,6 +1,12 @@
 import { NativeError } from "../../../../../../../../../errors/NativeError";
 import moment from 'moment';
 import * as xml2Js from 'xml2js';
+import * as uuid from 'uuid';
+import { parse } from 'csv-parse/sync';
+//@ts-ignore
+import * as cheerio from 'cheerio';
+import * as chai from 'chai';
+import ajv from 'ajv';
 
 
 export class PackageNotFound extends NativeError {
@@ -17,6 +23,12 @@ export class PackageImportError extends NativeError {
 const packageMap: {[key: string]: Object | undefined} = {
   moment,
   xml2Js,
+  uuid,
+  'csv-parse/lib/sync': parse,
+  cheerio,
+  //@ts-ignore
+  chai,
+  ajv,
 }
 
 export function require(id: string) {
