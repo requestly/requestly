@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { RenderableError } from "errors/RenderableError";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import "./collectionRunnerDataFileError.scss";
@@ -8,7 +8,7 @@ import { trackCollectionRunnerSelectFileClicked } from "modules/analytics/events
 import { RQButton } from "lib/design-system-v2/components/RQButton/RQButton";
 import { FiUpload } from "@react-icons/all-files/fi/FiUpload";
 
-export const CollectionRunnerDataFileError = <T extends RenderableError>({ error }: { error: T }) => {
+export const CollectionRunnerDataFileError: React.FC<{ error: RenderableError }> = ({ error }) => {
   const { openFileSelector } = useCollectionRunnerFileSelection();
 
   const handleFileSelection = useCallback(() => {
