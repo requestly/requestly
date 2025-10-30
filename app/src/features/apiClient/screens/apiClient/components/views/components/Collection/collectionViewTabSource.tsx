@@ -11,7 +11,7 @@ interface CollectionViewTabSourceMetadata extends TabSourceMetadata {}
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {
     super();
-    this.component = <CollectionView key={metadata.id} collectionId={metadata.id} isNewItem={metadata.isNewTab} />;
+    this.component = <CollectionView key={metadata.id} collectionId={metadata.id} isNewRecord={metadata.isNewTab} />;
     this.metadata = {
       ...metadata,
       name: "collection",

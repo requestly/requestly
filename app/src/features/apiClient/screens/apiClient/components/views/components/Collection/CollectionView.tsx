@@ -28,10 +28,10 @@ const TAB_KEYS = {
 
 interface CollectionViewProps {
   collectionId: string;
-  isNewItem?: boolean;
+  isNewRecord?: boolean;
 }
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, isNewItem = false }) => {
+export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, isNewRecord = false }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
@@ -179,7 +179,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, is
               placeholder="New Collection"
               name={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
-              autoFocus={isNewItem}
+              autoFocus={isNewRecord}
               breadCrumbType={BreadcrumbType.COLLECTION}
             />
           </div>
