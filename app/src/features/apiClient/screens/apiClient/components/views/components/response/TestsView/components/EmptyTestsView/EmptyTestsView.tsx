@@ -2,8 +2,6 @@ import React, { useCallback } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdAutoAwesome } from "@react-icons/all-files/md/MdAutoAwesome";
 import { MdArrowOutward } from "@react-icons/all-files/md/MdArrowOutward";
-import { useDeepLinkState } from "hooks";
-import { RequestTab } from "../../../../../http/components/HttpRequestTabs/HttpRequestTabs";
 
 interface EmptyTestsViewProps {
   onGenerateTests?: () => void;
@@ -16,8 +14,6 @@ export const EmptyTestsView: React.FC<EmptyTestsViewProps> = ({
   isGeneratingTests = false,
   canGenerateTests = false,
 }) => {
-  const [, setDeepLinkState] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
-
   const showGenerateCta = canGenerateTests;
   const title = canGenerateTests ? "No tests found for this request" : "Tests are set up but not run yet";
 
@@ -27,9 +23,8 @@ export const EmptyTestsView: React.FC<EmptyTestsViewProps> = ({
 
   const handleGenerateClick = useCallback(() => {
     if (!onGenerateTests || !canGenerateTests) return;
-    setDeepLinkState({ tab: RequestTab.SCRIPTS });
     onGenerateTests();
-  }, [onGenerateTests, canGenerateTests, setDeepLinkState]);
+  }, [onGenerateTests, canGenerateTests]);
 
   return (
     <div className="empty-tests-view-container">

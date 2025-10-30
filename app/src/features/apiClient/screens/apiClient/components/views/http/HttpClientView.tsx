@@ -48,7 +48,7 @@ import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomShe
 import { BottomSheetPlacement, SheetLayout } from "componentsV2/BottomSheet/types";
 import { ApiClientBottomSheet } from "../components/response/ApiClientBottomSheet/ApiClientBottomSheet";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../constants/keyboardShortcuts";
-import { useHasUnsavedChanges } from "hooks";
+import { useDeepLinkState, useHasUnsavedChanges } from "hooks";
 import { RBACButton, RevertViewModeChangesAlert, RoleBasedComponent } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { useGenericState } from "hooks/useGenericState";
@@ -69,7 +69,7 @@ import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import HttpApiClientUrl from "./components/HttpClientUrl/HttpClientUrl";
 import { ApiClientBreadCrumb, BreadcrumbType } from "../components/ApiClientBreadCrumb/ApiClientBreadCrumb";
 import { ClientCodeButton } from "../components/ClientCodeButton/ClientCodeButton";
-import HttpRequestTabs from "./components/HttpRequestTabs/HttpRequestTabs";
+import HttpRequestTabs, { RequestTab } from "./components/HttpRequestTabs/HttpRequestTabs";
 import "./httpClientView.scss";
 import { QueryParamsProvider } from "features/apiClient/store/QueryParamsContextProvider";
 import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
@@ -127,6 +127,8 @@ const HttpClientView: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const user = useSelector(getUserAuthDetails);
+
+  const [, setDeepLinkState] = useDeepLinkState({ tab: RequestTab.QUERY_PARAMS });
 
   const { toggleBottomSheet, toggleSheetPlacement, sheetPlacement } = useBottomSheetContext();
 
@@ -214,6 +216,7 @@ const HttpClientView: React.FC<Props> = ({
       }));
 
       setScriptEditorVersion((prev) => prev + 1);
+      setDeepLinkState({ tab: RequestTab.SCRIPTS });
       trackTestGenerationCompleted({
         src: "test_tab_response_panel",
       });
