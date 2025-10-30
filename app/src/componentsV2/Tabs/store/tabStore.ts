@@ -29,11 +29,13 @@ export type TabState = {
   title: string;
   icon: ReactNode;
   closeBlockers: Map<CloseTopic, Map<CloseBlockerId, CloseBlocker>>;
+  isNewTab: boolean;
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
+  setIsNewTab: (isNewTab: boolean) => void;
 
   canCloseTab: () => boolean;
   getActiveBlockers: () => ActiveBlocker[];
@@ -43,7 +45,13 @@ export type TabState = {
   clearAllCloseBlockers: () => void;
 };
 
-export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
+export const createTabStore = (
+  id: number,
+  source: any,
+  title: string,
+  preview: boolean = false,
+  isNewTab: boolean = false
+) => {
   return create<TabState>((set, get) => ({
     id,
     title,
@@ -52,11 +60,13 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     unsaved: false,
     icon: source.getIcon(),
     closeBlockers: new Map(),
+    isNewTab,
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
+    setIsNewTab: (isNewTab: boolean) => set({ isNewTab }),
 
     canCloseTab: () => {
       const { closeBlockers } = get();

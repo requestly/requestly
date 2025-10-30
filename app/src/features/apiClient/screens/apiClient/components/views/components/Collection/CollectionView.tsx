@@ -28,10 +28,9 @@ const TAB_KEYS = {
 
 interface CollectionViewProps {
   collectionId: string;
-  isNewRecord?: boolean;
 }
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, isNewRecord = false }) => {
+export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) => {
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
   const {
@@ -42,7 +41,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, is
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
-  const { setTitle } = useGenericState();
+  const { setTitle, getIsNew, setIsNew } = useGenericState();
 
   const collection = useApiRecord(collectionId) as RQAPI.CollectionRecord;
 
@@ -143,6 +142,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, is
         }
 
         onSaveRecord(result.data);
+        setIsNew(false);
         const wasForceRefreshed = await forceRefreshApiClientRecords();
         if (wasForceRefreshed) {
           closeTab(
@@ -179,7 +179,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId, is
               placeholder="New Collection"
               name={collectionName}
               onBlur={(newName) => handleCollectionNameChange(newName)}
-              autoFocus={isNewRecord}
+              autoFocus={getIsNew()}
               breadCrumbType={BreadcrumbType.COLLECTION}
             />
           </div>
