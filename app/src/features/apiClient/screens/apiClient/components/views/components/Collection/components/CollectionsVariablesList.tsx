@@ -5,18 +5,21 @@ interface CollectionsVariablesListProps {
   searchValue: string;
   onVariablesChange: (variables: any[]) => void;
   variables: any[];
+  onSearchValueChange: (value: string) => void;
 }
 
 export const CollectionsVariablesList: React.FC<CollectionsVariablesListProps> = ({
   searchValue,
   variables,
   onVariablesChange,
+  onSearchValueChange,
 }) => {
   return (
     <VariablesList
       searchValue={searchValue}
       variables={variables}
       onVariablesChange={onVariablesChange}
+      onSearchValueChange={onSearchValueChange}
       container="environments"
     />
   );
