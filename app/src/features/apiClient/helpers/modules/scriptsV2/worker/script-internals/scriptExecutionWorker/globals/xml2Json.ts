@@ -9,13 +9,16 @@ const xml2jsOptions = {
 };
 
 export function xml2Json(string: string) {
-  let JSON = {};
+  let parsedResult = {};
 
-  xml2Js.parseString(string, xml2jsOptions, function(_: any, result: any) {
-    JSON = result;
+  xml2Js.parseString(string, xml2jsOptions, function(err: any, result: any) {
+    if(err) {
+      throw new Error(`XML Parsing failed! ${err.message}`);
+    }
+    parsedResult = result;
   });
 
-  return JSON;
+  return parsedResult;
 };
 
 
