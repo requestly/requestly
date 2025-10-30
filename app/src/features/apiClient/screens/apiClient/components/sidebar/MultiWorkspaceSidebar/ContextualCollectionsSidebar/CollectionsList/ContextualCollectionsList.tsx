@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { RQAPI } from "features/apiClient/types";
@@ -87,7 +86,6 @@ export const ContextualCollectionsList: React.FC<Props> = ({
       return newExpanded;
     });
 
-
     return recordsToRender;
   }, [context.id, apiClientRecords, handleShowSelection, searchValue]);
 
@@ -154,15 +152,14 @@ export const ContextualCollectionsList: React.FC<Props> = ({
     [showSelection, selectedRecords, handleRecordToggle, handleShowSelection]
   );
 
-useEffect(() => {
-  const id = requestId || collectionId;
-  if (!id) return;
+  useEffect(() => {
+    const id = requestId || collectionId;
+    if (!id) return;
 
-  setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
-    union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
-  );
-}, [collectionId, requestId, apiClientRecords]);
-
+    setExpandedRecordIds((prev: RQAPI.ApiClientRecord["id"][]) =>
+      union(prev, getRecordIdsToBeExpanded(id, prev, apiClientRecords))
+    );
+  }, [collectionId, requestId, apiClientRecords]);
 
   useEffect(() => {
     if (!showSelection) {
@@ -213,7 +210,7 @@ useEffect(() => {
                       recordsSelectionHandler,
                       setShowSelection: handleShowSelection,
                     }}
-                    onRequestlyExportClick={() => { }}
+                    onRequestlyExportClick={() => {}}
                     // TODO: just pass contextId
                     onItemClick={handleItemClick}
                     handleRecordsToBeDeleted={(records) => handleRecordsToBeDeleted(records, context)}
@@ -264,8 +261,7 @@ useEffect(() => {
           )}
         </div>
       </div>
-      <MultiSelectNudge />
+      {/* <MultiSelectNudge /> */}
     </>
   );
 };
-

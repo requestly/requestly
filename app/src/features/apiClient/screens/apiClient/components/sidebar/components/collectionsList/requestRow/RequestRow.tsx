@@ -1,4 +1,3 @@
-
 import React, { useCallback, useMemo, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
@@ -142,7 +141,6 @@ export const RequestRow: React.FC<Props> = ({
     [onSaveRecord, apiClientRecordsRepository]
   );
 
-
   const requestOptions = useMemo((): MenuProps["items"] => {
     return [
       {
@@ -233,7 +231,9 @@ export const RequestRow: React.FC<Props> = ({
       ) : (
         <div className={`request-row`} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
           <div
-            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
+              selectedRecords.has(record.id) && showSelection ? "selected" : ""
+            }`}
             onClick={(e) => {
               if (onItemClick && (e.metaKey || e.ctrlKey)) {
                 onItemClick(record, e);
@@ -301,5 +301,3 @@ export const RequestRow: React.FC<Props> = ({
     </>
   );
 };
-
-

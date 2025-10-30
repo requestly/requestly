@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
@@ -96,7 +95,7 @@ export const CollectionRow: React.FC<Props> = ({
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
+  const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
@@ -247,7 +246,6 @@ const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionR
     setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
   }, [expandedRecordIds, record.id]);
 
-
   useEffect(() => {
     /* Temporary Change-> To remove previous key from session storage
        which was added due to the previous logic can be removed after some time */
@@ -258,10 +256,6 @@ const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionR
     async (item: DraggableApiRecord, dropContextId: string) => {
       try {
         const sourceContext = getApiClientFeatureContext(item.contextId);
-        if (!sourceContext) {
-          console.error("Source context not found");
-          return;
-        }
 
         const destination = {
           contextId: dropContextId,
@@ -415,12 +409,16 @@ const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionR
             }}
           >
             <Collapse.Panel
-              className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""}`}
+              className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""} ${
+                selectedRecords.has(record.id) && showSelection ? "selected" : ""
+              }`}
               key={record.id}
               header={
                 <div
                   ref={drag}
-                  className="collection-name-container"
+                  className={`collection-name-container ${
+                    selectedRecords.has(record.id) && showSelection ? "selected" : ""
+                  }`}
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={(e) => {
@@ -593,5 +591,3 @@ const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionR
     </>
   );
 };
-
-
