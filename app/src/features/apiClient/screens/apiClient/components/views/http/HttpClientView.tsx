@@ -210,7 +210,8 @@ const HttpClientView: React.FC<Props> = ({
       };
 
       if (!supportsRequestBody(method)) {
-        newEntry.request.body = null;
+        //FIXME: Please revisit this was removed to check impact
+        newEntry.request.bodyContainer = null;
         newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
         newEntry.request.contentType = RequestContentType.RAW;
       }
@@ -225,20 +226,19 @@ const HttpClientView: React.FC<Props> = ({
   const setContentType = useCallback(
     (contentType: RequestContentType) => {
       setEntry((entry) => {
-        let newBody: RQAPI.RequestBody;
+        // let newBody: RQAPI.RequestBody;
 
-        if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
-          newBody =
-            entry.request.bodyContainer?.[contentType === RequestContentType.FORM ? "form" : "multipartForm"] ?? [];
-        } else {
-          newBody = entry.request.bodyContainer?.["text"] ?? "";
-        }
+        // if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
+        //   newBody =
+        //     entry.request.bodyContainer?.[contentType === RequestContentType.FORM ? "form" : "multipartForm"] ?? [];
+        // } else {
+        //   newBody = entry.request.bodyContainer?.["text"] ?? "";
+        // }
 
         const newEntry: RQAPI.HttpApiEntry = {
           ...entry,
           request: {
             ...entry.request,
-            body: newBody,
             contentType,
           },
         };
@@ -347,7 +347,9 @@ const HttpClientView: React.FC<Props> = ({
     setIsRequestCancelled(false);
     setIsLongRequest(false);
 
-    const hasLargeFiles = checkForLargeFiles(entry.request.body);
+    //recheck is this correctly written
+    //large files check was for multipartform specially
+    const hasLargeFiles = checkForLargeFiles(entry.request.bodyContainer.multipartForm);
 
     const longRequestTimer = setTimeout(() => {
       if (hasLargeFiles) {
@@ -379,6 +381,7 @@ const HttpClientView: React.FC<Props> = ({
     });
 
     try {
+      console.log("Sending Request: ", requestToSend);
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         apiEntryDetails?.id,
         sanitizeEntry(requestToSend)
@@ -636,6 +639,7 @@ const HttpClientView: React.FC<Props> = ({
         parentId: apiEntryDetails?.collectionId,
       };
 
+      //FIX: body depedency inside it needs to removed and depend on bodycontainer
       const resolvedAuth = resolveAuth(newAuth, childDetails, getParentChain, getData);
       const { headers, queryParams } = parseAuth(resolvedAuth, resolver);
       const headersContent = Object.fromEntries(headers);

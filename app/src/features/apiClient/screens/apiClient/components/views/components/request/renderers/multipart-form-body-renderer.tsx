@@ -21,7 +21,6 @@ export const MultipartFormBodyRenderer: react.FC<{
           ...prev,
           request: {
             ...prev.request,
-            body: updatedPairs,
             bodyContainer: requestBodyStateManager.serialize(),
           },
         };

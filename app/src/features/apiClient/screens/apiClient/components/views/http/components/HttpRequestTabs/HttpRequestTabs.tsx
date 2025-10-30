@@ -52,7 +52,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
-  
 
   const items = useMemo(() => {
     return [
@@ -89,9 +88,16 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          //TODO: Revisit this check
+          <RequestTabLabel
+            label="Body"
+            count={requestEntry.request.bodyContainer ? 1 : 0}
+            showDot={isRequestBodySupported}
+          />
         ),
+        //TODO: I think this bodyContainer check is not required now
         children: requestEntry.request.bodyContainer ? (
+          //TODO: Remove this check of mode prop
           <RequestBody
             mode="multiple"
             recordId={requestId}
@@ -104,7 +110,7 @@ const HttpRequestTabs: React.FC<Props> = ({
           <RequestBody
             mode="single"
             recordId={requestId}
-            body={requestEntry.request.body}
+            bodyContainer={requestEntry.request.bodyContainer}
             contentType={requestEntry.request.contentType}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
@@ -168,7 +174,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     isRequestBodySupported,
     queryParams.length,
     requestEntry.auth,
-    requestEntry.request.body,
     requestEntry.request.bodyContainer,
     requestEntry.request.contentType,
     requestEntry.request.headers,

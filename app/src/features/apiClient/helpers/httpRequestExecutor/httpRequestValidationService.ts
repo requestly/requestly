@@ -69,7 +69,8 @@ export class HttpRequestValidationService {
     invalidFiles: string[];
   }> {
     if (entryDetails.request.contentType === RequestContentType.MULTIPART_FORM) {
-      const fileBodies = (entryDetails.request.body as RQAPI.MultipartFormBody)?.filter(
+      const fileBodies = (entryDetails.request.bodyContainer?.multipartForm as RQAPI.MultipartFormBody)?.filter(
+        // please revisit this modification is this correctly handled?
         (body) => body.type === FormDropDownOptions.FILE && typeof body.value !== "string"
       );
 

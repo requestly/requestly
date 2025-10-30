@@ -21,7 +21,6 @@ export function FormBody(props: { recordId: string; setRequestEntry: RequestBody
           ...prev,
           request: {
             ...prev.request,
-            body: updatedPairs,
             bodyContainer: requestBodyStateManager.serialize(),
           },
         };
