@@ -122,7 +122,7 @@ class Runner {
     const collectionId = this.runContext.collectionId;
     if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
       throw new RunnerFileMissingError(
-        `Data file "${dataFile.name}" is missing! Please re-add the file to proceed.`
+        `The selected data file was moved, renamed, or deleted. Please re-upload the file to continue.`
       ).addContext({
         collectionId,
         filePath: dataFile.path,
@@ -133,7 +133,9 @@ class Runner {
       const parsedData = await parseCollectionRunnerDataFile(dataFile.path, ITERATIONS_MAX_LIMIT);
       return parsedData.data;
     } catch (e) {
-      throw new DataFileParseError("Failed to read or parse data file!").addContext({
+      throw new DataFileParseError(
+        `The data file used for this collection appears to be damaged or unreadable. Please re-upload a valid file to continue.`
+      ).addContext({
         collectionId,
         error: e,
         filePath: dataFile.path,
