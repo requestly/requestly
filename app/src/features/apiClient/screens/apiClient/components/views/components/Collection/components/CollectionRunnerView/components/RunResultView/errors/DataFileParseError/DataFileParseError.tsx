@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import { RenderableError } from "errors/RenderableError";
-import LINKS from "config/constants/sub/links";
 import { MdOutlineOpenInNew } from "@react-icons/all-files/md/MdOutlineOpenInNew";
 import "../collectionRunnerErrors.scss";
 import { RQButton } from "lib/design-system-v2/components";
@@ -11,6 +10,7 @@ import {
   DataFileModalViewMode,
   useDataFileModalContext,
 } from "../../../RunConfigView/ParseFileModal/Modals/DataFileModalContext";
+import { API_CLIENT_DOCS } from "features/apiClient/constants";
 
 export class DataFileParseError extends RenderableError {
   render() {
@@ -66,7 +66,7 @@ const DataFileParseErrorComponent: React.FC<{ error: DataFileParseError }> = ({ 
 
         <a
           className="documentation-link"
-          href={LINKS.REQUESTLY_API_CLIENT_DOCS}
+          href={API_CLIENT_DOCS.COLLECTION_RUNNER_DATA_FILE}
           target="_blank"
           rel="noopener noreferrer"
         >
