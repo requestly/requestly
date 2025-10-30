@@ -212,14 +212,14 @@ export function Try<R = any, E extends Error = Error>(fn: (...args: any[]) => R)
       }).catch(e => {
           const err = e instanceof Error ? e : new Error(typeof e === 'string' ? e : 'Could not execute given function');
           return new Err(err);
-        }) as TryReturn<R>;
+        }) as TryReturn<R, E>;
     }
 
-    return new Ok(possibleResultPromise) as TryReturn<R>;
+    return new Ok(possibleResultPromise) as TryReturn<R, E>;
 
   }
   catch (e) {
     const err = e instanceof Error ? e : new Error(typeof e === 'string' ? e : 'Could not execute given function');
-    return new Err(err) as TryReturn<R>;
+    return new Err(err) as TryReturn<R, E>;
   }
 }
