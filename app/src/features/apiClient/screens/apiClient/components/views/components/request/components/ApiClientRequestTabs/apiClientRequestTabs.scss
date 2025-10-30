@@ -39,11 +39,18 @@
     align-items: center;
     gap: 4px;
 
-    .request-tab-dot {
+    .request-tab-dot-success {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: var(--requestly-color-success);
+    }
+
+    .request-tab-dot-error {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--requestly-color-error);
     }
   }
 
