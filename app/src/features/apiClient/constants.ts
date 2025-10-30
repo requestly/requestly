@@ -82,7 +82,7 @@ export enum Headers {
   CONTENT_TYPE = "Content-Type",
 }
 
-export const LARGE_FILE_SIZE = 104857600;
+export const LARGE_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 export const API_CLIENT_DOCS = {
   COLLECTION_RUNNER: "https://docs.requestly.com/general/api-client/collection-runner",

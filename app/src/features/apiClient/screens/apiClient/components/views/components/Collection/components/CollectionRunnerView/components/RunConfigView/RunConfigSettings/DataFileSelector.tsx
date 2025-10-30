@@ -15,6 +15,7 @@ import {
   trackCollectionRunnerFileCleared,
   trackCollectionRunnerSelectFileClicked,
 } from "modules/analytics/events/features/apiClient";
+import { LARGE_FILE_SIZE } from "features/apiClient/constants";
 
 export const DataFileSelector: React.FC = () => {
   const {
@@ -60,7 +61,7 @@ export const DataFileSelector: React.FC = () => {
       };
       setDataFileMetadata(metadata);
 
-      if (file.size > 100 * 1024 * 1024) {
+      if (file.size > LARGE_FILE_SIZE) {
         setViewMode(DataFileModalViewMode.LARGE_FILE);
         setShowModal(true);
         return;

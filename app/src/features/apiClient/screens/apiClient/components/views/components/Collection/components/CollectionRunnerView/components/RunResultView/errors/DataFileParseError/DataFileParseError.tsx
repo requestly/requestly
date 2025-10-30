@@ -10,7 +10,7 @@ import {
   DataFileModalViewMode,
   useDataFileModalContext,
 } from "../../../RunConfigView/ParseFileModal/Modals/DataFileModalContext";
-import { API_CLIENT_DOCS } from "features/apiClient/constants";
+import { API_CLIENT_DOCS, LARGE_FILE_SIZE } from "features/apiClient/constants";
 
 export class DataFileParseError extends RenderableError {
   render() {
@@ -37,7 +37,7 @@ const DataFileParseErrorComponent: React.FC<{ error: DataFileParseError }> = ({ 
       };
       setDataFileMetadata(metadata);
 
-      if (file.size > 100 * 1024 * 1024) {
+      if (file.size > LARGE_FILE_SIZE) {
         setViewMode(DataFileModalViewMode.LARGE_FILE);
         setShowModal(true);
         return;
