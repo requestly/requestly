@@ -26,6 +26,7 @@ export enum RequestTab {
 }
 
 interface Props {
+  error: RQAPI.ExecutionError;
   requestEntry: RQAPI.HttpApiEntry;
   requestId: RQAPI.ApiRecord["id"];
   collectionId: string;
@@ -35,6 +36,7 @@ interface Props {
 }
 
 const HttpRequestTabs: React.FC<Props> = ({
+  error,
   requestEntry,
   requestId,
   collectionId,
@@ -51,6 +53,8 @@ const HttpRequestTabs: React.FC<Props> = ({
   const hasEnabledQueryParams = useQueryParamStore((state) => {
     return state.queryParams.some((qp) => qp.isEnabled === true);
   });
+  const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
+  
 
   const items = useMemo(() => {
     return [
@@ -153,6 +157,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: (
           <RequestTabLabel
             label="Scripts"
+            dotIndicator={hasScriptError ? "error" : "success"}
             showDot={true}
             count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
           />
@@ -168,6 +173,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
     ];
   }, [
+    hasScriptError,
     requestId,
     collectionId,
     handleAuthChange,
