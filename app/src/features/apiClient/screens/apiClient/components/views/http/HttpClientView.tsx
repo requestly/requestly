@@ -884,6 +884,7 @@ const HttpClientView: React.FC<Props> = ({
       >
         <div className="api-client-body">
           <HttpRequestTabs
+            error={error}
             requestEntry={entry}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
