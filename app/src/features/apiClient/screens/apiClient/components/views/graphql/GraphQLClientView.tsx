@@ -206,7 +206,7 @@ const GraphQLClientView: React.FC<Props> = ({
     } finally {
       setIsGeneratingTests(false);
     }
-  }, [getEntry, isGeneratingTests, updateEntryScripts]);
+  }, [getEntry, isGeneratingTests, updateEntryScripts, setDeepLinkState]);
 
   const canGenerateTests = useMemo(() => {
     const responseExists = Boolean(response);
