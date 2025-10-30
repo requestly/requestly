@@ -821,6 +821,7 @@ const HttpClientView: React.FC<Props> = ({
       >
         <div className="api-client-body">
           <HttpRequestTabs
+            error={error}
             requestEntry={entry}
             requestId={apiEntryDetails?.id}
             collectionId={apiEntryDetails?.collectionId}
@@ -844,7 +845,7 @@ const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC 
     const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
 
     return (
-      <ErrorBoundary>
+      <ErrorBoundary boundaryId="http-client-view-error-boundary">
         <PathVariablesProvider pathVariables={entry.request?.pathVariables}>
           <QueryParamsProvider entry={entry}>
             <Component {...props} />

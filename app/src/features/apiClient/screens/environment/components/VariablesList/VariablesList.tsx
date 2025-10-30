@@ -9,6 +9,7 @@ import { EnvironmentAnalyticsContext, EnvironmentAnalyticsSource } from "../../t
 import { trackAddVariableClicked } from "../../analytics";
 import "./variablesList.scss";
 import { VariableData } from "features/apiClient/store/variables/types";
+import EmptySearchResultsView from "./components/emptySearchResultsView/EmptySearchResultsView";
 
 interface VariablesListProps {
   variables: VariableRow[];
@@ -16,6 +17,7 @@ interface VariablesListProps {
   onVariablesChange: (variables: VariableRow[]) => void;
   isReadOnly?: boolean;
   container: "environments" | "runtime";
+  onSearchValueChange?: (value: string) => void;
 }
 
 export type VariableRow = VariableData & { key: string };
@@ -35,13 +37,17 @@ export const VariablesList: React.FC<VariablesListProps> = ({
   onVariablesChange,
   isReadOnly = false,
   container = "environments",
+  onSearchValueChange = () => {},
 }) => {
-  const [dataSource, setDataSource] = useState([]);
-  const [visibleSecretsRowIds, setVisibleSecrets] = useState([]);
+  const [dataSource, setDataSource] = useState<VariableRow[]>([]);
+  const [visibleSecretsRowIds, setVisibleSecrets] = useState<number[]>([]);
+
   const filteredDataSource = useMemo(
     () => dataSource.filter((item) => item.key.toLowerCase().includes(searchValue.toLowerCase())),
     [dataSource, searchValue]
   );
+
+  const hideFooter = isReadOnly || searchValue !== "";
 
   const duplicateKeyIndices = useMemo(() => {
     const keyIndices = new Map<string, number[]>();
@@ -184,7 +190,9 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       rowKey="id"
       columns={columns}
       data={filteredDataSource}
-      locale={{ emptyText: "No variables found" }}
+      locale={{
+        emptyText: <EmptySearchResultsView searchValue={searchValue} onSearchValueChange={onSearchValueChange} />,
+      }}
       components={{
         body: {
           row: EditableRow,
@@ -193,8 +201,8 @@ export const VariablesList: React.FC<VariablesListProps> = ({
       }}
       scroll={{ y: "calc(100vh - 280px)" }}
       footer={
-        isReadOnly
-          ? null
+        hideFooter
+          ? undefined
           : () => (
               <div className="variables-list-footer">
                 <RQButton icon={<MdAdd />} size="small" onClick={handleAddVariable}>
