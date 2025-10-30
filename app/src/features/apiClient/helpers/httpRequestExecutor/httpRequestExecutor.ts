@@ -220,7 +220,7 @@ export class HttpRequestExecutor {
       }
 
       // Re-prepare the request as pre-request script might have modified it.
-      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry)).mapError(
+      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
         (error) => new ExecutionError(entry, error)
       );
 
