@@ -8,14 +8,13 @@ import { RxCross2 } from "@react-icons/all-files/rx/RxCross2";
 import { useRunConfigStore } from "../../../run.context";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { useFileSelection } from "../hooks/useFileSelection.hook";
+import { useCollectionRunnerFileSelection } from "../hooks/useCollectionRunnerFileSelection.hook";
 import { DataFileModalWrapper } from "../ParseFileModal/Modals/DataFileModalWrapper";
 import { DataFileModalViewMode, useDataFileModalContext } from "../ParseFileModal/Modals/DataFileModalContext";
 import {
   trackCollectionRunnerFileCleared,
   trackCollectionRunnerSelectFileClicked,
 } from "modules/analytics/events/features/apiClient";
-import { LARGE_FILE_SIZE } from "features/apiClient/constants";
 
 export const DataFileSelector: React.FC = () => {
   const {
@@ -49,27 +48,12 @@ export const DataFileSelector: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dataFile?.id, getFilesByIds, storeFiles]
   );
-  const { openFileSelector } = useFileSelection();
+  const { openFileSelector } = useCollectionRunnerFileSelection();
 
   const handleFileSelection = useCallback(() => {
     trackCollectionRunnerSelectFileClicked();
-    openFileSelector((file) => {
-      const metadata = {
-        name: file.name,
-        path: file.path,
-        size: file.size,
-      };
-      setDataFileMetadata(metadata);
-
-      if (file.size > LARGE_FILE_SIZE) {
-        setViewMode(DataFileModalViewMode.LARGE_FILE);
-        setShowModal(true);
-        return;
-      }
-      setShowModal(true);
-      parseFile(file.path, true);
-    });
-  }, [openFileSelector, setDataFileMetadata, setShowModal, parseFile, setViewMode]);
+    openFileSelector();
+  }, [openFileSelector]);
 
   const handleModalClose = useCallback(() => {
     // Clear metadata when modal closes
