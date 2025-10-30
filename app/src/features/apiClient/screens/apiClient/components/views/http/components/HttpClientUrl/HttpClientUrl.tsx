@@ -75,11 +75,6 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
   const handleUrlChange = useCallback(
     (value: string) => {
 
-      if (value.trim().toLowerCase().startsWith("curl ")) {
-        parseAndHandleCurl(value);
-        return;
-      }
-
       const pathVariables = extractPathVariablesFromUrl(value);
       updatePathVariableKeys(pathVariables);
 
