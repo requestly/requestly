@@ -366,7 +366,6 @@ class Runner {
           this.runContext.runResultStore.getState().abortController,
           scopes
         );
-        console.log("!!!debug", `[runCollection] iteration:${iteration}`, result.executedEntry);
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
       }

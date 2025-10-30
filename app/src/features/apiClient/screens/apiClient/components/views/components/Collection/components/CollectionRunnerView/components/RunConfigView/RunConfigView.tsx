@@ -63,7 +63,6 @@ const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const handleSaveClick = useCallback(async () => {
     setIsSaving(true);
     const configToSave = getConfigToSave();
-    console.log("!!!debug", "configToSave", configToSave);
 
     try {
       await saveRunConfig({ collectionId, configToSave });
