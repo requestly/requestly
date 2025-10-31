@@ -30,7 +30,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       throw new ScriptExecutionError(error);
     }
     try {
-      await this.syncLocalDump(callback);
+      this.syncLocalDump(callback);
       return {
         testResults: this.testResults,
       };
@@ -39,12 +39,12 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     }
   }
 
-  private async syncLocalDump(callback: ScriptWorkloadCallback) {
+  private syncLocalDump(callback: ScriptWorkloadCallback) {
     if (!this.localScope.getIsStateMutated()) {
       return;
     }
     const dump = this.localScope.getAll();
-    await callback(dump);
+    callback(dump);
   }
 }
 
