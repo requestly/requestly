@@ -359,19 +359,22 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
   );
 
   // Shared drop configuration for all drop zones
-  const dropConfig = {
-    accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
-    drop: (item: DraggableApiRecord, monitor: any) => {
-      if (!monitor.isOver({ shallow: true })) return;
-      handleDropToRoot(item);
-    },
-    canDrop: (item: DraggableApiRecord) => {
-      return Boolean(item.record.collectionId);
-    },
-  };
+  const dropConfig = useMemo(
+    () => ({
+      accept: [RQAPI.RecordType.API, RQAPI.RecordType.COLLECTION],
+      drop: (item: DraggableApiRecord, monitor: any) => {
+        if (!monitor.isOver({ shallow: true })) return;
+        handleDropToRoot(item);
+      },
+      canDrop: (item: DraggableApiRecord) => {
+        return Boolean(item.record.collectionId);
+      },
+    }),
+    [handleDropToRoot]
+  );
 
   // Background drop zone (entire content area)
-  const [, dropBackground] = useDrop(() => dropConfig, [handleDropToRoot]);
+  const [, dropBackground] = useDrop(() => dropConfig, [dropConfig]);
 
   // Top drop zone with hover indicator
   const [{ isOverTopLevel }, dropTopLevel] = useDrop(
@@ -381,7 +384,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         isOverTopLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
       }),
     }),
-    [handleDropToRoot]
+    [dropConfig]
   );
 
   // Bottom drop zone with hover indicator
@@ -392,7 +395,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
         isOverBottomLevel: monitor.isOver({ shallow: true }) && monitor.canDrop(),
       }),
     }),
-    [handleDropToRoot]
+    [dropConfig]
   );
 
   return (
