@@ -86,17 +86,14 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           }}
         />
       </Tooltip>
-      {items?.map((item: any) => (
-        <Tooltip key={item.key} title={item.label?.props?.children?.[1] || item.key} placement="left">
+      {items?.map((item: any, index: number) => (
+        <Tooltip key={index} title={item.key} placement="left">
           <RQButton
             size="default"
             type="transparent"
             title={item.key}
             icon={item.icon ? <item.icon /> : null}
-            onClick={() => {
-              setIsCollapsed(false);
-              toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" });
-            }}
+            onClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
           />
         </Tooltip>
       ))}

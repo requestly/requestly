@@ -26,6 +26,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       const sheetSize = savedSizes ? JSON.parse(savedSizes) : isSheetPlacedAtBottom ? initialSizes : [55, 45];
       splitPane.current.split.setSizes(sheetSize);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -60,7 +61,9 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       sizes={isSheetPlacedAtBottom ? initialSizes : [55, 45]}
       onDrag={handleDrag}
       onDragEnd={(sizes: number[]) => {
-        localStorage.setItem("bottom_sheet_size", JSON.stringify(sizes));
+        if (sizes[1] > 16) {
+          localStorage.setItem("bottom_sheet_size", JSON.stringify(sizes));
+        }
       }}
       minSize={minSize || 25}
       className={`bottomsheet-layout-container ${

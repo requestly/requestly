@@ -793,7 +793,7 @@ const HttpClientView: React.FC<Props> = ({
             executeRequest={onSendButtonClick}
           />
         }
-        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 25}
+        minSize={25}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">
