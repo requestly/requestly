@@ -44,7 +44,7 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
   const {
     env: { renameEnvironment },
   } = useCommand();
-  const { setTitle, getIsActive, getIsNew } = useGenericState();
+  const { setTitle, getIsActive, getIsNew, setIsNew } = useGenericState();
   const enableHotKey = getIsActive();
   const isNewEnvironment = getIsNew();
 
@@ -67,7 +67,10 @@ export const VariablesListHeader: React.FC<VariablesListHeaderProps> = ({
             autoFocus={isNewEnvironment}
             placeholder="New Environment"
             recordName={currentEnvironmentName}
-            onBlur={handleNewEnvironmentNameChange}
+            onBlur={(newName) => {
+              handleNewEnvironmentNameChange(newName);
+              setIsNew(false);
+            }}
             disabled={isGlobalEnvironment(environmentId)}
             defaultBreadcrumbs={[
               { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
