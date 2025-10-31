@@ -7,6 +7,7 @@ import { parse } from 'csv-parse/sync';
 import * as cheerio from 'cheerio';
 import * as chai from 'chai';
 import ajv from 'ajv';
+import * as lodash from 'lodash';
 
 
 export class PackageNotFound extends NativeError {
@@ -29,6 +30,8 @@ const packageMap: {[key: string]: Object | undefined} = {
   //@ts-ignore
   chai,
   ajv,
+  //@ts-ignore
+  lodash,
 }
 
 export function require(id: string) {
