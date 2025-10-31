@@ -23,12 +23,12 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.2",
+    "@rollup/plugin-typescript": "^12.3.0",
     "concurrently": "^9.1.2",
     "glob": "^11.0.1",
-    "rollup": "^4.29.1",
+    "rollup": "^4.52.5",
     "tsc-alias": "^1.8.10",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   },
   "files": [
     "dist"

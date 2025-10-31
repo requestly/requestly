@@ -1,0 +1,191 @@
+
+.api-history-list-container {
+  .api-history-date-group {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .api-history-date-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      border-left: 3px solid #1890ff;
+      cursor: default;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .api-history-date-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .delete-date-icon {
+        color: #ff4d4f;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        opacity: 0.8;
+
+        &:hover {
+          color: #ff7875;
+          transform: scale(1.15);
+          opacity: 1;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+
+    // Timeline entries
+    .api-history-group-timeline {
+      margin-left: 8px;
+
+      .ant-timeline-item {
+        padding-bottom: 12px;
+
+        .api-history-row {
+          padding: 8px 12px;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+
+          &.clickable:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(2px);
+          }
+
+          &.active {
+            background: rgba(24, 144, 255, 0.1);
+            border: 1px solid rgba(24, 144, 255, 0.3);
+          }
+
+          .api-history-row-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+
+            .api-method {
+              margin-right: 8px;
+              font-size: 11px;
+              min-width: 40px;
+              text-align: center;
+              flex-shrink: 0;
+            }
+
+            .api-history-url {
+              flex: 1;
+              cursor: pointer;
+              min-width: 0;
+              transition: color 0.2s ease;
+
+              &:hover {
+                color: #1890ff;
+              }
+            }
+
+            .delete-item-icon {
+              color: #ff4d4f;
+              font-size: 14px;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              margin-left: auto;
+              flex-shrink: 0;
+              opacity: 0.8;
+
+              &:hover {
+                color: #ff7875;
+                transform: scale(1.15);
+                opacity: 1;
+              }
+
+              &:active {
+                transform: scale(0.95);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // End timeline marker
+  .api-history-end-timeline {
+    margin-top: 16px;
+    opacity: 0.6;
+
+    .api-history-start-marker {
+      font-size: 12px;
+    }
+  }
+}
+
+.storage-communication-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: rgba(24, 144, 255, 0.1);
+  border: 1px solid rgba(24, 144, 255, 0.2);
+  border-radius: 6px;
+  position: relative;
+
+  img {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  p {
+    flex: 1;
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  svg {
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.5);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+
+
+.api-client-sidebar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+
+  img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  .ant-typography {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+  }
+}
