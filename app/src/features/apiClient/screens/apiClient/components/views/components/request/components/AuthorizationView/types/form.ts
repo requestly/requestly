@@ -9,7 +9,7 @@ export interface BEARER_TOKEN_FORM_VALUES {
 }
 
 export interface BASIC_AUTH_FORM_VALUES {
-  username: string;
+  username?: string;
   password: string;
 }
 

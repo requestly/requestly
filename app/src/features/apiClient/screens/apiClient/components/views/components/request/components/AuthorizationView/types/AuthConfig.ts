@@ -19,7 +19,7 @@ export namespace Authorization {
   };
 
   export type BASIC_AUTH_CONFIG = {
-    username: string;
+    username?: string;
     password: string;
   };
 
@@ -113,18 +113,18 @@ export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.
 }
 
 export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Type.BASIC_AUTH> {
-  username: string;
+  username?: string;
   password: string;
 
   type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
 
   constructor(username: string, password: string) {
-    this.username = username;
+    this.username = username ?? "";
     this.password = password;
   }
 
   validate(): boolean {
-    return !!(this.username && this.password);
+    return Boolean(this.password);
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {

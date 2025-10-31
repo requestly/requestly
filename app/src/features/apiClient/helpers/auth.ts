@@ -143,7 +143,6 @@ function pruneConfig(auth?: RQAPI.Auth): RQAPI.Auth | null {
     case Authorization.Type.BASIC_AUTH:
       if (
         isEmpty(authConfigStore[Authorization.Type.BASIC_AUTH]) ||
-        !authConfigStore[Authorization.Type.BASIC_AUTH].username ||
         !authConfigStore[Authorization.Type.BASIC_AUTH].password
       ) {
         return null;
