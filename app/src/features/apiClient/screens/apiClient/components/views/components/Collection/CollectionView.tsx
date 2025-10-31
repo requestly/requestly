@@ -142,7 +142,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
         }
 
         onSaveRecord(result.data);
-        setIsNew(false);
         const wasForceRefreshed = await forceRefreshApiClientRecords();
         if (wasForceRefreshed) {
           closeTab(
@@ -178,7 +177,10 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
               id={collection.id}
               placeholder="New Collection"
               name={collectionName}
-              onBlur={(newName) => handleCollectionNameChange(newName)}
+              onBlur={(newName) => {
+                handleCollectionNameChange(newName);
+                setIsNew(false);
+              }}
               autoFocus={getIsNew()}
               breadCrumbType={BreadcrumbType.COLLECTION}
             />
