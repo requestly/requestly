@@ -18,6 +18,9 @@ import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
 
 interface Props {
+  onGenerateTests?: () => void;
+  isGeneratingTests?: boolean;
+  canGenerateTests?: boolean;
   response: RQAPI.Response;
   testResults: TestResult[];
   isLoading: boolean;
@@ -39,6 +42,9 @@ const BOTTOM_SHEET_TAB_KEYS = {
 };
 
 export const ApiClientBottomSheet: React.FC<Props> = ({
+  onGenerateTests,
+  isGeneratingTests = false,
+  canGenerateTests = false,
   response,
   testResults,
   isLoading,
@@ -87,7 +93,15 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
         label: <>Test results {testResultsStats}</>,
-        children: <TestsView testResults={testResults} handleTestResultRefresh={handleTestResultRefresh} />,
+        children: (
+          <TestsView
+            testResults={testResults}
+            handleTestResultRefresh={handleTestResultRefresh}
+            onGenerateTests={onGenerateTests}
+            isGeneratingTests={isGeneratingTests}
+            canGenerateTests={canGenerateTests}
+          />
+        ),
       },
     ];
 
@@ -157,6 +171,9 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     executeRequest,
     onDismissError,
     isFailed,
+    canGenerateTests,
+    isGeneratingTests,
+    onGenerateTests,
   ]);
 
   return (
