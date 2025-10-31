@@ -19,7 +19,7 @@ export namespace Authorization {
   };
 
   export type BASIC_AUTH_CONFIG = {
-    username: string;
+    username?: string;
     password: string;
   };
 
@@ -113,7 +113,7 @@ export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.
 }
 
 export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Type.BASIC_AUTH> {
-  username: string;
+  username?: string;
   password: string;
 
   type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
