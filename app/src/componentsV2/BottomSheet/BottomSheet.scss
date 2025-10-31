@@ -89,3 +89,14 @@
     color: var(--requestly-color-text-subtle);
   }
 }
+
+.bottom-sheet-collapsed-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+
+  .bottom-sheet-toggle-btn-collapsed.ant-btn {
+  }
+}
