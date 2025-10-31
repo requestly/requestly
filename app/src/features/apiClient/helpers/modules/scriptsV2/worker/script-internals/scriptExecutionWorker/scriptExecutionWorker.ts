@@ -30,7 +30,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       throw new ScriptExecutionError(error);
     }
     try {
-      await this.syncLocalDump(callback);
+      this.syncLocalDump(callback);
       return {
         testResults: this.testResults,
       };
