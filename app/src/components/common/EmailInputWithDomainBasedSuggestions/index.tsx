@@ -7,6 +7,7 @@ import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
 import { isCompanyEmail } from "utils/mailCheckerUtils";
+import { toast } from "utils/Toast.js";
 import Logger from "lib/logger";
 
 interface Props {
@@ -24,6 +25,9 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;
+
+  const [selectedEmails, setSelectedEmails] = useState<{ label: string; value: string }[]>([]);
+  const [inputValue, setInputValue] = useState("");
 
   const [suggestionOptions, setSuggestionOptions] = useState<
     MultiValue<{
@@ -55,40 +59,62 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
       });
   }, [getOrganizationUsers, user.details?.emailType, userEmail]);
 
-  useEffect(() => {
-    // Set default value if it is a valid email
-    if (isEmailValid(defaultValue)) {
-      onChange([defaultValue]);
-    }
-  }, [defaultValue, onChange]);
+  const commitEmail = useCallback(
+    (raw: string) => {
+      const trimmed = raw.trim().replace(/,$/, "");
+      if (!trimmed) return;
 
-  const handleEmailChange = useCallback(
-    (
-      emails: MultiValue<{
-        label: string;
-        value: string;
-      }>
-    ) => {
-      const newEmails = emails.map((email) => email.value);
-      onChange(newEmails);
+      if (isEmailValid(trimmed)) {
+        if (selectedEmails.some((e) => e.value === trimmed)) {
+          toast.error(`Email already added: ${trimmed}`);
+          return;
+        }
+        const newEntry = { label: trimmed, value: trimmed };
+        const updated = [...selectedEmails, newEntry];
+        setSelectedEmails(updated);
+        onChange(updated.map((e) => e.value));
+        setInputValue("");
+      } else {
+        toast.error(`Invalid email: ${trimmed}`);
+      }
     },
-    [onChange]
+    [selectedEmails, onChange]
   );
+
+  useEffect(() => {
+    if (defaultValue) {
+      commitEmail(defaultValue);
+    }
+  }, [defaultValue, commitEmail]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (["Enter", " ", ","].includes(e.key)) {
+      e.preventDefault();
+      commitEmail(inputValue);
+    }
+  };
+
+  const handleBlur = () => {
+    // when user clicks outside
+    if (inputValue) {
+      commitEmail(inputValue);
+    }
+  };
+
+  const handleChange = (value: MultiValue<{ label: string; value: string }>) => {
+    setSelectedEmails(value as { label: string; value: string }[]);
+    onChange(value.map((v) => v.value));
+  };
 
   const emailInputRef = useRef(null);
 
   return (
     <CreatableSelect
-      defaultValue={
-        isEmailValid(defaultValue)
-          ? [
-              {
-                label: defaultValue,
-                value: defaultValue,
-              },
-            ]
-          : []
-      }
+      inputValue={inputValue}
+      onInputChange={(val) => setInputValue(val)}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+      value={selectedEmails}
       autoFocus={autoFocus}
       isMulti={true}
       isClearable={false}
@@ -111,9 +137,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
       isValidNewOption={(email) => isEmailValid(email)}
       noOptionsMessage={() => null}
       placeholder={"Enter emails"}
-      onChange={(value) => {
-        handleEmailChange(value);
-      }}
+      onChange={handleChange}
       menuPlacement="top"
       formatCreateLabel={(email) => email}
       ref={emailInputRef}
