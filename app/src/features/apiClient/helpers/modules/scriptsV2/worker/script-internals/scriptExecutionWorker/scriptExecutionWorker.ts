@@ -39,12 +39,12 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     }
   }
 
-  private syncLocalDump(callback: ScriptWorkloadCallback) {
+  private async syncLocalDump(callback: ScriptWorkloadCallback) {
     if (!this.localScope.getIsStateMutated()) {
       return;
     }
     const dump = this.localScope.getAll();
-    callback(dump);
+    await callback(dump);
   }
 }
 
