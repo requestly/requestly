@@ -39,9 +39,10 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
 
         setIsNew: useCallback(
           (isNewTab: boolean) => {
-            return props.store.getState().setIsNewTab(isNewTab);
+            props.store.getState().setIsNewTab(isNewTab);
+            incrementVersion();
           },
-          [props.store]
+          [incrementVersion, props.store]
         ),
 
         getIsActive: useCallback(() => {
