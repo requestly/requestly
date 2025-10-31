@@ -10,7 +10,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import FileDropdown from "./FileDropdown";
 import * as Sentry from "@sentry/react";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { FileFeature, useApiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -73,7 +73,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
         path,
         size,
         source: "desktop",
-        isFileValid: true,
+        fileFeature: FileFeature.FILE_BODY,
       });
 
       return {

@@ -15,7 +15,9 @@ function getDefaultRunOrderByCollectionId(
 }
 
 function getConfigFromSavedData(config: SavedRunConfig): SavedRunConfig {
-  return { id: config.id, runOrder: config.runOrder };
+  return {
+    ...config,
+  };
 }
 
 export async function getDefaultRunConfig(
@@ -40,6 +42,9 @@ export async function getDefaultRunConfig(
   const defaultConfig: SavedRunConfig = {
     id: DEFAULT_RUN_CONFIG_ID,
     runOrder: getDefaultRunOrderByCollectionId(ctx, collectionId),
+    delay: 0,
+    iterations: 1,
+    dataFile: null,
   };
 
   return defaultConfig;

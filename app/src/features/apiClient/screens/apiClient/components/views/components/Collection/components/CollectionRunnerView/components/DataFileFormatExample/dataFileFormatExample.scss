@@ -1,0 +1,53 @@
+.data-file-format-example {
+  display: flex;
+  padding: 12px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
+  border-radius: 8px;
+  background: var(--requestly-color-neutral-1100);
+
+  .example-label {
+    color: var(--requestly-color-text-placeholder);
+    text-align: center;
+
+    /* overline/medium */
+    font-family: var(--requestly-font-family-default);
+    font-size: var(--requestly-font-size-2xs);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .code-example {
+    margin: 8px 0;
+    border-radius: 4px;
+    background-color: var(--requestly-color-background-dark);
+    overflow-x: auto;
+    align-self: stretch;
+
+    code {
+      font-family: "Consolas", "Monaco", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--requestly-color-text-placeholder);
+      white-space: pre;
+      display: block;
+
+      .key {
+        color: var(--requestly-color-error-text);
+      }
+
+      .value {
+        color: var(--requestly-color-success-text);
+      }
+
+      .punctuation {
+        color: var(--requestly-color-text-placeholder);
+      }
+    }
+  }
+}
