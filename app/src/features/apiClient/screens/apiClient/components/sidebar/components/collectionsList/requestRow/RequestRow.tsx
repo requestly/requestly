@@ -40,6 +40,7 @@ interface Props {
     setShowSelection: (arg: boolean) => void;
   };
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
+  onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
 }
 
 export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
@@ -69,7 +70,13 @@ export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
   }
 };
 
-export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions, handleRecordsToBeDeleted }) => {
+export const RequestRow: React.FC<Props> = ({
+  record,
+  isReadOnly,
+  bulkActionOptions,
+  handleRecordsToBeDeleted,
+  onItemClick,
+}) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
   const [recordToMove, setRecordToMove] = useState(null);
@@ -227,7 +234,12 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
         <div className={`request-row`} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
           <div
             className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
-            onClick={() => {
+            onClick={(e) => {
+              if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                onItemClick(record, e);
+                return;
+              }
+
               openTab(
                 new RequestViewTabSource({
                   id: record.id,
