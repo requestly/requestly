@@ -280,6 +280,11 @@ export const API_CLIENT = {
   COLLECTION_RUNNER_CONFIG_SAVED: "api_client_collection_runner_config_saved",
   COLLECTION_RUNNER_CONFIG_SAVE_FAILED: "api_client_collection_runner_config_save_failed",
 
+  // Tests Autogeneration
+  TEST_GENERATION_STARTED: "api_client_test_generation_started",
+  TEST_GENERATION_COMPLETED: "api_client_test_generation_completed",
+  TEST_GENERATION_FAILED: "api_client_test_generation_failed",
+
   //Data-File Support for Collection Runner
   COLLECTION_RUNNER_SELECT_FILE_CLICKED: "api_client_collection_runner_select_file_clicked",
   COLLECTION_RUNNER_FILE_PARSED: "api_client_collection_runner_file_parsed",
