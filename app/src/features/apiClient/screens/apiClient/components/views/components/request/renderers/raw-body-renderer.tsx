@@ -23,10 +23,12 @@ export function RawBody(props: {
   const handleTextChange = useDebounce(
     useCallback(
       (value: string) => {
+        //this will set value in class
         setText(value);
+        //removing body field from the entry
         setRequestEntry((prev) => ({
           ...prev,
-          request: { ...prev.request, body: value, bodyContainer: requestBodyStateManager.serialize() },
+          request: { ...prev.request, bodyContainer: requestBodyStateManager.serialize() },
         }));
       },
       [setRequestEntry, setText, requestBodyStateManager]

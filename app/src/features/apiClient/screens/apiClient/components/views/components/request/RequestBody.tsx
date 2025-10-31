@@ -14,6 +14,7 @@ import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import MultipartFormRedirectScreen from "../../../clientView/components/MultipartFormRedirectScreen";
 
+//Might needs this for backward compatibility
 function parseSingleModeBody(params: {
   contentType: RequestContentType;
   body: RQAPI.RequestBody;
@@ -60,18 +61,23 @@ const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const appMode = useSelector(getAppMode);
   const isFileBodyEnabled = useFeatureIsOn("api_client_file_body_support");
 
-  const requestBodyStateManager = useMemo(
-    () =>
-      new RequestBodyStateManager(
-        props.mode === "multiple"
-          ? props.bodyContainer
-          : parseSingleModeBody({
-              contentType,
-              body: props.body,
-            })
-      ),
-    [contentType, props]
-  );
+  // const requestBodyStateManager = useMemo(
+  //   () =>
+  //     new RequestBodyStateManager(
+  //       props.mode === "multiple"
+  //         ? props.bodyContainer
+  //         : parseSingleModeBody({
+  //             contentType,
+  //             body: props.body,
+  //           })
+  //     ),
+  //   [contentType, props]
+  // );
+
+  //Now no mode check should be there, since we rely on bodyContainer only
+  const requestBodyStateManager = useMemo(() => {
+    return new RequestBodyStateManager(props.bodyContainer);
+  }, [props]);
 
   const requestBodyOptions = useMemo(() => {
     return (

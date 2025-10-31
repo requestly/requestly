@@ -69,9 +69,20 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          <RequestTabLabel
+            label="Body"
+            count={
+              requestEntry.request.bodyContainer.form ||
+              requestEntry.request.bodyContainer.text ||
+              requestEntry.request.bodyContainer.multipartForm
+                ? 1
+                : 0
+            }
+            showDot={isRequestBodySupported}
+          />
         ),
-        children: requestEntry.request.bodyContainer ? (
+        children: (
+          //FIX: fix this mode thing here
           <RequestBody
             mode="multiple"
             recordId={requestId}
@@ -80,17 +91,27 @@ const HttpRequestTabs: React.FC<Props> = ({
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
-        ) : (
-          <RequestBody
-            mode="single"
-            recordId={requestId}
-            body={requestEntry.request.body}
-            contentType={requestEntry.request.contentType}
-            setRequestEntry={setRequestEntry}
-            setContentType={setContentType}
-          />
         ),
         disabled: !isRequestBodySupported,
+        // children: requestEntry.request.bodyContainer ? (
+        //   <RequestBody
+        //     mode="multiple"
+        //     recordId={requestId}
+        //     bodyContainer={requestEntry.request.bodyContainer}
+        //     contentType={requestEntry.request.contentType}
+        //     setRequestEntry={setRequestEntry}
+        //     setContentType={setContentType}
+        //   />
+        // ) : (
+        //   <RequestBody
+        //     mode="single"
+        //     recordId={requestId}
+        //     bodyContainer={requestEntry.request.bodyContainer}
+        //     contentType={requestEntry.request.contentType}
+        //     setRequestEntry={setRequestEntry}
+        //     setContentType={setContentType}
+        //   />
+        // ),
       },
       {
         key: RequestTab.HEADERS,
@@ -140,7 +161,6 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
     ];
   }, [
-    requestEntry.request.body,
     requestEntry.request.bodyContainer,
     requestEntry.request.contentType,
     requestEntry.request.headers,
