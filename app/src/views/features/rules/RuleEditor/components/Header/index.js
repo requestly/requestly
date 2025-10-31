@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -32,6 +32,10 @@ import { getEventObject } from "components/common/RuleEditorModal/utils";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
 import { RBACButton, RoleBasedComponent, useRBAC } from "features/rbac";
 import CreateRuleButton from "./ActionButtons/CreateRuleButton";
+import { RULE_DETAILS } from "features/rules/screens/rulesList/components/RulesList/components/RuleSelectionList/constants";
+import clientRuleStorageService from "services/clientStorageService/features/rule";
+import { RecordType } from "@requestly/shared/types/entities/rules";
+import { recordsActions } from "store/features/rules/slice";
 
 const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
@@ -51,6 +55,26 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
     allRecordsMap,
     currentlySelectedRuleData,
   ]);
+
+  // handle the edge case scenario, when user reloads the page
+  // Or lands directly, since the allRecordMap is Empty, so we need get the records
+  // instead of this we can also use the useFetchAndUpdateRules hook
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      if (Object.keys(allRecordsMap).length === 0) {
+        try {
+          const groups = await clientRuleStorageService.getRecordsByObjectType(RecordType.GROUP);
+          if (groups && groups.length > 0) {
+            dispatch(recordsActions.setAllRecords(groups));
+          }
+        } catch (error) {
+          console.error("Error fetching groups:", error);
+        }
+      }
+    };
+
+    fetchGroupData();
+  }, [currentlySelectedRuleData?.groupId, allRecordsMap, dispatch]);
 
   // If user directly lands on rule editor, it ensures that
   // groupwise rules object is created for the current rule shown in the
@@ -76,6 +100,49 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
     [dispatch, currentlySelectedRuleData]
   );
 
+  const breadcrumbItems = useMemo(() => {
+    const items = [
+      {
+        label: "Rules",
+        pathname: PATHS.RULES.MY_RULES.ABSOLUTE,
+        disabled: false,
+      },
+    ];
+
+    // add group in breadcrumb if rule is in the group
+    if (currentlySelectedRuleData?.groupId) {
+      const group = allRecordsMap[currentlySelectedRuleData.groupId];
+      if (group) {
+        items.push({
+          label: group.name,
+          pathname: PATHS.RULES.MY_RULES.ABSOLUTE,
+          disabled: false,
+        });
+      }
+    }
+
+    items.push({
+      label: currentlySelectedRuleData?.name || "Rule",
+      pathname: window.location.pathname,
+      disabled: false,
+      isEditable: true,
+    });
+
+    return items;
+  }, [currentlySelectedRuleData, allRecordsMap]);
+
+  const getRecordIcon = () => {
+    if (!currentlySelectedRuleData?.ruleType) return null;
+
+    for (const category of RULE_DETAILS.categories) {
+      const matchedRule = category.rules.find((rule) => rule.type === currentlySelectedRuleData.ruleType);
+      if (matchedRule) {
+        return matchedRule.icon();
+      }
+    }
+    return null;
+  };
+
   return (
     <Layout.Header className="rule-editor-header" key={currentlySelectedRuleData.id}>
       <div className="rule-editor-row">
@@ -86,7 +153,9 @@ const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleToo
               disabled={isSampleRule || !isValidPermission}
               placeholder="Enter rule name"
               recordName={currentlySelectedRuleData?.name}
+              recordIcon={getRecordIcon()}
               onRecordNameUpdate={handleRuleNameChange}
+              defaultBreadcrumbs={breadcrumbItems}
             />
           </div>
         </div>

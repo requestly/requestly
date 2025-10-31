@@ -6,6 +6,8 @@ ol.rq-breadcrumb {
   padding-left: 0;
   margin: 8px 16px;
   max-height: 24px;
+  width: 100%;
+  overflow: hidden;
 
   .ant-skeleton {
     opacity: 0.6;
@@ -46,26 +48,70 @@ ol.rq-breadcrumb {
 
   input.ant-input.rq-breadcrumb-input {
     min-height: 24px;
-    max-width: 166px;
+    max-width: 160px;
     padding: 2px 4px !important;
     font-size: var(--requestly-font-size-xs, 11px);
     font-weight: var(--requestly-font-weight-medium);
     border-radius: 4px;
+    flex: 1;
   }
 
   .rq-breadcrumb-record-name {
     display: flex;
     align-items: center;
-    max-width: 166px;
+    gap: 4px;
+    max-width: 160px;
     font-size: var(--requestly-font-size-xs, 11px);
     font-weight: var(--requestly-font-weight-medium);
+
+    .record-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--requestly-color-text-subtle);
+    }
+
+    .record-name {
+      cursor: pointer;
+    }
 
     .edit-icon {
       flex-shrink: 0;
       width: 14px;
       height: 14px;
       cursor: pointer;
-      margin-left: 2px;
+      color: var(--requestly-color-text-subtle);
+      transition: color 0.2s;
+
+      &:hover {
+        color: var(--requestly-color-text-default);
+      }
     }
   }
+
+  .rq-breadcrumb-ellipsis {
+    cursor: pointer;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      border-radius: 4px;
+    }
+  }
+}
+
+ol.rq-breadcrumb-measurement {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  visibility: hidden;
+  pointer-events: none;
+  height: 0;
+  overflow: visible;
 }
