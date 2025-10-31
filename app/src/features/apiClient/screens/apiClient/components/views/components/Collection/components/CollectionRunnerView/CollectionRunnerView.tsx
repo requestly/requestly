@@ -13,6 +13,7 @@ import { RunViewContextProvider } from "./run.context";
 import { RunResultView } from "./components/RunResultView/RunResultView";
 import "./collectionRunnerView.scss";
 import { RunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { DataFileModalProvider } from "./components/RunConfigView/ParseFileModal/Modals/DataFileModalContext";
 
 interface Props {
   collectionId: RQAPI.CollectionRecord["id"];
@@ -68,8 +69,10 @@ export const CollectionRunnerView: React.FC<Props> = ({ collectionId }) => {
               direction="horizontal"
               className="collection-runner-view-split"
             >
-              <RunConfigView />
-              <RunResultView />
+              <DataFileModalProvider>
+                <RunConfigView />
+                <RunResultView />
+              </DataFileModalProvider>
             </Split>
           </div>
         </RunViewContextProvider>

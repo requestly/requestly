@@ -284,6 +284,14 @@ export const API_CLIENT = {
   TEST_GENERATION_STARTED: "api_client_test_generation_started",
   TEST_GENERATION_COMPLETED: "api_client_test_generation_completed",
   TEST_GENERATION_FAILED: "api_client_test_generation_failed",
+
+  //Data-File Support for Collection Runner
+  COLLECTION_RUNNER_SELECT_FILE_CLICKED: "api_client_collection_runner_select_file_clicked",
+  COLLECTION_RUNNER_FILE_PARSED: "api_client_collection_runner_file_parsed",
+  COLLECTION_RUNNER_FILE_PARSE_FAILED: "api_client_collection_runner_file_parse_failed",
+  COLLECTION_RUNNER_FILE_RECORD_LIMIT_EXCEEDED: "api_client_collection_runner_file_record_limit_exceeded",
+  COLLECTION_RUNNER_TRUNCATED_FILE_USED: "api_client_collection_runner_truncated_file_used",
+  COLLECTION_RUNNER_FILE_CLEARED: "api_client_collection_runner_file_cleared",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
