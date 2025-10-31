@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Spin, Row } from "antd";
@@ -31,7 +32,7 @@ import { trackSignUpButtonClicked } from "modules/analytics/events/common/auth/s
 import { setRedirectMetadata } from "features/onboarding/utils";
 import { LoggedOutPopover } from "./LoggedOutPopover/LoggedOutPopover";
 
-export default function HeaderUser() {
+export default function HeaderUser({ showUpgradeButton = true }) {
   const navigate = useNavigate();
   const location = useLocation();
   //Global State
@@ -178,7 +179,8 @@ export default function HeaderUser() {
             </Dropdown>
           </Col>
           <Col>
-            {!isSafariBrowser() &&
+            {showUpgradeButton &&
+            !isSafariBrowser() &&
             (!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
             appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
               <RQButton
@@ -226,3 +228,7 @@ export default function HeaderUser() {
     </section>
   );
 }
+
+HeaderUser.propTypes = {
+  showUpgradeButton: PropTypes.bool,
+};
