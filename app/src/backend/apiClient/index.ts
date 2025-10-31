@@ -7,3 +7,6 @@ export { getRunConfig } from "./getRunConfig";
 export { upsertRunConfig } from "./upsertRunConfig";
 export { getRunResults } from "./getRunResults";
 export { addRunResult } from "./addRunResult";
+export { createSession } from "./chatSession/createSession";
+export { addMessage } from "./chatSession/addMessage";
+export { getAllSessions } from "./chatSession/getAllSessions";
