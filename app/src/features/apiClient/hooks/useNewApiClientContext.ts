@@ -75,7 +75,7 @@ export function useNewApiClientContext() {
             new CollectionViewTabSource({
               id: recordId,
               title: apiClientRecord.name,
-              focusBreadcrumb: !doesRecordExist,
+              isNewTab: !doesRecordExist,
               context: {
                 id: context.id,
               },

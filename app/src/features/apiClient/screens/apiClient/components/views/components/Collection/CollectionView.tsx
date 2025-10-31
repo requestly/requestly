@@ -41,8 +41,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
 
   const closeTab = useTabServiceWithSelector((state) => state.closeTab);
 
-  const { setTitle, getIsNew } = useGenericState();
-  const isNewCollection = getIsNew();
+  const { setTitle, getIsNew, setIsNew } = useGenericState();
 
   const collection = useApiRecord(collectionId) as RQAPI.CollectionRecord;
 
@@ -178,8 +177,11 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ collectionId }) 
               id={collection.id}
               placeholder="New Collection"
               name={collectionName}
-              onBlur={(newName) => handleCollectionNameChange(newName)}
-              autoFocus={isNewCollection}
+              onBlur={(newName) => {
+                handleCollectionNameChange(newName);
+                setIsNew(false);
+              }}
+              autoFocus={getIsNew()}
               breadCrumbType={BreadcrumbType.COLLECTION}
             />
           </div>
