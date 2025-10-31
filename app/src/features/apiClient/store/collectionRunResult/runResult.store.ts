@@ -102,6 +102,7 @@ export type RunResultState = {
   startTime: Timestamp | null;
   endTime: Timestamp | null;
   runStatus: RunStatus;
+  error?: Error;
   iterations: Map<Iteration, IterationDetails>;
   currentlyExecutingRequest: CurrentlyExecutingRequest;
   abortController: AbortController;
@@ -115,10 +116,20 @@ export type RunResultState = {
   setStartTime(time: Timestamp | number): void;
   setEndtime(time: Timestamp | number): void;
   addResult(result: RequestExecutionResult): void;
-  setRunStatus(status: RunStatus): void;
+  setRunStatus(status: Exclude<RunStatus, RunStatus.ERRORED>): void;
   getRunSummary(): LiveRunResult;
   addToHistory(runResult: RunResult): void;
-};
+  setError(error: Error): void;
+} & (
+  | {
+      runStatus: RunStatus.ERRORED;
+      error: Error;
+    }
+  | {
+      runStatus: Exclude<RunStatus, RunStatus.ERRORED>;
+      error: undefined;
+    }
+);
 
 export function createRunResultStore(data: { history: RunResult[] }) {
   return create<RunResultState>()((set, get) => ({
@@ -130,6 +141,7 @@ export function createRunResultStore(data: { history: RunResult[] }) {
     historySaveStatus: HistorySaveStatus.IDLE,
     currentlyExecutingRequest: null,
     abortController: new AbortController(),
+    error: undefined,
 
     reset() {
       set({
@@ -139,6 +151,12 @@ export function createRunResultStore(data: { history: RunResult[] }) {
         iterations: new Map(),
         currentlyExecutingRequest: null,
         abortController: new AbortController(),
+      });
+    },
+    setError(error) {
+      set({
+        runStatus: RunStatus.ERRORED,
+        error,
       });
     },
 
