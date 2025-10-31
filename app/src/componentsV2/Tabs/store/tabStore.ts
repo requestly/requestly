@@ -49,8 +49,8 @@ export const createTabStore = (
   id: number,
   source: any,
   title: string,
-  preview: boolean = false,
-  isNewTab: boolean = false
+  preview = false,
+  isNewTab = false
 ) => {
   return create<TabState>((set, get) => ({
     id,
