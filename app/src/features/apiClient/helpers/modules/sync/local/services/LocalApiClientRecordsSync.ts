@@ -615,6 +615,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: {
         id: runConfigId,
         runOrder: [],
+        delay: 0,
+        iterations: 1,
+        dataFile: null,
       },
     };
   }
