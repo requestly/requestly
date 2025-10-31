@@ -1,59 +1,10 @@
 import { create, useStore } from "zustand";
 import { persist } from "zustand/middleware";
-import { RequestContentType, RQAPI } from "../types";
-import { generateKeyValuePairs, isHttpApiRecord } from "../screens/apiClient/utils";
 import { useShallow } from "zustand/shallow";
 
-function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
-  const files: Record<FileId, ApiClientFile> = {};
-  const canHaveFiles =
-    record.type === RQAPI.RecordType.API &&
-    isHttpApiRecord(record) &&
-    record.data.request.contentType === RequestContentType.MULTIPART_FORM;
-
-  if (!canHaveFiles) {
-    return;
-  }
-
-  let requestBody = record.data.request.body as RQAPI.MultipartFormBody;
-
-  if (!requestBody) {
-    return;
-  }
-
-  // hotfix for existing requests
-  if (!Array.isArray(requestBody)) {
-    requestBody = generateKeyValuePairs(requestBody);
-  }
-
-  for (const bodyEntry of requestBody) {
-    const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
-    if (Array.isArray(bodyValue)) {
-      bodyValue?.forEach((file) => {
-        files[file.id] = {
-          name: file.name,
-          path: file.path,
-          source: file.source,
-          size: file.size,
-          isFileValid: true,
-        };
-      });
-    }
-  }
-
-  return files;
-}
-
-function parseRecordsToFiles(records: RQAPI.ApiClientRecord[]) {
-  let files: Record<FileId, ApiClientFile> = {};
-  for (const record of records) {
-    const filesFromRecord = getFilesFromRecord(record);
-    if (filesFromRecord) {
-      files = { ...files, ...filesFromRecord };
-    }
-  }
-
-  return files;
+export enum FileFeature {
+  FILE_BODY = "file_body",
+  COLLECTION_RUNNER = "collection_runner",
 }
 
 export interface ApiClientFile {
@@ -61,19 +12,24 @@ export interface ApiClientFile {
   path: string;
   source: "desktop" | "extension"; // Currently only "desktop" is supported
   size: number;
+  fileFeature: FileFeature;
   // isFileValid indicates whether the file exists and is valid in the local filesystem
   isFileValid: boolean;
 }
 
 export type FileId = string;
 
+export const shouldHydrate = (fileFeature: FileFeature) => {
+  return fileFeature !== FileFeature.COLLECTION_RUNNER;
+};
+
 export interface ApiClientFilesStore {
   files: Record<FileId, ApiClientFile>;
   appMode: "desktop" | "extension"; // Currently only "desktop" is supported
   isFilePresentLocally: (fileId: FileId) => Promise<boolean>;
 
-  initialize: (records: RQAPI.ApiClientRecord[]) => void;
-  addFile: (fileId: FileId, fileDetails: any) => void;
+  replace: (files: Record<FileId, ApiClientFile>, fileFeature: FileFeature) => void;
+  addFile: (fileId: FileId, fileDetails: Omit<ApiClientFile, "isFileValid">) => void;
   getFilesByIds: (fileIds: string[]) => (ApiClientFile & { id: string })[];
   removeFile: (fileId: FileId) => void;
 }
@@ -95,30 +51,47 @@ const createApiClientFilesStore = (appMode: "desktop") => {
             ...file,
             isFileValid: doesFileExist,
           };
-          set({ files });
+          const updatedFiles = {
+            ...files,
+          };
+          set({ files: updatedFiles });
           return doesFileExist;
         },
 
-        initialize(records) {
-          const files = parseRecordsToFiles(records);
+        replace(fileRecords: Record<FileId, ApiClientFile>, fileFeature: FileFeature) {
+          // const filesFromRecords = parseRecordsToFiles(records);
+          const { files: existingFiles } = get();
+
+          // Only keep existing files that are not FILE_BODY type
+          const filteredExistingFiles = Object.fromEntries(
+            Object.entries(existingFiles).filter(([_, file]) => file.fileFeature !== fileFeature)
+          );
+
           set({
-            files,
+            files: { ...filteredExistingFiles, ...fileRecords },
           });
         },
 
-        addFile: (fileId: FileId, fileDetails: any) => {
+        addFile: (fileId: FileId, fileDetails: Omit<ApiClientFile, "isFileValid">) => {
           const { files } = get();
-          files[fileId] = {
-            ...fileDetails,
-            isFileValid: true, // Assuming the file is valid when added
-          };
-          set({ files });
+          set({
+            files: {
+              ...files,
+              [fileId]: {
+                ...fileDetails,
+                isFileValid: true, // Assuming the file is valid when added
+              },
+            },
+          });
         },
+
         removeFile: (fileId: FileId) => {
           const { files } = get();
-          delete files[fileId];
-          set({ files });
+          const newFiles = { ...files };
+          delete newFiles[fileId];
+          set({ files: newFiles });
         },
+
         getFilesByIds: (fileIds: string[]) => {
           const { files } = get();
           return fileIds.map((fileId) => ({ id: fileId, ...files[fileId] })).filter((file) => file.name !== undefined);
@@ -133,10 +106,12 @@ const createApiClientFilesStore = (appMode: "desktop") => {
       {
         name: "apiClientFilesStore",
         version: 1,
-        partialize: (state) => ({
-          files: state.files,
-          appMode: state.appMode,
-        }),
+        partialize: (state) => {
+          const filteredExistingFiles = Object.fromEntries(
+            Object.entries(state.files).filter(([_, file]) => shouldHydrate(file.fileFeature))
+          );
+          return { files: filteredExistingFiles, appMode: state.appMode };
+        },
       }
     )
   );
