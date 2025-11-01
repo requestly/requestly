@@ -40,6 +40,7 @@ interface Props {
     setShowSelection: (arg: boolean) => void;
   };
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
+  onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
 }
 
 export const HttpMethodIcon = ({ method }: { method: RequestMethod }) => {
@@ -69,10 +70,16 @@ export const RequestIcon = ({ record }: { record: RQAPI.ApiRecord }) => {
   }
 };
 
-export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOptions, handleRecordsToBeDeleted }) => {
+export const RequestRow: React.FC<Props> = ({
+  record,
+  isReadOnly,
+  bulkActionOptions,
+  handleRecordsToBeDeleted,
+  onItemClick,
+}) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
-  const [recordToMove, setRecordToMove] = useState(null);
+  const [recordToMove, setRecordToMove] = useState<RQAPI.ApiRecord | null>(null);
 
   const { apiClientRecordsRepository } = useApiClientRepository();
   const { onSaveRecord } = useNewApiClientContext();
@@ -108,30 +115,28 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
 
   const handleDuplicateRequest = useCallback(
     async (record: RQAPI.ApiRecord) => {
-      const newRecord = {
-        ...record,
-        name: `(Copy) ${record.name || record.data.request.url}`,
+      const { id, ...rest } = record;
+      const newRecord: Omit<RQAPI.ApiRecord, "id"> = {
+        ...rest,
+        name: `(Copy) ${record.name || record.data.request?.url}`,
       };
-      delete newRecord.id;
-      return apiClientRecordsRepository
-        .createRecord(newRecord)
-        .then((result) => {
-          if (!result.success) {
-            throw new Error("Failed to duplicate request");
-          }
-          onSaveRecord(result.data, "open");
-          toast.success("Request duplicated successfully");
-          trackRequestDuplicated();
-        })
-        .catch((error) => {
-          console.error("Error duplicating request:", error);
-          notification.error({
-            message: "Error duplicating request",
-            description: error?.message || "Unexpected error. Please contact support.",
-            placement: "bottomRight",
-          });
-          trackDuplicateRequestFailed();
+
+      try {
+        const result = await apiClientRecordsRepository.createRecord(newRecord);
+        if (!result.success) throw new Error("Failed to duplicate request");
+
+        onSaveRecord(result.data, "open");
+        toast.success("Request duplicated successfully");
+        trackRequestDuplicated();
+      } catch (error: any) {
+        console.error("Error duplicating request:", error);
+        notification.error({
+          message: "Error duplicating request",
+          description: error?.message || "Unexpected error. Please contact support.",
+          placement: "bottomRight",
         });
+        trackDuplicateRequestFailed();
+      }
     },
     [onSaveRecord, apiClientRecordsRepository]
   );
@@ -207,7 +212,7 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
       {recordToMove && (
         <MoveToCollectionModal
           recordsToMove={[recordToMove]}
-          isOpen={recordToMove}
+          isOpen={!!recordToMove}
           onClose={() => {
             setRecordToMove(null);
           }}
@@ -226,8 +231,15 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
       ) : (
         <div className={`request-row`} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
           <div
-            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""}`}
-            onClick={() => {
+            className={`collections-list-item api ${record.id === activeTabSourceId ? "active" : ""} ${
+              selectedRecords.has(record.id) && showSelection ? "selected" : ""
+            }`}
+            onClick={(e) => {
+              if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                onItemClick(record, e);
+                return;
+              }
+
               openTab(
                 new RequestViewTabSource({
                   id: record.id,

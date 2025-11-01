@@ -272,3 +272,18 @@
     }
   }
 }
+
+.collections-list-container.selection-enabled {
+  .collections-list-item {
+    transition: all 0.15s ease;
+    cursor: pointer;
+
+    &:not(.selected):hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .ant-checkbox-wrapper {
+    transition: opacity 0.15s ease;
+  }
+}

@@ -8,3 +8,15 @@ svg.graphql-request-icon {
 .request-dropdown-menu .ant-dropdown-menu {
   min-width: 160px;
 }
+
+.collections-list-item.api.selected {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+
+  .request-url {
+    color: var(--requestly-color-text-default);
+  }
+}
+
+.collections-list-item.api.selected:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
