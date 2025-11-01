@@ -54,18 +54,20 @@
 }
 
 .collection-panel.selected {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  border-radius: 4px;
+  > .ant-collapse-header {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    padding-left: calc(var(--requestly-space-4) - 3px);
 
-  .collection-name-container {
-    background-color: transparent !important;
-  }
-
-  .collection-name {
-    color: var(--requestly-color-text-default);
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12) !important;
+    }
   }
 }
 
-.collection-panel.selected:hover {
-  background-color: rgba(255, 255, 255, 0.12) !important;
+.collection-panel.active.selected > .ant-collapse-header {
+  border-left: 2px solid var(--requestly-color-primary-500);
+}
+
+.collection-panel.selected + .ant-collapse-content {
+  background: transparent;
 }

@@ -101,7 +101,6 @@ export const CollectionRow: React.FC<Props> = ({
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
-  const activeWorkspace = useSelector(getActiveWorkspace);
   const handleCollectionExport = useCallback(
     (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
       const collectionRecordState = getRecordStore(record.id)?.getState() as CollectionRecordState;
@@ -256,6 +255,9 @@ export const CollectionRow: React.FC<Props> = ({
     async (item: DraggableApiRecord, dropContextId: string) => {
       try {
         const sourceContext = getApiClientFeatureContext(item.contextId);
+        if (!sourceContext) {
+          throw new Error(`Source context not found for id: ${item.contextId}`);
+        }
 
         const destination = {
           contextId: dropContextId,
@@ -282,7 +284,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [activeWorkspace.workspaceType, record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -416,9 +418,7 @@ export const CollectionRow: React.FC<Props> = ({
               header={
                 <div
                   ref={drag}
-                  className={`collection-name-container ${
-                    selectedRecords.has(record.id) && showSelection ? "selected" : ""
-                  }`}
+                  className="collection-name-container"
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={(e) => {

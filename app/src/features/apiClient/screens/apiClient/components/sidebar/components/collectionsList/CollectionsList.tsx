@@ -335,6 +335,7 @@ export const CollectionsList: React.FC<Props> = ({ onNewClick, recordTypeToBeCre
     (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => {
       if (event.metaKey || event.ctrlKey) {
         event.preventDefault();
+        event.stopPropagation();
 
         if (!showSelection) {
           setShowSelection(true);
