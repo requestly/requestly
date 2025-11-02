@@ -1,5 +1,9 @@
 const isFirefox = () => {
-  if (navigator !== undefined && navigator.userAgent.toLocaleLowerCase().includes("firefox")) {
+  if (
+    navigator !== undefined &&
+    navigator.userAgent !== undefined &&
+    navigator.userAgent.toLowerCase().includes("firefox")
+  ) {
     return true;
   }
 
