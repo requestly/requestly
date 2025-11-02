@@ -243,7 +243,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
 
     const firstItem = breadcrumbs[0];
     const collapsedItems = breadcrumbs.slice(1, -visibleBreadcrumbsCount);
-    const lastItems = Array.from(breadcrumbs.slice(-visibleBreadcrumbsCount));
+    const lastItems = breadcrumbs.slice(-visibleBreadcrumbsCount);
 
     const dropdownItems = collapsedItems.map((item, index) => {
       return {
