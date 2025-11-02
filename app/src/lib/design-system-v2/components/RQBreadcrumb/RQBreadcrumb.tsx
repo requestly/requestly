@@ -67,6 +67,7 @@ export const RQBreadcrumb: React.FC<Props> = ({
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("breadcrumbs", "update");
   const [openTab, setIgnorePath] = useTabServiceWithSelector((state) => [state.openTab, state.setIgnorePath]);
+  const [visibleBreadcrumbsCount, setVisibleBreadcrumbsCount] = useState(1);
 
   const autoFocusRef = useRef(false);
   useEffect(() => {
@@ -108,12 +109,13 @@ export const RQBreadcrumb: React.FC<Props> = ({
       const containerWidth = breadcrumbRef.current?.offsetWidth ?? 0;
       const fullBreadcrumbWidth = measurementRef.current?.scrollWidth ?? 0;
 
-      if (!containerWidth || !fullBreadcrumbWidth) {
-        return;
-      }
-
       const shouldCollapse = fullBreadcrumbWidth > containerWidth && breadcrumbs.length > 5;
       setIsCollapsedBreadcrumbs(shouldCollapse);
+
+      if (fullBreadcrumbWidth - containerWidth < 100) setVisibleBreadcrumbsCount(4);
+      else if (fullBreadcrumbWidth - containerWidth < 150) setVisibleBreadcrumbsCount(3);
+      else if (fullBreadcrumbWidth - containerWidth < 250) setVisibleBreadcrumbsCount(2);
+      else setVisibleBreadcrumbsCount(1);
     };
 
     checkOverflow();
@@ -240,8 +242,8 @@ export const RQBreadcrumb: React.FC<Props> = ({
     }
 
     const firstItem = breadcrumbs[0];
-    const collapsedItems = breadcrumbs.slice(1, -3);
-    const lastItems = breadcrumbs.slice(-3);
+    const collapsedItems = breadcrumbs.slice(1, -visibleBreadcrumbsCount);
+    const lastItems = Array.from(breadcrumbs.slice(-visibleBreadcrumbsCount));
 
     const dropdownItems = collapsedItems.map((item, index) => {
       return {
@@ -268,11 +270,11 @@ export const RQBreadcrumb: React.FC<Props> = ({
           </li>
         </Dropdown>
         {lastItems.map((item, index) => (
-          <React.Fragment key={breadcrumbs.length - 3 + index}>
+          <React.Fragment key={index + 3}>
             <span className="rq-breadcrumb-separator">
               <MdOutlineChevronRight />
             </span>
-            {renderBreadcrumbItem(item, breadcrumbs.length - 3 + index)}
+            {renderBreadcrumbItem(item, index + 3)}
           </React.Fragment>
         ))}
       </>
@@ -284,6 +286,9 @@ export const RQBreadcrumb: React.FC<Props> = ({
       <ol ref={breadcrumbRef} className="rq-breadcrumb">
         {loading ? <Skeleton.Input active size="small" block /> : renderBreadcrumbs()}
       </ol>
+
+      {/* This is a Transparent/Hidden breadcrumb used to measure width we have, based on the width we will
+       have then we can decide collapsed state or how many breadcrumbs elements to be rendered */}
       {!loading && (
         <ol ref={measurementRef} className="rq-breadcrumb rq-breadcrumb-measurement" aria-hidden="true">
           {renderExpandedBreadcrumbs()}
