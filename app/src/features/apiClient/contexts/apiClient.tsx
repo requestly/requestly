@@ -204,7 +204,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   new CollectionViewTabSource({
                     id: result.data.id,
                     title: result.data.name,
-                    focusBreadcrumb: false,
+                    isNewTab: true,
                     context: {
                       id: context.id,
                     },
@@ -240,7 +240,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 new EnvironmentViewTabSource({
                   id: newEnvironment.id,
                   title: newEnvironment.name,
-                  focusBreadcrumb: true,
+                  isNewTab: true,
                   context: {
                     id: context.id,
                   },
