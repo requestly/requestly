@@ -100,7 +100,7 @@ export function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
       break;
     case Authorization.Type.BASIC_AUTH: {
       if (!auth.authConfigStore?.[Authorization.Type.BASIC_AUTH]) break; // invalid auth config gets stored as null for now
-      const { username, password } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
+      const { username = "", password = "" } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
       addEntryToResults(resultingHeaders, "Authorization", `Basic ${btoa(`${username}:${password}`)}`);
       break;
     }
@@ -141,11 +141,11 @@ function pruneConfig(auth?: RQAPI.Auth): RQAPI.Auth | null {
         authConfigStore: {},
       };
     case Authorization.Type.BASIC_AUTH:
-      if (
-        isEmpty(authConfigStore[Authorization.Type.BASIC_AUTH]) ||
-        !authConfigStore[Authorization.Type.BASIC_AUTH].password
-      ) {
-        return null;
+      if (isEmpty(authConfigStore[Authorization.Type.BASIC_AUTH])) {
+        authConfigStore[Authorization.Type.BASIC_AUTH] = {
+          username: "",
+          password: "",
+        };
       }
       break;
     case Authorization.Type.BEARER_TOKEN:
