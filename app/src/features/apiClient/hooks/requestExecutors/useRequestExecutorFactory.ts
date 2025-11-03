@@ -12,6 +12,7 @@ import { useAPIEnvironment } from "../../store/apiRecords/ApiRecordsContextProvi
 import { useCommand } from "../../commands";
 import { setRuntimeStore } from "../../store/runtimeVariables/utils";
 import { BaseSnapshot } from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
+import { toast } from "utils/Toast";
 
 type ExecutorConstructor<T> = new (
   requestPreparer: HttpRequestPreparationService,
@@ -35,30 +36,35 @@ export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<
 
   const handleUpdatesFromExecutionWorker = useCallback(
     async (state: BaseSnapshot) => {
-      for (const key in state) {
-        if (key === "environment") {
-          const activeEnvironment = getActiveEnvironment();
-          if (activeEnvironment) {
-            await setEnvironmentVariables({ environmentId: activeEnvironment.id, variables: state[key] });
+      try {
+        for (const key in state) {
+          if (key === "environment") {
+            const activeEnvironment = getActiveEnvironment();
+            if (activeEnvironment) {
+              await setEnvironmentVariables({ environmentId: activeEnvironment.id, variables: state[key] });
+            }
           }
-        }
-        if (key === "global") {
-          const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
-          await setEnvironmentVariables({ environmentId: globalEnvId, variables: state[key] });
-        }
-        if (key === "collectionVariables") {
-          if (!collectionId) {
-            continue;
+          if (key === "global") {
+            const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
+            await setEnvironmentVariables({ environmentId: globalEnvId, variables: state[key] });
           }
+          if (key === "collectionVariables") {
+            if (!collectionId) {
+              continue;
+            }
 
-          await setCollectionVariables({
-            collectionId,
-            variables: state[key],
-          });
+            await setCollectionVariables({
+              collectionId,
+              variables: state[key],
+            });
+          }
+          if (key === "variables") {
+            setRuntimeStore(state[key]);
+          }
         }
-        if (key === "variables") {
-          setRuntimeStore(state[key]);
-        }
+      } catch (error) {
+        console.log("Failed to update variables from script execution", error);
+        toast.error("Failed to update variables from script execution");
       }
     },
     [
