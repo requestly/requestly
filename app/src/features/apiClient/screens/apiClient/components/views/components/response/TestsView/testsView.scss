@@ -9,16 +9,25 @@
   .empty-tests-view-title {
     color: var(--requestly-color-default);
     font-size: var(--requestly-font-size-md);
+    font-weight: 500;
   }
 
   .empty-tests-view-description {
     color: var(--requestly-color-text-subtle);
     font-size: var(--requestly-font-size-sm);
+    text-align: center;
+    text-wrap: pretty;
+  }
+
+  .empty-tests-doc-anchor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
   }
 }
 
 .tests-results-view-container {
-  overflow: hidden;
   height: inherit;
 
   .tests-results-view-header {
@@ -37,6 +46,8 @@
           color: var(--requestly-color-text-subtle);
           font-size: var(--requestly-font-size-xs);
           border: none;
+          display: flex;
+          align-items: center;
 
           &:before {
             display: none;
@@ -61,11 +72,12 @@
           box-shadow: none;
           min-width: 1.1rem;
           height: 1.1rem;
-          padding: 0 0.25rem;
+          padding: 0 0.55rem;
           font-size: var(--requestly-font-size-xs);
           position: relative;
           top: -1px;
           line-height: 1rem;
+          border-radius: 10px;
         }
       }
     }
