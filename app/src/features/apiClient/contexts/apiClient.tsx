@@ -240,7 +240,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 new EnvironmentViewTabSource({
                   id: newEnvironment.id,
                   title: newEnvironment.name,
-                  focusBreadcrumb: true,
+                  isNewTab: true,
                   context: {
                     id: context.id,
                   },
