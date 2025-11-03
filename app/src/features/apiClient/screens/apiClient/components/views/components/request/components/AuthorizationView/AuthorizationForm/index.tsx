@@ -78,7 +78,7 @@ function generateFields(
               size="small"
               className={field.className ?? ""}
               placeholder={field.placeholder}
-              value={formState[field.id]}
+              value={formState[field.id] ?? ""}
               onChange={(e) => onChangeHandler(e.target.value, field.id)}
             />
           ) : (
