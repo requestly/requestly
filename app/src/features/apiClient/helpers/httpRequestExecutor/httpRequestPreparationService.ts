@@ -110,6 +110,8 @@ export class HttpRequestPreparationService {
 
     renderedEntry.request.url = addUrlSchemeIfMissing(renderedEntry.request.url);
 
+    console.log("renderedEntry", renderedEntry);
+
     return {
       renderedVariables,
       preparedEntry: renderedEntry,

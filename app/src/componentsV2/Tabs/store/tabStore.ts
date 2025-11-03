@@ -2,6 +2,17 @@ import { create } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { ReactNode } from "react";
 import { NativeError } from "errors/NativeError";
+import { StoreApi } from "zustand";
+import { EntryStoreState } from "../types";
+import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { RQAPI } from "features/apiClient/types";
+
+const createEntryStore = (entry: any): StoreApi<EntryStoreState> => {
+  return create<EntryStoreState>((set) => ({
+    entry,
+    setEntry: (newEntry: any) => set({ entry: newEntry }),
+  }));
+};
 
 export enum CloseTopic {
   UNSAVED_CHANGES = "unsaved_changes",
@@ -29,11 +40,13 @@ export type TabState = {
   title: string;
   icon: ReactNode;
   closeBlockers: Map<CloseTopic, Map<CloseBlockerId, CloseBlocker>>;
+  entryStore: StoreApi<EntryStoreState> | null;
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
   setPreview: (preview: boolean) => void;
   setIcon: (icon: ReactNode) => void;
+  setEntryStore: (store: StoreApi<EntryStoreState> | null) => void;
 
   canCloseTab: () => boolean;
   getActiveBlockers: () => ActiveBlocker[];
@@ -44,6 +57,8 @@ export type TabState = {
 };
 
 export const createTabStore = (id: number, source: any, title: string, preview: boolean = false) => {
+  const viewStore = source?.createViewStore();
+
   return create<TabState>((set, get) => ({
     id,
     title,
@@ -52,11 +67,13 @@ export const createTabStore = (id: number, source: any, title: string, preview: 
     unsaved: false,
     icon: source.getIcon(),
     closeBlockers: new Map(),
+    entryStore: viewStore,
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),
     setPreview: (preview: boolean) => set({ preview }),
     setIcon: (icon: ReactNode) => set({ icon }),
+    setEntryStore: (store: StoreApi<any> | null) => set({ entryStore: store }),
 
     canCloseTab: () => {
       const { closeBlockers } = get();

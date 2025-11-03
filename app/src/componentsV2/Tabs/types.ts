@@ -31,3 +31,9 @@ export interface TabRoute {
   path: string;
   tabSourceFactory: TabSourceFactory;
 }
+
+export type EntryStoreState = {
+  recordId?: string;
+  entry: any;
+  setEntry: (entry: any) => void;
+};

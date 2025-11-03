@@ -5,6 +5,7 @@ import { MatchedTabSource, TabSourceMetadata } from "componentsV2/Tabs/types";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { createCollectionViewStore } from "../../store";
 
 interface CollectionViewTabSourceMetadata extends TabSourceMetadata {
   focusBreadcrumb?: boolean;
@@ -36,5 +37,9 @@ export class CollectionViewTabSource extends BaseTabSource {
     const store = getApiClientRecordsStore(context);
     const isExist = store.getState().getData(this.metadata.id);
     return !!isExist;
+  }
+
+  createViewStore() {
+    return createCollectionViewStore(this.metadata.record as RQAPI.CollectionRecord);
   }
 }

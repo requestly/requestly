@@ -1,5 +1,6 @@
 import React from "react";
 import { TabSourceMetadata } from "../types";
+import { StoreApi } from "zustand";
 
 export abstract class AbstractTabSource {
   abstract component: NonNullable<React.ReactNode>;
@@ -16,4 +17,5 @@ export abstract class AbstractTabSource {
   abstract getIcon(): React.ReactNode;
   abstract getIsNewTab(): boolean;
   abstract getIsValidTab(ctx: unknown): boolean;
+  abstract createViewStore(): StoreApi<unknown>;
 }

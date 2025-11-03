@@ -5,23 +5,27 @@ import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
-  const [
-    activeTabId,
-    incrementVersion,
-    resetPreviewTab,
-    closeTabById,
-    upsertTabSource,
-  ] = useTabServiceWithSelector((state) => [
-    state.activeTabId,
-    state.incrementVersion,
-    state.resetPreviewTab,
-    state.closeTabById,
-    state.upsertTabSource,
-  ]);
+  const [activeTabId, incrementVersion, resetPreviewTab, closeTabById, upsertTabSource] = useTabServiceWithSelector(
+    (state) => [
+      state.activeTabId,
+      state.incrementVersion,
+      state.resetPreviewTab,
+      state.closeTabById,
+      state.upsertTabSource,
+    ]
+  );
 
   return (
     <GenericStateContext.Provider
       value={{
+        entryStore: props.store.getState().entryStore,
+        setEntryStore: useCallback(
+          (store: any) => {
+            props.store.getState().setEntryStore(store);
+            incrementVersion();
+          },
+          [incrementVersion, props.store]
+        ),
         close: useCallback(() => {
           closeTabById(props.store.getState().id);
         }, [closeTabById, props.store]),

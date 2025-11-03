@@ -95,13 +95,7 @@ const trackUserProperties = (records: RQAPI.ApiClientRecord[]) => {
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
   const { validatePermission, getRBACValidationFailureErrorMessage } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
-  const [apiClientRecords] = useAPIRecords((state) => [
-    state.apiClientRecords,
-    state.addNewRecord,
-    state.updateRecord,
-    state.updateRecords,
-    state.getData,
-  ]);
+  const apiClientRecords = useAPIRecords((state) => state.apiClientRecords);
   const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
