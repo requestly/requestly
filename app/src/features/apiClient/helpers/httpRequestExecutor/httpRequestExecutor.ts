@@ -192,8 +192,8 @@ export class HttpRequestExecutor {
 
     this.scriptExecutor.buildBaseSnapshot(recordId);
 
-    let preRequestScriptResult: WorkResult;
-    let responseScriptResult: WorkResult;
+    let preRequestScriptResult: WorkResult | undefined;
+    let responseScriptResult: WorkResult | undefined;
 
     if (
       preparedEntry.scripts?.preRequest.length &&
