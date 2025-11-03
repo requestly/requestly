@@ -13,8 +13,9 @@ import {
 
 export class HttpRequestScriptExecutionService {
   private snapshot: BaseSnapshot;
+  private isSnapshotMutated: boolean = false;
   constructor(private ctx: ApiClientFeatureContext, private workloadManager: APIClientWorkloadManager) {
-    this.resetSnapshot();
+    this.resetAndInitializeState();
   }
 
   private getVariablesByScope(recordId: string) {
@@ -33,13 +34,14 @@ export class HttpRequestScriptExecutionService {
     return variablesByScope;
   }
 
-  private resetSnapshot() {
+  private resetAndInitializeState() {
     this.snapshot = {
       global: {},
       collectionVariables: {},
       environment: {},
       variables: {},
     };
+    this.isSnapshotMutated = false;
   }
 
   private setSnapshot(snapshot: BaseSnapshot) {
@@ -89,8 +91,12 @@ export class HttpRequestScriptExecutionService {
     this.setSnapshot(baseSnapshot);
   }
 
-  getSnapshot(): BaseSnapshot {
+  public getSnapshot(): BaseSnapshot {
     return this.snapshot;
+  }
+
+  public getIsSnapshotMutated(): boolean {
+    return this.isSnapshotMutated;
   }
 
   async executePreRequestScript(entry: RQAPI.HttpApiEntry, abortController: AbortController) {
@@ -98,8 +104,9 @@ export class HttpRequestScriptExecutionService {
       new PreRequestScriptWorkload(
         entry.scripts?.preRequest,
         this.buildPreRequestSnapshot(entry),
-        (snapshot: SnapshotForPreRequest) => {
+        (snapshot: SnapshotForPreRequest, isStateMutated: boolean) => {
           this.setSnapshot(snapshot);
+          this.isSnapshotMutated = isStateMutated;
         }
       ),
       abortController.signal
@@ -111,8 +118,9 @@ export class HttpRequestScriptExecutionService {
       new PostResponseScriptWorkload(
         entry.scripts?.postResponse,
         this.buildPostResponseSnapshot(entry),
-        (snapshot: SnapshotForPostResponse) => {
+        (snapshot: SnapshotForPostResponse, isStateMutated: boolean) => {
           this.setSnapshot(snapshot);
+          this.isSnapshotMutated = isStateMutated;
         }
       ),
       abortController.signal

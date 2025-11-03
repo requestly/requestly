@@ -282,7 +282,10 @@ export class HttpRequestExecutor {
       }
     }
 
-    this.postScriptExecutionCallback(this.scriptExecutor.getSnapshot());
+    const isSnapshotMutated = this.scriptExecutor.getIsSnapshotMutated();
+    if (isSnapshotMutated) {
+      this.postScriptExecutionCallback(this.scriptExecutor.getSnapshot());
+    }
 
     const executionResult: RQAPI.ExecutionResult = {
       status: RQAPI.ExecutionStatus.SUCCESS,
