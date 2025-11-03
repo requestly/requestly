@@ -1,7 +1,6 @@
 import { AbortReason, KeyValuePair, RequestContentType, RQAPI } from "../../types";
 import { HttpRequestPreparationService } from "./httpRequestPreparationService";
 import { HttpRequestValidationService } from "./httpRequestValidationService";
-import { WorkResultType } from "../modules/scriptsV2/workload-manager/workLoadTypes";
 import { UserAbortError } from "../../errors/UserAbortError/UserAbortError";
 import { trackRequestFailed } from "modules/analytics/events/features/apiClient";
 import { makeRequest } from "../../screens/apiClient/utils";
@@ -17,6 +16,8 @@ import { HttpRequestScriptExecutionService } from "./httpRequestScriptExecutionS
 import { Scope } from "../variableResolver/variable-resolver";
 import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
+import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
+import { BaseSnapshot } from "./snapshotTypes";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -79,7 +80,7 @@ export class HttpRequestExecutor {
     public requestPreparer: HttpRequestPreparationService,
     private requestValidator: HttpRequestValidationService,
     private scriptExecutor: HttpRequestScriptExecutionService,
-    private postScriptExecutionCallback: (state: any) => Promise<void>,
+    private postScriptExecutionCallback: (state: BaseSnapshot) => Promise<void>,
     private appMode: string
   ) {}
 
@@ -189,20 +190,17 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    let preRequestScriptResult;
-    let responseScriptResult;
+    this.scriptExecutor.buildBaseSnapshot(recordId);
+
+    let preRequestScriptResult: WorkResult;
+    let responseScriptResult: WorkResult;
 
     if (
       preparedEntry.scripts?.preRequest.length &&
       preparedEntry.scripts?.preRequest !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
-      preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
-        recordId,
-        preparedEntry,
-        this.postScriptExecutionCallback,
-        this.abortController
-      );
+      preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(preparedEntry, this.abortController);
 
       if (preRequestScriptResult.type === WorkResultType.ERROR) {
         trackScriptExecutionFailed(
@@ -262,12 +260,7 @@ export class HttpRequestExecutor {
       preparedEntry.scripts?.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
-      responseScriptResult = await this.scriptExecutor.executePostResponseScript(
-        recordId,
-        preparedEntry,
-        this.postScriptExecutionCallback,
-        this.abortController
-      );
+      responseScriptResult = await this.scriptExecutor.executePostResponseScript(preparedEntry, this.abortController);
 
       if (responseScriptResult.type === WorkResultType.SUCCESS) {
         trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
@@ -289,13 +282,19 @@ export class HttpRequestExecutor {
       }
     }
 
+    this.postScriptExecutionCallback(this.scriptExecutor.getSnapshot());
+
     const executionResult: RQAPI.ExecutionResult = {
       status: RQAPI.ExecutionStatus.SUCCESS,
       executedEntry: {
         ...preparedEntry,
         testResults: [
-          ...(preRequestScriptResult ? preRequestScriptResult.testExecutionResults : []),
-          ...(responseScriptResult ? responseScriptResult.testExecutionResults : []),
+          ...(preRequestScriptResult && preRequestScriptResult.type === WorkResultType.SUCCESS
+            ? preRequestScriptResult.testExecutionResults
+            : []),
+          ...(responseScriptResult && responseScriptResult.type === WorkResultType.SUCCESS
+            ? responseScriptResult.testExecutionResults
+            : []),
         ],
       },
     };
@@ -315,12 +314,7 @@ export class HttpRequestExecutor {
   async rerun(recordId: string, entry: RQAPI.HttpApiEntry): Promise<RQAPI.RerunResult> {
     this.abortController = new AbortController();
 
-    const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(
-      recordId,
-      entry,
-      async () => {},
-      this.abortController
-    );
+    const preRequestScriptResult = await this.scriptExecutor.executePreRequestScript(entry, this.abortController);
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       const error = buildExecutionErrorObject(
         preRequestScriptResult.error,
@@ -333,12 +327,7 @@ export class HttpRequestExecutor {
       };
     }
 
-    const responseScriptResult = await this.scriptExecutor.executePostResponseScript(
-      recordId,
-      entry,
-      async () => {},
-      this.abortController
-    );
+    const responseScriptResult = await this.scriptExecutor.executePostResponseScript(entry, this.abortController);
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       const error = buildExecutionErrorObject(

@@ -11,6 +11,7 @@ import { renderVariables } from "backend/environment/utils";
 import { useAPIEnvironment } from "../../store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "../../commands";
 import { setRuntimeStore } from "../../store/runtimeVariables/utils";
+import { BaseSnapshot } from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
 
 type ExecutorConstructor<T> = new (
   requestPreparer: HttpRequestPreparationService,
@@ -33,7 +34,7 @@ export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<
   const { environmentVariablesRepository } = useApiClientRepository();
 
   const handleUpdatesFromExecutionWorker = useCallback(
-    async (state: any) => {
+    async (state: BaseSnapshot) => {
       for (const key in state) {
         if (key === "environment") {
           const activeEnvironment = getActiveEnvironment();
@@ -60,7 +61,13 @@ export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<
         }
       }
     },
-    [collectionId, environmentVariablesRepository, getActiveEnvironment]
+    [
+      collectionId,
+      environmentVariablesRepository,
+      getActiveEnvironment,
+      setCollectionVariables,
+      setEnvironmentVariables,
+    ]
   );
 
   return useMemo(() => {

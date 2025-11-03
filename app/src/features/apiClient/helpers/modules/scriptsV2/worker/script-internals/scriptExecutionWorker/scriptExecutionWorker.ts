@@ -6,14 +6,14 @@ import {
 } from "../../../workloadManager/workLoadTypes";
 import { RQ } from "../RQmethods";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
-import { LocalScope } from "../../../../../../../../modules/localScope";
+import { InitialState, LocalScope } from "../../../../../../../../modules/localScope";
 import { TestResult } from "../types";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
   private testResults: TestResult[] = [];
 
-  async executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback) {
+  async executeScript(script: string, initialState: InitialState, callback: ScriptWorkloadCallback) {
     this.localScope = new LocalScope(initialState);
 
     // eslint-disable-next-line no-new-func
