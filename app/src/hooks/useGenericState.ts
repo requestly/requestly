@@ -1,7 +1,11 @@
+import { EntryStoreState } from "componentsV2/Tabs/types";
 import { createContext, useContext } from "react";
 import { ReactNode } from "react";
+import { StoreApi } from "zustand";
 
 export interface GenericState {
+  entryStore: StoreApi<any> | null;
+  setEntryStore: (store: StoreApi<EntryStoreState> | null) => void;
   setTitle: (title: string) => void;
   setPreview: (preview: boolean) => void;
   setUnsaved: (unsaved: boolean) => void;
@@ -16,6 +20,8 @@ export interface GenericState {
 }
 
 const defaultGenericState: GenericState = {
+  entryStore: null,
+  setEntryStore: () => {},
   setTitle: () => {},
   setPreview: () => {},
   setUnsaved: () => {},

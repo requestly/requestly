@@ -6,6 +6,8 @@ import { MdOutlineSyncAlt } from "@react-icons/all-files/md/MdOutlineSyncAlt";
 import { RQAPI } from "features/apiClient/types";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { TabSourceMetadata } from "componentsV2/Tabs/types";
+import { createRequestViewStore } from "../../store";
+import { getEmptyDraftApiRecord } from "features/apiClient/screens/apiClient/utils";
 
 interface DraftRequestContainerTabSourceMetadata extends Partial<TabSourceMetadata> {
   apiEntryType?: RQAPI.ApiEntryType;
@@ -53,5 +55,9 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
 
   getIsValidTab(): boolean {
     return true; // Always a valid tab, on reload we get new draft tab
+  }
+
+  createViewStore() {
+    return createRequestViewStore(getEmptyDraftApiRecord(this.metadata.apiEntryType ?? RQAPI.ApiEntryType.HTTP));
   }
 }

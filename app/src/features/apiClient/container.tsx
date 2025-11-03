@@ -21,6 +21,7 @@ import { createRepository } from "./commands/context/setupContext.command";
 import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { AIChat, AiChatContainer } from "./screens/apiClient/components/AIChat/AIChat";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -95,8 +96,8 @@ const ApiClientFeatureContainer: React.FC = () => {
             <Split
               className="api-client-container__split"
               direction="horizontal"
-              sizes={[20, 80]}
-              minSize={[300, getSecondPaneMinSize()]}
+              sizes={[20, 20, 60]}
+              minSize={[300, getSecondPaneMinSize(), 300]}
               gutter={(index, direction) => {
                 const gutterContainer = document.createElement("div");
                 gutterContainer.style.position = "relative";
@@ -114,6 +115,9 @@ const ApiClientFeatureContainer: React.FC = () => {
             >
               <APIClientSidebar />
               <TabsContainer />
+              {/* <AIChat />
+               */}
+              <AiChatContainer />
             </Split>
           </ApiClientProvider>
         </div>
