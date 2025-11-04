@@ -228,6 +228,7 @@ export class HttpRequestExecutor {
     }
 
     try {
+      console.log("deb", preparedEntry.request);
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");

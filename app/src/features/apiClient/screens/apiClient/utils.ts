@@ -29,6 +29,33 @@ const createAbortError = (signal: AbortSignal) => {
   return new Error("Request aborted");
 };
 
+/**
+ * Extracts the actual body from the bodyContainer based on the contentType
+ */
+export const extractBodyFromContainer = (
+  bodyContainer: RQAPI.RequestBodyContainer,
+  contentType: RequestContentType
+): RQAPI.RequestBody => {
+  if (!bodyContainer) {
+    return null;
+  }
+
+  switch (contentType) {
+    case RequestContentType.FORM:
+      return bodyContainer.form ?? null;
+    case RequestContentType.MULTIPART_FORM:
+      return bodyContainer.multipartForm ?? null;
+    case RequestContentType.JSON:
+    case RequestContentType.RAW:
+    case RequestContentType.HTML:
+    case RequestContentType.JAVASCRIPT:
+    case RequestContentType.XML:
+      return bodyContainer.text ?? null;
+    default:
+      return bodyContainer.text ?? null;
+  }
+};
+
 type ResponseOrError = RQAPI.HttpResponse | { error: string };
 export const makeRequest = async (
   appMode: string,
@@ -51,9 +78,18 @@ export const makeRequest = async (
     //TODO: make the default value false if and when the feature flag is turned on
     request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
+    //remove body from APi request
+    const { bodyContainer, ...trimmedRequest } = request;
+
+    //extraction of body happens here now
+    const requestWithBody = {
+      ...trimmedRequest,
+      body: extractBodyFromContainer(bodyContainer, request.contentType),
+    };
+
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      console.log("DEBUG", request);
-      getAPIResponseViaExtension(request)
+      console.log("DEBUG", requestWithBody);
+      getAPIResponseViaExtension(requestWithBody as any)
         .then((result: ResponseOrError) => {
           if (!result) {
             //Backward compatibility check
@@ -68,7 +104,7 @@ export const makeRequest = async (
           signal?.removeEventListener("abort", abortListener);
         });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request)
+      getAPIResponseViaProxy(requestWithBody as any)
         .then((result: ResponseOrError) => {
           if (!result) {
             //Backward compatibility check
@@ -909,18 +945,6 @@ export const createBodyContainer = (params: {
     case RequestContentType.RAW:
       return {
         text: body as RQAPI.RequestRawBody,
-      };
-    case RequestContentType.HTML:
-      return {
-        text: body as RQAPI.RequestHtmlBody,
-      };
-    case RequestContentType.JAVASCRIPT:
-      return {
-        text: body as RQAPI.RequestJavascriptBody,
-      };
-    case RequestContentType.XML:
-      return {
-        text: body as RQAPI.RequestXmlBody,
       };
     default:
       return {
