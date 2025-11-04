@@ -795,11 +795,11 @@ const HttpClientView: React.FC<Props> = ({
               placeholder="Untitled request"
               name={apiEntryDetails?.name}
               onRecordNameUpdate={setRequestName}
+              autoFocus={getIsNew()}
               onBlur={() => {
                 setIsNew(false);
                 handleRecordNameUpdate();
               }}
-              autoFocus={getIsNew()}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />
 
