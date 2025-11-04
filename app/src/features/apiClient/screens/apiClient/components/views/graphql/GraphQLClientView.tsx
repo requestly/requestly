@@ -63,6 +63,7 @@ interface Props {
   onSaveCallback: (apiEntryDetails: RQAPI.GraphQLApiRecord) => void;
   isCreateMode: boolean;
   openInModal?: boolean;
+  apiEntryDetails: RQAPI.GraphQLApiRecord;
 }
 
 const createApiRecord = (entry: RQAPI.GraphQLApiEntry, record: RQAPI.GraphQLApiRecord) => {
@@ -78,6 +79,7 @@ const GraphQLClientView: React.FC<Props> = ({
   onSaveCallback,
   isCreateMode,
   openInModal = false,
+  apiEntryDetails,
 }) => {
   const [
     url,
@@ -121,7 +123,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
-  const { getIsActive, setUnsaved, setTitle, setIcon } = useGenericState();
+  const { getIsActive, setUnsaved, setTitle, setIcon, getIsNew, setIsNew } = useGenericState();
   const { record } = useApiRecordState(recordId) as { record: RQAPI.GraphQLApiRecord };
 
   const enableHotkey = getIsActive();
@@ -516,11 +518,15 @@ const GraphQLClientView: React.FC<Props> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
-              id={record.id}
+              id={apiEntryDetails.id}
               placeholder="Untitled request"
               openInModal={openInModal}
-              name={record.name}
-              onBlur={(newName) => handleRecordNameUpdate(newName)}
+              name={apiEntryDetails?.name}
+              autoFocus={getIsNew()}
+              onBlur={(newName) => {
+                setIsNew(false);
+                handleRecordNameUpdate(newName);
+              }}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />
 
