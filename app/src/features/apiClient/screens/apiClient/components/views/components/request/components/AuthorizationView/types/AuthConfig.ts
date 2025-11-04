@@ -118,7 +118,7 @@ export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Ty
 
   type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
 
-  constructor(username: string, password: string) {
+  constructor(username?: string, password?: string) {
     this.username = username;
     this.password = password;
   }
