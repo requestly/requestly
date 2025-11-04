@@ -107,7 +107,6 @@ const createApiRecord = (
         method: (request.method || "GET") as RequestMethod,
         queryParams: processParams(request.params),
         headers: processParams(request.headers),
-        body: requestBody,
         bodyContainer: createBodyContainer({ contentType, body: requestBody }),
         contentType,
       },

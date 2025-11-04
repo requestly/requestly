@@ -225,6 +225,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const setContentType = useCallback(
     (contentType: RequestContentType) => {
+      console.log("current content type:", contentType);
       setEntry((entry) => {
         // let newBody: RQAPI.RequestBody;
 
@@ -234,6 +235,9 @@ const HttpClientView: React.FC<Props> = ({
         // } else {
         //   newBody = entry.request.bodyContainer?.["text"] ?? "";
         // }
+
+        //which body I have to send according to content type is now resonsibility of getApirequestextension here
+        //that will extract body from container based on content type
 
         const newEntry: RQAPI.HttpApiEntry = {
           ...entry,
