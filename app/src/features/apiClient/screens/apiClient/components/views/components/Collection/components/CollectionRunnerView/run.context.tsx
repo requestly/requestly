@@ -15,6 +15,8 @@ import { useShallow } from "zustand/shallow";
 import { RQAPI } from "features/apiClient/types";
 
 export type RunContext = {
+  //rename this something that makes sense in using collection runnner
+  //autogenerateStore: StoreApi<AutogenerateState>;
   runConfigStore: StoreApi<RunConfigState>;
   runResultStore: StoreApi<RunResultState>;
   collectionId: RQAPI.CollectionRecord["id"];
