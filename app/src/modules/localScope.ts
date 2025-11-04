@@ -1,11 +1,6 @@
-import {
-  SnapshotForPostResponse,
-  SnapshotForPreRequest,
-} from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
+import { ScriptExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
-export type InitialState = SnapshotForPreRequest & {
-  response?: SnapshotForPostResponse["response"];
-};
+export type InitialState = ScriptExecutionContext["context"];
 
 export class LocalScope {
   private state: InitialState;

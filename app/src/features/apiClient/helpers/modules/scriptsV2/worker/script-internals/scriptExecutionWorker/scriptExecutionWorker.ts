@@ -42,7 +42,9 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private syncLocalDump(callback: ScriptWorkloadCallback) {
     const isStateMutated = this.localScope.getIsStateMutated();
     const dump = this.localScope.getAll();
-    callback(dump, isStateMutated);
+    if (isStateMutated) {
+      callback(dump);
+    }
   }
 }
 
