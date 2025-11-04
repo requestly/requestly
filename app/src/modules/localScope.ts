@@ -1,6 +1,6 @@
-import { ScriptExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
-export type InitialState = ScriptExecutionContext["context"];
+export type InitialState = ExecutionContext;
 
 export class LocalScope {
   private state: InitialState;

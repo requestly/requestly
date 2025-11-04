@@ -6,7 +6,7 @@ import { VariableData } from "features/apiClient/store/variables/types";
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 
-type ExecutionContext = BaseSnapshot & {
+export type ExecutionContext = BaseSnapshot & {
   request: SnapshotForPreRequest["request"];
   response: SnapshotForPostResponse["response"];
 };
