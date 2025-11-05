@@ -82,9 +82,7 @@ const HttpRequestTabs: React.FC<Props> = ({
           />
         ),
         children: (
-          //FIX: fix this mode thing here
           <RequestBody
-            mode="multiple"
             recordId={requestId}
             bodyContainer={requestEntry.request.bodyContainer}
             contentType={requestEntry.request.contentType}
@@ -93,25 +91,6 @@ const HttpRequestTabs: React.FC<Props> = ({
           />
         ),
         disabled: !isRequestBodySupported,
-        // children: requestEntry.request.bodyContainer ? (
-        //   <RequestBody
-        //     mode="multiple"
-        //     recordId={requestId}
-        //     bodyContainer={requestEntry.request.bodyContainer}
-        //     contentType={requestEntry.request.contentType}
-        //     setRequestEntry={setRequestEntry}
-        //     setContentType={setContentType}
-        //   />
-        // ) : (
-        //   <RequestBody
-        //     mode="single"
-        //     recordId={requestId}
-        //     bodyContainer={requestEntry.request.bodyContainer}
-        //     contentType={requestEntry.request.contentType}
-        //     setRequestEntry={setRequestEntry}
-        //     setContentType={setContentType}
-        //   />
-        // ),
       },
       {
         key: RequestTab.HEADERS,

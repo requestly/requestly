@@ -36,23 +36,23 @@ export const extractBodyFromContainer = (
   bodyContainer: RQAPI.RequestBodyContainer,
   contentType: RequestContentType
 ): RQAPI.RequestBody => {
+  //is this correct?
   if (!bodyContainer) {
-    return null;
+    return "";
   }
-
   switch (contentType) {
     case RequestContentType.FORM:
-      return bodyContainer.form ?? null;
+      return bodyContainer.form ?? [];
     case RequestContentType.MULTIPART_FORM:
-      return bodyContainer.multipartForm ?? null;
+      return bodyContainer.multipartForm ?? [];
     case RequestContentType.JSON:
     case RequestContentType.RAW:
     case RequestContentType.HTML:
     case RequestContentType.JAVASCRIPT:
     case RequestContentType.XML:
-      return bodyContainer.text ?? null;
+      return bodyContainer.text ?? "";
     default:
-      return bodyContainer.text ?? null;
+      return bodyContainer.text ?? "";
   }
 };
 
@@ -78,17 +78,16 @@ export const makeRequest = async (
     //TODO: make the default value false if and when the feature flag is turned on
     request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
-    //remove body from APi request
-    const { bodyContainer, ...trimmedRequest } = request;
+    //remove bodyContainer from API request
+    const { bodyContainer, ...requestWithoutBodyContainer } = request;
 
-    //extraction of body happens here now
+    //extraction of body happens here
     const requestWithBody = {
-      ...trimmedRequest,
+      ...requestWithoutBodyContainer,
       body: extractBodyFromContainer(bodyContainer, request.contentType),
     };
 
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      console.log("DEBUG", requestWithBody);
       getAPIResponseViaExtension(requestWithBody as any)
         .then((result: ResponseOrError) => {
           if (!result) {
@@ -366,7 +365,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     contentType = RequestContentType.MULTIPART_FORM;
   }
 
-  let newbodyContainer: RQAPI.RequestBodyContainer;
+  let newbodyContainer: RQAPI.RequestBodyContainer = {};
   switch (contentType) {
     case RequestContentType.JSON:
       newbodyContainer.text = JSON.stringify(requestJson.data);
@@ -681,7 +680,6 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
     headersSize: -1,
   };
 
-  //FIX ME: this needs a change
   if (supportsRequestBody(apiRequest.method)) {
     if (apiRequest?.contentType === RequestContentType.RAW) {
       harRequest.postData = {
@@ -699,7 +697,7 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
         params: (apiRequest.bodyContainer.form as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
       };
     } else if (apiRequest?.contentType === RequestContentType.MULTIPART_FORM) {
-      //recheck this I think I have written wrong map
+      //retest if this is not breaking
       harRequest.postData = {
         mimeType: RequestContentType.MULTIPART_FORM,
         params: (apiRequest.bodyContainer.multipartForm as RQAPI.FormDataKeyValuePair[]).map(({ key, value }) => ({

@@ -210,8 +210,7 @@ const HttpClientView: React.FC<Props> = ({
       };
 
       if (!supportsRequestBody(method)) {
-        //FIXME: Please revisit this was removed to check impact
-        newEntry.request.bodyContainer = null;
+        newEntry.request.bodyContainer = {};
         newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
         newEntry.request.contentType = RequestContentType.RAW;
       }
@@ -225,17 +224,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const setContentType = useCallback(
     (contentType: RequestContentType) => {
-      console.log("current content type:", contentType);
       setEntry((entry) => {
-        // let newBody: RQAPI.RequestBody;
-
-        // if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
-        //   newBody =
-        //     entry.request.bodyContainer?.[contentType === RequestContentType.FORM ? "form" : "multipartForm"] ?? [];
-        // } else {
-        //   newBody = entry.request.bodyContainer?.["text"] ?? "";
-        // }
-
         //which body I have to send according to content type is now resonsibility of getApirequestextension here
         //that will extract body from container based on content type
 
@@ -385,7 +374,6 @@ const HttpClientView: React.FC<Props> = ({
     });
 
     try {
-      console.log("Sending Request: ", requestToSend);
       const apiClientExecutionResult = await httpRequestExecutor.execute(
         apiEntryDetails?.id,
         sanitizeEntry(requestToSend)

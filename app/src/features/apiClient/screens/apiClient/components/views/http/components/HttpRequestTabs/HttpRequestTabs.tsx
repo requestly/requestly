@@ -91,24 +91,18 @@ const HttpRequestTabs: React.FC<Props> = ({
           //TODO: Revisit this check
           <RequestTabLabel
             label="Body"
-            count={requestEntry.request.bodyContainer ? 1 : 0}
+            count={
+              requestEntry.request.bodyContainer.form ||
+              requestEntry.request.bodyContainer.text ||
+              requestEntry.request.bodyContainer.multipartForm
+                ? 1
+                : 0
+            }
             showDot={isRequestBodySupported}
           />
         ),
-        //TODO: I think this bodyContainer check is not required now
-        children: requestEntry.request.bodyContainer ? (
-          //TODO: Remove this check of mode prop
+        children: (
           <RequestBody
-            mode="multiple"
-            recordId={requestId}
-            bodyContainer={requestEntry.request.bodyContainer}
-            contentType={requestEntry.request.contentType}
-            setRequestEntry={setRequestEntry}
-            setContentType={setContentType}
-          />
-        ) : (
-          <RequestBody
-            mode="single"
             recordId={requestId}
             bodyContainer={requestEntry.request.bodyContainer}
             contentType={requestEntry.request.contentType}
