@@ -34,7 +34,6 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
       try {
         const { variableName, scope, type, initialValue, currentValue } = data;
 
-        // Build variable data with both initial and current values
         const variableData = {
           [variableName]: {
             id: 0, // Will be set by the store
@@ -83,9 +82,16 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
           case VariableScope.RUNTIME: {
             // Create in runtime store (session only)
             const runtimeValue = currentValue || initialValue || "";
-            runtimeVariablesStore.getState().update(variableName, {
+
+            // Generate an ID for the new variable
+            const existingVariables = runtimeVariablesStore.getState().data;
+            const newId = existingVariables.size;
+
+            runtimeVariablesStore.getState().add(variableName, {
+              id: newId,
               type,
               localValue: runtimeValue,
+              isPersisted: true,
             });
             toast.success(`Variable "${variableName}" created in Runtime (session only)`);
             break;
