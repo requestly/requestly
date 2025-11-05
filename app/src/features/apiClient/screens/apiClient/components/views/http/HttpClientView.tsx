@@ -631,7 +631,6 @@ const HttpClientView: React.FC<Props> = ({
         parentId: apiEntryDetails?.collectionId,
       };
 
-      //FIX: body depedency inside it needs to removed and depend on bodycontainer
       const resolvedAuth = resolveAuth(newAuth, childDetails, getParentChain, getData);
       const { headers, queryParams } = parseAuth(resolvedAuth, resolver);
       const headersContent = Object.fromEntries(headers);
