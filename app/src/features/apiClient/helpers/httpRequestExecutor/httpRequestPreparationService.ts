@@ -81,29 +81,6 @@ export class HttpRequestPreparationService {
     const headers = getAllHeaders().map((kv, index) => ({ ...kv, id: index, isEnabled: true }));
     const queryParams = getAllQueryParams().map((kv, index) => ({ ...kv, id: index, isEnabled: true }));
 
-    // const existingHeaders = getAllHeaders();
-    // const existingQueryParams = getAllQueryParams();
-
-    // console.log("deb1", existingHeaders);
-
-    // this.populateAutogenerateStore(recordId);
-    // const newHeaders = getAllHeaders();
-    // const newQueryParams = getAllQueryParams();
-
-    // const mergedHeaders = new Map();
-    // existingHeaders.forEach((header) => mergedHeaders.set(header.key, header));
-    // newHeaders.forEach((header) => mergedHeaders.set(header.key, header));
-    // const headers = Array.from(mergedHeaders.values()).map((kv, index) => ({ ...kv, id: index, isEnabled: true }));
-
-    // const mergedQueryParams = new Map();
-    // existingQueryParams.forEach((param) => mergedQueryParams.set(param.key, param));
-    // newQueryParams.forEach((param) => mergedQueryParams.set(param.key, param));
-    // const queryParams = Array.from(mergedQueryParams.values()).map((kv, index) => ({
-    //   ...kv,
-    //   id: index,
-    //   isEnabled: true,
-    // }));
-
     workingEntry.request.headers = updateRequestWithAuthOptions(workingEntry.request.headers, headers);
     workingEntry.request.queryParams = updateRequestWithAuthOptions(workingEntry.request.queryParams, queryParams);
 
