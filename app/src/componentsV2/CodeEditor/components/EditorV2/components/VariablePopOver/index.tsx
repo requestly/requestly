@@ -29,6 +29,16 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 }) => {
   const variableData = variables.get(hoveredVariable);
 
+  // Extract collectionId from the scoped variables
+  const collectionId = React.useMemo(() => {
+    for (const [, [, source]] of variables) {
+      if (source.scope === VariableScope.COLLECTION) {
+        return source.scopeId;
+      }
+    }
+    return undefined;
+  }, [variables]);
+
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   const [currentView, setCurrentView] = useState<PopoverView>(initialView);
@@ -79,7 +89,14 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
         return <VariableNotFound onCreateClick={handleCreateClick} onSwitchEnvironment={handleSwitchEnvironment} />;
 
       case PopoverView.CREATE_FORM:
-        return <CreateVariableView variableName={hoveredVariable} onCancel={handleCancel} onSave={handleSave} />;
+        return (
+          <CreateVariableView
+            variableName={hoveredVariable}
+            onCancel={handleCancel}
+            onSave={handleSave}
+            collectionId={collectionId}
+          />
+        );
 
       default:
         return null;

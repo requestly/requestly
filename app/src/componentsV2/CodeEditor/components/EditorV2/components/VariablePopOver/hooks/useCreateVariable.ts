@@ -13,12 +13,13 @@ interface UseCreateVariableResult {
   error: string | null;
 }
 
-export const useCreateVariable = (): UseCreateVariableResult => {
+export const useCreateVariable = (collectionId?: string): UseCreateVariableResult => {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const {
-    env: { setEnvironmentVariables },
+    env: { patchEnvironmentVariables },
+    api: { patchCollectionVariables },
   } = useCommand();
 
   const activeEnvironment = useActiveEnvironment();
@@ -33,12 +34,13 @@ export const useCreateVariable = (): UseCreateVariableResult => {
       try {
         const { variableName, scope, type, initialValue, currentValue } = data;
 
-        // Build variable data
+        // Build variable data with both initial and current values
         const variableData = {
           [variableName]: {
             id: 0, // Will be set by the store
             type,
             syncValue: initialValue || "",
+            localValue: currentValue || undefined,
             isPersisted: true as const,
           },
         };
@@ -47,7 +49,7 @@ export const useCreateVariable = (): UseCreateVariableResult => {
         switch (scope) {
           case VariableScope.GLOBAL: {
             const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
-            await setEnvironmentVariables({
+            await patchEnvironmentVariables({
               environmentId: globalEnvId,
               variables: variableData,
             });
@@ -59,7 +61,7 @@ export const useCreateVariable = (): UseCreateVariableResult => {
             if (!activeEnvironment) {
               throw new Error("No active environment selected");
             }
-            await setEnvironmentVariables({
+            await patchEnvironmentVariables({
               environmentId: activeEnvironment.id,
               variables: variableData,
             });
@@ -67,11 +69,16 @@ export const useCreateVariable = (): UseCreateVariableResult => {
             break;
           }
 
-          case VariableScope.COLLECTION: {
-            // Collection variables will be handled separately
-            // For now, throw error as we need collectionId context
-            throw new Error("Collection variable creation requires collection context");
-          }
+          case VariableScope.COLLECTION:
+            if (!collectionId) {
+              throw new Error("Collection variable creation requires collection context");
+            }
+            await patchCollectionVariables({
+              collectionId: collectionId,
+              variables: variableData,
+            });
+            toast.success(`Variable "${variableName}" created in Collection`);
+            break;
 
           case VariableScope.RUNTIME: {
             // Create in runtime store (session only)
@@ -96,7 +103,13 @@ export const useCreateVariable = (): UseCreateVariableResult => {
         setIsCreating(false);
       }
     },
-    [activeEnvironment, environmentVariablesRepository, setEnvironmentVariables]
+    [
+      activeEnvironment,
+      collectionId,
+      environmentVariablesRepository,
+      patchEnvironmentVariables,
+      patchCollectionVariables,
+    ]
   );
 
   return {
