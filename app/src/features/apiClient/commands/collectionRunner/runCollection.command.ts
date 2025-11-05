@@ -9,7 +9,11 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
+import {
+  isHTTPApiEntry,
+  parseCollectionRunnerDataFile,
+  parseHttpRequestEntry,
+} from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -28,6 +32,7 @@ import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore
 import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
 import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
 import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
+import { renderVariables } from "backend/environment/utils";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -181,8 +186,36 @@ class Runner {
     });
   }
 
+  private populateAutogenerateStore(recordId: string) {
+    console.log("called");
+    const { getData, getParentChain } = this.ctx.stores.records.getState();
+    const apiRecord = getData(recordId);
+
+    if (!apiRecord || !apiRecord.data) {
+      return;
+    }
+
+    const childDetails = {
+      id: apiRecord.id,
+      parentId: apiRecord.collectionId,
+    };
+
+    const resolvedEntry = renderVariables(apiRecord.data, apiRecord.id, this.ctx);
+    const newNamespaces = parseHttpRequestEntry(
+      resolvedEntry.result as RQAPI.HttpApiEntry,
+      childDetails,
+      getParentChain,
+      getData
+    );
+
+    console.log("newName", newNamespaces);
+    this.runContext.autogenerateStore.getState().initialize(newNamespaces);
+  }
+
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
     const collection = this.ctx.stores.records.getState().getData(request.collectionId);
+    this.populateAutogenerateStore(request.id);
+
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
       iteration,

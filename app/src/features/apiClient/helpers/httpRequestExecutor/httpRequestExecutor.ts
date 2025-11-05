@@ -177,6 +177,7 @@ export class HttpRequestExecutor {
     abortController?: AbortController,
     scopes?: Scope[]
   ): Promise<RQAPI.ExecutionResult> {
+    console.log("called2");
     this.abortController = abortController || new AbortController();
 
     const preparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
@@ -235,6 +236,7 @@ export class HttpRequestExecutor {
 
     try {
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
+      console.log("response", response);
       preparedEntry.response = response;
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
