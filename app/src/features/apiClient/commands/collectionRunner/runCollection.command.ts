@@ -186,7 +186,7 @@ class Runner {
     });
   }
 
-  private populateAutogenerateStore(recordId: string) {
+  private populateAutogenerateStore(recordId: string, scopes: Scope[]) {
     const { getData, getParentChain } = this.ctx.stores.records.getState();
     const apiRecord = getData(recordId);
 
@@ -200,7 +200,7 @@ class Runner {
     };
 
     const resolver = <T extends Record<string, any>>(template: T) => {
-      return renderVariables(template, apiRecord.id, this.ctx).result;
+      return renderVariables(template, apiRecord.id, this.ctx, scopes).result;
     };
 
     const newNamespaces = parseHttpRequestEntry(apiRecord.data as RQAPI.HttpApiEntry, childDetails, {
@@ -214,7 +214,6 @@ class Runner {
 
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
     const collection = this.ctx.stores.records.getState().getData(request.collectionId);
-    this.populateAutogenerateStore(request.id);
 
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
@@ -240,6 +239,8 @@ class Runner {
         createDummyVariablesStore(this.variables[iteration - 1]),
       ]);
     }
+
+    this.populateAutogenerateStore(request.id, scopes);
 
     return {
       currentExecutingRequest,
