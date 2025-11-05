@@ -6,9 +6,14 @@ import { CreateVariableViewProps, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 
-export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variableName, onCancel, onSave }) => {
-  const { scopeOptions, defaultScope } = useScopeOptions();
-  const { createVariable, isCreating } = useCreateVariable();
+export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
+  variableName,
+  onCancel,
+  onSave,
+  collectionId,
+}) => {
+  const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
+  const { createVariable, isCreating } = useCreateVariable(collectionId);
 
   const [formData, setFormData] = useState({
     scope: defaultScope,
@@ -145,7 +150,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
             labelInValue
             value={{
               value: formData.scope,
-              label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope)),
+              label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope) || scopeOptions[0]),
             }}
             onChange={(val) => setFormData({ ...formData, scope: val.value })}
             className="form-select scope-select"
