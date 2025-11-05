@@ -1,7 +1,8 @@
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 import { LocalScope } from "modules/localScope";
 
 export class IterationData {
-  private readonly iterationData;
+  private iterationData: ExecutionContext["iterationData"];
   constructor(private readonly localScope: LocalScope) {
     this.iterationData = this.localScope.get("iterationData");
   }
@@ -14,10 +15,11 @@ export class IterationData {
     return key in this.iterationData;
   }
 
+  // TODO@nafees: discuss the behaviour for unset
   unset(key: string) {
     const variables = this.iterationData;
-    variables[key] = undefined;
-    this.localScope.set("iterationData", variables);
+    variables[key].localValue = undefined;
+    variables[key].syncValue = undefined;
   }
 
   toObject() {
