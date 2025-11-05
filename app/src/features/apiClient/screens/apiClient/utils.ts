@@ -36,9 +36,8 @@ export const extractBodyFromContainer = (
   bodyContainer: RQAPI.RequestBodyContainer,
   contentType: RequestContentType
 ): RQAPI.RequestBody => {
-  //is this correct?
   if (!bodyContainer) {
-    return "";
+    return null;
   }
   switch (contentType) {
     case RequestContentType.FORM:

@@ -26,9 +26,6 @@ interface KeyValuePair {
   key: string;
   value: string;
 }
-
-type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
-
 export type MultipartFileValue = {
   id: string; // file id for each multipart key value pair
   name: string;
@@ -41,13 +38,8 @@ export type FormDataKeyValuePair = KeyValuePair & {
   value: string | MultipartFileValue[];
 };
 
-export type RequestBodyContainer = {
-  text?: string;
-  form?: KeyValuePair[];
-  multipartForm?: FormDataKeyValuePair[];
-};
+type RequestBody = string | KeyValuePair[] | FormDataKeyValuePair[]; // in case of form data, body will be key-value pairs
 
-//fix the interface - provide support for bodycontainer here
 interface Request {
   url: string;
   queryParams: KeyValuePair[];
@@ -71,43 +63,19 @@ export const REQUESTLY_ID_HEADER = "x-requestly-id";
 
 /* UTIL */
 
-//FIX THIS
-const isFormRequest = (method: RequestMethod, contentType: RequestContentType, body: any): body is KeyValuePair[] => {
+const isFormRequest = (
+  method: RequestMethod,
+  contentType: RequestContentType,
+  body: Request["body"]
+): body is KeyValuePair[] => {
   return ![RequestMethod.GET, RequestMethod.HEAD].includes(method) && contentType === RequestContentType.FORM;
 };
 
-// export const getBodyFromBodyContainer = (
-//   bodyContainer: RequestBodyContainer,
-//   contentType: RequestContentType
-// ): RequestBody => {
-//   if (!bodyContainer) return null;
-
-//   switch (contentType) {
-//     case RequestContentType.JSON:
-//     case RequestContentType.RAW:
-//       return bodyContainer.text ?? "";
-
-//     case RequestContentType.FORM:
-//       return bodyContainer.form ?? [];
-
-//     case RequestContentType.MULTIPART_FORM:
-//       return bodyContainer.multipartForm ?? [];
-
-//     default:
-//       return bodyContainer.text ?? "";
-//   }
-// };
-
 /* CORE */
-//FIX THIS PART: we are now relying on the bodycontainer
-//One thing not decided yet, should the extraction of body from bodycontainer based on content type should happen here or one level before in app
-//code
 export async function getAPIResponse(apiRequest: Request): Promise<Response | { error: string }> {
-  console.log("apiRequest", apiRequest);
   const method = apiRequest.method || "GET";
   const headers = new Headers();
   const body = apiRequest.body;
-  console.log("Body", body);
 
   let url = apiRequest.url;
   let finalRequestBody: any = body;
@@ -130,7 +98,6 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   headers.append(REQUESTLY_ID_HEADER, requestlyId);
 
   if (isFormRequest(apiRequest.method, apiRequest.contentType, body)) {
-    console.log("form", body);
     const formData = new FormData();
     body?.forEach(({ key, value }) => {
       formData.append(key, value);
