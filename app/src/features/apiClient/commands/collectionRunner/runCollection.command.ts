@@ -187,7 +187,6 @@ class Runner {
   }
 
   private populateAutogenerateStore(recordId: string) {
-    console.log("called");
     const { getData, getParentChain } = this.ctx.stores.records.getState();
     const apiRecord = getData(recordId);
 
@@ -200,15 +199,16 @@ class Runner {
       parentId: apiRecord.collectionId,
     };
 
-    const resolvedEntry = renderVariables(apiRecord.data, apiRecord.id, this.ctx);
-    const newNamespaces = parseHttpRequestEntry(
-      resolvedEntry.result as RQAPI.HttpApiEntry,
-      childDetails,
-      getParentChain,
-      getData
-    );
+    const resolver = <T extends Record<string, any>>(template: T) => {
+      return renderVariables(template, apiRecord.id, this.ctx).result;
+    };
 
-    console.log("newName", newNamespaces);
+    const newNamespaces = parseHttpRequestEntry(apiRecord.data as RQAPI.HttpApiEntry, childDetails, {
+      getParentChain,
+      getData,
+      resolver,
+    });
+
     this.runContext.autogenerateStore.getState().initialize(newNamespaces);
   }
 

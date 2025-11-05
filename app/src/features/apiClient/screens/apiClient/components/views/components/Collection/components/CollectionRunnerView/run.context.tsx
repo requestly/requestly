@@ -93,10 +93,10 @@ export function useRunResultStore<T>(selector: (state: RunResultState) => T) {
 }
 
 export function useRunAutogenerateStore() {
-  // get the same storee that was created in AutogenerateProvider
+  // get the same store that was created in AutogenerateProvider
   const store = useContext(AutogenerateStoreContext);
   if (!store) {
-    throw new Error("useRunAutogenerateStore must be used within AutogenerateProvider");
+    throw new NativeError("useRunAutogenerateStore must be used within AutogenerateProvider");
   }
 
   return store;
