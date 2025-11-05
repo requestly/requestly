@@ -63,7 +63,6 @@ interface Props {
   onSaveCallback: (apiEntryDetails: RQAPI.GraphQLApiRecord) => void;
   isCreateMode: boolean;
   openInModal?: boolean;
-  apiEntryDetails: RQAPI.GraphQLApiRecord;
 }
 
 const createApiRecord = (entry: RQAPI.GraphQLApiEntry, record: RQAPI.GraphQLApiRecord) => {
@@ -79,7 +78,6 @@ const GraphQLClientView: React.FC<Props> = ({
   onSaveCallback,
   isCreateMode,
   openInModal = false,
-  apiEntryDetails,
 }) => {
   const [
     url,
@@ -518,10 +516,10 @@ const GraphQLClientView: React.FC<Props> = ({
         <div className="api-client-header-container__header">
           <div className="api-client-breadcrumb-container">
             <ApiClientBreadCrumb
-              id={apiEntryDetails.id}
+              id={record.id}
               placeholder="Untitled request"
               openInModal={openInModal}
-              name={apiEntryDetails?.name}
+              name={record.name ?? "Untitled request"}
               autoFocus={getIsNew()}
               onBlur={(newName) => {
                 setIsNew(false);
