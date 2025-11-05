@@ -680,26 +680,27 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
   };
 
   if (supportsRequestBody(apiRequest.method)) {
+    const bodyContainer = apiRequest.bodyContainer || {};
     if (apiRequest?.contentType === RequestContentType.RAW) {
       harRequest.postData = {
         mimeType: RequestContentType.RAW,
-        text: apiRequest.bodyContainer.text as string,
+        text: bodyContainer.text as string,
       };
     } else if (apiRequest?.contentType === RequestContentType.JSON) {
       harRequest.postData = {
         mimeType: RequestContentType.JSON,
-        text: apiRequest.bodyContainer.text as string,
+        text: bodyContainer.text as string,
       };
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
       harRequest.postData = {
         mimeType: RequestContentType.FORM,
-        params: (apiRequest.bodyContainer.form as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
+        params: (bodyContainer.form as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
       };
     } else if (apiRequest?.contentType === RequestContentType.MULTIPART_FORM) {
       //retest if this is not breaking
       harRequest.postData = {
         mimeType: RequestContentType.MULTIPART_FORM,
-        params: (apiRequest.bodyContainer.multipartForm as RQAPI.FormDataKeyValuePair[]).map(({ key, value }) => ({
+        params: (bodyContainer.multipartForm as RQAPI.FormDataKeyValuePair[]).map(({ key, value }) => ({
           name: key,
           value,
         })),
