@@ -194,7 +194,7 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const executionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry);
+    const executionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry, scopes);
     const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
 
     let preRequestScriptResult: WorkResult | undefined;

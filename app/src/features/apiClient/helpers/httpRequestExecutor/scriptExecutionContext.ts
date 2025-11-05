@@ -1,6 +1,6 @@
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
-import { getScopedVariables } from "../variableResolver/variable-resolver";
+import { getScopedVariables, Scope } from "../variableResolver/variable-resolver";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { VariableData } from "features/apiClient/store/variables/types";
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
@@ -18,14 +18,15 @@ export class ScriptExecutionContext {
   constructor(
     private readonly ctx: ApiClientFeatureContext,
     private readonly recordId: string,
-    private readonly entry: RQAPI.HttpApiEntry
+    private readonly entry: RQAPI.HttpApiEntry,
+    private readonly scopes: Scope[] = []
   ) {
     this.initializeContext();
   }
 
   private getVariablesByScope(recordId: string) {
     const parents = getApiClientRecordsStore(this.ctx).getState().getParentChain(recordId);
-    const scopedVariables = getScopedVariables(parents, this.ctx.stores);
+    const scopedVariables = getScopedVariables(parents, this.ctx.stores, this.scopes);
 
     const variablesByScope: Record<string, Record<string, VariableData>> = Array.from(scopedVariables).reduce(
       (acc, [key, [variableData, variableSource]]) => {
@@ -45,12 +46,16 @@ export class ScriptExecutionContext {
     const collectionVariables = (variablesByScope[VariableScope.COLLECTION] || {}) as EnvironmentVariables;
     const environmentVariables = (variablesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
     const variables = variablesByScope[VariableScope.RUNTIME] || {};
+    const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+
+    console.log("!!!debug", "buildExecutionContext", { iterationData, variablesByScope });
 
     const baseSnapshot: BaseSnapshot = {
       global: globalVariables,
       collectionVariables,
       environment: environmentVariables,
       variables,
+      iterationData,
     };
 
     return {

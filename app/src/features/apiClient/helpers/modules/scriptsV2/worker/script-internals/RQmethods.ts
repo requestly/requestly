@@ -7,6 +7,7 @@ import { Options as AjvOptions } from "ajv";
 import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
 import { status } from "http-status";
+import { IterationData } from "./IterationData";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -49,12 +50,12 @@ export class RQ implements SandboxAPI {
   public collectionVariables: VariableScope;
   public expect: Chai.ExpectStatic;
   public test: TestFunction;
+  public iterationData: IterationData;
 
   // Add other sandbox properties
   public cookies = createInfiniteChainable("cookie");
   public execution = createInfiniteChainable("execution");
   public info = createInfiniteChainable("info");
-  public iterationData = createInfiniteChainable("iterationData");
   public require = createInfiniteChainable("require");
   public sendRequest = createInfiniteChainable("sendRequest");
   public vault = createInfiniteChainable("vault");
@@ -71,6 +72,7 @@ export class RQ implements SandboxAPI {
     this.test = this.createTestObject();
     this.request = this.createRequestObject(localScope.get("request"));
     this.response = this.createResponseObject(localScope.get("response"));
+    this.iterationData = new IterationData(localScope);
 
     this.assertionHandler = new AssertionHandler(this.response);
   }
@@ -123,7 +125,7 @@ export class RQ implements SandboxAPI {
           };
         },
         json: () => jsonifyObject(originalResponse.body),
-        text: () => this.response.body,
+        text: () => this.response?.body,
         to: {
           be: this.createBeAssertions(true),
           have: this.createHaveAssertions(true),

@@ -7,6 +7,7 @@ export type BaseSnapshot = {
   collectionVariables: EnvironmentVariables;
   environment: EnvironmentVariables;
   variables: RuntimeVariables;
+  iterationData: EnvironmentVariables;
 };
 
 export type SnapshotForPreRequest = BaseSnapshot & {

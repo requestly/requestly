@@ -1,6 +1,7 @@
-import { VariableValueType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { Options as AjvOptions } from "ajv";
+import { IterationData } from "./IterationData";
+import { VariableScope } from "./variableScope";
 
 interface StatusAssertions {
   accepted: void;
@@ -78,32 +79,16 @@ export interface TestFunction {
 export interface SandboxAPI {
   request: LocalScopeRequest;
   response: LocalScopeResponse;
-  environment: {
-    set(key: string, value: VariableValueType): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
-  globals: {
-    set(key: string, value: VariableValueType): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
-  collectionVariables: {
-    set(key: string, value: VariableValueType): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
-  variables: {
-    set(key: string, value: VariableValueType, options?: { persist: boolean }): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
+  environment: VariableScope;
+  globals: VariableScope;
+  collectionVariables: VariableScope;
+  variables: VariableScope;
+  iterationData: IterationData;
   test: TestFunction;
   expect: Chai.ExpectStatic;
   cookies: any;
   execution: any;
   info: any;
-  iterationData: any;
   require: any;
   sendRequest: any;
   vault: any;
