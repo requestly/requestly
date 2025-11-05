@@ -375,7 +375,6 @@ const HttpClientView: React.FC<Props> = ({
       id: apiEntryDetails?.id,
       parentId: apiEntryDetails?.collectionId,
     };
-    // resolving templates
     const namespaces = parseHttpRequestEntry(entry, childDetails, {
       getParentChain,
       getData,

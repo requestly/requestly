@@ -33,7 +33,7 @@ export const RunViewContextProvider: React.FC<{
   const { collectionId } = useCollectionView();
   const records = useChildren(collectionId);
   const requestIds = useMemo(() => records.filter(isApiRequest).map((r) => r.id), [records]);
-  const autogenerateStore = useRunAutogenerateStore();
+  const autogenerateStore = useContext(AutogenerateStoreContext);
 
   const runConfigStore = useMemo(() => {
     return createRunConfigStore({
@@ -90,14 +90,4 @@ export function useRunResultStore<T>(selector: (state: RunResultState) => T) {
   }
 
   return useStore(ctx.runResultStore, useShallow(selector));
-}
-
-export function useRunAutogenerateStore() {
-  // get the same store that was created in AutogenerateProvider
-  const store = useContext(AutogenerateStoreContext);
-  if (!store) {
-    throw new NativeError("useRunAutogenerateStore must be used within AutogenerateProvider");
-  }
-
-  return store;
 }
