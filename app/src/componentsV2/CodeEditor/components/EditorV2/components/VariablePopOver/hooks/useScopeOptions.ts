@@ -3,15 +3,39 @@ import React from "react";
 import { VariableScope } from "backend/environment/types";
 import { ScopeOption } from "../types";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
-import { MdOutlineStorage } from "@react-icons/all-files/md/MdOutlineStorage";
-import { AiOutlineFolder } from "@react-icons/all-files/ai/AiOutlineFolder";
-import { AiOutlineGlobal } from "@react-icons/all-files/ai/AiOutlineGlobal";
-import { AiOutlineClockCircle } from "@react-icons/all-files/ai/AiOutlineClockCircle";
+import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
+import { BiNote } from "@react-icons/all-files/bi/BiNote";
+import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
+import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];
   defaultScope: VariableScope;
 }
+
+const createIconWithWrapper = (
+  IconComponent: React.ComponentType<any>,
+  iconColor: string,
+  bgColor: string = "transparent"
+) => {
+  return React.createElement(
+    "div",
+    {
+      style: {
+        width: "20px",
+        height: "16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: bgColor,
+        borderRadius: "4px",
+      },
+    },
+    React.createElement(IconComponent, {
+      style: { color: iconColor, height: "12px", width: "12px" },
+    })
+  );
+};
 
 export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
   const activeEnvironment = useActiveEnvironment();
@@ -21,25 +45,37 @@ export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult =>
       {
         value: VariableScope.ENVIRONMENT,
         label: activeEnvironment ? `Current environment` : "No Active Environment",
-        icon: React.createElement(MdOutlineStorage, { style: { color: "#4F90F0" } }),
+        icon: createIconWithWrapper(
+          MdHorizontalSplit,
+          "var(--requestly-color-primary-text)",
+          "var(--requestly-color-primary-darker)"
+        ),
         disabled: !activeEnvironment,
       },
       {
         value: VariableScope.COLLECTION,
         label: "Current collection",
-        icon: React.createElement(AiOutlineFolder, { style: { color: "#999" } }),
+        icon: createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)"),
         disabled: !collectionId,
       },
       {
         value: VariableScope.GLOBAL,
         label: "Global",
-        icon: React.createElement(AiOutlineGlobal, { style: { color: "#52C41A" } }),
+        icon: createIconWithWrapper(
+          BsGlobeCentralSouthAsia,
+          "var(--requestly-color-success-text)",
+          "var(--requestly-color-success-darker)"
+        ),
         disabled: false,
       },
       {
         value: VariableScope.RUNTIME,
         label: "Runtime variables",
-        icon: React.createElement(AiOutlineClockCircle, { style: { color: "#D4752E" } }),
+        icon: createIconWithWrapper(
+          MdOutlineCategory,
+          "var(--requestly-color-text-subtle)",
+          "var(--requestly-color-warning-darker)"
+        ),
         disabled: false,
       },
     ];

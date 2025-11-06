@@ -49,19 +49,14 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   };
 
   const handleSwitchEnvironment = () => {
-    // TODO: Implement environment switcher
-    // This will open the environment switcher dropdown/modal
-    console.log("Switch environment clicked");
+    window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
+    onClose?.();
   };
 
   const handleCancel = () => {
     // Return to not found view or close if variable exists
     onPinChange?.(false); // Unpin popover
-    if (variableData) {
-      onClose?.();
-    } else {
-      setCurrentView(PopoverView.NOT_FOUND);
-    }
+    onClose?.();
   };
 
   const handleSave = async () => {
