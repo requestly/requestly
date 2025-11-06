@@ -1,5 +1,12 @@
 import { LocalScope } from "modules/localScope";
-import { LocalScopeRequest, LocalScopeResponse, SandboxAPI, TestFunction, TestResult } from "./types";
+import {
+  ExecutionMetadata,
+  LocalScopeRequest,
+  LocalScopeResponse,
+  SandboxAPI,
+  TestFunction,
+  TestResult,
+} from "./types";
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
@@ -51,11 +58,11 @@ export class RQ implements SandboxAPI {
   public expect: Chai.ExpectStatic;
   public test: TestFunction;
   public iterationData: IterationData;
+  public info: ExecutionMetadata;
 
   // Add other sandbox properties
   public cookies = createInfiniteChainable("cookie");
   public execution = createInfiniteChainable("execution");
-  public info = createInfiniteChainable("info");
   public require = createInfiniteChainable("require");
   public sendRequest = createInfiniteChainable("sendRequest");
   public vault = createInfiniteChainable("vault");
@@ -63,7 +70,7 @@ export class RQ implements SandboxAPI {
 
   private assertionHandler: AssertionHandler;
 
-  constructor(localScope: LocalScope, private testResults: TestResult[]) {
+  constructor(localScope: LocalScope, private testResults: TestResult[], private executionMetadata: ExecutionMetadata) {
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
@@ -73,6 +80,7 @@ export class RQ implements SandboxAPI {
     this.request = this.createRequestObject(localScope.get("request"));
     this.response = this.createResponseObject(localScope.get("response"));
     this.iterationData = new IterationData(localScope);
+    this.info = this.executionMetadata;
 
     this.assertionHandler = new AssertionHandler(this.response);
   }
