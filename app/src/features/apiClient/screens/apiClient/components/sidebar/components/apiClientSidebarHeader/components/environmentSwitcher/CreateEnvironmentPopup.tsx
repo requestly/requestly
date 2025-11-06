@@ -44,7 +44,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
             context: { id: context.id },
           })
         );
-        toast.success(`Environment '${name}' created`);
+        toast.success(`Environment created`);
       } catch (error: any) {
         toast.error(error?.message || "Failed to create environment");
       } finally {
