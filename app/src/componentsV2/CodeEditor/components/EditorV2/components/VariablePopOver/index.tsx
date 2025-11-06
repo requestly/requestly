@@ -55,8 +55,6 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     }
   }, [requestId, getData]);
 
-  console.log({ variables, collectionId, params, requestId });
-
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   const [currentView, setCurrentView] = useState<PopoverView>(initialView);
