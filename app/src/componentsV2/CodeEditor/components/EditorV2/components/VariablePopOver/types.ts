@@ -11,8 +11,8 @@ export interface CreateVariableFormData {
   variableName: string;
   scope: VariableScope;
   type: EnvironmentVariableType;
-  initialValue: string;
-  currentValue: string;
+  initialValue: string | number | boolean;
+  currentValue: string | number | boolean;
 }
 
 export interface ScopeOption {

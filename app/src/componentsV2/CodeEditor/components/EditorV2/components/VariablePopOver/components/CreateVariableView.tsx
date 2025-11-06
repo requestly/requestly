@@ -46,6 +46,18 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
 
     // Type-specific validation
     if (formData.type === EnvironmentVariableType.Number) {
+      // Explicitly reject empty or whitespace-only strings before converting to Number
+      if (hasInitialValue && String(formData.initialValue).trim() === "") {
+        setValidationError("Please provide valid number values");
+        return false;
+      }
+
+      if (hasCurrentValue && String(formData.currentValue).trim() === "") {
+        setValidationError("Please provide valid number values");
+        return false;
+      }
+
+      // Only after non-empty checks, convert to Number and check for NaN
       const initialNum = Number(formData.initialValue);
       const currentNum = Number(formData.currentValue);
 
@@ -96,7 +108,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   const renderValueInput = useCallback(
     (fieldName: "initialValue" | "currentValue", value: any, type: EnvironmentVariableType) => {
       const onChange = (newValue: any) => {
-        setFormData({ ...formData, [fieldName]: newValue });
+        setFormData((prev) => ({ ...prev, [fieldName]: newValue }));
       };
 
       switch (type) {
@@ -158,7 +170,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
           );
       }
     },
-    [formData]
+    []
   );
 
   const renderScopeOption = (option: ScopeOption) => (
@@ -214,7 +226,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
               value: formData.scope,
               label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope) || scopeOptions[0]),
             }}
-            onChange={(val) => setFormData({ ...formData, scope: val.value })}
+            onChange={(val) => setFormData((prev) => ({ ...prev, scope: val.value }))}
             className="form-select scope-select"
             popupClassName="form-select-dropdown"
             optionLabelProp="label"
