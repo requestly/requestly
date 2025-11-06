@@ -11,9 +11,10 @@ import Editor from "componentsV2/CodeEditor";
 interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
   onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
+  focusPostResponse?: boolean;
 }
 // FIX: Editor does not re-render when scripts are undefined
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsChange }) => {
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsChange, focusPostResponse }) => {
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -21,6 +22,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
+  const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
+
+  React.useEffect(() => {
+    if (focusPostResponse && hasPostResponseScript) {
+      setScriptType(RQAPI.ScriptType.POST_RESPONSE);
+    }
+  }, [focusPostResponse, hasPostResponseScript]);
 
   const scriptTypeOptions = useMemo(() => {
     return (
@@ -51,7 +59,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">
       <Editor
-        key={scriptType}
+        key={`${scriptType}`}
         value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
         handleChange={(value: string) => onScriptsChange({ ...scripts, [scriptType]: value })}
         language={EditorLanguage.JAVASCRIPT}
@@ -60,6 +68,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
           options: [scriptTypeOptions],
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
+        autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
       />
     </div>
   );

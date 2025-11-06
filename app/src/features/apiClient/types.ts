@@ -7,6 +7,7 @@ import {
   BearerTokenAuthorizationConfig,
 } from "./screens/apiClient/components/views/components/request/components/AuthorizationView/types/AuthConfig";
 import { ErroredRecord } from "./helpers/modules/sync/local/services/types";
+import { ApiClientFile, FileId } from "./store/apiClientFilesStore";
 
 export enum RequestMethod {
   GET = "GET",
@@ -331,6 +332,11 @@ export namespace RQAPI {
     runOrder: RunOrder;
     iterations: number;
     delay: number;
+    dataFile:
+      | (Omit<ApiClientFile, "isFileValid"> & {
+          id: FileId;
+        })
+      | null;
   };
 }
 

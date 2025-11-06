@@ -9,7 +9,11 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { isHTTPApiEntry } from "features/apiClient/screens/apiClient/utils";
+import {
+  isHTTPApiEntry,
+  parseCollectionRunnerDataFile,
+  parseHttpRequestEntry,
+} from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -21,6 +25,14 @@ import {
 import { GenericState } from "hooks/useGenericState";
 import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
+import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { VariableScope } from "backend/environment/types";
+import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
+import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
+import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
+import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
+import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
+import { renderVariables } from "backend/environment/utils";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -74,11 +86,13 @@ function prepareExecutionResult(params: {
 class RunCancelled extends NativeError {}
 
 class Runner {
+  private variables: Record<string, any>[] = [];
   constructor(
     readonly ctx: ApiClientFeatureContext,
     readonly runContext: RunContext,
     readonly executor: BatchRequestExecutor,
-    readonly genericState: GenericState
+    readonly genericState: GenericState,
+    readonly appMode: "DESKTOP" | "EXTENSION"
   ) {}
 
   private get abortController() {
@@ -87,7 +101,7 @@ class Runner {
 
   private throwIfRunCancelled() {
     if (this.abortController.signal.aborted) {
-      throw new RunCancelled();
+      throw new RunCancelled("Run has been cancelled by the user.");
     }
   }
 
@@ -102,16 +116,55 @@ class Runner {
     return request;
   }
 
-  private beforeStart() {
+  private async parseDataFile() {
+    const dataFile = this.runContext.runConfigStore.getState().getConfig().dataFile;
+    if (!dataFile) {
+      return;
+    }
+
+    const apiClientFilesStore = apiClientFileStore.getState();
+
+    const collectionId = this.runContext.collectionId;
+    if (!(await apiClientFilesStore.isFilePresentLocally(dataFile.id))) {
+      throw new RunnerFileMissingError(
+        `The selected data file was moved, renamed, or deleted. Please re-upload the file to continue.`
+      ).addContext({
+        collectionId,
+        filePath: dataFile.path,
+      });
+    }
+
+    try {
+      const parsedData = await parseCollectionRunnerDataFile(dataFile.path, ITERATIONS_MAX_LIMIT);
+      return parsedData.data;
+    } catch (e) {
+      throw new DataFileParseError(
+        `The data file used for this collection appears to be damaged or unreadable. Please re-upload a valid file to continue.`
+      ).addContext({
+        collectionId,
+        error: e,
+        filePath: dataFile.path,
+      });
+    }
+  }
+
+  private async beforeStart() {
     this.genericState.setPreview(false);
     this.runContext.runResultStore.getState().reset();
     this.runContext.runResultStore.getState().setRunStatus(RunStatus.RUNNING);
     this.runContext.runResultStore.getState().setHistorySaveStatus(HistorySaveStatus.IDLE);
     this.runContext.runResultStore.getState().setStartTime(Date.now());
     this.runContext.runResultStore.getState().setEndtime(null);
+    this.variables = [];
 
     const runConfig = this.runContext.runConfigStore.getState().getConfig();
     const collectionId = this.runContext.collectionId;
+
+    if (this.appMode === "DESKTOP") {
+      const variables = await this.parseDataFile();
+      this.variables = variables ?? [];
+    }
+
     trackCollectionRunStarted({
       collection_id: collectionId,
       iteration_count: runConfig.iterations,
@@ -133,8 +186,35 @@ class Runner {
     });
   }
 
+  private populateAutogenerateStore(recordId: string, scopes: Scope[]) {
+    const { getData, getParentChain } = this.ctx.stores.records.getState();
+    const apiRecord = getData(recordId);
+
+    if (!apiRecord || !apiRecord.data) {
+      return;
+    }
+
+    const childDetails = {
+      id: apiRecord.id,
+      parentId: apiRecord.collectionId,
+    };
+
+    const resolver = <T extends Record<string, any>>(template: T) => {
+      return renderVariables(template, apiRecord.id, this.ctx, scopes).result;
+    };
+
+    const newNamespaces = parseHttpRequestEntry(apiRecord.data as RQAPI.HttpApiEntry, childDetails, {
+      getParentChain,
+      getData,
+      resolver,
+    });
+
+    this.runContext.autogenerateStore.getState().initialize(newNamespaces);
+  }
+
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
     const collection = this.ctx.stores.records.getState().getData(request.collectionId);
+
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
       iteration,
@@ -147,8 +227,24 @@ class Runner {
     this.throwIfRunCancelled();
     this.runContext.runResultStore.getState().setCurrentlyExecutingRequest(currentExecutingRequest);
 
+    const scopes: Scope[] = [];
+    if (iteration <= this.variables.length) {
+      scopes.push([
+        {
+          scope: VariableScope.DATA_FILE,
+          scopeId: "data_file",
+          name: "Data File",
+          level: 0,
+        },
+        createDummyVariablesStore(this.variables[iteration - 1]),
+      ]);
+    }
+
+    this.populateAutogenerateStore(request.id, scopes);
+
     return {
       currentExecutingRequest,
+      scopes,
     };
   }
 
@@ -200,8 +296,8 @@ class Runner {
     }
   }
 
-  private onError(error: any) {
-    this.runContext.runResultStore.getState().setRunStatus(RunStatus.ERRORED);
+  private onError(error: Error) {
+    this.runContext.runResultStore.getState().setError(error);
     this.runContext.runResultStore.getState().setEndtime(null);
   }
 
@@ -296,14 +392,15 @@ class Runner {
 
   async run() {
     try {
-      this.beforeStart();
+      await this.beforeStart();
 
       for await (const { request, iteration, startTime } of this.iterate()) {
-        const { currentExecutingRequest } = this.beforeRequestExecutionStart(iteration, request, startTime);
+        const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
           request.id,
           request.data,
-          this.runContext.runResultStore.getState().abortController
+          this.runContext.runResultStore.getState().abortController,
+          scopes
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
@@ -315,6 +412,7 @@ class Runner {
         this.onRunCancelled();
         return;
       }
+
       this.onError(e);
       return e;
     } finally {
@@ -329,8 +427,9 @@ export async function runCollection(
     runContext: RunContext;
     executor: BatchRequestExecutor;
     genericState: GenericState;
+    appMode: "DESKTOP" | "EXTENSION";
   }
 ) {
-  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState);
+  const runner = new Runner(ctx, params.runContext, params.executor, params.genericState, params.appMode);
   return runner.run();
 }

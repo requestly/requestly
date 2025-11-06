@@ -9,11 +9,21 @@
   .empty-tests-view-title {
     color: var(--requestly-color-default);
     font-size: var(--requestly-font-size-md);
+    font-weight: 500;
   }
 
   .empty-tests-view-description {
     color: var(--requestly-color-text-subtle);
     font-size: var(--requestly-font-size-sm);
+    text-align: center;
+    text-wrap: pretty;
+  }
+
+  .empty-tests-doc-anchor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
   }
 }
 

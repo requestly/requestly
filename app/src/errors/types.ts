@@ -3,9 +3,11 @@ export enum ErrorCode {
   UNKNOWN = "unknown",
 }
 
+// Contains the value from Sentry.SeverityLevel
 export enum ErrorSeverity {
-  FATAL = "fatal", // Shows Blocking UI
-  WARNING = "warning", // Shows Non-Blocking UI/Notification
-  DEBUG = "debug", // Captured but not shown to the user (To be triaged)
-  INFO = "info", // Captured but not shown to the user (Can be ignored)
+  FATAL = "fatal",
+  ERROR = "error",
+  WARNING = "warning",
+  INFO = "info",
+  DEBUG = "debug",
 }
