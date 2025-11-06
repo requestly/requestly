@@ -1,6 +1,6 @@
 import { Radio, Select } from "antd";
 import React, { useMemo } from "react";
-import { RQAPI, RequestContentType } from "../../../../../../types";
+import { RequestContentType } from "../../../../../../types";
 import { FormBody } from "./renderers/form-body-renderer";
 import { RawBody } from "./renderers/raw-body-renderer";
 import { RequestBodyContext, RequestBodyStateManager } from "./request-body-state-manager";

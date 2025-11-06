@@ -44,7 +44,10 @@ export const extractBodyFromContainer = (
   contentType: RequestContentType
 ): RQAPI.RequestBody => {
   if (!bodyContainer) {
-    return null;
+    if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
+      return [];
+    }
+    return "";
   }
   switch (contentType) {
     case RequestContentType.FORM:
@@ -700,13 +703,12 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
       harRequest.postData = {
         mimeType: RequestContentType.FORM,
-        params: (bodyContainer.form as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
+        params: ((bodyContainer.form as KeyValuePair[]) || []).map(({ key, value }) => ({ name: key, value })),
       };
     } else if (apiRequest?.contentType === RequestContentType.MULTIPART_FORM) {
-      //retest if this is not breaking
       harRequest.postData = {
         mimeType: RequestContentType.MULTIPART_FORM,
-        params: (bodyContainer.multipartForm as RQAPI.FormDataKeyValuePair[]).map(({ key, value }) => ({
+        params: ((bodyContainer.multipartForm as RQAPI.FormDataKeyValuePair[]) || []).map(({ key, value }) => ({
           name: key,
           value,
         })),

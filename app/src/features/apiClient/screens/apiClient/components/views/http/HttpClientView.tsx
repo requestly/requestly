@@ -427,7 +427,7 @@ const HttpClientView: React.FC<Props> = ({
 
     //recheck is this correctly written
     //large files check was for multipartform specially
-    const hasLargeFiles = checkForLargeFiles(entry.request.bodyContainer.multipartForm);
+    const hasLargeFiles = checkForLargeFiles(entry.request.bodyContainer?.multipartForm ?? []);
 
     const longRequestTimer = setTimeout(() => {
       if (hasLargeFiles) {
