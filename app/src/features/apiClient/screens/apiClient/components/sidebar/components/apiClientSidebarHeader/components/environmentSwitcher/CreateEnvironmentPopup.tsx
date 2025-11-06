@@ -32,7 +32,6 @@ export const CreateEnvironmentPopup: React.FC = () => {
         const context = getApiClientFeatureContext(contextId || undefined);
         if (!context) {
           toast.error("Missing API client context");
-          setIsCreating(false);
           return;
         }
         const { id, name } = await createEnvironment(context, { newEnvironmentName: "New Environment" });
@@ -51,7 +50,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
         setIsCreating(false);
       }
     },
-    [contextId, isCreating, openTab]
+    [contextId, openTab]
   );
 
   return (
