@@ -393,14 +393,17 @@ class Runner {
   async run() {
     try {
       await this.beforeStart();
+      const iterationCount = this.runContext.runConfigStore.getState().getConfig().iterations;
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
         const result = await this.executor.executeSingleRequest(
-          request.id,
-          request.data,
-          this.runContext.runResultStore.getState().abortController,
-          scopes
+          { entry: request.data as RQAPI.ApiEntry, recordId: request.id },
+          {
+            iteration: iteration - 1, // We want 0-based index for usage in scripts
+            iterationCount,
+          },
+          { abortController: this.abortController, scopes }
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);

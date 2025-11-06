@@ -21,6 +21,7 @@ import { BaseSnapshot } from "./snapshotTypes";
 import { ScriptExecutionContext } from "./scriptExecutionContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
+import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -177,11 +178,19 @@ export class HttpRequestExecutor {
   }
 
   async execute(
-    recordId: string,
-    entry: RQAPI.HttpApiEntry,
-    abortController?: AbortController,
-    scopes?: Scope[]
+    entryDetails: {
+      entry: RQAPI.HttpApiEntry;
+      recordId: string;
+    },
+    iterationContext: IterationContext,
+    executionConfig?: {
+      abortController?: AbortController;
+      scopes?: Scope[];
+    }
   ): Promise<RQAPI.ExecutionResult> {
+    const { entry, recordId } = entryDetails;
+    const { abortController, scopes } = executionConfig ?? {};
+
     this.abortController = abortController || new AbortController();
 
     const preparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
@@ -194,8 +203,20 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
+    const recordName = this.ctx.stores.records.getState().getData(recordId).name;
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry, scopes);
-    const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
+    const executionMetadata: BaseExecutionMetadata = {
+      requestId: recordId,
+      requestName: recordName,
+      iteration: iterationContext?.iteration ?? 0,
+      iterationCount: iterationContext?.iterationCount ?? 1,
+    };
+
+    const scriptExecutor = new HttpRequestScriptExecutionService(
+      executionContext,
+      executionMetadata,
+      this.workloadManager
+    );
 
     let preRequestScriptResult: WorkResult | undefined;
     let responseScriptResult: WorkResult | undefined;
@@ -329,7 +350,17 @@ export class HttpRequestExecutor {
     this.abortController = new AbortController();
 
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
-    const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
+    const executionMetadata: BaseExecutionMetadata = {
+      requestId: recordId,
+      requestName: this.ctx.stores.records.getState().getData(recordId).name,
+      iteration: 0,
+      iterationCount: 1,
+    };
+    const scriptExecutor = new HttpRequestScriptExecutionService(
+      executionContext,
+      executionMetadata,
+      this.workloadManager
+    );
 
     const preRequestScriptResult = await scriptExecutor.executePreRequestScript(entry, this.abortController, () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {

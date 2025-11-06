@@ -120,3 +120,19 @@ export interface SkippedTestResult extends BaseTestResult {
 }
 
 export type TestResult = PassedTestResult | FailedTestResult | SkippedTestResult;
+
+export type IterationContext = {
+  iteration: number;
+  iterationCount: number;
+};
+
+export type BaseExecutionMetadata = {
+  requestId: string;
+  requestName: string;
+  iteration: number;
+  iterationCount: number;
+};
+
+export type ExecutionMetadata = BaseExecutionMetadata & {
+  eventName: "prerequest" | "postresponse";
+};

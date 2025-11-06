@@ -5,6 +5,7 @@ import {
 } from "../../screens/apiClient/components/views/graphql/utils";
 import { HttpRequestExecutor } from "../httpRequestExecutor/httpRequestExecutor";
 import { Scope } from "../variableResolver/variable-resolver";
+import { IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 
 export class GraphQLRequestExecutor extends HttpRequestExecutor {
   /**
@@ -12,17 +13,24 @@ export class GraphQLRequestExecutor extends HttpRequestExecutor {
    * @returns Promise<RQAPI.ExecutionResult>
    */
   async executeGraphQLRequest(
-    recordId: string,
-    entry: RQAPI.GraphQLApiEntry,
-    abortController?: AbortController,
-    scopes?: Scope[]
+    entryDetails: {
+      entry: RQAPI.GraphQLApiEntry;
+      recordId: string;
+    },
+    iterationContext: IterationContext,
+    executionConfig?: {
+      abortController?: AbortController;
+      scopes?: Scope[];
+    }
   ): Promise<RQAPI.ExecutionResult> {
+    const { entry, recordId } = entryDetails;
+    const { abortController, scopes } = executionConfig || {};
+
     const httpPreparedEntry = this.prepareGraphQLRequest(recordId, entry, scopes);
     const apiClientExecutionResult = await this.execute(
-      recordId,
-      httpPreparedEntry.preparedEntry,
-      abortController,
-      scopes
+      { entry: httpPreparedEntry.preparedEntry, recordId },
+      iterationContext,
+      { abortController, scopes }
     );
     const graphQLEntryWithResponse: RQAPI.GraphQLApiEntry = httpEntryToGraphQLEntryAdapter(
       apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry
