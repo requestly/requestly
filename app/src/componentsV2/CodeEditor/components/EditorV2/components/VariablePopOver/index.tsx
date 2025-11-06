@@ -9,8 +9,6 @@ import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
-import { useParams } from "react-router-dom";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -30,30 +28,6 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
-  const params = useParams();
-  const requestId = useMemo(() => {
-    const wildcard = params["*"];
-    if (!wildcard) return "";
-    const parts = wildcard.split("/").filter(Boolean);
-    return parts[0] === "request" && parts[1] ? parts[1] : "";
-  }, [params]);
-
-  const [getData] = useAPIRecords((state) => [state.getData]);
-
-  const collectionId = useMemo(() => {
-    if (!requestId) {
-      return undefined;
-    }
-
-    try {
-      const record = getData(requestId);
-      // Every record has a collectionId property that points to its immediate parent collection
-      return record?.collectionId || undefined;
-    } catch (error) {
-      console.error("Error extracting collection ID:", error);
-      return undefined;
-    }
-  }, [requestId, getData]);
 
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
@@ -100,14 +74,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
         return <VariableNotFound onCreateClick={handleCreateClick} onSwitchEnvironment={handleSwitchEnvironment} />;
 
       case PopoverView.CREATE_FORM:
-        return (
-          <CreateVariableView
-            variableName={hoveredVariable}
-            onCancel={handleCancel}
-            onSave={handleSave}
-            collectionId={collectionId}
-          />
-        );
+        return <CreateVariableView variableName={hoveredVariable} onCancel={handleCancel} onSave={handleSave} />;
 
       default:
         return null;
