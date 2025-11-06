@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Dropdown, MenuProps, Typography } from "antd";
+import { Dropdown, MenuProps, Typography, Popover } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
@@ -12,6 +12,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import "./environmentSwitcher.scss";
+import { CreateEnvironmentPopup } from "./CreateEnvironmentPopup";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { EnvironmentState } from "features/apiClient/store/environments/environments.store";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
@@ -78,9 +79,21 @@ export const EnvironmentSwitcher = () => {
 
   if (environments.length === 0) {
     return (
-      <div className="no-environment-container">
-        <MdHorizontalSplit /> No environment
-      </div>
+      <Popover
+        trigger="click"
+        placement="bottomLeft"
+        showArrow={false}
+        overlayStyle={{ padding: 0, margin: 0 }}
+        align={{ offset: [-17, -6] }}
+        overlayClassName="create-environment-popup-wrapper"
+        content={<CreateEnvironmentPopup />}
+      >
+        <RQButton onClick={(e) => e.stopPropagation()} className="environment-switcher-button" size="small">
+          <div className="no-environment-container">
+            <MdHorizontalSplit /> No environment
+          </div>
+        </RQButton>
+      </Popover>
     );
   }
 
