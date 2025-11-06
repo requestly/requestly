@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Dropdown, MenuProps, Typography } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
@@ -36,6 +36,7 @@ function SwitcherListItemLabel(props: { environmentId: EnvironmentState["id"] })
 
 export const EnvironmentSwitcher = () => {
   const location = useLocation();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [environments, setActiveEnvironment] = useAPIEnvironment((s) => [s.environments, s.setActive]);
 
@@ -43,6 +44,15 @@ export const EnvironmentSwitcher = () => {
 
   const contextId = useContextId();
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+
+  useEffect(() => {
+    const handleEvent = () => {
+      setIsDropdownOpen(true);
+    };
+
+    window.addEventListener("trigger-env-switcher", handleEvent);
+    return () => window.removeEventListener("trigger-env-switcher", handleEvent);
+  }, []);
 
   const dropdownItems: MenuProps["items"] = useMemo(() => {
     return environments
@@ -85,7 +95,13 @@ export const EnvironmentSwitcher = () => {
   }
 
   return (
-    <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
+    <Dropdown
+      overlayClassName="environment-switcher-dropdown"
+      trigger={["click"]}
+      menu={{ items: dropdownItems }}
+      open={isDropdownOpen}
+      onOpenChange={setIsDropdownOpen}
+    >
       <RQButton onClick={(e) => e.stopPropagation()} className="environment-switcher-button" size="small">
         <span className="environment-icon">
           <MdHorizontalSplit />

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Input, Select } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Input, InputNumber, Select, Switch } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableType } from "backend/environment/types";
 import { CreateVariableViewProps, ScopeOption } from "../types";
@@ -30,13 +30,43 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   }, [defaultScope]);
 
   const validate = (): boolean => {
-    if (!formData.initialValue && !formData.currentValue) {
+    const hasInitialValue =
+      formData.type === EnvironmentVariableType.Boolean
+        ? formData.initialValue !== "" && formData.initialValue !== undefined
+        : formData.initialValue;
+    const hasCurrentValue =
+      formData.type === EnvironmentVariableType.Boolean
+        ? formData.currentValue !== "" && formData.currentValue !== undefined
+        : formData.currentValue;
+
+    if (!hasInitialValue && !hasCurrentValue) {
       setValidationError("Please provide at least one value (Initial or Current)");
       return false;
     }
+
+    // Type-specific validation
+    if (formData.type === EnvironmentVariableType.Number) {
+      const initialNum = Number(formData.initialValue);
+      const currentNum = Number(formData.currentValue);
+
+      if ((hasInitialValue && isNaN(initialNum)) || (hasCurrentValue && isNaN(currentNum))) {
+        setValidationError("Please provide valid number values");
+        return false;
+      }
+    }
+
     setValidationError(null);
     return true;
   };
+
+  const handleTypeChange = useCallback((newType: EnvironmentVariableType) => {
+    setFormData((prev) => ({
+      ...prev,
+      type: newType,
+      initialValue: "",
+      currentValue: "",
+    }));
+  }, []);
 
   const handleSave = async () => {
     if (!validate()) {
@@ -63,7 +93,73 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
     { value: EnvironmentVariableType.Secret, label: "Secret" },
   ];
 
-  const isSecret = formData.type === EnvironmentVariableType.Secret;
+  const renderValueInput = useCallback(
+    (fieldName: "initialValue" | "currentValue", value: any, type: EnvironmentVariableType) => {
+      const onChange = (newValue: any) => {
+        setFormData({ ...formData, [fieldName]: newValue });
+      };
+
+      switch (type) {
+        case EnvironmentVariableType.String:
+          return (
+            <Input
+              size="small"
+              placeholder="Enter value"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="form-input"
+            />
+          );
+
+        case EnvironmentVariableType.Secret:
+          return (
+            <Input.Password
+              size="small"
+              placeholder="Enter value"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="form-input"
+              visibilityToggle={true}
+            />
+          );
+
+        case EnvironmentVariableType.Number:
+          return (
+            <InputNumber
+              size="large"
+              placeholder="Enter value"
+              value={value}
+              onChange={onChange}
+              controls={false}
+              className="form-input"
+            />
+          );
+
+        case EnvironmentVariableType.Boolean:
+          return (
+            <div className="form-input boolean-input">
+              <Switch
+                // size="small"
+                checked={value === true || value === "true"}
+                onChange={(checked) => onChange(checked)}
+              />
+            </div>
+          );
+
+        default:
+          return (
+            <Input
+              size="small"
+              placeholder="Enter value"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="form-input"
+            />
+          );
+      }
+    },
+    [formData]
+  );
 
   const renderScopeOption = (option: ScopeOption) => (
     <div className="scope-option">
@@ -83,50 +179,15 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
         <div className="form-row">
           <label className="form-label">Initial value</label>
           <div className="form-input-wrapper">
-            {isSecret ? (
-              <Input.Password
-                size="small"
-                placeholder="Enter value"
-                value={formData.initialValue}
-                onChange={(e) => setFormData({ ...formData, initialValue: e.target.value })}
-                className="form-input"
-                visibilityToggle={true}
-              />
-            ) : (
-              <Input
-                size="small"
-                placeholder="Enter value"
-                value={formData.initialValue}
-                onChange={(e) => setFormData({ ...formData, initialValue: e.target.value })}
-                className="form-input"
-              />
-            )}
+            {renderValueInput("initialValue", formData.initialValue, formData.type)}
           </div>
         </div>
 
         {/* Current Value */}
-
         <div className="form-row">
           <label className="form-label">Current value</label>
           <div className="form-input-wrapper">
-            {isSecret ? (
-              <Input.Password
-                size="small"
-                placeholder="Enter value"
-                value={formData.currentValue}
-                onChange={(e) => setFormData({ ...formData, currentValue: e.target.value })}
-                className="form-input"
-                visibilityToggle={true}
-              />
-            ) : (
-              <Input
-                size="small"
-                placeholder="Enter value"
-                value={formData.currentValue}
-                onChange={(e) => setFormData({ ...formData, currentValue: e.target.value })}
-                className="form-input"
-              />
-            )}
+            {renderValueInput("currentValue", formData.currentValue, formData.type)}
           </div>
         </div>
 
@@ -136,9 +197,10 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
           <Select
             size="small"
             value={formData.type}
-            onChange={(value) => setFormData({ ...formData, type: value })}
+            onChange={handleTypeChange}
             options={typeOptions}
             className="form-select"
+            popupClassName="form-select-dropdown"
           />
         </div>
 
@@ -154,6 +216,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
             }}
             onChange={(val) => setFormData({ ...formData, scope: val.value })}
             className="form-select scope-select"
+            popupClassName="form-select-dropdown"
             optionLabelProp="label"
           >
             {scopeOptions.map((option) => (
