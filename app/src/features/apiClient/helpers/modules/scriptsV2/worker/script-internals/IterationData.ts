@@ -15,7 +15,7 @@ export class IterationData {
     return key in this.iterationData;
   }
 
-  // TODO@nafees: discuss the behaviour for unset
+  // only unsets in the current class instance, does not modify the localScope
   unset(key: string) {
     const variables = this.iterationData;
     variables[key].localValue = undefined;
