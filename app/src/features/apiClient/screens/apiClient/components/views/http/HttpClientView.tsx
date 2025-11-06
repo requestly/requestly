@@ -163,7 +163,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
 
-  const { setPreview, setUnsaved, setTitle, getIsActive, setIcon } = useGenericState();
+  const { setPreview, setUnsaved, setTitle, getIsActive, setIcon, getIsNew, setIsNew } = useGenericState();
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
@@ -797,7 +797,11 @@ const HttpClientView: React.FC<Props> = ({
               placeholder="Untitled request"
               name={apiEntryDetails?.name}
               onRecordNameUpdate={setRequestName}
-              onBlur={handleRecordNameUpdate}
+              autoFocus={getIsNew()}
+              onBlur={() => {
+                setIsNew(false);
+                handleRecordNameUpdate();
+              }}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />
 
