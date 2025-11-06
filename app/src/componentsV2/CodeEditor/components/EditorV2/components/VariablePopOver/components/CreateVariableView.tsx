@@ -5,13 +5,11 @@ import { EnvironmentVariableType } from "backend/environment/types";
 import { CreateVariableViewProps, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
+import { useGenericState } from "hooks/useGenericState";
 
-export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
-  variableName,
-  onCancel,
-  onSave,
-  collectionId,
-}) => {
+export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variableName, onCancel, onSave }) => {
+  const genericState = useGenericState();
+  const collectionId = genericState.getSourceId();
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
   const { createVariable, isCreating } = useCreateVariable(collectionId);
 

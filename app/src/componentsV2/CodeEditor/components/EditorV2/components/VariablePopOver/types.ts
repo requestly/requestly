@@ -31,5 +31,4 @@ export interface CreateVariableViewProps {
   variableName: string;
   onCancel: () => void;
   onSave: (data: CreateVariableFormData) => Promise<void>;
-  collectionId?: string;
 }
