@@ -30,14 +30,9 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   }, [defaultScope]);
 
   const validate = (): boolean => {
-    const hasInitialValue =
-      formData.type === EnvironmentVariableType.Boolean
-        ? formData.initialValue !== "" && formData.initialValue !== undefined
-        : formData.initialValue;
-    const hasCurrentValue =
-      formData.type === EnvironmentVariableType.Boolean
-        ? formData.currentValue !== "" && formData.currentValue !== undefined
-        : formData.currentValue;
+    const hasInitialValue = formData.initialValue !== "" && formData.initialValue !== undefined;
+
+    const hasCurrentValue = formData.currentValue !== "" && formData.currentValue !== undefined;
 
     if (!hasInitialValue && !hasCurrentValue) {
       setValidationError("Please provide at least one value (Initial or Current)");
@@ -138,7 +133,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
         case EnvironmentVariableType.Number:
           return (
             <InputNumber
-              size="large"
+              size="small"
               placeholder="Enter value"
               value={value}
               onChange={onChange}
@@ -152,7 +147,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
             <div className="form-input boolean-input">
               <Switch
                 // size="small"
-                checked={value === true || value === "true"}
+                checked={Boolean(value)}
                 onChange={(checked) => onChange(checked)}
               />
             </div>

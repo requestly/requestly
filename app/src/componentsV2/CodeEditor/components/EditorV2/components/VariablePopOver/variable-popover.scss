@@ -278,6 +278,8 @@ div.n-popup {
         }
 
         .ant-input-number {
+          align-items: center;
+          display: flex;
           padding: 2px 0;
           height: 36px;
           font-size: 14px;
@@ -294,10 +296,6 @@ div.n-popup {
           justify-content: flex-end;
           align-items: center;
           padding: 7px 0;
-
-          .ant-switch {
-            background-color: var(--requestly-color-surface-2);
-          }
         }
       }
 
