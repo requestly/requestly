@@ -29,17 +29,4 @@ export class IterationData {
     }
     return result;
   }
-
-  toJSON() {
-    const result: { key: string; value: any }[] = [];
-    for (const key in this.iterationData) {
-      result.push({
-        key,
-        value: this.iterationData[key]?.localValue,
-      });
-    }
-    return {
-      values: result,
-    };
-  }
 }
