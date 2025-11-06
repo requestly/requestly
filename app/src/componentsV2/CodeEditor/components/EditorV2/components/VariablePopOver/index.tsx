@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Popover, Tag } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
@@ -9,6 +9,8 @@ import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
+import { useParams } from "react-router-dom";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -28,16 +30,32 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
+  const params = useParams();
+  const requestId = useMemo(() => {
+    const wildcard = params["*"];
+    if (!wildcard) return "";
+    const parts = wildcard.split("/").filter(Boolean);
+    return parts[0] === "request" && parts[1] ? parts[1] : "";
+  }, [params]);
 
-  // Extract collectionId from the scoped variables
-  const collectionId = React.useMemo(() => {
-    for (const [, [, source]] of variables) {
-      if (source.scope === VariableScope.COLLECTION) {
-        return source.scopeId;
-      }
+  const [getData] = useAPIRecords((state) => [state.getData]);
+
+  const collectionId = useMemo(() => {
+    if (!requestId) {
+      return undefined;
     }
-    return undefined;
-  }, [variables]);
+
+    try {
+      const record = getData(requestId);
+      // Every record has a collectionId property that points to its immediate parent collection
+      return record?.collectionId || undefined;
+    } catch (error) {
+      console.error("Error extracting collection ID:", error);
+      return undefined;
+    }
+  }, [requestId, getData]);
+
+  console.log({ variables, collectionId, params, requestId });
 
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
