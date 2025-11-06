@@ -46,6 +46,29 @@
   &:active {
     border: none;
   }
+
+  .no-environment-button-label {
+    .no-environment-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg {
+        position: static;
+        bottom: auto;
+        width: 15px;
+        height: 15px;
+      }
+    }
+  }
+}
+
+.no-environment-button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  .no-environment-icon svg {
+    color: var(--requestly-color-text-subtle);
+  }
 }
 
 .environment-switcher-dropdown {
@@ -92,6 +115,29 @@
       &:not(:first-child) {
         margin-top: 4px;
       }
+    }
+
+    .no-env-item {
+      .no-env-icon {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+        svg {
+          font-size: 16px;
+          color: var(--requestly-color-text-subtle);
+        }
+      }
+      .ant-typography {
+        flex: 1;
+      }
+      display: flex;
+      gap: 4px;
+    }
+
+    .ant-dropdown-menu-item-divider {
+      margin: 4px 0;
+      background-color: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+      height: 1px;
     }
   }
 }
