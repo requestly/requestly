@@ -3,6 +3,7 @@ import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/A
 import {
   PostResponseScriptWorkload,
   PreRequestScriptWorkload,
+  ScriptWorkloadCallback,
 } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { ScriptExecutionContext } from "./scriptExecutionContext";
 
@@ -15,7 +16,7 @@ export class HttpRequestScriptExecutionService {
   async executePreRequestScript(
     entry: RQAPI.HttpApiEntry,
     abortController: AbortController,
-    postExecutionCallback: (executionContext: ScriptExecutionContext["context"]) => void
+    postExecutionCallback: ScriptWorkloadCallback
   ) {
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(
@@ -33,7 +34,7 @@ export class HttpRequestScriptExecutionService {
   async executePostResponseScript(
     entry: RQAPI.HttpApiEntry,
     abortController: AbortController,
-    postExecutionCallback: (executionContext: ScriptExecutionContext["context"]) => void
+    postExecutionCallback: ScriptWorkloadCallback
   ) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
