@@ -96,9 +96,9 @@ const HttpRequestTabs: React.FC<Props> = ({
           <RequestTabLabel
             label="Body"
             count={
-              requestEntry.request.bodyContainer.form ||
-              requestEntry.request.bodyContainer.text ||
-              requestEntry.request.bodyContainer.multipartForm
+              requestEntry.request.bodyContainer?.form ||
+              requestEntry.request.bodyContainer?.text ||
+              requestEntry.request.bodyContainer?.multipartForm
                 ? 1
                 : 0
             }
