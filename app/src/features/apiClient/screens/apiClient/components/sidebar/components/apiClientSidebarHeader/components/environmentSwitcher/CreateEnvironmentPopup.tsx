@@ -50,7 +50,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
         setIsCreating(false);
       }
     },
-    [contextId, openTab]
+    [contextId, isCreating, openTab]
   );
 
   return (
