@@ -5,7 +5,7 @@ import {
 } from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
 import { TestResult } from "../worker/script-internals/types";
 
-export type ScriptWorkloadCallback = (state: BaseSnapshot) => void;
+export type ScriptWorkloadCallback = (state: BaseSnapshot) => Promise<void>;
 
 export interface ScriptWorkload<T extends BaseSnapshot = BaseSnapshot> {
   readonly script: string;

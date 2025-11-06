@@ -205,7 +205,12 @@ export class HttpRequestExecutor {
       preparedEntry.scripts?.preRequest !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
-      preRequestScriptResult = await scriptExecutor.executePreRequestScript(preparedEntry, this.abortController);
+      preRequestScriptResult = await scriptExecutor.executePreRequestScript(preparedEntry, this.abortController, () => {
+        const isSnapshotMutated = executionContext.getIsMutated();
+        if (isSnapshotMutated) {
+          this.postScriptExecutionCallback(executionContext.getContext());
+        }
+      });
 
       if (preRequestScriptResult.type === WorkResultType.ERROR) {
         trackScriptExecutionFailed(
@@ -265,8 +270,13 @@ export class HttpRequestExecutor {
       preparedEntry.scripts?.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
-      executionContext.updateResponse(preparedEntry.response);
-      responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController);
+      executionContext.setResponse(preparedEntry.response);
+      responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
+        const isSnapshotMutated = executionContext.getIsMutated();
+        if (isSnapshotMutated) {
+          this.postScriptExecutionCallback(executionContext.getContext());
+        }
+      });
 
       if (responseScriptResult.type === WorkResultType.SUCCESS) {
         trackScriptExecutionCompleted(RQAPI.ScriptType.POST_RESPONSE);
@@ -286,11 +296,6 @@ export class HttpRequestExecutor {
 
         return buildErroredExecutionResult(preparedEntry, error);
       }
-    }
-
-    const isSnapshotMutated = executionContext.getIsMutated();
-    if (isSnapshotMutated) {
-      this.postScriptExecutionCallback(executionContext.getContext());
     }
 
     const executionResult: RQAPI.ExecutionResult = {
@@ -326,7 +331,7 @@ export class HttpRequestExecutor {
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
     const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
 
-    const preRequestScriptResult = await scriptExecutor.executePreRequestScript(entry, this.abortController);
+    const preRequestScriptResult = await scriptExecutor.executePreRequestScript(entry, this.abortController, () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {
       const error = buildExecutionErrorObject(
         preRequestScriptResult.error,
@@ -339,7 +344,7 @@ export class HttpRequestExecutor {
       };
     }
 
-    const responseScriptResult = await scriptExecutor.executePostResponseScript(entry, this.abortController);
+    const responseScriptResult = await scriptExecutor.executePostResponseScript(entry, this.abortController, () => {});
 
     if (responseScriptResult.type === WorkResultType.ERROR) {
       const error = buildExecutionErrorObject(

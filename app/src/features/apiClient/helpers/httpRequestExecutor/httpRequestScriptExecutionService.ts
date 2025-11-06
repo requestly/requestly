@@ -12,26 +12,36 @@ export class HttpRequestScriptExecutionService {
     private readonly workloadManager: APIClientWorkloadManager
   ) {}
 
-  async executePreRequestScript(entry: RQAPI.HttpApiEntry, abortController: AbortController) {
+  async executePreRequestScript(
+    entry: RQAPI.HttpApiEntry,
+    abortController: AbortController,
+    postExecutionCallback: (executionContext: ScriptExecutionContext["context"]) => void
+  ) {
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(
         entry.scripts?.preRequest,
         this.executionContext.getContext(),
-        (snapshot: ScriptExecutionContext["context"]) => {
-          this.executionContext.updateContext(snapshot);
+        (context: ScriptExecutionContext["context"]) => {
+          this.executionContext.updateContext(context);
+          postExecutionCallback(context);
         }
       ),
       abortController.signal
     );
   }
 
-  async executePostResponseScript(entry: RQAPI.HttpApiEntry, abortController: AbortController) {
+  async executePostResponseScript(
+    entry: RQAPI.HttpApiEntry,
+    abortController: AbortController,
+    postExecutionCallback: (executionContext: ScriptExecutionContext["context"]) => void
+  ) {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
         entry.scripts?.postResponse,
         this.executionContext.getContext(),
-        (snapshot: ScriptExecutionContext["context"]) => {
-          this.executionContext.updateContext(snapshot);
+        (context: ScriptExecutionContext["context"]) => {
+          this.executionContext.updateContext(context);
+          postExecutionCallback(context);
         }
       ),
       abortController.signal
