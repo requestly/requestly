@@ -14,65 +14,10 @@ import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import MultipartFormRedirectScreen from "../../../clientView/components/MultipartFormRedirectScreen";
 
-//Might needs this for backward compatibility
-function parseSingleModeBody(params: {
-  contentType: RequestContentType;
-  body: RQAPI.RequestBody;
-}): RQAPI.RequestBodyContainer {
-  const { contentType, body } = params;
-  switch (contentType) {
-    case RequestContentType.FORM:
-      return {
-        form: body as RQAPI.RequestFormBody,
-      };
-    case RequestContentType.MULTIPART_FORM:
-      return {
-        multipartForm: body as RQAPI.MultipartFormBody,
-      };
-    case RequestContentType.JSON:
-      return {
-        text: body as RQAPI.RequestJsonBody,
-      };
-    case RequestContentType.RAW:
-      return {
-        text: body as RQAPI.RequestRawBody,
-      };
-    case RequestContentType.HTML:
-      return {
-        text: body as RQAPI.RequestHtmlBody,
-      };
-    case RequestContentType.JAVASCRIPT:
-      return {
-        text: body as RQAPI.RequestJavascriptBody,
-      };
-    case RequestContentType.XML:
-      return {
-        text: body as RQAPI.RequestXmlBody,
-      };
-    default:
-      return {
-        text: body as RQAPI.RequestRawBody,
-      };
-  }
-}
-
 const RequestBody: React.FC<RequestBodyProps> = (props) => {
   const { contentType, recordId, setRequestEntry, setContentType } = props;
   const appMode = useSelector(getAppMode);
   const isFileBodyEnabled = useFeatureIsOn("api_client_file_body_support");
-
-  // const requestBodyStateManager = useMemo(
-  //   () =>
-  //     new RequestBodyStateManager(
-  //       props.mode === "multiple"
-  //         ? props.bodyContainer
-  //         : parseSingleModeBody({
-  //             contentType,
-  //             body: props.body,
-  //           })
-  //     ),
-  //   [contentType, props]
-  // );
 
   //Now no mode check should be there, since we rely on bodyContainer only
   const requestBodyStateManager = useMemo(() => {
