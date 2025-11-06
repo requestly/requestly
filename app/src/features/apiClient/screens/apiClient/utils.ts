@@ -140,7 +140,6 @@ export const addUrlSchemeIfMissing = (url: string): string => {
 };
 
 export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry => {
-  //get this checked - bodycontainer
   return {
     type: RQAPI.ApiEntryType.HTTP,
     request: {
