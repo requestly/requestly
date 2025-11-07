@@ -81,11 +81,12 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
 
           case VariableScope.RUNTIME: {
             // Create in runtime store (session only)
-            const runtimeValue = currentValue || initialValue || "";
+            const runtimeValue = currentValue ?? initialValue ?? "";
 
             // Generate an ID for the new variable
             const existingVariables = runtimeVariablesStore.getState().data;
-            const newId = existingVariables.size;
+            const newId =
+              existingVariables.size > 0 ? Math.max(...Array.from(existingVariables.values(), (v) => v.id)) + 1 : 0;
 
             runtimeVariablesStore.getState().add(variableName, {
               id: newId,
