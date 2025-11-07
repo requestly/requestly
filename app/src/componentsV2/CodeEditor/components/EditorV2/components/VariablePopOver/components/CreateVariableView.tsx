@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Input, InputNumber, Select, Switch } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableType } from "backend/environment/types";
@@ -6,10 +6,39 @@ import { CreateVariableViewProps, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { useGenericState } from "hooks/useGenericState";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { RQAPI } from "features/apiClient/types";
 
 export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variableName, onCancel, onSave }) => {
   const genericState = useGenericState();
-  const collectionId = genericState.getSourceId();
+  const [getData] = useAPIRecords((state) => [state.getData]);
+  const recordId = genericState.getSourceId()?.id;
+
+  // Determine the collection ID based on the current record
+  const collectionId = useMemo(() => {
+    try {
+      const record = getData(recordId);
+
+      if (!record) {
+        return undefined;
+      }
+
+      // If the current record is a collection, use its ID
+      if (record.type === RQAPI.RecordType.COLLECTION) {
+        return record.id;
+      }
+
+      // If the current record is a request, use its parent collection ID
+      if (record.type === RQAPI.RecordType.API) {
+        return record.collectionId || undefined;
+      }
+
+      return undefined;
+    } catch (error) {
+      console.error("Error determining collection ID:", error);
+      return undefined;
+    }
+  }, [recordId, getData]);
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
   const { createVariable, isCreating } = useCreateVariable(collectionId);
 
