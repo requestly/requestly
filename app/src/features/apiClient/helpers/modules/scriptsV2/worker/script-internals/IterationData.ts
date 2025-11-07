@@ -18,13 +18,7 @@ export class IterationData {
   // only unsets in the current class instance, does not modify the localScope
   unset(key: string) {
     const variables = this.iterationData;
-
-    if (!variables[key]) {
-      return;
-    }
-
-    variables[key].localValue = undefined;
-    variables[key].syncValue = undefined;
+    delete variables[key];
   }
 
   toObject() {
