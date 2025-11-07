@@ -70,7 +70,7 @@ export class RQ implements SandboxAPI {
 
   private assertionHandler: AssertionHandler;
 
-  constructor(localScope: LocalScope, private testResults: TestResult[], private executionMetadata: ExecutionMetadata) {
+  constructor(localScope: LocalScope, private testResults: TestResult[], executionMetadata: ExecutionMetadata) {
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
@@ -80,7 +80,13 @@ export class RQ implements SandboxAPI {
     this.request = this.createRequestObject(localScope.get("request"));
     this.response = this.createResponseObject(localScope.get("response"));
     this.iterationData = new IterationData(localScope);
-    this.info = this.executionMetadata;
+    this.info = {
+      requestId: executionMetadata.requestId,
+      eventName: executionMetadata.eventName,
+      iteration: executionMetadata.iteration,
+      iterationCount: executionMetadata.iterationCount,
+      requestName: executionMetadata.requestName,
+    };
 
     this.assertionHandler = new AssertionHandler(this.response);
   }

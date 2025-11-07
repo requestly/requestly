@@ -1,8 +1,7 @@
-import { BaseSnapshot } from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
 import { ExecutionMetadata, TestResult } from "../worker/script-internals/types";
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
-export type ScriptWorkloadCallback = (state: BaseSnapshot) => void | Promise<void>;
+export type ScriptWorkloadCallback = (state: ExecutionContext) => void | Promise<void>;
 
 export interface ScriptWorkload<T extends ScriptContext = ScriptContext> {
   readonly script: string;

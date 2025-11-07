@@ -1,14 +1,22 @@
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
-import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
 import { getScopedVariables, Scope } from "../variableResolver/variable-resolver";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { VariableData } from "features/apiClient/store/variables/types";
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import { RuntimeVariables } from "features/apiClient/store/runtimeVariables/utils";
 
-export type ExecutionContext = BaseSnapshot & {
-  request: SnapshotForPreRequest["request"];
-  response: SnapshotForPostResponse["response"];
+export type BaseExecutionContext = {
+  global: EnvironmentVariables;
+  collectionVariables: EnvironmentVariables;
+  environment: EnvironmentVariables;
+  variables: RuntimeVariables;
+  iterationData: EnvironmentVariables;
+};
+
+export type ExecutionContext = BaseExecutionContext & {
+  request: RQAPI.Request;
+  response: RQAPI.Response;
 };
 
 export class ScriptExecutionContext {
@@ -50,7 +58,7 @@ export class ScriptExecutionContext {
 
     console.log("!!!debug", "buildExecutionContext", { iterationData, variablesByScope });
 
-    const baseSnapshot: BaseSnapshot = {
+    const baseExecutionContext: BaseExecutionContext = {
       global: globalVariables,
       collectionVariables,
       environment: environmentVariables,
@@ -59,7 +67,7 @@ export class ScriptExecutionContext {
     };
 
     return {
-      ...baseSnapshot,
+      ...baseExecutionContext,
       request: this.entry.request,
       response: this.entry.response,
     };
@@ -86,6 +94,16 @@ export class ScriptExecutionContext {
     this.isMutated = true;
   }
 
+  public getBaseContext(): BaseExecutionContext {
+    return {
+      global: this.context.global,
+      collectionVariables: this.context.collectionVariables,
+      environment: this.context.environment,
+      variables: this.context.variables,
+      iterationData: this.context.iterationData,
+    };
+  }
+
   public getContext(): ExecutionContext {
     return this.context;
   }
@@ -98,7 +116,7 @@ export class ScriptExecutionContext {
     this.isMutated = false;
   }
 
-  public setResponse(response: SnapshotForPostResponse["response"]) {
+  public setResponse(response: ExecutionContext["response"]) {
     this.context.response = response;
   }
 }

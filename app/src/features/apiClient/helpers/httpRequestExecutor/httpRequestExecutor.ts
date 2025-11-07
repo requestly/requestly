@@ -17,8 +17,7 @@ import { Scope } from "../variableResolver/variable-resolver";
 import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
-import { BaseSnapshot } from "./snapshotTypes";
-import { ScriptExecutionContext } from "./scriptExecutionContext";
+import { BaseExecutionContext, ScriptExecutionContext } from "./scriptExecutionContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
@@ -85,7 +84,7 @@ export class HttpRequestExecutor {
     public requestPreparer: HttpRequestPreparationService,
     private requestValidator: HttpRequestValidationService,
     private readonly workloadManager: APIClientWorkloadManager,
-    private postScriptExecutionCallback: (state: BaseSnapshot) => Promise<void>,
+    private postScriptExecutionCallback: (state: BaseExecutionContext) => Promise<void>,
     private appMode: string
   ) {}
 
@@ -203,7 +202,7 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const recordName = this.ctx.stores.records.getState().getData(recordId).name;
+    const recordName = this.ctx.stores.records.getState().getData(recordId)?.name ?? "";
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry, scopes);
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
@@ -229,7 +228,7 @@ export class HttpRequestExecutor {
       preRequestScriptResult = await scriptExecutor.executePreRequestScript(preparedEntry, this.abortController, () => {
         const isSnapshotMutated = executionContext.getIsMutated();
         if (isSnapshotMutated) {
-          this.postScriptExecutionCallback(executionContext.getContext());
+          this.postScriptExecutionCallback(executionContext.getBaseContext());
         }
       });
 
@@ -298,7 +297,7 @@ export class HttpRequestExecutor {
       responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
         const isSnapshotMutated = executionContext.getIsMutated();
         if (isSnapshotMutated) {
-          this.postScriptExecutionCallback(executionContext.getContext());
+          this.postScriptExecutionCallback(executionContext.getBaseContext());
         }
       });
 
@@ -355,7 +354,7 @@ export class HttpRequestExecutor {
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
-      requestName: this.ctx.stores.records.getState().getData(recordId).name,
+      requestName: this.ctx.stores.records.getState().getData(recordId)?.name ?? "",
       iteration: 0,
       iterationCount: 1,
     };
