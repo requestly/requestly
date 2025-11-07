@@ -39,14 +39,15 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
       return undefined;
     }
   }, [recordId, getData]);
+
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
   const { createVariable, isCreating } = useCreateVariable(collectionId);
 
   const [formData, setFormData] = useState({
     scope: defaultScope,
     type: EnvironmentVariableType.String,
-    initialValue: "",
-    currentValue: "",
+    initialValue: "" as string | number | boolean,
+    currentValue: "" as string | number | boolean,
   });
 
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -57,9 +58,15 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
   }, [defaultScope]);
 
   const validate = (): boolean => {
-    const hasInitialValue = formData.initialValue !== "" && formData.initialValue !== undefined;
+    const hasInitialValue =
+      formData.type === EnvironmentVariableType.Boolean
+        ? formData.initialValue !== undefined && formData.initialValue !== null && formData.initialValue !== ""
+        : formData.initialValue !== "" && formData.initialValue !== undefined;
 
-    const hasCurrentValue = formData.currentValue !== "" && formData.currentValue !== undefined;
+    const hasCurrentValue =
+      formData.type === EnvironmentVariableType.Boolean
+        ? formData.currentValue !== undefined && formData.currentValue !== null && formData.currentValue !== ""
+        : formData.currentValue !== "" && formData.currentValue !== undefined;
 
     if (!hasInitialValue && !hasCurrentValue) {
       setValidationError("Please provide at least one value (Initial or Current)");
@@ -94,11 +101,31 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
   };
 
   const handleTypeChange = useCallback((newType: EnvironmentVariableType) => {
+    let defaultInitialValue: string | number | boolean = "";
+    let defaultCurrentValue: string | number | boolean = "";
+
+    switch (newType) {
+      case EnvironmentVariableType.Boolean:
+        defaultInitialValue = false;
+        defaultCurrentValue = false;
+        break;
+      case EnvironmentVariableType.Number:
+        defaultInitialValue = 0;
+        defaultCurrentValue = 0;
+        break;
+      case EnvironmentVariableType.String:
+      case EnvironmentVariableType.Secret:
+      default:
+        defaultInitialValue = "";
+        defaultCurrentValue = "";
+        break;
+    }
+
     setFormData((prev) => ({
       ...prev,
       type: newType,
-      initialValue: "",
-      currentValue: "",
+      initialValue: defaultInitialValue,
+      currentValue: defaultCurrentValue,
     }));
   }, []);
 
