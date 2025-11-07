@@ -94,6 +94,10 @@ export class ScriptExecutionContext {
     return this.isMutated;
   }
 
+  public resetIsMutated() {
+    this.isMutated = false;
+  }
+
   public setResponse(response: SnapshotForPostResponse["response"]) {
     this.context.response = response;
   }

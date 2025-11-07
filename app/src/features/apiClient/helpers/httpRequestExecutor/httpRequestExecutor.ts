@@ -291,7 +291,10 @@ export class HttpRequestExecutor {
       preparedEntry.scripts?.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
+
       executionContext.setResponse(preparedEntry.response);
+      executionContext.resetIsMutated();
+
       responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
         const isSnapshotMutated = executionContext.getIsMutated();
         if (isSnapshotMutated) {
