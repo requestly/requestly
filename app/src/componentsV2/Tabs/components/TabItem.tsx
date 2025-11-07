@@ -50,7 +50,7 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
         }, [activeTabId, props.store]),
 
         getSourceId: useCallback(() => {
-          return props.store.getState().source?.getSourceId?.() ?? "";
+          return props.store.getState()?.source?.metadata ?? "";
         }, [props.store]),
 
         addCloseBlocker: useCallback(
