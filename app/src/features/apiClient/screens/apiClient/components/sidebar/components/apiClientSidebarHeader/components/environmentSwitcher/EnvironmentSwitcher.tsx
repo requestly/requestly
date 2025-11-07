@@ -12,7 +12,7 @@ import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceSto
 import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
 import { useAPIEnvironment } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import "./environmentSwitcher.scss";
-import { CreateEnvironmentPopup } from "./CreateEnvironmentPopup";
+import { CreateEnvironmentPopup } from "../CreateEnvironmentPopup/CreateEnvironmentPopup";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { EnvironmentState } from "features/apiClient/store/environments/environments.store";
 import { useEnvironment } from "features/apiClient/hooks/useEnvironment.hook";
