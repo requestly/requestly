@@ -38,8 +38,8 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
           [variableName]: {
             id: 0, // Will be set by the store
             type,
-            syncValue: initialValue || "",
-            localValue: currentValue || undefined,
+            syncValue: initialValue ?? "",
+            localValue: currentValue ?? "",
             isPersisted: true as const,
           },
         };
