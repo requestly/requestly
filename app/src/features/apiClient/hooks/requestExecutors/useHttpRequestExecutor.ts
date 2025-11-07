@@ -2,5 +2,5 @@ import { HttpRequestExecutor } from "../../helpers/httpRequestExecutor/httpReque
 import { useRequestExecutorFactory } from "./useRequestExecutorFactory";
 
 export const useHttpRequestExecutor = (collectionId: string) => {
-  return useRequestExecutorFactory(HttpRequestExecutor, collectionId);
+  return useRequestExecutorFactory<HttpRequestExecutor>(HttpRequestExecutor, collectionId);
 };
