@@ -1,6 +1,7 @@
 import { LocalScope } from "modules/localScope";
 import {
   ExecutionMetadata,
+  InfoObject,
   LocalScopeRequest,
   LocalScopeResponse,
   SandboxAPI,
@@ -58,7 +59,7 @@ export class RQ implements SandboxAPI {
   public expect: Chai.ExpectStatic;
   public test: TestFunction;
   public iterationData: IterationData;
-  public info: ExecutionMetadata;
+  public info: InfoObject;
 
   // Add other sandbox properties
   public cookies = createInfiniteChainable("cookie");
@@ -80,15 +81,19 @@ export class RQ implements SandboxAPI {
     this.request = this.createRequestObject(localScope.get("request"));
     this.response = this.createResponseObject(localScope.get("response"));
     this.iterationData = new IterationData(localScope);
-    this.info = {
+    this.info = this.createInfoObject(executionMetadata);
+
+    this.assertionHandler = new AssertionHandler(this.response);
+  }
+
+  private createInfoObject(executionMetadata: ExecutionMetadata) {
+    return {
       requestId: executionMetadata.requestId,
       eventName: executionMetadata.eventName,
       iteration: executionMetadata.iteration,
       iterationCount: executionMetadata.iterationCount,
       requestName: executionMetadata.requestName,
     };
-
-    this.assertionHandler = new AssertionHandler(this.response);
   }
 
   private createTestObject(): TestFunction {

@@ -71,6 +71,14 @@ export type ExecutionArtifacts = {
   testResults: TestResult[];
 };
 
+export type InfoObject = {
+  requestId: string;
+  eventName: "prerequest" | "postresponse";
+  iteration: number;
+  iterationCount: number;
+  requestName: string;
+};
+
 export interface TestFunction {
   (testName: string, testFn: () => void): void;
   skip: (testName: string) => void;
@@ -86,9 +94,9 @@ export interface SandboxAPI {
   iterationData: IterationData;
   test: TestFunction;
   expect: Chai.ExpectStatic;
+  info: InfoObject;
   cookies: any;
   execution: any;
-  info: any;
   require: any;
   sendRequest: any;
   vault: any;
