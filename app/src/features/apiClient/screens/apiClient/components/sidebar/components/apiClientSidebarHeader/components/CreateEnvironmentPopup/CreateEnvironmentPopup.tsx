@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Typography } from "antd";
+import { captureException } from "@sentry/react";
 import NoEnvironmentIllustration from "features/apiClient/screens/environment/assets/noEnvironment.svg?react";
 import { RQButton } from "lib/design-system-v2/components";
 import { toast } from "utils/Toast";
@@ -23,15 +24,16 @@ export const CreateEnvironmentPopup: React.FC = () => {
 
   const handleCreate = useCallback(
     async (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (isCreating) return; // prevent duplicate clicks
+      if (isCreating) return;
 
       try {
         setIsCreating(true);
         trackNewEnvironmentClicked();
         const context = getApiClientFeatureContext(contextId || undefined);
         if (!context) {
-          toast.error("Missing API client context");
+          const errorMessage = "Missing API client context";
+          toast.error(errorMessage);
+          captureException(new Error(errorMessage));
           return;
         }
         const { id, name } = await createEnvironment(context, { newEnvironmentName: "New Environment" });
