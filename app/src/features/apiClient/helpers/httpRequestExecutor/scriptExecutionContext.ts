@@ -56,8 +56,6 @@ export class ScriptExecutionContext {
     const variables = variablesByScope[VariableScope.RUNTIME] || {};
     const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
 
-    console.log("!!!debug", "buildExecutionContext", { iterationData, variablesByScope });
-
     const baseExecutionContext: BaseExecutionContext = {
       global: globalVariables,
       collectionVariables,
