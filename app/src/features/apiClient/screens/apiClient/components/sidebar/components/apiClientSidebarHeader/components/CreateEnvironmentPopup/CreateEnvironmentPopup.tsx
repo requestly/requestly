@@ -24,8 +24,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
 
   const handleCreate = useCallback(
     async (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (isCreating) return; // prevent duplicate clicks
+      if (isCreating) return;
 
       try {
         setIsCreating(true);
