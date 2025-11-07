@@ -12,52 +12,52 @@
   color: var(--requestly-color-text-default);
   font-size: var(--requestly-font-size-sm, 13px);
   line-height: 1.4;
-}
 
-.create-environment-popup__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-}
-
-.create-environment-popup__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-
-  svg {
-    width: 72px;
-    height: 72px;
-    color: var(--requestly-color-text-subtle);
-    opacity: 0.9;
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
   }
-}
 
-.create-environment-popup__title {
-  margin: 0;
-  font-size: var(--requestly-font-size-md, 14px);
-  font-weight: 600;
-  color: var(--requestly-color-text-default);
-}
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
 
-.create-environment-popup__description {
-  margin: 0;
-  font-size: var(--requestly-font-size-sm, 13px);
-  color: var(--requestly-color-text-subtle);
-}
+    svg {
+      width: 72px;
+      height: 72px;
+      color: var(--requestly-color-text-subtle);
+      opacity: 0.9;
+    }
+  }
 
-.create-environment-popup__cta.ant-btn {
-  margin-top: 4px;
-  font-weight: 500;
-  padding: 0 24px;
-  transition: transform 140ms ease, background-color 140ms ease;
-  transform: scale(1.06);
-  transform-origin: center;
-  will-change: transform;
-  letter-spacing: 0.2px;
+  &__title {
+    margin: 0;
+    font-size: var(--requestly-font-size-md, 14px);
+    font-weight: 600;
+    color: var(--requestly-color-text-default);
+  }
+
+  &__description {
+    margin: 0;
+    font-size: var(--requestly-font-size-sm, 13px);
+    color: var(--requestly-color-text-subtle);
+  }
+
+  &__cta.ant-btn {
+    margin-top: 4px;
+    font-weight: 500;
+    padding: 0 24px;
+    transition: transform 140ms ease, background-color 140ms ease;
+    transform: scale(1.06);
+    transform-origin: center;
+    will-change: transform;
+    letter-spacing: 0.2px;
+  }
 }
 
 .create-environment-popup-wrapper .ant-popover-inner {
