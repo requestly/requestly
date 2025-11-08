@@ -18,7 +18,7 @@ import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { BaseSnapshot } from "./snapshotTypes";
-import { ScriptExecutionContext } from "./scriptExecutionContext";
+import { ScriptExecutionContext, ExecutionContext } from "./scriptExecutionContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 
@@ -147,10 +147,11 @@ export class HttpRequestExecutor {
   async prepareRequestWithValidation(
     recordId: string,
     entry: RQAPI.HttpApiEntry,
-    scopes?: Scope[]
+    scopes?: Scope[],
+    executionContext?: ExecutionContext
   ): Promise<Result<PreparedRequest>> {
     const preparationResult = Try(() => {
-      const result = this.requestPreparer.prepareRequest(recordId, entry, scopes);
+      const result = this.requestPreparer.prepareRequest(recordId, entry, scopes, executionContext);
       result.preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
       return result;
     });
@@ -228,9 +229,14 @@ export class HttpRequestExecutor {
       }
 
       // Re-prepare the request as pre-request script might have modified it.
-      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
-        (error) => new ExecutionError(entry, error)
-      );
+      const rePreparationResult = (
+        await this.prepareRequestWithValidation(
+          recordId,
+          entry,
+          scopes,
+          executionContext.getContext() // Pass execution context to use runtime-modified variables
+        )
+      ).mapError((error) => new ExecutionError(entry, error));
 
       if (rePreparationResult.isError()) {
         return rePreparationResult.unwrapError().result;
