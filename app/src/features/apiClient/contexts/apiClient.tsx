@@ -183,6 +183,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 id: result.data.id,
                 apiEntryDetails: result.data as RQAPI.ApiRecord,
                 title: result.data.name,
+                isNewTab: true,
                 context: {
                   id: context.id,
                 },
@@ -240,7 +241,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 new EnvironmentViewTabSource({
                   id: newEnvironment.id,
                   title: newEnvironment.name,
-                  focusBreadcrumb: true,
+                  isNewTab: true,
                   context: {
                     id: context.id,
                   },
