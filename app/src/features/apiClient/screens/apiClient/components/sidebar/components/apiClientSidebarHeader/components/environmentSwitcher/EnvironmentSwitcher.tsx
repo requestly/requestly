@@ -54,12 +54,12 @@ export const EnvironmentSwitcher = () => {
     const noEnvItem = {
       key: "__no_environment__",
       label: (
-        <div className={`${!activeEnvironment ? "active-env-item" : ""} env-item no-env-item`}>
+        <div className={`${!activeEnvironment?.id ? "active-env-item" : ""} env-item no-env-item`}>
           <span className="no-env-icon">
             <MdNotInterested />
           </span>
           <Typography.Text>No environment</Typography.Text>
-          {!activeEnvironment ? <MdOutlineCheckCircleOutline /> : null}
+          {!activeEnvironment?.id ? <MdOutlineCheckCircleOutline /> : null}
         </div>
       ),
       onClick: (menuInfo: any) => {
