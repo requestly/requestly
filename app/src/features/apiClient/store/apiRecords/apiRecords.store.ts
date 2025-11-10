@@ -1,12 +1,66 @@
 import { NativeError } from "errors/NativeError";
 import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
-import { CollectionVariableMap, RQAPI } from "features/apiClient/types";
+import { CollectionVariableMap, RequestContentType, RQAPI } from "features/apiClient/types";
 import { create, StoreApi } from "zustand";
 import { EnvVariableState, parseEnvVariables } from "../variables/variables.store";
-import { apiClientFileStore } from "../apiClientFilesStore";
+import { ApiClientFile, apiClientFileStore, FileFeature, FileId } from "../apiClientFilesStore";
 import { PersistedVariables } from "../shared/variablePersistence";
 import { ApiClientFeatureContext } from "../apiClientFeatureContext/apiClientFeatureContext.store";
 import { TreeChanged } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
+import { generateKeyValuePairs, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+
+function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
+  const files: Record<FileId, ApiClientFile> = {};
+  const canHaveFiles =
+    record.type === RQAPI.RecordType.API &&
+    isHttpApiRecord(record) &&
+    record.data.request.contentType === RequestContentType.MULTIPART_FORM;
+
+  if (!canHaveFiles) {
+    return;
+  }
+
+  let requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+
+  if (!requestBody) {
+    return;
+  }
+
+  // hotfix for existing requests
+  if (!Array.isArray(requestBody)) {
+    requestBody = generateKeyValuePairs(requestBody);
+  }
+
+  for (const bodyEntry of requestBody) {
+    const bodyValue = bodyEntry.value as RQAPI.FormDataKeyValuePair["value"];
+    if (Array.isArray(bodyValue)) {
+      bodyValue?.forEach((file) => {
+        files[file.id] = {
+          name: file.name,
+          path: file.path,
+          source: file.source,
+          size: file.size,
+          isFileValid: true,
+          fileFeature: FileFeature.FILE_BODY,
+        };
+      });
+    }
+  }
+
+  return files;
+}
+
+function parseRecordsToFiles(records: RQAPI.ApiClientRecord[]) {
+  let files: Record<FileId, ApiClientFile> = {};
+  for (const record of records) {
+    const filesFromRecord = getFilesFromRecord(record);
+    if (filesFromRecord) {
+      files = { ...files, ...filesFromRecord };
+    }
+  }
+
+  return files;
+}
 
 type BaseRecordState = {
   type: RQAPI.RecordType;
@@ -203,7 +257,7 @@ export const createApiRecordsStore = (
       // This works out only because there's no reactive field in the file store
       // and frequent resetting doesn't cause any renders.
       // TODO: Send patches to file store
-      apiClientFileStore.getState().initialize(records);
+      apiClientFileStore.getState().replace(parseRecordsToFiles(records), FileFeature.FILE_BODY);
       set({
         apiClientRecords: records,
         childParentMap,

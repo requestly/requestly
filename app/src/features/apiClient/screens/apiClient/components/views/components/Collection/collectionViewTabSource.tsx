@@ -6,9 +6,7 @@ import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
-interface CollectionViewTabSourceMetadata extends TabSourceMetadata {
-  focusBreadcrumb?: boolean;
-}
+interface CollectionViewTabSourceMetadata extends TabSourceMetadata {}
 
 export class CollectionViewTabSource extends BaseTabSource {
   constructor(metadata: CollectionViewTabSourceMetadata) {

@@ -6,7 +6,7 @@ import {
 } from "../../../workloadManager/workLoadTypes";
 import { RQ } from "../RQmethods";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
-import { LocalScope } from "../../../../../../../../modules/localScope";
+import { InitialState, LocalScope } from "../../../../../../../../modules/localScope";
 import { TestResult } from "../types";
 import {globals, getGlobalScript} from './globals';
 
@@ -35,7 +35,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     }
   }
 
-  async executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback) {
+  async executeScript(script: string, initialState: InitialState, callback: ScriptWorkloadCallback) {
     this.localScope = new LocalScope(initialState);
     const { globalObject, globalScript } = this.getGlobals();
     // eslint-disable-next-line no-new-func
@@ -55,7 +55,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       throw new ScriptExecutionError(error);
     }
     try {
-      await this.syncLocalDump(callback);
+      this.syncLocalDump(callback);
       return {
         testResults: this.testResults,
       };
@@ -65,11 +65,11 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   }
 
   private async syncLocalDump(callback: ScriptWorkloadCallback) {
-    if (!this.localScope.getIsStateMutated()) {
-      return;
-    }
+    const isStateMutated = this.localScope.getIsStateMutated();
     const dump = this.localScope.getAll();
-    await callback(dump);
+    if (isStateMutated) {
+      await callback(dump);
+    }
   }
 }
 
