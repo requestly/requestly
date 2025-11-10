@@ -36,7 +36,9 @@ export class HttpRequestPreparationService {
       variableValues[variable.key] = variable.value;
     });
 
-    const urlObject = new URL(url);
+    const normalizedUrl = addUrlSchemeIfMissing(url);
+
+    const urlObject = new URL(normalizedUrl);
 
     const toPath = compile(urlObject.pathname);
     const renderedPath = toPath(variableValues);
