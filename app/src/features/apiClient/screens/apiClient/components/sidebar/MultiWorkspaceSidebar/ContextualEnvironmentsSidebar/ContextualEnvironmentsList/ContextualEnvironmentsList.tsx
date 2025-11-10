@@ -16,6 +16,12 @@ import {
 import "./contextualEnvironmentsList.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { useCommand } from "features/apiClient/commands";
+import { RQButton } from "lib/design-system-v2/components";
+import { trackNewEnvironmentClicked } from "modules/analytics/events/features/apiClient";
+import { toast } from "utils/Toast";
+import { EnvironmentViewTabSource } from "features/apiClient/screens/environment/components/environmentView/EnvironmentViewTabSource";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 interface ContextualEnvironmentsListProps {
   searchValue: string;
@@ -34,6 +40,11 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
   const contextId = useContextId();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
+  const {
+    env: { createEnvironment },
+  } = useCommand();
+  const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+  const [isCreatingEnvironment, setIsCreatingEnvironment] = useState(false);
 
   const filteredEnvironments = useMemo(() => {
     const globalEnv = parseEnvironmentStore(globalEnvironment);
@@ -63,6 +74,25 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
     [getEnvironment]
   );
 
+  const showEmptyCreateCard =
+    searchValue.length === 0 && nonGlobalEnvironments.length === 0 && !isRecordBeingCreated && isValidPermission;
+
+  const handleCreateEnvironment = useCallback(async () => {
+    if (isCreatingEnvironment || !isValidPermission) return;
+
+    try {
+      setIsCreatingEnvironment(true);
+      trackNewEnvironmentClicked();
+      const { id, name } = await createEnvironment({ newEnvironmentName: "New Environment" });
+      openTab(new EnvironmentViewTabSource({ id, title: name, isNewTab: true, context: { id: contextId } }));
+      toast.success("Environment created");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to create environment");
+    } finally {
+      setIsCreatingEnvironment(false);
+    }
+  }, [createEnvironment, openTab, contextId, isCreatingEnvironment, isValidPermission]);
+
   return (
     <>
       <div className="environments-list-container">
@@ -81,6 +111,20 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
                     onExportClick={handleExportEnvironments}
                   />
                 )
+              )}
+              {showEmptyCreateCard && (
+                <div className="environments-empty-create-card">
+                  <div className="environments-empty-create-card__text">No environment created yet</div>
+                  <RQButton
+                    size="small"
+                    type="secondary"
+                    onClick={handleCreateEnvironment}
+                    loading={isCreatingEnvironment}
+                    disabled={isCreatingEnvironment}
+                  >
+                    {isCreatingEnvironment ? "Creating..." : "Create environment"}
+                  </RQButton>
+                </div>
               )}
               <div className="mt-8">
                 {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && onNewClickContextId === contextId && (
