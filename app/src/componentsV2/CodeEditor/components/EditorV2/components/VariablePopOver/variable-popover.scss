@@ -99,6 +99,15 @@ div.n-popup {
       gap: 8px;
       align-self: stretch;
       border-bottom: 1px solid var(--requestly-color-white-t-10);
+
+      .edit-variable-btn {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      &:hover .edit-variable-btn {
+        opacity: 1;
+      }
     }
 
     .variable-info-header {
@@ -238,6 +247,63 @@ div.n-popup {
       font-weight: var(--requestly-font-weight-medium);
       color: var(--requestly-color-text-default);
     }
+  }
+
+  // ----------------------------
+  // Edit Mode Header
+  // ----------------------------
+  .edit-variable-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--requestly-color-white-t-10);
+    margin-bottom: 4px;
+
+    .edit-variable-scope-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .scope-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 16px;
+        background-color: var(--requestly-color-primary);
+        border-radius: 4px;
+        color: var(--requestly-color-text-default);
+        font-size: 12px;
+      }
+
+      .scope-name {
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-size-sm);
+        font-weight: var(--requestly-font-weight-medium);
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .edit-variable-actions {
+      display: flex;
+      gap: 8px;
+
+      .rq-custom-btn {
+        /* min-width: 70px; */
+        height: 24px;
+      }
+    }
+  }
+
+  // Variable Name in Edit Mode
+  .edit-variable-name {
+    font-family: var(--requestly-font-family-default);
+    font-size: var(--requestly-font-size-lg);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-default);
+    padding: 8px 0;
+    margin-bottom: 4px;
   }
 
   .create-variable-form {

@@ -5,7 +5,10 @@ export enum PopoverView {
   VARIABLE_INFO = "variable_info",
   NOT_FOUND = "not_found",
   CREATE_FORM = "create_form",
+  EDIT_FORM = "edit_form",
 }
+
+export type FormMode = "create" | "edit";
 
 export interface CreateVariableFormData {
   variableName: string;
@@ -29,6 +32,16 @@ export interface VariableNotFoundProps {
 
 export interface CreateVariableViewProps {
   variableName: string;
+  mode: FormMode;
+  existingVariable?: { type: EnvironmentVariableType; syncValue: any; localValue: any; scope: VariableScope };
   onCancel: () => void;
   onSave: (data: CreateVariableFormData) => Promise<void>;
+}
+
+export interface VariableInfoProps {
+  params: {
+    name: string;
+    variable: any;
+  };
+  onEditClick?: () => void;
 }

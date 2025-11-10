@@ -4,19 +4,31 @@ import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableType } from "backend/environment/types";
 import { CreateVariableViewProps, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
+import { useUpdateVariable } from "../hooks/useUpdateVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { useGenericState } from "hooks/useGenericState";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { RQAPI } from "features/apiClient/types";
+import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 
-export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variableName, onCancel, onSave }) => {
+export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
+  variableName,
+  mode,
+  existingVariable,
+  onCancel,
+  onSave,
+}) => {
   const genericState = useGenericState();
   const [getData] = useAPIRecords((state) => [state.getData]);
-  const recordId = genericState.getSourceId()?.id;
+  const recordId = (genericState.getSourceId() as any)?.id;
 
   // Determine the collection ID based on the current record
   const collectionId = useMemo(() => {
     try {
+      if (!recordId) {
+        return undefined;
+      }
+
       const record = getData(recordId);
 
       if (!record) {
@@ -42,20 +54,36 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
 
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
   const { createVariable, isCreating } = useCreateVariable(collectionId);
+  const { updateVariable, isUpdating } = useUpdateVariable(collectionId);
 
-  const [formData, setFormData] = useState({
-    scope: defaultScope,
-    type: EnvironmentVariableType.String,
-    initialValue: "" as string | number | boolean,
-    currentValue: "" as string | number | boolean,
-  });
+  // Initialize form data based on mode
+  const initialFormData = useMemo(() => {
+    if (mode === "edit" && existingVariable) {
+      return {
+        scope: existingVariable.scope,
+        type: existingVariable.type,
+        initialValue: existingVariable.syncValue ?? "",
+        currentValue: existingVariable.localValue ?? "",
+      };
+    }
+    return {
+      scope: defaultScope,
+      type: EnvironmentVariableType.String,
+      initialValue: "" as string | number | boolean,
+      currentValue: "" as string | number | boolean,
+    };
+  }, [mode, existingVariable, defaultScope]);
+
+  const [formData, setFormData] = useState(initialFormData);
 
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Update default scope when it changes
+  // Update default scope when it changes (only in create mode)
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, scope: defaultScope }));
-  }, [defaultScope]);
+    if (mode === "create") {
+      setFormData((prev) => ({ ...prev, scope: defaultScope }));
+    }
+  }, [defaultScope, mode]);
 
   const validate = (): boolean => {
     const hasInitialValue =
@@ -139,11 +167,17 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
         variableName,
         ...formData,
       };
-      await createVariable(variableData);
+
+      if (mode === "edit") {
+        await updateVariable(variableData);
+      } else {
+        await createVariable(variableData);
+      }
+
       await onSave(variableData);
     } catch (error) {
-      // Error is already handled in useCreateVariable hook
-      console.error("Error creating variable:", error);
+      // Error is already handled in hooks
+      console.error(`Error ${mode === "edit" ? "updating" : "creating"} variable:`, error);
     }
   };
 
@@ -229,11 +263,42 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
     </div>
   );
 
+  const isProcessing = isCreating || isUpdating;
+
+  // Get scope information for edit mode header
+  const currentScopeOption = useMemo(() => {
+    if (mode === "edit" && existingVariable) {
+      return scopeOptions.find((o) => o.value === existingVariable.scope) || scopeOptions[0];
+    }
+    return null;
+  }, [mode, existingVariable, scopeOptions]);
+
   return (
     <div className="create-variable-view">
-      <div className="create-variable-header">
-        <h3 className="create-variable-title">Add as a new variable</h3>
-      </div>
+      {mode === "edit" ? (
+        <>
+          {/* Edit Mode Header */}
+          <div className="edit-variable-header">
+            <div className="edit-variable-scope-info">
+              <div className="scope-icon-wrapper">{currentScopeOption?.icon || <FaListAlt />}</div>
+              <span className="scope-name">{currentScopeOption?.label || "Environment"}</span>
+            </div>
+            <div className="edit-variable-actions">
+              <RQButton size="small" onClick={onCancel} disabled={isProcessing}>
+                Cancel
+              </RQButton>
+              <RQButton size="small" type="primary" onClick={handleSave} loading={isProcessing}>
+                Save
+              </RQButton>
+            </div>
+          </div>
+        </>
+      ) : (
+        /* Create Mode Header */
+        <div className="create-variable-header">
+          <h3 className="create-variable-title">Add as a new variable</h3>
+        </div>
+      )}
 
       <div className="create-variable-form">
         {/* Initial Value */}
@@ -265,47 +330,51 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
           />
         </div>
 
-        {/* Scope */}
-        <div className="form-row">
-          <label className="form-label">Scope</label>
-          <Select
-            size="small"
-            labelInValue
-            value={{
-              value: formData.scope,
-              label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope) || scopeOptions[0]),
-            }}
-            onChange={(val) => setFormData((prev) => ({ ...prev, scope: val.value }))}
-            className="form-select scope-select"
-            popupClassName="form-select-dropdown"
-            optionLabelProp="label"
-          >
-            {scopeOptions.map((option) => (
-              <Select.Option
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-                label={renderScopeOption(option)} // ensures icon shows in dropdown and selected display
-              >
-                {renderScopeOption(option)}
-              </Select.Option>
-            ))}
-          </Select>
-        </div>
+        {/* Scope - Only show in create mode */}
+        {mode === "create" && (
+          <div className="form-row">
+            <label className="form-label">Scope</label>
+            <Select
+              size="small"
+              labelInValue
+              value={{
+                value: formData.scope,
+                label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope) || scopeOptions[0]),
+              }}
+              onChange={(val) => setFormData((prev) => ({ ...prev, scope: val.value }))}
+              className="form-select scope-select"
+              popupClassName="form-select-dropdown"
+              optionLabelProp="label"
+            >
+              {scopeOptions.map((option) => (
+                <Select.Option
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.disabled}
+                  label={renderScopeOption(option)} // ensures icon shows in dropdown and selected display
+                >
+                  {renderScopeOption(option)}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        )}
 
         {/* Validation Error */}
         {validationError && <div className="form-error">{validationError}</div>}
       </div>
 
-      {/* Actions */}
-      <div className="create-variable-actions">
-        <RQButton onClick={onCancel} disabled={isCreating}>
-          Cancel
-        </RQButton>
-        <RQButton type="primary" onClick={handleSave} loading={isCreating}>
-          Save
-        </RQButton>
-      </div>
+      {/* Actions - Only show in create mode (edit mode has actions in header) */}
+      {mode === "create" && (
+        <div className="create-variable-actions">
+          <RQButton onClick={onCancel} disabled={isProcessing}>
+            Cancel
+          </RQButton>
+          <RQButton type="primary" onClick={handleSave} loading={isProcessing}>
+            Save
+          </RQButton>
+        </div>
+      )}
     </div>
   );
 };

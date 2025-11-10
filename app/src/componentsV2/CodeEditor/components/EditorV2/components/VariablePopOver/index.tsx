@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Popover, Tag } from "antd";
+import React, { useState } from "react";
+import { Popover, Tag, Tooltip } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
@@ -9,6 +9,8 @@ import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -38,6 +40,11 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     onPinChange?.(true); // Pin popover when entering create form
   };
 
+  const handleEditClick = () => {
+    setCurrentView(PopoverView.EDIT_FORM);
+    onPinChange?.(true); // Pin popover when entering edit form
+  };
+
   const handleSwitchEnvironment = () => {
     window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
     onClose?.();
@@ -50,8 +57,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   };
 
   const handleSave = async () => {
-    // Variable creation is handled in CreateVariableView
-    // After successful creation, close the popover
+    // Variable creation/update is handled in CreateVariableView
+    // After successful creation/update, close the popover
     onPinChange?.(false); // Unpin popover
     onClose?.();
   };
@@ -59,7 +66,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   // Render content based on current view
   const popoverContent = (() => {
     switch (currentView) {
-      case PopoverView.VARIABLE_INFO:
+      case PopoverView.VARIABLE_INFO: {
         if (!variableData) return null;
         return (
           <VariableInfo
@@ -67,17 +74,46 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               name: hoveredVariable,
               variable: variableData,
             }}
+            onEditClick={handleEditClick}
           />
         );
+      }
 
-      case PopoverView.NOT_FOUND:
+      case PopoverView.NOT_FOUND: {
         return <VariableNotFound onCreateClick={handleCreateClick} onSwitchEnvironment={handleSwitchEnvironment} />;
+      }
+      case PopoverView.CREATE_FORM: {
+        return (
+          <CreateVariableView
+            variableName={hoveredVariable}
+            mode="create"
+            onCancel={handleCancel}
+            onSave={handleSave}
+          />
+        );
+      }
+      case PopoverView.EDIT_FORM: {
+        if (!variableData) return null;
+        const [variable, source] = variableData;
+        return (
+          <CreateVariableView
+            variableName={hoveredVariable}
+            mode="edit"
+            existingVariable={{
+              type: variable.type,
+              syncValue: variable.syncValue,
+              localValue: variable.localValue,
+              scope: source.scope,
+            }}
+            onCancel={handleCancel}
+            onSave={handleSave}
+          />
+        );
+      }
 
-      case PopoverView.CREATE_FORM:
-        return <CreateVariableView variableName={hoveredVariable} onCancel={handleCancel} onSave={handleSave} />;
-
-      default:
+      default: {
         return null;
+      }
     }
   })();
 
@@ -95,7 +131,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       destroyTooltipOnHide
       placement="bottom"
       showArrow={false}
-      overlayClassName={`variable-info-popover ${currentView === PopoverView.CREATE_FORM ? "create-form-view" : ""}`}
+      overlayClassName={`variable-info-popover ${
+        currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM ? "create-form-view" : ""
+      }`}
     >
       <div style={popupStyle} className="variable-info-div"></div>
     </Popover>
@@ -124,11 +162,13 @@ const VariableInfo: React.FC<{
     name: string;
     variable: ScopedVariable;
   };
+  onEditClick?: () => void;
 }> = ({
   params: {
     name,
     variable: [variable, source],
   },
+  onEditClick,
 }) => {
   const { syncValue, localValue, isPersisted } = getSanitizedVariableValue(variable);
   const infoFields =
@@ -158,6 +198,20 @@ const VariableInfo: React.FC<{
             <span className="variable-header-info-seperator">/</span>
             <div className="variable-info-header-name">{source.name}</div>
           </>
+        )}
+
+        {/* Edit button - only for non-runtime variables */}
+        {source.scope !== VariableScope.RUNTIME && onEditClick && (
+          <Tooltip title="Edit variable">
+            <RQButton
+              type="transparent"
+              size="small"
+              icon={<MdEdit style={{ fontSize: "14px" }} />}
+              onClick={onEditClick}
+              className="edit-variable-btn"
+              style={{ marginLeft: "auto", padding: "2px 4px", height: "auto" }}
+            />
+          </Tooltip>
         )}
       </div>
 
