@@ -147,10 +147,6 @@ function getScopes(
       throw new NativeError(`Could not find store for record: ${parent}`);
     }
     if (recordState.type === RQAPI.RecordType.COLLECTION) {
-      // console.log("!!!debug", "found collection variables", {
-      //   recordState: recordState.collectionVariables,
-      //   storeOverrideConfig: storeOverrideConfig?.collectionVariables,
-      // });
       scopes.push([
         {
           scope: VariableScope.COLLECTION,
