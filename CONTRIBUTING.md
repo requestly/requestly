@@ -52,27 +52,6 @@ https://github.com/requestly/requestly-docs
 
 Please follow the steps in [README](https://github.com/requestly/requestly-docs/blob/master/README.md) file to get started.
 
-## How to add yourself to the list of contributors
-
-Comment on Issue or Pull Request, asking @all-contributors to add a contributor:
-```@all-contributors please add @<username> for <contributions>. please add @<username> for <contributions>.```
-
-Replace ```<username>``` with your GitHub username and repalce ```<contributions>``` with one of the following values
-
- - bug
- - blog
- - code
- - content
- - doc
- - design
- - infra
- - maintenance
- - projectManagement
- - review
- - security
- - test
-
-
 ## Special rules for “fest” events (Hacktoberfest-style)
 
 To keep things fair during contribution events we follow a few extra rules. These are written so everyone gets a chance to contribute, and maintainers aren’t overwhelmed.
@@ -80,6 +59,7 @@ To keep things fair during contribution events we follow a few extra rules. Thes
 ### The 2-Issue Limit
 - A contributor can have at most 2 issues assigned at the same time.
 - This helps prevent a few people from taking all the easy tasks and keeps things open for new contributors.
+- Issues are assigned on a first-come-first-served basis, so comment on the issue you'd like to work on to get assigned.
 
 
 ### PR Merged Unlock
