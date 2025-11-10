@@ -1,6 +1,6 @@
 import { trackEvent } from "modules/analytics";
-import { WorkErrorType } from "../workload-manager/workLoadTypes";
 import { RQAPI } from "features/apiClient/types";
+import { WorkErrorType } from "../workloadManager/workLoadTypes";
 
 const SCRIPT_EVENTS = {
   SCRIPT_EXECUTION_STARTED: "SCRIPT_EXECUTION_STARTED",
