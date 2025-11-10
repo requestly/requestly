@@ -12,10 +12,11 @@ import { updateRequestWithAuthOptions } from "../auth";
 import { cloneDeep } from "lodash";
 import { renderVariables as renderVariablesType, renderTemplate } from "backend/environment/utils";
 import { compile } from "path-to-regexp";
-import { Scope } from "../variableResolver/variable-resolver";
+import { Scope, getScopedVariables, StoreOverrideConfig } from "../variableResolver/variable-resolver";
 import { ExecutionContext } from "./scriptExecutionContext";
 import { VariableData } from "../../store/variables/types";
 import { getApiClientRecordsStore } from "../../commands/store.utils";
+import { createDummyVariablesStore } from "../../store/variables/variables.store";
 
 export class HttpRequestPreparationService {
   constructor(
@@ -46,36 +47,49 @@ export class HttpRequestPreparationService {
   }
 
   /**
-   * Extracts and merges all variables from execution context into a flat structure
-   * Priority order (lowest to highest): global -> collection -> environment -> runtime -> scopes
+   * Converts ExecutionContext to StoreOverrideConfig for use with getScopedVariables
    */
-  private extractVariablesFromContext(context: ExecutionContext, scopes?: Scope[]): Record<string, VariableData> {
-    const baseVariables = {
-      ...context.global,
-      ...context.collectionVariables,
-      ...context.environment,
-      ...context.variables,
+  private buildStoreOverrideFromContext(context: ExecutionContext): StoreOverrideConfig {
+    const config: StoreOverrideConfig = {
+      runtimeVariablesStore: context.variables ? createDummyVariablesStore(context.variables) : undefined,
+      activeEnvironmentVariablesStore: context.environment ? createDummyVariablesStore(context.environment) : undefined,
+      globalEnvironmentVariablesStore: context.global ? createDummyVariablesStore(context.global) : undefined,
+      collectionVariablesStore: context.collectionVariables
+        ? createDummyVariablesStore(context.collectionVariables)
+        : undefined,
     };
 
-    // If scopes are provided (e.g., DATA_FILE for iteration data), merge them with highest priority
-    if (scopes && scopes.length > 0) {
-      const scopeVariables: Record<string, VariableData> = {};
+    return config;
+  }
 
-      for (const [, variableStore] of scopes) {
-        const state = variableStore.getState();
-        for (const [key, value] of state.data) {
-          scopeVariables[key] = value;
-        }
-      }
+  /**
+   * Extracts and merges all variables in execution context using getScopedVariables
+   */
+  private extractVariablesFromContext(
+    recordId: string,
+    context: ExecutionContext,
+    scopes?: Scope[]
+  ): Record<string, VariableData> {
+    const recordsStore = getApiClientRecordsStore(this.ctx);
+    const parents = recordsStore.getState().getParentChain(recordId);
 
-      // Scope variables (like data_file) have highest priority
-      return {
-        ...baseVariables,
-        ...scopeVariables,
-      };
+    // Build store override config from execution context
+    const storeOverrideConfig = this.buildStoreOverrideFromContext(context);
+
+    // Use getScopedVariables to get variables with proper precedence
+    const scopedVariables = getScopedVariables(parents, this.ctx.stores, scopes, storeOverrideConfig);
+
+    console.log("!!!debug", "extracted variables", { scopedVariables, context, storeOverrideConfig });
+
+    // Convert ScopedVariables to flat Record for template rendering
+    const variables: Record<string, VariableData> = {};
+    for (const [key, [variableData]] of scopedVariables) {
+      variables[key] = variableData;
     }
 
-    return baseVariables;
+    console.log("!!!debug", "final variables", variables);
+
+    return variables;
   }
 
   private updateAuthWithExecutionContext(
@@ -109,7 +123,7 @@ export class HttpRequestPreparationService {
       return;
     }
 
-    const variables = this.extractVariablesFromContext(executionContext, scopes);
+    const variables = this.extractVariablesFromContext(recordId, executionContext, scopes);
 
     const { renderedTemplate: renderedAuth } = renderTemplate(resolvedAuth as any, variables);
 
@@ -128,11 +142,12 @@ export class HttpRequestPreparationService {
    * Used when we need to use runtime-modified variables (e.g., after pre-request script)
    */
   private renderVariablesFromContext(
+    recordId: string,
     entry: RQAPI.HttpApiEntry,
     context: ExecutionContext,
     scopes?: Scope[]
   ): { renderedVariables: any; result: RQAPI.HttpApiEntry } {
-    const variables = this.extractVariablesFromContext(context, scopes);
+    const variables = this.extractVariablesFromContext(recordId, context, scopes);
     const { renderedTemplate, renderedVariables } = renderTemplate(entry as any, variables);
 
     return {
@@ -173,7 +188,12 @@ export class HttpRequestPreparationService {
     let result: RQAPI.HttpApiEntry;
 
     if (executionContext) {
-      ({ renderedVariables, result } = this.renderVariablesFromContext(workingEntry, executionContext, scopes));
+      ({ renderedVariables, result } = this.renderVariablesFromContext(
+        recordId,
+        workingEntry,
+        executionContext,
+        scopes
+      ));
     } else {
       ({ renderedVariables, result } = this.renderVariables(workingEntry, recordId, this.ctx, scopes));
     }

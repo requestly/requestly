@@ -150,9 +150,26 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
   }));
 };
 
-export const createDummyVariablesStore = (variables: Record<string, VariableValueType>) => {
+/**
+ * Creates a dummy variables store without any side effects or persistence.
+ * Can accept either primitive values or VariableData objects.
+ */
+export const createDummyVariablesStore = (
+  variables: Record<string, VariableValueType> | Record<string, VariableData>
+) => {
+  // Check if the first value is a VariableData object
+  // VariableData always has 'localValue' or 'syncValue' property
+  // otherwise its assumed to be primitive valuesF
+  const firstValue = Object.values(variables)[0];
+  const isVariableDataObject =
+    firstValue !== undefined &&
+    typeof firstValue === "object" &&
+    ("localValue" in firstValue || "syncValue" in firstValue);
+
   return create<VariablesState>()((_, get) => ({
-    data: parsePrimitiveVariables(variables),
+    data: isVariableDataObject
+      ? new Map(Object.entries(variables as Record<string, VariableData>))
+      : parsePrimitiveVariables(variables as Record<string, VariableValueType>),
 
     reset() {},
 
