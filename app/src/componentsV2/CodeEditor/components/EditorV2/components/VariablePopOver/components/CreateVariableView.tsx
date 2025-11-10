@@ -20,7 +20,8 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
 }) => {
   const genericState = useGenericState();
   const [getData] = useAPIRecords((state) => [state.getData]);
-  const recordId = (genericState.getSourceId() as any)?.id;
+  const sourceId = genericState.getSourceId();
+  const recordId = sourceId?.id;
 
   // Determine the collection ID based on the current record
   const collectionId = useMemo(() => {
