@@ -195,8 +195,8 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const executionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry);
-    const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
+    const scriptExecutionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry);
+    const scriptExecutor = new HttpRequestScriptExecutionService(scriptExecutionContext, this.workloadManager);
 
     let preRequestScriptResult: WorkResult | undefined;
     let responseScriptResult: WorkResult | undefined;
@@ -207,9 +207,9 @@ export class HttpRequestExecutor {
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
       preRequestScriptResult = await scriptExecutor.executePreRequestScript(preparedEntry, this.abortController, () => {
-        const isSnapshotMutated = executionContext.getIsMutated();
+        const isSnapshotMutated = scriptExecutionContext.getIsMutated();
         if (isSnapshotMutated) {
-          this.postScriptExecutionCallback(executionContext.getContext());
+          this.postScriptExecutionCallback(scriptExecutionContext.getContext());
         }
       });
 
@@ -234,7 +234,7 @@ export class HttpRequestExecutor {
           recordId,
           entry,
           scopes,
-          executionContext.getContext() // Pass execution context to use runtime-modified variables
+          scriptExecutionContext.getContext() // Pass execution context to use runtime-modified variables
         )
       ).mapError((error) => new ExecutionError(entry, error));
 
@@ -277,13 +277,13 @@ export class HttpRequestExecutor {
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
 
-      executionContext.setResponse(preparedEntry.response);
-      executionContext.resetIsMutated();
+      scriptExecutionContext.setResponse(preparedEntry.response);
+      scriptExecutionContext.resetIsMutated();
 
       responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
-        const isSnapshotMutated = executionContext.getIsMutated();
+        const isSnapshotMutated = scriptExecutionContext.getIsMutated();
         if (isSnapshotMutated) {
-          this.postScriptExecutionCallback(executionContext.getContext());
+          this.postScriptExecutionCallback(scriptExecutionContext.getContext());
         }
       });
 
