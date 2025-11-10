@@ -73,21 +73,14 @@ export class HttpRequestPreparationService {
     const recordsStore = getApiClientRecordsStore(this.ctx);
     const parents = recordsStore.getState().getParentChain(recordId);
 
-    // Build store override config from execution context
     const storeOverrideConfig = this.buildStoreOverrideFromContext(context);
 
-    // Use getScopedVariables to get variables with proper precedence
     const scopedVariables = getScopedVariables(parents, this.ctx.stores, scopes, storeOverrideConfig);
 
-    console.log("!!!debug", "extracted variables", { scopedVariables, context, storeOverrideConfig });
-
-    // Convert ScopedVariables to flat Record for template rendering
     const variables: Record<string, VariableData> = {};
     for (const [key, [variableData]] of scopedVariables) {
       variables[key] = variableData;
     }
-
-    console.log("!!!debug", "final variables", variables);
 
     return variables;
   }
@@ -184,19 +177,13 @@ export class HttpRequestPreparationService {
     workingEntry.request.headers = updateRequestWithAuthOptions(workingEntry.request.headers, headers);
     workingEntry.request.queryParams = updateRequestWithAuthOptions(workingEntry.request.queryParams, queryParams);
 
-    let renderedVariables: any;
-    let result: RQAPI.HttpApiEntry;
-
-    if (executionContext) {
-      ({ renderedVariables, result } = this.renderVariablesFromContext(
-        recordId,
-        workingEntry,
-        executionContext,
-        scopes
-      ));
-    } else {
-      ({ renderedVariables, result } = this.renderVariables(workingEntry, recordId, this.ctx, scopes));
-    }
+    const { renderedVariables, result } = (() => {
+      if (executionContext) {
+        return this.renderVariablesFromContext(recordId, workingEntry, executionContext, scopes);
+      } else {
+        return this.renderVariables(workingEntry, recordId, this.ctx, scopes);
+      }
+    })();
 
     const renderedEntry = result;
 
