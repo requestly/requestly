@@ -173,6 +173,7 @@ Start working on individual modules:
 We welcome contributions from the community! Whether you're fixing bugs, adding new features, or improving documentation, your contributions help make Requestly better for everyone.
 
 **Getting Started:**
+
 - Check out our [issues](https://github.com/requestly/requestly/issues) to find something to work on
 - Read our [contributing guide](./CONTRIBUTING.md) to learn about our development process and guidelines
 - Join our [Discord community](https://rqst.ly/join-community) if you need help or have questions
