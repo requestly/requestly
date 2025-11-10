@@ -26,7 +26,6 @@ export const setUserPersona = async (uid: string, persona: string) => {
   const userRef = doc(db, "users", uid);
   return setDoc(userRef, { persona }, { merge: true })
     .then(() => {
-      console.log("Persona set successfully");
       return {
         success: true,
       };

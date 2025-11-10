@@ -28,8 +28,6 @@ if (isEnvEmulator()) {
     connectDatabaseEmulator(db, "localhost", 9000);
     const auth = getAuth();
     connectAuthEmulator(auth, "http://localhost:9099");
-
-    console.log("CONNECTED TO EMULATOR");
   }
 }
 

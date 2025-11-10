@@ -1,5 +1,6 @@
 import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
+import Logger from "lib/logger";
 
 export const getSSOProviderId = async (email: string) => {
   try {
@@ -17,6 +18,7 @@ export const getSSOProviderId = async (email: string) => {
       return null;
     }
   } catch (err) {
-    console.log(err);
+    Logger.error("Error fetching SSO provider ID:", err);
+    return null;
   }
 };

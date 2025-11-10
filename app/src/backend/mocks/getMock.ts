@@ -24,7 +24,6 @@ const getMockFromFirebase = async (mockId: string): Promise<RQMockSchema> => {
   const docRef = doc(db, "mocks", mockId);
 
   const snapshot = await getDoc(docRef);
-  console.log("snapshot", snapshot.data());
 
   if (snapshot.exists()) {
     const data = snapshot.data() as RQMockSchema;

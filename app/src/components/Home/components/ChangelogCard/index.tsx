@@ -14,7 +14,6 @@ export const ChangeLogCard: React.FC = () => {
   useEffect(() => {
     fetch("https://requestly.tech/api/mockv2/v1/rq-changelog?teamId=LmyapmzY39XTFXvua6eX")
       .then((res) => {
-        console.log({ res });
         return res.json();
       })
       .then((data) => {

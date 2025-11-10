@@ -80,13 +80,9 @@ export const mergeRecordsAndSaveToFirebase = async (
 ): Promise<Record<string, any>[]> => {
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
-  // todo @nsr: remove, just tracking count for now
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of recordsOnFirebase", recordsOnFirebase?.length ?? 0);
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of merged", mergedRecords?.length ?? 0);
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -120,9 +116,6 @@ const resolveLocalConflictsAndSaveToFirebase = async (
   const localRecords: any[] = await getAllLocalRecords(appMode, false);
   const resolvedRecords: any[] = handleLocalConflicts(recordsOnFirebase, localRecords);
 
-  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
-  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of resolved", resolvedRecords?.length ?? 0);
-
   // Write to firebase
   const formattedObject: { [key: string]: any } = {};
   resolvedRecords.forEach((object) => {
@@ -153,7 +146,6 @@ export const doSync = async (
   syncTarget: "teamSync" | "sync",
   team_id: string
 ): Promise<void> => {
-  console.log("DEBUG", "doSync");
   if (!isLocalStoragePresent(appMode)) {
     return;
   }
@@ -208,18 +200,16 @@ export const doSync = async (
   }
 };
 
-/** Trottled version of the doSync function */
+/** Throttled version of the doSync function */
 export const doSyncThrottled = throttle((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
-  console.log("[DEBUG] doSyncThrottled in action");
   doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);
 
 export const resetSyncThrottle = () => {
   try {
     doSyncThrottled?.cancel();
-    console.log("[Debug] Sync Throttle Canceled");
   } catch (err) {
-    Logger.log("Sync Trottle cancel failed");
+    Logger.log("Sync Throttle cancel failed");
   }
 };
 
@@ -275,7 +265,6 @@ export const invokeSyncingIfRequired = async ({
   }
 
   if (Date.now() - window.syncThrottleTimerStart > waitPeriod) {
-    console.log("[DEBUG] invokeSyncingIfRequired - doSyncThrottled");
     doSyncThrottled(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
     resetSyncThrottle();
