@@ -71,3 +71,25 @@ Replace ```<username>``` with your GitHub username and repalce ```<contributions
  - review
  - security
  - test
+
+
+## Special rules for “fest” events (Hacktoberfest-style)
+
+To keep things fair during contribution events we follow a few extra rules. These are written so everyone gets a chance to contribute, and maintainers aren’t overwhelmed.
+
+### The 2-Issue Limit
+- A contributor can have at most 2 issues assigned at the same time.
+- This helps prevent a few people from taking all the easy tasks and keeps things open for new contributors.
+
+
+### PR Merged Unlock
+- You can be assigned a new issue (up to the 2-issue cap) only after one of your assigned PRs has been merged.
+- This encourages finishing work and responding to review feedback.
+
+
+### 7-Day Inactivity Rule
+- If you’re assigned an issue but show no activity for 7 consecutive days (no commits, comments, or draft PR), the issue will be unassigned automatically.
+- This keeps issues from becoming stale and available to others.
+
+
+These rules follow the spirit of events like Hacktoberfest: encourage quality and fair participation. Please keep PRs meaningful and useful; low-quality or trivial PRs (that don’t help maintainers) are discouraged. 
