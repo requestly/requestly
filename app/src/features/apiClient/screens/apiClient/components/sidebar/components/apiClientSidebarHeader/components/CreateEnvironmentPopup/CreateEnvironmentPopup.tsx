@@ -28,7 +28,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
 
       try {
         setIsCreating(true);
-        trackNewEnvironmentClicked();
+        trackNewEnvironmentClicked("environment_dropdown");
         const context = getApiClientFeatureContext(contextId || undefined);
         if (!context) {
           const errorMessage = "Failed to create new environment";

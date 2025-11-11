@@ -233,7 +233,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
-          trackNewEnvironmentClicked();
+          trackNewEnvironmentClicked("api_client_sidebar_header");
           return _createEnvironment(context, { newEnvironmentName: "New Environment" })
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
