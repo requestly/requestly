@@ -27,7 +27,7 @@ export const EmptyEnvironmentsCreateCard: React.FC<EmptyEnvironmentsCreateCardPr
 
     try {
       setIsCreatingEnvironment(true);
-      trackNewEnvironmentClicked();
+      trackNewEnvironmentClicked("environment_list_empty_state");
       const { id, name } = await createEnvironment({ newEnvironmentName: "New Environment" });
       openTab(
         new EnvironmentViewTabSource({
