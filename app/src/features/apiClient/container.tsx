@@ -21,6 +21,7 @@ import { createRepository } from "./commands/context/setupContext.command";
 import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { AiChatContainer } from "./screens/apiClient/components/AIChat";
 
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
@@ -68,7 +69,7 @@ const ApiClientFeatureContainer: React.FC = () => {
 
       clearAllStaleContextOnAuthChange({
         user: { loggedIn: user.loggedIn },
-        workspaceType: activeWorkspace.workspaceType,
+        workspaceType: activeWorkspace.workspaceType!,
       });
 
       const repository = createRepository(activeWorkspace, {
@@ -76,6 +77,7 @@ const ApiClientFeatureContainer: React.FC = () => {
         uid: user.details?.profile?.uid ?? "",
       });
 
+      // @ts-expect-error because the internal types of the repository are not correct
       await setupContextWithRepo(activeWorkspace.id, repository);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- not adding `activeWorkspace` to control reactivity
@@ -114,6 +116,7 @@ const ApiClientFeatureContainer: React.FC = () => {
             >
               <APIClientSidebar />
               <TabsContainer />
+              <AiChatContainer />
             </Split>
           </ApiClientProvider>
         </div>

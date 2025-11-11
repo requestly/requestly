@@ -8,6 +8,7 @@ import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
 import { ReactNode } from "react";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { createRequestViewStore } from "../../store";
 
 interface RequestViewTabSourceMetadata extends TabSourceMetadata {
   apiEntryDetails?: RQAPI.ApiRecord;
@@ -52,5 +53,11 @@ export class RequestViewTabSource extends BaseTabSource {
     const store = getApiClientRecordsStore(context);
     const isExist = store.getState().getData(this.metadata.id);
     return !!isExist;
+  }
+
+  createViewStore() {
+    const metadata = this.metadata as RequestViewTabSourceMetadata;
+    const store = createRequestViewStore(metadata.apiEntryDetails);
+    return store;
   }
 }

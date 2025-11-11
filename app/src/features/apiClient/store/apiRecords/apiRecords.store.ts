@@ -8,6 +8,7 @@ import { PersistedVariables } from "../shared/variablePersistence";
 import { ApiClientFeatureContext } from "../apiClientFeatureContext/apiClientFeatureContext.store";
 import { TreeChanged } from "features/apiClient/helpers/apiClientTreeBus/apiClientTreeBus";
 import { generateKeyValuePairs, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { useSyncExternalStore } from "react";
 
 function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
   const files: Record<FileId, ApiClientFile> = {};
@@ -70,9 +71,9 @@ type BaseRecordState = {
   incrementVersion: () => void;
 };
 
-export type ApiRecordState = BaseRecordState & {
+export type ApiRecordState<T extends RQAPI.ApiEntry = RQAPI.ApiEntry> = BaseRecordState & {
   type: RQAPI.RecordType.API;
-  record: RQAPI.ApiRecord;
+  record: RQAPI.ApiRecord<T>;
 };
 
 export type CollectionRecordState = BaseRecordState & {
@@ -82,7 +83,7 @@ export type CollectionRecordState = BaseRecordState & {
   persistence: PersistedVariables.Store;
 };
 
-export type RecordState = ApiRecordState | CollectionRecordState;
+export type RecordState<T extends RQAPI.ApiEntry = RQAPI.ApiEntry> = ApiRecordState<T> | CollectionRecordState;
 
 export type ApiRecordsState = {
   /**
@@ -170,6 +171,20 @@ function parseRecords(records: RQAPI.ApiClientRecord[]) {
     childParentMap,
     index,
   };
+}
+
+const dummyStore = create(() => ({ _isDummyStore: true })) as StoreApi<any>;
+
+export function useLiveStore<T>(getStore: () => StoreApi<T> | undefined): StoreApi<T> {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const store = getStore();
+      if (!store) return () => {};
+      return store.subscribe(onStoreChange);
+    },
+    () => getStore() ?? (dummyStore as StoreApi<T>),
+    () => dummyStore as StoreApi<T>
+  );
 }
 
 export const createRecordStore = (record: RQAPI.ApiClientRecord, contextId: string = "private") => {

@@ -31,8 +31,8 @@ interface Props {
   handleTestResultRefresh: () => Promise<void>;
   executeRequest: () => Promise<void>;
   onDismissError: () => void;
-  error?: RQAPI.ExecutionError;
-  warning?: RQAPI.ExecutionWarning;
+  error?: RQAPI.ExecutionError | null;
+  warning?: RQAPI.ExecutionWarning | null;
 }
 
 const BOTTOM_SHEET_TAB_KEYS = {
@@ -149,7 +149,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
             <EmptyResponsePlaceholder
               isFailed={isFailed}
               emptyDescription="Please run a request to see the response"
-              error={error}
+              error={error ?? undefined}
             />
           ),
         };

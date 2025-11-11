@@ -3,6 +3,7 @@ import { AbstractTabSource } from "./tabSource";
 import { TabSourceMetadata } from "../types";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NativeError } from "errors/NativeError";
+import { StoreApi } from "zustand";
 
 export class BaseTabSource implements AbstractTabSource {
   component: NonNullable<React.ReactNode>;
@@ -16,7 +17,7 @@ export class BaseTabSource implements AbstractTabSource {
   }
 
   getSourceName(): string {
-    return this.metadata.name;
+    return this.metadata.name ?? "Untitled";
   }
 
   render(): React.ReactNode {
@@ -52,5 +53,9 @@ export class BaseTabSource implements AbstractTabSource {
       metadata: this.metadata,
       sourceType: this.type,
     });
+  }
+
+  createViewStore(): StoreApi<unknown> | null {
+    return null;
   }
 }
