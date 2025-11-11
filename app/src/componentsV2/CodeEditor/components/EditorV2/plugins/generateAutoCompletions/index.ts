@@ -61,7 +61,7 @@ function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
 
 /* CORE PLUGIN */
 export default function generateCompletionsForVariables(envVariables?: ScopedVariables) {
-  const customCompletions = [];
+  const customCompletions = ["Aryan"];
   if (envVariables) {
     customCompletions.push(varCompletionSource(envVariables));
   }

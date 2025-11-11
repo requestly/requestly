@@ -1,9 +1,23 @@
 .popup-option {
   background-color: var(--requestly-color-surface-0);
   color: var(--requestly-color-text-default);
-  padding: 0;
+  padding: 6px 10px; /* cleaner spacing */
+
   font-size: var(--requestly-font-size-xs);
   line-height: var(--requestly-font-line-height-xs);
-  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+
+  border-radius: 6px; /* modern rounded corners */
+
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22), 0 2px 4px rgba(0, 0, 0, 0.18);
+
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+
+  cursor: pointer;
   z-index: 10;
+}
+
+/* subtle highlight on hover */
+.popup-option:hover {
+  background-color: var(--requestly-color-primary-500);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28), 0 3px 6px rgba(0, 0, 0, 0.22);
 }

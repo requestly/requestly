@@ -12,11 +12,7 @@
   "bugs": {
     "url": "https://github.com/requestly/requestly/issues"
   },
-  "author": {
-    "name": "Requestly",
-    "email": "contact@requestly.io",
-    "url": "https://requestly.com/"
-  },
+  "author": "Requestly <contact@requestly.io> (https://requestly.com/)",
   "engines": {
     "node": ">=18.18.0",
     "npm": ">=8.0.0"
@@ -66,7 +62,7 @@
     "@reduxjs/toolkit": "^1.9.0",
     "@requestly/alternative-importers": "^0.0.5",
     "@requestly/mock-server": "0.1.6",
-    "@requestly/requestly-core": "file:..",
+    "@requestly/requestly-core": "^1.1.1",
     "@requestly/shared": "file:../shared",
     "@sentry/react": "^7.54.0",
     "@sentry/tracing": "^7.54.0",
@@ -196,5 +192,9 @@
     "transformIgnorePatterns": [
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
     ]
-  }
+  },
+  "keywords": [],
+  "license": "ISC",
+  "type": "commonjs",
+  "homepage": "https://github.com/requestly/requestly#readme"
 }
