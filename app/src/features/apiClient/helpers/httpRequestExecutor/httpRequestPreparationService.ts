@@ -16,7 +16,7 @@ import { Scope, getScopedVariables, StoreOverrideConfig } from "../variableResol
 import { ExecutionContext } from "./scriptExecutionContext";
 import { VariableData } from "../../store/variables/types";
 import { getApiClientRecordsStore } from "../../commands/store.utils";
-import { createDummyVariablesStore } from "../../store/variables/variables.store";
+import { createDummyVariablesStoreFromData } from "features/apiClient/store/variables/variables.store";
 
 export class HttpRequestPreparationService {
   constructor(
@@ -53,11 +53,13 @@ export class HttpRequestPreparationService {
    */
   private buildStoreOverrideFromContext(context: ExecutionContext): StoreOverrideConfig {
     const config: StoreOverrideConfig = {
-      runtimeVariablesStore: context.variables ? createDummyVariablesStore(context.variables) : undefined,
-      activeEnvironmentVariablesStore: context.environment ? createDummyVariablesStore(context.environment) : undefined,
-      globalEnvironmentVariablesStore: context.global ? createDummyVariablesStore(context.global) : undefined,
+      runtimeVariablesStore: context.variables ? createDummyVariablesStoreFromData(context.variables) : undefined,
+      activeEnvironmentVariablesStore: context.environment
+        ? createDummyVariablesStoreFromData(context.environment)
+        : undefined,
+      globalEnvironmentVariablesStore: context.global ? createDummyVariablesStoreFromData(context.global) : undefined,
       collectionVariablesStore: context.collectionVariables
-        ? createDummyVariablesStore(context.collectionVariables)
+        ? createDummyVariablesStoreFromData(context.collectionVariables)
         : undefined,
     };
 
