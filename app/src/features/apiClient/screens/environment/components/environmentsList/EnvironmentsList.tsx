@@ -18,7 +18,6 @@ import {
 } from "features/apiClient/commands/environments/utils";
 import "./environmentsList.scss";
 import { ApiClientSidebarTabKey } from "features/apiClient/screens/apiClient/components/sidebar/SingleWorkspaceSidebar/SingleWorkspaceSidebar";
-import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
 
 export const EnvironmentsList = () => {
@@ -35,7 +34,6 @@ export const EnvironmentsList = () => {
   const { isRecordBeingCreated, onNewClick } = useApiClientContext();
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "update");
-  const contextId = useContextId();
 
   const filteredEnvironments = useMemo(() => {
     const globalEnv = parseEnvironmentStore(globalEnvironment);
@@ -111,7 +109,7 @@ export const EnvironmentsList = () => {
                 )
               )}
               {showEmptyCreateCard && (
-                <EmptyEnvironmentsCreateCard contextId={contextId} isValidPermission={isValidPermission} />
+                <EmptyEnvironmentsCreateCard contextId={null} isValidPermission={isValidPermission} />
               )}
               <div className="mt-8">
                 {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
