@@ -2,6 +2,7 @@ import React, { createContext, useContext } from "react";
 
 const ContextIdContext = createContext<string | null>(null);
 
+//it provides the contextId/workspaceId to its children / components in component tree
 export function ContextId(props: { id: string; children: React.ReactNode }) {
   return <ContextIdContext.Provider value={props.id}>{props.children}</ContextIdContext.Provider>;
 }

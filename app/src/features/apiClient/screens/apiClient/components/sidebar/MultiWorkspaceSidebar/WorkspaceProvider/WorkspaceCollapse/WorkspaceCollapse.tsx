@@ -67,6 +67,7 @@ export const WorkspaceCollapse: React.FC<WorkspaceCollapseProps> = ({
   } = useWorkspaceSwitcher();
 
   const { onNewClickV2 } = useApiClientContext();
+  //set last used context is getting context id from here
   const contextId = useContextId();
 
   const items: MenuProps["items"] = useMemo(() => {

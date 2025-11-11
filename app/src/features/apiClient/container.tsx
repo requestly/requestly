@@ -23,7 +23,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 const ApiClientFeatureContainer: React.FC = () => {
-  const user: Record<string, any> = useSelector(getUserAuthDetails);
+  const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [
     s.viewMode,
@@ -48,12 +48,14 @@ const ApiClientFeatureContainer: React.FC = () => {
   useEffect(() => {
     (async () => {
       if (getViewMode() === ApiClientViewMode.MULTI) {
+        //why we are missing userId here?
         await loadWorkspaces();
         return;
       }
     })();
   }, [getViewMode]);
 
+  //what does this effect do ?
   useEffect(() => {
     if (viewMode === ApiClientViewMode.MULTI) {
       return;

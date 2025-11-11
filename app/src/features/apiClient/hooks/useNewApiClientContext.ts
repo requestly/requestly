@@ -57,6 +57,7 @@ export function useNewApiClientContext() {
 
       if (onSaveTabAction === "open") {
         if (apiClientRecord.type === RQAPI.RecordType.API) {
+          //context id to tab is going through useApiClientFeatureContext
           openTab(
             new RequestViewTabSource({
               id: recordId,

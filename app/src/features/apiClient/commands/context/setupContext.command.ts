@@ -35,7 +35,19 @@ export const setupContextWithoutMarkingLoaded = async (
   workspace: Workspace,
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
+  console.log("userDetails", user, workspace);
+  /*
+  {
+    "loggedIn": false,
+    "uid": ""
+  }
+  */
   const repository = createRepository(workspace, user);
+  //some how globalId is coming undefined in repository object of some workspaces
+  console.log("repository", repository, workspace.id);
   const id = await setupContextWithRepoWithoutMarkingLoaded(workspace.id, repository);
+  ///here returned id is a contextId
+  //only 2 workspaces had returnId;
+  console.log("return Id", id);
   return { id };
 };

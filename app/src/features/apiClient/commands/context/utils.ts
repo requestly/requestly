@@ -6,13 +6,20 @@ export async function extractSetupDataFromRepository(
   repository: ApiClientRepositoryInterface
 ): Promise<ContextSetupData> {
   const { apiClientRecordsRepository, environmentVariablesRepository } = repository;
+  console.log("[EXTRACT] Starting for rootPath:", environmentVariablesRepository.meta?.rootPath);
   let records: ContextSetupData["apiClientRecords"];
   let environments: ContextSetupData["environments"];
   let erroredRecords: ContextSetupData["erroredRecords"] = { apiErroredRecords: [], environmentErroredRecords: [] };
+
+  console.log("[EXTRACT] Calling getAllRecords and getAllEnvironments...");
   const [fetchedRecordsResult, fetchedEnvResult] = await Promise.all([
     apiClientRecordsRepository.getAllRecords(),
     environmentVariablesRepository.getAllEnvironments(),
   ]);
+  console.log("[EXTRACT] Promise.all completed", {
+    recordsSuccess: fetchedRecordsResult.success,
+    envSuccess: fetchedEnvResult.success,
+  });
 
   if (!fetchedRecordsResult.success) {
     toast.error({
@@ -37,10 +44,19 @@ export async function extractSetupDataFromRepository(
   } else {
     const allEnvironments = fetchedEnvResult.data.environments;
     const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
+    console.log("[EXTRACT] Looking for global env", {
+      globalEnvId,
+      allEnvKeys: Object.keys(allEnvironments),
+      rootPath: environmentVariablesRepository.meta?.rootPath,
+    });
     const { [globalEnvId]: globalEnv, ...otherEnvs } = allEnvironments;
 
-    if (!globalEnv) throw new Error("Global Environment doesn't exist");
+    if (!globalEnv) {
+      console.error("[EXTRACT] Global env NOT FOUND!", { globalEnvId, allEnvironments });
+      throw new Error("Global Environment doesn't exist");
+    }
 
+    console.log("[EXTRACT] Global env found successfully");
     environments = {
       globalEnvironment: globalEnv,
       nonGlobalEnvironments: otherEnvs,

@@ -153,6 +153,8 @@ const createTabServiceStore = () => {
           const sourceId = source.getSourceId();
           const sourceName = source.getSourceName();
 
+          //this is contextId is coming from metadata of the TAB, having the contextId(workspace Id attached with it)
+          //So it means tabsMetadata have the workspace Id with them
           const contextId = source.metadata.context?.id;
           if (contextId) {
             setLastUsedContextId(contextId);
@@ -332,6 +334,8 @@ const createTabServiceStore = () => {
             const tabState = tab.getState();
             set({ activeTabId: id, activeTabSource: tabState.source });
             const contextId = tabState.source.metadata.context?.id;
+
+            //same above reasoning goes here too
             if (contextId) {
               setLastUsedContextId(contextId);
             }

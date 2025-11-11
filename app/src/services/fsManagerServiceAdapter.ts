@@ -103,9 +103,12 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   @FsErrorHandler
   async getAllEnvironments() {
-    return this.invokeProcedureInBG("getAllEnvironments") as Promise<
+    console.log("[FsAdapter] Calling getAllEnvironments in background");
+    const result = this.invokeProcedureInBG("getAllEnvironments") as Promise<
       FileSystemResult<{ environments: EnvironmentEntity[]; erroredRecords: ErroredRecord[] }>
     >;
+    console.log("[FsAdapter] getAllEnvironments call initiated");
+    return result;
   }
 
   @FsErrorHandler

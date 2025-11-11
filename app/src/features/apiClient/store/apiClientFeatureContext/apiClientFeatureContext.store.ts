@@ -32,6 +32,7 @@ export type ApiClientFeatureContext = {
 
 type ApiClientFeatureContextProviderState = {
   lastUsedContext?: ApiClientFeatureContext;
+  //all the contexts are here, having workspaceId, corresponding ApiClientFeatureContext
   contexts: Map<RenderableWorkspaceState["id"], ApiClientFeatureContext>;
 
   addContext(context: ApiClientFeatureContext): void;
@@ -141,7 +142,10 @@ export const NoopContext: ApiClientFeatureContext = {
 };
 
 export function setLastUsedContextId(id: string) {
+  //this context is null if workspaceId is null here
+  console.log("DEUBG-3", id);
   const context = apiClientFeatureContextProviderStore.getState().contexts.get(id);
+  console.log("DEBUG-2", context);
   if (!context) {
     throw new Error("Could not find context!");
   }

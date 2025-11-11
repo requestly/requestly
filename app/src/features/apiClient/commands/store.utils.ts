@@ -54,6 +54,7 @@ export function getOrderedApiClientRecords(
 
 // Multiview
 export function getApiClientFeatureContext(contextId?: string) {
+  console.log("contextId", contextId);
   const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
   if (contextId === NoopContextId) {
     return NoopContext;

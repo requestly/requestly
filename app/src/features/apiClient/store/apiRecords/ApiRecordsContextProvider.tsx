@@ -22,6 +22,7 @@ export function useAPIRecords<T>(selector: (state: ApiRecordsState) => T) {
 
 export function useAPIRecordsStore() {
   const store = useApiClientFeatureContext().stores;
+  console.log("stores", store);
 
   if (!store || !store.records) {
     throw new Error("records store not found!");

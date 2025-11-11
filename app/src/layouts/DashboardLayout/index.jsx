@@ -47,6 +47,8 @@ const DashboardLayout = () => {
 
   useRootPathRedirector();
   useInitPopupConfig();
+
+  //top level intialization
   useWorkspaceFetcher();
   // initializeOneTap();
 

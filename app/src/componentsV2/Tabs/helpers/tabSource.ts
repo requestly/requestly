@@ -1,6 +1,7 @@
 import React from "react";
 import { TabSourceMetadata } from "../types";
 
+//what is this abstractTabSource
 export abstract class AbstractTabSource {
   abstract component: NonNullable<React.ReactNode>;
   abstract metadata: TabSourceMetadata;
