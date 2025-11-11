@@ -3,6 +3,7 @@ import { ActiveBlocker, TabState } from "../store/tabStore";
 import { StoreApi } from "zustand";
 import { GenericStateContext } from "hooks/useGenericState";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
+import { RequestViewState } from "features/apiClient/screens/apiClient/components/views/store";
 
 export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabState> }>> = React.memo((props) => {
   const [
@@ -18,10 +19,13 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
     state.closeTabById,
     state.upsertTabSource,
   ]);
-
+  const viewStore = props.store.getState().viewStore;
+  const createViewStore = props.store.getState().source.createViewStore;
   return (
     <GenericStateContext.Provider
       value={{
+        genericStore: viewStore ? (viewStore as StoreApi<RequestViewState>) : null,
+        createGenericStore: createViewStore,
         close: useCallback(() => {
           closeTabById(props.store.getState().id);
         }, [closeTabById, props.store]),

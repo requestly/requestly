@@ -5,8 +5,8 @@ import HttpClientView from "../components/views/http/HttpClientView";
 
 interface Props {
   apiRecord: RQAPI.ApiRecord;
-  handleRequestFinished: (entry: RQAPI.ApiEntry) => void;
-  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  handleRequestFinished?: (entry: RQAPI.ApiEntry) => void;
+  onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
   isCreateMode: boolean;
   isOpenInModal?: boolean;
 }

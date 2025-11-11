@@ -1,7 +1,8 @@
-import { create } from "zustand";
+import { create, StoreApi } from "zustand";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { ReactNode } from "react";
 import { NativeError } from "errors/NativeError";
+import { RequestViewState } from "features/apiClient/screens/apiClient/components/views/store";
 
 export enum CloseTopic {
   UNSAVED_CHANGES = "unsaved_changes",
@@ -30,6 +31,7 @@ export type TabState = {
   icon: ReactNode;
   closeBlockers: Map<CloseTopic, Map<CloseBlockerId, CloseBlocker>>;
   isNewTab: boolean;
+  viewStore: StoreApi<RequestViewState> | null; // for now specifically focusing on request view store
 
   setTitle: (title: string) => void;
   setUnsaved: (saved: boolean) => void;
@@ -43,15 +45,11 @@ export type TabState = {
   addCloseBlocker: (topic: CloseTopic, id: CloseBlockerId, blocker: CloseBlocker) => void;
   removeCloseBlocker: (topic: CloseTopic, id: CloseBlockerId) => void;
   clearAllCloseBlockers: () => void;
+  // setEntryStore: (store: StoreApi<RequestViewStore> | null) => void;
 };
 
-export const createTabStore = (
-  id: number,
-  source: any,
-  title: string,
-  preview = false,
-  isNewTab = false
-) => {
+export const createTabStore = (id: number, source: any, title: string, preview = false, isNewTab = false) => {
+  const viewStore = source?.createViewStore?.() ?? null;
   return create<TabState>((set, get) => ({
     id,
     title,
@@ -61,6 +59,9 @@ export const createTabStore = (
     icon: source.getIcon(),
     closeBlockers: new Map(),
     isNewTab,
+    viewStore,
+    // entryStore: viewStore,
+    // setEntryStore: (store: StoreApi<RequestViewStore> | null) => set({ entryStore: store }),
 
     setTitle: (title: string) => set({ title }),
     setUnsaved: (unsaved: boolean) => set({ unsaved }),

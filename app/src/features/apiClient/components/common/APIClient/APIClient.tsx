@@ -25,7 +25,9 @@ interface Props {
   modalTitle?: string;
 }
 
-const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord => {
+export const createDummyApiRecord = <T extends RQAPI.ApiEntry = RQAPI.HttpApiEntry>(
+  apiEntry: RQAPI.ApiEntry
+): RQAPI.ApiRecord => {
   // This record is created only for cases when client view is opened without any option to save the request.
   // if saving is enabled in such cases, please take the necessary fields into account (eg. id, ownerId...).
   return {
@@ -47,7 +49,8 @@ const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord => {
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const apiRecord = useMemo<RQAPI.ApiRecord>(() => {
     if (!request) {
-      return null;
+      throw new Error("No record found");
+      // return null;
     }
 
     if (typeof request === "string") {

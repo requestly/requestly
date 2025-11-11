@@ -1,7 +1,13 @@
+import { RequestViewState } from "features/apiClient/screens/apiClient/components/views/store";
 import { createContext, useContext } from "react";
 import { ReactNode } from "react";
+import { StoreApi } from "zustand";
 
 export interface GenericState {
+  /* restricting to RequestViewState for now */
+  genericStore: StoreApi<RequestViewState> | null;
+  createGenericStore: (store?: StoreApi<RequestViewState>) => void;
+
   setTitle: (title: string) => void;
   setPreview: (preview: boolean) => void;
   setUnsaved: (unsaved: boolean) => void;
@@ -17,6 +23,9 @@ export interface GenericState {
 }
 
 const defaultGenericState: GenericState = {
+  genericStore: null,
+  createGenericStore: () => {},
+
   setTitle: () => {},
   setPreview: () => {},
   setUnsaved: () => {},

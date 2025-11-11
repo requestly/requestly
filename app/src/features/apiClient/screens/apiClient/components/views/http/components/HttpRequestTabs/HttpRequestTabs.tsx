@@ -26,7 +26,7 @@ export enum RequestTab {
 }
 
 interface Props {
-  error: RQAPI.ExecutionError;
+  error: RQAPI.ExecutionError | null;
   requestEntry: RQAPI.HttpApiEntry;
   requestId: RQAPI.ApiRecord["id"];
   collectionId: string;
@@ -56,7 +56,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
-  
 
   const items = useMemo(() => {
     return [

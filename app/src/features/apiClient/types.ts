@@ -295,14 +295,14 @@ export namespace RQAPI {
     data: Collection;
   }
 
-  export type ApiRecord = {
+  export type ApiRecord<T extends ApiEntry = ApiEntry> = {
     type: RecordType.API;
-    data: ApiEntry;
+    data: T;
   } & BaseApiRecord;
 
-  export type HttpApiRecord = ApiRecord & { data: HttpApiEntry };
+  export type HttpApiRecord = ApiRecord<HttpApiEntry>;
 
-  export type GraphQLApiRecord = ApiRecord & { data: GraphQLApiEntry };
+  export type GraphQLApiRecord = ApiRecord<GraphQLApiEntry>;
 
   export type ApiClientRecord = ApiRecord | CollectionRecord;
 
