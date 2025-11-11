@@ -31,7 +31,7 @@ export const CreateEnvironmentPopup: React.FC = () => {
         trackNewEnvironmentClicked();
         const context = getApiClientFeatureContext(contextId || undefined);
         if (!context) {
-          const errorMessage = "Missing API client context";
+          const errorMessage = "Failed to create new environment";
           toast.error(errorMessage);
           captureException(new Error(errorMessage));
           return;
