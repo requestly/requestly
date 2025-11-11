@@ -93,20 +93,21 @@ div.n-popup {
 
     .variable-info-property-container {
       display: flex;
-      padding: 10px 12px 8px 12px;
+      padding: 8px 12px 8px 12px;
       flex-direction: row;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
       align-self: stretch;
       border-bottom: 1px solid var(--requestly-color-white-t-10);
 
       .edit-variable-btn {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-      }
-
-      &:hover .edit-variable-btn {
-        opacity: 1;
+        height: 24px;
+        margin: 0px;
+        margin-left: auto;
+        border-radius: 4px;
+        font-size: var(--requestly-font-size-xs);
+        color: var(--requestly-color-text-subtle);
+        padding: 8px;
       }
     }
 
