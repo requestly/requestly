@@ -19,8 +19,8 @@ export namespace Authorization {
   };
 
   export type BASIC_AUTH_CONFIG = {
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
   };
 
   export const requiresConfig = (type: Type): type is AuthConfigMeta.AuthWithConfig => {
@@ -113,25 +113,22 @@ export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.
 }
 
 export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Type.BASIC_AUTH> {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 
   type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
 
-  constructor(username: string, password: string) {
+  constructor(username?: string, password?: string) {
     this.username = username;
     this.password = password;
   }
 
   validate(): boolean {
-    return !!(this.username && this.password);
+    return true; //always send headers , no validation is done
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {
-    if (!this.validate()) {
-      // throw new Error("Invalid Basic Auth Authorization Config");
-      return null;
-    }
+    // always return config since validate alwyas return true
     return {
       username: this.username,
       password: this.password,
