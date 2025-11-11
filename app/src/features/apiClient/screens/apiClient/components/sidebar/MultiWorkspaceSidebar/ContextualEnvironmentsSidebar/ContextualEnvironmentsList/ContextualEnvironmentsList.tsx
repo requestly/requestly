@@ -17,6 +17,7 @@ import "./contextualEnvironmentsList.scss";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
+import { Conditional } from "components/common/Conditional";
 
 interface ContextualEnvironmentsListProps {
   searchValue: string;
@@ -86,9 +87,9 @@ export const ContextualEnvironmentsList: React.FC<ContextualEnvironmentsListProp
                   />
                 )
               )}
-              {showEmptyCreateCard && (
+              <Conditional condition={showEmptyCreateCard}>
                 <EmptyEnvironmentsCreateCard contextId={contextId} isValidPermission={isValidPermission} />
-              )}
+              </Conditional>
               <div className="mt-8">
                 {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && onNewClickContextId === contextId && (
                   <SidebarPlaceholderItem name="New Environment" />

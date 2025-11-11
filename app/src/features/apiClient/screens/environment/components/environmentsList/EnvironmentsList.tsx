@@ -19,6 +19,7 @@ import {
 import "./environmentsList.scss";
 import { ApiClientSidebarTabKey } from "features/apiClient/screens/apiClient/components/sidebar/SingleWorkspaceSidebar/SingleWorkspaceSidebar";
 import { EmptyEnvironmentsCreateCard } from "features/apiClient/screens/apiClient/components/sidebar/components/EmptyEnvironmentsCreateCard/EmptyEnvironmentsCreateCard";
+import { Conditional } from "components/common/Conditional";
 
 export const EnvironmentsList = () => {
   const [globalEnvironment, nonGlobalEnvironments, getEnvironment] = useAPIEnvironment((s) => [
@@ -108,9 +109,9 @@ export const EnvironmentsList = () => {
                   />
                 )
               )}
-              {showEmptyCreateCard && (
+              <Conditional condition={showEmptyCreateCard}>
                 <EmptyEnvironmentsCreateCard contextId={null} isValidPermission={isValidPermission} />
-              )}
+              </Conditional>
               <div className="mt-8">
                 {isRecordBeingCreated === RQAPI.RecordType.ENVIRONMENT && (
                   <SidebarPlaceholderItem name="New Environment" />
