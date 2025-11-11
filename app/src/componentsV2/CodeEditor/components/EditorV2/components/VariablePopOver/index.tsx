@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { Popover, Tag, Tooltip } from "antd";
+import { Popover } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
 import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { PiHighlighterBold } from "@react-icons/all-files/pi/PiHighlighterBold";
 import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
+import { getScopeIcon } from "./hooks/useScopeOptions";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -189,29 +189,25 @@ const VariableInfo: React.FC<{
   return (
     <>
       <div className="variable-info-property-container">
-        <Tag icon={<PiHighlighterBold />} className="variable-info-header">
-          {source.scope}
-        </Tag>
-
         {source.scope !== VariableScope.RUNTIME && (
           <>
-            <span className="variable-header-info-seperator">/</span>
-            <div className="variable-info-header-name">{source.name}</div>
+            <span>{getScopeIcon(source.scope)} </span>
+            <span className="variable-header-info-seperator"> </span>
+            <div className="variable-info-header-name"> {source.name}</div>
           </>
         )}
 
         {/* Edit button - only for non-runtime variables */}
         {source.scope !== VariableScope.RUNTIME && onEditClick && (
-          <Tooltip title="Edit variable">
-            <RQButton
-              type="transparent"
-              size="small"
-              icon={<MdEdit style={{ fontSize: "14px" }} />}
-              onClick={onEditClick}
-              className="edit-variable-btn"
-              style={{ marginLeft: "auto", padding: "2px 4px", height: "auto" }}
-            />
-          </Tooltip>
+          <RQButton
+            type="transparent"
+            size="small"
+            icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+            onClick={onEditClick}
+            className="edit-variable-btn"
+          >
+            Edit
+          </RQButton>
         )}
       </div>
 
