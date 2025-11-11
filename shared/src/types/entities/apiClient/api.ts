@@ -11,8 +11,8 @@ export interface BEARER_TOKEN_FORM_VALUES {
 }
 
 export interface BASIC_AUTH_FORM_VALUES {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 }
 
 export type AUTH_OPTIONS = API_KEY_FORM_VALUES | BEARER_TOKEN_FORM_VALUES | BASIC_AUTH_FORM_VALUES;
@@ -38,8 +38,8 @@ export namespace Authorization {
   };
 
   export type BASIC_AUTH_CONFIG = {
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
   };
 
   export const requiresConfig = (type: Type): type is AuthConfigMeta.AuthWithConfig => {
@@ -132,25 +132,21 @@ export class BearerTokenAuthorizationConfig implements AuthConfig<Authorization.
 }
 
 export class BasicAuthAuthorizationConfig implements AuthConfig<Authorization.Type.BASIC_AUTH> {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 
   type: Authorization.Type.BASIC_AUTH = Authorization.Type.BASIC_AUTH;
 
-  constructor(username: string, password: string) {
+  constructor(username?: string, password?: string) {
     this.username = username;
     this.password = password;
   }
 
   validate(): boolean {
-    return !!(this.username && this.password);
+    return true;
   }
 
   get config(): AuthConfigMeta.TypeToConfig[Authorization.Type.BASIC_AUTH] | null {
-    if (!this.validate()) {
-      // throw new Error("Invalid Basic Auth Authorization Config");
-      return null;
-    }
     return {
       username: this.username,
       password: this.password,
@@ -249,6 +245,7 @@ export enum ApiClientImporterType {
   POSTMAN = "POSTMAN",
   BRUNO = "BRUNO",
   CURL = "CURL",
+  OPENAPI = "OPENAPI",
 }
 
 export type CollectionVariableMap = Record<string, { variables: EnvironmentVariables }>;

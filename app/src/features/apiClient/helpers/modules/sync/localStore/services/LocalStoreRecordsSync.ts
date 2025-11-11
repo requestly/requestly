@@ -10,16 +10,20 @@ import { ApiClientLocalDbQueryService } from "../helpers";
 import { ApiClientLocalDbTable } from "../helpers/types";
 import { v4 as uuidv4 } from "uuid";
 import { ResponsePromise } from "backend/types";
-import { SavedRunConfig } from "features/apiClient/commands/collectionRunner/types";
+import { SavedRunConfig, SavedRunConfigRecord } from "features/apiClient/commands/collectionRunner/types";
 import { RunResult, SavedRunResult } from "features/apiClient/store/collectionRunResult/runResult.store";
+import { LocalStore } from "./types";
 
 export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClientLocalStoreMeta> {
   meta: ApiClientLocalStoreMeta;
-  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>;
+  private queryService: ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>;
 
   constructor(meta: ApiClientLocalStoreMeta) {
     this.meta = meta;
-    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiClientRecord>(meta, ApiClientLocalDbTable.APIS);
+    this.queryService = new ApiClientLocalDbQueryService<RQAPI.ApiRecord | LocalStore.CollectionRecord>(
+      meta,
+      ApiClientLocalDbTable.APIS
+    );
   }
 
   private getNewId() {
@@ -233,6 +237,11 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
+  async batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]> {
+    await this.queryService.createBulkRecords(records);
+    return records;
+  }
+
   async batchCreateRecordsWithExistingId(records: RQAPI.ApiClientRecord[]): RQAPI.RecordsPromise {
     await this.queryService.createBulkRecords(records);
     return {
@@ -285,47 +294,211 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return this.queryService.getIsAllCleared();
   }
 
+  async batchCreateCollectionRunDetails(
+    details: {
+      collectionId: RQAPI.CollectionRecord["id"];
+      runConfigs?: Record<string, SavedRunConfig>;
+      runResults?: RunResult[];
+    }[]
+  ): RQAPI.RecordsPromise {
+    return {
+      success: false,
+      data: { records: [], erroredRecords: [] },
+      message: "Not implemented",
+    };
+  }
+
+  private async getCollectionDetails(
+    collectionId: RQAPI.ApiClientRecord["collectionId"]
+  ): Promise<LocalStore.CollectionRecord | null> {
+    const result = await this.getRecord(collectionId);
+
+    if (!result.success) {
+      return null;
+    }
+
+    return result.data as LocalStore.CollectionRecord;
+  }
+
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
   ): ResponsePromise<SavedRunConfig> {
-    return {
-      success: true,
-      data: {
-        id: runConfigId,
-        runOrder: [],
-      },
-    };
+    try {
+      const collection = await this.getCollectionDetails(collectionId);
+
+      if (!collection) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const runConfig = collection?.runConfigs?.[runConfigId];
+
+      if (!runConfig) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Not found!",
+          },
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          id: runConfigId,
+          runOrder: runConfig.runOrder,
+          delay: runConfig.delay,
+          iterations: runConfig.iterations,
+          dataFile: runConfig.dataFile,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        },
+      };
+    }
   }
 
   async upsertRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
-    runConfig: Partial<RQAPI.RunConfig>
+    runConfig: SavedRunConfig
   ): ResponsePromise<SavedRunConfig> {
-    return {
-      success: false,
-      data: null,
-      error: {
-        type: "INTERNAL_SERVER_ERROR",
-        message: "Not implemented",
-      },
-    };
+    try {
+      const collection = await this.getCollectionDetails(collectionId);
+
+      if (!collection) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const timeStamp = Timestamp.now().toMillis();
+      const updatedRunConfig = {
+        ...runConfig,
+        updatedTs: timeStamp,
+      } as SavedRunConfigRecord;
+
+      updatedRunConfig.createdTs = collection.runConfigs?.[runConfig.id]?.createdTs || timeStamp;
+
+      await this.updateRecord(
+        {
+          ...collection,
+          runConfigs: {
+            ...(collection.runConfigs ?? {}),
+            [runConfig.id]: updatedRunConfig,
+          },
+        } as LocalStore.CollectionRecord,
+        collection.id
+      );
+
+      return { success: true, data: { ...runConfig, id: runConfig.id } };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        },
+      };
+    }
   }
 
   async getRunResults(collectionId: RQAPI.ApiClientRecord["collectionId"]): ResponsePromise<RunResult[]> {
-    return {
-      success: true,
-      data: [],
-    };
+    try {
+      const collection = await this.getCollectionDetails(collectionId);
+
+      if (!collection) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const runResults = collection.runResults || [];
+      return {
+        success: true,
+        data: runResults,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        },
+      };
+    }
   }
 
   async addRunResult(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runResult: RunResult
   ): ResponsePromise<SavedRunResult> {
-    return {
-      success: true,
-      data: null,
-    };
+    try {
+      const collection = await this.getCollectionDetails(collectionId);
+
+      if (!collection) {
+        return {
+          success: false,
+          data: null,
+          error: {
+            type: "NOT_FOUND",
+            message: "Collection not found!",
+          },
+        };
+      }
+
+      const resultArray = Array.from(runResult.iterations.values());
+
+      const runResultToSave = {
+        id: this.getNewId(),
+        ...runResult,
+        iterations: resultArray,
+      } as SavedRunResult;
+
+      await this.updateRecord(
+        {
+          ...collection,
+          runResults: [...(collection.runResults || []), runResultToSave],
+        } as LocalStore.CollectionRecord,
+        collection.id
+      );
+
+      return { success: true, data: runResultToSave };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: {
+          type: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        },
+      };
+    }
   }
 }

@@ -21,7 +21,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     return fsManagerServiceAdapterProvider.get(this.meta.rootPath);
   }
 
-  
   private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
     switch (requestDetails.type) {
       case "http":
@@ -265,7 +264,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         ...this.parseApiRecordRequest(record),
       },
       id,
-      record.collectionId,
+      record.collectionId
     );
 
     if (result.type === "error") {
@@ -515,6 +514,17 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  async batchWriteApiRecords(records: RQAPI.ApiRecord[]): Promise<RQAPI.ApiRecord[]> {
+    try {
+      for (const record of records) {
+        await this.createRecordWithId(record, record.id);
+      }
+      return records;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
   async duplicateApiEntities(entities: RQAPI.ApiClientRecord[]) {
     const result: RQAPI.ApiClientRecord[] = [];
     for (const entity of entities) {
@@ -582,6 +592,20 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
+  async batchCreateCollectionRunDetails(
+    details: {
+      collectionId: RQAPI.CollectionRecord["id"];
+      runConfigs?: Record<string, SavedRunConfig>;
+      runResults?: RunResult[];
+    }[]
+  ): RQAPI.RecordsPromise {
+    return {
+      success: false,
+      data: { records: [], erroredRecords: [] },
+      message: "Not implemented",
+    };
+  }
+
   async getRunConfig(
     collectionId: RQAPI.ApiClientRecord["collectionId"],
     runConfigId: RQAPI.RunConfig["id"]
@@ -591,6 +615,9 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       data: {
         id: runConfigId,
         runOrder: [],
+        delay: 0,
+        iterations: 1,
+        dataFile: null,
       },
     };
   }

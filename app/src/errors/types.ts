@@ -1,6 +1,13 @@
 export enum ErrorCode {
-  WRONG_INPUT = "wrong_input",
   PERMISSION_DENIED = "permission_denied",
   UNKNOWN = "unknown",
-  MIGRATION_FAILED = "migration_failed",
+}
+
+// Contains the value from Sentry.SeverityLevel
+export enum ErrorSeverity {
+  FATAL = "fatal",
+  ERROR = "error",
+  WARNING = "warning",
+  INFO = "info",
+  DEBUG = "debug",
 }

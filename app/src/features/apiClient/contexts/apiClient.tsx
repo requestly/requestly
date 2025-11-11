@@ -35,8 +35,8 @@ interface ApiClientContextInterface {
 
   isImportModalOpen: boolean;
 
-  selectedHistoryIndex: number;
-  setCurrentHistoryIndex: (index: number) => void;
+  selectedHistoryIndex?: number;
+  setCurrentHistoryIndex: (index?: number) => void;
   onImportClick: () => void;
   onImportRequestModalClose: () => void;
   onNewClick: (
@@ -67,7 +67,7 @@ const ApiClientContext = createContext<ApiClientContextInterface>({
 
   isImportModalOpen: false,
 
-  selectedHistoryIndex: 0,
+  selectedHistoryIndex: undefined,
   setCurrentHistoryIndex: () => {},
   onImportClick: () => {},
   onImportRequestModalClose: () => {},
@@ -105,7 +105,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
-  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(undefined);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
@@ -125,11 +125,12 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
   const clearHistory = useCallback(() => {
     setHistory([]);
+    setSelectedHistoryIndex(undefined);
     clearHistoryFromStore();
     trackHistoryCleared();
   }, []);
 
-  const setCurrentHistoryIndex = useCallback((index: number) => {
+  const setCurrentHistoryIndex = useCallback((index?: number) => {
     setSelectedHistoryIndex(index);
   }, []);
 
@@ -171,8 +172,8 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
           setIsRecordBeingCreated(recordType);
           return createBlankApiRecord(recordType, collectionId, recordsRepository, entryType).then((result) => {
             setIsRecordBeingCreated(null);
-            if(!result.success) {
-              toast.error(result.message || 'Failed to create record!');
+            if (!result.success) {
+              toast.error(result.message || "Failed to create record!");
               return;
             }
             saveOrUpdateRecord(context, result.data);
@@ -182,6 +183,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 id: result.data.id,
                 apiEntryDetails: result.data as RQAPI.ApiRecord,
                 title: result.data.name,
+                isNewTab: true,
                 context: {
                   id: context.id,
                 },
@@ -203,7 +205,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   new CollectionViewTabSource({
                     id: result.data.id,
                     title: result.data.name,
-                    focusBreadcrumb: false,
+                    isNewTab: true,
                     context: {
                       id: context.id,
                     },
@@ -239,7 +241,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 new EnvironmentViewTabSource({
                   id: newEnvironment.id,
                   title: newEnvironment.name,
-                  focusBreadcrumb: true,
+                  isNewTab: true,
                   context: {
                     id: context.id,
                   },

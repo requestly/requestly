@@ -3,15 +3,16 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   height: 100%;
   overflow: scroll;
+  --breakpoint-md: 768px;
 
   &.collection-auth {
-    border-bottom: 0;
+    border-bottom: var(--requestly-space-0, 0px);
   }
 
   .form-and-description {
     display: flex;
     flex-direction: column;
-    padding: 16px;
+    padding: var(--requestly-space-6, 16px);
     height: calc(100% - 45px);
 
     &.no-auth {
@@ -30,41 +31,51 @@
         font-size: var(--requestly-font-size-xs, 11px);
         display: flex;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: var(--requestly-space-6, 16px);
         span {
-          margin-left: 4px;
+          margin-left: var(--requestly-space-2, 4px);
         }
       }
 
       .form {
         .field-group {
           display: flex;
-          gap: 8px;
-          margin-bottom: 16px;
+          gap: var(--requestly-space-4, 8px);
+          margin-bottom: var(--requestly-space-6, 16px);
           align-items: center;
 
           label {
-            width: 120px;
+            min-width: 100px;
           }
 
           .field {
-            width: 448px;
+            width: 100%;
+            flex-grow: 1;
+            min-width: 0;
+
+            .select-full {
+              width: 100%;
+            }
+
+            @media (max-width: var(--breakpoint-md)) {
+              width: auto;
+              flex-grow: 0;
+              min-width: initial;
+            }
 
             .input-container.error-state {
               position: relative;
               display: flex;
               align-items: center;
-              height: 32px;
+              height: var(--requestly-space-9, 32px);
               padding: 8px 8px;
-              gap: 6px;
+              gap: var(--requestly-space-3, 6px);
               border: 1px solid var(--requestly-color-error);
-              border-radius: 4px;
+              border-radius: var(--requestly-space-2, 4px);
 
               .error-icon {
-                position: inherit;
-                margin-bottom: 12px;
-                padding: 2px;
-                align-items: center;
+                margin-bottom: var(--requestly-space-0, 0px);
+                padding: var(--requestly-space-1, 2px);
                 margin-left: auto;
                 svg {
                   width: 17px;
@@ -76,22 +87,30 @@
               width: 100%;
               height: 100%;
               border: none;
-              padding: 0;
-              margin-bottom: 8px;
+              padding: var(--requestly-space-0, 0px);
+              margin-bottom: var(--requestly-space-4, 8px);
             }
           }
 
           .ant-select-selector {
-            width: 448px;
+            width: 100%;
+            min-width: var(--requestly-space-0, 0px);
             background: none;
+            @media (min-width: var(--breakpoint-md)) {
+              width: auto;
+            }
           }
 
           .ant-input {
-            height: 32px;
+            height: var(--requestly-space-9, 32px);
             background: none;
             font-size: 13px;
-            line-height: 20px;
+            line-height: var(--requestly-space-7, 20px);
             padding: 4px 6px;
+          }
+
+          .ant-input-affix-wrapper {
+            background: none;
           }
 
           label,
@@ -104,10 +123,16 @@
     }
 
     .auth-description {
-      padding: 16px;
-      max-width: 320px;
-      margin-left: auto;
-      border-left: 1px solid rgba(255, 255, 255, 0.06);
+      padding: var(--requestly-space-6, 16px);
+      width: 100%;
+      margin-left: var(--requestly-space-0, 0px);
+      border-left: none;
+
+      @media (min-width: 1024px) {
+        max-width: 320px;
+        margin-left: var(--requestly-space-0, 0px);
+        border-left: 1px solid rgba(255, 255, 255, 0.06); // Restore separator
+      }
 
       &.no-auth {
         border: none;
@@ -116,18 +141,18 @@
         max-width: 100%;
 
         img {
-          margin-top: 72px;
-          margin-bottom: 16px;
-          width: 80px;
-          height: 80px;
+          margin-top: var(--requestly-space-14, 72px);
+          margin-bottom: var(--requestly-space-6, 16px);
+          width: var(--requestly-space-15, 80px);
+          height: var(--requestly-space-15, 80px);
         }
 
         h1 {
-          line-height: 20px;
+          line-height: var(--requestly-space-7, 20px);
           font-size: 13px;
           font-weight: 500;
           color: #fff;
-          margin-bottom: 4px;
+          margin-bottom: var(--requestly-space-2, 4px);
         }
 
         h2 {
@@ -140,7 +165,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 4px;
+          gap: var(--requestly-space-2, 4px);
           text-decoration: underline;
           font-size: var(--requestly-font-size-sm);
           color: var(--requestly-color-primary-text, #639ff9);
@@ -151,7 +176,15 @@
 
   &.read-only {
     .form-and-description {
-      height: calc(100% - 45px - 48px); // 48px = read only alert height
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      padding: var(--requestly-space-6, 16px);
+      height: calc(100% - 45px); // 48px = read only alert height
+
+      @media (min-width: 1024px) {
+        flex-direction: row;
+      }
     }
   }
 
@@ -169,7 +202,7 @@
 
       .clear-icon {
         cursor: pointer;
-        margin-left: 16px;
+        margin-left: var(--requestly-space-6, 16px);
         display: flex;
         align-items: center;
 
@@ -185,7 +218,7 @@
         font-size: var(--requestly-font-size-xs, 11px);
         line-height: 15px;
         color: #bbbbbb;
-        margin-right: 12px;
+        margin-right: var(--requestly-space-5, 12px);
         font-weight: 500;
       }
 

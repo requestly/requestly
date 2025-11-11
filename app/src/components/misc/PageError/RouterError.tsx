@@ -1,10 +1,11 @@
 import { Button, Typography } from "antd";
 import React, { useEffect } from "react";
-import * as Sentry from "@sentry/react";
 import "./pageError.scss";
 import LINKS from "config/constants/sub/links";
 import { trackErrorBoundaryShown } from "modules/analytics/events/common/error-boundaries";
 import { useRouteError } from "react-router-dom";
+import { sendErrorToSentry } from "features/apiClient/components/ErrorBoundary/utils";
+import { ErrorSeverity } from "errors/types";
 
 interface Props {}
 
@@ -14,10 +15,7 @@ const RouterError: React.FC<Props> = () => {
   useEffect(() => {
     console.log("RouterError", error);
     trackErrorBoundaryShown(error.toString(), "");
-    Sentry.withScope((scope) => {
-      scope.setTag("errorType", "react-router");
-      Sentry.captureException(error);
-    });
+    sendErrorToSentry(error, "react-router-error-boundary", `reactRouter`, ErrorSeverity.FATAL, true, {});
   }, [error]);
 
   return (
