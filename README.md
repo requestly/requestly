@@ -170,6 +170,10 @@ Start working on individual modules:
 
 ## 🙏 Contributing
 
-Currently, while Requestly is open source, we are not accepting pull requests. As a startup with a small team, our focus is on moving quickly and we currently lack the resources and documentation needed to actively support an open-source community. This will probably change in the future.
+We welcome contributions from the community! Whether you're fixing bugs, adding new features, or improving documentation, your contributions help make Requestly better for everyone.
 
-If you are still interested, read our [contributing guide](./CONTRIBUTING.md) to learn about how to propose bugfixes and improvements, and how the development process works.
+**Getting Started:**
+
+- Check out our [issues](https://github.com/requestly/requestly/issues) to find something to work on
+- Read our [contributing guide](./CONTRIBUTING.md) to learn about our development process and guidelines
+- Join our [Discord community](https://rqst.ly/join-community) if you need help or have questions
