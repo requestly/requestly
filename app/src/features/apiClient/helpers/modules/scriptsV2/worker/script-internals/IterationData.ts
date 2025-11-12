@@ -1,11 +1,7 @@
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
-import { LocalScope } from "modules/localScope";
 
 export class IterationData {
-  private iterationData: ExecutionContext["iterationData"];
-  constructor(private readonly localScope: LocalScope) {
-    this.iterationData = this.localScope.get("iterationData");
-  }
+  constructor(private readonly iterationData: ExecutionContext["iterationData"]) {}
 
   get(key: string) {
     return this.iterationData[key]?.localValue;

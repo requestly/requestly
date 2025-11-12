@@ -137,8 +137,7 @@ export type IterationContext = {
 export type BaseExecutionMetadata = {
   requestId: string;
   requestName: string;
-  iteration: number;
-  iterationCount: number;
+  iterationContext: IterationContext;
 };
 
 export type ExecutionMetadata = BaseExecutionMetadata & {

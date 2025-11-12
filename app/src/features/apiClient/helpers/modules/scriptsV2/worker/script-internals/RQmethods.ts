@@ -16,6 +16,7 @@ import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
 import { status } from "http-status";
 import { IterationData } from "./IterationData";
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -71,7 +72,16 @@ export class RQ implements SandboxAPI {
 
   private assertionHandler: AssertionHandler;
 
-  constructor(localScope: LocalScope, private testResults: TestResult[], executionMetadata: ExecutionMetadata) {
+  constructor(
+    context: {
+      localScope: LocalScope;
+      executionMetadata: ExecutionMetadata;
+      iterationData: ExecutionContext["iterationData"];
+    },
+    private testResults: TestResult[]
+  ) {
+    const { localScope, executionMetadata, iterationData } = context;
+
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
@@ -80,7 +90,7 @@ export class RQ implements SandboxAPI {
     this.test = this.createTestObject();
     this.request = this.createRequestObject(localScope.get("request"));
     this.response = this.createResponseObject(localScope.get("response"));
-    this.iterationData = new IterationData(localScope);
+    this.iterationData = new IterationData(iterationData);
     this.info = this.createInfoObject(executionMetadata);
 
     this.assertionHandler = new AssertionHandler(this.response);
@@ -90,8 +100,8 @@ export class RQ implements SandboxAPI {
     return {
       requestId: executionMetadata.requestId,
       eventName: executionMetadata.eventName,
-      iteration: executionMetadata.iteration,
-      iterationCount: executionMetadata.iterationCount,
+      iteration: executionMetadata.iterationContext.iteration,
+      iterationCount: executionMetadata.iterationContext.iterationCount,
       requestName: executionMetadata.requestName,
     };
   }

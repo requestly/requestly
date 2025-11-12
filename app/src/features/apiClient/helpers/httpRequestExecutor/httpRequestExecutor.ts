@@ -208,8 +208,7 @@ export class HttpRequestExecutor {
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
       requestName: recordName,
-      iteration: iterationContext?.iteration ?? 0,
-      iterationCount: iterationContext?.iterationCount ?? 1,
+      iterationContext,
     };
 
     const scriptExecutor = new HttpRequestScriptExecutionService(
@@ -361,8 +360,7 @@ export class HttpRequestExecutor {
     const executionMetadata: BaseExecutionMetadata = {
       requestId: recordId,
       requestName: this.ctx.stores.records.getState().getData(recordId)?.name ?? "",
-      iteration: 0,
-      iterationCount: 1,
+      iterationContext: { iteration: 0, iterationCount: 1 },
     };
     const scriptExecutor = new HttpRequestScriptExecutionService(
       executionContext,
