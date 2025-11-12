@@ -72,15 +72,6 @@ function generateFields(
               : ""
           }`}
         >
-          <SingleLineEditor
-            key={`${formType}-${index}`}
-            className={field.className ?? ""}
-            placeholder={field.placeholder}
-            defaultValue={formState[field.id]}
-            onChange={(value) => onChangeHandler(value, field.id)}
-            variables={variables}
-            isSecret={field.isSecret ?? false}
-          />
           {formType === Authorization.Type.BASIC_AUTH && field.id === "password" ? (
             <Input.Password
               key={`${formType}-${index}`}
@@ -98,6 +89,7 @@ function generateFields(
               defaultValue={formState[field.id]}
               onChange={(value) => onChangeHandler(value, field.id)}
               variables={variables}
+              isSecret={field.isSecret ?? false}
             />
           )}
           <Conditional

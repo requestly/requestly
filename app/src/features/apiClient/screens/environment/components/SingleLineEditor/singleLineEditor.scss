@@ -15,4 +15,9 @@
   position: relative;
   float: right;
   right: 0;
+  color: var(--requestly-color-text-subtle);
+}
+
+.eye-icon:hover {
+  color: var(--requestly-color-text-default);
 }
