@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { ReactNode } from "react";
+import { TabSourceMetadata } from "componentsV2/Tabs/types";
 
 export interface GenericState {
   setTitle: (title: string) => void;
@@ -11,7 +12,7 @@ export interface GenericState {
   addCloseBlocker: (topic: unknown, id: string, blocker: unknown) => void;
   removeCloseBlocker: (topic: unknown, id: string) => void;
   setIsNew: (isNewTab: boolean) => void;
-  getSourceId: () => void;
+  getSourceId: () => TabSourceMetadata;
   replace: (args: unknown) => void; // TODO: make type generic
   close: () => void;
 }
@@ -28,7 +29,7 @@ const defaultGenericState: GenericState = {
   addCloseBlocker: () => {},
   removeCloseBlocker: () => {},
   setIsNew: () => {},
-  getSourceId: () => {},
+  getSourceId: () => ({} as TabSourceMetadata),
 };
 
 /**
