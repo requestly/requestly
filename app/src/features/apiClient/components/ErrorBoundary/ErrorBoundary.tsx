@@ -17,7 +17,7 @@ interface Props {
 }
 
 interface State {
-  hasError: boolean;
+  showBoundary: boolean;
   error: NativeError | null;
 }
 
@@ -27,7 +27,7 @@ const ErrorBoundaryWrapper = (props: Props) => {
 
   useEffect(() => {
     if (errorBoundaryRef.current) {
-      errorBoundaryRef.current.setState({ hasError: false, error: null });
+      errorBoundaryRef.current.setState({ showBoundary: false, error: null });
     }
   }, [activeWorkspace?.id]);
 
@@ -39,15 +39,13 @@ const ErrorBoundaryWrapper = (props: Props) => {
     return tags;
   }, [activeWorkspace?.workspaceType]); // Only create new object when workspaceType changes
 
-  return (
-    <ErrorBoundary ref={errorBoundaryRef} {...props} defaultTags={defaultTags} />
-  );
+  return <ErrorBoundary ref={errorBoundaryRef} {...props} defaultTags={defaultTags} />;
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { showBoundary: false, error: null };
   }
 
   componentDidMount(): void {
@@ -58,44 +56,67 @@ class ErrorBoundary extends React.Component<Props, State> {
     globalUnhandledRejectionHandlers?.delete(this.promiseRejectionHandler);
   }
 
-  componentDidCatch(error: Error) {
+  componentDidCatch(error: Error | NativeError) {
     Logger.log("[ErrorBoundary] Crash componentDidCatch", error, this.props.boundaryId);
-    sendErrorToSentry(prepareError(error, ErrorSeverity.FATAL), this.props.boundaryId, this.props.defaultTags);
+    sendErrorToSentry(
+      error,
+      this.props.boundaryId,
+      "componentDidCatch",
+      ErrorSeverity.FATAL,
+      true,
+      this.props.defaultTags,
+    );
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error: prepareError(error, ErrorSeverity.FATAL) };
+  static getDerivedStateFromError(error: Error | NativeError): State {
+    // Error Boundary only renders NativeErrors. So converting the crash to a NativeError first
+    return { showBoundary: true, error: prepareError(error, ErrorSeverity.FATAL) };
   }
 
   private promiseRejectionHandler = (event: PromiseRejectionEvent & { _caughtBy?: string }) => {
-    if (event?._caughtBy) {
-      return;
+    const error = typeof event.reason === "string" ? new Error(event.reason) : event.reason;
+
+    if (error instanceof NativeError) {
+      // Already caught by another error boundary
+      if (event?._caughtBy) {
+        return;
+      } else {
+        Logger.log("[ErrorBoundary] uncaught promise rejection", event, event._caughtBy, this.props.boundaryId);
+
+        const showBoundary = error?.showBoundary || false;
+        sendErrorToSentry(
+          error,
+          this.props.boundaryId,
+          "onunhandledrejection",
+          undefined,
+          showBoundary,
+          this.props.defaultTags,
+        );
+        this.setState({ showBoundary, error: error });
+
+        event._caughtBy = this.props.boundaryId;
+        event.stopImmediatePropagation();
+      }
     } else {
-      Logger.log("[ErrorBoundary] uncaught promise rejection", event, event._caughtBy, this.props.boundaryId);
-      const error = typeof event.reason === "string" ? new Error(event.reason) : event.reason;
-      const finalError = prepareError(error);
-
-      sendErrorToSentry(finalError, this.props.boundaryId, this.props.defaultTags);
-      event._caughtBy = this.props.boundaryId;
-      this.setState({ hasError: true, error: finalError });
-
-      event.stopImmediatePropagation();
+      // Non Native Errors to be captured by the global unhandled rejection handler
+      return;
     }
   };
 
   private handleResetError = () => {
     getTabServiceActions().resetTabs(true);
-    this.setState({ hasError: false, error: null });
+    this.setState({ showBoundary: false, error: null });
   };
 
   render() {
-    if (this.state.hasError) {
+    // Only show error screen if the error is a NativeError
+    if (this.state.showBoundary && this.state.error instanceof NativeError) {
       const error = this.state.error;
 
       Logger.log("[ErrorBoundary] Boundary Shown", { severity: error?.severity });
       if (error?.severity === ErrorSeverity.FATAL) {
         return <ErrorScreen error={error} resetError={this.handleResetError} />;
-      } else if (error?.severity === ErrorSeverity.WARNING) {
+      } else if (error?.severity === ErrorSeverity.ERROR || error?.severity === ErrorSeverity.WARNING) {
         return (
           <>
             {this.props.children}

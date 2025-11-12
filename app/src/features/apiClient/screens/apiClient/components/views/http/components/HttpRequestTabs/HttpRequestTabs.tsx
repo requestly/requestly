@@ -26,21 +26,27 @@ export enum RequestTab {
 }
 
 interface Props {
+  error: RQAPI.ExecutionError;
   requestEntry: RQAPI.HttpApiEntry;
   requestId: RQAPI.ApiRecord["id"];
   collectionId: string;
   setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
   setContentType: (contentType: RequestContentType) => void;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
+  focusPostResponseScriptEditor?: boolean;
+  scriptEditorVersion?: number;
 }
 
 const HttpRequestTabs: React.FC<Props> = ({
+  error,
   requestEntry,
   requestId,
   collectionId,
   setRequestEntry,
   setContentType,
   handleAuthChange,
+  focusPostResponseScriptEditor,
+  scriptEditorVersion,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
@@ -48,6 +54,9 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
+
+  const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
+  
 
   const items = useMemo(() => {
     return [
@@ -140,21 +149,25 @@ const HttpRequestTabs: React.FC<Props> = ({
         label: (
           <RequestTabLabel
             label="Scripts"
+            dotIndicator={hasScriptError ? "error" : "success"}
             showDot={true}
             count={requestEntry.scripts?.postResponse?.length || requestEntry.scripts?.preRequest?.length}
           />
         ),
         children: (
           <ScriptEditor
+            key={`${scriptEditorVersion}`}
             scripts={requestEntry.scripts}
             onScriptsChange={(newScripts) => {
               setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
             }}
+            focusPostResponse={focusPostResponseScriptEditor}
           />
         ),
       },
     ];
   }, [
+    hasScriptError,
     requestId,
     collectionId,
     handleAuthChange,
@@ -169,6 +182,8 @@ const HttpRequestTabs: React.FC<Props> = ({
     setContentType,
     setRequestEntry,
     pathVariables.length,
+    focusPostResponseScriptEditor,
+    scriptEditorVersion,
   ]);
 
   return (

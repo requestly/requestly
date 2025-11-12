@@ -20,9 +20,20 @@ export type VariableSource = {
 
 export type ScopedVariable = [VariableData, VariableSource];
 
-type Scope = [VariableSource, StoreApi<VariablesState>];
+export type Scope = [VariableSource, StoreApi<VariablesState>];
 
 export type ScopedVariables = Map<VariableKey, ScopedVariable>;
+
+/**
+ * Configuration for overriding store reads with execution context values.
+ * This allows deriving scopes from passed data instead of reading from stores.
+ */
+export type StoreOverrideConfig = {
+  runtimeVariablesStore?: StoreApi<VariablesState>;
+  activeEnvironmentVariablesStore?: StoreApi<VariablesState>;
+  globalEnvironmentVariablesStore?: StoreApi<VariablesState>;
+  collectionVariablesStore?: StoreApi<VariablesState>;
+};
 
 /**
  * This class is used to maintains and store variables, keeping in check that scopes that are higher in chain
@@ -79,22 +90,32 @@ export class VariableHolder {
   }
 }
 
-function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
-  const scopes: Scope[] = [];
-  let currentScopeLevel = 0;
+function getScopes(
+  parents: string[],
+  stores: AllApiClientStores,
+  scopes: Scope[] = [],
+  storeOverrideConfig?: StoreOverrideConfig
+): Scope[] {
+  let currentScopeLevel = scopes.length;
   const {
     activeEnvironment: activeEnvironmentStore,
     globalEnvironment: globalEnvironmentStore,
   } = stores.environments.getState();
 
-  const runtimeVaribles = runtimeVariablesStore.getState();
+  const runtimeVariables = runtimeVariablesStore.getState();
+
   const activeEnvironment = activeEnvironmentStore?.getState();
   const globalEnvironment = globalEnvironmentStore.getState();
+
+  const activeEnvironmentVariablesStore =
+    storeOverrideConfig?.activeEnvironmentVariablesStore ?? activeEnvironment?.data.variables;
+  const globalEnvironmentVariablesStore =
+    storeOverrideConfig?.globalEnvironmentVariablesStore ?? globalEnvironment.data.variables;
 
   const { getRecordStore } = stores.records.getState();
 
   // 0. Runtime Variables
-  if (runtimeVaribles) {
+  if (runtimeVariables) {
     scopes.push([
       {
         scope: VariableScope.RUNTIME,
@@ -115,7 +136,7 @@ function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
         name: activeEnvironment.name,
         level: currentScopeLevel++,
       },
-      activeEnvironment.data.variables,
+      activeEnvironmentVariablesStore!,
     ]);
   }
 
@@ -133,7 +154,7 @@ function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
           name: recordState.record.name,
           level: currentScopeLevel++,
         },
-        recordState.collectionVariables,
+        storeOverrideConfig?.collectionVariablesStore ?? recordState.collectionVariables,
       ]);
     }
   }
@@ -146,7 +167,7 @@ function getScopes(parents: string[], stores: AllApiClientStores): Scope[] {
       name: globalEnvironment.name,
       level: currentScopeLevel++,
     },
-    globalEnvironment.data.variables,
+    globalEnvironmentVariablesStore!,
   ]);
 
   return scopes;
@@ -167,11 +188,16 @@ function readScopesIntoVariableHolder(
   }
 }
 
-export function getScopedVariables(parents: string[], stores: AllApiClientStores): ScopedVariables {
+export function getScopedVariables(
+  parents: string[],
+  stores: AllApiClientStores,
+  scopes?: Scope[],
+  storeOverrideConfig?: StoreOverrideConfig
+): ScopedVariables {
   const variableHolder = new VariableHolder();
   readScopesIntoVariableHolder(
     {
-      scopes: getScopes(parents, stores),
+      scopes: getScopes(parents, stores, scopes, storeOverrideConfig),
     },
     variableHolder
   );
@@ -179,8 +205,13 @@ export function getScopedVariables(parents: string[], stores: AllApiClientStores
   return variableHolder.getAll();
 }
 
-export function resolveVariable(key: string, parents: string[], stores: AllApiClientStores) {
-  return getScopedVariables(parents, stores).get(key);
+export function resolveVariable(
+  key: string,
+  parents: string[],
+  stores: AllApiClientStores,
+  storeOverrideConfig?: StoreOverrideConfig
+) {
+  return getScopedVariables(parents, stores, undefined, storeOverrideConfig).get(key);
 }
 
 class VariableEventsManager {

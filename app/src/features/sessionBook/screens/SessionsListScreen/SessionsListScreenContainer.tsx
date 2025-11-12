@@ -1,4 +1,3 @@
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
@@ -11,11 +10,10 @@ import "./sessionsListScreenContainer.scss";
 
 export const SessionsListScreenContainer = () => {
   const appMode = useSelector(getAppMode);
-  const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
 
   return (
     <div className="sessions-list-screen-container">
-      {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
+      {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) ? (
         <NetworkSessionsIndexPage />
       ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
         <DesktopAppError />

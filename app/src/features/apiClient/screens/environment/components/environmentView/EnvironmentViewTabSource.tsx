@@ -6,9 +6,7 @@ import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
 import { getApiClientEnvironmentsStore } from "features/apiClient/commands/store.utils";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
-interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {
-  focusBreadcrumb?: boolean;
-}
+interface EnvironmentViewTabSourceMetadata extends TabSourceMetadata {}
 
 export class EnvironmentViewTabSource extends BaseTabSource {
   constructor(metadata: EnvironmentViewTabSourceMetadata) {

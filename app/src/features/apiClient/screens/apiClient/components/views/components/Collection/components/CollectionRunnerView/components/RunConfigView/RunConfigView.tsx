@@ -22,7 +22,7 @@ import { Conditional } from "components/common/Conditional";
 import "./runConfigView.scss";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { isDesktopMode } from "utils/AppUtils";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import {
   trackCollectionRunnerConfigSaved,
@@ -30,6 +30,7 @@ import {
   trackInstallExtensionDialogShown,
 } from "modules/analytics/events/features/apiClient";
 import { ApiClientLocalRepository } from "features/apiClient/helpers/modules/sync/local";
+import { getAppMode } from "store/selectors";
 
 const RunConfigSaveButton: React.FC<{ disabled?: boolean }> = ({ disabled = false }) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -117,6 +118,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
   const [runStatus] = useRunResultStore((s) => [s.runStatus]);
   const dispatch = useDispatch();
   const genericState = useGenericState();
+  const appMode = useSelector(getAppMode);
 
   const {
     runner: { runCollection, cancelRun },
@@ -137,7 +139,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
       return;
     }
 
-    const error = await runCollection({ runContext, executor, genericState });
+    const error = await runCollection({ runContext, executor, genericState, appMode });
     if (!error) {
       return;
     }
@@ -148,7 +150,7 @@ const RunCollectionButton: React.FC<{ disabled?: boolean }> = ({ disabled = fals
         reason: "Unable to run collection!",
       },
     });
-  }, [runCollection, runContext, executor, dispatch, genericState]);
+  }, [runCollection, runContext, executor, dispatch, genericState, appMode]);
 
   const handleCancelRunClick = useCallback(() => {
     cancelRun({ runContext });

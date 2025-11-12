@@ -8,5 +8,6 @@ const rulesEntitySelectors = storageRecordAdapter.getSelectors((state: any) => s
 export const getAllRecords = rulesEntitySelectors.selectAll;
 export const getAllRecordsMap = rulesEntitySelectors.selectEntities;
 export const getAllRecordIds = rulesEntitySelectors.selectIds;
+export const getRecordById = rulesEntitySelectors.selectById;
 
-export const getAllRules = (state: any) => getAllRecords(state).filter((record) => isRule(record));
+export const getAllRules = (state: any) => getAllRecords(state).filter((record: any) => isRule(record));

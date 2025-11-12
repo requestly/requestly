@@ -6,12 +6,14 @@ interface EnvironmentVariablesListProps {
   searchValue: string;
   pendingVariables: any[];
   handleSetPendingVariables: (variables: any[]) => void;
+  onSearchValueChange: (value: string) => void;
 }
 
 export const EnvironmentVariablesList: React.FC<EnvironmentVariablesListProps> = ({
   searchValue,
   pendingVariables,
   handleSetPendingVariables,
+  onSearchValueChange,
 }) => {
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_environment", "create");
@@ -23,6 +25,7 @@ export const EnvironmentVariablesList: React.FC<EnvironmentVariablesListProps> =
       onVariablesChange={handleSetPendingVariables}
       isReadOnly={!isValidPermission} // tobe omitted in runtime variable list
       container="environments"
+      onSearchValueChange={onSearchValueChange}
     />
   );
 };

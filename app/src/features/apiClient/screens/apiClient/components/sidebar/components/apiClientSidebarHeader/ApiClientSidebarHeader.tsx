@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Dropdown, DropdownProps } from "antd";
+import { Dropdown, MenuProps } from "antd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { RQButton } from "lib/design-system-v2/components";
@@ -57,7 +57,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
   const [commonImportModalConfig, setCommonImportModalConfig] = useState<ImportModalConfig | null>(null);
   const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
-  const importItems: DropdownProps["menu"]["items"] = useMemo(
+  const importItems: MenuProps["items"] = useMemo(
     () => [
       {
         key: "1",
@@ -73,6 +73,24 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
       },
       {
         key: "2",
+        hidden: !isOpenApiSupportEnabled,
+        label: (
+          <div className="new-btn-option">
+            <SiOpenapiinitiative /> OpenAPI Specifications
+          </div>
+        ),
+        onClick: () => {
+          trackImportStarted(ApiClientImporterType.OPENAPI);
+          setCommonImportModalConfig({
+            productName: "OpenAPI Specifications",
+            supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
+            importer: openApiImporter,
+            importerType: ApiClientImporterType.OPENAPI,
+          });
+        },
+      },
+      {
+        key: "3",
         label: (
           <div className="new-btn-option">
             <BsCollection />
@@ -85,7 +103,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
       {
-        key: "3",
+        key: "4",
         label: (
           <div className="new-btn-option">
             <SiPostman /> Postman Collections and Environments
@@ -97,7 +115,7 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         },
       },
       {
-        key: "4",
+        key: "5",
         label: (
           <div className="new-btn-option">
             <SiBruno /> Bruno Collections and Variables
@@ -106,24 +124,6 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         onClick: () => {
           trackImportStarted(ApiClientImporterType.BRUNO);
           setIsBrunoImporterModalOpen(true);
-        },
-      },
-      {
-        key: "5",
-        hidden: !isOpenApiSupportEnabled,
-        label: (
-          <div className="new-btn-option">
-            <SiOpenapiinitiative /> OpenAPI Specfication
-          </div>
-        ),
-        onClick: () => {
-          trackImportStarted(ApiClientImporterType.OPENAPI);
-          setCommonImportModalConfig({
-            productName: "OpenAPI Specifications",
-            supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
-            importer: openApiImporter,
-            importerType: ApiClientImporterType.OPENAPI,
-          });
         },
       },
     ],

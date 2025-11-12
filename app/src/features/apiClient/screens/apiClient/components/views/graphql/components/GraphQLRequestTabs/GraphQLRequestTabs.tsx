@@ -21,6 +21,8 @@ interface Props {
   collectionId: RQAPI.ApiRecord["collectionId"];
   isSchemaBuilderOpen: boolean;
   setIsSchemaBuilderOpen: (isOpen: boolean) => void;
+  focusPostResponseScriptEditor?: boolean;
+  scriptEditorVersion?: number;
 }
 
 export const GraphQLRequestTabs: React.FC<Props> = ({
@@ -28,6 +30,8 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
   collectionId,
   isSchemaBuilderOpen,
   setIsSchemaBuilderOpen,
+  focusPostResponseScriptEditor,
+  scriptEditorVersion,
 }) => {
   const tabItems = useMemo(() => {
     return [
@@ -51,10 +55,17 @@ export const GraphQLRequestTabs: React.FC<Props> = ({
       {
         key: GraphQLRequestTab.SCRIPTS,
         label: <RequestTabLabel label="Scripts" />,
-        children: <GraphQLScripts />,
+        children: <GraphQLScripts key={`${scriptEditorVersion}`} focusPostResponse={focusPostResponseScriptEditor} />,
       },
     ];
-  }, [requestId, collectionId, setIsSchemaBuilderOpen, isSchemaBuilderOpen]);
+  }, [
+    requestId,
+    collectionId,
+    setIsSchemaBuilderOpen,
+    isSchemaBuilderOpen,
+    scriptEditorVersion,
+    focusPostResponseScriptEditor,
+  ]);
   return (
     <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>
       <ApiClientRequestTabs requestId={requestId} items={tabItems} defaultActiveKey={GraphQLRequestTab.QUERY} />

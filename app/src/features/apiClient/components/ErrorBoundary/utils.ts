@@ -1,19 +1,45 @@
 import * as Sentry from "@sentry/react";
 import { NativeError } from "errors/NativeError";
+import { RenderableError } from "errors/RenderableError";
 import { ErrorSeverity } from "errors/types";
 
 export function sendErrorToSentry(
-  error: NativeError,
-  errorBoundaryId: string = "error_boundary",
-  defaultTags: Record<string, string> = {}
+  error: NativeError | Error,
+  errorBoundaryId: string,
+  mechanismType: `onerror` | `onunhandledrejection` | `generic` | `componentDidCatch` | `reactRouter`,
+  updatedLevel?: Sentry.SeverityLevel | undefined,
+  boundaryShown: boolean = false,
+  defaultTags: Record<string, string> = {},
 ) {
   Sentry.withScope((scope) => {
-    scope.setTags({ caught_by: `${errorBoundaryId}`, severity: error?.severity || ErrorSeverity.INFO, ...defaultTags });
+    scope.setTags({ caught_by: `${errorBoundaryId}`, ...defaultTags, boundary_shown: boundaryShown });
 
-    if (error instanceof NativeError && error.context) {
-      scope.setExtras({ ...error.context });
+    const mechanism: Sentry.EventHint["mechanism"] = {
+      type: mechanismType || "generic",
+      handled: false,
+    };
+
+    if (error instanceof NativeError) {
+      scope.setTags({ is_native_error: true });
+
+      if (error.context) {
+        scope.setExtras({ ...error.context });
+      }
+
+      if (error.severity) {
+        scope.setLevel(error.severity as Sentry.SeverityLevel);
+      }
+
+      if (error instanceof RenderableError) {
+        mechanism.handled = true;
+      }
     }
-    Sentry.captureException(error);
+
+    if (updatedLevel) {
+      scope.setLevel(updatedLevel);
+    }
+
+    Sentry.captureException(error, { mechanism });
   });
 }
 

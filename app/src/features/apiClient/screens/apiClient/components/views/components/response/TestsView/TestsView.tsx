@@ -1,26 +1,45 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { EmptyTestsView } from "./components/EmptyTestsView/EmptyTestsView";
 import { TestResultItem } from "./components/TestResult/TestResult";
-import { Badge, Radio } from "antd";
+import { Badge, Radio, Skeleton } from "antd";
 import { MdRefresh } from "@react-icons/all-files/md/MdRefresh";
 import { RQButton } from "lib/design-system-v2/components";
 import { useTheme } from "styled-components";
 import "./testsView.scss";
 import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
+import Logger from "../../../../../../../../../../../common/logger";
+import { LoadingOutlined } from "@ant-design/icons";
 
 interface TestsViewProps {
   handleTestResultRefresh: () => Promise<void>;
   testResults: TestResult[];
+  onGenerateTests?: () => void;
+  isGeneratingTests?: boolean;
+  canGenerateTests?: boolean;
 }
 
 type TestsFilter = TestResult["status"] | "all";
 
-export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestResultRefresh }) => {
+export const TestsView: React.FC<TestsViewProps> = ({
+  testResults,
+  handleTestResultRefresh,
+  onGenerateTests,
+  isGeneratingTests = false,
+  canGenerateTests = false,
+}) => {
   const theme = useTheme();
   const [testsFilter, setTestsFilter] = useState<TestsFilter>("all");
+  const [isResultRefreshing, setIsResultRefreshing] = useState(false);
 
   const handleRefresh = useCallback(async () => {
-    await handleTestResultRefresh();
+    setIsResultRefreshing(true);
+    try {
+      await handleTestResultRefresh();
+    } catch (error) {
+      Logger.error("Error while refreshing the result", error);
+    } finally {
+      setIsResultRefreshing(false);
+    }
   }, [handleTestResultRefresh]);
 
   const testCounts = useMemo(() => {
@@ -40,7 +59,13 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
   }, [testResults, testsFilter]);
 
   if (!testResults?.length) {
-    return <EmptyTestsView />;
+    return (
+      <EmptyTestsView
+        onGenerateTests={onGenerateTests}
+        isGeneratingTests={isGeneratingTests}
+        canGenerateTests={canGenerateTests}
+      />
+    );
   }
 
   return (
@@ -82,18 +107,30 @@ export const TestsView: React.FC<TestsViewProps> = ({ testResults, handleTestRes
           className="tests-refresh-btn"
           size="small"
           type="transparent"
-          icon={<MdRefresh />}
+          disabled={isResultRefreshing}
+          icon={isResultRefreshing ? <LoadingOutlined /> : <MdRefresh />}
           onClick={handleRefresh}
         >
-          Refresh
+          {isResultRefreshing ? "Refreshing..." : "Refresh"}
         </RQButton>
       </div>
 
-      <div className="test-results-list">
-        {filteredTestResults.map((testResult, index) => (
-          <TestResultItem key={index} testResult={testResult} />
-        ))}
-      </div>
+      {isResultRefreshing ? (
+        <div className="test-results-list">
+          {filteredTestResults.map((testResult, index) => (
+            <div key={index} className="test-result-item">
+              <Skeleton.Button size="default" style={{ height: 16 }} />
+              <Skeleton.Button shape="round" size="small" block={true} style={{ height: 16 }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="test-results-list">
+          {filteredTestResults.map((testResult, index) => (
+            <TestResultItem key={index} testResult={testResult} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

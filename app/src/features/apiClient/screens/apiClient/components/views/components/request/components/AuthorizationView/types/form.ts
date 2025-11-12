@@ -9,8 +9,8 @@ export interface BEARER_TOKEN_FORM_VALUES {
 }
 
 export interface BASIC_AUTH_FORM_VALUES {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
 }
 
 export type AUTH_OPTIONS = API_KEY_FORM_VALUES | BEARER_TOKEN_FORM_VALUES | BASIC_AUTH_FORM_VALUES;

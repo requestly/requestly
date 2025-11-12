@@ -41,16 +41,18 @@ const AuthorizationView: React.FC<Props> = ({
 
   const onFormConfigChange = useCallback(
     <SelectedAuthType extends AuthConfigMeta.AuthWithConfig>(authConfig: AuthConfig<SelectedAuthType> | null) => {
-      if (!authConfig) {
-        return;
-      }
       setResolvedAuthConfigStore((prevOptions) => {
         const newConfigStore = { ...prevOptions };
-        newConfigStore[authConfig.type] = authConfig.config;
+        if (authConfig) {
+          newConfigStore[authConfig.type] = authConfig.config;
+        } else {
+          // Clear the config for the current auth type when validation fails
+          newConfigStore[selectedAuthType] = null;
+        }
         return newConfigStore;
       });
     },
-    []
+    [selectedAuthType]
   );
 
   const handleAuthTypeChange = useCallback((value: Authorization.Type) => {

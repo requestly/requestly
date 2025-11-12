@@ -266,3 +266,46 @@ export const trackCollectionRunnerConfigSaveFailed = (params) => {
   const { collection_id, request_count, iteration_count, delay } = params;
   trackEvent(API_CLIENT.COLLECTION_RUNNER_CONFIG_SAVE_FAILED, { collection_id, request_count, iteration_count, delay });
 };
+
+// Tests Autogeneration
+
+export const trackTestGenerationStarted = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_STARTED, params);
+};
+
+export const trackTestGenerationCompleted = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_COMPLETED, params);
+};
+
+export const trackTestGenerationFailed = (params = {}) => {
+  trackEvent(API_CLIENT.TEST_GENERATION_FAILED, params);
+};
+
+// Data-File Support for Collection Runner
+export const trackCollectionRunnerSelectFileClicked = (params) => {
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_SELECT_FILE_CLICKED, params);
+};
+
+export const trackCollectionRunnerFileParsed = (params) => {
+  const { record_count, format } = params;
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_PARSED, { record_count, format });
+};
+
+export const trackCollectionRunnerFileParseFailed = (params) => {
+  const { reason, format } = params;
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_PARSE_FAILED, { reason, format });
+};
+
+export const trackCollectionRunnerRecordLimitExceeded = (params) => {
+  const { record_count } = params;
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_RECORD_LIMIT_EXCEEDED, { record_count });
+};
+
+export const trackCollectionRunnerTruncatedFileUsed = (params) => {
+  const { record_count } = params;
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_TRUNCATED_FILE_USED, { record_count });
+};
+
+export const trackCollectionRunnerFileCleared = (params) => {
+  trackEvent(API_CLIENT.COLLECTION_RUNNER_FILE_CLEARED, params);
+};

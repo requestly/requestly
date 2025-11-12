@@ -2,7 +2,7 @@ import { NativeError } from "errors/NativeError";
 import { create } from "zustand";
 import { EnvironmentVariableData, VariableData, VariableValues, VariableKey } from "./types";
 import { PersistedVariables } from "../shared/variablePersistence";
-import { EnvironmentVariables } from "backend/environment/types";
+import { EnvironmentVariables, EnvironmentVariableType, VariableValueType } from "backend/environment/types";
 
 type _VariablesState<T extends VariableData> = {
   data: Map<VariableKey, T>;
@@ -30,6 +30,32 @@ export const parseVariables = (rawVariables: VariableValues): VariablesState["da
 
 export const parseEnvVariables = (rawVariables: EnvironmentVariables): EnvVariableState["data"] => {
   return new Map(Object.entries(rawVariables));
+};
+
+const getVariableType = (value: VariableValueType): EnvironmentVariableType => {
+  switch (typeof value) {
+    case "string":
+      return EnvironmentVariableType.String;
+    case "number":
+      return EnvironmentVariableType.Number;
+    case "boolean":
+      return EnvironmentVariableType.Boolean;
+    default:
+      return EnvironmentVariableType.String;
+  }
+};
+
+const parsePrimitiveVariables = (variableRecord: Record<string, VariableValueType>): Map<VariableKey, VariableData> => {
+  const parsedEntries = Object.entries(variableRecord).map(([key, value], index) => {
+    const variableData: VariableData = {
+      id: index,
+      type: getVariableType(value),
+      syncValue: value,
+      localValue: value,
+    };
+    return [key, variableData] as [VariableKey, VariableData];
+  });
+  return new Map(parsedEntries);
 };
 
 export const createVariablesStore = (props?: { variables: VariableValues }) => {
@@ -122,4 +148,55 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
       return new Map(searchResults);
     },
   }));
+};
+
+const _createDummyVariablesStore = (data: Map<VariableKey, VariableData>) => {
+  return create<VariablesState>()((_, get) => ({
+    data,
+
+    reset() {},
+
+    resetSyncValues() {},
+
+    delete() {},
+
+    add() {},
+
+    update() {},
+
+    getVariable(key) {
+      const { data } = get();
+
+      return data.get(key);
+    },
+
+    getAll() {
+      const { data } = get();
+      return data;
+    },
+
+    search(value) {
+      const { data } = get();
+      const searchResults = Array.from(data.entries()).filter(([key]) =>
+        key.toLowerCase().includes(value.toLowerCase())
+      );
+      return new Map(searchResults);
+    },
+  }));
+};
+
+/**
+ * Creates a dummy variables store from primitive values (string, number, boolean).
+ */
+export const createDummyVariablesStoreFromPrimitives = (variables: Record<string, VariableValueType>) => {
+  const data = parsePrimitiveVariables(variables);
+  return _createDummyVariablesStore(data);
+};
+
+/**
+ * Creates a dummy variables store from VariableData objects.
+ */
+export const createDummyVariablesStoreFromData = (variables: Record<string, VariableData>) => {
+  const data = new Map(Object.entries(variables));
+  return _createDummyVariablesStore(data);
 };

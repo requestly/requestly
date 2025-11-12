@@ -107,7 +107,13 @@ const createTabServiceStore = () => {
             return;
           }
 
-          const tab = createTabStore(tabId, source, source.getDefaultTitle(), config?.preview);
+          const tab = createTabStore(
+            tabId,
+            source,
+            source.getDefaultTitle(),
+            config?.preview,
+            source.metadata.isNewTab
+          );
 
           if (tabsIndex.has(sourceName)) {
             tabsIndex.get(sourceName)?.set(sourceId, tabId);

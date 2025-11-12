@@ -45,6 +45,8 @@ interface EditorProps {
     enablePrettify?: boolean;
   };
   hideToolbar?: boolean;
+  autoFocus?: boolean;
+  onFocus?: () => void;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -61,6 +63,8 @@ const Editor: React.FC<EditorProps> = ({
   envVariables,
   showOptions = { enablePrettify: true },
   hideToolbar = false,
+  autoFocus = false,
+  onFocus,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -170,6 +174,16 @@ const Editor: React.FC<EditorProps> = ({
       })();
     }
   }, [isEditorInitialized, isDefaultPrettificationDone, applyPrettification, prettifyOnInit, isFullScreen]);
+
+  useEffect(() => {
+    if (autoFocus && isEditorInitialized && editorRef.current?.view) {
+      const timer = setTimeout(() => {
+        editorRef.current?.view?.focus();
+        onFocus?.();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus, isEditorInitialized, onFocus]);
 
   // Reinitializing the fullscreen editor
   useEffect(() => {

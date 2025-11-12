@@ -1,4 +1,4 @@
-import { WorkResult } from "../../workload-manager/workLoadTypes";
+import { WorkResult } from "../../workloadManager/workLoadTypes";
 
 export abstract class RQWorker {
   abstract work(workload: any, abortSignal?: AbortSignal): Promise<WorkResult>;
