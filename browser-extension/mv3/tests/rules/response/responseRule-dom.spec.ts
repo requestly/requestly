@@ -27,7 +27,9 @@ const testResponseRuleWithDOM = async (testScenarioData: ResponseRuleDOMTestScen
   // Execute page interactions (click buttons to trigger XHR)
   for (const interaction of pageInteractions) {
     await interaction(testPage);
-    await testPage.waitForTimeout(2000);
+    // Longer wait for tests with multiple requests (like shared state test)
+    const waitTime = ruleIds.includes("Response_8") ? 3000 : 2000;
+    await testPage.waitForTimeout(waitTime);
   }
 
   // Verify DOM changes based on modified responses
