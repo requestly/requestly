@@ -1,4 +1,4 @@
-import { Select } from "antd";
+import { Select, Input } from "antd";
 import React from "react";
 import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
@@ -81,6 +81,25 @@ function generateFields(
             variables={variables}
             isSecret={field.isSecret ?? false}
           />
+          {formType === Authorization.Type.BASIC_AUTH && field.id === "password" ? (
+            <Input.Password
+              key={`${formType}-${index}`}
+              size="small"
+              className={field.className ?? ""}
+              placeholder={field.placeholder}
+              value={formState[field.id] ?? ""}
+              onChange={(e) => onChangeHandler(e.target.value, field.id)}
+            />
+          ) : (
+            <SingleLineEditor
+              key={`${formType}-${index}`}
+              className={field.className ?? ""}
+              placeholder={field.placeholder}
+              defaultValue={formState[field.id]}
+              onChange={(value) => onChangeHandler(value, field.id)}
+              variables={variables}
+            />
+          )}
           <Conditional
             condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}
           >
