@@ -27,12 +27,12 @@ import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
 import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { VariableScope } from "backend/environment/types";
-import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
 import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
 import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import { renderVariables } from "backend/environment/utils";
+import { createDummyVariablesStoreFromPrimitives } from "features/apiClient/store/variables/variables.store";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -236,7 +236,7 @@ class Runner {
           name: "Data File",
           level: 0,
         },
-        createDummyVariablesStore(this.variables[iteration - 1]),
+        createDummyVariablesStoreFromPrimitives(this.variables[iteration - 1]),
       ]);
     }
 
