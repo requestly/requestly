@@ -8,7 +8,7 @@
   right: 20px;
   z-index: 3;
   width: 424px;
-  height: 640px;
+  height: 85vh;  /*Adjusted height to 85vh to make it resposnsive to all the device  */
   background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
