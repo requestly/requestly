@@ -21,16 +21,37 @@
     <div>Status: <span id="status-2">-</span></div>
   </div>
 
+  <div id="test-3">
+    <h2>Test 3: XHR Mock (No Server Hit)</h2>
+    <button id="test-btn-3">Test Response_3</button>
+    <div id="result-3">Not tested yet</div>
+    <div>Status: <span id="status-3">-</span></div>
+  </div>
+
+  <div id="test-4">
+    <h2>Test 4: XHR Dynamic Response</h2>
+    <button id="test-btn-4">Test Response_4</button>
+    <div id="result-4">Not tested yet</div>
+    <div>Status: <span id="status-4">-</span></div>
+  </div>
+
+  <div id="test-5">
+    <h2>Test 5: XHR Shared State</h2>
+    <button id="test-btn-5">Test Response_8</button>
+    <div id="result-5">Not tested yet</div>
+    <div id="request-count">Requests sent: <span id="count-5">0</span></div>
+  </div>
+
   <script>
     document.getElementById('test-btn-1').addEventListener('click', () => {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', 'https://resp-mock.free.beeceptor.com/todos');
+      xhr.open('GET', 'http://localhost:3087/mock');
       xhr.setRequestHeader('content-type', 'application/json');
 
       xhr.onload = function() {
         const resultDiv = document.getElementById('result-1');
         try {
-          const response = JSON.parse(xhr.responseText);
+          const response = typeof xhr.response === 'string' ? JSON.parse(xhr.responseText) : xhr.response;
           resultDiv.innerHTML = '';
           for (const [key, value] of Object.entries(response)) {
             const p = document.createElement('p');
@@ -51,14 +72,14 @@
 
     document.getElementById('test-btn-2').addEventListener('click', () => {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', 'https://resp-mock.free.beeceptor.com/todos');
+      xhr.open('GET', 'http://localhost:3087/mock');
       xhr.setRequestHeader('content-type', 'application/json');
 
       xhr.onload = function() {
         document.getElementById('status-2').textContent = xhr.status;
         const resultDiv = document.getElementById('result-2');
         try {
-          const response = JSON.parse(xhr.responseText);
+          const response = typeof xhr.response === 'string' ? JSON.parse(xhr.responseText) : xhr.response;
           resultDiv.innerHTML = '';
           for (const [key, value] of Object.entries(response)) {
             const p = document.createElement('p');
@@ -75,6 +96,110 @@
       };
 
       xhr.send();
+    });
+
+    // Test 3: Response_3 (Mock without server)
+    document.getElementById('test-btn-3').addEventListener('click', () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'http://localhost:3087/mock');
+      xhr.setRequestHeader('content-type', 'application/json');
+
+      xhr.onload = function() {
+        document.getElementById('status-3').textContent = xhr.status;
+        const resultDiv = document.getElementById('result-3');
+        try {
+          const response = typeof xhr.response === 'string' ? JSON.parse(xhr.responseText) : xhr.response;
+          resultDiv.innerHTML = '';
+          for (const [key, value] of Object.entries(response)) {
+            const p = document.createElement('p');
+            p.textContent = key + ': ' + value;
+            resultDiv.appendChild(p);
+          }
+        } catch (e) {
+          resultDiv.textContent = 'Error: ' + e.message;
+        }
+      };
+
+      xhr.onerror = () => {
+        document.getElementById('result-3').textContent = 'Network error';
+      };
+
+      xhr.send();
+    });
+
+    // Test 4: Response_4 (Dynamic response)
+    document.getElementById('test-btn-4').addEventListener('click', () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://localhost:3087/mock');
+      xhr.setRequestHeader('content-type', 'application/json');
+
+      xhr.onload = function() {
+        document.getElementById('status-4').textContent = xhr.status;
+        const resultDiv = document.getElementById('result-4');
+        try {
+          const response = typeof xhr.response === 'string' ? JSON.parse(xhr.responseText) : xhr.response;
+          resultDiv.innerHTML = '';
+          for (const [key, value] of Object.entries(response)) {
+            const p = document.createElement('p');
+            p.textContent = key + ': ' + value;
+            resultDiv.appendChild(p);
+          }
+        } catch (e) {
+          resultDiv.textContent = 'Error: ' + e.message;
+        }
+      };
+
+      xhr.onerror = () => {
+        document.getElementById('result-4').textContent = 'Network error';
+      };
+
+      xhr.send('{"foo": "bar1"}');
+    });
+
+    // Test 5: Response_8 (Shared state)
+    document.getElementById('test-btn-5').addEventListener('click', () => {
+      let requestCount = 0;
+
+      // First two requests to increment shared state
+      for (let i = 1; i <= 2; i++) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://localhost:3087/mock');
+        xhr.onload = function() {
+          requestCount++;
+          document.getElementById('count-5').textContent = requestCount;
+        };
+        xhr.send();
+      }
+
+      // Third request to check shared state
+      setTimeout(() => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://localhost:3087/mock');
+        xhr.setRequestHeader('content-type', 'application/json');
+
+        xhr.onload = function() {
+          requestCount++;
+          document.getElementById('count-5').textContent = requestCount;
+          const resultDiv = document.getElementById('result-5');
+          try {
+            const response = typeof xhr.response === 'string' ? JSON.parse(xhr.responseText) : xhr.response;
+            resultDiv.innerHTML = '';
+            for (const [key, value] of Object.entries(response)) {
+              const p = document.createElement('p');
+              p.textContent = key + ': ' + value;
+              resultDiv.appendChild(p);
+            }
+          } catch (e) {
+            resultDiv.textContent = 'Error: ' + e.message;
+          }
+        };
+
+        xhr.onerror = () => {
+          document.getElementById('result-5').textContent = 'Network error';
+        };
+
+        xhr.send();
+      }, 100);
     });
   </script>
 </body>

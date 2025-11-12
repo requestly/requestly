@@ -105,7 +105,7 @@
           "filters": [],
           "key": "Url",
           "operator": "Contains",
-          "value": "https://resp-mock.free.beeceptor.com/todos"
+          "value": "http://localhost:3087"
         }
       }
     ],
@@ -139,7 +139,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://resp-mock.free.beeceptor.com/todos"
+          "value": "http://localhost:3087"
         }
       }
     ],
@@ -174,7 +174,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://resp-mock.free.beeceptor.com/todos"
+          "value": "http://localhost:3087"
         }
       }
     ],
@@ -208,7 +208,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://resp-mock.free.beeceptor.com/todos"
+          "value": "http://localhost:3087"
         }
       }
     ],
@@ -242,7 +242,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://resp-mock.free.beeceptor.com/todos"
+          "value": "http://localhost:3087"
         }
       }
     ],
@@ -275,7 +275,7 @@
           "filters": [],
           "key": "Url",
           "operator": "Contains",
-          "value": "https://requestly.tech/api/mockv2/"
+          "value": "http://localhost:3087"
         }
       }
     ],
