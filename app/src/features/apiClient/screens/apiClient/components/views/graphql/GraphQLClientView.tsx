@@ -121,7 +121,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
-  const { getIsActive, setUnsaved, setTitle, setIcon } = useGenericState();
+  const { getIsActive, setUnsaved, setTitle, setIcon, getIsNew, setIsNew } = useGenericState();
   const { record } = useApiRecordState(recordId) as { record: RQAPI.GraphQLApiRecord };
 
   const enableHotkey = getIsActive();
@@ -519,8 +519,12 @@ const GraphQLClientView: React.FC<Props> = ({
               id={record.id}
               placeholder="Untitled request"
               openInModal={openInModal}
-              name={record.name}
-              onBlur={(newName) => handleRecordNameUpdate(newName)}
+              name={record.name ?? "Untitled request"}
+              autoFocus={getIsNew()}
+              onBlur={(newName) => {
+                setIsNew(false);
+                handleRecordNameUpdate(newName);
+              }}
               breadCrumbType={BreadcrumbType.API_REQUEST}
             />
 
