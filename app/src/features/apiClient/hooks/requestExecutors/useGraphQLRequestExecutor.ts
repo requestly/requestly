@@ -2,5 +2,5 @@ import { GraphQLRequestExecutor } from "../../helpers/graphQLRequestExecutor/Gra
 import { useRequestExecutorFactory } from "./useRequestExecutorFactory";
 
 export const useGraphQLRequestExecutor = (collectionId: string) => {
-  return useRequestExecutorFactory(GraphQLRequestExecutor, collectionId);
+  return useRequestExecutorFactory<GraphQLRequestExecutor>(GraphQLRequestExecutor, collectionId);
 };
