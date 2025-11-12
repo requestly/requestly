@@ -3,7 +3,11 @@ import { Row } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { VariableNotFoundProps } from "../types";
 
-export const VariableNotFound: React.FC<VariableNotFoundProps> = ({ onCreateClick, onSwitchEnvironment }) => {
+export const VariableNotFound: React.FC<VariableNotFoundProps> = ({
+  onCreateClick,
+  onSwitchEnvironment,
+  isNoopContext,
+}) => {
   return (
     <div className="variable-not-found-info-container">
       <Row className="variable-info-header">Variable not found</Row>
@@ -14,9 +18,11 @@ export const VariableNotFound: React.FC<VariableNotFoundProps> = ({ onCreateClic
         <RQButton type="primary" block onClick={onCreateClick} className="add-new-variable-btn">
           Add as a new variable
         </RQButton>
-        <RQButton block onClick={onSwitchEnvironment} className="switch-environment-btn">
-          Switch environment
-        </RQButton>
+        {!isNoopContext && (
+          <RQButton block onClick={onSwitchEnvironment} className="switch-environment-btn">
+            Switch environment
+          </RQButton>
+        )}
       </div>
     </div>
   );

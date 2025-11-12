@@ -11,6 +11,8 @@ import { CreateVariableView } from "./components/CreateVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -30,6 +32,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
+  const contextId = useContextId();
+  const isNoopContext = contextId === NoopContextId;
 
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
@@ -75,12 +79,19 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               variable: variableData,
             }}
             onEditClick={handleEditClick}
+            isNoopContext
           />
         );
       }
 
       case PopoverView.NOT_FOUND: {
-        return <VariableNotFound onCreateClick={handleCreateClick} onSwitchEnvironment={handleSwitchEnvironment} />;
+        return (
+          <VariableNotFound
+            isNoopContext
+            onCreateClick={handleCreateClick}
+            onSwitchEnvironment={handleSwitchEnvironment}
+          />
+        );
       }
       case PopoverView.CREATE_FORM: {
         return (
@@ -163,12 +174,14 @@ const VariableInfo: React.FC<{
     variable: ScopedVariable;
   };
   onEditClick?: () => void;
+  isNoopContext: boolean;
 }> = ({
   params: {
     name,
     variable: [variable, source],
   },
   onEditClick,
+  isNoopContext,
 }) => {
   const { syncValue, localValue, isPersisted } = getSanitizedVariableValue(variable);
   const infoFields =
@@ -188,28 +201,30 @@ const VariableInfo: React.FC<{
 
   return (
     <>
-      <div className="variable-info-property-container">
-        {source.scope !== VariableScope.RUNTIME && (
-          <>
-            <span>{getScopeIcon(source.scope)} </span>
-            <span className="variable-header-info-seperator"> </span>
-            <div className="variable-info-header-name"> {source.name}</div>
-          </>
-        )}
+      {!isNoopContext && (
+        <div className="variable-info-property-container">
+          {source.scope !== VariableScope.RUNTIME && (
+            <>
+              <span>{getScopeIcon(source.scope)} </span>
+              <span className="variable-header-info-seperator"> </span>
+              <div className="variable-info-header-name"> {source.name}</div>
+            </>
+          )}
 
-        {/* Edit button - only for non-runtime variables */}
-        {source.scope !== VariableScope.RUNTIME && onEditClick && (
-          <RQButton
-            type="transparent"
-            size="small"
-            icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
-            onClick={onEditClick}
-            className="edit-variable-btn"
-          >
-            Edit
-          </RQButton>
-        )}
-      </div>
+          {/* Edit button - only for non-runtime variables */}
+          {source.scope !== VariableScope.RUNTIME && onEditClick && (
+            <RQButton
+              type="transparent"
+              size="small"
+              icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+              onClick={onEditClick}
+              className="edit-variable-btn"
+            >
+              Edit
+            </RQButton>
+          )}
+        </div>
+      )}
 
       <div className="variable-info-content-container">
         <div className="variable-info-content">

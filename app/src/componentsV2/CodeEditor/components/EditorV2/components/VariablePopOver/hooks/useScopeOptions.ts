@@ -7,6 +7,8 @@ import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
 import { BiNote } from "@react-icons/all-files/bi/BiNote";
 import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
 import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
 interface UseScopeOptionsResult {
   scopeOptions: ScopeOption[];
@@ -66,6 +68,8 @@ export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
 
 export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
   const activeEnvironment = useActiveEnvironment();
+  const contextId = useContextId();
+  const isNoopContext = contextId === NoopContextId;
 
   return useMemo(() => {
     const options: ScopeOption[] = [
@@ -85,7 +89,7 @@ export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult =>
         value: VariableScope.GLOBAL,
         label: "Global",
         icon: getScopeIcon(VariableScope.GLOBAL),
-        disabled: false,
+        disabled: isNoopContext,
       },
       {
         value: VariableScope.RUNTIME,
@@ -97,7 +101,9 @@ export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult =>
 
     // Determine default scope based on availability
     let defaultScope: VariableScope;
-    if (activeEnvironment) {
+    if (isNoopContext) {
+      defaultScope = VariableScope.RUNTIME;
+    } else if (activeEnvironment) {
       defaultScope = VariableScope.ENVIRONMENT;
     } else if (collectionId) {
       defaultScope = VariableScope.COLLECTION;
@@ -106,5 +112,5 @@ export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult =>
     }
 
     return { scopeOptions: options, defaultScope };
-  }, [activeEnvironment, collectionId]);
+  }, [activeEnvironment, collectionId, isNoopContext]);
 };
