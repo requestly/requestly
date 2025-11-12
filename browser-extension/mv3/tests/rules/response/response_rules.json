@@ -105,7 +105,7 @@
           "filters": [],
           "key": "Url",
           "operator": "Contains",
-          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+          "value": "https://resp-mock.free.beeceptor.com/todos"
         }
       }
     ],
@@ -139,7 +139,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+          "value": "https://resp-mock.free.beeceptor.com/todos"
         }
       }
     ],
@@ -174,7 +174,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+          "value": "https://resp-mock.free.beeceptor.com/todos"
         }
       }
     ],
@@ -208,7 +208,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+          "value": "https://resp-mock.free.beeceptor.com/todos"
         }
       }
     ],
@@ -242,7 +242,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz"
+          "value": "https://resp-mock.free.beeceptor.com/todos"
         }
       }
     ],

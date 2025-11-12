@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Response Rule Tests</title>
+</head>
+<body>
+  <h1>Response Rule Tests</h1>
+
+  <div id="test-1">
+    <h2>Test 1: XHR Static Response</h2>
+    <button id="test-btn-1">Test Response_1</button>
+    <div id="result-1">Not tested yet</div>
+  </div>
+
+  <div id="test-2">
+    <h2>Test 2: XHR with Status Code</h2>
+    <button id="test-btn-2">Test Response_2</button>
+    <div id="result-2">Not tested yet</div>
+    <div>Status: <span id="status-2">-</span></div>
+  </div>
+
+  <script>
+    document.getElementById('test-btn-1').addEventListener('click', () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://resp-mock.free.beeceptor.com/todos');
+      xhr.setRequestHeader('content-type', 'application/json');
+
+      xhr.onload = function() {
+        const resultDiv = document.getElementById('result-1');
+        try {
+          const response = JSON.parse(xhr.responseText);
+          resultDiv.innerHTML = '';
+          for (const [key, value] of Object.entries(response)) {
+            const p = document.createElement('p');
+            p.textContent = key + ': ' + value;
+            resultDiv.appendChild(p);
+          }
+        } catch (e) {
+          resultDiv.textContent = 'Error: ' + e.message;
+        }
+      };
+
+      xhr.onerror = () => {
+        document.getElementById('result-1').textContent = 'Network error';
+      };
+
+      xhr.send();
+    });
+
+    document.getElementById('test-btn-2').addEventListener('click', () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://resp-mock.free.beeceptor.com/todos');
+      xhr.setRequestHeader('content-type', 'application/json');
+
+      xhr.onload = function() {
+        document.getElementById('status-2').textContent = xhr.status;
+        const resultDiv = document.getElementById('result-2');
+        try {
+          const response = JSON.parse(xhr.responseText);
+          resultDiv.innerHTML = '';
+          for (const [key, value] of Object.entries(response)) {
+            const p = document.createElement('p');
+            p.textContent = key + ': ' + value;
+            resultDiv.appendChild(p);
+          }
+        } catch (e) {
+          resultDiv.textContent = 'Error: ' + e.message;
+        }
+      };
+
+      xhr.onerror = () => {
+        document.getElementById('result-2').textContent = 'Network error';
+      };
+
+      xhr.send();
+    });
+  </script>
+</body>
+</html>
+
