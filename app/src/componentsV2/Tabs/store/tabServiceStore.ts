@@ -7,6 +7,7 @@ import { createTabStore, TabState } from "./tabStore";
 import { AbstractTabSource } from "../helpers/tabSource";
 import { TAB_SOURCES_MAP } from "../constants";
 import { setLastUsedContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { Try } from "utils/try";
 
 type TabId = number;
 type SourceName = string;
@@ -155,7 +156,9 @@ const createTabServiceStore = () => {
 
           const contextId = source.metadata.context?.id;
           if (contextId) {
-            setLastUsedContextId(contextId);
+            Try(() => setLastUsedContextId(contextId)).inspectError((e) => {
+              Sentry.captureException(e);
+            });
           }
 
           const {
@@ -333,7 +336,9 @@ const createTabServiceStore = () => {
             set({ activeTabId: id, activeTabSource: tabState.source });
             const contextId = tabState.source.metadata.context?.id;
             if (contextId) {
-              setLastUsedContextId(contextId);
+              Try(() => setLastUsedContextId(contextId)).inspectError((e) => {
+                Sentry.captureException(e);
+              });
             }
           } else {
             set({
