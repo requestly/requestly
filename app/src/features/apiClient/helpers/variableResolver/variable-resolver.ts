@@ -102,8 +102,6 @@ function getScopes(
     globalEnvironment: globalEnvironmentStore,
   } = stores.environments.getState();
 
-  const runtimeVariables = _runtimeVariablesStore.getState();
-
   const activeEnvironment = activeEnvironmentStore?.getState();
   const globalEnvironment = globalEnvironmentStore.getState();
 
@@ -112,6 +110,7 @@ function getScopes(
   const globalEnvironmentVariablesStore =
     storeOverrideConfig?.globalEnvironmentVariablesStore ?? globalEnvironment.data.variables;
   const runtimeVariablesStore = storeOverrideConfig?.runtimeVariablesStore ?? _runtimeVariablesStore;
+  const runtimeVariables = runtimeVariablesStore.getState();
 
   const { getRecordStore } = stores.records.getState();
 
