@@ -5,6 +5,7 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 import { VariableData } from "features/apiClient/store/variables/types";
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import { isEmpty } from "lodash";
 
 export type ExecutionContext = BaseSnapshot & {
   request: SnapshotForPreRequest["request"];
@@ -18,9 +19,22 @@ export class ScriptExecutionContext {
   constructor(
     private readonly ctx: ApiClientFeatureContext,
     private readonly recordId: string,
-    private readonly entry: RQAPI.HttpApiEntry
+    private readonly entry: RQAPI.HttpApiEntry,
+    initialExecutionContext?: ExecutionContext
   ) {
-    this.initializeContext();
+    // If initialExecutionContext is provided, use it and mutate it in place
+    // Otherwise, build a new context
+    if (initialExecutionContext) {
+      this.context = initialExecutionContext;
+      // Fill in the initial context if it's empty
+      if (isEmpty(initialExecutionContext)) {
+        const builtContext = this.buildExecutionContext();
+        Object.assign(this.context, builtContext);
+      }
+    } else {
+      this.context = this.buildExecutionContext();
+    }
+    this.isMutated = false;
   }
 
   private getVariablesByScope(recordId: string) {
@@ -58,11 +72,6 @@ export class ScriptExecutionContext {
       request: this.entry.request,
       response: this.entry.response,
     };
-  }
-
-  private initializeContext() {
-    this.context = this.buildExecutionContext();
-    this.isMutated = false;
   }
 
   public updateContext(snapshot: ExecutionContext) {
