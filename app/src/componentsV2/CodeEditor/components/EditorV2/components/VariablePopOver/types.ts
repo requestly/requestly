@@ -28,6 +28,7 @@ export interface ScopeOption {
 export interface VariableNotFoundProps {
   onCreateClick: () => void;
   onSwitchEnvironment: () => void;
+  isNoopContext: boolean;
 }
 
 export interface CreateVariableViewProps {
