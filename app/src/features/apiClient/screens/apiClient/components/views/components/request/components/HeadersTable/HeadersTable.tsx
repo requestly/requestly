@@ -23,6 +23,7 @@ function Data(props: {
       variables={scopedVariables}
       onChange={props.handleHeadersChange}
       checkInvalidCharacter={true}
+      enableHeaderSuggestions={true}
     />
   );
 }
