@@ -1,4 +1,4 @@
-import { Select, Input } from "antd";
+import { Select } from "antd";
 import React from "react";
 import { AuthForm } from "./formStructure/types";
 import { AuthConfig, AuthConfigMeta, Authorization } from "../types/AuthConfig";
