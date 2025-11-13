@@ -22,7 +22,6 @@ export async function loadWorkspaces(userId?: string) {
         .getState()
         .setStateForSelectedWorkspace(workspace.id, { loading: false, errored: false });
     } catch (error) {
-      console.log("debug", workspace, error);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred while adding workspace to view";
       apiClientMultiWorkspaceViewStore.getState().setStateForSelectedWorkspace(workspace.id, {
