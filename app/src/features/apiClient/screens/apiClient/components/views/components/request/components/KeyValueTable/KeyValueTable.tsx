@@ -30,6 +30,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       key: "",
       value: "",
       isEnabled: true,
+      description: "",
     }),
     []
   );
@@ -135,6 +136,20 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         }),
       },
       {
+        title: "description",
+        dataIndex: "description",
+        editable: true,
+        onCell: (record: KeyValuePair) => ({
+          record,
+          editable: true,
+          dataIndex: "description",
+          title: "description",
+          variables,
+          handleUpdatePair,
+          className: "kv-description-cell",
+        }),
+      },
+      {
         title: "",
         width: "50px",
         fixed: "right",
@@ -142,7 +157,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           if (record.key === "" && record.value === "" && data.length === 1) {
             return null;
           }
-
           return (
             <RQButton
               className="key-value-delete-btn"
