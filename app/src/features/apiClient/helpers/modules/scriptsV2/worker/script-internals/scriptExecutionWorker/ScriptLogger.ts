@@ -16,6 +16,10 @@ export class ScriptLogger {
     this.originalConsole = console;
   }
 
+  static logInfo(...args: any[]) {
+    console.log(PROXIED_LOG_PREFIX, ...args);
+  }
+
   createProxyConsole(): Console {
     const self = this;
 
