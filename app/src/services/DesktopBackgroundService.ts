@@ -30,9 +30,6 @@ export function rpc(
           reject(res.data);
         }
       })
-      .catch((e) => {
-        throw e;
-      })
       .catch(reject);
   });
 }
