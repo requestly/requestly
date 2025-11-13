@@ -10,8 +10,8 @@ export function closeCorruptedTabs() {
     const contextId = source.metadata.context?.id;
     const context = getApiClientFeatureContext(contextId);
 
-    // This getIsValidTab will give false always, since on every restart the
-    // record id changes
+    // "getIsValidTab" will always give false for local workspace,
+    // since on every app restart the record id changes
     const isValid = !!context && source.getIsValidTab(context);
 
     if (!isValid) {
