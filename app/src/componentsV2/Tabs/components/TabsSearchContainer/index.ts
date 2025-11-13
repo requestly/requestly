@@ -1,0 +1,1 @@
+export { TabsSearchContainer } from "./TabsSearchContainer";

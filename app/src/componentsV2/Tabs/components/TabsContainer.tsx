@@ -12,6 +12,7 @@ import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
+import { useTabsDropdownSearch } from "../hooks/useTabsDropdownSearch";
 
 export const TabsContainer: React.FC = () => {
   // Enable keyboard shortcuts for closing active tabs
@@ -44,6 +45,9 @@ export const TabsContainer: React.FC = () => {
   ]);
 
   const { setUrl } = useSetUrl();
+
+  // Add search functionality to the existing dropdown
+  useTabsDropdownSearch();
 
   const hasUnsavedChanges = Array.from(tabs.values()).some(
     (tab) => tab.getState().unsaved || !tab.getState().canCloseTab()
