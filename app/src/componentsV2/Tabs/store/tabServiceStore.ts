@@ -156,7 +156,9 @@ const createTabServiceStore = () => {
 
           const contextId = source.metadata.context?.id;
           if (contextId) {
-            Try(() => setLastUsedContextId(contextId));
+            Try(() => setLastUsedContextId(contextId)).inspectError((e) => {
+              Sentry.captureException(e);
+            });
           }
 
           const {
@@ -334,7 +336,9 @@ const createTabServiceStore = () => {
             set({ activeTabId: id, activeTabSource: tabState.source });
             const contextId = tabState.source.metadata.context?.id;
             if (contextId) {
-              Try(() => setLastUsedContextId(contextId));
+              Try(() => setLastUsedContextId(contextId)).inspectError((e) => {
+                Sentry.captureException(e);
+              });
             }
           } else {
             set({
