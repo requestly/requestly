@@ -1,33 +1,25 @@
 import { tabServiceStore } from "componentsV2/Tabs/store/tabServiceStore";
-import * as Sentry from "@sentry/react";
 import { getApiClientFeatureContext } from "../store.utils";
-import { NativeError } from "errors/NativeError";
 
 export function closeCorruptedTabs() {
   const { tabs, closeTabBySource, setIgnorePath } = tabServiceStore.getState();
 
-  try {
-    tabs.forEach((tab) => {
-      const { source } = tab.getState();
+  tabs.forEach((tab) => {
+    const { source } = tab.getState();
 
-      const contextId = source.metadata.context?.id;
-      const context = getApiClientFeatureContext(contextId);
+    const contextId = source.metadata.context?.id;
+    const context = getApiClientFeatureContext(contextId);
 
-      if (!context) {
-        throw new NativeError("Tab context does not exist!").addContext({ metadata: source.metadata });
-      }
+    // This getIsValidTab will give false always, since on every restart the
+    // record id changes
+    const isValid = !!context && source.getIsValidTab(context);
 
-      const isValid = source.getIsValidTab(context);
+    if (!isValid) {
+      const sourceId = source.getSourceId();
+      const sourceName = source.getSourceName();
 
-      if (!isValid) {
-        const sourceId = source.getSourceId();
-        const sourceName = source.getSourceName();
-
-        closeTabBySource(sourceId, sourceName, true);
-        setIgnorePath(true);
-      }
-    });
-  } catch (e) {
-    Sentry.captureException(e);
-  }
+      closeTabBySource(sourceId, sourceName, true);
+      setIgnorePath(true);
+    }
+  });
 }

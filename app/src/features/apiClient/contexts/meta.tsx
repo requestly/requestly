@@ -10,7 +10,7 @@ export function useApiClientFeatureContext(): apiClientFeatureContextStore.ApiCl
   }, [contextId]);
 
   if (!context) {
-    throw new Error("No context found!");
+    throw new Error("No context found! " + contextId);
   }
 
   return context;
