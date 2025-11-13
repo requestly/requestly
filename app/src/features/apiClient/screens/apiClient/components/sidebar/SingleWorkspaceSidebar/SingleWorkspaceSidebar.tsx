@@ -47,6 +47,8 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     isImportModalOpen,
     onImportRequestModalClose,
     setIsImportModalOpen,
+    deleteHistoryItem,
+    deleteHistoryByDate,
   } = useApiClientContext();
 
   const { onSaveRecord } = useNewApiClientContext();
@@ -153,6 +155,8 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
           history={history}
           selectedHistoryIndex={selectedHistoryIndex}
           onSelectionFromHistory={setCurrentHistoryIndex}
+          onDeleteHistoryItem={deleteHistoryItem}
+          onDeleteHistoryByDate={deleteHistoryByDate}
         />
       ),
     },
@@ -180,13 +184,11 @@ export const SingleWorkspaceSidebar: React.FC<Props> = () => {
     setActiveKey(activeKey);
   };
 
-  // TODO: Move this import logic and the import modal to the api client container which wraps all the routes.
   const handleImportRequest = useCallback(
     async (request: RQAPI.Request) => {
       setIsLoading(true);
 
       try {
-        // TODO: handle import for graphql requests
         const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, request);
 
         const record: Partial<RQAPI.ApiRecord> = {
