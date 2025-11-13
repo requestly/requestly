@@ -1,4 +1,4 @@
-const PROXIED_LOG_PREFIX = "[RQ.Script]";
+const PROXIED_LOG_PREFIX = "#script";
 
 type Console = typeof console;
 
@@ -21,12 +21,14 @@ export class ScriptLogger {
 
     return new Proxy(this.originalConsole, {
       get(target, prop: keyof Console) {
+        // handles non-string properties like console[Symbol.toStringTag]
         if (typeof prop !== "string") {
           return Reflect.get(target, prop);
         }
 
         const method = target[prop];
 
+        // handles string objects like console.memory -> returns an object
         if (typeof method !== "function") {
           return method;
         }
