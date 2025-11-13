@@ -8,7 +8,7 @@ import { RQ } from "../RQmethods";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
 import { InitialState, LocalScope } from "../../../../../../../../modules/localScope";
 import { TestResult } from "../types";
-import {globals, getGlobalScript} from './globals';
+import { globals, getGlobalScript } from "./globals";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
@@ -32,10 +32,10 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     return {
       globalObject,
       globalScript,
-    }
+    };
   }
 
-  async executeScript(script: string, initialState: InitialState, callback: ScriptWorkloadCallback) {
+  async executeScript(userScript: string, initialState: InitialState, callback: ScriptWorkloadCallback) {
     this.localScope = new LocalScope(initialState);
     const { globalObject, globalScript } = this.getGlobals();
     // eslint-disable-next-line no-new-func
@@ -44,13 +44,16 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       `
       "use strict";
       ${globalScript}
-      ${script}
+      try {
+        ${userScript}
+      } catch (error) {
+        console.error(\`\${error.name}: \${error.message}\`);
+        throw error;
+      }
       `
-    ) as (globals: Record<string, any>) => void
+    ) as (globals: Record<string, any>) => void;
     try {
-      scriptFunction(
-        globalObject,
-      );
+      scriptFunction(globalObject);
     } catch (error) {
       throw new ScriptExecutionError(error);
     }
