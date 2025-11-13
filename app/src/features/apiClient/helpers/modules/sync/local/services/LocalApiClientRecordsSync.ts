@@ -165,7 +165,6 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   async getAllRecords(): RQAPI.RecordsPromise {
-    //adapter getting called here
     const service = await this.getAdapter();
     const result = await service.getAllRecords();
     if (result.type === "error") {

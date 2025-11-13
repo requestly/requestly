@@ -17,25 +17,20 @@ export function rpc(
   ...args: any[]
 ) {
   const { namespace, method, timeout } = params;
-  console.log("dgb1: calling ", namespace, method, args, Date.now());
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      console.log("dgb1: timed out calling ", namespace, method, args, Date.now());
       reject(new TimoutError(method));
     }, timeout || IPC_TIMEOUT);
 
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG(`${namespace}-${method}`, args)
       .then((res: any) => {
         if (res.success) {
-          console.log("dgb1: received result ", namespace, method, args, Date.now());
           resolve(res.data);
         } else {
-          console.log("dgb1: errored call ", namespace, method, args, Date.now());
           reject(res.data);
         }
       })
       .catch((e) => {
-        console.log("dgb1: errored call ", namespace, method, args, Date.now());
         throw e;
       })
       .catch(reject);
