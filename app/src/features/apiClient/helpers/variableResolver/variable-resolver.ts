@@ -8,7 +8,7 @@ import { AllApiClientStores } from "features/apiClient/store/apiRecords/ApiRecor
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { useApiRecordState } from "features/apiClient/hooks/useApiRecordState.hook";
 import { VariableData, VariableKey } from "features/apiClient/store/variables/types";
-import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
+import { runtimeVariablesStore as _runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 export type VariableSource = {
@@ -102,7 +102,7 @@ function getScopes(
     globalEnvironment: globalEnvironmentStore,
   } = stores.environments.getState();
 
-  const runtimeVariables = runtimeVariablesStore.getState();
+  const runtimeVariables = _runtimeVariablesStore.getState();
 
   const activeEnvironment = activeEnvironmentStore?.getState();
   const globalEnvironment = globalEnvironmentStore.getState();
@@ -111,6 +111,7 @@ function getScopes(
     storeOverrideConfig?.activeEnvironmentVariablesStore ?? activeEnvironment?.data.variables;
   const globalEnvironmentVariablesStore =
     storeOverrideConfig?.globalEnvironmentVariablesStore ?? globalEnvironment.data.variables;
+  const runtimeVariablesStore = storeOverrideConfig?.runtimeVariablesStore ?? _runtimeVariablesStore;
 
   const { getRecordStore } = stores.records.getState();
 

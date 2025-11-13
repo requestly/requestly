@@ -34,6 +34,9 @@ export class ScriptExecutionContext {
     } else {
       this.context = this.buildExecutionContext();
     }
+    this.context.request = entry.request;
+    this.context.response = null;
+
     this.isMutated = false;
   }
 
