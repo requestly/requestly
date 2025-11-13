@@ -17,10 +17,10 @@ import { Scope } from "../variableResolver/variable-resolver";
 import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
-import { BaseSnapshot } from "./snapshotTypes";
-import { ScriptExecutionContext, ExecutionContext } from "./scriptExecutionContext";
+import { BaseExecutionContext, ExecutionContext, ScriptExecutionContext } from "./scriptExecutionContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
+import { BaseExecutionMetadata, IterationContext } from "../modules/scriptsV2/worker/script-internals/types";
 
 enum RQErrorHeaderValue {
   DNS_RESOLUTION_ERROR = "ERR_NAME_NOT_RESOLVED",
@@ -84,7 +84,7 @@ export class HttpRequestExecutor {
     public requestPreparer: HttpRequestPreparationService,
     private requestValidator: HttpRequestValidationService,
     private readonly workloadManager: APIClientWorkloadManager,
-    private postScriptExecutionCallback: (state: BaseSnapshot) => Promise<void>,
+    private postScriptExecutionCallback: (state: BaseExecutionContext) => Promise<void>,
     private appMode: string
   ) {}
 
@@ -178,11 +178,19 @@ export class HttpRequestExecutor {
   }
 
   async execute(
-    recordId: string,
-    entry: RQAPI.HttpApiEntry,
-    abortController?: AbortController,
-    scopes?: Scope[]
+    entryDetails: {
+      entry: RQAPI.HttpApiEntry;
+      recordId: string;
+    },
+    iterationContext: IterationContext,
+    executionConfig?: {
+      abortController?: AbortController;
+      scopes?: Scope[];
+    }
   ): Promise<RQAPI.ExecutionResult> {
+    const { entry, recordId } = entryDetails;
+    const { abortController, scopes } = executionConfig ?? {};
+
     this.abortController = abortController || new AbortController();
 
     const preparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
@@ -195,8 +203,19 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const scriptExecutionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry);
-    const scriptExecutor = new HttpRequestScriptExecutionService(scriptExecutionContext, this.workloadManager);
+    const recordName = this.ctx.stores.records.getState().getData(recordId)?.name ?? "";
+    const scriptExecutionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry, scopes);
+    const executionMetadata: BaseExecutionMetadata = {
+      requestId: recordId,
+      requestName: recordName,
+      iterationContext,
+    };
+
+    const scriptExecutor = new HttpRequestScriptExecutionService(
+      scriptExecutionContext,
+      executionMetadata,
+      this.workloadManager
+    );
 
     let preRequestScriptResult: WorkResult | undefined;
     let responseScriptResult: WorkResult | undefined;
@@ -338,7 +357,16 @@ export class HttpRequestExecutor {
     this.abortController = new AbortController();
 
     const executionContext = new ScriptExecutionContext(this.ctx, recordId, entry);
-    const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
+    const executionMetadata: BaseExecutionMetadata = {
+      requestId: recordId,
+      requestName: this.ctx.stores.records.getState().getData(recordId)?.name ?? "",
+      iterationContext: { iteration: 0, iterationCount: 1 },
+    };
+    const scriptExecutor = new HttpRequestScriptExecutionService(
+      executionContext,
+      executionMetadata,
+      this.workloadManager
+    );
 
     const preRequestScriptResult = await scriptExecutor.executePreRequestScript(entry, this.abortController, () => {});
     if (preRequestScriptResult.type === WorkResultType.ERROR) {

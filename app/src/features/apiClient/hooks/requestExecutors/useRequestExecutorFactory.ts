@@ -10,10 +10,10 @@ import { renderVariables } from "backend/environment/utils";
 import { useAPIEnvironment } from "../../store/apiRecords/ApiRecordsContextProvider";
 import { useCommand } from "../../commands";
 import { setRuntimeStore } from "../../store/runtimeVariables/utils";
-import { BaseSnapshot } from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
 import { toast } from "utils/Toast";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "features/apiClient/helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
+import { BaseExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
 type ExecutorConstructor<T> = new (
   ctx: ApiClientFeatureContext,
@@ -37,7 +37,7 @@ export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<
   const { environmentVariablesRepository } = useApiClientRepository();
 
   const handleUpdatesFromExecutionWorker = useCallback(
-    async (state: BaseSnapshot) => {
+    async (state: BaseExecutionContext) => {
       try {
         for (const key in state) {
           if (key === "environment") {

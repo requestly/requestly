@@ -1,14 +1,22 @@
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
-import { BaseSnapshot, SnapshotForPostResponse, SnapshotForPreRequest } from "./snapshotTypes";
-import { getScopedVariables } from "../variableResolver/variable-resolver";
+import { getScopedVariables, Scope } from "../variableResolver/variable-resolver";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { VariableData } from "features/apiClient/store/variables/types";
 import { EnvironmentVariables, VariableScope } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
+import { RuntimeVariables } from "features/apiClient/store/runtimeVariables/utils";
 
-export type ExecutionContext = BaseSnapshot & {
-  request: SnapshotForPreRequest["request"];
-  response: SnapshotForPostResponse["response"];
+export type BaseExecutionContext = {
+  global: EnvironmentVariables;
+  collectionVariables: EnvironmentVariables;
+  environment: EnvironmentVariables;
+  variables: RuntimeVariables;
+  iterationData: EnvironmentVariables;
+};
+
+export type ExecutionContext = BaseExecutionContext & {
+  request: RQAPI.Request;
+  response: RQAPI.Response;
 };
 
 export class ScriptExecutionContext {
@@ -18,14 +26,15 @@ export class ScriptExecutionContext {
   constructor(
     private readonly ctx: ApiClientFeatureContext,
     private readonly recordId: string,
-    private readonly entry: RQAPI.HttpApiEntry
+    private readonly entry: RQAPI.HttpApiEntry,
+    private readonly scopes: Scope[] = []
   ) {
     this.initializeContext();
   }
 
   private getVariablesByScope(recordId: string) {
     const parents = getApiClientRecordsStore(this.ctx).getState().getParentChain(recordId);
-    const scopedVariables = getScopedVariables(parents, this.ctx.stores);
+    const scopedVariables = getScopedVariables(parents, this.ctx.stores, this.scopes);
 
     const variablesByScope: Record<string, Record<string, VariableData>> = Array.from(scopedVariables).reduce(
       (acc, [key, [variableData, variableSource]]) => {
@@ -45,16 +54,18 @@ export class ScriptExecutionContext {
     const collectionVariables = (variablesByScope[VariableScope.COLLECTION] || {}) as EnvironmentVariables;
     const environmentVariables = (variablesByScope[VariableScope.ENVIRONMENT] || {}) as EnvironmentVariables;
     const variables = variablesByScope[VariableScope.RUNTIME] || {};
+    const iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
 
-    const baseSnapshot: BaseSnapshot = {
+    const baseExecutionContext: BaseExecutionContext = {
       global: globalVariables,
       collectionVariables,
       environment: environmentVariables,
       variables,
+      iterationData,
     };
 
     return {
-      ...baseSnapshot,
+      ...baseExecutionContext,
       request: this.entry.request,
       response: this.entry.response,
     };
@@ -81,6 +92,16 @@ export class ScriptExecutionContext {
     this.isMutated = true;
   }
 
+  public getBaseContext(): BaseExecutionContext {
+    return {
+      global: this.context.global,
+      collectionVariables: this.context.collectionVariables,
+      environment: this.context.environment,
+      variables: this.context.variables,
+      iterationData: this.context.iterationData,
+    };
+  }
+
   public getContext(): ExecutionContext {
     return this.context;
   }
@@ -93,7 +114,7 @@ export class ScriptExecutionContext {
     this.isMutated = false;
   }
 
-  public setResponse(response: SnapshotForPostResponse["response"]) {
+  public setResponse(response: ExecutionContext["response"]) {
     this.context.response = response;
   }
 }
