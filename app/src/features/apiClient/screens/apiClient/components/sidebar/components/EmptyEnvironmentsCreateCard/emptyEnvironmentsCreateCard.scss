@@ -1,0 +1,26 @@
+.environments-empty-create-card {
+  margin: 12px 0 8px;
+  padding: 18px 16px;
+  border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+  background: var(--requestly-color-surface-1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  font-size: var(--requestly-font-size-sm, 13px);
+  line-height: 1.4;
+  color: var(--requestly-color-text-subtle);
+
+  &__text {
+    font-weight: 500;
+    color: var(--requestly-color-text-subtle);
+  }
+
+  .ant-btn {
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+}
