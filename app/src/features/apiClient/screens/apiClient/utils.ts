@@ -861,7 +861,13 @@ export const extractPathVariablesFromUrl = (url: string) => {
   }
 
   const urlWithScheme = addUrlSchemeIfMissing(url);
-  const pathname = new URL(urlWithScheme).pathname;
+  let pathname: string = "";
+  try {
+    pathname = new URL(urlWithScheme).pathname;
+  } catch (error) {
+    Logger.log("Invalid URL while extracting path variables:", error);
+    return [];
+  }
 
   // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
   // Also exclude whitespace and control characters for practical reasons
