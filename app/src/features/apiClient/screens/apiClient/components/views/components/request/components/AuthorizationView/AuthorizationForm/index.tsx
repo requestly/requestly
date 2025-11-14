@@ -72,14 +72,17 @@ function generateFields(
               : ""
           }`}
         >
-          <SingleLineEditor
-            key={`${formType}-${index}`}
-            className={field.className ?? ""}
-            placeholder={field.placeholder}
-            defaultValue={formState[field.id]}
-            onChange={(value) => onChangeHandler(value, field.id)}
-            variables={variables}
-          />
+
+            <SingleLineEditor
+              key={`${formType}-${index}`}
+              className={field.className ?? ""}
+              placeholder={field.placeholder}
+              defaultValue={formState[field.id]}
+              onChange={(value) => onChangeHandler(value, field.id)}
+              variables={variables}
+              isSecret={field.isSecret ?? false}
+            />
+          
           <Conditional
             condition={hasInvalidCharacter && formType === Authorization.Type.API_KEY && field.id === "key" && isHeader}
           >

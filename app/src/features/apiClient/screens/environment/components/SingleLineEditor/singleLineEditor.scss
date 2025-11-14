@@ -7,3 +7,17 @@
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
   z-index: 10;
 }
+
+.eye-icon {
+  cursor: pointer;
+  background: none;
+  border: none;
+  position: relative;
+  float: right;
+  right: 0;
+  color: var(--requestly-color-text-subtle);
+}
+
+.eye-icon:hover {
+  color: var(--requestly-color-text-default);
+}
