@@ -74,11 +74,11 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
 
     if (typeof request.body === "string") {
-      entry.request.body = request.body;
+      entry.request.bodyContainer.text = request.body;
 
       if (entry.request.contentType === RequestContentType.FORM) {
         const searchParams = new URLSearchParams(request.body);
-        entry.request.body = generateKeyValuePairs(Object.fromEntries(searchParams));
+        entry.request.bodyContainer.form = generateKeyValuePairs(Object.fromEntries(searchParams));
       }
     } else if (request.body instanceof FormData) {
       if (entry.request.contentType !== RequestContentType.FORM) {
@@ -94,7 +94,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
         request.body.forEach((value, key) => {
           formDataObj[key] = value as string;
         });
-        entry.request.body = generateKeyValuePairs(formDataObj);
+        entry.request.bodyContainer.form = generateKeyValuePairs(formDataObj);
       }
     }
 

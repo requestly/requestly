@@ -20,7 +20,7 @@ function getFilesFromRecord(record: RQAPI.ApiClientRecord) {
     return;
   }
 
-  let requestBody = record.data.request.body as RQAPI.MultipartFormBody;
+  let requestBody = record.data.request.bodyContainer?.multipartForm as RQAPI.MultipartFormBody;
 
   if (!requestBody) {
     return;

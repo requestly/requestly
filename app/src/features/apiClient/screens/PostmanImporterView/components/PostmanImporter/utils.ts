@@ -310,7 +310,6 @@ const createApiRecord = (
         method: request.method || RequestMethod.GET,
         queryParams,
         headers,
-        body: requestBody,
         bodyContainer: createBodyContainer({ contentType, body: requestBody }),
         contentType,
       },
