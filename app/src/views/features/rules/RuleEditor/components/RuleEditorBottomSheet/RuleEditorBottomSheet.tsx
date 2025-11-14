@@ -33,6 +33,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
     return [
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RULE,
+        icon: MdOutlineScience,
         label: (
           <div className="bottom-sheet-tab">
             <MdOutlineScience />

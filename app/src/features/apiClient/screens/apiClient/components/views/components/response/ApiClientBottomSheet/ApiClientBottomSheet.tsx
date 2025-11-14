@@ -16,6 +16,9 @@ import { RequestError } from "../../errors/RequestError";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
+import { MdDataObject } from "@react-icons/all-files/md/MdDataObject";
+import { PiTag } from "@react-icons/all-files/pi/PiTag";
+import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 
 interface Props {
   onGenerateTests?: () => void;
@@ -80,19 +83,34 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
     const baseTabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.RESPONSE,
-        label: "Body",
+        icon: MdDataObject,
+        label: (
+          <span className="tab-items">
+            <MdDataObject /> Body
+          </span>
+        ),
         children: <ResponseBody responseText={response?.body} contentTypeHeader={contentTypeHeader} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.HEADERS,
+        icon: PiTag,
         label: (
-          <>Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}</>
+          <span className="tab-items">
+            <PiTag />
+            Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}
+          </span>
         ),
         children: <ResponseHeaders headers={response?.headers} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: <>Test results {testResultsStats}</>,
+        icon: MdOutlineScience,
+        label: (
+          <span className="tab-items">
+            <MdOutlineScience />
+            Test results {testResultsStats}
+          </span>
+        ),
         children: (
           <TestsView
             testResults={testResults}
