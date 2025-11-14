@@ -48,6 +48,15 @@ export const MultiWorkspaceSidebar: React.FC = () => {
   const { onSaveRecord } = useNewApiClientContext();
   const { apiClientRecordsRepository } = useApiClientRepository();
 
+  useEffect(() => {
+    const handleEvent = () => {
+      setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
+    };
+
+    window.addEventListener("trigger-env-switcher", handleEvent);
+    return () => window.removeEventListener("trigger-env-switcher", handleEvent);
+  }, []);
+
   const handleNewRecordClick = useCallback(
     (recordType: RQAPI.RecordType, analyticEventSource: RQAPI.AnalyticsEventSource, entryType?: RQAPI.ApiEntryType) => {
       setRecordTypeToBeCreated(recordType);
