@@ -5,7 +5,13 @@ export const TabsSearchContainer: React.FC = () => {
   return (
     <div className="tabs-search-container">
       <div className="tabs-search-input-wrapper">
-        <input type="text" placeholder="Search tabs" className="tabs-search-input" autoComplete="off" />
+        <input
+          type="text"
+          placeholder="Search tabs"
+          className="tabs-search-input"
+          autoComplete="off"
+          aria-label="Search tabs"
+        />
       </div>
     </div>
   );
