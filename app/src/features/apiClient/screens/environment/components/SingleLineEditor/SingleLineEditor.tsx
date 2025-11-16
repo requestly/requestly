@@ -5,7 +5,7 @@ import { history, historyKeymap } from "@codemirror/commands";
 import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
-import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
+import { generateCompletionsWithPopover } from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
@@ -20,8 +20,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onBlur,
   variables,
 }) => {
-  const editorRef = useRef(null);
-  const editorViewRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
   which causes the editor to be recreated when onKeyDown changes
@@ -37,7 +37,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     onChangeRef.current = onChange;
   }, [onBlur, onChange]);
 
-  const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     Returning true in the run function prevents default browser actions, like the save dialog for Ctrl-S
     */
     editorViewRef.current = new EditorView({
-      parent: editorRef.current,
+      parent: editorRef.current!,
       state: EditorState.create({
         doc: typeof defaultValue === "string" ? defaultValue : "", // hack to scope down the crash
         extensions: [
@@ -124,7 +124,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables
           ),
-          generateCompletionsForVariables(variables),
+          ...generateCompletionsWithPopover(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
         ],
       }),
@@ -169,12 +169,12 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       className={`${className ?? ""} editor-popup-container ant-input`}
       onMouseLeave={() => setHoveredVariable(null)}
     >
-      <Conditional condition={hoveredVariable}>
+      <Conditional condition={Boolean(hoveredVariable)}>
         <VariablePopover
           editorRef={editorRef}
-          hoveredVariable={hoveredVariable}
+          hoveredVariable={hoveredVariable as string}
           popupPosition={popupPosition}
-          variables={variables}
+          variables={variables ?? new Map()}
         />
       </Conditional>
     </div>
