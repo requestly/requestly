@@ -3,6 +3,8 @@ import { RQAPI } from "../types";
 import { GraphQLRequestExecutor } from "./graphQLRequestExecutor/GraphQLRequestExecutor";
 import { HttpRequestExecutor } from "./httpRequestExecutor/httpRequestExecutor";
 import { Scope } from "./variableResolver/variable-resolver";
+import { ExecutionContext } from "./httpRequestExecutor/scriptExecutionContext";
+
 export class BatchRequestExecutor {
   constructor(
     private httpRequestExecutor: HttpRequestExecutor,
@@ -13,12 +15,19 @@ export class BatchRequestExecutor {
     recordId: string,
     entry: RQAPI.ApiEntry,
     abortController?: AbortController,
-    scopes?: Scope[]
+    scopes?: Scope[],
+    executionContext?: ExecutionContext
   ): Promise<RQAPI.ExecutionResult> {
     if (isGraphQLApiEntry(entry)) {
-      return this.graphQLRequestExecutor.executeGraphQLRequest(recordId, entry, abortController, scopes);
+      return this.graphQLRequestExecutor.executeGraphQLRequest(
+        recordId,
+        entry,
+        abortController,
+        scopes,
+        executionContext
+      );
     } else if (isHTTPApiEntry(entry)) {
-      return this.httpRequestExecutor.execute(recordId, entry, abortController, scopes);
+      return this.httpRequestExecutor.execute(recordId, entry, abortController, scopes, executionContext);
     }
 
     throw new Error("Unsupported API entry type");
