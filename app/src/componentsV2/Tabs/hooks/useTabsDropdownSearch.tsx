@@ -56,14 +56,16 @@ export const useTabsDropdownSearch = () => {
     // Focus input when dropdown opens
     requestAnimationFrame(() => searchInput.focus());
 
+    const focusoutHandler = (e: FocusEvent) => {
+      const nextFocused = e.relatedTarget as Node | null;
+      if (!nextFocused || !dropdownContainer?.contains(nextFocused)) {
+        clearFilter();
+      }
+    };
+
     const dropdownContainer = dropdownMenu.closest(".tabs-content-more-dropdown");
     if (dropdownContainer) {
-      dropdownContainer.addEventListener("focusout", (e: FocusEvent) => {
-        const nextFocused = e.relatedTarget as Node | null;
-        if (!nextFocused || !dropdownContainer.contains(nextFocused)) {
-          clearFilter();
-        }
-      });
+      dropdownContainer.addEventListener("focusout", focusoutHandler);
     }
 
     // Cleanup handler
@@ -71,7 +73,7 @@ export const useTabsDropdownSearch = () => {
       searchInput.removeEventListener("input", updateSearch);
       const clearBtn = dropdownMenu.querySelector(".tabs-clear-filter");
       clearBtn?.removeEventListener("click", clearFilter);
-      dropdownContainer?.removeEventListener("focusout", clearFilter);
+      dropdownContainer?.removeEventListener("focusout", focusoutHandler);
     };
 
     (dropdownMenu as any)._searchCleanup = cleanup;
