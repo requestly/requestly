@@ -19,6 +19,7 @@ export class DraftRequestContainerTabSource extends BaseTabSource {
       name: "request",
       title: "Untitled request",
       context: {},
+      isNewTab: true,
       ...metadata,
     };
     this.component = (

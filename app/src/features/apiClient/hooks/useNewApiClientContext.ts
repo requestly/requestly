@@ -62,6 +62,7 @@ export function useNewApiClientContext() {
               id: recordId,
               apiEntryDetails: apiClientRecord,
               title: apiClientRecord.name,
+              isNewTab: !doesRecordExist,
               context: {
                 id: context.id,
               },
