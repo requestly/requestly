@@ -1,5 +1,5 @@
 import React from "react";
-import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 
 export enum PopoverView {
   VARIABLE_INFO = "variable_info",
@@ -11,8 +11,8 @@ export interface CreateVariableFormData {
   variableName: string;
   scope: VariableScope;
   type: EnvironmentVariableType;
-  initialValue: string | number | boolean;
-  currentValue: string | number | boolean;
+  initialValue: VariableValueType;
+  currentValue: VariableValueType;
 }
 
 export interface ScopeOption {
@@ -20,15 +20,4 @@ export interface ScopeOption {
   label: string;
   icon?: React.ReactNode;
   disabled?: boolean;
-}
-
-export interface VariableNotFoundProps {
-  onCreateClick: () => void;
-  onSwitchEnvironment: () => void;
-}
-
-export interface CreateVariableViewProps {
-  variableName: string;
-  onCancel: () => void;
-  onSave: (data: CreateVariableFormData) => Promise<void>;
 }

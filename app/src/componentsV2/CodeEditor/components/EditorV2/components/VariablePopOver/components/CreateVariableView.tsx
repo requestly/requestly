@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Input, InputNumber, Select, Switch } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableType } from "backend/environment/types";
-import { CreateVariableViewProps, ScopeOption } from "../types";
+import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import { CreateVariableFormData, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { useGenericState } from "hooks/useGenericState";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { RQAPI } from "features/apiClient/types";
+import { captureException } from "backend/apiClient/utils";
+
+interface CreateVariableViewProps {
+  variableName: string;
+  onCancel: () => void;
+  onSave: (data: CreateVariableFormData) => Promise<void>;
+}
 
 export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variableName, onCancel, onSave }) => {
   const genericState = useGenericState();
@@ -16,38 +23,33 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
 
   // Determine the collection ID based on the current record
   const collectionId = useMemo(() => {
-    try {
-      const record = getData(recordId);
+    const record = getData(recordId);
 
-      if (!record) {
-        return undefined;
-      }
-
-      // If the current record is a collection, use its ID
-      if (record.type === RQAPI.RecordType.COLLECTION) {
-        return record.id;
-      }
-
-      // If the current record is a request, use its parent collection ID
-      if (record.type === RQAPI.RecordType.API) {
-        return record.collectionId || undefined;
-      }
-
-      return undefined;
-    } catch (error) {
-      console.error("Error determining collection ID:", error);
+    if (!record) {
       return undefined;
     }
+
+    // If the current record is a collection, use its ID
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      return record.id;
+    }
+
+    // If the current record is a request, use its parent collection ID
+    if (record.type === RQAPI.RecordType.API) {
+      return record.collectionId || undefined;
+    }
+
+    return undefined;
   }, [recordId, getData]);
 
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
-  const { createVariable, isCreating } = useCreateVariable(collectionId);
+  const { createVariable, status } = useCreateVariable(collectionId);
 
   const [formData, setFormData] = useState({
     scope: defaultScope,
     type: EnvironmentVariableType.String,
-    initialValue: "" as string | number | boolean,
-    currentValue: "" as string | number | boolean,
+    initialValue: "" as VariableValueType,
+    currentValue: "" as VariableValueType,
   });
 
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -101,32 +103,33 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
   };
 
   const handleTypeChange = useCallback((newType: EnvironmentVariableType) => {
-    let defaultInitialValue: string | number | boolean = "";
-    let defaultCurrentValue: string | number | boolean = "";
+    setFormData((prev) => {
+      let convertedInitialValue = prev.initialValue;
+      let convertedCurrentValue = prev.currentValue;
 
-    switch (newType) {
-      case EnvironmentVariableType.Boolean:
-        defaultInitialValue = false;
-        defaultCurrentValue = false;
-        break;
-      case EnvironmentVariableType.Number:
-        defaultInitialValue = 0;
-        defaultCurrentValue = 0;
-        break;
-      case EnvironmentVariableType.String:
-      case EnvironmentVariableType.Secret:
-      default:
-        defaultInitialValue = "";
-        defaultCurrentValue = "";
-        break;
-    }
+      switch (newType) {
+        case EnvironmentVariableType.Boolean:
+          convertedInitialValue = Boolean(convertedInitialValue ?? true);
+          convertedCurrentValue = Boolean(convertedCurrentValue ?? true);
+          break;
+        case EnvironmentVariableType.Number:
+          convertedInitialValue = isNaN(Number(convertedInitialValue)) ? 0 : Number(convertedInitialValue);
+          convertedCurrentValue = isNaN(Number(convertedCurrentValue)) ? 0 : Number(convertedCurrentValue);
+          break;
+        case EnvironmentVariableType.String:
+        case EnvironmentVariableType.Secret:
+          convertedInitialValue = String(convertedInitialValue ?? "");
+          convertedCurrentValue = String(convertedCurrentValue ?? "");
+          break;
+      }
 
-    setFormData((prev) => ({
-      ...prev,
-      type: newType,
-      initialValue: defaultInitialValue,
-      currentValue: defaultCurrentValue,
-    }));
+      return {
+        ...prev,
+        type: newType,
+        initialValue: convertedInitialValue,
+        currentValue: convertedCurrentValue,
+      };
+    });
   }, []);
 
   const handleSave = async () => {
@@ -142,8 +145,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
       await createVariable(variableData);
       await onSave(variableData);
     } catch (error) {
-      // Error is already handled in useCreateVariable hook
-      console.error("Error creating variable:", error);
+      captureException(error);
     }
   };
 
@@ -299,10 +301,10 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
 
       {/* Actions */}
       <div className="create-variable-actions">
-        <RQButton onClick={onCancel} disabled={isCreating}>
+        <RQButton onClick={onCancel} disabled={status.creating}>
           Cancel
         </RQButton>
-        <RQButton type="primary" onClick={handleSave} loading={isCreating}>
+        <RQButton type="primary" onClick={handleSave} loading={status.creating}>
           Save
         </RQButton>
       </div>
