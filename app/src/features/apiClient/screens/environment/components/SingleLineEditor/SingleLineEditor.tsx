@@ -122,9 +122,9 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
               setHoveredVariable,
               setPopupPosition,
             },
-            variables
+            variables!
           ),
-          ...generateCompletionsWithPopover(variables),
+          ...generateCompletionsWithPopover(variables!),
           cmPlaceHolder(placeholder ?? "Input here"),
         ],
       }),

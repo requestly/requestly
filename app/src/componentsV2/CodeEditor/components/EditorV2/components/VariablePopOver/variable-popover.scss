@@ -194,8 +194,10 @@ div.n-popup {
   }
 }
 
-// Override Ant Design Popover inner content padding
-.ant-popover-inner-content {
-  padding: 0 !important;
-  margin: 0 !important;
+// Scoped overrides for variable suggestions popover
+.variable-suggestions-popover {
+  .ant-popover-inner-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
 }

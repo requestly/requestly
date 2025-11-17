@@ -5,10 +5,10 @@ import {
   CompletionSource,
   insertCompletionText,
 } from "@codemirror/autocomplete";
-import { EditorView } from "@codemirror/view";
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { EditorView, ViewPlugin } from "@codemirror/view";
+import { ScopedVariables, ScopedVariable } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Popover } from "antd";
 import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
 import { capitalize } from "lodash";
@@ -36,6 +36,7 @@ const VariableSuggestionsPopover: React.FC<{
         width: "450px",
         height: "150px",
         borderRadius: "4px",
+        marginTop: "-16px",
         border: "1px solid var(--requestly-color-white-t-10)",
       },
     },
@@ -262,9 +263,10 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
   if (!envVariables) return [];
 
   let popoverContainer: HTMLElement | null = null;
+  let popoverRoot: any = null;
   let currentRange: { from: number; to: number } | null = null;
   let selectedIndex = 0;
-  let filteredVariables: [string, any][] = [];
+  let filteredVariables: [string, ScopedVariable][] = [];
 
   const updateFilteredVariables = (query: string) => {
     filteredVariables = Array.from(envVariables.entries()).filter(([key]) =>
@@ -287,9 +289,10 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
     popoverContainer = document.createElement("div");
     popoverContainer.style.position = "fixed";
     popoverContainer.style.left = `${position.x}px`;
-    popoverContainer.style.top = `${position.y - 16}px`;
+    popoverContainer.style.top = `${position.y}px`;
     popoverContainer.style.zIndex = "10000";
     document.body.appendChild(popoverContainer);
+    popoverRoot = createRoot(popoverContainer);
 
     const handleSelect = (variableKey: string) => {
       insertVariable(view, variableKey);
@@ -304,7 +307,7 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
     const rerenderPopover = (view: EditorView, query: string) => {
       if (!popoverContainer) return;
 
-      ReactDOM.render(
+      popoverRoot.render(
         React.createElement(
           Popover,
           {
@@ -321,13 +324,13 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
             destroyTooltipOnHide: true,
             showArrow: false,
             overlayStyle: { background: "transparent", boxShadow: "none", border: "none" },
+            overlayClassName: "variable-suggestions-popover",
             onOpenChange: (open: boolean) => {
               if (!open) hidePopover();
             },
           },
           React.createElement("span")
-        ),
-        popoverContainer
+        )
       );
     };
 
@@ -374,7 +377,7 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
       rerenderCurrentPopover(view);
     };
 
-    ReactDOM.render(
+    popoverRoot.render(
       React.createElement(
         Popover,
         {
@@ -391,19 +394,22 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
           destroyTooltipOnHide: true,
           showArrow: false,
           overlayStyle: { background: "transparent", boxShadow: "none", border: "none" },
+          overlayClassName: "variable-suggestions-popover",
           onOpenChange: (open: boolean) => {
             if (!open) hidePopover();
           },
         },
         React.createElement("span")
-      ),
-      popoverContainer
+      )
     );
   };
 
   const hidePopover = () => {
+    if (popoverRoot) {
+      popoverRoot.unmount();
+      popoverRoot = null;
+    }
     if (popoverContainer) {
-      ReactDOM.unmountComponentAtNode(popoverContainer);
       popoverContainer.remove();
       popoverContainer = null;
     }
@@ -424,65 +430,74 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
 
       if (match) {
         const query = match[1] || "";
+        updateFilteredVariables(query);
         const coords = update.view.coordsAtPos(pos);
 
-        if (coords) {
-          const filteredVariables = Array.from(envVariables.entries()).filter(([key]) =>
-            key.toLowerCase().includes(query.toLowerCase())
-          );
-
-          if (filteredVariables.length > 0) {
-            showPopover(update.view, { x: coords.left, y: coords.bottom + 2 }, query, {
-              from: line.from + match.index,
-              to: pos,
-            });
-          } else {
-            hidePopover();
-          }
+        if (coords && filteredVariables.length > 0) {
+          showPopover(update.view, { x: coords.left, y: coords.bottom + 2 }, query, {
+            from: line.from + match.index,
+            to: pos,
+          });
+        } else {
+          hidePopover();
         }
       } else {
         hidePopover();
       }
     }),
-    EditorView.domEventHandlers({
-      blur: () => {
-        // Hide popover when editor loses focus
-        setTimeout(hidePopover, 100); // Small delay to allow popover clicks
-      },
-      keydown: (event, view) => {
-        if (!popoverContainer || filteredVariables.length === 0) return false;
-
-        switch (event.key) {
-          case "ArrowDown":
-            event.preventDefault();
-            selectedIndex = (selectedIndex + 1) % filteredVariables.length;
-            rerenderCurrentPopover(view);
-            return true;
-
-          case "ArrowUp":
-            event.preventDefault();
-            selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : filteredVariables.length - 1;
-            rerenderCurrentPopover(view);
-            return true;
-
-          case "Enter":
-            event.preventDefault();
-            if (filteredVariables[selectedIndex]) {
-              const [variableKey] = filteredVariables[selectedIndex];
-              insertVariable(view, variableKey);
-              hidePopover();
-            }
-            return true;
-
-          case "Escape":
-            event.preventDefault();
-            hidePopover();
-            return true;
+    ViewPlugin.fromClass(
+      class {
+        constructor(private view: EditorView) {
+          view.dom.addEventListener("keydown", this.handleKeydown.bind(this));
+          view.dom.addEventListener("blur", this.handleBlur.bind(this));
         }
 
-        return false;
-      },
-    }),
+        private handleKeydown(event: KeyboardEvent) {
+          if (!popoverContainer || filteredVariables.length === 0) return false;
+
+          switch (event.key) {
+            case "ArrowDown":
+              event.preventDefault();
+              selectedIndex = (selectedIndex + 1) % filteredVariables.length;
+              rerenderCurrentPopover(this.view);
+              return true;
+
+            case "ArrowUp":
+              event.preventDefault();
+              selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : filteredVariables.length - 1;
+              rerenderCurrentPopover(this.view);
+              return true;
+
+            case "Enter":
+              event.preventDefault();
+              if (filteredVariables[selectedIndex]) {
+                const [variableKey] = filteredVariables[selectedIndex];
+                insertVariable(this.view, variableKey);
+                hidePopover();
+              }
+              return true;
+
+            case "Escape":
+              event.preventDefault();
+              hidePopover();
+              return true;
+          }
+
+          return false;
+        }
+
+        private handleBlur() {
+          // Hide popover when editor loses focus
+          setTimeout(hidePopover, 100); // Small delay to allow popover clicks
+        }
+
+        destroy() {
+          hidePopover();
+          this.view.dom.removeEventListener("keydown", this.handleKeydown.bind(this));
+          this.view.dom.removeEventListener("blur", this.handleBlur.bind(this));
+        }
+      }
+    ),
   ];
 }
 
