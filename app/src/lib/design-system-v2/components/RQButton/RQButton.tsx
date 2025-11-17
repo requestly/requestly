@@ -42,7 +42,13 @@ const RQ_TO_ANTD_PROPS: {
 const BaseButton = React.forwardRef<HTMLButtonElement, RQButtonProps>(function BaseButton({ ...props }, ref) {
   const { hotKey, showHotKeyText, enableHotKey, ...restProps } = props; // Remove unrecognised props
 
-  const antDProps = { size: RQ_TO_ANTD_PROPS.size[props.size], type: RQ_TO_ANTD_PROPS.type[props.type] };
+  const antDProps: Partial<{ size: AntDButtonProps["size"]; type: AntDButtonProps["type"] }> = {};
+  if (props.size) {
+    antDProps.size = RQ_TO_ANTD_PROPS.size[props.size];
+  }
+  if (props.type) {
+    antDProps.type = RQ_TO_ANTD_PROPS.type[props.type];
+  }
 
   const isIconOnly = props.icon && !props.children;
 
@@ -66,7 +72,7 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(func
     {
       preventDefault: true,
       enableOnFormTags: ["input", "INPUT"],
-      enabled: props.enableHotKey ?? true,
+      enabled: (props.enableHotKey ?? true) && !props.disabled,
     }
   );
 
