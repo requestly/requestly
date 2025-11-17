@@ -181,13 +181,14 @@ export class HttpRequestExecutor {
     recordId: string,
     entry: RQAPI.HttpApiEntry,
     abortController?: AbortController,
-    scopes?: Scope[]
+    scopes?: Scope[],
+    executionContext?: ExecutionContext
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
-      (error) => new ExecutionError(entry, error)
-    );
+    const preparationResult = (
+      await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
+    ).mapError((error) => new ExecutionError(entry, error));
 
     if (preparationResult.isError()) {
       return preparationResult.unwrapError().result;
@@ -195,7 +196,7 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const scriptExecutionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry);
+    const scriptExecutionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry, executionContext);
     const scriptExecutor = new HttpRequestScriptExecutionService(scriptExecutionContext, this.workloadManager);
 
     let preRequestScriptResult: WorkResult | undefined;
@@ -245,11 +246,13 @@ export class HttpRequestExecutor {
       const rePreparation = rePreparationResult.unwrap();
       preparedEntry = rePreparation.preparedEntry;
       renderedVariables = rePreparation.renderedVariables;
+      scriptExecutionContext.setRequest(preparedEntry.request);
     }
 
     try {
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
+      scriptExecutionContext.setResponse(response);
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
@@ -277,7 +280,6 @@ export class HttpRequestExecutor {
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
 
-      scriptExecutionContext.setResponse(preparedEntry.response);
       scriptExecutionContext.resetIsMutated();
 
       responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
