@@ -66,13 +66,16 @@ const ButtonWithHotkey = React.forwardRef<HTMLButtonElement, RQButtonProps>(func
   useHotkeys(
     props.hotKey,
     (event) => {
-      // TODO: Fix type - hotkey callback gives keyboard event but button onClick needs mouse event
-      props.onClick(event as any);
+      // Only execute onClick if button is not disabled
+      if (!props.disabled && props.onClick) {
+        props.onClick(event as any);
+      }
+      // Always prevent browser default (even when disabled)
     },
     {
       preventDefault: true,
       enableOnFormTags: ["input", "INPUT"],
-      enabled: (props.enableHotKey ?? true) && !props.disabled,
+      enabled: props.enableHotKey ?? true, // Always enabled to catch and prevent browser default
     }
   );
 
