@@ -108,4 +108,8 @@ export class ScriptExecutionContext {
   public setResponse(response: SnapshotForPostResponse["response"]) {
     this.context.response = response;
   }
+
+  public setRequest(request: SnapshotForPreRequest["request"]) {
+    this.context.request = request;
+  }
 }

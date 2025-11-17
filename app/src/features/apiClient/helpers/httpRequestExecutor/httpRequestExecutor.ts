@@ -246,11 +246,13 @@ export class HttpRequestExecutor {
       const rePreparation = rePreparationResult.unwrap();
       preparedEntry = rePreparation.preparedEntry;
       renderedVariables = rePreparation.renderedVariables;
+      scriptExecutionContext.setRequest(preparedEntry.request);
     }
 
     try {
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
+      scriptExecutionContext.setResponse(response);
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
@@ -278,7 +280,6 @@ export class HttpRequestExecutor {
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
 
-      scriptExecutionContext.setResponse(preparedEntry.response);
       scriptExecutionContext.resetIsMutated();
 
       responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
