@@ -447,12 +447,7 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
     }),
     ViewPlugin.fromClass(
       class {
-        constructor(private view: EditorView) {
-          view.dom.addEventListener("keydown", this.handleKeydown.bind(this));
-          view.dom.addEventListener("blur", this.handleBlur.bind(this));
-        }
-
-        private handleKeydown(event: KeyboardEvent) {
+        private handleKeydown = (event: KeyboardEvent) => {
           if (!popoverContainer || filteredVariables.length === 0) return false;
 
           switch (event.key) {
@@ -484,17 +479,22 @@ export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
           }
 
           return false;
-        }
+        };
 
-        private handleBlur() {
+        private handleBlur = () => {
           // Hide popover when editor loses focus
           setTimeout(hidePopover, 100); // Small delay to allow popover clicks
+        };
+
+        constructor(private view: EditorView) {
+          view.dom.addEventListener("keydown", this.handleKeydown);
+          view.dom.addEventListener("blur", this.handleBlur);
         }
 
         destroy() {
           hidePopover();
-          this.view.dom.removeEventListener("keydown", this.handleKeydown.bind(this));
-          this.view.dom.removeEventListener("blur", this.handleBlur.bind(this));
+          this.view.dom.removeEventListener("keydown", this.handleKeydown);
+          this.view.dom.removeEventListener("blur", this.handleBlur);
         }
       }
     ),
