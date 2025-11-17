@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
@@ -164,17 +164,17 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     // Don't close popover if it's pinned (e.g., in create form view)
     if (!isPopoverPinned) {
       setHoveredVariable(null);
     }
-  };
+  }, [isPopoverPinned]);
 
-  const handleClosePopover = () => {
+  const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);
     setIsPopoverPinned(false);
-  };
+  }, []);
 
   return (
     <div

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Popover, Tag } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
@@ -9,6 +9,13 @@ import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
+
+// Define valid state transitions
+const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
+  [PopoverView.VARIABLE_INFO]: [], // Terminal state for existing variables
+  [PopoverView.NOT_FOUND]: [PopoverView.CREATE_FORM],
+  [PopoverView.CREATE_FORM]: [PopoverView.NOT_FOUND],
+};
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -33,28 +40,40 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   const [currentView, setCurrentView] = useState<PopoverView>(initialView);
 
-  const handleCreateClick = () => {
-    setCurrentView(PopoverView.CREATE_FORM);
-    onPinChange?.(true); // Pin popover when entering create form
-  };
+  const transitionToView = useCallback(
+    (nextView: PopoverView) => {
+      const allowedTransitions = PopoverViewTransitions[currentView];
+      if (!allowedTransitions.includes(nextView)) {
+        console.error(`Invalid popover view transition from ${currentView} to ${nextView}`);
+        return;
+      }
+      setCurrentView(nextView);
+    },
+    [currentView]
+  );
 
-  const handleSwitchEnvironment = () => {
+  const handleCreateClick = useCallback(() => {
+    transitionToView(PopoverView.CREATE_FORM);
+    onPinChange?.(true); // Pin popover when entering create form
+  }, [transitionToView, onPinChange]);
+
+  const handleSwitchEnvironment = useCallback(() => {
     window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
     onClose?.();
-  };
+  }, [onClose]);
 
-  const handleCancel = () => {
-    // Return to not found view or close if variable exists
+  const handleCancel = useCallback(() => {
+    // Return to not found view
+    transitionToView(PopoverView.NOT_FOUND);
     onPinChange?.(false); // Unpin popover
-    onClose?.();
-  };
+  }, [transitionToView, onPinChange]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     // Variable creation is handled in CreateVariableView
     // After successful creation, close the popover
     onPinChange?.(false); // Unpin popover
     onClose?.();
-  };
+  }, [onPinChange, onClose]);
 
   // Render content based on current view
   const popoverContent = (() => {
