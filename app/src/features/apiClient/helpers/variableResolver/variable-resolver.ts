@@ -93,10 +93,11 @@ export class VariableHolder {
 function getScopes(
   parents: string[],
   stores: AllApiClientStores,
-  scopes: Scope[] = [],
+  initialScopes: Scope[] = [],
   storeOverrideConfig?: StoreOverrideConfig
 ): Scope[] {
-  let currentScopeLevel = scopes.length;
+  let currentScopeLevel = initialScopes.length;
+  const scopes: Scope[] = [...initialScopes];
   const {
     activeEnvironment: activeEnvironmentStore,
     globalEnvironment: globalEnvironmentStore,
