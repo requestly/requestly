@@ -73,7 +73,7 @@
 
   .api-client-body {
     flex: auto;
-    height: 100%;
+    height: calc(100% - 43px);
     min-height: 0;
     position: sticky;
     overflow: hidden;
@@ -149,10 +149,12 @@
 
       .count {
         font-size: 10px;
-        padding: 0 4px;
+        padding: 3px 8px;
         line-height: 14px;
         margin-left: 5px;
         margin-right: 0;
+        border: none;
+        border-radius: 10px;
       }
     }
   }
