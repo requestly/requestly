@@ -38,7 +38,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
-
+  console.log({ variableData });
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   const [currentView, setCurrentView] = useState<PopoverView>(initialView);
@@ -125,6 +125,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               syncValue: variable.syncValue ?? "",
               localValue: variable.localValue ?? "",
               scope: source.scope,
+              scopeName: source.name,
             }}
             onCancel={handleCancel}
             onSave={handleSave}

@@ -17,6 +17,7 @@ interface ExistingVariableData {
   syncValue: VariableValueType;
   localValue: VariableValueType;
   scope: VariableScope;
+  scopeName: String;
 }
 
 interface CreateVariableViewProps {
@@ -282,6 +283,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
     return null;
   }, [mode, existingVariable, scopeOptions]);
 
+  console.log({ scopeOptions, existingVariable });
   return (
     <div className="create-variable-view">
       {mode === "edit" ? (
@@ -290,14 +292,14 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
           <div className="edit-variable-header">
             <div className="edit-variable-scope-info">
               <div className="scope-icon-wrapper">{currentScopeOption?.icon || <FaListAlt />}</div>
-              <span className="scope-name">{currentScopeOption?.label || "Environment"}</span>
+              <span className="scope-name">{existingVariable?.scopeName || "Environment"}</span>
             </div>
             <div className="edit-variable-actions">
               <RQButton size="small" onClick={onCancel} disabled={isProcessing}>
                 Cancel
               </RQButton>
               <RQButton size="small" type="primary" onClick={handleSave} loading={isProcessing}>
-                Save
+                {isProcessing ? "" : "Save"}
               </RQButton>
             </div>
           </div>
@@ -376,11 +378,11 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
       {/* Actions - Only show in create mode (edit mode has actions in header) */}
       {mode === "create" && (
         <div className="create-variable-actions">
-          <RQButton onClick={onCancel} disabled={isProcessing}>
+          <RQButton size="large" onClick={onCancel} disabled={isProcessing}>
             Cancel
           </RQButton>
-          <RQButton type="primary" onClick={handleSave} loading={isProcessing}>
-            Save
+          <RQButton size="large" type="primary" onClick={handleSave} loading={isProcessing}>
+            {isProcessing ? "" : "Save"}
           </RQButton>
         </div>
       )}

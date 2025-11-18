@@ -257,9 +257,10 @@ div.n-popup {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 8px;
+    padding: 0px 8px;
+    padding-bottom: 6px;
+    margin: 0px -12px;
     border-bottom: 1px solid var(--requestly-color-white-t-10);
-    margin-bottom: 4px;
 
     .edit-variable-scope-info {
       display: flex;
@@ -283,6 +284,7 @@ div.n-popup {
         font-size: var(--requestly-font-size-sm);
         font-weight: var(--requestly-font-weight-medium);
         color: var(--requestly-color-text-default);
+        margin-right: 4px;
       }
     }
 
@@ -291,8 +293,8 @@ div.n-popup {
       gap: 8px;
 
       .rq-custom-btn {
-        /* min-width: 70px; */
         height: 24px;
+        border-radius: 4px !important;
       }
     }
   }
@@ -304,7 +306,6 @@ div.n-popup {
     font-weight: var(--requestly-font-weight-medium);
     color: var(--requestly-color-text-default);
     padding: 8px 0;
-    margin-bottom: 4px;
   }
 
   .create-variable-form {
@@ -400,11 +401,13 @@ div.n-popup {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    padding-top: 12px;
-    border-top: 1px solid var(--requestly-color-white-t-10);
 
     .rq-custom-btn {
-      min-width: 80px;
+      border-radius: 4px !important;
+
+      &:not(:last-child) {
+        margin-right: 0;
+      }
     }
   }
 }
