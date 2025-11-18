@@ -72,20 +72,6 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  [PRICING.PLAN_NAMES.SESSION_PROFESSIONAL]: {
-    plans: {
-      monthly: {
-        usd: {
-          price: 10,
-        },
-      },
-      annually: {
-        usd: {
-          price: 120,
-        },
-      },
-    },
-  },
   [PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE]: {
     plans: {
       monthly: {

@@ -42,8 +42,6 @@ export const getPrettyPlanName = (planName) => {
       return "Professional (Student Program)";
     case PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE:
       return "API Client Enterprise";
-    case PRICING.PLAN_NAMES.SESSION_PROFESSIONAL:
-      return "Plus";
     default:
       return planName
         .toLowerCase()
