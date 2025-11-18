@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Input, InputNumber, Select, Switch } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { CreateVariableFormData, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
 import { useUpdateVariable } from "../hooks/useUpdateVariable";
@@ -12,15 +12,24 @@ import { RQAPI } from "features/apiClient/types";
 import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 import { captureException } from "backend/apiClient/utils";
 
+interface ExistingVariableData {
+  type: EnvironmentVariableType;
+  syncValue: VariableValueType;
+  localValue: VariableValueType;
+  scope: VariableScope;
+}
+
 interface CreateVariableViewProps {
   variableName: string;
+  mode: "create" | "edit";
+  existingVariable?: ExistingVariableData;
   onCancel: () => void;
   onSave: (data: CreateVariableFormData) => Promise<void>;
 }
 
 export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   variableName,
-  mode,
+  mode = "create",
   existingVariable,
   onCancel,
   onSave,
@@ -55,13 +64,25 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   }, [recordId, getData]);
 
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
-  const { createVariable, status } = useCreateVariable(collectionId);
+  const { createVariable, status: createStatus } = useCreateVariable(collectionId);
+  const { updateVariable, isUpdating } = useUpdateVariable(collectionId);
 
-  const [formData, setFormData] = useState({
-    scope: defaultScope,
-    type: EnvironmentVariableType.String,
-    initialValue: "" as VariableValueType,
-    currentValue: "" as VariableValueType,
+  // Initialize form data based on mode
+  const [formData, setFormData] = useState(() => {
+    if (mode === "edit" && existingVariable) {
+      return {
+        scope: existingVariable.scope,
+        type: existingVariable.type,
+        initialValue: existingVariable.syncValue ?? "",
+        currentValue: existingVariable.localValue ?? "",
+      };
+    }
+    return {
+      scope: defaultScope,
+      type: EnvironmentVariableType.String,
+      initialValue: "" as VariableValueType,
+      currentValue: "" as VariableValueType,
+    };
   });
 
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -251,7 +272,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
     </div>
   );
 
-  const isProcessing = isCreating || isUpdating;
+  const isProcessing = mode === "edit" ? isUpdating : createStatus.creating;
 
   // Get scope information for edit mode header
   const currentScopeOption = useMemo(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Popover, Tag } from "antd";
+import { Popover } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
@@ -14,9 +14,10 @@ import { getScopeIcon } from "./hooks/useScopeOptions";
 
 // Define valid state transitions
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
-  [PopoverView.VARIABLE_INFO]: [], // Terminal state for existing variables
+  [PopoverView.VARIABLE_INFO]: [PopoverView.EDIT_FORM],
   [PopoverView.NOT_FOUND]: [PopoverView.CREATE_FORM],
-  [PopoverView.CREATE_FORM]: [PopoverView.NOT_FOUND],
+  [PopoverView.CREATE_FORM]: [],
+  [PopoverView.EDIT_FORM]: [PopoverView.VARIABLE_INFO],
 };
 
 interface VariablePopoverProps {
@@ -59,21 +60,27 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     onPinChange?.(true); // Pin popover when entering create form
   }, [transitionToView, onPinChange]);
 
+  const handleEditClick = useCallback(() => {
+    transitionToView(PopoverView.EDIT_FORM);
+    onPinChange?.(true);
+  }, [transitionToView, onPinChange]);
+
   const handleSwitchEnvironment = useCallback(() => {
     window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
     onClose?.();
   }, [onClose]);
 
   const handleCancel = useCallback(() => {
-    // Return to not found view
-    transitionToView(PopoverView.NOT_FOUND);
-    onPinChange?.(false); // Unpin popover
-  }, [transitionToView, onPinChange]);
+    if (currentView === PopoverView.CREATE_FORM) {
+      onClose?.();
+    } else if (currentView === PopoverView.EDIT_FORM) {
+      transitionToView(PopoverView.VARIABLE_INFO);
+    }
+    onPinChange?.(false);
+  }, [currentView, transitionToView, onPinChange, onClose]);
 
   const handleSave = useCallback(async () => {
-    // Variable creation is handled in CreateVariableView
-    // After successful creation, close the popover
-    onPinChange?.(false); // Unpin popover
+    onPinChange?.(false);
     onClose?.();
   }, [onPinChange, onClose]);
 
@@ -115,8 +122,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
             mode="edit"
             existingVariable={{
               type: variable.type,
-              syncValue: variable.syncValue,
-              localValue: variable.localValue,
+              syncValue: variable.syncValue ?? "",
+              localValue: variable.localValue ?? "",
               scope: source.scope,
             }}
             onCancel={handleCancel}
