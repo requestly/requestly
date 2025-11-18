@@ -26,6 +26,7 @@ const PremiumPlanBadge = () => {
   const planEndDateString = userPlanDetails?.subscription?.endDate ?? "";
   const planName = userPlanDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
   const prettyPlanName = planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "Pro" : getPrettyPlanName(planName);
+  const isUserLoggedIn = user?.loggedIn ?? false;
   const daysLeft = useMemo(() => {
     const endMs = Date.parse(planEndDateString);
     if (!Number.isFinite(endMs)) return 0;
@@ -73,7 +74,8 @@ const PremiumPlanBadge = () => {
   if (
     isAppSumoDeal ||
     [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus) ||
-    daysLeft > 30
+    daysLeft > 30 ||
+    !isUserLoggedIn
   ) {
     return null;
   }
