@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Popover } from "antd";
+import React, { useState, useCallback } from "react";
+import { Popover, Tag } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
@@ -11,6 +11,13 @@ import { CreateVariableView } from "./components/CreateVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
+
+// Define valid state transitions
+const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
+  [PopoverView.VARIABLE_INFO]: [], // Terminal state for existing variables
+  [PopoverView.NOT_FOUND]: [PopoverView.CREATE_FORM],
+  [PopoverView.CREATE_FORM]: [PopoverView.NOT_FOUND],
+};
 
 interface VariablePopoverProps {
   hoveredVariable: string;
@@ -35,33 +42,40 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   const [currentView, setCurrentView] = useState<PopoverView>(initialView);
 
-  const handleCreateClick = () => {
-    setCurrentView(PopoverView.CREATE_FORM);
+  const transitionToView = useCallback(
+    (nextView: PopoverView) => {
+      const allowedTransitions = PopoverViewTransitions[currentView];
+      if (!allowedTransitions.includes(nextView)) {
+        console.error(`Invalid popover view transition from ${currentView} to ${nextView}`);
+        return;
+      }
+      setCurrentView(nextView);
+    },
+    [currentView]
+  );
+
+  const handleCreateClick = useCallback(() => {
+    transitionToView(PopoverView.CREATE_FORM);
     onPinChange?.(true); // Pin popover when entering create form
-  };
+  }, [transitionToView, onPinChange]);
 
-  const handleEditClick = () => {
-    setCurrentView(PopoverView.EDIT_FORM);
-    onPinChange?.(true); // Pin popover when entering edit form
-  };
-
-  const handleSwitchEnvironment = () => {
+  const handleSwitchEnvironment = useCallback(() => {
     window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
     onClose?.();
-  };
+  }, [onClose]);
 
-  const handleCancel = () => {
-    // Return to not found view or close if variable exists
+  const handleCancel = useCallback(() => {
+    // Return to not found view
+    transitionToView(PopoverView.NOT_FOUND);
+    onPinChange?.(false); // Unpin popover
+  }, [transitionToView, onPinChange]);
+
+  const handleSave = useCallback(async () => {
+    // Variable creation is handled in CreateVariableView
+    // After successful creation, close the popover
     onPinChange?.(false); // Unpin popover
     onClose?.();
-  };
-
-  const handleSave = async () => {
-    // Variable creation/update is handled in CreateVariableView
-    // After successful creation/update, close the popover
-    onPinChange?.(false); // Unpin popover
-    onClose?.();
-  };
+  }, [onPinChange, onClose]);
 
   // Render content based on current view
   const popoverContent = (() => {

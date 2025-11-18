@@ -7,15 +7,18 @@ import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables
 import { toast } from "utils/Toast";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
+type CreateVariableStatus =
+  | { creating: false; errored: false }
+  | { creating: true; errored: false }
+  | { creating: false; errored: true; error: string };
+
 interface UseCreateVariableResult {
   createVariable: (data: CreateVariableFormData) => Promise<void>;
-  isCreating: boolean;
-  error: string | null;
+  status: CreateVariableStatus;
 }
 
 export const useCreateVariable = (collectionId?: string): UseCreateVariableResult => {
-  const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<CreateVariableStatus>({ creating: false, errored: false });
 
   const {
     env: { patchEnvironmentVariables },
@@ -28,8 +31,7 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
 
   const createVariable = useCallback(
     async (data: CreateVariableFormData) => {
-      setIsCreating(true);
-      setError(null);
+      setStatus({ creating: true, errored: false });
 
       try {
         const { variableName, scope, type, initialValue, currentValue } = data;
@@ -101,13 +103,12 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
           default:
             throw new Error(`Unknown scope: ${scope}`);
         }
+        setStatus({ creating: false, errored: false });
       } catch (err: any) {
         const errorMessage = err?.message || "Failed to create variable";
-        setError(errorMessage);
+        setStatus({ creating: false, errored: true, error: errorMessage });
         toast.error(errorMessage);
         throw err;
-      } finally {
-        setIsCreating(false);
       }
     },
     [
@@ -121,7 +122,6 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
 
   return {
     createVariable,
-    isCreating,
-    error,
+    status,
   };
 };

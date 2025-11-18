@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Input, InputNumber, Select, Switch } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableType } from "backend/environment/types";
-import { CreateVariableViewProps, ScopeOption } from "../types";
+import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import { CreateVariableFormData, ScopeOption } from "../types";
 import { useCreateVariable } from "../hooks/useCreateVariable";
 import { useUpdateVariable } from "../hooks/useUpdateVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
@@ -10,6 +10,13 @@ import { useGenericState } from "hooks/useGenericState";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { RQAPI } from "features/apiClient/types";
 import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
+import { captureException } from "backend/apiClient/utils";
+
+interface CreateVariableViewProps {
+  variableName: string;
+  onCancel: () => void;
+  onSave: (data: CreateVariableFormData) => Promise<void>;
+}
 
 export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   variableName,
@@ -20,62 +27,42 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
 }) => {
   const genericState = useGenericState();
   const [getData] = useAPIRecords((state) => [state.getData]);
-  const sourceId = genericState.getSourceId();
-  const recordId = sourceId?.id;
+  const recordId = genericState.getSourceId();
 
   // Determine the collection ID based on the current record
   const collectionId = useMemo(() => {
-    try {
-      if (!recordId) {
-        return undefined;
-      }
-
-      const record = getData(recordId);
-
-      if (!record) {
-        return undefined;
-      }
-
-      // If the current record is a collection, use its ID
-      if (record.type === RQAPI.RecordType.COLLECTION) {
-        return record.id;
-      }
-
-      // If the current record is a request, use its parent collection ID
-      if (record.type === RQAPI.RecordType.API) {
-        return record.collectionId || undefined;
-      }
-
-      return undefined;
-    } catch (error) {
-      console.error("Error determining collection ID:", error);
+    if (!recordId) {
       return undefined;
     }
+
+    const record = getData(recordId);
+
+    if (!record) {
+      return undefined;
+    }
+
+    // If the current record is a collection, use its ID
+    if (record.type === RQAPI.RecordType.COLLECTION) {
+      return record.id;
+    }
+
+    // If the current record is a request, use its parent collection ID
+    if (record.type === RQAPI.RecordType.API) {
+      return record.collectionId || undefined;
+    }
+
+    return undefined;
   }, [recordId, getData]);
 
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
-  const { createVariable, isCreating } = useCreateVariable(collectionId);
-  const { updateVariable, isUpdating } = useUpdateVariable(collectionId);
+  const { createVariable, status } = useCreateVariable(collectionId);
 
-  // Initialize form data based on mode
-  const initialFormData = useMemo(() => {
-    if (mode === "edit" && existingVariable) {
-      return {
-        scope: existingVariable.scope,
-        type: existingVariable.type,
-        initialValue: existingVariable.syncValue ?? "",
-        currentValue: existingVariable.localValue ?? "",
-      };
-    }
-    return {
-      scope: defaultScope,
-      type: EnvironmentVariableType.String,
-      initialValue: "" as string | number | boolean,
-      currentValue: "" as string | number | boolean,
-    };
-  }, [mode, existingVariable, defaultScope]);
-
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState({
+    scope: defaultScope,
+    type: EnvironmentVariableType.String,
+    initialValue: "" as VariableValueType,
+    currentValue: "" as VariableValueType,
+  });
 
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -130,32 +117,33 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   };
 
   const handleTypeChange = useCallback((newType: EnvironmentVariableType) => {
-    let defaultInitialValue: string | number | boolean = "";
-    let defaultCurrentValue: string | number | boolean = "";
+    setFormData((prev) => {
+      let convertedInitialValue = prev.initialValue;
+      let convertedCurrentValue = prev.currentValue;
 
-    switch (newType) {
-      case EnvironmentVariableType.Boolean:
-        defaultInitialValue = false;
-        defaultCurrentValue = false;
-        break;
-      case EnvironmentVariableType.Number:
-        defaultInitialValue = 0;
-        defaultCurrentValue = 0;
-        break;
-      case EnvironmentVariableType.String:
-      case EnvironmentVariableType.Secret:
-      default:
-        defaultInitialValue = "";
-        defaultCurrentValue = "";
-        break;
-    }
+      switch (newType) {
+        case EnvironmentVariableType.Boolean:
+          convertedInitialValue = Boolean(convertedInitialValue ?? true);
+          convertedCurrentValue = Boolean(convertedCurrentValue ?? true);
+          break;
+        case EnvironmentVariableType.Number:
+          convertedInitialValue = isNaN(Number(convertedInitialValue)) ? 0 : Number(convertedInitialValue);
+          convertedCurrentValue = isNaN(Number(convertedCurrentValue)) ? 0 : Number(convertedCurrentValue);
+          break;
+        case EnvironmentVariableType.String:
+        case EnvironmentVariableType.Secret:
+          convertedInitialValue = String(convertedInitialValue ?? "");
+          convertedCurrentValue = String(convertedCurrentValue ?? "");
+          break;
+      }
 
-    setFormData((prev) => ({
-      ...prev,
-      type: newType,
-      initialValue: defaultInitialValue,
-      currentValue: defaultCurrentValue,
-    }));
+      return {
+        ...prev,
+        type: newType,
+        initialValue: convertedInitialValue,
+        currentValue: convertedCurrentValue,
+      };
+    });
   }, []);
 
   const handleSave = async () => {
@@ -177,8 +165,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
 
       await onSave(variableData);
     } catch (error) {
-      // Error is already handled in hooks
-      console.error(`Error ${mode === "edit" ? "updating" : "creating"} variable:`, error);
+      captureException(error);
     }
   };
 

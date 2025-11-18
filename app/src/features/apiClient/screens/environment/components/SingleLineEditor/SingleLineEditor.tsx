@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
@@ -10,6 +10,7 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -40,6 +41,18 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false); // Track if popover should stay open
+
+  // Subscribe to active tab changes to close popover when tab switches
+  const activeTabId = useTabServiceWithSelector((state) => state.activeTabId);
+
+  // Close popover when tab changes
+  useEffect(() => {
+    if (hoveredVariable || isPopoverPinned) {
+      setHoveredVariable(null);
+      setIsPopoverPinned(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTabId]);
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -164,17 +177,17 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     // Don't close popover if it's pinned (e.g., in create form view)
     if (!isPopoverPinned) {
       setHoveredVariable(null);
     }
-  };
+  }, [isPopoverPinned]);
 
-  const handleClosePopover = () => {
+  const handleClosePopover = useCallback(() => {
     setHoveredVariable(null);
     setIsPopoverPinned(false);
-  };
+  }, []);
 
   return (
     <div
