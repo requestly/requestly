@@ -5,9 +5,11 @@ import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/typ
 import {
   filterHeadersToImport,
   generateKeyValuePairs,
+  generateMultipartFormKeyValuePairs,
   getContentTypeFromRequestHeaders,
   getEmptyApiEntry,
   parseCurlRequest,
+  parseMultipartFormDataString,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
@@ -79,6 +81,16 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       if (entry.request.contentType === RequestContentType.FORM) {
         const searchParams = new URLSearchParams(request.body);
         entry.request.body = generateKeyValuePairs(Object.fromEntries(searchParams));
+      } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
+        const parsedParts = parseMultipartFormDataString(request.body);
+        const multipartData = parsedParts.map(({ key, value, isFile, fileName }) => ({
+          key,
+          //The @ prefix is not a standard multipart form-data thing.
+          // It's a cURL convention used to indicate file uploads in command-line cURL requests.
+          // Using it here to maintain consistency with cURL import/export and to reuse the same util
+          value: isFile && fileName ? `@${fileName}` : value,
+        }));
+        entry.request.body = generateMultipartFormKeyValuePairs(multipartData);
       }
     } else if (request.body instanceof FormData) {
       if (entry.request.contentType !== RequestContentType.FORM) {
