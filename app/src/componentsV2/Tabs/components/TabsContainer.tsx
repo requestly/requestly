@@ -5,7 +5,7 @@ import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
@@ -189,6 +189,11 @@ export const TabsContainer: React.FC = () => {
             openTab(new DraftRequestContainerTabSource());
           }
         }}
+        addIcon={
+          <RQTooltip title="New request">
+            <span>+</span>
+          </RQTooltip>
+        }
       />
     </div>
   );

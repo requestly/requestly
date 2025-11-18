@@ -5,6 +5,7 @@ import { Input, Skeleton, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import { useRBAC } from "features/rbac";
 import "./RQBreadcrumb.scss";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 interface Props {
   loading?: boolean;
@@ -138,7 +139,11 @@ export const RQBreadcrumb: React.FC<Props> = ({
                       {name || placeholder}
                     </Typography.Text>
                     {disabled || !isValidPermission ? null : (
-                      <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                      <RQTooltip title="Edit">
+                        <span>
+                          <MdOutlineEdit className="edit-icon" onClick={handleRecordNameEditClick} />
+                        </span>
+                      </RQTooltip>
                     )}
                   </div>
                 )

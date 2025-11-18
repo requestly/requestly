@@ -29,6 +29,7 @@ import { useApiClientRepository } from "features/apiClient/contexts/meta";
 import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClientContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { isGraphQLApiRecord, isHttpApiRecord } from "features/apiClient/screens/apiClient/utils";
+import { RQTooltip } from "lib/design-system-v2/components";
 
 interface Props {
   record: RQAPI.ApiRecord;
@@ -271,15 +272,17 @@ export const RequestRow: React.FC<Props> = ({ record, isReadOnly, bulkActionOpti
                   open={isDropdownVisible}
                   onOpenChange={handleDropdownVisibleChange}
                 >
-                  <RQButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSelection(false);
-                    }}
-                    size="small"
-                    type="transparent"
-                    icon={<MdOutlineMoreHoriz />}
-                  />
+                  <RQTooltip title="More actions">
+                    <RQButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSelection(false);
+                      }}
+                      size="small"
+                      type="transparent"
+                      icon={<MdOutlineMoreHoriz />}
+                    />
+                  </RQTooltip>
                 </Dropdown>
               </div>
             </Conditional>

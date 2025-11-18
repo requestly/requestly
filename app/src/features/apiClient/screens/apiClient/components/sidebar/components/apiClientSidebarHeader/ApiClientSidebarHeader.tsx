@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, MenuProps } from "antd";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { ClearOutlined, CodeOutlined } from "@ant-design/icons";
 import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 import { EnvironmentSwitcher } from "./components/environmentSwitcher/EnvironmentSwitcher";
@@ -161,9 +161,11 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
                   onNewClick(params.recordType, params.entryType);
                 }}
               >
-                <RQButton type="transparent" size="small" icon={<MdAdd />}>
-                  New
-                </RQButton>
+                <RQTooltip title="New request or collection">
+                  <RQButton type="transparent" size="small" icon={<MdAdd />}>
+                    New
+                  </RQButton>
+                </RQTooltip>
               </NewApiRecordDropdown>
               <Dropdown
                 menu={{ items: importItems }}
