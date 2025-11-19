@@ -27,11 +27,42 @@ import { getFileContents } from "components/mode-specific/desktop/DesktopFilePic
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
 
+//FIX: Utilities use the body object, which requires a change now
+
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
     return new UserAbortError();
   }
   return new Error("Request aborted");
+};
+
+/**
+ * Extracts the actual body from the bodyContainer based on the contentType
+ */
+export const extractBodyFromContainer = (
+  bodyContainer: RQAPI.RequestBodyContainer,
+  contentType: RequestContentType
+): RQAPI.RequestBody => {
+  if (!bodyContainer) {
+    if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
+      return [];
+    }
+    return "";
+  }
+  switch (contentType) {
+    case RequestContentType.FORM:
+      return bodyContainer.form ?? [];
+    case RequestContentType.MULTIPART_FORM:
+      return bodyContainer.multipartForm ?? [];
+    case RequestContentType.JSON:
+    case RequestContentType.RAW:
+    case RequestContentType.HTML:
+    case RequestContentType.JAVASCRIPT:
+    case RequestContentType.XML:
+      return bodyContainer.text ?? "";
+    default:
+      return bodyContainer.text ?? "";
+  }
 };
 
 type ResponseOrError = RQAPI.HttpResponse | { error: string };
@@ -56,8 +87,17 @@ export const makeRequest = async (
     //TODO: make the default value false if and when the feature flag is turned on
     request.includeCredentials = request.includeCredentials ?? true; // Always include credentials for API requests
 
+    //remove bodyContainer from API request
+    const { bodyContainer, ...requestWithoutBodyContainer } = request;
+
+    //extraction of body happens here
+    const requestWithBody = {
+      ...requestWithoutBodyContainer,
+      body: extractBodyFromContainer(bodyContainer, request.contentType),
+    };
+
     if (appMode === CONSTANTS.APP_MODES.EXTENSION) {
-      getAPIResponseViaExtension(request)
+      getAPIResponseViaExtension(requestWithBody as any)
         .then((result: ResponseOrError) => {
           if (!result) {
             //Backward compatibility check
@@ -72,7 +112,7 @@ export const makeRequest = async (
           signal?.removeEventListener("abort", abortListener);
         });
     } else if (appMode === CONSTANTS.APP_MODES.DESKTOP) {
-      getAPIResponseViaProxy(request)
+      getAPIResponseViaProxy(requestWithBody as any)
         .then((result: ResponseOrError) => {
           if (!result) {
             //Backward compatibility check
@@ -110,7 +150,7 @@ export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry =
       method: RequestMethod.GET,
       headers: [],
       queryParams: [],
-      body: null,
+      bodyContainer: {},
       contentType: RequestContentType.RAW,
       ...(request || {}),
     },
@@ -189,17 +229,17 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = tr
     },
   };
 
-  if (entry.request.body != null) {
+  if (entry.request.bodyContainer != null) {
     if (!supportsRequestBody(entry.request.method)) {
-      sanitizedEntry.request.body = null;
+      sanitizedEntry.request.bodyContainer = null;
     } else if (entry.request.contentType === RequestContentType.FORM) {
-      sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        entry.request.body as RQAPI.RequestFormBody,
+      sanitizedEntry.request.bodyContainer.form = sanitizeKeyValuePairs(
+        entry.request.bodyContainer.form as RQAPI.RequestFormBody,
         removeInvalidPairs
       );
     } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
-      sanitizedEntry.request.body = sanitizeKeyValuePairs(
-        entry.request.body as RQAPI.MultipartFormBody,
+      sanitizedEntry.request.bodyContainer.multipartForm = sanitizeKeyValuePairs(
+        entry.request.bodyContainer.multipartForm as RQAPI.MultipartFormBody,
         removeInvalidPairs
       );
     }
@@ -333,13 +373,13 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     contentType = RequestContentType.MULTIPART_FORM;
   }
 
-  let body: RQAPI.RequestBody;
+  let newbodyContainer: RQAPI.RequestBodyContainer = {};
   switch (contentType) {
     case RequestContentType.JSON:
-      body = JSON.stringify(requestJson.data);
+      newbodyContainer.text = JSON.stringify(requestJson.data);
       break;
     case RequestContentType.FORM:
-      body = generateKeyValuePairs(requestJson.data);
+      newbodyContainer.form = generateKeyValuePairs(requestJson.data);
       break;
     case RequestContentType.MULTIPART_FORM: {
       const multipartData: { key: string; value: string }[] = [];
@@ -354,11 +394,12 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
           multipartData.push({ key, value: `@${filePath}` });
         }
       }
-      body = generateMultipartFormKeyValuePairs(multipartData);
+      newbodyContainer.multipartForm = generateMultipartFormKeyValuePairs(multipartData);
       break;
     }
     default:
-      body = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
+      //FIX: check this once
+      newbodyContainer.text = requestJson.data ?? null; // Body can be undefined which throws an error while saving the request in firestore
       break;
   }
 
@@ -371,8 +412,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     queryParams: queryParamsFromJson.length ? queryParamsFromJson : paramsFromUrl,
     headers,
     contentType,
-    body: body ?? null,
-    bodyContainer: createBodyContainer({ contentType, body }),
+    bodyContainer: newbodyContainer,
   };
 
   return request;
@@ -649,20 +689,29 @@ export const apiRequestToHarRequestAdapter = (apiRequest: RQAPI.HttpRequest): Ha
   };
 
   if (supportsRequestBody(apiRequest.method)) {
+    const bodyContainer = apiRequest.bodyContainer || {};
     if (apiRequest?.contentType === RequestContentType.RAW) {
       harRequest.postData = {
         mimeType: RequestContentType.RAW,
-        text: apiRequest.body as string,
+        text: bodyContainer.text as string,
       };
     } else if (apiRequest?.contentType === RequestContentType.JSON) {
       harRequest.postData = {
         mimeType: RequestContentType.JSON,
-        text: apiRequest.body as string,
+        text: bodyContainer.text as string,
       };
     } else if (apiRequest?.contentType === RequestContentType.FORM) {
       harRequest.postData = {
         mimeType: RequestContentType.FORM,
-        params: (apiRequest.body as KeyValuePair[]).map(({ key, value }) => ({ name: key, value })),
+        params: ((bodyContainer.form as KeyValuePair[]) || []).map(({ key, value }) => ({ name: key, value })),
+      };
+    } else if (apiRequest?.contentType === RequestContentType.MULTIPART_FORM) {
+      harRequest.postData = {
+        mimeType: RequestContentType.MULTIPART_FORM,
+        params: ((bodyContainer.multipartForm as RQAPI.FormDataKeyValuePair[]) || []).map(({ key, value }) => ({
+          name: key,
+          value,
+        })),
       };
     }
   }
@@ -840,6 +889,8 @@ export const truncateString = (str: string, maxLength: number) => {
   }
 };
 
+//this is generic for all types of body, but should be specific to multipart form body only
+//since that is the only function that accepts files
 export const checkForLargeFiles = (body: RQAPI.RequestBody): boolean => {
   if (Array.isArray(body)) {
     return body.some((item: any) => {
@@ -910,18 +961,6 @@ export const createBodyContainer = (params: {
     case RequestContentType.RAW:
       return {
         text: body as RQAPI.RequestRawBody,
-      };
-    case RequestContentType.HTML:
-      return {
-        text: body as RQAPI.RequestHtmlBody,
-      };
-    case RequestContentType.JAVASCRIPT:
-      return {
-        text: body as RQAPI.RequestJavascriptBody,
-      };
-    case RequestContentType.XML:
-      return {
-        text: body as RQAPI.RequestXmlBody,
       };
     default:
       return {

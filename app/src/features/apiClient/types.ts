@@ -148,7 +148,6 @@ export namespace RQAPI {
     pathVariables?: PathVariable[];
     method: RequestMethod;
     headers: KeyValuePair[];
-    body?: RequestBody;
     bodyContainer?: RequestBodyContainer;
     contentType?: RequestContentType;
     includeCredentials?: boolean;

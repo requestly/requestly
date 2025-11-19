@@ -293,7 +293,7 @@ const HttpClientView: React.FC<Props> = ({
       };
 
       if (!supportsRequestBody(method)) {
-        newEntry.request.body = null;
+        newEntry.request.bodyContainer = {};
         newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
         newEntry.request.contentType = RequestContentType.RAW;
       }
@@ -308,20 +308,13 @@ const HttpClientView: React.FC<Props> = ({
   const setContentType = useCallback(
     (contentType: RequestContentType) => {
       setEntry((entry) => {
-        let newBody: RQAPI.RequestBody;
-
-        if (contentType === RequestContentType.FORM || contentType === RequestContentType.MULTIPART_FORM) {
-          newBody =
-            entry.request.bodyContainer?.[contentType === RequestContentType.FORM ? "form" : "multipartForm"] ?? [];
-        } else {
-          newBody = entry.request.bodyContainer?.["text"] ?? "";
-        }
+        //which body I have to send according to content type is now resonsibility of getApirequestextension here
+        //that will extract body from container based on content type
 
         const newEntry: RQAPI.HttpApiEntry = {
           ...entry,
           request: {
             ...entry.request,
-            body: newBody,
             contentType,
           },
         };
@@ -432,7 +425,9 @@ const HttpClientView: React.FC<Props> = ({
     setIsRequestCancelled(false);
     setIsLongRequest(false);
 
-    const hasLargeFiles = checkForLargeFiles(entry.request.body);
+    //recheck is this correctly written
+    //large files check was for multipartform specially
+    const hasLargeFiles = checkForLargeFiles(entry.request.bodyContainer?.multipartForm ?? []);
 
     const longRequestTimer = setTimeout(() => {
       if (hasLargeFiles) {

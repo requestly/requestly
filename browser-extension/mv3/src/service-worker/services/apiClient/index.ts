@@ -11,10 +11,14 @@ enum RequestMethod {
   OPTIONS = "OPTIONS",
 }
 
-enum RequestContentType {
+export enum RequestContentType {
   RAW = "text/plain",
   JSON = "application/json",
   FORM = "application/x-www-form-urlencoded",
+  MULTIPART_FORM = "multipart/form-data",
+  HTML = "text/html",
+  XML = "application/xml",
+  JAVASCRIPT = "application/javascript",
 }
 
 interface KeyValuePair {
@@ -22,8 +26,19 @@ interface KeyValuePair {
   key: string;
   value: string;
 }
+export type MultipartFileValue = {
+  id: string; // file id for each multipart key value pair
+  name: string;
+  path: string;
+  size: number;
+  source: "extension" | "desktop";
+};
 
-type RequestBody = string | KeyValuePair[]; // in case of form data, body will be key-value pairs
+export type FormDataKeyValuePair = KeyValuePair & {
+  value: string | MultipartFileValue[];
+};
+
+type RequestBody = string | KeyValuePair[] | FormDataKeyValuePair[]; // in case of form data, body will be key-value pairs
 
 interface Request {
   url: string;
@@ -61,6 +76,7 @@ export async function getAPIResponse(apiRequest: Request): Promise<Response | { 
   const method = apiRequest.method || "GET";
   const headers = new Headers();
   const body = apiRequest.body;
+
   let url = apiRequest.url;
   let finalRequestBody: any = body;
 
