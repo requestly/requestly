@@ -8,24 +8,52 @@ import { RQ } from "../RQmethods";
 import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
 import { InitialState, LocalScope } from "../../../../../../../../modules/localScope";
 import { TestResult } from "../types";
+import { globals, getGlobalScript } from "./globals";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
   private testResults: TestResult[] = [];
 
-  async executeScript(script: string, initialState: InitialState, callback: ScriptWorkloadCallback) {
-    this.localScope = new LocalScope(initialState);
+  private getGlobals() {
+    const rq = new RQ(this.localScope, this.testResults);
+    const responseCode = {
+      code: rq.response?.code,
+    };
+    const responseBody = rq.response?.body;
+    const globalObject = {
+      ...globals,
+      rq,
+      responseCode,
+      responseBody,
+    };
 
+    const globalScript = getGlobalScript(globalObject);
+
+    return {
+      globalObject,
+      globalScript,
+    };
+  }
+
+  async executeScript(userScript: string, initialState: InitialState, callback: ScriptWorkloadCallback) {
+    this.localScope = new LocalScope(initialState);
+    const { globalObject, globalScript } = this.getGlobals();
     // eslint-disable-next-line no-new-func
     const scriptFunction = new Function(
-      "rq",
+      "globals",
       `
       "use strict";
-      ${script}
+      ${globalScript}
+      try {
+        ${userScript}
+      } catch (error) {
+        console.error(\`\${error.name}: \${error.message}\`);
+        throw error;
+      }
       `
-    );
+    ) as (globals: Record<string, any>) => void;
     try {
-      scriptFunction(new RQ(this.localScope, this.testResults));
+      scriptFunction(globalObject);
     } catch (error) {
       throw new ScriptExecutionError(error);
     }
