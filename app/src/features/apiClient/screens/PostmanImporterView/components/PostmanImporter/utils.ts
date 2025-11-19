@@ -237,7 +237,7 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
     case PostmanBodyMode.RAW:
       return processRawRequestBody(raw, options);
     case PostmanBodyMode.FORMDATA:
-      return { ...processFormDataBody(formdata) };
+      return processFormDataBody(formdata);
     case PostmanBodyMode.URL_ENCODED:
       return processUrlEncodedBody(urlencoded);
     case PostmanBodyMode.GRAPHQL:
@@ -280,7 +280,6 @@ const createApiRecord = (
 
   const { requestBody, contentType } = processRequestBody(request);
   const { headers } = processRequestHeaders(request);
-  console.log("header", headers);
 
   return {
     id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
@@ -376,7 +375,6 @@ export const processPostmanCollectionData = (
       } else if (item.request) {
         // This is an API endpoint
         const data = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
-        console.log("pdata", data);
         result.apis.push(data);
       }
     });
