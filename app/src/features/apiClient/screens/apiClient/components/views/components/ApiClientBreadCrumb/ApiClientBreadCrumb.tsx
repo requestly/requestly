@@ -46,7 +46,7 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
 
   const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
 
-  const localWsPath = currentWorkspace.getState().rawWorkspace.rootPath;
+  const localWsPath = currentWorkspace?.getState()?.rawWorkspace?.rootPath ?? "";
   const truncatePath = truncateString(localWsPath, 40);
 
   const parentCollectionNames = useMemo(() => {
@@ -57,7 +57,7 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
       .reverse()
       .map((id) => {
         return {
-          label: getData(id).name,
+          label: getData(id)?.name,
           pathname: "",
           isEditable: false,
         };
@@ -76,14 +76,16 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
       defaultBreadcrumbs={[
         {
           label: (
-            <div>
-              <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
-                <span className="api-client-local-workspace-path-breadcrumb">
-                  <LuFolderCog className="api-client-local-workspace-icon" />
-                  {truncatePath}
-                </span>
-              </Tooltip>
-            </div>
+            <Conditional condition={!!truncatePath}>
+              <div>
+                <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
+                  <span className="api-client-local-workspace-path-breadcrumb">
+                    <LuFolderCog className="api-client-local-workspace-icon" />
+                    {truncatePath}
+                  </span>
+                </Tooltip>
+              </div>
+            </Conditional>
           ),
           pathname: PATHS.API_CLIENT.INDEX,
           isEditable: false,
