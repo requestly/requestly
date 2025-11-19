@@ -64,7 +64,7 @@
     "@devtools-ds/table": "^1.2.1",
     "@devtools-ds/themes": "^1.2.1",
     "@requestly/analytics-vendors": "file:../../common/analytics-vendors/dist",
-    "@uiw/codemirror-theme-vscode": "^4.23.0",
+    "@uiw/codemirror-theme-vscode": "^4.23.8",
     "@uiw/react-codemirror": "^4.23.0",
     "antd": "^5.0.4",
     "lodash": "^4.17.21",
