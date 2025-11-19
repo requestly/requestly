@@ -96,41 +96,24 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({
   }, [defaultScope, mode]);
 
   const validate = (): boolean => {
-    const hasInitialValue =
-      formData.type === EnvironmentVariableType.Boolean
-        ? formData.initialValue !== undefined && formData.initialValue !== null && formData.initialValue !== ""
-        : formData.initialValue !== "" && formData.initialValue !== undefined;
-
-    const hasCurrentValue =
-      formData.type === EnvironmentVariableType.Boolean
-        ? formData.currentValue !== undefined && formData.currentValue !== null && formData.currentValue !== ""
-        : formData.currentValue !== "" && formData.currentValue !== undefined;
-
-    if (!hasInitialValue && !hasCurrentValue) {
-      setValidationError("Please provide at least one value (Initial or Current)");
-      return false;
-    }
-
-    // Type-specific validation
     if (formData.type === EnvironmentVariableType.Number) {
-      // Explicitly reject empty or whitespace-only strings before converting to Number
-      if (hasInitialValue && String(formData.initialValue).trim() === "") {
-        setValidationError("Please provide valid number values");
-        return false;
+      const initialValueProvided = formData.initialValue !== "" && formData.initialValue !== undefined;
+      const currentValueProvided = formData.currentValue !== "" && formData.currentValue !== undefined;
+
+      if (initialValueProvided) {
+        const initialNum = Number(formData.initialValue);
+        if (isNaN(initialNum)) {
+          setValidationError("Initial value must be a valid number");
+          return false;
+        }
       }
 
-      if (hasCurrentValue && String(formData.currentValue).trim() === "") {
-        setValidationError("Please provide valid number values");
-        return false;
-      }
-
-      // Only after non-empty checks, convert to Number and check for NaN
-      const initialNum = Number(formData.initialValue);
-      const currentNum = Number(formData.currentValue);
-
-      if ((hasInitialValue && isNaN(initialNum)) || (hasCurrentValue && isNaN(currentNum))) {
-        setValidationError("Please provide valid number values");
-        return false;
+      if (currentValueProvided) {
+        const currentNum = Number(formData.currentValue);
+        if (isNaN(currentNum)) {
+          setValidationError("Current value must be a valid number");
+          return false;
+        }
       }
     }
 
