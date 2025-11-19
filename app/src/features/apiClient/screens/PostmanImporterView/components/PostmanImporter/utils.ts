@@ -194,8 +194,8 @@ const addImplicitContentTypeHeader = (headers: KeyValuePair[], contentType: Requ
 };
 
 const processRawRequestBody = (raw: string, options: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
-  const contentType = getContentTypeForRawBody(options?.raw.language);
-  const updatedHeaders = raw.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
+  const contentType = getContentTypeForRawBody(options?.raw?.language);
+  const updatedHeaders = raw?.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
 
   return {
     requestBody: raw,

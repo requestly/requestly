@@ -17,6 +17,10 @@ export const isEnvBeta = () => {
   return isReactEnv(REACT_ENV.DEV);
 };
 
+export const isEnvDev = () => {
+  return process.env.NODE_ENV === "development";
+};
+
 export const isEnvDevWithBeta = () => {
   return process.env.NODE_ENV === "development" && !isEnvEmulator();
 };
