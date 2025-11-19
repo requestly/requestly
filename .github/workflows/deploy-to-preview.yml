@@ -1,0 +1,20 @@
+name: Deploy Preview
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  deploy:
+    if: |
+      github.event.issue.pull_request &&
+      github.event.comment.body == '@github-actions deploy-preview'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Preview Deployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REQUESTLY_CLOUD_TOKEN }}
+          repository: requestly/requestly-cloud
+          event-type: deploy-preview
+          client-payload: '{"pr_number": "${{ github.event.issue.number }}"}'

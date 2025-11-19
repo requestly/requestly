@@ -18,7 +18,7 @@ import { Ok, Result, Try } from "utils/try";
 import { NativeError } from "errors/NativeError";
 import { WorkResult, WorkResultType } from "../modules/scriptsV2/workloadManager/workLoadTypes";
 import { BaseSnapshot } from "./snapshotTypes";
-import { ScriptExecutionContext } from "./scriptExecutionContext";
+import { ScriptExecutionContext, ExecutionContext } from "./scriptExecutionContext";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 
@@ -147,10 +147,11 @@ export class HttpRequestExecutor {
   async prepareRequestWithValidation(
     recordId: string,
     entry: RQAPI.HttpApiEntry,
-    scopes?: Scope[]
+    scopes?: Scope[],
+    executionContext?: ExecutionContext
   ): Promise<Result<PreparedRequest>> {
     const preparationResult = Try(() => {
-      const result = this.requestPreparer.prepareRequest(recordId, entry, scopes);
+      const result = this.requestPreparer.prepareRequest(recordId, entry, scopes, executionContext);
       result.preparedEntry.response = null; // cannot do this in preparation as it would break other features. Preparation is also used in curl export, rerun etc.
       return result;
     });
@@ -180,13 +181,14 @@ export class HttpRequestExecutor {
     recordId: string,
     entry: RQAPI.HttpApiEntry,
     abortController?: AbortController,
-    scopes?: Scope[]
+    scopes?: Scope[],
+    executionContext?: ExecutionContext
   ): Promise<RQAPI.ExecutionResult> {
     this.abortController = abortController || new AbortController();
 
-    const preparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
-      (error) => new ExecutionError(entry, error)
-    );
+    const preparationResult = (
+      await this.prepareRequestWithValidation(recordId, entry, scopes, executionContext)
+    ).mapError((error) => new ExecutionError(entry, error));
 
     if (preparationResult.isError()) {
       return preparationResult.unwrapError().result;
@@ -194,8 +196,8 @@ export class HttpRequestExecutor {
 
     let { preparedEntry, renderedVariables } = preparationResult.unwrap();
 
-    const executionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry);
-    const scriptExecutor = new HttpRequestScriptExecutionService(executionContext, this.workloadManager);
+    const scriptExecutionContext = new ScriptExecutionContext(this.ctx, recordId, preparedEntry, executionContext);
+    const scriptExecutor = new HttpRequestScriptExecutionService(scriptExecutionContext, this.workloadManager);
 
     let preRequestScriptResult: WorkResult | undefined;
     let responseScriptResult: WorkResult | undefined;
@@ -206,9 +208,9 @@ export class HttpRequestExecutor {
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.PRE_REQUEST);
       preRequestScriptResult = await scriptExecutor.executePreRequestScript(preparedEntry, this.abortController, () => {
-        const isSnapshotMutated = executionContext.getIsMutated();
+        const isSnapshotMutated = scriptExecutionContext.getIsMutated();
         if (isSnapshotMutated) {
-          this.postScriptExecutionCallback(executionContext.getContext());
+          this.postScriptExecutionCallback(scriptExecutionContext.getContext());
         }
       });
 
@@ -228,9 +230,14 @@ export class HttpRequestExecutor {
       }
 
       // Re-prepare the request as pre-request script might have modified it.
-      const rePreparationResult = (await this.prepareRequestWithValidation(recordId, entry, scopes)).mapError(
-        (error) => new ExecutionError(entry, error)
-      );
+      const rePreparationResult = (
+        await this.prepareRequestWithValidation(
+          recordId,
+          entry,
+          scopes,
+          scriptExecutionContext.getContext() // Pass execution context to use runtime-modified variables
+        )
+      ).mapError((error) => new ExecutionError(entry, error));
 
       if (rePreparationResult.isError()) {
         return rePreparationResult.unwrapError().result;
@@ -239,11 +246,13 @@ export class HttpRequestExecutor {
       const rePreparation = rePreparationResult.unwrap();
       preparedEntry = rePreparation.preparedEntry;
       renderedVariables = rePreparation.renderedVariables;
+      scriptExecutionContext.setRequest(preparedEntry.request);
     }
 
     try {
       const response = await makeRequest(this.appMode, preparedEntry.request, this.abortController.signal);
       preparedEntry.response = response;
+      scriptExecutionContext.setResponse(response);
       const rqErrorHeader = response?.headers?.find((header) => header.key === "x-rq-error");
 
       if (rqErrorHeader) {
@@ -271,13 +280,12 @@ export class HttpRequestExecutor {
     ) {
       trackScriptExecutionStarted(RQAPI.ScriptType.POST_RESPONSE);
 
-      executionContext.setResponse(preparedEntry.response);
-      executionContext.resetIsMutated();
+      scriptExecutionContext.resetIsMutated();
 
       responseScriptResult = await scriptExecutor.executePostResponseScript(preparedEntry, this.abortController, () => {
-        const isSnapshotMutated = executionContext.getIsMutated();
+        const isSnapshotMutated = scriptExecutionContext.getIsMutated();
         if (isSnapshotMutated) {
-          this.postScriptExecutionCallback(executionContext.getContext());
+          this.postScriptExecutionCallback(scriptExecutionContext.getContext());
         }
       });
 
