@@ -40,6 +40,23 @@
           margin-bottom: 1px;
         }
       }
+      position: relative;
+
+      // Add shadow effect when more icon is visible (indicating overflow)
+      &:has(.ant-tabs-nav-more) {
+        &::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 56px;
+          bottom: 0;
+          width: 42px;
+          background: linear-gradient(270deg, #1a1a1a 0%, rgba(26, 26, 26, 0) 100%);
+          pointer-events: none;
+          z-index: 1;
+          margin-bottom: 1px;
+        }
+      }
 
       .ant-tabs-nav-wrap {
         height: 32px;
@@ -51,6 +68,7 @@
         .ant-tabs-nav-list {
           display: flex;
           align-items: center;
+          gap: 3px;
           gap: 3px;
 
           .ant-tabs-nav-add {
@@ -77,7 +95,11 @@
         .ant-tabs-tab {
           padding: 0 4px;
           width: auto;
+          width: auto;
           max-width: 144px;
+          border-radius: 4px;
+          background: rgba(255, 255, 255, 0.04);
+          height: 24px;
           border-radius: 4px;
           background: rgba(255, 255, 255, 0.04);
           height: 24px;
@@ -93,12 +115,14 @@
 
           &:hover {
             border-radius: 4px;
-            border: 1px solid var(--alias-tokens-color-white-t-10, rgba(255, 255, 255, 0.06));
-            background: var(--alias-tokens-color-white-t-10, rgba(255, 255, 255, 0.06));
+            border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+            background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
             .tab-close-button {
               display: flex;
               border-radius: 4px;
-              background: var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
+              &:hover {
+                background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+              }
             }
 
             .unsaved-changes-indicator {
@@ -114,8 +138,12 @@
 
         .ant-tabs-tab-active {
           border-radius: 4px;
-          border: 1px solid var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
-          background-color: var(--alias-tokens-color-white-t-20, rgba(255, 255, 255, 0.12));
+          border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          background-color: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+
+          &:hover {
+            background-color: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
 
           .tab-title {
             .icon,
@@ -130,10 +158,28 @@
         display: flex;
         height: 24px;
         margin-top: 2px;
-        gap: var(--space-4, 8px);
+        gap: var(--requestly-space-4, 8px);
         width: 60px;
         .ant-tabs-nav-more {
           cursor: pointer;
+          width: 24px;
+          height: 24px;
+          border-radius: 4px;
+          padding: 0;
+          border: none;
+          background-color: transparent;
+          color: var(--requestly-color-text-default);
+          order: 2; // Move more icon to the left
+
+          &:hover {
+            background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
+
+          svg {
+            width: 10px;
+            height: 14px;
+            margin-top: 5px;
+          }
           width: 24px;
           height: 24px;
           border-radius: 4px;
@@ -156,12 +202,15 @@
 
         .ant-tabs-nav-add {
           width: 24px;
+          width: 24px;
           min-width: 24px;
+          border-radius: 4px;
           border-radius: 4px;
           padding: 0;
           border: none;
           background-color: transparent;
           color: var(--requestly-color-text-default);
+          order: 1; // Move add icon to the right
           order: 1; // Move add icon to the right
 
           &:hover {
@@ -193,6 +242,12 @@
       }
     }
 
+    &:hover {
+      .tab-actions {
+        display: flex;
+      }
+    }
+
     .tab-title {
       user-select: none;
       display: flex;
@@ -202,6 +257,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      flex: 1;
+      min-width: 0;
       flex: 1;
       min-width: 0;
 
@@ -216,10 +273,12 @@
 
       .title {
         text-align: left;
+        text-align: left;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 8px 0;
+        padding-right: 26px;
         padding-right: 26px;
         color: var(--requestly-color-text-subtle, #bbb);
         font-size: var(--requestly-font-size-xs, 11px);
@@ -228,16 +287,33 @@
         line-height: var(--requestly-font-line-height-xs, 15px);
         flex: 1;
         min-width: 0;
+        flex: 1;
+        min-width: 0;
       }
     }
 
     .tab-actions {
       flex-shrink: 0;
       display: none;
+      display: none;
       align-items: center;
       justify-content: center;
       position: absolute;
       right: 0;
+
+      .tab-close-button {
+        height: 16px;
+        width: 16px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          width: 10px;
+          height: 14px;
+        }
+      }
 
       .tab-close-button {
         height: 16px;
@@ -277,7 +353,7 @@
   .ant-tabs-dropdown-menu {
     width: 280px;
     max-height: 480px;
-    background-color: var(--alias-tokens-color-surface-1, #282828);
+    background-color: var(--requestly-space-4-color-surface-1, #282828);
     border-radius: 4px;
 
     .ant-tabs-dropdown-menu-item {
