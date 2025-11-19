@@ -339,7 +339,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     if (httpString) {
       const match = httpString.match(/content-type:\s*([^\r\n]+)/i); // stops matching at line break
       if (match) {
-        const httpContentType = match[1].trim();
+        const httpContentType = match[1].trim().toLowerCase();
 
         if (httpContentType.includes("multipart/form-data")) {
           contentType = RequestContentType.MULTIPART_FORM;
