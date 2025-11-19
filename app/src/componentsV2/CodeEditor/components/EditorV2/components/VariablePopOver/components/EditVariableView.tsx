@@ -78,8 +78,13 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
 
       const result = await upsertVariable(variableData, "update");
 
+      if (!result.success) {
+        toast.error("Failed to update variable");
+        return;
+      }
+
       // Show success toast
-      toast.success(`Variable "${variableName}" updated in ${result.scopeName || existingVariable.scopeName}`);
+      toast.success(`Variable updated in ${result.scopeName || existingVariable.scopeName}`);
 
       await onSave(variableData);
     } catch (error) {
