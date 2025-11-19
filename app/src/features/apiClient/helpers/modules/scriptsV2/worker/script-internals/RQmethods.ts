@@ -7,6 +7,7 @@ import { Options as AjvOptions } from "ajv";
 import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
 import { status } from "http-status";
+import { ScriptLogger } from "./scriptExecutionWorker/ScriptLogger";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -15,7 +16,7 @@ const createInfiniteChainable = (methodName: string) => {
   const handler = {
     get: () => {
       if (!hasLogged) {
-        console.log(`Using unsupported method: ${methodName}`);
+        ScriptLogger.logInfo(`Using unsupported method: ${methodName}`);
         hasLogged = true;
       }
       return new Proxy(() => {}, handler);
@@ -123,7 +124,7 @@ export class RQ implements SandboxAPI {
           };
         },
         json: () => jsonifyObject(originalResponse.body),
-        text: () => this.response.body,
+        text: () => this.response?.body,
         to: {
           be: this.createBeAssertions(true),
           have: this.createHaveAssertions(true),

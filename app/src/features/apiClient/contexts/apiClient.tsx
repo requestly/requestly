@@ -183,6 +183,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 id: result.data.id,
                 apiEntryDetails: result.data as RQAPI.ApiRecord,
                 title: result.data.name,
+                isNewTab: true,
                 context: {
                   id: context.id,
                 },
@@ -232,7 +233,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
         case RQAPI.RecordType.ENVIRONMENT: {
           setIsRecordBeingCreated(recordType);
-          trackNewEnvironmentClicked();
+          trackNewEnvironmentClicked("api_client_sidebar_header");
           return _createEnvironment(context, { newEnvironmentName: "New Environment" })
             .then((newEnvironment: { id: string; name: string }) => {
               setIsRecordBeingCreated(null);
@@ -240,7 +241,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                 new EnvironmentViewTabSource({
                   id: newEnvironment.id,
                   title: newEnvironment.name,
-                  focusBreadcrumb: true,
+                  isNewTab: true,
                   context: {
                     id: context.id,
                   },
