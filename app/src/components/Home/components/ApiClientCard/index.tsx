@@ -21,6 +21,8 @@ import { trackHomeApisActionClicked } from "components/Home/analytics";
 import { RoleBasedComponent, useRBAC } from "features/rbac";
 import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
+import { SiOpenapiinitiative } from "@react-icons/all-files/si/SiOpenapiinitiative";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./apiClientCard.scss";
 
 interface CardOptions {
@@ -36,6 +38,7 @@ const ApiClientCard = () => {
   const [cardOptions] = useState<CardOptions>(!isEmpty(tabs) ? getOptions(tabs) : null);
   const { validatePermission } = useRBAC();
   const { isValidPermission } = validatePermission("api_client_request", "create");
+  const isOpenApiSupportEnabled = useFeatureIsOn("openapi-import-support");
 
   const createNewHandler = useCallback(
     (type: CreateType) => {
@@ -98,6 +101,13 @@ const ApiClientCard = () => {
     },
     {
       key: "4",
+      hidden: !isOpenApiSupportEnabled,
+      label: "OpenAPI",
+      icon: <SiOpenapiinitiative />,
+      onClick: () => importTriggerHandler(ApiClientImporterType.OPENAPI),
+    },
+    {
+      key: "5",
       label: "Requestly",
       icon: <img src={"/assets/img/brandLogos/requestly-icon.svg"} alt="Requestly" />,
       onClick: () => importTriggerHandler(ApiClientImporterType.REQUESTLY),
