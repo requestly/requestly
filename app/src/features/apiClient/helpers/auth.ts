@@ -101,7 +101,10 @@ export function extractAuthHeadersAndParams(auth: RQAPI.Auth) {
     case Authorization.Type.BASIC_AUTH: {
       if (!auth.authConfigStore?.[Authorization.Type.BASIC_AUTH]) break; // invalid auth config gets stored as null for now
       const { username = "", password = "" } = auth.authConfigStore[Authorization.Type.BASIC_AUTH];
-      addEntryToResults(resultingHeaders, "Authorization", `Basic ${btoa(`${username}:${password}`)}`);
+      const credentials = `${username}:${password}`;
+      // Use TextEncoder and btoa to handle UTF-8 characters properly
+      const base64Credentials = btoa(String.fromCharCode(...new TextEncoder().encode(credentials)));
+      addEntryToResults(resultingHeaders, "Authorization", `Basic ${base64Credentials}`);
       break;
     }
     case Authorization.Type.BEARER_TOKEN: {
