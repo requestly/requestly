@@ -56,38 +56,10 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
     currentValue: "" as VariableValueType,
   });
 
-  const [validationError, setValidationError] = useState<string | null>(null);
-
   // Update default scope when it changes
   useEffect(() => {
     setFormData((prev) => ({ ...prev, scope: defaultScope }));
   }, [defaultScope]);
-
-  const validate = (): boolean => {
-    if (formData.type === EnvironmentVariableType.Number) {
-      const initialValueProvided = formData.initialValue !== "" && formData.initialValue !== undefined;
-      const currentValueProvided = formData.currentValue !== "" && formData.currentValue !== undefined;
-
-      if (initialValueProvided) {
-        const initialNum = Number(formData.initialValue);
-        if (isNaN(initialNum)) {
-          setValidationError("Initial value must be a valid number");
-          return false;
-        }
-      }
-
-      if (currentValueProvided) {
-        const currentNum = Number(formData.currentValue);
-        if (isNaN(currentNum)) {
-          setValidationError("Current value must be a valid number");
-          return false;
-        }
-      }
-    }
-
-    setValidationError(null);
-    return true;
-  };
 
   const handleTypeChange = useCallback((newType: EnvironmentVariableType) => {
     setFormData((prev) => {
@@ -120,10 +92,6 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
   }, []);
 
   const handleSave = async () => {
-    if (!validate()) {
-      return;
-    }
-
     try {
       const variableData = {
         variableName,
@@ -176,6 +144,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
         case EnvironmentVariableType.Number:
           return (
             <InputNumber
+              type="number"
               size="small"
               placeholder="Enter value"
               value={value}
@@ -188,11 +157,7 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
         case EnvironmentVariableType.Boolean:
           return (
             <div className="form-input boolean-input">
-              <Switch
-                // size="small"
-                checked={Boolean(value)}
-                onChange={(checked) => onChange(checked)}
-              />
+              <Switch checked={Boolean(value)} onChange={(checked) => onChange(checked)} />
             </div>
           );
 
@@ -274,16 +239,13 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
                 key={option.value}
                 value={option.value}
                 disabled={option.disabled}
-                label={renderScopeOption(option)} // ensures icon shows in dropdown and selected display
+                label={renderScopeOption(option)}
               >
                 {renderScopeOption(option)}
               </Select.Option>
             ))}
           </Select>
         </div>
-
-        {/* Validation Error */}
-        {validationError && <div className="form-error">{validationError}</div>}
       </div>
 
       {/* Actions */}
