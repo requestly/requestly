@@ -23,7 +23,6 @@ import {
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { updateRecordSelection } from "./utils";
-import { MultiSelectNudge } from "features/apiClient/components/MultiSelectNudge/MultiSelectNudge";
 
 interface Props {
   searchValue: string;
