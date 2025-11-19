@@ -56,6 +56,8 @@ export const useTabsDropdownSearch = () => {
     // Focus input when dropdown opens
     requestAnimationFrame(() => searchInput.focus());
 
+    const dropdownContainer = dropdownMenu.closest(".tabs-content-more-dropdown");
+
     const focusoutHandler = (e: FocusEvent) => {
       const nextFocused = e.relatedTarget as Node | null;
       if (!nextFocused || !dropdownContainer?.contains(nextFocused)) {
@@ -63,7 +65,6 @@ export const useTabsDropdownSearch = () => {
       }
     };
 
-    const dropdownContainer = dropdownMenu.closest(".tabs-content-more-dropdown");
     if (dropdownContainer) {
       dropdownContainer.addEventListener("focusout", focusoutHandler);
     }
