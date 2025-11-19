@@ -33,6 +33,7 @@ import { DataFileParseError } from "features/apiClient/screens/apiClient/compone
 import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
 import { renderVariables } from "backend/environment/utils";
 import { createDummyVariablesStoreFromPrimitives } from "features/apiClient/store/variables/variables.store";
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -393,6 +394,7 @@ class Runner {
   async run() {
     try {
       await this.beforeStart();
+      const executionContext: ExecutionContext = {} as ExecutionContext; // Empty object that will be filled and shared across iterations
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
@@ -400,7 +402,8 @@ class Runner {
           request.id,
           request.data,
           this.runContext.runResultStore.getState().abortController,
-          scopes
+          scopes,
+          executionContext // Pass the same execution context across all iterations
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
