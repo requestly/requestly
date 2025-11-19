@@ -105,7 +105,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const hbsTemplate = compile(wrappedTemplate);
+    const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
     const renderedTemplate = hbsTemplate(variables) as T; // since handlebars generic types resolve to any; not string
 
     return {

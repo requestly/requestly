@@ -9,7 +9,11 @@ import {
   RunResult,
   RunStatus,
 } from "features/apiClient/store/collectionRunResult/runResult.store";
-import { isHTTPApiEntry, parseCollectionRunnerDataFile } from "features/apiClient/screens/apiClient/utils";
+import {
+  isHTTPApiEntry,
+  parseCollectionRunnerDataFile,
+  parseHttpRequestEntry,
+} from "features/apiClient/screens/apiClient/utils";
 import { NativeError } from "errors/NativeError";
 import { notification } from "antd";
 import { saveRunResult } from "./saveRunResult.command";
@@ -23,11 +27,13 @@ import { CloseTopic } from "componentsV2/Tabs/store/tabStore";
 import { cancelRun } from "./cancelRun.command";
 import { Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { VariableScope } from "backend/environment/types";
-import { createDummyVariablesStore } from "features/apiClient/store/variables/variables.store";
 import { apiClientFileStore } from "features/apiClient/store/apiClientFilesStore";
 import { RunnerFileMissingError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/RunnerFileMissingError/RunnerFileMissingError";
 import { DataFileParseError } from "features/apiClient/screens/apiClient/components/views/components/Collection/components/CollectionRunnerView/components/RunResultView/errors/DataFileParseError/DataFileParseError";
 import { ITERATIONS_MAX_LIMIT } from "features/apiClient/store/collectionRunConfig/runConfig.store";
+import { renderVariables } from "backend/environment/utils";
+import { createDummyVariablesStoreFromPrimitives } from "features/apiClient/store/variables/variables.store";
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
 function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResult["entry"] {
   return isHTTPApiEntry(entry)
@@ -181,8 +187,35 @@ class Runner {
     });
   }
 
+  private populateAutogenerateStore(recordId: string, scopes: Scope[]) {
+    const { getData, getParentChain } = this.ctx.stores.records.getState();
+    const apiRecord = getData(recordId);
+
+    if (!apiRecord || !apiRecord.data) {
+      return;
+    }
+
+    const childDetails = {
+      id: apiRecord.id,
+      parentId: apiRecord.collectionId,
+    };
+
+    const resolver = <T extends Record<string, any>>(template: T) => {
+      return renderVariables(template, apiRecord.id, this.ctx, scopes).result;
+    };
+
+    const newNamespaces = parseHttpRequestEntry(apiRecord.data as RQAPI.HttpApiEntry, childDetails, {
+      getParentChain,
+      getData,
+      resolver,
+    });
+
+    this.runContext.autogenerateStore.getState().initialize(newNamespaces);
+  }
+
   private beforeRequestExecutionStart(iteration: number, request: RQAPI.ApiRecord, startTime: number) {
     const collection = this.ctx.stores.records.getState().getData(request.collectionId);
+
     const currentExecutingRequest: CurrentlyExecutingRequest = {
       startTime,
       iteration,
@@ -204,9 +237,11 @@ class Runner {
           name: "Data File",
           level: 0,
         },
-        createDummyVariablesStore(this.variables[iteration - 1]),
+        createDummyVariablesStoreFromPrimitives(this.variables[iteration - 1]),
       ]);
     }
+
+    this.populateAutogenerateStore(request.id, scopes);
 
     return {
       currentExecutingRequest,
@@ -359,6 +394,7 @@ class Runner {
   async run() {
     try {
       await this.beforeStart();
+      const executionContext: ExecutionContext = {} as ExecutionContext; // Empty object that will be filled and shared across iterations
 
       for await (const { request, iteration, startTime } of this.iterate()) {
         const { currentExecutingRequest, scopes } = this.beforeRequestExecutionStart(iteration, request, startTime);
@@ -366,7 +402,8 @@ class Runner {
           request.id,
           request.data,
           this.runContext.runResultStore.getState().abortController,
-          scopes
+          scopes,
+          executionContext // Pass the same execution context across all iterations
         );
 
         this.afterRequestExecutionComplete(currentExecutingRequest, result);
