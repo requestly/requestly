@@ -178,22 +178,6 @@ const getContentTypeForRawBody = (bodyType: string) => {
   }
 };
 
-// const addImplicitContentTypeHeader = (headers: KeyValuePair[], contentType: RequestContentType): KeyValuePair[] => {
-//   const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
-//   if (!isContentTypeHeaderSet) {
-//     return [
-//       ...headers,
-//       {
-//         id: headers.length,
-//         key: "Content-Type",
-//         value: contentType,
-//         isEnabled: true,
-//       },
-//     ];
-//   }
-//   return headers;
-// };
-
 const processRawRequestBody = (raw: string, options: any): RequestBodyProcessingResult => {
   const contentType = getContentTypeForRawBody(options?.raw.language);
 
@@ -206,13 +190,14 @@ const processRawRequestBody = (raw: string, options: any): RequestBodyProcessing
 const processFormDataBody = (formdata: any[]): RequestBodyProcessingResult => {
   return {
     requestBody:
-      formdata?.map((formData: { key: string; value: string }) => ({
+      formdata?.map((formData: { key: string; value?: any; src?: any; type: "file" | "text" }) => ({
         id: Date.now(),
         key: formData.key,
-        value: formData.value,
+        value: formData.type === "file" ? formData.src : formData.value,
         isEnabled: true,
+        type: formData.type,
       })) || [],
-    contentType: RequestContentType.FORM,
+    contentType: RequestContentType.MULTIPART_FORM,
   };
 };
 
@@ -233,7 +218,7 @@ const processUrlEncodedBody = (urlencoded: any[]): RequestBodyProcessingResult =
 const processRequestBody = (request: any): RequestBodyProcessingResult => {
   if (!request.body) {
     return {
-      requestBody: null,
+      requestBody: "",
       contentType: RequestContentType.RAW,
     };
   }
@@ -259,7 +244,7 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
       return processGraphqlBody(graphql);
     default:
       return {
-        requestBody: null,
+        requestBody: "",
         contentType: RequestContentType.RAW,
       };
   }
