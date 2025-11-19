@@ -76,7 +76,7 @@
 
         .ant-tabs-tab {
           padding: 0 4px;
-          width: 144px;
+          width: auto;
           max-width: 144px;
           border-radius: 4px;
           background: rgba(255, 255, 255, 0.04);
@@ -208,6 +208,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      flex: 1;
+      min-width: 0;
 
       .icon {
         display: flex;
