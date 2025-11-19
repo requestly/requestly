@@ -70,14 +70,26 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
 
   const getFilterCount = useCallback(
     (pairIndex) => {
-      const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
-      return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
-            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length;
+      const filters = isSourceFilterFormatUpgraded(pairIndex, currentlySelectedRuleData)
+        ? currentlySelectedRuleData.pairs[pairIndex].source.filters?.[0] || {}
+        : currentlySelectedRuleData.pairs[pairIndex].source.filters || {};
+
+      if (!filters || typeof filters !== "object") {
+        return 0;
+      }
+
+      // Count only filters that are shown in the "Apply advance source filters" modal
+      // Exclude: pageUrl (internal), requestPayload (shown separately for GraphQL)
+      const COUNTABLE_FILTERS = [
+        GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.REQUEST_METHOD,
+        GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.RESOURCE_TYPE,
+        GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_DOMAINS,
+      ];
+
+      return COUNTABLE_FILTERS.filter((filterType) => {
+        const value = filters[filterType];
+        return Array.isArray(value) && value.length > 0;
+      }).length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
