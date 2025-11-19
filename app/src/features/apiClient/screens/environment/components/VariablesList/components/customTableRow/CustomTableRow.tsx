@@ -4,6 +4,7 @@ import { EnvironmentVariableType } from "backend/environment/types";
 import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { VariableRow } from "../../VariablesList";
+import EnumSelect from "./EnumSelect";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -148,6 +149,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             placeholder={getPlaceholderText(dataIndex)}
           />
         );
+
       case EnvironmentVariableType.Boolean:
         return (
           <Select
@@ -159,6 +161,16 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             <Select.Option value={true}>True</Select.Option>
             <Select.Option value={false}>False</Select.Option>
           </Select>
+        );
+
+      case EnvironmentVariableType.Enum:
+        return (
+          <EnumSelect
+            disabled={disabled}
+            value={record[dataIndex] as string}
+            onChange={(val) => handleVariableChange({ ...record, [dataIndex]: val }, dataIndex)}
+            initialOptions={options}
+          />
         );
     }
   }, [isReadOnly, record, handleChange, dataIndex, getPlaceholderText, isSecret]);
