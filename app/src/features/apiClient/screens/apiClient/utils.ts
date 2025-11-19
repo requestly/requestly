@@ -347,6 +347,8 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
           contentType = RequestContentType.FORM;
         } else if (httpContentType.includes("application/json")) {
           contentType = RequestContentType.JSON;
+        } else {
+          contentType = RequestContentType.RAW;
         }
       }
     }
