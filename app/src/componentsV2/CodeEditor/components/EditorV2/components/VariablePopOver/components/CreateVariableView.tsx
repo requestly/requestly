@@ -144,7 +144,6 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
         case EnvironmentVariableType.Number:
           return (
             <InputNumber
-              type="number"
               size="small"
               placeholder="Enter value"
               value={value}
