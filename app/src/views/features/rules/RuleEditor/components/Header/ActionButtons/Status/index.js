@@ -62,7 +62,10 @@ const Status = ({
           const message = newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE ? "Rule activated" : "Rule deactivated";
           toast.success(message);
         })
-        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
+        .catch((error) => {
+          toast.error("Failed to update rule status. Please try again.");
+        });
       return;
     }
 
@@ -95,7 +98,10 @@ const Status = ({
           }
           toast.success(message);
         })
-        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
+        .catch((error) => {
+          toast.error("Failed to update rule status. Please try again.");
+        });
   };
 
   const stableChangeRuleStatus = useCallback(changeRuleStatus, [
