@@ -9,6 +9,7 @@ import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 // Define valid state transitions
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
@@ -35,6 +36,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
+  const contextId = useContextId();
 
   // Determine initial view based on whether variable exists
   const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
@@ -58,9 +60,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   }, [transitionToView, onPinChange]);
 
   const handleSwitchEnvironment = useCallback(() => {
-    window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
+    window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId } }));
     onClose?.();
-  }, [onClose]);
+  }, [onClose, contextId]);
 
   const handleCancel = useCallback(() => {
     // Return to not found view

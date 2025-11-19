@@ -49,8 +49,13 @@ export const MultiWorkspaceSidebar: React.FC = () => {
   const { apiClientRecordsRepository } = useApiClientRepository();
 
   useEffect(() => {
-    const handleEvent = () => {
-      setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
+    const handleEvent = (event: any) => {
+      const eventContextId = event.detail?.contextId;
+      // Only switch to environments tab if it's a global event (no specific contextId)
+      // When contextId is specified, just let the specific EnvironmentSwitcher handle it
+      if (!eventContextId) {
+        setActiveKey(ApiClientSidebarTabKey.ENVIRONMENTS);
+      }
     };
 
     window.addEventListener("trigger-env-switcher", handleEvent);

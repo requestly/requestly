@@ -48,13 +48,17 @@ export const EnvironmentSwitcher = () => {
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
 
   useEffect(() => {
-    const handleEvent = () => {
-      setIsDropdownOpen(true);
+    const handleEvent = (event: any) => {
+      const eventContextId = event.detail?.contextId;
+      // Only open dropdown if event is for this context (or no context specified for backward compatibility)
+      if (!eventContextId || eventContextId === contextId) {
+        setIsDropdownOpen(true);
+      }
     };
 
     window.addEventListener("trigger-env-switcher", handleEvent);
     return () => window.removeEventListener("trigger-env-switcher", handleEvent);
-  }, []);
+  }, [contextId]);
 
   const dropdownItems: MenuProps["items"] = useMemo(() => {
     const sorted = environments
