@@ -321,7 +321,8 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     */
   const requestUrlParams = new URL(requestJson.url).searchParams;
   const paramsFromUrl = generateKeyValuePairs(Object.fromEntries(requestUrlParams.entries()));
-  const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers as Record<string, string>));
+  const headersObj = (requestJson.headers ?? {}) as Record<string, string>;
+  const headers = filterHeadersToImport(generateKeyValuePairs(headersObj));
 
   let contentType = getContentTypeFromRequestHeaders(headers);
 
