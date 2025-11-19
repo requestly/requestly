@@ -1,4 +1,12 @@
 .new-api-record-dropdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   .ant-btn.ant-btn-default {
     padding: var(--space-0, 0px) var(--space-5, 12px);
     font-size: var(--requestly-font-size-sm);
@@ -6,6 +14,11 @@
     border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
     background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
 
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
     &:hover {
       background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
 
