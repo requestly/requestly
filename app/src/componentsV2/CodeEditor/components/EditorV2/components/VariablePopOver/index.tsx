@@ -157,10 +157,19 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     zIndex: 1000,
   };
 
+  const isInFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
+
   return (
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
-      open
+      open={true}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          onPinChange?.(false); // unpin in parent
+          onClose?.(); // close the popover
+        }
+      }}
+      trigger={isInFormMode ? [] : ["click"]}
       destroyTooltipOnHide
       placement="bottom"
       showArrow={false}
