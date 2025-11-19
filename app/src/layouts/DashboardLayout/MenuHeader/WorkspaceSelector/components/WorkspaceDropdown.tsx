@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { DownOutlined } from "@ant-design/icons";
 import { MdOutlineRefresh } from "@react-icons/all-files/md/MdOutlineRefresh";
@@ -39,11 +39,13 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const activeWorkspaceName = isActiveWorkspaceNotPrivate
-    ? activeWorkspace?.name
-    : user.loggedIn
-    ? "Private Workspace"
-    : "Workspaces";
+  const activeWorkspaceName = useMemo(() => {
+    if (!activeWorkspace?.id) {
+      return user.loggedIn ? "Private Workspace" : "Workspaces";
+    } else {
+      return activeWorkspace?.name;
+    }
+  }, [activeWorkspace?.name, user.loggedIn, isActiveWorkspaceNotPrivate]);
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
