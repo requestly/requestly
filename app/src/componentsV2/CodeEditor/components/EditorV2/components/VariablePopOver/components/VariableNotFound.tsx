@@ -5,6 +5,7 @@ import { RQButton } from "lib/design-system-v2/components";
 interface VariableNotFoundProps {
   onCreateClick: () => void;
   onSwitchEnvironment: () => void;
+  isNoopContext: boolean;
 }
 
 export const VariableNotFound: React.FC<VariableNotFoundProps> = ({
