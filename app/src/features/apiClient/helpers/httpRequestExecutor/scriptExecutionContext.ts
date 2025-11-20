@@ -43,26 +43,33 @@ export class ScriptExecutionContext {
     } else {
       this.context = this.buildExecutionContext();
     }
+
     this.context.request = entry.request;
     this.context.response = null;
 
+    const scopedVariables = getScopedVariables([], this.ctx.stores, this.scopes);
+    const variablesByScope = this.convertScopedVariablesToRecord(scopedVariables);
+
+    // Override iterationData with scopedVariables
+    // Currently only overriding iterationData because all other scopes are handled during initial context build from context but
+    // iterationData needs to be updated from scope
+    this.context.iterationData = (variablesByScope[VariableScope.DATA_FILE] || {}) as EnvironmentVariables;
+
     this.isMutated = false;
+  }
+
+  private convertScopedVariablesToRecord(scopedVariables: Map<string, [VariableData, any]>) {
+    return Array.from(scopedVariables).reduce((acc, [key, [variableData, variableSource]]) => {
+      acc[variableSource.scope] = acc[variableSource.scope] || {};
+      acc[variableSource.scope][key] = variableData;
+      return acc;
+    }, {} as Record<string, Record<string, VariableData>>);
   }
 
   private getVariablesByScope(recordId: string) {
     const parents = getApiClientRecordsStore(this.ctx).getState().getParentChain(recordId);
     const scopedVariables = getScopedVariables(parents, this.ctx.stores, this.scopes);
-
-    const variablesByScope: Record<string, Record<string, VariableData>> = Array.from(scopedVariables).reduce(
-      (acc, [key, [variableData, variableSource]]) => {
-        acc[variableSource.scope] = acc[variableSource.scope] || {};
-        acc[variableSource.scope][key] = variableData;
-        return acc;
-      },
-      {} as Record<string, Record<string, VariableData>>
-    );
-
-    return variablesByScope;
+    return this.convertScopedVariablesToRecord(scopedVariables);
   }
 
   private buildExecutionContext(): ExecutionContext {
