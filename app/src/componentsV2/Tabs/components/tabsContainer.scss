@@ -76,7 +76,7 @@
 
         .ant-tabs-tab {
           padding: 0 4px;
-          width: auto;
+          width: 144px;
           max-width: 144px;
           border-radius: 4px;
           background: rgba(255, 255, 255, 0.04);
@@ -208,8 +208,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      flex: 1;
-      min-width: 0;
 
       .icon {
         display: flex;
@@ -239,6 +237,7 @@
 
     .tab-actions {
       flex-shrink: 0;
+      display: flex;
       align-items: center;
       justify-content: center;
       position: absolute;
@@ -282,7 +281,7 @@
   .ant-tabs-dropdown-menu {
     width: 280px;
     max-height: 480px;
-    background-color: var(--requestly-color-surface-1, #282828);
+    background-color: var(--requestly-space-4-color-surface-1, #282828);
     border-radius: 4px;
 
     .ant-tabs-dropdown-menu-item {
