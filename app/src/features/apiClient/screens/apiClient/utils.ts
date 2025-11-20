@@ -314,19 +314,30 @@ export const generateMultipartFormKeyValuePairs = (
 };
 
 export const parseMultipartFormDataString = (
-  body: string
+  body: string,
+  contentTypeHeader: string | null
 ): { key: string; value: string; isFile?: boolean; fileName?: string }[] => {
   const result: { key: string; value: string; isFile?: boolean; fileName?: string }[] = [];
 
-  // Extract boundary from the first line
-  // In the body, boundaries appear with 2 extra leading dashes (e.g., ------WebKit...)
-  // But the actual boundary for parsing should have 2 fewer dashes (e.g., ----WebKit...)
-  const boundaryMatch = body.match(/^--(-+\S+)/);
-  if (!boundaryMatch) {
+  const boundary = (() => {
+    if (contentTypeHeader) {
+      return getBoundary(contentTypeHeader);
+    }
+
+    // Fallback: try to extract boundary from body
+    // Extract boundary from the first line
+    // In the body, boundaries appear with 2 extra leading dashes (e.g., ------WebKit...)
+    // But the actual boundary for parsing should have 2 fewer dashes (e.g., ----WebKit...)
+    const boundaryMatch = body.match(/^--(-+\S+)/);
+    if (!boundaryMatch) {
+      return null;
+    }
+    return boundaryMatch[1].trim();
+  })();
+
+  if (!boundary) {
     return result;
   }
-
-  const boundary = boundaryMatch[1].trim();
 
   try {
     const bodyBuffer = Buffer.from(body, "utf-8");
@@ -336,10 +347,11 @@ export const parseMultipartFormDataString = (
     parts.forEach((part) => {
       const fieldName = part.name;
       if (fieldName) {
+        const isFile = !!part.filename;
         result.push({
           key: fieldName,
-          value: part.data ? part.data.toString("utf-8") : "",
-          isFile: !!part.filename,
+          value: !isFile ? part.data.toString("utf-8") : "",
+          isFile: isFile,
           fileName: part.filename || undefined,
         });
       }

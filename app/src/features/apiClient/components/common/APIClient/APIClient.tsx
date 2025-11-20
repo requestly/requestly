@@ -82,7 +82,10 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
         const searchParams = new URLSearchParams(request.body);
         entry.request.body = generateKeyValuePairs(Object.fromEntries(searchParams));
       } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
-        const parsedParts = parseMultipartFormDataString(request.body);
+        const contentTypeHeaderValue = entry.request.headers.find(
+          (h) => h.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase()
+        )?.value;
+        const parsedParts = parseMultipartFormDataString(request.body, contentTypeHeaderValue ?? null);
         const multipartData = parsedParts.map(({ key, value, isFile, fileName }) => ({
           key,
           //The @ prefix is not a standard multipart form-data thing.
