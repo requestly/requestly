@@ -15,9 +15,8 @@ import { getScopeIcon } from "./hooks/useScopeOptions";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
-// Define valid state transitions - starting from IDLE
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
-  [PopoverView.IDLE]: [],
+  [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
   [PopoverView.VARIABLE_INFO]: [PopoverView.EDIT_FORM, PopoverView.IDLE],
   [PopoverView.NOT_FOUND]: [PopoverView.CREATE_FORM, PopoverView.IDLE],
   [PopoverView.CREATE_FORM]: [PopoverView.IDLE],
@@ -45,7 +44,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   const contextId = useContextId();
   const isNoopContext = contextId === NoopContextId;
 
-  const [currentView, setCurrentView] = useState(() => {
+  const [currentView, setCurrentView] = useState<PopoverView>(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
   });
 
@@ -63,7 +62,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const handleCreateClick = useCallback(() => {
     transitionToView(PopoverView.CREATE_FORM);
-    onPinChange?.(true); // Pin popover when entering create form
+    onPinChange?.(true);
   }, [transitionToView, onPinChange]);
 
   const handleEditClick = useCallback(() => {
@@ -78,28 +77,23 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const handleCancel = useCallback(() => {
     if (currentView === PopoverView.CREATE_FORM) {
-      // Cancel from create form - go to IDLE and close
       transitionToView(PopoverView.IDLE);
       onClose?.();
     } else if (currentView === PopoverView.EDIT_FORM) {
-      // Cancel from edit form - go back to info view
       transitionToView(PopoverView.VARIABLE_INFO);
     }
     onPinChange?.(false);
   }, [currentView, transitionToView, onPinChange, onClose]);
 
   const handleSave = useCallback(async () => {
-    // After save - go to IDLE and close
     transitionToView(PopoverView.IDLE);
     onPinChange?.(false);
     onClose?.();
   }, [transitionToView, onPinChange, onClose]);
 
-  // Render content based on current view
   const popoverContent = (() => {
     switch (currentView) {
       case PopoverView.IDLE: {
-        // Show nothing in IDLE state (transitioning)
         return null;
       }
 
@@ -156,7 +150,6 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     }
   })();
 
-  // Don't render popover if in IDLE state
   if (currentView === PopoverView.IDLE) {
     return null;
   }
@@ -176,8 +169,8 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       open={true}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
-          onPinChange?.(false); // unpin in parent
-          onClose?.(); // close the popover
+          onPinChange?.(false);
+          onClose?.();
         }
       }}
       trigger={isInFormMode ? [] : ["click"]}
