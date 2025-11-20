@@ -1,21 +1,27 @@
 import React, { useState, useCallback } from "react";
-import { Popover, Tag } from "antd";
+import { Popover } from "antd";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { capitalize } from "lodash";
 import { pipe } from "lodash/fp";
 import { ScopedVariable, ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { PiHighlighterBold } from "@react-icons/all-files/pi/PiHighlighterBold";
 import { VariableData } from "features/apiClient/store/variables/types";
 import { PopoverView } from "./types";
 import { VariableNotFound } from "./components/VariableNotFound";
 import { CreateVariableView } from "./components/CreateVariableView";
+import { EditVariableView } from "./components/EditVariableView";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdEdit } from "@react-icons/all-files/md/MdEdit";
+import { getScopeIcon } from "./hooks/useScopeOptions";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 
-// Define valid state transitions
+// Define valid state transitions - starting from IDLE
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
-  [PopoverView.VARIABLE_INFO]: [], // Terminal state for existing variables
-  [PopoverView.NOT_FOUND]: [PopoverView.CREATE_FORM],
-  [PopoverView.CREATE_FORM]: [PopoverView.NOT_FOUND],
+  [PopoverView.IDLE]: [],
+  [PopoverView.VARIABLE_INFO]: [PopoverView.EDIT_FORM, PopoverView.IDLE],
+  [PopoverView.NOT_FOUND]: [PopoverView.CREATE_FORM, PopoverView.IDLE],
+  [PopoverView.CREATE_FORM]: [PopoverView.IDLE],
+  [PopoverView.EDIT_FORM]: [PopoverView.VARIABLE_INFO, PopoverView.IDLE],
 };
 
 interface VariablePopoverProps {
@@ -37,10 +43,11 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 }) => {
   const variableData = variables.get(hoveredVariable);
   const contextId = useContextId();
+  const isNoopContext = contextId === NoopContextId;
 
-  // Determine initial view based on whether variable exists
-  const initialView = variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
-  const [currentView, setCurrentView] = useState<PopoverView>(initialView);
+  const [currentView, setCurrentView] = useState(() => {
+    return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
+  });
 
   const transitionToView = useCallback(
     (nextView: PopoverView) => {
@@ -59,28 +66,44 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     onPinChange?.(true); // Pin popover when entering create form
   }, [transitionToView, onPinChange]);
 
+  const handleEditClick = useCallback(() => {
+    transitionToView(PopoverView.EDIT_FORM);
+    onPinChange?.(true);
+  }, [transitionToView, onPinChange]);
+
   const handleSwitchEnvironment = useCallback(() => {
     window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId } }));
     onClose?.();
   }, [onClose, contextId]);
 
   const handleCancel = useCallback(() => {
-    // Return to not found view
-    transitionToView(PopoverView.NOT_FOUND);
-    onPinChange?.(false); // Unpin popover
-  }, [transitionToView, onPinChange]);
+    if (currentView === PopoverView.CREATE_FORM) {
+      // Cancel from create form - go to IDLE and close
+      transitionToView(PopoverView.IDLE);
+      onClose?.();
+    } else if (currentView === PopoverView.EDIT_FORM) {
+      // Cancel from edit form - go back to info view
+      transitionToView(PopoverView.VARIABLE_INFO);
+    }
+    onPinChange?.(false);
+  }, [currentView, transitionToView, onPinChange, onClose]);
 
   const handleSave = useCallback(async () => {
-    // Variable creation is handled in CreateVariableView
-    // After successful creation, close the popover
-    onPinChange?.(false); // Unpin popover
+    // After save - go to IDLE and close
+    transitionToView(PopoverView.IDLE);
+    onPinChange?.(false);
     onClose?.();
-  }, [onPinChange, onClose]);
+  }, [transitionToView, onPinChange, onClose]);
 
   // Render content based on current view
   const popoverContent = (() => {
     switch (currentView) {
-      case PopoverView.VARIABLE_INFO:
+      case PopoverView.IDLE: {
+        // Show nothing in IDLE state (transitioning)
+        return null;
+      }
+
+      case PopoverView.VARIABLE_INFO: {
         if (!variableData) return null;
         return (
           <VariableInfo
@@ -88,19 +111,55 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               name: hoveredVariable,
               variable: variableData,
             }}
+            onEditClick={handleEditClick}
+            isNoopContext
           />
         );
+      }
 
-      case PopoverView.NOT_FOUND:
-        return <VariableNotFound onCreateClick={handleCreateClick} onSwitchEnvironment={handleSwitchEnvironment} />;
+      case PopoverView.NOT_FOUND: {
+        return (
+          <VariableNotFound
+            isNoopContext
+            onCreateClick={handleCreateClick}
+            onSwitchEnvironment={handleSwitchEnvironment}
+          />
+        );
+      }
 
-      case PopoverView.CREATE_FORM:
+      case PopoverView.CREATE_FORM: {
         return <CreateVariableView variableName={hoveredVariable} onCancel={handleCancel} onSave={handleSave} />;
+      }
 
-      default:
+      case PopoverView.EDIT_FORM: {
+        if (!variableData) return null;
+        const [variable, source] = variableData;
+        return (
+          <EditVariableView
+            variableName={hoveredVariable}
+            existingVariable={{
+              type: variable.type,
+              syncValue: variable.syncValue ?? "",
+              localValue: variable.localValue ?? "",
+              scope: source.scope,
+              scopeName: source.name,
+            }}
+            onCancel={handleCancel}
+            onSave={handleSave}
+          />
+        );
+      }
+
+      default: {
         return null;
+      }
     }
   })();
+
+  // Don't render popover if in IDLE state
+  if (currentView === PopoverView.IDLE) {
+    return null;
+  }
 
   const popupStyle: React.CSSProperties = {
     position: "absolute",
@@ -109,14 +168,25 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     zIndex: 1000,
   };
 
+  const isInFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
+
   return (
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
-      open
+      open={true}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          onPinChange?.(false); // unpin in parent
+          onClose?.(); // close the popover
+        }
+      }}
+      trigger={isInFormMode ? [] : ["click"]}
       destroyTooltipOnHide
       placement="bottom"
       showArrow={false}
-      overlayClassName={`variable-info-popover ${currentView === PopoverView.CREATE_FORM ? "create-form-view" : ""}`}
+      overlayClassName={`variable-info-popover ${
+        currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM ? "create-form-view" : ""
+      }`}
     >
       <div style={popupStyle} className="variable-info-div"></div>
     </Popover>
@@ -145,11 +215,15 @@ const VariableInfo: React.FC<{
     name: string;
     variable: ScopedVariable;
   };
+  onEditClick?: () => void;
+  isNoopContext: boolean;
 }> = ({
   params: {
     name,
     variable: [variable, source],
   },
+  onEditClick,
+  isNoopContext,
 }) => {
   const { syncValue, localValue, isPersisted } = getSanitizedVariableValue(variable);
   const infoFields =
@@ -169,18 +243,30 @@ const VariableInfo: React.FC<{
 
   return (
     <>
-      <div className="variable-info-property-container">
-        <Tag icon={<PiHighlighterBold />} className="variable-info-header">
-          {source.scope}
-        </Tag>
+      {!isNoopContext && (
+        <div className="variable-info-property-container">
+          {source.scope !== VariableScope.RUNTIME && (
+            <>
+              <span>{getScopeIcon(source.scope)} </span>
+              <span className="variable-header-info-seperator"> </span>
+              <div className="variable-info-header-name"> {source.name}</div>
+            </>
+          )}
 
-        {source.scope !== VariableScope.RUNTIME && (
-          <>
-            <span className="variable-header-info-seperator">/</span>
-            <div className="variable-info-header-name">{source.name}</div>
-          </>
-        )}
-      </div>
+          {/* Edit button - only for non-runtime variables */}
+          {source.scope !== VariableScope.RUNTIME && onEditClick && (
+            <RQButton
+              type="transparent"
+              size="small"
+              icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+              onClick={onEditClick}
+              className="edit-variable-btn"
+            >
+              Edit
+            </RQButton>
+          )}
+        </div>
+      )}
 
       <div className="variable-info-content-container">
         <div className="variable-info-content">

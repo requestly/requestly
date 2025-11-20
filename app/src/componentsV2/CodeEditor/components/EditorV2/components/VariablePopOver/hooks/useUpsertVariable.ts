@@ -1,24 +1,25 @@
 import { useState, useCallback } from "react";
 import { VariableScope } from "backend/environment/types";
-import { CreateVariableFormData } from "../types";
+import { CreateVariableFormData, UpsertVariableResult } from "../types";
 import { useCommand } from "features/apiClient/commands";
 import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
 import { runtimeVariablesStore } from "features/apiClient/store/runtimeVariables/runtimeVariables.store";
-import { toast } from "utils/Toast";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
-type CreateVariableStatus =
-  | { creating: false; errored: false }
-  | { creating: true; errored: false }
-  | { creating: false; errored: true; error: string };
+type UpsertMode = "create" | "update";
 
-interface UseCreateVariableResult {
-  createVariable: (data: CreateVariableFormData) => Promise<void>;
-  status: CreateVariableStatus;
+type UpsertVariableStatus =
+  | { upserting: false; errored: false }
+  | { upserting: true; errored: false }
+  | { upserting: false; errored: true; error: string };
+
+interface UseUpsertVariableResult {
+  upsertVariable: (data: CreateVariableFormData, mode: UpsertMode) => Promise<UpsertVariableResult>;
+  status: UpsertVariableStatus;
 }
 
-export const useCreateVariable = (collectionId?: string): UseCreateVariableResult => {
-  const [status, setStatus] = useState<CreateVariableStatus>({ creating: false, errored: false });
+export const useUpsertVariable = (collectionId?: string): UseUpsertVariableResult => {
+  const [status, setStatus] = useState<UpsertVariableStatus>({ upserting: false, errored: false });
 
   const {
     env: { patchEnvironmentVariables },
@@ -29,16 +30,16 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
   const { repositories } = useApiClientFeatureContext();
   const { environmentVariablesRepository } = repositories;
 
-  const createVariable = useCallback(
-    async (data: CreateVariableFormData) => {
-      setStatus({ creating: true, errored: false });
+  const upsertVariable = useCallback(
+    async (data: CreateVariableFormData, mode: UpsertMode): Promise<UpsertVariableResult> => {
+      setStatus({ upserting: true, errored: false });
 
       try {
         const { variableName, scope, type, initialValue, currentValue } = data;
 
         const variableData = {
           [variableName]: {
-            id: 0, // Will be set by the store
+            id: 0, // Will be set/preserved by the store
             type,
             syncValue: initialValue ?? "",
             localValue: currentValue ?? "",
@@ -46,7 +47,9 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
           },
         };
 
-        // Create variable based on scope
+        let scopeName: string | undefined;
+
+        // Upsert variable based on scope
         switch (scope) {
           case VariableScope.GLOBAL: {
             const globalEnvId = environmentVariablesRepository.getGlobalEnvironmentId();
@@ -54,7 +57,7 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
               environmentId: globalEnvId,
               variables: variableData,
             });
-            toast.success(`Variable "${variableName}" created in Global scope`);
+            scopeName = "Global";
             break;
           }
 
@@ -66,49 +69,65 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
               environmentId: activeEnvironment.id,
               variables: variableData,
             });
-            toast.success(`Variable "${variableName}" created in ${activeEnvironment.name}`);
+            scopeName = activeEnvironment.name;
             break;
           }
 
           case VariableScope.COLLECTION:
             if (!collectionId) {
-              throw new Error("Collection variable creation requires collection context");
+              throw new Error(
+                `Collection variable ${mode === "create" ? "creation" : "update"} requires collection context`
+              );
             }
             await patchCollectionVariables({
               collectionId: collectionId,
               variables: variableData,
             });
-            toast.success(`Variable "${variableName}" created in Collection`);
+            scopeName = "Collection";
             break;
 
           case VariableScope.RUNTIME: {
-            // Create in runtime store (session only)
+            // Upsert in runtime store (session only)
             const runtimeValue = currentValue ?? initialValue ?? "";
 
-            // Generate an ID for the new variable
-            const existingVariables = runtimeVariablesStore.getState().data;
-            const newId =
-              existingVariables.size > 0 ? Math.max(...Array.from(existingVariables.values(), (v) => v.id)) + 1 : 0;
+            let variableId = 0;
+            if (mode === "create") {
+              // Generate a new ID for create mode
+              const existingVariables = runtimeVariablesStore.getState().data;
+              variableId =
+                existingVariables.size > 0 ? Math.max(...Array.from(existingVariables.values(), (v) => v.id)) + 1 : 0;
+            } else {
+              // Preserve existing ID for update mode
+              const existingVariables = runtimeVariablesStore.getState().data;
+              const existingVariable = existingVariables.get(variableName);
+              variableId = existingVariable?.id ?? 0;
+            }
 
             runtimeVariablesStore.getState().add(variableName, {
-              id: newId,
+              id: variableId,
               type,
               localValue: runtimeValue,
               isPersisted: true,
             });
-            toast.success(`Variable "${variableName}" created in Runtime (session only)`);
+            scopeName = "Runtime";
             break;
           }
 
           default:
             throw new Error(`Unknown scope: ${scope}`);
         }
-        setStatus({ creating: false, errored: false });
+
+        setStatus({ upserting: false, errored: false });
+
+        return {
+          success: true,
+          scope,
+          scopeName,
+        };
       } catch (err: any) {
-        const errorMessage = err?.message || "Failed to create variable";
-        setStatus({ creating: false, errored: true, error: errorMessage });
-        toast.error(errorMessage);
-        throw err;
+        const errorMessage = err?.message || `Failed to ${mode === "create" ? "create" : "update"} variable`;
+        setStatus({ upserting: false, errored: true, error: errorMessage });
+        throw new Error(errorMessage);
       }
     },
     [
@@ -121,7 +140,7 @@ export const useCreateVariable = (collectionId?: string): UseCreateVariableResul
   );
 
   return {
-    createVariable,
+    upsertVariable,
     status,
   };
 };
