@@ -18,6 +18,10 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
+  const COLLAPSE_THRESHOLD = 16;
+  // the BottomSheet's UI breaks when it is less than 16% in horizontal Split
+  // so automatically collapse it when dragged below this value
+
   useEffect(() => {
     // Initialize Sheet Size on mount
     const savedSizes = localStorage.getItem("bottom_sheet_size");
@@ -43,14 +47,13 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   const handleDrag = useCallback(
     (sizes: number[]) => {
-      // Detect if user manually dragged to collapsed state
-      if (sizes[1] < 16) {
-        setIsCollapsed(true);
-      } else {
-        setIsCollapsed(false);
+      // detect if user manually dragged to collapsed state
+      const shouldCollapse = sizes[1] < COLLAPSE_THRESHOLD;
+      if (shouldCollapse !== isCollapsed) {
+        setIsCollapsed(shouldCollapse);
       }
     },
-    [setIsCollapsed]
+    [setIsCollapsed, isCollapsed]
   );
 
   return (
@@ -61,7 +64,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       sizes={isSheetPlacedAtBottom ? initialSizes : [55, 45]}
       onDrag={handleDrag}
       onDragEnd={(sizes: number[]) => {
-        if (sizes[1] > 16) {
+        if (sizes[1] > COLLAPSE_THRESHOLD) {
           localStorage.setItem("bottom_sheet_size", JSON.stringify(sizes));
         }
       }}
