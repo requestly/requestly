@@ -1,4 +1,4 @@
-import { trackEvent } from "modules/analytics";
+import { trackEvent } from "modules/analytics/utils";
 import { API_CLIENT } from "../constants";
 
 // Example collections
@@ -117,7 +117,17 @@ export const trackNewEnvironmentClicked = (source) => {
 };
 
 export const trackVariablesSaved = (params) => {
-  trackEvent(API_CLIENT.VARIABLES_UPDATED, params);
+  trackEvent(API_CLIENT.VARIABLES_UPDATED, {
+    ...params,
+    source: params.source,
+  });
+};
+
+export const trackVariableCreated = (params) => {
+  trackEvent(API_CLIENT.VARIABLE_CREATED, {
+    ...params,
+    source: params.source,
+  });
 };
 
 export const trackEnvironmentSwitched = () => {

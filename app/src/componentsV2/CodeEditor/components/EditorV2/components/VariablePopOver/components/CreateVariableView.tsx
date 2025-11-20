@@ -10,6 +10,7 @@ import { VariableFormFields } from "./VariableFormFields";
 import { toast } from "utils/Toast";
 import { getCollectionIdByRecordId } from "../utils/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 
 interface CreateVariableViewProps {
   variableName: string;
@@ -58,6 +59,9 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
       await onSave(variableData);
       // Show success toast
       toast.success(`Variable created in ${result.scopeName || "scope"}`);
+      trackVariablesSaved({
+        source: "variable popover",
+      });
     } catch (error) {
       // Show error toast
       toast.error("Failed to create variable");
