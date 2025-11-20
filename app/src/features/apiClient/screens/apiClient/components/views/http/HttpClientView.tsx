@@ -465,8 +465,14 @@ const HttpClientView: React.FC<Props> = ({
 
     try {
       const apiClientExecutionResult = await httpRequestExecutor.execute(
-        apiEntryDetails?.id,
-        sanitizeEntry(requestToSend)
+        {
+          entry: sanitizeEntry(requestToSend),
+          recordId: apiEntryDetails?.id,
+        },
+        {
+          iteration: 0,
+          iterationCount: 1,
+        }
       );
 
       const executedEntry = apiClientExecutionResult.executedEntry as RQAPI.HttpApiEntry;
