@@ -39,7 +39,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  const [isPopoverPinned, setIsPopoverPinned] = useState(false); // Track if popover should stay open
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -164,23 +163,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
-  const handleMouseLeave = useCallback(() => {
-    // Don't close popover if it's pinned (e.g., in create form view)
-    if (!isPopoverPinned) {
-      setHoveredVariable(null);
-    }
-  }, [isPopoverPinned]);
-
-  const handleClosePopover = useCallback(() => {
-    setHoveredVariable(null);
-    setIsPopoverPinned(false);
-  }, []);
-
   return (
     <div
       ref={editorRef}
       className={`${className ?? ""} editor-popup-container ant-input`}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={() => setHoveredVariable(null)}
     >
       <Conditional condition={hoveredVariable}>
         <VariablePopover
@@ -188,8 +175,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           hoveredVariable={hoveredVariable!}
           popupPosition={popupPosition}
           variables={variables!}
-          onClose={handleClosePopover}
-          onPinChange={setIsPopoverPinned}
         />
       </Conditional>
     </div>
