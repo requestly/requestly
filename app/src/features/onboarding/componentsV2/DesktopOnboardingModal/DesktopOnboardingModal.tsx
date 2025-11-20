@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "antd";
+import { useNavigate } from "react-router-dom";
 import { WorkspaceCreationView } from "componentsV2/modals/CreateWorkspaceModal/components/WorkspaceCreationView";
 import { AuthCard } from "./components/AuthCard/AuthCard";
 import { WelcomeCard } from "./components/WelcomeCard/WelcomeCard";
@@ -7,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import { redirectToApiClient } from "utils/RedirectionUtils";
 import "./desktopOnboardingModal.scss";
 import { trackDesktopOnboardingStepSkipped, trackDesktopOnboardingViewed } from "./analytics";
 import { OnboardingStep } from "./types";
@@ -18,6 +20,7 @@ export const DesktopOnboardingCard = ({ children, className }: { children: React
 
 export const DesktopOnboardingModal = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(OnboardingStep.FEATURE_SELECTION);
 
@@ -52,7 +55,10 @@ export const DesktopOnboardingModal = () => {
             <WorkspaceCreationView
               workspaceType={WorkspaceType.LOCAL}
               onCancel={() => setOnboardingStep(OnboardingStep.FEATURE_SELECTION)}
-              callback={() => dispatch(globalActions.updateIsOnboardingCompleted(true))}
+              callback={() => {
+                dispatch(globalActions.updateIsOnboardingCompleted(true));
+                redirectToApiClient(navigate);
+              }}
               analyticEventSource="desktop_onboarding_modal"
             />
           </DesktopOnboardingCard>
