@@ -252,11 +252,11 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
 
 export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
   const headers =
-    request.header?.map((header: KeyValuePair, index: number) => ({
+    request.header?.map((header: { key: string; value: string; disabled: boolean; type: string }, index: number) => ({
       id: index,
       key: header.key,
       value: header.value,
-      isEnabled: true,
+      isEnabled: !header?.disabled,
     })) ?? [];
 
   return { headers };
