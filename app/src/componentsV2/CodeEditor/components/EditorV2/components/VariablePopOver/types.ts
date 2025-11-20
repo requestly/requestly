@@ -26,6 +26,28 @@ export interface ScopeOption {
   disabled?: boolean;
 }
 
+export interface VariableNotFoundProps {
+  onCreateClick: () => void;
+  onSwitchEnvironment: () => void;
+  isNoopContext: boolean;
+}
+
+export interface CreateVariableViewProps {
+  variableName: string;
+  mode: FormMode;
+  existingVariable?: { type: EnvironmentVariableType; syncValue: any; localValue: any; scope: VariableScope };
+  onCancel: () => void;
+  onSave: (data: CreateVariableFormData) => Promise<void>;
+}
+
+export interface VariableInfoProps {
+  params: {
+    name: string;
+    variable: any;
+  };
+  onEditClick?: () => void;
+}
+
 export interface UpsertVariableResult {
   success: boolean;
   scope: VariableScope;
