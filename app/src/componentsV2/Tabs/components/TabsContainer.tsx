@@ -7,6 +7,7 @@ import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
+import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
 import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
@@ -181,6 +182,8 @@ export const TabsContainer: React.FC = () => {
         activeKey={activeTabId?.toString()}
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
+        moreIcon={<IoIosArrowDown />}
+        size="small"
         onChange={(key) => {
           setActiveTab(parseInt(key));
         }}

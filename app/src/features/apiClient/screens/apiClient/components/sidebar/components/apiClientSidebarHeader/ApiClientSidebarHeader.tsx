@@ -142,6 +142,14 @@ export const ApiClientSidebarHeader: React.FC<Props> = ({
         case ApiClientImporterType.REQUESTLY:
           setIsImportModalOpen(true);
           break;
+        case ApiClientImporterType.OPENAPI:
+          setCommonImportModalConfig({
+            productName: "OpenAPI Specifications",
+            supportedFileTypes: ["application/yaml", "application/json", "application/x-yaml", "application/x-json"],
+            importer: openApiImporter,
+            importerType: ApiClientImporterType.OPENAPI,
+          });
+          break;
         default:
           break;
       }

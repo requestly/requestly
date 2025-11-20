@@ -12,6 +12,7 @@ import { EditVariableView } from "./components/EditVariableView";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
 
 // Define valid state transitions - starting from IDLE
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
@@ -40,6 +41,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
+  const contextId = useContextId();
 
   const [currentView, setCurrentView] = useState(() => {
     return variableData ? PopoverView.VARIABLE_INFO : PopoverView.NOT_FOUND;
@@ -68,9 +70,9 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   }, [transitionToView, onPinChange]);
 
   const handleSwitchEnvironment = useCallback(() => {
-    window.dispatchEvent(new CustomEvent("trigger-env-switcher"));
+    window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId } }));
     onClose?.();
-  }, [onClose]);
+  }, [onClose, contextId]);
 
   const handleCancel = useCallback(() => {
     if (currentView === PopoverView.CREATE_FORM) {
