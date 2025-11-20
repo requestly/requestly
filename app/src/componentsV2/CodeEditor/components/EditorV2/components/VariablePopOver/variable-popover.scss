@@ -93,12 +93,22 @@ div.n-popup {
 
     .variable-info-property-container {
       display: flex;
-      padding: 10px 12px 8px 12px;
+      padding: 8px 12px 8px 12px;
       flex-direction: row;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
       align-self: stretch;
       border-bottom: 1px solid var(--requestly-color-white-t-10);
+
+      .edit-variable-btn {
+        height: 24px;
+        margin: 0px;
+        margin-left: auto;
+        border-radius: 4px;
+        font-size: var(--requestly-font-size-xs);
+        color: var(--requestly-color-text-subtle);
+        padding: 8px;
+      }
     }
 
     .variable-info-header {
@@ -202,6 +212,7 @@ div.n-popup {
     .switch-environment-btn {
       background: transparent;
       border: 1px solid var(--requestly-color-white-t-20);
+      border-radius: 4px !important;
       color: var(--requestly-color-text-default);
     }
   }
@@ -238,6 +249,64 @@ div.n-popup {
       font-weight: var(--requestly-font-weight-medium);
       color: var(--requestly-color-text-default);
     }
+  }
+
+  // ----------------------------
+  // Edit Mode Header
+  // ----------------------------
+  .edit-variable-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 8px;
+    padding-bottom: 6px;
+    margin: 0px -12px;
+    border-bottom: 1px solid var(--requestly-color-white-t-10);
+
+    .edit-variable-scope-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .scope-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 16px;
+        background-color: var(--requestly-color-primary);
+        border-radius: 4px;
+        color: var(--requestly-color-text-default);
+        font-size: 12px;
+      }
+
+      .scope-name {
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-size-sm);
+        font-weight: var(--requestly-font-weight-medium);
+        color: var(--requestly-color-text-default);
+        margin-right: 4px;
+      }
+    }
+
+    .edit-variable-actions {
+      display: flex;
+      gap: 8px;
+
+      .rq-custom-btn {
+        height: 24px;
+        border-radius: 4px !important;
+      }
+    }
+  }
+
+  // Variable Name in Edit Mode
+  .edit-variable-name {
+    font-family: var(--requestly-font-family-default);
+    font-size: var(--requestly-font-size-lg);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-default);
+    padding: 8px 0;
   }
 
   .create-variable-form {
@@ -306,7 +375,7 @@ div.n-popup {
 
         .ant-select-selector {
           background: none;
-          border-radius: 4px;
+          border-radius: 4px !important;
           align-items: center;
           color: var(--requestly-color-text-default);
           height: 32px;
@@ -333,11 +402,13 @@ div.n-popup {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    padding-top: 12px;
-    border-top: 1px solid var(--requestly-color-white-t-10);
 
     .rq-custom-btn {
-      min-width: 80px;
+      border-radius: 4px !important;
+
+      &:not(:last-child) {
+        margin-right: 0;
+      }
     }
   }
 }
@@ -367,7 +438,6 @@ div.n-popup {
 .ant-select-dropdown {
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
   background: var(--requestly-color-surface-0);
-  border-radius: 6px;
 
   .ant-select-item {
     color: var(--requestly-color-text-default);

@@ -10,7 +10,6 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
-import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -41,18 +40,6 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopoverPinned, setIsPopoverPinned] = useState(false); // Track if popover should stay open
-
-  // Subscribe to active tab changes to close popover when tab switches
-  const activeTabId = useTabServiceWithSelector((state) => state.activeTabId);
-
-  // Close popover when tab changes
-  useEffect(() => {
-    if (hoveredVariable || isPopoverPinned) {
-      setHoveredVariable(null);
-      setIsPopoverPinned(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabId]);
 
   useEffect(() => {
     if (editorViewRef.current) {

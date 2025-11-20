@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { ReactNode } from "react";
+import { TabSourceMetadata } from "componentsV2/Tabs/types";
 
 export interface GenericState {
   setTitle: (title: string) => void;
