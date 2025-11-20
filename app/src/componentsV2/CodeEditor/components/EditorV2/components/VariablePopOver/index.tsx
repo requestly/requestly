@@ -112,7 +112,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
               variable: variableData,
             }}
             onEditClick={handleEditClick}
-            isNoopContext
+            isNoopContext={isNoopContext}
           />
         );
       }
@@ -120,7 +120,7 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
       case PopoverView.NOT_FOUND: {
         return (
           <VariableNotFound
-            isNoopContext
+            isNoopContext={isNoopContext}
             onCreateClick={handleCreateClick}
             onSwitchEnvironment={handleSwitchEnvironment}
           />
@@ -245,26 +245,19 @@ const VariableInfo: React.FC<{
     <>
       {!isNoopContext && (
         <div className="variable-info-property-container">
-          {source.scope !== VariableScope.RUNTIME && (
-            <>
-              <span>{getScopeIcon(source.scope)} </span>
-              <span className="variable-header-info-seperator"> </span>
-              <div className="variable-info-header-name"> {source.name}</div>
-            </>
-          )}
+          <span>{getScopeIcon(source.scope)} </span>
+          <span className="variable-header-info-seperator"> </span>
+          <div className="variable-info-header-name"> {source.name}</div>
 
-          {/* Edit button - only for non-runtime variables */}
-          {source.scope !== VariableScope.RUNTIME && onEditClick && (
-            <RQButton
-              type="transparent"
-              size="small"
-              icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
-              onClick={onEditClick}
-              className="edit-variable-btn"
-            >
-              Edit
-            </RQButton>
-          )}
+          <RQButton
+            type="transparent"
+            size="small"
+            icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+            onClick={onEditClick}
+            className="edit-variable-btn"
+          >
+            Edit
+          </RQButton>
         </div>
       )}
 
