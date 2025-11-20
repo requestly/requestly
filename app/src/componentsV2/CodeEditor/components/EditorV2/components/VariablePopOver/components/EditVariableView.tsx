@@ -11,6 +11,7 @@ import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 import { toast } from "utils/Toast";
 import { getCollectionIdByRecordId } from "../utils/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 
 interface ExistingVariableData {
   type: EnvironmentVariableType;
@@ -71,6 +72,9 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
 
       await onSave(variableData);
       toast.success(`Variable updated in ${result.scopeName || existingVariable.scopeName}`);
+      trackVariablesSaved({
+        source: "variable popover",
+      });
     } catch (error) {
       toast.error("Failed to update variable");
       captureException(error);

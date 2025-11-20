@@ -258,6 +258,7 @@ export const API_CLIENT = {
   // Environment & Variables
   ENVIRONMENT_CLICKED: "api_client_new_environment_clicked",
   VARIABLES_UPDATED: "api_client_variables_updated",
+  VARIABLE_CREATED: "api_client_variable_created",
   ENVIRONMENT_SWITCHED: "api_client_environment_switched",
   ENVIRONMENT_RENAMED: "api_client_environment_renamed",
   ENVIRONMENT_DUPLICATED: "api_client_environment_duplicated",
