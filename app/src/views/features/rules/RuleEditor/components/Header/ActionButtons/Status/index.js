@@ -22,6 +22,16 @@ import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { useRBAC } from "features/rbac";
 
+const getRuleStatusMessage = (isValidPermission, newStatus) => {
+  const isActive = newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
+
+  if (isValidPermission) {
+    return isActive ? "Rule saved and activated" : "Rule saved and deactivated";
+  }
+
+  return isActive ? "Rule activated" : "Rule deactivated";
+};
+
 const Status = ({
   mode,
   isDisabled = false,
@@ -59,8 +69,7 @@ const Status = ({
       saveRule(appMode, dispatch, ruleData)
         .then(() => {
           // for Sample rules always show simple messages
-          const message = newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE ? "Rule activated" : "Rule deactivated";
-          toast.success(message);
+          toast.success(getRuleStatusMessage(false, newValue));
         })
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
         .catch((error) => {
@@ -85,18 +94,7 @@ const Status = ({
       saveRule(appMode, dispatch, syntaxValidatedAndTransformedRule)
         .then(() => {
           // Showing different messages based on user permissions
-          // Viewers cannot save rules, so showing simple "activated/deactivated" message
-          // Editors can save rules, so showing "saved and activated/deactivated" message
-          let message;
-          if (isValidPermission) {
-            message =
-              newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-                ? "Rule saved and activated"
-                : "Rule saved and deactivated";
-          } else {
-            message = newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE ? "Rule activated" : "Rule deactivated";
-          }
-          toast.success(message);
+          toast.success(getRuleStatusMessage(isValidPermission, newValue));
         })
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
         .catch((error) => {
