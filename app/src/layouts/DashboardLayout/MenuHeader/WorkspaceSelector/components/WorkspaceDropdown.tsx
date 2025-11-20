@@ -8,7 +8,7 @@ import FEATURES from "config/constants/sub/features";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { RQButton } from "lib/design-system-v2/components";
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import { getActiveWorkspace, isActiveWorkspaceShared } from "store/slices/workspaces/selectors";
+import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { Invite } from "types";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { WorkspacesOverlay } from "./WorkspacesOverlay/WorkspacesOverlay";
@@ -34,7 +34,6 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
   const user = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const viewMode = useApiClientMultiWorkspaceView((s) => s.viewMode);
-  const isActiveWorkspaceNotPrivate = useSelector(isActiveWorkspaceShared);
 
   // Local State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -45,7 +44,7 @@ const WorkSpaceDropDown = ({ teamInvites }: { teamInvites: Invite[] }) => {
     } else {
       return activeWorkspace?.name;
     }
-  }, [activeWorkspace?.name, user.loggedIn, isActiveWorkspaceNotPrivate]);
+  }, [activeWorkspace?.id, activeWorkspace?.name, user.loggedIn]);
 
   const handleWorkspaceDropdownClick = (open: boolean) => {
     setIsDropdownOpen(open);
