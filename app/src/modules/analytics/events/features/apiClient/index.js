@@ -1,4 +1,4 @@
-import { trackEvent } from "modules/analytics/utils";
+import { trackEvent } from "modules/analytics";
 import { API_CLIENT } from "../constants";
 
 // Example collections
