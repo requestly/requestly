@@ -44,7 +44,7 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
     };
   }
 
-  async executeScript(script: string, scriptContext: ScriptContext, callback: ScriptWorkloadCallback) {
+  async executeScript(userScript: string, scriptContext: ScriptContext, callback: ScriptWorkloadCallback) {
     const { executionContext, executionMetadata } = scriptContext;
 
     const localScopeInitialState: LocalScopeInitialState = {
@@ -66,7 +66,12 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
       `
       "use strict";
       ${globalScript}
-      ${script}
+      try {
+        ${userScript}
+      } catch (error) {
+        console.error(\`\${error.name}: \${error.message}\`);
+        throw error;
+      }
       `
     ) as (globals: Record<string, any>) => void;
     try {

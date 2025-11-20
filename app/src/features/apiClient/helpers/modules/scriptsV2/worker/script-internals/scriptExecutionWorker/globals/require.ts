@@ -23,6 +23,7 @@ export class PackageImportError extends NativeError {
 const packageMap: { [key: string]: Object | undefined } = {
   moment,
   xml2Js,
+  xml2js: xml2Js,
   uuid,
   "csv-parse/lib/sync": parse,
   cheerio,

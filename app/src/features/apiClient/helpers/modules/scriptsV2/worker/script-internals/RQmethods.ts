@@ -17,6 +17,7 @@ import { AssertionHandler } from "./assertionHandler";
 import { status } from "http-status";
 import { IterationData } from "./IterationData";
 import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
+import { ScriptLogger } from "./scriptExecutionWorker/ScriptLogger";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -25,7 +26,7 @@ const createInfiniteChainable = (methodName: string) => {
   const handler = {
     get: () => {
       if (!hasLogged) {
-        console.log(`Using unsupported method: ${methodName}`);
+        ScriptLogger.logInfo(`Using unsupported method: ${methodName}`);
         hasLogged = true;
       }
       return new Proxy(() => {}, handler);
