@@ -30,7 +30,6 @@ interface VariablePopoverProps {
   editorRef: React.RefObject<HTMLDivElement>;
   variables: ScopedVariables;
   onClose?: () => void;
-  onPinChange?: (pinned: boolean) => void;
 }
 
 export const VariablePopover: React.FC<VariablePopoverProps> = ({
@@ -39,7 +38,6 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
   popupPosition,
   variables,
   onClose,
-  onPinChange,
 }) => {
   const variableData = variables.get(hoveredVariable);
   const contextId = useContextId();
@@ -66,13 +64,11 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
 
   const handleCreateClick = useCallback(() => {
     transitionToView(PopoverView.CREATE_FORM);
-    onPinChange?.(true);
-  }, [transitionToView, onPinChange]);
+  }, [transitionToView]);
 
   const handleEditClick = useCallback(() => {
     transitionToView(PopoverView.EDIT_FORM);
-    onPinChange?.(true);
-  }, [transitionToView, onPinChange]);
+  }, [transitionToView]);
 
   const handleSwitchEnvironment = useCallback(() => {
     window.dispatchEvent(new CustomEvent("trigger-env-switcher", { detail: { contextId } }));
@@ -86,14 +82,12 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     } else if (currentView === PopoverView.EDIT_FORM) {
       transitionToView(PopoverView.VARIABLE_INFO);
     }
-    onPinChange?.(false);
-  }, [currentView, transitionToView, onPinChange, onClose]);
+  }, [currentView, transitionToView, onClose]);
 
   const handleSave = useCallback(async () => {
     transitionToView(PopoverView.IDLE);
-    onPinChange?.(false);
     onClose?.();
-  }, [transitionToView, onPinChange, onClose]);
+  }, [transitionToView, onClose]);
 
   const popoverContent = (() => {
     switch (currentView) {
@@ -165,19 +159,10 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     zIndex: 1000,
   };
 
-  const isInFormMode = currentView === PopoverView.CREATE_FORM || currentView === PopoverView.EDIT_FORM;
-
   return (
     <Popover
       content={<div className="variable-info-body">{popoverContent}</div>}
-      open={true}
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
-          onPinChange?.(false);
-          onClose?.();
-        }
-      }}
-      trigger={isInFormMode ? [] : ["click"]}
+      open
       destroyTooltipOnHide
       placement="bottom"
       showArrow={false}
