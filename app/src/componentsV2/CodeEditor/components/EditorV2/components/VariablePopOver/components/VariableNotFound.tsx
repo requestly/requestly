@@ -1,7 +1,11 @@
 import React from "react";
 import { Row } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
-import { VariableNotFoundProps } from "../types";
+
+interface VariableNotFoundProps {
+  onCreateClick: () => void;
+  onSwitchEnvironment: () => void;
+}
 
 export const VariableNotFound: React.FC<VariableNotFoundProps> = ({
   onCreateClick,

@@ -1,7 +1,8 @@
 import React from "react";
-import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 
 export enum PopoverView {
+  IDLE = "idle",
   VARIABLE_INFO = "variable_info",
   NOT_FOUND = "not_found",
   CREATE_FORM = "create_form",
@@ -14,8 +15,8 @@ export interface CreateVariableFormData {
   variableName: string;
   scope: VariableScope;
   type: EnvironmentVariableType;
-  initialValue: string | number | boolean;
-  currentValue: string | number | boolean;
+  initialValue: VariableValueType;
+  currentValue: VariableValueType;
 }
 
 export interface ScopeOption {
@@ -45,4 +46,10 @@ export interface VariableInfoProps {
     variable: any;
   };
   onEditClick?: () => void;
+}
+
+export interface UpsertVariableResult {
+  success: boolean;
+  scope: VariableScope;
+  scopeName?: string;
 }

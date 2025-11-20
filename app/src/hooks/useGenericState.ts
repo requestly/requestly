@@ -12,7 +12,7 @@ export interface GenericState {
   addCloseBlocker: (topic: unknown, id: string, blocker: unknown) => void;
   removeCloseBlocker: (topic: unknown, id: string) => void;
   setIsNew: (isNewTab: boolean) => void;
-  getSourceId: () => TabSourceMetadata;
+  getSourceId: () => string | undefined;
   replace: (args: unknown) => void; // TODO: make type generic
   close: () => void;
 }
@@ -29,7 +29,7 @@ const defaultGenericState: GenericState = {
   addCloseBlocker: () => {},
   removeCloseBlocker: () => {},
   setIsNew: () => {},
-  getSourceId: () => ({} as TabSourceMetadata),
+  getSourceId: () => undefined,
 };
 
 /**
