@@ -195,6 +195,11 @@ export const TabsContainer: React.FC = () => {
             openTab(new DraftRequestContainerTabSource());
           }
         }}
+        addIcon={
+          <RQTooltip title="New request">
+            <span>+</span>
+          </RQTooltip>
+        }
       />
     </div>
   );
