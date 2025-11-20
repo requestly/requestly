@@ -50,8 +50,7 @@ export const EnvironmentSwitcher = () => {
   useEffect(() => {
     const handleEvent = (event: any) => {
       const eventContextId = event.detail?.contextId;
-      // Only open dropdown if event is for this context (or no context specified for backward compatibility)
-      if (!eventContextId || eventContextId === contextId) {
+      if (eventContextId === contextId) {
         setIsDropdownOpen(true);
       }
     };
