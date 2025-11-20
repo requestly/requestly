@@ -14,6 +14,7 @@ import { MdEdit } from "@react-icons/all-files/md/MdEdit";
 import { getScopeIcon } from "./hooks/useScopeOptions";
 import { useContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { captureMessage } from "@sentry/react";
 
 const PopoverViewTransitions: Record<PopoverView, PopoverView[]> = {
   [PopoverView.IDLE]: [PopoverView.VARIABLE_INFO, PopoverView.NOT_FOUND],
@@ -52,7 +53,10 @@ export const VariablePopover: React.FC<VariablePopoverProps> = ({
     (nextView: PopoverView) => {
       const allowedTransitions = PopoverViewTransitions[currentView];
       if (!allowedTransitions.includes(nextView)) {
-        console.error(`Invalid popover view transition from ${currentView} to ${nextView}`);
+        const message = `Invalid popover view transition from ${currentView} to ${nextView}`;
+        captureMessage(message, {
+          level: "info",
+        });
         return;
       }
       setCurrentView(nextView);
