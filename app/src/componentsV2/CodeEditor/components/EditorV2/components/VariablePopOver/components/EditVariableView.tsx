@@ -5,12 +5,12 @@ import { CreateVariableFormData } from "../types";
 import { useUpsertVariable } from "../hooks/useUpsertVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { useGenericState } from "hooks/useGenericState";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { RQAPI } from "features/apiClient/types";
 import { captureException } from "backend/apiClient/utils";
 import { VariableFormFields } from "./VariableFormFields";
 import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 import { toast } from "utils/Toast";
+import { getCollectionIdByRecordId } from "../utils/utils";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 interface ExistingVariableData {
   type: EnvironmentVariableType;
@@ -34,26 +34,12 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
   onSave,
 }) => {
   const genericState = useGenericState();
-  const [getData] = useAPIRecords((state) => [state.getData]);
+  const apiClientCtx = useApiClientFeatureContext();
   const recordId = genericState.getSourceId();
 
-  // Determine the collection ID based on the current record
   const collectionId = useMemo(() => {
-    if (!recordId) return undefined;
-
-    const record = getData(recordId);
-    if (!record) return undefined;
-
-    if (record.type === RQAPI.RecordType.COLLECTION) {
-      return record.id;
-    }
-
-    if (record.type === RQAPI.RecordType.API) {
-      return record.collectionId || undefined;
-    }
-
-    return undefined;
-  }, [recordId, getData]);
+    return getCollectionIdByRecordId(apiClientCtx, recordId);
+  }, [apiClientCtx, recordId]);
 
   const { scopeOptions } = useScopeOptions(collectionId);
   const { upsertVariable, status } = useUpsertVariable(collectionId);
@@ -84,16 +70,13 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
       }
 
       await onSave(variableData);
-      // Show success toast
       toast.success(`Variable updated in ${result.scopeName || existingVariable.scopeName}`);
     } catch (error) {
-      // Show error toast
       toast.error("Failed to update variable");
       captureException(error);
     }
   };
 
-  // Get scope information for header
   const currentScopeOption = useMemo(() => {
     return scopeOptions.find((o) => o.value === existingVariable.scope) || scopeOptions[0];
   }, [existingVariable.scope, scopeOptions]);
