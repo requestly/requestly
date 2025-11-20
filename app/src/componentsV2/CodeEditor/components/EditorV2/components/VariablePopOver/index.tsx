@@ -240,23 +240,21 @@ const VariableInfo: React.FC<{
 
   return (
     <>
-      {!isNoopContext && (
-        <div className="variable-info-property-container">
-          <span>{getScopeIcon(source.scope)} </span>
-          <span className="variable-header-info-seperator"> </span>
-          <div className="variable-info-header-name"> {source.name}</div>
+      <div className="variable-info-property-container">
+        <span>{getScopeIcon(source.scope)} </span>
+        <span className="variable-header-info-seperator"> </span>
+        <div className="variable-info-header-name"> {source.name}</div>
 
-          <RQButton
-            type="transparent"
-            size="small"
-            icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
-            onClick={onEditClick}
-            className="edit-variable-btn"
-          >
-            Edit
-          </RQButton>
-        </div>
-      )}
+        <RQButton
+          type="transparent"
+          size="small"
+          icon={<MdEdit style={{ fontSize: "14px", color: "var(--requestly-color-text-subtle)" }} />}
+          onClick={onEditClick}
+          className="edit-variable-btn"
+        >
+          Edit
+        </RQButton>
+      </div>
 
       <div className="variable-info-content-container">
         <div className="variable-info-content">
