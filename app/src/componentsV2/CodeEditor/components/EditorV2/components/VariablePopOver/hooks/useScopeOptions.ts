@@ -37,6 +37,33 @@ const createIconWithWrapper = (
   );
 };
 
+export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
+  switch (scope) {
+    case VariableScope.ENVIRONMENT:
+      return createIconWithWrapper(
+        MdHorizontalSplit,
+        "var(--requestly-color-primary-text)",
+        "var(--requestly-color-primary-darker)"
+      );
+    case VariableScope.COLLECTION:
+      return createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)");
+    case VariableScope.GLOBAL:
+      return createIconWithWrapper(
+        BsGlobeCentralSouthAsia,
+        "var(--requestly-color-success-text)",
+        "var(--requestly-color-success-darker)"
+      );
+    case VariableScope.RUNTIME:
+      return createIconWithWrapper(
+        MdOutlineCategory,
+        "var(--requestly-color-text-subtle)",
+        "var(--requestly-color-warning-darker)"
+      );
+    default:
+      return null;
+  }
+};
+
 export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
   const activeEnvironment = useActiveEnvironment();
 
@@ -45,37 +72,25 @@ export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult =>
       {
         value: VariableScope.ENVIRONMENT,
         label: activeEnvironment ? `Current environment` : "No Active Environment",
-        icon: createIconWithWrapper(
-          MdHorizontalSplit,
-          "var(--requestly-color-primary-text)",
-          "var(--requestly-color-primary-darker)"
-        ),
+        icon: getScopeIcon(VariableScope.ENVIRONMENT),
         disabled: !activeEnvironment,
       },
       {
         value: VariableScope.COLLECTION,
         label: "Current collection",
-        icon: createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)"),
+        icon: getScopeIcon(VariableScope.COLLECTION),
         disabled: !collectionId,
       },
       {
         value: VariableScope.GLOBAL,
         label: "Global",
-        icon: createIconWithWrapper(
-          BsGlobeCentralSouthAsia,
-          "var(--requestly-color-success-text)",
-          "var(--requestly-color-success-darker)"
-        ),
+        icon: getScopeIcon(VariableScope.GLOBAL),
         disabled: false,
       },
       {
         value: VariableScope.RUNTIME,
         label: "Runtime variables",
-        icon: createIconWithWrapper(
-          MdOutlineCategory,
-          "var(--requestly-color-text-subtle)",
-          "var(--requestly-color-warning-darker)"
-        ),
+        icon: getScopeIcon(VariableScope.RUNTIME),
         disabled: false,
       },
     ];
