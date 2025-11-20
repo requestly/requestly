@@ -73,7 +73,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     }
     entry.request.headers = filterHeadersToImport(generateKeyValuePairs(request.headers));
     entry.request.method = (request.method as RequestMethod) || RequestMethod.GET;
-    entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers);
+    entry.request.contentType = getContentTypeFromRequestHeaders(entry.request.headers) ?? RequestContentType.RAW;
 
     if (typeof request.body === "string") {
       entry.request.body = request.body;

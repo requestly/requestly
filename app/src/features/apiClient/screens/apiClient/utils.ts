@@ -255,14 +255,14 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
   return result;
 };
 
-export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
+export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]) => {
   const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase());
   const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
 
-  const contentType: RequestContentType =
+  const contentType: RequestContentType | undefined =
     contentTypeHeaderValue && Object.values(RequestContentType).find((type) => contentTypeHeaderValue.includes(type));
 
-  return contentType || RequestContentType.RAW;
+  return contentType;
 };
 
 export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {
@@ -364,8 +364,7 @@ export const parseMultipartFormDataString = (
 };
 
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  const requestJsonString = curlconverter.toJsonString(curl);
-  const requestJson = JSON.parse(requestJsonString);
+  const requestJson = curlconverter.toJsonObject(curl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests
@@ -373,7 +372,9 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     */
   const requestUrlParams = new URL(requestJson.url).searchParams;
   const paramsFromUrl = generateKeyValuePairs(Object.fromEntries(requestUrlParams.entries()));
-  const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers));
+  const headersObj = (requestJson.headers ?? {}) as Record<string, string>;
+  const headers = filterHeadersToImport(generateKeyValuePairs(headersObj));
+
   let contentType = getContentTypeFromRequestHeaders(headers);
 
   // For multipart-form data we need to check the json structure
@@ -382,6 +383,27 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
 
   if (hasFiles) {
     contentType = RequestContentType.MULTIPART_FORM;
+  }
+
+  // Fallback: If content-type is still undefined, check the HTTP string for content-type
+  if (!contentType) {
+    const httpString = curlconverter.toHTTP(curl);
+    if (httpString) {
+      const match = httpString.match(/content-type:\s*([^\r\n]+)/i); // stops matching at line break
+      if (match) {
+        const httpContentType = match[1].trim().toLowerCase();
+
+        if (httpContentType.includes("multipart/form-data")) {
+          contentType = RequestContentType.MULTIPART_FORM;
+        } else if (httpContentType.includes("application/x-www-form-urlencoded")) {
+          contentType = RequestContentType.FORM;
+        } else if (httpContentType.includes("application/json")) {
+          contentType = RequestContentType.JSON;
+        } else {
+          contentType = RequestContentType.RAW;
+        }
+      }
+    }
   }
 
   let body: RQAPI.RequestBody;
