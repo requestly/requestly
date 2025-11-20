@@ -70,13 +70,12 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
 
       const result = await upsertVariable(variableData, "create");
 
+      await onSave(variableData);
       // Show success toast
       toast.success(`Variable created in ${result.scopeName || "scope"}`);
-
-      await onSave(variableData);
     } catch (error) {
       // Show error toast
-      toast.error(error instanceof Error ? error.message : "Failed to create variable");
+      toast.error("Failed to create variable");
       captureException(error);
     }
   };
