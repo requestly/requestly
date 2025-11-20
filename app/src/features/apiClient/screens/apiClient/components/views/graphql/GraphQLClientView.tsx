@@ -494,8 +494,11 @@ const GraphQLClientView: React.FC<Props> = ({
     }
 
     isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
+    const savedPlacement = localStorage.getItem("sheet_placement");
+    if (!savedPlacement) {
+      const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+      toggleSheetPlacement(bottomSheetPlacement);
+    }
   }, [toggleSheetPlacement]);
 
   return (
