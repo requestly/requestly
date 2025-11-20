@@ -52,3 +52,22 @@
     border-color: var(--requestly-color-primary-600);
   }
 }
+
+.collection-panel.selected {
+  > .ant-collapse-header {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    padding-left: calc(var(--requestly-space-4) - 3px);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.12) !important;
+    }
+  }
+}
+
+.collection-panel.active.selected > .ant-collapse-header {
+  border-left: 2px solid var(--requestly-color-primary-500);
+}
+
+.collection-panel.selected + .ant-collapse-content {
+  background: transparent;
+}
