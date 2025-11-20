@@ -179,7 +179,7 @@ const getContentTypeForRawBody = (bodyType: string) => {
 };
 
 const processRawRequestBody = (raw: string, options: any): RequestBodyProcessingResult => {
-  const contentType = getContentTypeForRawBody(options?.raw.language);
+  const contentType = getContentTypeForRawBody(options?.raw?.language);
 
   return {
     requestBody: raw,
