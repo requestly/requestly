@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Button, Tabs, TabsProps, Tooltip } from "antd";
+import { Tabs, TabsProps, Tooltip } from "antd";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
 import { BiDockBottom } from "@react-icons/all-files/bi/BiDockBottom";
