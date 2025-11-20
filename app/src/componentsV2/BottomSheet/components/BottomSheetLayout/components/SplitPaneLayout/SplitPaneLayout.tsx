@@ -24,10 +24,16 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   useEffect(() => {
     // Initialize Sheet Size on mount
-    const savedSizes = localStorage.getItem("bottom_sheet_size");
+    let parsedSize = null;
+    try {
+      const savedSizes = localStorage.getItem("bottom_sheet_size");
+      parsedSize = savedSizes ? JSON.parse(savedSizes) : null;
+    } catch (error) {
+      console.error("Failed to parse the bottom sheet size", error);
+    }
 
     if (splitPane.current) {
-      const sheetSize = savedSizes ? JSON.parse(savedSizes) : isSheetPlacedAtBottom ? initialSizes : [55, 45];
+      const sheetSize = parsedSize ?? (isSheetPlacedAtBottom ? initialSizes : [55, 45]);
       splitPane.current.split.setSizes(sheetSize);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
