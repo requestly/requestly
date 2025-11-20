@@ -17,10 +17,6 @@ export const TabsContainer: React.FC = () => {
   // Enable keyboard shortcuts for closing active tabs
   useCloseActiveTabShortcut();
 
-  const tabsContainerRef = useRef<HTMLDivElement>(null);
-  // Ref to store the previous number of tabs
-  const prevTabCountRef = useRef(0);
-
   const [
     activeTabId,
     activeTabSource,
@@ -118,33 +114,6 @@ export const TabsContainer: React.FC = () => {
     }
   }, [activeTabSource, setUrl]);
 
-  useEffect(() => {
-    const currentTabCount = tabs.size;
-    const prevTabCount = prevTabCountRef.current;
-    prevTabCountRef.current = currentTabCount;
-    if (!tabsContainerRef.current || currentTabCount <= prevTabCount) return;
-
-    const navWrap = tabsContainerRef.current.querySelector<HTMLElement>(".ant-tabs-nav-wrap");
-    if (!navWrap) return;
-
-    const maxVisibleTabs = Math.floor(navWrap.clientWidth / 135);
-    if (currentTabCount < maxVisibleTabs) return;
-
-    const timeoutId = setTimeout(() => {
-      const navListElement = tabsContainerRef.current?.querySelector<HTMLDivElement>(".ant-tabs-nav-list");
-      if (!navListElement) return;
-
-      const currentX = (() => {
-        const match = navListElement.style.transform.match(/translate\(([-+]?\d+)px,\s*([-+]?\d+)px\)/);
-        return match?.[1] ? parseInt(match[1], 10) : 0;
-      })();
-
-      navListElement.style.transform = `translate(${currentX - 160}px, 0px)`;
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [tabs.size]);
-
   const tabItems: TabsProps["items"] = useMemo(() => {
     return Array.from(tabs.values()).map((tabStore) => {
       const tabState = tabStore.getState();
@@ -206,7 +175,7 @@ export const TabsContainer: React.FC = () => {
       <Outlet />
     </div>
   ) : (
-    <div className="tabs-container" ref={tabsContainerRef}>
+    <div className="tabs-container">
       <Tabs
         type="editable-card"
         items={tabItems}
