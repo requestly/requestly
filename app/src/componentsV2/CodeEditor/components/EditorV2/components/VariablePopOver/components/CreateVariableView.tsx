@@ -5,11 +5,11 @@ import { CreateVariableFormData } from "../types";
 import { useUpsertVariable } from "../hooks/useUpsertVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { useGenericState } from "hooks/useGenericState";
-import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { RQAPI } from "features/apiClient/types";
 import { captureException } from "backend/apiClient/utils";
 import { VariableFormFields } from "./VariableFormFields";
 import { toast } from "utils/Toast";
+import { getCollectionIdByRecordId } from "../utils/utils";
+import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
 
 interface CreateVariableViewProps {
   variableName: string;
@@ -19,28 +19,13 @@ interface CreateVariableViewProps {
 
 export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variableName, onCancel, onSave }) => {
   const genericState = useGenericState();
-  const [getData] = useAPIRecords((state) => [state.getData]);
+  const apiClientCtx = useApiClientFeatureContext();
   const recordId = genericState.getSourceId();
 
-  // Determine the collection ID based on the current record
+  // Determine the collection ID based on the current record using shared util
   const collectionId = useMemo(() => {
-    if (!recordId) return undefined;
-
-    const record = getData(recordId);
-    if (!record) return undefined;
-
-    // If the current record is a collection, use its ID
-    if (record.type === RQAPI.RecordType.COLLECTION) {
-      return record.id;
-    }
-
-    // If the current record is a request, use its parent collection ID
-    if (record.type === RQAPI.RecordType.API) {
-      return record.collectionId || undefined;
-    }
-
-    return undefined;
-  }, [recordId, getData]);
+    return getCollectionIdByRecordId(apiClientCtx, recordId);
+  }, [apiClientCtx, recordId]);
 
   const { scopeOptions, defaultScope } = useScopeOptions(collectionId);
   const { upsertVariable, status } = useUpsertVariable(collectionId);
