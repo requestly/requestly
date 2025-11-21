@@ -2,6 +2,9 @@
   height: 100%;
   table {
     tbody {
+      tr {
+        user-select: none;
+      }
       tr[aria-selected="true"] {
         .graphql-operation-name {
           color: var(--requestly-color-text-default);
