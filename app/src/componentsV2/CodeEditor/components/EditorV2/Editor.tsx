@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import { Prec } from "@codemirror/state";
+import { keymap } from "@codemirror/view";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
@@ -26,7 +28,6 @@ import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -200,6 +201,43 @@ const Editor: React.FC<EditorProps> = ({
   const debouncedhandleEditorBodyChange = useDebounce((value: string) => {
     handleChange(value, isUnsaveChange.current);
   }, 200);
+
+  const customKeyBinding = useMemo(
+    () =>
+      Prec.highest(
+        keymap.of([
+          {
+            key: "Mod-s",
+            run: (view) => {
+              const event = new KeyboardEvent("keydown", {
+                key: "s",
+                metaKey: navigator.platform.includes("Mac"),
+                ctrlKey: !navigator.platform.includes("Mac"),
+                bubbles: true,
+                cancelable: true,
+              });
+              view.dom.dispatchEvent(event);
+              return true;
+            },
+          },
+          {
+            key: "Mod-Enter",
+            run: (view) => {
+              const event = new KeyboardEvent("keydown", {
+                key: "Enter",
+                metaKey: navigator.platform.includes("Mac"),
+                ctrlKey: !navigator.platform.includes("Mac"),
+                bubbles: true,
+                cancelable: true,
+              });
+              view.dom.dispatchEvent(event);
+              return true;
+            },
+          },
+        ])
+      ),
+    []
+  );
 
   const toolbar = useMemo(
     () => (
