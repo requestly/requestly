@@ -10,7 +10,6 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
-import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -67,7 +66,39 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
         extensions: [
           history(),
           keymap.of(historyKeymap),
-          customKeyBinding,
+          Prec.highest(
+            keymap.of([
+              {
+                key: "Mod-s",
+                run: (view) => {
+                  const event = new KeyboardEvent("keydown", {
+                    key: "s",
+                    metaKey: navigator.platform.includes("Mac"),
+                    ctrlKey: !navigator.platform.includes("Mac"),
+                    bubbles: true,
+                    cancelable: true,
+                  });
+                  view.dom.dispatchEvent(event);
+                  return true;
+                },
+              },
+              {
+                key: "Mod-Enter",
+                run: (view) => {
+                  const event = new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    metaKey: navigator.platform.includes("Mac"),
+                    ctrlKey: !navigator.platform.includes("Mac"),
+                    bubbles: true,
+                    cancelable: true,
+                  });
+                  view.dom.dispatchEvent(event);
+                  return true;
+                },
+              },
+            ])
+          ),
+
           EditorState.transactionFilter.of((tr) => {
             return tr.newDoc.lines > 1 ? [] : [tr];
           }),
