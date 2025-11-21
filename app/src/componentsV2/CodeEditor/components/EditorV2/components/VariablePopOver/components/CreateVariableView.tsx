@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { RQButton } from "lib/design-system-v2/components";
-import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
+import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 import { CreateVariableFormData } from "../types";
 import { useUpsertVariable } from "../hooks/useUpsertVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
@@ -10,7 +10,7 @@ import { VariableFormFields } from "./VariableFormFields";
 import { toast } from "utils/Toast";
 import { getCollectionIdByRecordId } from "../utils/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
+import { trackVariableCreated, VariableAnalyticsSource } from "modules/analytics/events/features/apiClient";
 
 interface CreateVariableViewProps {
   variableName: string;
@@ -47,6 +47,21 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
+  const getVariableScopeForAnalytics = (scope: VariableScope | string) => {
+    switch (scope) {
+      case VariableScope.RUNTIME:
+        return "runtime";
+      case VariableScope.GLOBAL:
+        return "global";
+      case VariableScope.ENVIRONMENT:
+        return "environment";
+      case VariableScope.COLLECTION:
+        return "collection";
+      default:
+        return "runtime";
+    }
+  };
+
   const handleSave = async () => {
     try {
       const variableData = {
@@ -56,14 +71,15 @@ export const CreateVariableView: React.FC<CreateVariableViewProps> = ({ variable
 
       const result = await upsertVariable(variableData, "create");
 
+      const variableScope = getVariableScopeForAnalytics(variableData.scope);
+
       await onSave(variableData);
-      // Show success toast
       toast.success(`Variable created in ${result.scopeName || "scope"}`);
-      trackVariablesSaved({
-        source: "variable popover",
+      trackVariableCreated({
+        source: VariableAnalyticsSource.VARIABLE_POPOVER,
+        variable_scope: variableScope,
       });
     } catch (error) {
-      // Show error toast
       toast.error("Failed to create variable");
       captureException(error);
     }
