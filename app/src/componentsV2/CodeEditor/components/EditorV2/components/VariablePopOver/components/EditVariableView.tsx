@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { RQButton } from "lib/design-system-v2/components";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
-import { CreateVariableFormData } from "../types";
+import { CreateVariableFormData, VariableUpsertSource } from "../types";
 import { useUpsertVariable } from "../hooks/useUpsertVariable";
 import { useScopeOptions } from "../hooks/useScopeOptions";
 import { useGenericState } from "hooks/useGenericState";
@@ -11,7 +11,7 @@ import { FaListAlt } from "@react-icons/all-files/fa/FaListAlt";
 import { toast } from "utils/Toast";
 import { getCollectionIdByRecordId } from "../utils/utils";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
-import { trackVariablesSaved, VariableAnalyticsSource } from "modules/analytics/events/features/apiClient";
+import { trackVariablesSaved } from "modules/analytics/events/features/apiClient";
 
 interface ExistingVariableData {
   type: EnvironmentVariableType;
@@ -71,7 +71,7 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
       }
 
       trackVariablesSaved({
-        source: VariableAnalyticsSource.VARIABLE_POPOVER,
+        source: VariableUpsertSource.VARIABLE_POPOVER,
         variable_scope: formData.scope.toLowerCase(),
       });
 
