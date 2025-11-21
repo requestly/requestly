@@ -91,6 +91,7 @@ export const VariableFormFields: React.FC<VariableFormFieldsProps> = ({
         case EnvironmentVariableType.Number:
           return (
             <InputNumber
+              type="number"
               size="small"
               placeholder="Enter value"
               value={value}

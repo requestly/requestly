@@ -77,6 +77,7 @@ export const EnvironmentSwitcher = () => {
       ),
       onClick: (menuInfo: any) => {
         menuInfo?.domEvent?.stopPropagation?.();
+        setIsDropdownOpen(false);
         setActiveEnvironment(undefined); // Clear active environment
         trackEnvironmentSwitched();
         toast.success("No environment selected");
@@ -93,6 +94,7 @@ export const EnvironmentSwitcher = () => {
       ),
       onClick: (menuInfo: any) => {
         menuInfo?.domEvent?.stopPropagation?.();
+        setIsDropdownOpen(false);
         setActiveEnvironment(environment.id);
         trackEnvironmentSwitched();
         if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
