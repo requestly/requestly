@@ -35,9 +35,12 @@ export const CollectionChain: React.FC<Props> = ({ recordId }) => {
 
   const collections = useMemo(() => {
     const parentIds = getParentChain(recordId);
-    const parents = parentIds.map((id) => getData(id)).reverse();
+    const parents = parentIds
+      .map((id) => getData(id))
+      .filter((record): record is RQAPI.CollectionRecord => Boolean(record))
+      .reverse();
 
-    return parents as RQAPI.CollectionRecord[];
+    return parents;
   }, [getData, getParentChain, recordId]);
 
   return collections.length > 0 ? (
