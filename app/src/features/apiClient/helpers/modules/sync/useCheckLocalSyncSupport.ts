@@ -15,7 +15,7 @@ interface Props {
 export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: false }) => {
   const os = getUserOS();
   const localSyncSupportFlag = useFeatureValue("local_sync_support", {
-    whitelist: ["macOS", "Linux"],
+    whitelist: ["macOS", "Linux", "Windows"],
   });
   const isOsSupported = localSyncSupportFlag?.whitelist?.includes(os);
   const rawIsWorkspaceLocal = useSelector(getActiveWorkspace)?.workspaceType === WorkspaceType.LOCAL;
