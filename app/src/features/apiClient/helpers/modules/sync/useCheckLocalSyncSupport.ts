@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
@@ -23,20 +22,11 @@ export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: 
   const isWorkspaceLocal = options.skipWorkspaceCheck ? true : rawIsWorkspaceLocal;
   const appMode = useSelector(getAppMode);
 
-  const [isLocalSyncSupported, setIsLocalSyncSupported] = useState(false);
-
-  useEffect(() => {
-    if (
-      isOsSupported &&
-      appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-      isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC) &&
-      isWorkspaceLocal
-    ) {
-      setIsLocalSyncSupported(true);
-      return;
-    }
-    setIsLocalSyncSupported(false);
-  }, [appMode, isOsSupported, isWorkspaceLocal, options.skipWorkspaceCheck]);
+  const isLocalSyncSupported =
+    isOsSupported &&
+    appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+    isFeatureCompatible(FEATURES.LOCAL_FILE_SYNC) &&
+    isWorkspaceLocal;
 
   return isLocalSyncSupported;
 };
