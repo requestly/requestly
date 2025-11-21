@@ -37,7 +37,7 @@ export const CollectionChain: React.FC<Props> = ({ recordId }) => {
     const parentIds = getParentChain(recordId);
     const parents = parentIds
       .map((id) => getData(id))
-      .filter((record): record is RQAPI.ApiClientRecord => Boolean(record))
+      .filter((record): record is RQAPI.CollectionRecord => Boolean(record))
       .reverse();
 
     return parents;
