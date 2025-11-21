@@ -193,3 +193,11 @@ div.n-popup {
     }
   }
 }
+
+// Scoped overrides for variable suggestions popover
+.variable-suggestions-popover {
+  .ant-popover-inner-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
