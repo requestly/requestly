@@ -1,6 +1,7 @@
-import { VariableValueType } from "backend/environment/types";
 import { RQAPI } from "features/apiClient/types";
 import { Options as AjvOptions } from "ajv";
+import { IterationData } from "./IterationData";
+import { VariableScope } from "./variableScope";
 
 interface StatusAssertions {
   accepted: void;
@@ -70,6 +71,14 @@ export type ExecutionArtifacts = {
   testResults: TestResult[];
 };
 
+export type InfoObject = {
+  requestId: string;
+  eventName: "prerequest" | "postresponse";
+  iteration: number;
+  iterationCount: number;
+  requestName: string;
+};
+
 export interface TestFunction {
   (testName: string, testFn: () => void): void;
   skip: (testName: string) => void;
@@ -78,32 +87,16 @@ export interface TestFunction {
 export interface SandboxAPI {
   request: LocalScopeRequest;
   response: LocalScopeResponse;
-  environment: {
-    set(key: string, value: VariableValueType): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
-  globals: {
-    set(key: string, value: VariableValueType): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
-  collectionVariables: {
-    set(key: string, value: VariableValueType): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
-  variables: {
-    set(key: string, value: VariableValueType, options?: { persist: boolean }): void;
-    get(key: string): any;
-    unset(key: string): void;
-  };
+  environment: VariableScope;
+  globals: VariableScope;
+  collectionVariables: VariableScope;
+  variables: VariableScope;
+  iterationData: IterationData;
   test: TestFunction;
   expect: Chai.ExpectStatic;
+  info: InfoObject;
   cookies: any;
   execution: any;
-  info: any;
-  iterationData: any;
   require: any;
   sendRequest: any;
   vault: any;
@@ -135,3 +128,18 @@ export interface SkippedTestResult extends BaseTestResult {
 }
 
 export type TestResult = PassedTestResult | FailedTestResult | SkippedTestResult;
+
+export type IterationContext = {
+  iteration: number;
+  iterationCount: number;
+};
+
+export type BaseExecutionMetadata = {
+  requestId: string;
+  requestName: string;
+  iterationContext: IterationContext;
+};
+
+export type ExecutionMetadata = BaseExecutionMetadata & {
+  eventName: "prerequest" | "postresponse";
+};
