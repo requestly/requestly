@@ -258,8 +258,11 @@ const HttpClientView: React.FC<Props> = ({
     }
 
     isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
+    const savedPlacement = localStorage.getItem("sheet_placement");
+    if (!savedPlacement) {
+      const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+      toggleSheetPlacement(bottomSheetPlacement);
+    }
   }, [toggleSheetPlacement]);
 
   useEffect(() => {
@@ -891,7 +894,7 @@ const HttpClientView: React.FC<Props> = ({
             executeRequest={onSendButtonClick}
           />
         }
-        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
+        minSize={25}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div className="api-client-body">

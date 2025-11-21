@@ -78,6 +78,9 @@
 }
 
 .bottom-sheet-tab-extra-content {
+  &.collapsed-bottom-state {
+    margin-right: 56px;
+  }
   &,
   .bottom-sheet-utilites {
     display: flex;
@@ -87,5 +90,28 @@
 
   .bottom-sheet-toggle-btn.ant-btn {
     color: var(--requestly-color-text-subtle);
+  }
+}
+
+.bottom-sheet-vertical-collapsed-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+
+  .bottom-sheet-toggle-btn-collapsed.ant-btn {
+    margin-top: auto;
+    margin-bottom: 56px;
+  }
+}
+
+.collapsed-bottom-sheet {
+  .ant-tabs-tab.ant-tabs-tab-active {
+    border: none !important;
+
+    & .ant-tabs-tab-btn {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
   }
 }
