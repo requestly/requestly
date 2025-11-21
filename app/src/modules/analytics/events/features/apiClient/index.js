@@ -1,10 +1,6 @@
 import { trackEvent } from "modules/analytics/utils";
 import { API_CLIENT } from "../constants";
 
-export const VariableAnalyticsSource = {
-  VARIABLE_POPOVER: "variable_popover",
-};
-
 // Example collections
 // TODO: To be removed once analysis done
 export const trackExampleCollectionsImported = (params = {}) => {

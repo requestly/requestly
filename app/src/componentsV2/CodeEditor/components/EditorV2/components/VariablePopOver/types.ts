@@ -1,6 +1,10 @@
 import React from "react";
 import { EnvironmentVariableType, VariableScope, VariableValueType } from "backend/environment/types";
 
+export enum VariableUpsertSource {
+  VARIABLE_POPOVER = "variable_popover",
+}
+
 export enum PopoverView {
   IDLE = "idle",
   VARIABLE_INFO = "variable_info",
