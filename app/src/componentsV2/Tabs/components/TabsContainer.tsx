@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Tabs, TabsProps, Typography } from "antd";
+import { Tabs, TabsProps, Typography, Popover } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
@@ -12,6 +12,7 @@ import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
+import { TabsMorePopover } from "./TabsMorePopover";
 
 export const TabsContainer: React.FC = () => {
   // Enable keyboard shortcuts for closing active tabs
@@ -44,6 +45,17 @@ export const TabsContainer: React.FC = () => {
   ]);
 
   const { setUrl } = useSetUrl();
+
+  const operations = (
+    <Popover
+      trigger="click"
+      placement="bottomRight"
+      overlayClassName="tabs-operations-popover"
+      content={<TabsMorePopover tabs={tabs} setActiveTab={setActiveTab} closeTabById={closeTabById} />}
+    >
+      <IoIosArrowDown className="tabs-more-icon" />
+    </Popover>
+  );
 
   const hasUnsavedChanges = Array.from(tabs.values()).some(
     (tab) => tab.getState().unsaved || !tab.getState().canCloseTab()
@@ -178,11 +190,11 @@ export const TabsContainer: React.FC = () => {
     <div className="tabs-container">
       <Tabs
         type="editable-card"
+        tabBarExtraContent={operations}
         items={tabItems}
         activeKey={activeTabId?.toString()}
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
-        moreIcon={<IoIosArrowDown />}
         size="small"
         onChange={(key) => {
           setActiveTab(parseInt(key));
