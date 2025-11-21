@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { Checkbox, Collapse, Dropdown, MenuProps, Skeleton, Typography, notification } from "antd";
 import { RQAPI } from "features/apiClient/types";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { RequestRow } from "../requestRow/RequestRow";
 import { ApiRecordEmptyState } from "../apiRecordEmptyState/ApiRecordEmptyState";
@@ -491,12 +491,14 @@ export const CollectionRow: React.FC<Props> = ({
                           });
                         }}
                       >
-                        <RQButton
-                          size="small"
-                          type="transparent"
-                          icon={<MdAdd />}
-                          onClick={(e) => e.stopPropagation()}
-                        />
+                        <RQTooltip title="New request or collection">
+                          <RQButton
+                            size="small"
+                            type="transparent"
+                            icon={<MdAdd />}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </RQTooltip>
                       </NewApiRecordDropdown>
                       <Dropdown
                         trigger={["click"]}
@@ -504,15 +506,17 @@ export const CollectionRow: React.FC<Props> = ({
                         placement="bottomRight"
                         overlayClassName="collection-dropdown-menu"
                       >
-                        <RQButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowSelection(false);
-                          }}
-                          size="small"
-                          type="transparent"
-                          icon={<MdOutlineMoreHoriz />}
-                        />
+                        <RQTooltip title="More Actions">
+                          <RQButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowSelection(false);
+                            }}
+                            size="small"
+                            type="transparent"
+                            icon={<MdOutlineMoreHoriz />}
+                          />
+                        </RQTooltip>
                       </Dropdown>
                     </div>
                   </Conditional>
