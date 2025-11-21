@@ -70,15 +70,11 @@ export const EditVariableView: React.FC<EditVariableViewProps> = ({
         return;
       }
 
-      trackVariablesSaved({
-        source: VariableUpsertSource.VARIABLE_POPOVER,
-        variable_scope: formData.scope.toLowerCase(),
-      });
-
       await onSave(variableData);
       toast.success(`Variable updated in ${result.scopeName || existingVariable.scopeName}`);
       trackVariablesSaved({
-        source: "variable popover",
+        source: VariableUpsertSource.VARIABLE_POPOVER,
+        variable_scope: formData.scope.toLowerCase(),
       });
     } catch (error) {
       toast.error("Failed to update variable");
