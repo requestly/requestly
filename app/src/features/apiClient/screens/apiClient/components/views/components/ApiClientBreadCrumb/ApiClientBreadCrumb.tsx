@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Conditional } from "components/common/Conditional";
 import PATHS from "config/constants/sub/paths";
 import { RQBreadcrumb } from "lib/design-system-v2/components";
@@ -7,12 +7,11 @@ import {
   ApiClientViewMode,
   useApiClientMultiWorkspaceView,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
-import { LuFolderCog } from "@react-icons/all-files/lu/LuFolderCog";
 import "./ApiClientBreadCrumb.scss";
-import { truncateString } from "features/apiClient/screens/apiClient/utils";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
-import { Tooltip } from "antd";
+import { Typography } from "antd";
 import { useApiClientFeatureContext } from "features/apiClient/contexts/meta";
+import { FolderOutlined } from "@ant-design/icons";
 
 interface Props {
   id: string;
@@ -30,7 +29,7 @@ export const BreadcrumbType = {
   API_REQUEST: "api_request",
 };
 
-export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
+export const MultiWorkSpaceViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
   const { id, autoFocus, name, onRecordNameUpdate, placeholder, onBlur, breadCrumbType } = props;
 
   const location = useLocation();
@@ -44,27 +43,37 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
     ctx.workspaceId,
   ]);
 
-  const [getParentChain, getData] = useAPIRecords((s) => [s.getParentChain, s.getData]);
+  const [getParentChain, getData, childParentMap] = useAPIRecords((s) => [
+    s.getParentChain,
+    s.getData,
+    s.childParentMap,
+  ]);
 
-  const localWsPath = currentWorkspace?.getState()?.rawWorkspace?.rootPath ?? "";
-  const truncatePath = truncateString(localWsPath, 40);
+  const workspaceName = currentWorkspace?.getState().name;
 
-  const parentCollectionNames = useMemo(() => {
+  const [parentCollectionNames, setParentCollectionNames] = useState<[]>([]);
+
+  useEffect(() => {
     const collections = getParentChain(id);
 
     const parentRecords = collections
       .slice()
       .reverse()
       .map((id) => {
+        const item = getData(id);
+        const path =
+          item?.type === BreadcrumbType.COLLECTION
+            ? `/api-client/collection/${item?.id}`
+            : `/api-client/request/${item?.id}`;
         return {
-          label: getData(id)?.name,
-          pathname: "",
+          label: item?.name || "Untitled",
+          pathname: path,
           isEditable: false,
         };
       });
 
-    return parentRecords;
-  }, [getData, getParentChain, id]);
+    setParentCollectionNames(parentRecords);
+  }, [getData, getParentChain, id, childParentMap]);
 
   return (
     <RQBreadcrumb
@@ -76,16 +85,21 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
       defaultBreadcrumbs={[
         {
           label: (
-            <Conditional condition={!!truncatePath}>
-              <div>
-                <Tooltip trigger="hover" title={localWsPath} color="var(--requestly-color-black)" placement="bottom">
-                  <span className="api-client-local-workspace-path-breadcrumb">
-                    <LuFolderCog className="api-client-local-workspace-icon" />
-                    {truncatePath}
-                  </span>
-                </Tooltip>
-              </div>
-            </Conditional>
+            <div className="workspace-breadcrumb-item">
+              <Typography.Text
+                className="api-client-local-workspace-breadcrumb"
+                ellipsis={{
+                  tooltip: {
+                    title: workspaceName || "Workspace",
+                    color: "var(--requestly-color-black)",
+                    placement: "bottom",
+                  },
+                }}
+              >
+                <FolderOutlined className="api-client-local-workspace-icon" />
+                <span>{workspaceName || "Workspace"}</span>
+              </Typography.Text>
+            </div>
           ),
           pathname: PATHS.API_CLIENT.INDEX,
           isEditable: false,
@@ -106,33 +120,76 @@ export const MultiViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
   );
 };
 
-export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
-  const { openInModal, autoFocus, name, placeholder, onRecordNameUpdate, onBlur } = props;
-
+const SingleWorkSpaceViewBreadCrumb: React.FC<Props> = ({ ...props }) => {
+  const { id, autoFocus, name, onRecordNameUpdate, placeholder, onBlur, breadCrumbType } = props;
   const location = useLocation();
   const isHistoryPath = location.pathname.includes("history");
+
+  const [getParentChain, getData, childParentMap] = useAPIRecords((s) => [
+    s.getParentChain,
+    s.getData,
+    s.childParentMap,
+  ]);
+
+  const [parentCollectionNames, setParentCollectionNames] = useState<[]>([]);
+
+  useEffect(() => {
+    const collections = getParentChain(id);
+
+    const parentRecords = collections
+      .slice()
+      .reverse()
+      .map((id) => {
+        const item = getData(id);
+        const path =
+          item?.type === BreadcrumbType.COLLECTION
+            ? `/api-client/collection/${item?.id}`
+            : `/api-client/request/${item?.id}`;
+        return {
+          label: item?.name || "Untitled Request",
+          pathname: path,
+          isEditable: false,
+        };
+      });
+
+    setParentCollectionNames(parentRecords);
+  }, [getData, getParentChain, id, childParentMap]);
+
+  return (
+    <RQBreadcrumb
+      placeholder={placeholder}
+      recordName={name}
+      onRecordNameUpdate={onRecordNameUpdate}
+      onBlur={onBlur}
+      autoFocus={autoFocus}
+      defaultBreadcrumbs={[
+        ...parentCollectionNames,
+        {
+          isEditable: breadCrumbType === BreadcrumbType.API_REQUEST ? !isHistoryPath : true,
+          pathname: window.location.pathname,
+          label:
+            breadCrumbType === BreadcrumbType.API_REQUEST
+              ? isHistoryPath
+                ? "History"
+                : name || "Untitled request"
+              : name,
+        },
+      ]}
+    />
+  );
+};
+
+export const ApiClientBreadCrumb: React.FC<Props> = ({ ...props }) => {
+  const { openInModal } = props;
+
   const [getViewMode] = useApiClientMultiWorkspaceView((s) => [s.getViewMode]);
 
   return (
     <Conditional condition={!openInModal}>
       {getViewMode() === ApiClientViewMode.SINGLE ? (
-        <RQBreadcrumb
-          placeholder={placeholder}
-          recordName={name}
-          onRecordNameUpdate={onRecordNameUpdate}
-          onBlur={onBlur}
-          autoFocus={autoFocus}
-          defaultBreadcrumbs={[
-            { label: "API Client", pathname: PATHS.API_CLIENT.INDEX },
-            {
-              isEditable: !isHistoryPath,
-              pathname: window.location.pathname,
-              label: isHistoryPath ? "History" : name || "Untitled request",
-            },
-          ]}
-        />
+        <SingleWorkSpaceViewBreadCrumb {...props} />
       ) : (
-        <MultiViewBreadCrumb {...props} />
+        <MultiWorkSpaceViewBreadCrumb {...props} />
       )}
     </Conditional>
   );
