@@ -258,3 +258,21 @@ export function getAllWorkspaces() {
     timeout: 1000,
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
 }
+
+// Remove a local workspace. If opts.deleteDirectory is true, attempts recursive delete of the workspace folder.
+// Treat non-existent workspace id as success (idempotent). Propagates permission errors so caller can retry without deleteDirectory.
+export function removeWorkspace(
+  workspaceId: string,
+  opts: { deleteDirectory?: boolean } = {}
+): Promise<{ type: string } | void> {
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "removeWorkspace",
+      // Folder deletion can take time; giving generous timeout.
+      timeout: 80000,
+    },
+    workspaceId,
+    opts
+  ) as Promise<{ type: string } | void>;
+}
