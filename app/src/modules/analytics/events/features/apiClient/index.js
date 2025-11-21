@@ -1,5 +1,9 @@
-import { trackEvent } from "modules/analytics";
+import { trackEvent } from "modules/analytics/utils";
 import { API_CLIENT } from "../constants";
+
+export const VariableAnalyticsSource = {
+  VARIABLE_POPOVER: "variable_popover",
+};
 
 // Example collections
 // TODO: To be removed once analysis done
@@ -117,17 +121,11 @@ export const trackNewEnvironmentClicked = (source) => {
 };
 
 export const trackVariablesSaved = (params) => {
-  trackEvent(API_CLIENT.VARIABLES_UPDATED, {
-    ...params,
-    source: params.source,
-  });
+  trackEvent(API_CLIENT.VARIABLES_UPDATED, params);
 };
 
 export const trackVariableCreated = (params) => {
-  trackEvent(API_CLIENT.VARIABLE_CREATED, {
-    ...params,
-    source: params.source,
-  });
+  trackEvent(API_CLIENT.VARIABLE_CREATED, params);
 };
 
 export const trackEnvironmentSwitched = () => {
