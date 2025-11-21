@@ -52,9 +52,11 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
-  const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
+  const hasEnabledQueryParams = useQueryParamStore((state) => {
+    return state.queryParams.some((qp) => qp.isEnabled === true);
+  });
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
   
 
@@ -62,7 +64,13 @@ const HttpRequestTabs: React.FC<Props> = ({
     return [
       {
         key: RequestTab.QUERY_PARAMS,
-        label: <RequestTabLabel label="Params" count={queryParams.length || pathVariables.length} showDot={true} />,
+        label: (
+          <RequestTabLabel
+            label="Params"
+            count={hasEnabledQueryParams || pathVariables.length ? 1 : 0}
+            showDot={true}
+          />
+        ),
         children: (
           <>
             <div className="params-table-title">Query Params</div>
@@ -93,7 +101,11 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          <RequestTabLabel
+            label="Body"
+            count={requestEntry.request.body?.length ? 1 : 0}
+            showDot={isRequestBodySupported}
+          />
         ),
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
@@ -172,7 +184,8 @@ const HttpRequestTabs: React.FC<Props> = ({
     collectionId,
     handleAuthChange,
     isRequestBodySupported,
-    queryParams.length,
+    hasEnabledQueryParams,
+    pathVariables.length,
     requestEntry.auth,
     requestEntry.request.body,
     requestEntry.request.bodyContainer,
