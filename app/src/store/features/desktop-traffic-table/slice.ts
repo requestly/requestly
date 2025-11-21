@@ -33,6 +33,7 @@ interface DesktopTrafficTableState {
   responses: ResponsesState; // Stores all the bodies in different state key
   filters: TrafficTableFilters;
   isInterceptionPaused: boolean;
+  selectedLogId: string | null; // Variable to track the currently selected request, which opens the details pane
 }
 
 export const logsAdapter = createEntityAdapter<any>({
@@ -56,6 +57,7 @@ const initialState: DesktopTrafficTableState = {
     showOnlyModifiedRequests: false,
   },
   isInterceptionPaused: false,
+  selectedLogId: null,
 };
 
 const slice = createSlice({
@@ -73,9 +75,10 @@ const slice = createSlice({
     },
     logUpdate: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       logsAdapter.updateOne(state.logs, action.payload);
-    },
+    }, // Modified logsClearAll reducer
     logsClearAll: (state: DesktopTrafficTableState, action: PayloadAction<any>) => {
       logsAdapter.removeAll(state.logs);
+      state.selectedLogId = null; // FIX: Clear selected log ID to close details pane
     },
     logResponseBodyAdd: {
       reducer(state: DesktopTrafficTableState, action: PayloadAction<any>) {
@@ -128,6 +131,10 @@ const slice = createSlice({
     },
     toggleIsInterceptionPaused: (state: DesktopTrafficTableState) => {
       state.isInterceptionPaused = !state.isInterceptionPaused;
+    },
+    // Added action to set the selected ID
+    setSelectedLogId: (state: DesktopTrafficTableState, action: PayloadAction<string | null>) => {
+      state.selectedLogId = action.payload;
     },
   },
 });
