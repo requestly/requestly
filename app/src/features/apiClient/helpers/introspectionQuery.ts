@@ -28,12 +28,10 @@ export const fetchGraphQLIntrospectionData = async (
     value: header.value,
   }));
 
-  const searchParams = new URLSearchParams();
-  queryParams.forEach((param) => {
-    searchParams.append(param.key, param.value);
-  });
   const requestUrl = new URL(url);
-  requestUrl.search = searchParams.toString();
+  queryParams.forEach((param) => {
+    requestUrl.searchParams.append(param.key, param.value);
+  });
 
   const request = createGraphQLIntrospectionRequest(requestUrl.toString(), formattedHeaders);
   const httpRequest = graphQLRequestToHttpRequestAdapter(request);
