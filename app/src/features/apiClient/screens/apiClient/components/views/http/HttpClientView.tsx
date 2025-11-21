@@ -840,6 +840,7 @@ const HttpClientView: React.FC<Props> = ({
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
               type="primary"
               className="text-bold"
+              enableHotKey={enableHotkey}
               disabled={
                 !entry.request.url ||
                 (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
