@@ -62,27 +62,41 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
 
   // Initialize API Client context when modal opens
   useEffect(() => {
-    if (isModalOpen && activeWorkspace && !contextId) {
-      (async () => {
-        try {
-          const { id } = await setupContextWithoutMarkingLoaded(activeWorkspace, {
-            loggedIn: user.loggedIn,
-            uid: user.details?.profile?.uid ?? "",
-          });
-          setContextId(id);
-        } catch (error) {
-          console.error("Failed to initialize API Client context:", error);
-          // Fallback to NoopContextId if initialization fails
-          setContextId(NoopContextId);
-        }
-      })();
+    if (!isModalOpen || !activeWorkspace || contextId) {
+      return;
     }
 
-    // Reset context when modal closes
+    let isMounted = true;
+
+    (async () => {
+      try {
+        const { id } = await setupContextWithoutMarkingLoaded(activeWorkspace, {
+          loggedIn: user.loggedIn,
+          uid: user.details?.profile?.uid ?? "",
+        });
+        if (isMounted) {
+          setContextId(id);
+        }
+      } catch (error) {
+        console.error("Failed to initialize API Client context:", error);
+        // Fallback to NoopContextId if initialization fails
+        if (isMounted) {
+          setContextId(NoopContextId);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isModalOpen, activeWorkspace, user.loggedIn, user.details?.profile?.uid, contextId]);
+
+  // Reset context when modal closes
+  useEffect(() => {
     if (!isModalOpen && contextId) {
       setContextId(null);
     }
-  }, [isModalOpen, activeWorkspace, user.loggedIn, user.details?.profile?.uid, contextId]);
+  }, [isModalOpen, contextId]);
 
   const apiRecord = useMemo<RQAPI.ApiRecord>(() => {
     if (!request) {
