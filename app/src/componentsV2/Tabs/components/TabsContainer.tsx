@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Tabs, TabsProps, Typography, Popover } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
@@ -17,6 +17,8 @@ import { TabsMorePopover } from "./TabsMorePopover";
 export const TabsContainer: React.FC = () => {
   // Enable keyboard shortcuts for closing active tabs
   useCloseActiveTabShortcut();
+
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const [
     activeTabId,
@@ -49,11 +51,13 @@ export const TabsContainer: React.FC = () => {
   const operations = (
     <Popover
       trigger="click"
-      placement="bottomRight"
+      placement="topRight"
       overlayClassName="tabs-operations-popover"
       content={<TabsMorePopover tabs={tabs} setActiveTab={setActiveTab} closeTabById={closeTabById} />}
+      open={isPopoverOpen}
+      onOpenChange={setIsPopoverOpen}
     >
-      <IoIosArrowDown className="tabs-more-icon" />
+      <IoIosArrowDown className={`tabs-more-icon ${isPopoverOpen ? "tabs-more-icon-open" : ""}`} />
     </Popover>
   );
 
