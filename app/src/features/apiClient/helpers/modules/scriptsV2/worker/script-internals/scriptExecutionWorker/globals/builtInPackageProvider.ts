@@ -1,24 +1,7 @@
 import { ExternalPackage, PackageProvider, PackageSource } from "./packageTypes";
 
-/**
- * Source identifier for all built-in packages.
- * This is intentionally narrow for now so we can
- * safely extend to "npm" | "jsr" | etc. later.
- */
 const BUILTIN_SOURCE: PackageSource = "builtin";
 
-/**
- * Central, curated list of built-in packages exposed to API Client scripts.
- *
- * NOTE:
- * - `id` should correspond to what the user/script would use in `require(id)`
- *   or import specifiers when we add ESM-style imports.
- * - `runtimeId` should match the keys used in runtimeBindings so that
- *   metadata and runtime resolution stay in sync.
- *
- * This file is intentionally free of any runtime imports. It only describes
- * metadata and is safe to use on both UI and worker sides.
- */
 const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
   {
     id: "moment",
@@ -102,29 +85,15 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
   },
 ];
 
-/**
- * Index packages by id for O(1) lookup.
- * Kept internal to avoid accidental mutation of the primary list.
- */
 const BUILTIN_PACKAGES_BY_ID: Readonly<Record<string, ExternalPackage>> = BUILTIN_PACKAGES.reduce<
   Record<string, ExternalPackage>
 >((acc, pkg) => {
-  // In case of accidental duplicates, first one wins to avoid
-  // surprising overrides. This is deliberate; duplicates should
-  // be caught in tests / code review.
   if (!acc[pkg.id]) {
     acc[pkg.id] = pkg;
   }
   return acc;
 }, {});
 
-/**
- * Package provider for built-in libraries.
- *
- * This is the only provider registered in the initial iteration.
- * Additional providers (npm/jsr/CDN) can be added later without
- * changing callers, as long as they conform to PackageProvider.
- */
 export class BuiltInPackageProvider implements PackageProvider {
   public readonly source: PackageSource = BUILTIN_SOURCE;
 
