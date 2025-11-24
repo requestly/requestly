@@ -20,14 +20,33 @@
 
 .tabs-operations-popover-content {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   background-color: var(--requestly-color-surface-1);
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .tabs-popover-list {
+  display: flex;
+  max-height: 480px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px !important;
+  align-self: stretch;
+  overflow-y: auto;
+
+  .ant-spin-nested-loading {
+    width: 100%;
+  }
+
   .tabs-ops-item {
-    flex: 1 1 0;
+    display: flex;
+    padding: var(--space-3, 6px) var(--space-5, 12px);
+    align-items: center;
+    gap: var(--space-4, 8px);
+    align-self: stretch;
     border: none;
     cursor: pointer;
     border-radius: 4px;
@@ -69,5 +88,31 @@
         background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
       }
     }
+  }
+}
+
+.tabs-popover-list {
+  scrollbar-width: none; /* Firefox */
+}
+
+.tabs-popover-list::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-title-tooltip {
+  .ant-tooltip-inner {
+    background-color: black;
+    color: var(--requestly-color-text-default);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: var(--requestly-font-size-xs, 11px);
+    font-weight: 400;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 250px;
+    word-wrap: break-word;
+  }
+
+  .ant-tooltip-arrow-content {
+    --antd-arrow-background-color: black !important;
   }
 }
