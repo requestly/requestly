@@ -76,6 +76,7 @@ const TeamViewer = () => {
     if (!(location?.state && location.state.previousPath)) {
       redirectTo404(navigate);
     }
+    return null;
   }
 
   return (
