@@ -32,7 +32,7 @@ export class RQScriptWebWorker implements RQWorker {
     try {
       const artifacts = await this.scriptWorker.executeScript(
         workload.script,
-        workload.initialState,
+        workload.scriptContext,
         proxy(workload.postScriptExecutionCallback)
       );
       return {
