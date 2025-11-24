@@ -5,12 +5,12 @@
   color: var(--requestly-color-text-default);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--requestly-color-white-t-20);
   height: 32px;
   align-items: center;
   &:focus {
     border-color: var(--requestly-color-primary);
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    box-shadow: 0 0 0 2px var(--requestly-color-primary-t-20);
   }
 
   &::placeholder {
@@ -21,7 +21,7 @@
 .tabs-operations-popover-content {
   width: 100%;
   padding: 10px;
-  background-color: var(--requestly-color-surface-1, #282828);
+  background-color: var(--requestly-color-surface-1);
   box-shadow: none;
 }
 
@@ -32,7 +32,7 @@
     cursor: pointer;
     border-radius: 4px;
     &:hover {
-      background-color: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+      background-color: var(--requestly-color-white-t-20);
     }
 
     .tab-ops-item-container {
@@ -48,8 +48,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
       width: 150px; /* or max-width: 100%; */
-      color: var(--alias-tokens-color-text-default, #fff);
-      font-family: var(--font-family-default, Inter);
+      color: var(--requestly-color-text-default);
+      font-family: var(--font-family-default);
       font-size: var(--font-size-sm, 12px);
       font-style: normal;
       font-weight: 400;

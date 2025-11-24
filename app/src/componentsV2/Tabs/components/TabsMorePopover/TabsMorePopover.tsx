@@ -4,8 +4,12 @@ import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsMorePopover.scss";
 import { TabsEmptyState } from "../TabsEmptyState";
 
+interface Tab {
+  getState: () => { id: number; title: string; icon?: React.ReactNode };
+}
+
 interface TabsMorePopoverProps {
-  tabs: Map<number, any>;
+  tabs: Map<number, Tab>;
   setActiveTab: (id: number) => void;
   closeTabById: (id: number) => void;
 }
@@ -37,8 +41,8 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiv
         renderItem={(tab) => (
           <List.Item className="tabs-ops-item" onClick={() => setActiveTab(tab.id)}>
             <div className="tab-ops-item-container">
-              {tab.icon}
-              <span className="tab-ops-item-title">{tab.title}</span>
+              {tab.icon ?? null}
+              <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
             </div>
 
             <MdClose
