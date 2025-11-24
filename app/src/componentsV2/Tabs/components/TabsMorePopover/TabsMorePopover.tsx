@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Input, List } from "antd";
+import React, { useState, useRef, useEffect } from "react";
+import { Input, List, Tooltip } from "antd";
+import type { InputRef } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsMorePopover.scss";
 import { TabsEmptyState } from "../TabsEmptyState";
@@ -16,8 +17,16 @@ interface TabsMorePopoverProps {
 
 export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiveTab, closeTabById }) => {
   const [query, setQuery] = useState("");
+  const inputRef = useRef<InputRef>(null);
   const tabList = Array.from(tabs.values()).map((t) => t.getState());
-  const filtered = tabList.filter((tab) => tab.title.toLowerCase().includes(query.toLowerCase()));
+  const filtered = tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
+
+  useEffect(() => {
+    // Auto-focus the input when the component mounts
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const onClearFilter = () => {
     setQuery("");
@@ -26,12 +35,12 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiv
   return (
     <div className="tabs-operations-popover-content">
       <Input
+        ref={inputRef}
         size="small"
         className="tabs-search-input"
         placeholder="Search tabs"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        style={{ marginBottom: 8 }}
       />
 
       <List
@@ -42,7 +51,18 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiv
           <List.Item className="tabs-ops-item" onClick={() => setActiveTab(tab.id)}>
             <div className="tab-ops-item-container">
               {tab.icon ?? null}
-              <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
+              {(tab.title ?? "Untitled").length > 20 ? (
+                <Tooltip
+                  title={tab.title ?? "Untitled"}
+                  mouseEnterDelay={0.5}
+                  overlayClassName="tab-title-tooltip"
+                  placement="top"
+                >
+                  <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
+                </Tooltip>
+              ) : (
+                <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
+              )}
             </div>
 
             <MdClose
