@@ -14,7 +14,7 @@ export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const isUserPremium = user?.details?.isPremium;
+  const isUserPremium = import.meta.env.DEV ? true : user?.details?.isPremium; // Bypass premium check in dev mode
   const userPlan = isUserPremium ? getPlanNameFromId(user?.details?.planDetails?.planId) : PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
