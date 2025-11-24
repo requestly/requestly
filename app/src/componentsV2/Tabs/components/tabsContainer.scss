@@ -31,7 +31,7 @@
           content: "";
           position: absolute;
           top: 0;
-          right: 50px;
+          right: 55px;
           bottom: 0;
           width: 42px;
           background: linear-gradient(270deg, #1a1a1a 0%, rgba(26, 26, 26, 0) 100%);
@@ -312,7 +312,7 @@
   align-items: center;
   justify-content: center;
   width: 24px;
-  height: 24px;
+  height: 25px;
   border-radius: 4px;
   padding: 0;
   border: none;
@@ -320,9 +320,13 @@
   color: var(--requestly-color-text-default);
   font-size: small;
   margin-top: -1px;
+  margin-left: 5px;
   &:hover {
     background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
   }
+}
+.ant-tabs-extra-content:has(.tabs-more-icon-open) {
+  background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
 }
 
 .tabs-operations-popover {
@@ -330,9 +334,9 @@
   max-height: 480px;
   background-color: var(--requestly-space-4-color-surface-1, #282828);
   border-radius: 4px;
-  overflow: scroll;
+  overflow-y: auto;
   padding: 0;
-  margin-top: 20px;
+  top: 75px !important;
   overflow-x: hidden;
 
   .ant-popover-inner-content {
@@ -341,6 +345,10 @@
     width: 100%;
     padding-right: 0px;
   }
+}
+
+.tabs-operations-popover {
+  scrollbar-width: none; /* Firefox */
 }
 
 .tabs-operations-popover::-webkit-scrollbar {
