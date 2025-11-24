@@ -1,7 +1,7 @@
 .tabs-search-input {
   background: var(--requestly-color-surface-1);
   border-radius: 4px;
-  font-size: var(--requestly-font-size-sm, 13px);
+  font-size: var(--requestly-font-size-sm);
   color: var(--requestly-color-text-default);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -43,9 +43,9 @@
 
   .tabs-ops-item {
     display: flex;
-    padding: var(--space-3, 6px) var(--space-5, 12px);
+    padding: var(--requestly-space-3, 6px) var(--requestly-space-5, 12px);
     align-items: center;
-    gap: var(--space-4, 8px);
+    gap: var(--requestly-space-4, 8px);
     align-self: stretch;
     border: none;
     cursor: pointer;
@@ -58,7 +58,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-4, 8px);
+      gap: var(--requestly-space-4);
     }
 
     .tab-ops-item-title {
@@ -101,11 +101,11 @@
 
 .tab-title-tooltip {
   .ant-tooltip-inner {
-    background-color: black;
+    background-color: var(--requestly-color-surface-1);
     color: var(--requestly-color-text-default);
     border-radius: 4px;
     padding: 6px 8px;
-    font-size: var(--requestly-font-size-xs, 11px);
+    font-size: var(--requestly-font-size-xs);
     font-weight: 400;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: 250px;
@@ -113,6 +113,6 @@
   }
 
   .ant-tooltip-arrow-content {
-    --antd-arrow-background-color: black !important;
+    --antd-arrow-background-color: var(--requestly-color-surface-1) !important;
   }
 }
