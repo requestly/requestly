@@ -4,36 +4,28 @@ import type { InputRef } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsMorePopover.scss";
 import { TabsEmptyState } from "../TabsEmptyState";
-import { StoreApi } from "zustand";
-import { TabState } from "componentsV2/Tabs/store/tabStore";
-
-type TabStore = StoreApi<TabState>;
-type TabId = number;
+import { useTabServiceWithSelector } from "componentsV2/Tabs/store/tabServiceStore";
 
 interface TabsMorePopoverProps {
-  tabs: Map<TabId, TabStore>;
   onTabItemClick: (id: number) => void;
   onCloseTab: (id: number) => void;
-  isOpen: boolean;
 }
 
-export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, onTabItemClick, onCloseTab, isOpen }) => {
+export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick, onCloseTab }) => {
   const [query, setQuery] = useState("");
   const inputRef = useRef<InputRef>(null);
-  const tabList = Array.from(tabs.values()).map((t) => t.getState());
-  const filtered = useMemo(() => {
-    return tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
-  }, [tabList, query]);
+  const tabs = useTabServiceWithSelector((state) => state.tabs);
+  const tabList = useMemo(() => {
+    return Array.from(tabs.values()).map((t) => t.getState());
+  }, [tabs]);
+
+  const filtered = tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
 
   useEffect(() => {
-    // Auto-focus the input and reset search query when the popover opens
-    if (isOpen) {
-      setQuery("");
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
-  }, [isOpen]);
+  }, []);
 
   const onClearFilter = () => {
     setQuery("");
