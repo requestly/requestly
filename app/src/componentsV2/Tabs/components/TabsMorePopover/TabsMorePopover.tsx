@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Input, List, Tooltip } from "antd";
 import type { InputRef } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
@@ -14,20 +14,26 @@ interface TabsMorePopoverProps {
   tabs: Map<TabId, TabStore>;
   onTabItemClick: (id: number) => void;
   onCloseTab: (id: number) => void;
+  isOpen: boolean;
 }
 
-export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, onTabItemClick, onCloseTab }) => {
+export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, onTabItemClick, onCloseTab, isOpen }) => {
   const [query, setQuery] = useState("");
   const inputRef = useRef<InputRef>(null);
   const tabList = Array.from(tabs.values()).map((t) => t.getState());
-  const filtered = tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
+  const filtered = useMemo(() => {
+    return tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
+  }, [tabList, query]);
 
   useEffect(() => {
-    // Auto-focus the input when the component mounts
-    if (inputRef.current) {
-      inputRef.current.focus();
+    // Auto-focus the input and reset search query when the popover opens
+    if (isOpen) {
+      setQuery("");
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
-  }, []);
+  }, [isOpen]);
 
   const onClearFilter = () => {
     setQuery("");

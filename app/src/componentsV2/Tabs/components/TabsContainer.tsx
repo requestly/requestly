@@ -54,7 +54,14 @@ export const TabsContainer: React.FC = () => {
         trigger="click"
         placement="topRight"
         overlayClassName="tabs-operations-popover"
-        content={<TabsMorePopover tabs={tabs} onTabItemClick={setActiveTab} onCloseTab={closeTabById} />}
+        content={
+          <TabsMorePopover
+            tabs={tabs}
+            onTabItemClick={setActiveTab}
+            onCloseTab={closeTabById}
+            isOpen={isMorePopoverOpen}
+          />
+        }
         open={isMorePopoverOpen}
         onOpenChange={setIsMorePopoverOpen}
       >
