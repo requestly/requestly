@@ -1,11 +1,11 @@
-.ant-list-empty-text {
+.tabs-popover-list .ant-list-empty-text {
   .tabs-empty-state {
     display: flex;
-    padding: var(--space-8, 24px) 0;
+    padding: var(--requestly-space-8, 24px) 0;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: var(--space-6, 16px);
+    gap: var(--requestly-space-6, 16px);
     align-self: stretch;
 
     .tabs-empty-icon {
