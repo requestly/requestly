@@ -9,9 +9,21 @@
   .code-editor-custom-options-row {
     margin-top: 0;
     margin-left: 4px;
+    flex: 1;
+
+    .code-editor-custom-options-block {
+      width: 100%;
+    }
   }
 
   overflow: hidden;
+
+  .api-client-script-editor-actions-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+  }
 
   .api-client-script-type-selector {
     &__btn.ant-radio-button-wrapper {

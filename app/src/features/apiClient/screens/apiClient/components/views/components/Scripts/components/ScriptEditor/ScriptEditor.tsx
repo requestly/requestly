@@ -2,11 +2,14 @@ import React from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
-import { Radio, Tooltip } from "antd";
+import { Popover, Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import "./scriptEditor.scss";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
+import { AIPromptPopover } from "../AIPromptPopover/AIPromptPopover";
+import { RQButton } from "lib/design-system-v2/components";
+import { MdOutlineAutoAwesome } from "@react-icons/all-files/md/MdOutlineAutoAwesome";
+import "./scriptEditor.scss";
 
 interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
@@ -22,6 +25,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
+  const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   React.useEffect(() => {
@@ -32,32 +36,58 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
 
   const scriptTypeOptions = useMemo(() => {
     return (
-      <>
-        <Radio.Group
-          className="api-client-script-type-selector"
-          value={scriptType}
-          onChange={(e) => setScriptType(e.target.value)}
-          size="small"
+      <div className="api-client-script-editor-actions-container">
+        <span>
+          <Radio.Group
+            className="api-client-script-type-selector"
+            value={scriptType}
+            onChange={(e) => setScriptType(e.target.value)}
+            size="small"
+          >
+            <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
+              Pre-request
+            </Radio.Button>
+            <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.POST_RESPONSE}>
+              Post-response
+            </Radio.Button>
+          </Radio.Group>
+          <Tooltip title="Learn more about using scripts in API requests" showArrow={false} placement="right">
+            <MdInfoOutline
+              className="api-client-script-type-selector__info-icon"
+              onClick={() => window.open("https://docs.requestly.com/general/api-client/scripts", "_blank")}
+            />
+          </Tooltip>
+        </span>
+        <Popover
+          open={isGenerateTestPopoverOpen}
+          onOpenChange={setIsGenerateTestPopoverOpen}
+          trigger="click"
+          content={
+            <AIPromptPopover
+              isLoading={false}
+              isPopoverOpen={isGenerateTestPopoverOpen}
+              onGenerateClick={() => {}}
+              onCancelClick={() => {}}
+            />
+          }
+          placement="bottomRight"
+          overlayClassName="ai-generate-test-popover"
+          showArrow={false}
         >
-          <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
-            Pre-request
-          </Radio.Button>
-          <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.POST_RESPONSE}>
-            Post-response
-          </Radio.Button>
-        </Radio.Group>
-        <Tooltip title="Learn more about using scripts in API requests" showArrow={false} placement="right">
-          <MdInfoOutline
-            className="api-client-script-type-selector__info-icon"
-            onClick={() => window.open("https://docs.requestly.com/general/api-client/scripts", "_blank")}
-          />
-        </Tooltip>
-      </>
+          <RQButton
+            className="ai-generate-test-btn ai-generate-test-btn__new"
+            size="small"
+            icon={<MdOutlineAutoAwesome />}
+          >
+            Generate tests
+          </RQButton>
+        </Popover>
+      </div>
     );
-  }, [scriptType]);
+  }, [scriptType, isGenerateTestPopoverOpen]);
 
   return (
-    <div className=" api-client-code-editor-container api-client-script-editor-container">
+    <div className="api-client-script-editor-container">
       <Editor
         key={`${scriptType}`}
         value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
