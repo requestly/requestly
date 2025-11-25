@@ -5,8 +5,17 @@ import {
   CompletionSource,
   insertCompletionText,
 } from "@codemirror/autocomplete";
-import { EditorView } from "@codemirror/view";
-import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { ScopedVariables, ScopedVariable } from "features/apiClient/helpers/variableResolver/variable-resolver";
+
+interface AutocompleteSetters {
+  setShowAutocomplete: (show: boolean) => void;
+  setAutocompleteQuery: (query: string) => void;
+  setAutocompletePosition: (position: { x: number; y: number }) => void;
+  setSelectedIndex: (index: number) => void;
+  setAutocompleteRange: (range: { from: number; to: number } | null) => void;
+  insertVariable: (view: EditorView, variableKey: string, range: { from: number; to: number }) => void;
+}
 
 /**
  * Creates a custom completion source that returns a set of suggestions
@@ -32,6 +41,7 @@ export function generateCompletionSource(
         filter: true,
       } as CompletionResult;
     }
+    return null;
   };
 }
 
@@ -57,6 +67,123 @@ function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
     };
   });
   return generateCompletionSource(/\{\{.*?/g, varCompletions, 2);
+}
+
+/* NEW PLUGIN WITH CALLBACK-BASED PATTERN */
+export function generateCompletionsWithPopover(setters: AutocompleteSetters, envVariables?: ScopedVariables) {
+  if (!envVariables) return [];
+
+  return ViewPlugin.fromClass(
+    class {
+      private view: EditorView;
+      private selectedIndex = 0;
+      private filteredVariables: [string, ScopedVariable][] = [];
+      private currentRange: { from: number; to: number } | null = null;
+
+      private updateFilteredVariables(query: string) {
+        this.filteredVariables = Array.from(envVariables.entries()).filter(([key]) =>
+          key.toLowerCase().includes(query.toLowerCase())
+        );
+        this.selectedIndex = 0; // Reset selection when filtering changes
+        setters.setSelectedIndex(0);
+      }
+
+      private handleKeydown = (event: KeyboardEvent) => {
+        if (this.filteredVariables.length === 0) return false;
+
+        switch (event.key) {
+          case "ArrowDown":
+            event.preventDefault();
+            this.selectedIndex = (this.selectedIndex + 1) % this.filteredVariables.length;
+            setters.setSelectedIndex(this.selectedIndex);
+            return true;
+
+          case "ArrowUp":
+            event.preventDefault();
+            this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : this.filteredVariables.length - 1;
+            setters.setSelectedIndex(this.selectedIndex);
+            return true;
+
+          case "Enter":
+            event.preventDefault();
+            if (this.filteredVariables[this.selectedIndex] && this.currentRange) {
+              const [variableKey] = this.filteredVariables[this.selectedIndex];
+              setters.insertVariable(this.view, variableKey, this.currentRange);
+              setters.setShowAutocomplete(false);
+            }
+            return true;
+
+          case "Escape":
+            event.preventDefault();
+            setters.setShowAutocomplete(false);
+            return true;
+        }
+
+        return false;
+      };
+
+      private handleBlur = () => {
+        // Small delay to allow popover clicks
+        setTimeout(() => setters.setShowAutocomplete(false), 100);
+      };
+
+      constructor(view: EditorView) {
+        this.view = view;
+        view.dom.addEventListener("keydown", this.handleKeydown);
+        view.dom.addEventListener("blur", this.handleBlur);
+      }
+
+      update(update: ViewUpdate) {
+        // Pattern detection logic (moved from EditorView.updateListener)
+        if (!update.docChanged && !update.selectionSet) return;
+
+        const state = update.state;
+        const pos = state.selection.main.head;
+
+        // Check if we're in a {{...}} pattern
+        const line = state.doc.lineAt(pos);
+        const textBefore = line.text.slice(0, pos - line.from);
+        const match = /\{\{([^{}]*)$/.exec(textBefore);
+
+        if (match) {
+          const query = match[1] || "";
+          this.updateFilteredVariables(query);
+
+          // Defer coordsAtPos call to avoid "Reading the editor layout isn't allowed during an update" error
+          requestAnimationFrame(() => {
+            const coords = this.view.coordsAtPos(pos);
+
+            if (coords && this.filteredVariables.length > 0) {
+              this.currentRange = {
+                from: line.from + match.index,
+                to: pos,
+              };
+
+              setters.setShowAutocomplete(true);
+              setters.setAutocompleteQuery(query);
+              setters.setAutocompletePosition({
+                x: coords.left,
+                y: coords.bottom + 2,
+              });
+              setters.setAutocompleteRange(this.currentRange);
+            } else {
+              setters.setShowAutocomplete(false);
+              this.currentRange = null;
+            }
+          });
+        } else {
+          setters.setShowAutocomplete(false);
+          this.currentRange = null;
+        }
+      }
+
+      destroy() {
+        setters.setShowAutocomplete(false);
+        this.view.dom.removeEventListener("keydown", this.handleKeydown);
+        this.view.dom.removeEventListener("blur", this.handleBlur);
+      }
+    }
+  );
 }
 
 /* CORE PLUGIN */

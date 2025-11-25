@@ -1,0 +1,102 @@
+.variable-suggestions-popover-container {
+  display: flex;
+  overflow: hidden;
+  width: 450px;
+  height: 150px;
+  border-radius: 4px;
+  margin-top: -16px;
+  border: 1px solid var(--requestly-color-white-t-10);
+}
+
+.variable-suggestions-popover-list {
+  min-width: 180px;
+  height: 100%;
+  padding: 8px;
+  background: #212121;
+  border-right: 1px solid var(--requestly-color-white-t-10);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.variable-suggestions-popover-item {
+  width: 100%;
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-xs);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  border-radius: 4px;
+
+  &:hover,
+  &.selected {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.variable-suggestions-popover-details {
+  flex: 1;
+  height: 100%;
+  padding: 8px;
+  background: var(--requestly-color-background);
+  min-width: 200px;
+  overflow-x: auto;
+  overflow-y: auto;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.variable-suggestions-popover-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm);
+}
+
+.variable-details-content {
+  display: flex;
+  padding: 6px 12px 12px 12px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+}
+
+.variable-details-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: start;
+  width: 100%;
+}
+
+.variable-details-label {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+  font-weight: 500;
+  padding: 2px 8px 2px 0;
+}
+
+.variable-details-value {
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-xs);
+  padding: 2px 0;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.variable-suggestions-popover-anchor {
+  width: 0;
+  height: 0;
+}
+
+// Scoped styles for Ant Design Popover
+.variable-suggestions-popover {
+  .ant-popover-inner-content {
+    padding: 0 !important;
+  }
+}
