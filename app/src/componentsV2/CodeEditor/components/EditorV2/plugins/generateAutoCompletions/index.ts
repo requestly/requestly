@@ -5,206 +5,17 @@ import {
   CompletionSource,
   insertCompletionText,
 } from "@codemirror/autocomplete";
-import { EditorView, ViewPlugin } from "@codemirror/view";
+import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { ScopedVariables, ScopedVariable } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import React from "react";
-import { createRoot } from "react-dom/client";
-import { Popover } from "antd";
-import { EnvironmentVariableType, VariableScope } from "backend/environment/types";
-import { capitalize } from "lodash";
 
-// Variable suggestions popover component with two-column layout
-const VariableSuggestionsPopover: React.FC<{
-  variables: ScopedVariables;
-  onSelect: (variableKey: string) => void;
-  query: string;
-  selectedIndex: number;
-  onSelectionChange: (index: number) => void;
-}> = ({ variables, onSelect, query, selectedIndex, onSelectionChange }) => {
-  const filteredVariables = Array.from(variables.entries()).filter(([key]) =>
-    key.toLowerCase().includes(query.toLowerCase())
-  );
-
-  const activeVariable = filteredVariables[selectedIndex] || filteredVariables[0];
-
-  return React.createElement(
-    "div",
-    {
-      style: {
-        display: "flex",
-        overflow: "hidden",
-        width: "450px",
-        height: "150px",
-        borderRadius: "4px",
-        marginTop: "-16px",
-        border: "1px solid var(--requestly-color-white-t-10)",
-      },
-    },
-    [
-      // Left column - Variables list
-      React.createElement(
-        "div",
-        {
-          key: "list",
-          style: {
-            minWidth: "180px",
-            height: "100%",
-            padding: "8px",
-            background: "#212121",
-            borderRight: "1px solid var(--requestly-color-white-t-10)",
-            overflowY: "auto",
-            flexShrink: 0,
-          },
-        },
-        filteredVariables.map(([key, [variable, source]], index) =>
-          React.createElement(
-            "div",
-            {
-              key: key,
-              style: {
-                width: "100%",
-                padding: "4px 8px",
-                border: "none",
-                background: "transparent",
-                textAlign: "left",
-                color: "var(--requestly-color-text-default)",
-                fontSize: "var(--requestly-font-size-xs)",
-                cursor: "pointer",
-                userSelect: "none",
-                outline: "none",
-                borderRadius: "4px",
-                backgroundColor: index === selectedIndex ? "rgba(255, 255, 255, 0.04)" : "transparent",
-              },
-              onClick: () => onSelect(key),
-              onMouseEnter: () => onSelectionChange(index),
-            },
-            key
-          )
-        )
-      ),
-
-      // Right column - Variable details
-      React.createElement(
-        "div",
-        {
-          key: "details",
-          style: {
-            flex: 1,
-            height: "100%",
-            padding: "8px",
-            background: "var(--requestly-color-background)",
-            minWidth: "200px",
-            overflowX: "auto",
-            overflowY: "auto",
-            wordWrap: "break-word",
-            whiteSpace: "normal",
-          },
-        },
-        activeVariable
-          ? (() => {
-              const [, [variable, source]] = activeVariable;
-
-              const sanitizeValue = (value: any) => {
-                if (variable.type === EnvironmentVariableType.Secret) {
-                  return "•".repeat(String(value || "").length);
-                }
-                return value === undefined || value === null ? "" : `${value}`;
-              };
-
-              const syncValue = sanitizeValue(variable.syncValue);
-              const localValue = sanitizeValue(variable.localValue);
-              const isPersisted = `${variable.isPersisted}`;
-
-              const infoFields =
-                source.scope === VariableScope.RUNTIME
-                  ? [
-                      { label: "Type", value: capitalize(variable.type) },
-                      { label: "Current Value", value: localValue },
-                      { label: "Is persistent", value: isPersisted },
-                    ]
-                  : [
-                      { label: "Type", value: capitalize(variable.type) },
-                      { label: "Initial Value", value: syncValue },
-                      { label: "Current Value", value: localValue },
-                    ];
-
-              return [
-                // Content with info fields
-                React.createElement(
-                  "div",
-                  {
-                    key: "content",
-                    style: {
-                      display: "flex",
-                      padding: "6px 12px 12px 12px",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "8px",
-                      alignSelf: "stretch",
-                    },
-                  },
-                  React.createElement(
-                    "div",
-                    {
-                      key: "info-content",
-                      style: {
-                        display: "grid",
-                        gridTemplateColumns: "auto 1fr",
-                        gap: "4px 12px",
-                        alignItems: "start",
-                        width: "100%",
-                      },
-                    },
-                    infoFields.flatMap(({ label, value }) => [
-                      React.createElement(
-                        "div",
-                        {
-                          key: `title-${label}`,
-                          style: {
-                            color: "var(--requestly-color-text-subtle)",
-                            fontSize: "var(--requestly-font-size-xs)",
-                            fontWeight: 500,
-                            padding: "2px 8px 2px 0",
-                          },
-                        },
-                        label
-                      ),
-                      React.createElement(
-                        "div",
-                        {
-                          key: `value-${label}`,
-                          style: {
-                            color: "var(--requestly-color-text-default)",
-                            fontSize: "var(--requestly-font-size-xs)",
-                            padding: "2px 0",
-                            wordWrap: "break-word",
-                            whiteSpace: "normal",
-                            overflowWrap: "break-word",
-                          },
-                        },
-                        value
-                      ),
-                    ])
-                  )
-                ),
-              ];
-            })()
-          : React.createElement(
-              "div",
-              {
-                style: {
-                  padding: "20px",
-                  textAlign: "center",
-                  color: "var(--requestly-color-text-subtle)",
-                  fontSize: "var(--requestly-font-size-sm)",
-                },
-              },
-              "No variables found"
-            )
-      ),
-    ]
-  );
-};
+interface AutocompleteSetters {
+  setShowAutocomplete: (show: boolean) => void;
+  setAutocompleteQuery: (query: string) => void;
+  setAutocompletePosition: (position: { x: number; y: number }) => void;
+  setSelectedIndex: (index: number) => void;
+  setAutocompleteRange: (range: { from: number; to: number } | null) => void;
+  insertVariable: (view: EditorView, variableKey: string, range: { from: number; to: number }) => void;
+}
 
 /**
  * Creates a custom completion source that returns a set of suggestions
@@ -258,247 +69,121 @@ function varCompletionSource(envVariables: ScopedVariables): CompletionSource {
   return generateCompletionSource(/\{\{.*?/g, varCompletions, 2);
 }
 
-/* NEW PLUGIN WITH ANT DESIGN POPOVER */
-export function generateCompletionsWithPopover(envVariables?: ScopedVariables) {
+/* NEW PLUGIN WITH CALLBACK-BASED PATTERN */
+export function generateCompletionsWithPopover(setters: AutocompleteSetters, envVariables?: ScopedVariables) {
   if (!envVariables) return [];
 
-  let popoverContainer: HTMLElement | null = null;
-  let popoverRoot: any = null;
-  let currentRange: { from: number; to: number } | null = null;
-  let selectedIndex = 0;
-  let filteredVariables: [string, ScopedVariable][] = [];
+  return ViewPlugin.fromClass(
+    class {
+      private view: EditorView;
+      private selectedIndex = 0;
+      private filteredVariables: [string, ScopedVariable][] = [];
+      private currentRange: { from: number; to: number } | null = null;
 
-  const updateFilteredVariables = (query: string) => {
-    filteredVariables = Array.from(envVariables.entries()).filter(([key]) =>
-      key.toLowerCase().includes(query.toLowerCase())
-    );
-    selectedIndex = 0; // Reset selection when filtering changes
-  };
+      private updateFilteredVariables(query: string) {
+        this.filteredVariables = Array.from(envVariables.entries()).filter(([key]) =>
+          key.toLowerCase().includes(query.toLowerCase())
+        );
+        this.selectedIndex = 0; // Reset selection when filtering changes
+        setters.setSelectedIndex(0);
+      }
 
-  const showPopover = (
-    view: EditorView,
-    position: { x: number; y: number },
-    query: string,
-    range: { from: number; to: number }
-  ) => {
-    hidePopover();
+      private handleKeydown = (event: KeyboardEvent) => {
+        if (this.filteredVariables.length === 0) return false;
 
-    currentRange = range;
-    updateFilteredVariables(query);
+        switch (event.key) {
+          case "ArrowDown":
+            event.preventDefault();
+            this.selectedIndex = (this.selectedIndex + 1) % this.filteredVariables.length;
+            setters.setSelectedIndex(this.selectedIndex);
+            return true;
 
-    popoverContainer = document.createElement("div");
-    popoverContainer.style.position = "fixed";
-    popoverContainer.style.left = `${position.x}px`;
-    popoverContainer.style.top = `${position.y}px`;
-    popoverContainer.style.zIndex = "10000";
-    document.body.appendChild(popoverContainer);
-    popoverRoot = createRoot(popoverContainer);
+          case "ArrowUp":
+            event.preventDefault();
+            this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : this.filteredVariables.length - 1;
+            setters.setSelectedIndex(this.selectedIndex);
+            return true;
 
-    const handleSelect = (variableKey: string) => {
-      insertVariable(view, variableKey);
-      hidePopover();
-    };
+          case "Enter":
+            event.preventDefault();
+            if (this.filteredVariables[this.selectedIndex] && this.currentRange) {
+              const [variableKey] = this.filteredVariables[this.selectedIndex];
+              setters.insertVariable(this.view, variableKey, this.currentRange);
+              setters.setShowAutocomplete(false);
+            }
+            return true;
 
-    const handleSelectionChange = (index: number) => {
-      selectedIndex = index;
-      rerenderPopover(view, query);
-    };
+          case "Escape":
+            event.preventDefault();
+            setters.setShowAutocomplete(false);
+            return true;
+        }
 
-    const rerenderPopover = (view: EditorView, query: string) => {
-      if (!popoverContainer) return;
+        return false;
+      };
 
-      popoverRoot.render(
-        React.createElement(
-          Popover,
-          {
-            content: React.createElement(VariableSuggestionsPopover, {
-              variables: envVariables,
-              query,
-              onSelect: handleSelect,
-              selectedIndex,
-              onSelectionChange: handleSelectionChange,
-            }),
-            open: true,
-            placement: "bottomLeft",
-            trigger: [],
-            destroyTooltipOnHide: true,
-            showArrow: false,
-            overlayStyle: { background: "transparent", boxShadow: "none", border: "none" },
-            overlayClassName: "variable-suggestions-popover",
-            onOpenChange: (open: boolean) => {
-              if (!open) hidePopover();
-            },
-          },
-          React.createElement("span")
-        )
-      );
-    };
+      private handleBlur = () => {
+        // Small delay to allow popover clicks
+        setTimeout(() => setters.setShowAutocomplete(false), 100);
+      };
 
-    rerenderPopover(view, query);
-  };
+      constructor(view: EditorView) {
+        this.view = view;
+        view.dom.addEventListener("keydown", this.handleKeydown);
+        view.dom.addEventListener("blur", this.handleBlur);
+      }
 
-  const insertVariable = (view: EditorView, variableKey: string) => {
-    if (!currentRange) return;
+      update(update: ViewUpdate) {
+        // Pattern detection logic (moved from EditorView.updateListener)
+        if (!update.docChanged && !update.selectionSet) return;
 
-    const state = view.state;
-    const { from, to } = currentRange;
+        const state = update.state;
+        const pos = state.selection.main.head;
 
-    // Look ahead for closing braces
-    const LOOK_AHEAD_BUFFER = 10;
-    const lookahead = state.doc.sliceString(to, to + LOOK_AHEAD_BUFFER);
-    const nextChars = lookahead.trimStart().slice(0, 2);
-    const closingChars = nextChars.startsWith("}}") ? "" : nextChars.startsWith("}") ? "}" : "}}";
+        // Check if we're in a {{...}} pattern
+        const line = state.doc.lineAt(pos);
+        const textBefore = line.text.slice(0, pos - line.from);
+        const match = /\{\{([^{}]*)$/.exec(textBefore);
 
-    view.dispatch({
-      changes: {
-        from,
-        to,
-        insert: `{{${variableKey}${closingChars}`,
-      },
-      selection: { anchor: from + `{{${variableKey}${closingChars}`.length },
-    });
-  };
+        if (match) {
+          const query = match[1] || "";
+          this.updateFilteredVariables(query);
 
-  const rerenderCurrentPopover = (view: EditorView) => {
-    if (!popoverContainer) return;
+          // Defer coordsAtPos call to avoid "Reading the editor layout isn't allowed during an update" error
+          requestAnimationFrame(() => {
+            const coords = this.view.coordsAtPos(pos);
 
-    const line = view.state.doc.lineAt(view.state.selection.main.head);
-    const textBefore = line.text.slice(0, view.state.selection.main.head - line.from);
-    const match = /\{\{([^{}]*)$/.exec(textBefore);
-    const query = match ? match[1] || "" : "";
+            if (coords && this.filteredVariables.length > 0) {
+              this.currentRange = {
+                from: line.from + match.index,
+                to: pos,
+              };
 
-    const handleSelect = (variableKey: string) => {
-      insertVariable(view, variableKey);
-      hidePopover();
-    };
-
-    const handleSelectionChange = (index: number) => {
-      selectedIndex = index;
-      rerenderCurrentPopover(view);
-    };
-
-    popoverRoot.render(
-      React.createElement(
-        Popover,
-        {
-          content: React.createElement(VariableSuggestionsPopover, {
-            variables: envVariables,
-            query,
-            onSelect: handleSelect,
-            selectedIndex,
-            onSelectionChange: handleSelectionChange,
-          }),
-          open: true,
-          placement: "bottomLeft",
-          trigger: [],
-          destroyTooltipOnHide: true,
-          showArrow: false,
-          overlayStyle: { background: "transparent", boxShadow: "none", border: "none" },
-          overlayClassName: "variable-suggestions-popover",
-          onOpenChange: (open: boolean) => {
-            if (!open) hidePopover();
-          },
-        },
-        React.createElement("span")
-      )
-    );
-  };
-
-  const hidePopover = () => {
-    if (popoverRoot) {
-      popoverRoot.unmount();
-      popoverRoot = null;
-    }
-    if (popoverContainer) {
-      popoverContainer.remove();
-      popoverContainer = null;
-    }
-    currentRange = null;
-  };
-
-  return [
-    EditorView.updateListener.of((update) => {
-      if (!update.docChanged && !update.selectionSet) return;
-
-      const state = update.state;
-      const pos = state.selection.main.head;
-
-      // Check if we're in a {{...}} pattern
-      const line = state.doc.lineAt(pos);
-      const textBefore = line.text.slice(0, pos - line.from);
-      const match = /\{\{([^{}]*)$/.exec(textBefore);
-
-      if (match) {
-        const query = match[1] || "";
-        updateFilteredVariables(query);
-        const coords = update.view.coordsAtPos(pos);
-
-        if (coords && filteredVariables.length > 0) {
-          showPopover(update.view, { x: coords.left, y: coords.bottom + 2 }, query, {
-            from: line.from + match.index,
-            to: pos,
+              setters.setShowAutocomplete(true);
+              setters.setAutocompleteQuery(query);
+              setters.setAutocompletePosition({
+                x: coords.left,
+                y: coords.bottom + 2,
+              });
+              setters.setAutocompleteRange(this.currentRange);
+            } else {
+              setters.setShowAutocomplete(false);
+              this.currentRange = null;
+            }
           });
         } else {
-          hidePopover();
-        }
-      } else {
-        hidePopover();
-      }
-    }),
-    ViewPlugin.fromClass(
-      class {
-        private handleKeydown = (event: KeyboardEvent) => {
-          if (!popoverContainer || filteredVariables.length === 0) return false;
-
-          switch (event.key) {
-            case "ArrowDown":
-              event.preventDefault();
-              selectedIndex = (selectedIndex + 1) % filteredVariables.length;
-              rerenderCurrentPopover(this.view);
-              return true;
-
-            case "ArrowUp":
-              event.preventDefault();
-              selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : filteredVariables.length - 1;
-              rerenderCurrentPopover(this.view);
-              return true;
-
-            case "Enter":
-              event.preventDefault();
-              if (filteredVariables[selectedIndex]) {
-                const [variableKey] = filteredVariables[selectedIndex];
-                insertVariable(this.view, variableKey);
-                hidePopover();
-              }
-              return true;
-
-            case "Escape":
-              event.preventDefault();
-              hidePopover();
-              return true;
-          }
-
-          return false;
-        };
-
-        private handleBlur = () => {
-          // Hide popover when editor loses focus
-          setTimeout(hidePopover, 100); // Small delay to allow popover clicks
-        };
-
-        constructor(private view: EditorView) {
-          view.dom.addEventListener("keydown", this.handleKeydown);
-          view.dom.addEventListener("blur", this.handleBlur);
-        }
-
-        destroy() {
-          hidePopover();
-          this.view.dom.removeEventListener("keydown", this.handleKeydown);
-          this.view.dom.removeEventListener("blur", this.handleBlur);
+          setters.setShowAutocomplete(false);
+          this.currentRange = null;
         }
       }
-    ),
-  ];
+
+      destroy() {
+        setters.setShowAutocomplete(false);
+        this.view.dom.removeEventListener("keydown", this.handleKeydown);
+        this.view.dom.removeEventListener("blur", this.handleBlur);
+      }
+    }
+  );
 }
 
 /* CORE PLUGIN */

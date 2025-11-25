@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
@@ -6,6 +6,9 @@ import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
 import { generateCompletionsWithPopover } from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
+import { VariableSuggestionsPopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariableSuggestionsPopover";
+import "componentsV2/CodeEditor/components/EditorV2/components/VariableSuggestionsPopover/variable-suggestions-popover.scss";
+import { useOutsideClick } from "hooks/useOutsideClick";
 import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
@@ -39,6 +42,55 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+
+  // Autocomplete state
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [autocompleteQuery, setAutocompleteQuery] = useState("");
+  const [autocompletePosition, setAutocompletePosition] = useState({ x: 0, y: 0 });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [autocompleteRange, setAutocompleteRange] = useState<{ from: number; to: number } | null>(null);
+
+  // Handle click outside to close autocomplete
+  const handleOutsideClick = useCallback(() => {
+    if (showAutocomplete) {
+      setShowAutocomplete(false);
+    }
+  }, [showAutocomplete]);
+
+  const { ref: outsideClickRef } = useOutsideClick<HTMLDivElement>(handleOutsideClick);
+
+  // Create autocomplete setters with insertion logic
+  const autocompleteSetters = useMemo(
+    () => ({
+      setShowAutocomplete,
+      setAutocompleteQuery,
+      setAutocompletePosition,
+      setSelectedIndex,
+      setAutocompleteRange,
+      insertVariable: (view: EditorView, variableKey: string, range: { from: number; to: number }) => {
+        const state = view.state;
+        const { from, to } = range;
+
+        // Look ahead for closing braces
+        const LOOK_AHEAD_BUFFER = 10;
+        const lookahead = state.doc.sliceString(to, to + LOOK_AHEAD_BUFFER);
+        const nextChars = lookahead.trimStart().slice(0, 2);
+        const closingChars = nextChars.startsWith("}}") ? "" : nextChars.startsWith("}") ? "}" : "}}";
+
+        view.dispatch({
+          changes: {
+            from,
+            to,
+            insert: `{{${variableKey}${closingChars}`,
+          },
+          selection: { anchor: from + `{{${variableKey}${closingChars}`.length },
+        });
+
+        setShowAutocomplete(false);
+      },
+    }),
+    []
+  );
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -124,7 +176,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
             },
             variables!
           ),
-          ...generateCompletionsWithPopover(variables!),
+          generateCompletionsWithPopover(autocompleteSetters, variables!),
           cmPlaceHolder(placeholder ?? "Input here"),
         ],
       }),
@@ -163,9 +215,20 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
+  // Combine refs: editorRef for CodeMirror and outsideClickRef for click detection
+  const combinedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      (editorRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      if (node) {
+        outsideClickRef.current = node;
+      }
+    },
+    [outsideClickRef]
+  );
+
   return (
     <div
-      ref={editorRef}
+      ref={combinedRef}
       className={`${className ?? ""} editor-popup-container ant-input`}
       onMouseLeave={() => setHoveredVariable(null)}
     >
@@ -175,6 +238,22 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           hoveredVariable={hoveredVariable as string}
           popupPosition={popupPosition}
           variables={variables ?? new Map()}
+        />
+      </Conditional>
+      <Conditional condition={showAutocomplete && Boolean(variables)}>
+        <VariableSuggestionsPopover
+          show={showAutocomplete}
+          query={autocompleteQuery}
+          position={autocompletePosition}
+          selectedIndex={selectedIndex}
+          variables={variables ?? new Map()}
+          editorRef={editorRef}
+          onSelect={(variableKey) => {
+            if (autocompleteRange && editorViewRef.current) {
+              autocompleteSetters.insertVariable(editorViewRef.current, variableKey, autocompleteRange);
+            }
+          }}
+          onSelectionChange={setSelectedIndex}
         />
       </Conditional>
     </div>
