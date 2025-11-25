@@ -18,15 +18,17 @@ import { toast } from "utils/Toast";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
-import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
 import { VariablePopover } from "./components/VariablePopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
-import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import {
+  customKeyBinding,
+  highlightVariablesPlugin,
+  generateCompletionsForVariables,
+} from "componentsV2/CodeEditor/components/EditorV2/plugins";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
