@@ -18,7 +18,7 @@ export const TabsContainer: React.FC = () => {
   // Enable keyboard shortcuts for closing active tabs
   useCloseActiveTabShortcut();
 
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
 
   const [
     activeTabId,
@@ -48,18 +48,30 @@ export const TabsContainer: React.FC = () => {
 
   const { setUrl } = useSetUrl();
 
-  const operations = (
-    <Popover
-      trigger="click"
-      placement="topRight"
-      overlayClassName="tabs-operations-popover"
-      content={<TabsMorePopover tabs={tabs} setActiveTab={setActiveTab} closeTabById={closeTabById} />}
-      open={isPopoverOpen}
-      onOpenChange={setIsPopoverOpen}
-    >
-      <IoIosArrowDown className={`tabs-more-icon ${isPopoverOpen ? "tabs-more-icon-open" : ""}`} />
-    </Popover>
+  const operations = useMemo(
+    () => (
+      <Popover
+        trigger="click"
+        placement="topRight"
+        overlayClassName="tabs-operations-popover"
+        content={<TabsMorePopover tabs={tabs} onTabItemClick={setActiveTab} onCloseTab={closeTabById} />}
+        open={isMorePopoverOpen}
+        onOpenChange={setIsMorePopoverOpen}
+      >
+        <div className={`tabs-more-icon ${isMorePopoverOpen ? "tabs-more-icon-open" : ""}`}>
+          <IoIosArrowDown />
+        </div>
+      </Popover>
+    ),
+    [tabs, isMorePopoverOpen]
   );
+
+  // Reset popover state when no tabs are present
+  useEffect(() => {
+    if (tabs.size === 0 && isMorePopoverOpen) {
+      setIsMorePopoverOpen(false);
+    }
+  }, [tabs.size, isMorePopoverOpen]);
 
   const hasUnsavedChanges = Array.from(tabs.values()).some(
     (tab) => tab.getState().unsaved || !tab.getState().canCloseTab()

@@ -25,22 +25,6 @@
       margin-bottom: 0;
       position: relative;
 
-      // Add shadow effect when more icon is visible (indicating overflow)
-      &:has(.ant-tabs-nav-more) {
-        &::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          right: 55px;
-          bottom: 0;
-          width: 42px;
-          background: linear-gradient(270deg, #1a1a1a 0%, rgba(26, 26, 26, 0) 100%);
-          pointer-events: none;
-          z-index: 1;
-          margin-bottom: 1px;
-        }
-      }
-
       .ant-tabs-nav-wrap {
         height: 32px;
         display: flex;
@@ -154,6 +138,20 @@
           margin-top: 1px;
           &:hover {
             background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
+
+          // Add shadow effect when more icon is visible (indicating overflow)
+          &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 55px;
+            bottom: 0;
+            width: 42px;
+            background: linear-gradient(270deg, #1a1a1a 0%, rgba(26, 26, 26, 0) 100%);
+            pointer-events: none;
+            z-index: 1;
+            margin-bottom: 1px;
           }
 
           svg {
@@ -306,7 +304,7 @@
   }
 }
 
-.ant-tabs-extra-content {
+.tabs-more-icon {
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -325,7 +323,7 @@
     background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
   }
 }
-.ant-tabs-extra-content:has(.tabs-more-icon-open) {
+.tabs-more-icon-open {
   background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
 }
 

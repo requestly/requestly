@@ -4,18 +4,19 @@ import type { InputRef } from "antd";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./tabsMorePopover.scss";
 import { TabsEmptyState } from "../TabsEmptyState";
+import { StoreApi } from "zustand";
+import { TabState } from "componentsV2/Tabs/store/tabStore";
 
-interface Tab {
-  getState: () => { id: number; title: string; icon?: React.ReactNode };
-}
+type TabStore = StoreApi<TabState>;
+type TabId = number;
 
 interface TabsMorePopoverProps {
-  tabs: Map<number, Tab>;
-  setActiveTab: (id: number) => void;
-  closeTabById: (id: number) => void;
+  tabs: Map<TabId, TabStore>;
+  onTabItemClick: (id: number) => void;
+  onCloseTab: (id: number) => void;
 }
 
-export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiveTab, closeTabById }) => {
+export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, onTabItemClick, onCloseTab }) => {
   const [query, setQuery] = useState("");
   const inputRef = useRef<InputRef>(null);
   const tabList = Array.from(tabs.values()).map((t) => t.getState());
@@ -48,7 +49,7 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiv
         dataSource={filtered}
         className="tabs-popover-list"
         renderItem={(tab) => (
-          <List.Item className="tabs-ops-item" onClick={() => setActiveTab(tab.id)}>
+          <List.Item className="tabs-ops-item" onClick={() => onTabItemClick(tab.id)}>
             <div className="tab-ops-item-container">
               {tab.icon ?? null}
               {(tab.title ?? "Untitled").length > 20 ? (
@@ -69,7 +70,7 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ tabs, setActiv
               size={14}
               onClick={(e: React.MouseEvent) => {
                 e.stopPropagation(); // Prevent selecting the tab when clicking close
-                closeTabById(tab.id);
+                onCloseTab(tab.id);
               }}
               className="tab-ops-item-close"
             />
