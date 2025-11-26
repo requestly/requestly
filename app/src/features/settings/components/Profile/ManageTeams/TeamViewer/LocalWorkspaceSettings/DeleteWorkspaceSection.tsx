@@ -29,7 +29,7 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
     setIsDeleting(true);
     try {
       const previousPath = location?.state?.previousPath;
-      const isPreviousValid = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
+      const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
 
       await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
 
@@ -64,7 +64,7 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
-      if (isPreviousValid) navigate(previousPath, { replace: true });
+      if (canNavigateToPreviousPath) navigate(previousPath, { replace: true });
       else redirectToRules(navigate);
     } catch (err: any) {
       toast.error(err?.message || "Failed to delete workspace");
