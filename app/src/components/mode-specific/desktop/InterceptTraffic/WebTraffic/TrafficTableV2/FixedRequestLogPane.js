@@ -120,8 +120,10 @@ const isPreviewAvailable = (contentType) => {
   //show values if content type is empty
   if (contentType === "") return true;
 
+  const normalizedContentType = contentType.toLowerCase();
+
   // Check if it's a binary type
-  if (binaryMIMETypes.some((type) => contentType.includes(type))) return false;
+  if (binaryMIMETypes.some((type) => normalizedContentType.includes(type))) return false;
 
   // non binary types are true to be shown in code mirror
   return true;
