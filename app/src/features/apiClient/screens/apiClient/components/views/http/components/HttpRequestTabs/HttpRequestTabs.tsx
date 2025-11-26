@@ -56,7 +56,6 @@ const HttpRequestTabs: React.FC<Props> = ({
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
-  
 
   const items = useMemo(() => {
     return [
@@ -157,7 +156,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: (
           <ScriptEditor
             key={`${scriptEditorVersion}`}
-            scripts={requestEntry.scripts}
+            entry={requestEntry}
             onScriptsChange={(newScripts) => {
               setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
             }}
@@ -173,12 +172,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     handleAuthChange,
     isRequestBodySupported,
     queryParams.length,
-    requestEntry.auth,
-    requestEntry.request.body,
-    requestEntry.request.bodyContainer,
-    requestEntry.request.contentType,
-    requestEntry.request.headers,
-    requestEntry.scripts,
+    requestEntry,
     setContentType,
     setRequestEntry,
     pathVariables.length,

@@ -139,14 +139,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
-        mergeConfig={{
-          newValue: `
-          fetch('https://app.requestly.io/echo')
-    .then(res => res.json())
-    .then(data => console.log(data))
-    .catch(err => console.error('Error:', err));
-        `,
-        }}
+        //     mergeConfig={{
+        //       newValue: `
+        //       fetch('https://app.requestly.io/echo')
+        // .then(res => res.json())
+        // .then(data => console.log(data))
+        // .catch(err => console.error('Error:', err));
+        //     `,
+        //     }}
       />
     </div>
   );
