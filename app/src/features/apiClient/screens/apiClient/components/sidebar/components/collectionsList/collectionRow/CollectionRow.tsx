@@ -35,8 +35,6 @@ import { getApiClientFeatureContext } from "features/apiClient/commands/store.ut
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
-import { useSelector } from "react-redux";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 
@@ -63,6 +61,7 @@ interface Props {
     recordsSelectionHandler: (record: RQAPI.ApiClientRecord, event: React.ChangeEvent<HTMLInputElement>) => void;
     setShowSelection: (arg: boolean) => void;
   };
+  onItemClick?: (record: RQAPI.ApiClientRecord, event: React.MouseEvent) => void;
   handleRecordsToBeDeleted: (records: RQAPI.ApiClientRecord[], context?: ApiClientFeatureContext) => void;
 }
 
@@ -80,27 +79,29 @@ export const CollectionRow: React.FC<Props> = ({
   bulkActionOptions,
   isReadOnly,
   handleRecordsToBeDeleted,
+  onItemClick,
 }) => {
   const { selectedRecords, showSelection, recordsSelectionHandler, setShowSelection } = bulkActionOptions || {};
   const [isEditMode, setIsEditMode] = useState(false);
-  const [activeKey, setActiveKey] = useState(expandedRecordIds?.includes(record.id) ? record.id : null);
-  const [createNewField, setCreateNewField] = useState(null);
+  const [activeKey, setActiveKey] = useState<string | undefined>(
+    expandedRecordIds?.includes(record.id) ? record.id : undefined
+  );
+  const [createNewField, setCreateNewField] = useState<RQAPI.RecordType | null>(null);
   const [hoveredId, setHoveredId] = useState("");
   const [isCollectionRowLoading, setIsCollectionRowLoading] = useState(false);
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPostmanExportModalOpen, setIsPostmanExportModalOpen] = useState(false);
 
-  const [collectionsToExport, setCollectionsToExport] = useState([]);
+  const [collectionsToExport, setCollectionsToExport] = useState<RQAPI.CollectionRecord[]>([]);
   const { onNewClickV2 } = useApiClientContext();
   const context = useApiClientFeatureContext();
   const [openTab, activeTabSource] = useTabServiceWithSelector((state) => [state.openTab, state.activeTabSource]);
 
   const [getParentChain, getRecordStore] = useAPIRecords((state) => [state.getParentChain, state.getRecordStore]);
-  const activeWorkspace = useSelector(getActiveWorkspace);
   const handleCollectionExport = useCallback(
     (collection: RQAPI.CollectionRecord, exportType: ExportType) => {
-      const collectionRecordState = getRecordStore(record.id).getState() as CollectionRecordState;
+      const collectionRecordState = getRecordStore(record.id)?.getState() as CollectionRecordState;
       const collectionVariables = collectionRecordState.collectionVariables.getState().data;
 
       const removeLocalValue = (variables: Map<string, any>): Record<string, any> => {
@@ -239,7 +240,7 @@ export const CollectionRow: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : null);
+    setActiveKey(expandedRecordIds?.includes(record.id) ? record.id : undefined);
   }, [expandedRecordIds, record.id]);
 
   useEffect(() => {
@@ -252,6 +253,9 @@ export const CollectionRow: React.FC<Props> = ({
     async (item: DraggableApiRecord, dropContextId: string) => {
       try {
         const sourceContext = getApiClientFeatureContext(item.contextId);
+        if (!sourceContext) {
+          throw new Error(`Source context not found for id: ${item.contextId}`);
+        }
 
         const destination = {
           contextId: dropContextId,
@@ -278,7 +282,7 @@ export const CollectionRow: React.FC<Props> = ({
         setIsCollectionRowLoading(false);
       }
     },
-    [activeWorkspace.workspaceType, record.id, expandedRecordIds, setExpandedRecordIds]
+    [record.id, expandedRecordIds, setExpandedRecordIds]
   );
 
   const checkCanDropItem = useCallback(
@@ -405,7 +409,9 @@ export const CollectionRow: React.FC<Props> = ({
             }}
           >
             <Collapse.Panel
-              className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""}`}
+              className={`collection-panel ${record.id === activeTabSourceId ? "active" : ""} ${
+                selectedRecords.has(record.id) && showSelection ? "selected" : ""
+              }`}
               key={record.id}
               header={
                 <div
@@ -414,6 +420,11 @@ export const CollectionRow: React.FC<Props> = ({
                   onMouseEnter={() => setHoveredId(record.id)}
                   onMouseLeave={() => setHoveredId("")}
                   onClick={(e) => {
+                    if (onItemClick && (e.metaKey || e.ctrlKey)) {
+                      e.stopPropagation();
+                      onItemClick(record, e);
+                      return;
+                    }
                     const isExpanded = activeKey === record.id;
                     const isAlreadyActive = activeTabSourceId === record.id;
                     if (!isExpanded) {
@@ -540,6 +551,7 @@ export const CollectionRow: React.FC<Props> = ({
                             record={apiRecord}
                             bulkActionOptions={bulkActionOptions}
                             handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                            onItemClick={onItemClick}
                           />
                         );
                       } else if (apiRecord.type === RQAPI.RecordType.COLLECTION) {
@@ -554,6 +566,7 @@ export const CollectionRow: React.FC<Props> = ({
                             setExpandedRecordIds={setExpandedRecordIds}
                             bulkActionOptions={bulkActionOptions}
                             handleRecordsToBeDeleted={handleRecordsToBeDeleted}
+                            onItemClick={onItemClick}
                           />
                         );
                       }
