@@ -94,7 +94,7 @@ const BodyTabView = ({ body, requestState, timestamp }) => {
   );
 };
 
-const canRenderInCM = (contentType) => {
+const isPreviewAvailable = (contentType) => {
   const binaryMIMETypes = [
     "image/",
     "video/",
@@ -130,7 +130,7 @@ const canRenderInCM = (contentType) => {
 const LogPane = ({ log_id, title, requestState, timestamp, data: request_data }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const { queryParams, headers, body } = request_data;
-  const contentType = headers["content-type"] || "";
+  const contentType = headers?.["content-type"] || headers?.["Content-Type"] || "";
 
   const tabs = [
     {
@@ -206,7 +206,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
       body: (
         <div className="navigation-panel-wrapper">
-          {canRenderInCM(contentType) ? (
+          {isPreviewAvailable(contentType) ? (
             <Editor
               scriptId={`${title}-${log_id}`}
               value={body || ""}
@@ -217,7 +217,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
             />
           ) : (
             <>
-              <span className="binary-data">Binary data can not be displayed</span>
+              <span className="binary-data">Preview not available</span>
             </>
           )}
         </div>
