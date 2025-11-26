@@ -57,7 +57,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     const menuItems: MenuProps["items"] = [
       {
         key: "copy_curl",
-        label: <LocalWorkspaceTooltip featureName="Copy cURL">Copy cURL</LocalWorkspaceTooltip>,
+        label: "Copy cURL",
         onClick: () => {
           copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_curl");
@@ -66,7 +66,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       },
       {
         key: "copy_url",
-        label: <LocalWorkspaceTooltip featureName="Copy URL">Copy URL</LocalWorkspaceTooltip>,
+        label: "Copy URL",
         onClick: () => {
           copyToClipBoard(log.url, "URL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_url");

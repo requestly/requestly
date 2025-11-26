@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Dropdown, MenuProps, Typography, Popover } from "antd";
 import { useLocation } from "react-router-dom";
 import { RQButton } from "lib/design-system-v2/components";
@@ -38,6 +38,7 @@ function SwitcherListItemLabel(props: { environmentId: EnvironmentState["id"] })
 
 export const EnvironmentSwitcher = () => {
   const location = useLocation();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [environments, setActiveEnvironment] = useAPIEnvironment((s) => [s.environments, s.setActive]);
 
@@ -45,6 +46,18 @@ export const EnvironmentSwitcher = () => {
 
   const contextId = useContextId();
   const [openTab] = useTabServiceWithSelector((state) => [state.openTab]);
+
+  useEffect(() => {
+    const handleEvent = (event: any) => {
+      const eventContextId = event.detail?.contextId;
+      if (eventContextId === contextId) {
+        setIsDropdownOpen(true);
+      }
+    };
+
+    window.addEventListener("trigger-env-switcher", handleEvent);
+    return () => window.removeEventListener("trigger-env-switcher", handleEvent);
+  }, [contextId]);
 
   const dropdownItems: MenuProps["items"] = useMemo(() => {
     const sorted = environments
@@ -64,6 +77,7 @@ export const EnvironmentSwitcher = () => {
       ),
       onClick: (menuInfo: any) => {
         menuInfo?.domEvent?.stopPropagation?.();
+        setIsDropdownOpen(false);
         setActiveEnvironment(undefined); // Clear active environment
         trackEnvironmentSwitched();
         toast.success("No environment selected");
@@ -80,6 +94,7 @@ export const EnvironmentSwitcher = () => {
       ),
       onClick: (menuInfo: any) => {
         menuInfo?.domEvent?.stopPropagation?.();
+        setIsDropdownOpen(false);
         setActiveEnvironment(environment.id);
         trackEnvironmentSwitched();
         if (location.pathname.includes(PATHS.API_CLIENT.ENVIRONMENTS.RELATIVE)) {
@@ -123,7 +138,13 @@ export const EnvironmentSwitcher = () => {
   }
 
   return (
-    <Dropdown overlayClassName="environment-switcher-dropdown" trigger={["click"]} menu={{ items: dropdownItems }}>
+    <Dropdown
+      overlayClassName="environment-switcher-dropdown"
+      trigger={["click"]}
+      menu={{ items: dropdownItems }}
+      open={isDropdownOpen}
+      onOpenChange={setIsDropdownOpen}
+    >
       <RQButton onClick={(e) => e.stopPropagation()} className="environment-switcher-button" size="small">
         {activeEnvironment ? (
           <>
