@@ -7,7 +7,6 @@ export {
   isPackageImported,
   generateRequireStatement,
   getDefaultVariableName,
-  calculateInsertPosition,
 } from "./scriptImportUtils";
 export { insertImportStatement, createPackageSelectHandler } from "./insertImportUtils";
 export type { InsertImportResult } from "./insertImportUtils";

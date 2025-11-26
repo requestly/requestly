@@ -8,31 +8,23 @@ import * as chai from "chai";
 import Ajv from "ajv";
 import * as lodash from "lodash";
 
+/**
+ * Runtime bindings for built-in packages.
+ * When adding a new built-in package:
+ * 1. Add the package metadata to BUILTIN_PACKAGES in builtInPackageProvider.ts
+ * 2. Add the runtime binding here, keyed by the `runtimeId` from step 1
+ *
+ * The key in this map MUST match the `runtimeId` field in builtInPackageProvider.ts
+ */
 const BUILTIN_RUNTIME_BINDINGS: Record<string, unknown> = {
-  // Date/time utilities
   moment,
-
-  // XML parsing
   xml2Js,
-  // Historically, scripts may use either "xml2Js" or "xml2js". We support both.
   xml2js: xml2Js,
-
-  // UUID generation
   uuid,
-
-  // CSV parsing (sync API)
   "csv-parse/lib/sync": parse,
-
-  // HTML parsing / jQuery-like API
   cheerio,
-
-  // Assertion library for tests in scripts
   chai,
-
-  // JSON schema validation
   ajv: Ajv,
-
-  // General-purpose utilities
   lodash,
 };
 
