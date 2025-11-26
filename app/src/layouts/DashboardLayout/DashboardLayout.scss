@@ -9,6 +9,7 @@
 }
 
 .app-layout.app-dashboard-layout {
+  background-color: var(--requestly-color-background-dark);
   grid-template-columns: fit-content(var(--app-sidebar-width)) 1fr;
   grid-template-rows: fit-content(var(--app-header-height)) 1fr fit-content(var(--app-footer-height));
   grid-template-areas:
