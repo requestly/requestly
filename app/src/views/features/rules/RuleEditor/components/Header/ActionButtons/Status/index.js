@@ -25,7 +25,7 @@ import { useRBAC } from "features/rbac";
 const getRuleStatusMessage = (newStatus, isValidCreatePersmission) => {
   const isActive = newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
 
-  if (isValidPermission) {
+  if (isValidCreatePersmission) {
     return isActive ? "Rule saved and activated" : "Rule saved and deactivated";
   }
 
@@ -47,7 +47,7 @@ const Status = ({
 
   // to Check if user has permission to create/save rules (viewers don't have this permission)
   const { validatePermission } = useRBAC();
-  const { isValidPermission } = validatePermission("http_rule", "create");
+  const { isValidCreatePersmission } = validatePermission("http_rule", "create");
 
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
@@ -69,7 +69,7 @@ const Status = ({
       saveRule(appMode, dispatch, ruleData)
         .then(() => {
           // for Sample rules always show simple messages
-          toast.success(getRuleStatusMessage(false, newValue));
+          toast.success(getRuleStatusMessage(newValue, false));
         })
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
         .catch((error) => {
@@ -94,7 +94,7 @@ const Status = ({
       saveRule(appMode, dispatch, syntaxValidatedAndTransformedRule)
         .then(() => {
           // Showing different messages based on user permissions
-          toast.success(getRuleStatusMessage(isValidPermission, newValue));
+          toast.success(getRuleStatusMessage(newValue, isValidCreatePersmission));
         })
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
         .catch((error) => {
@@ -107,7 +107,7 @@ const Status = ({
     currentlySelectedRuleData,
     dispatch,
     mode,
-    isValidPermission,
+    isValidCreatePersmission,
   ]);
 
   const toggleRuleStatus = (event) => {
