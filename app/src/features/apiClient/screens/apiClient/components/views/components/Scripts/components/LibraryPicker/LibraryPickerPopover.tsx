@@ -30,7 +30,7 @@ const FILTER_OPTIONS: FilterOption[] = [
   { value: "jsr", label: "JSR" },
 ];
 
-const GITHUB_ISSUE_URL = "https://github.com/nicjac/requestly-api-client/issues";
+const GITHUB_ISSUE_URL = "https://github.com/requestly/requestly/issues";
 
 export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
   open,
@@ -83,7 +83,7 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
   const handleDocsClick = useCallback((pkg: ExternalPackage, e: React.MouseEvent) => {
     e.stopPropagation();
     if (pkg.docsUrl) {
-      window.open(pkg.docsUrl, "_blank");
+      window.open(pkg.docsUrl, "_blank", "noopener,noreferrer");
     }
   }, []);
 
@@ -142,7 +142,10 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
             <br />
             Follow the GitHub issue for updates.
           </div>
-          <button className="library-picker-coming-soon-btn" onClick={() => window.open(GITHUB_ISSUE_URL, "_blank")}>
+          <button
+            className="library-picker-coming-soon-btn"
+            onClick={() => window.open(GITHUB_ISSUE_URL, "_blank", "noopener,noreferrer")}
+          >
             <RiGithubLine />
             <span>Track on Github</span>
           </button>
