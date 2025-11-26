@@ -217,7 +217,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
             />
           ) : (
             <>
-              <span>Binary data can not be displayed</span>
+              <span className="binary-data">Binary data can not be displayed</span>
             </>
           )}
         </div>
