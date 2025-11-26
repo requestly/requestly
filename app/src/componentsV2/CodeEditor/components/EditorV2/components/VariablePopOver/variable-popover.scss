@@ -81,7 +81,7 @@ div.n-popup {
 
   .variable-info-body {
     display: flex;
-    max-width: 300px;
+    width: 300px;
     min-width: 240px;
     max-height: 480px;
     gap: 8px;
@@ -343,11 +343,6 @@ div.n-popup {
           font-size: var(--requestly-font-size-xs);
           color: var(--requestly-color-text-default);
           border-radius: 4px;
-        }
-
-        .ant-select {
-          width: 100%;
-          min-width: 0;
         }
 
         .ant-input {

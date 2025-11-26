@@ -151,47 +151,43 @@ export const VariableFormFields: React.FC<VariableFormFieldsProps> = ({
       {/* Type */}
       <div className="form-row">
         <label className="form-label">Type</label>
-        <div className="form-input-wrapper">
-          <Select
-            size="small"
-            value={formData.type}
-            onChange={handleTypeChange}
-            options={typeOptions}
-            className="form-select"
-            popupClassName="form-select-dropdown"
-          />
-        </div>
+        <Select
+          size="small"
+          value={formData.type}
+          onChange={handleTypeChange}
+          options={typeOptions}
+          className="form-select"
+          popupClassName="form-select-dropdown"
+        />
       </div>
 
       {/* Scope - Conditionally shown */}
       {showScope && scopeOptions && (
         <div className="form-row">
           <label className="form-label">Scope</label>
-          <div className="form-input-wrapper">
-            <Select
-              size="small"
-              labelInValue
-              value={{
-                value: formData.scope,
-                label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope) || scopeOptions[0]),
-              }}
-              onChange={(val) => onFormDataChange({ scope: val.value })}
-              className="form-select scope-select"
-              popupClassName="form-select-dropdown"
-              optionLabelProp="label"
-            >
-              {scopeOptions.map((option) => (
-                <Select.Option
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                  label={renderScopeOption(option)}
-                >
-                  {renderScopeOption(option)}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
+          <Select
+            size="small"
+            labelInValue
+            value={{
+              value: formData.scope,
+              label: renderScopeOption(scopeOptions.find((o) => o.value === formData.scope) || scopeOptions[0]),
+            }}
+            onChange={(val) => onFormDataChange({ scope: val.value })}
+            className="form-select scope-select"
+            popupClassName="form-select-dropdown"
+            optionLabelProp="label"
+          >
+            {scopeOptions.map((option) => (
+              <Select.Option
+                key={option.value}
+                value={option.value}
+                disabled={option.disabled}
+                label={renderScopeOption(option)}
+              >
+                {renderScopeOption(option)}
+              </Select.Option>
+            ))}
+          </Select>
         </div>
       )}
     </div>
