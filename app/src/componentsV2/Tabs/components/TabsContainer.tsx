@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tabs, TabsProps, Typography, Popover } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
@@ -48,6 +48,14 @@ export const TabsContainer: React.FC = () => {
 
   const { setUrl } = useSetUrl();
 
+  const onTabItemClick = useCallback(
+    (id: number) => {
+      setActiveTab(id);
+      setIsMorePopoverOpen(false);
+    },
+    [setActiveTab]
+  );
+
   const operations = useMemo(
     () => (
       <Popover
@@ -55,7 +63,7 @@ export const TabsContainer: React.FC = () => {
         placement="topRight"
         overlayClassName="tabs-operations-popover"
         destroyTooltipOnHide
-        content={<TabsMorePopover onTabItemClick={setActiveTab} onCloseTab={closeTabById} />}
+        content={<TabsMorePopover onTabItemClick={onTabItemClick} onCloseTab={closeTabById} />}
         open={isMorePopoverOpen}
         onOpenChange={setIsMorePopoverOpen}
       >
@@ -64,7 +72,7 @@ export const TabsContainer: React.FC = () => {
         </div>
       </Popover>
     ),
-    [tabs, isMorePopoverOpen, setActiveTab, closeTabById]
+    [tabs, isMorePopoverOpen, onTabItemClick, closeTabById]
   );
 
   // Reset popover state when no tabs are present
