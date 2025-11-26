@@ -12,6 +12,8 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["date", "time", "moment"],
     defaultImportStyle: "default",
     runtimeId: "moment",
+    docsUrl: "https://momentjs.com/docs/",
+    version: "2.29.4",
   },
   {
     id: "xml2js",
@@ -22,6 +24,8 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["xml", "parser", "xml2js"],
     defaultImportStyle: "namespace",
     runtimeId: "xml2js",
+    docsUrl: "https://github.com/Leonidas-from-XIV/node-xml2js",
+    version: "0.6.2",
   },
   {
     id: "uuid",
@@ -32,16 +36,20 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["uuid", "id", "utility"],
     defaultImportStyle: "namespace",
     runtimeId: "uuid",
+    docsUrl: "https://github.com/uuidjs/uuid",
+    version: "9.0.0",
   },
   {
     id: "csv-parse/lib/sync",
     source: BUILTIN_SOURCE,
-    name: "csv-parse (sync)",
+    name: "csv-parse",
     description: "Synchronous CSV parsing utilities.",
     category: "parser",
     tags: ["csv", "parser"],
     defaultImportStyle: "named",
     runtimeId: "csv-parse/lib/sync",
+    docsUrl: "https://csv.js.org/parse/",
+    version: "5.5.2",
   },
   {
     id: "cheerio",
@@ -52,6 +60,8 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["html", "parser", "cheerio"],
     defaultImportStyle: "namespace",
     runtimeId: "cheerio",
+    docsUrl: "https://cheerio.js.org/docs/intro",
+    version: "1.0.0",
   },
   {
     id: "chai",
@@ -62,6 +72,8 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["assert", "testing", "chai"],
     defaultImportStyle: "namespace",
     runtimeId: "chai",
+    docsUrl: "https://www.chaijs.com/api/",
+    version: "4.3.7",
   },
   {
     id: "ajv",
@@ -72,6 +84,8 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["json", "schema", "validation", "ajv"],
     defaultImportStyle: "default",
     runtimeId: "ajv",
+    docsUrl: "https://ajv.js.org/guide/getting-started.html",
+    version: "8.12.0",
   },
   {
     id: "lodash",
@@ -82,6 +96,8 @@ const BUILTIN_PACKAGES: ReadonlyArray<ExternalPackage> = [
     tags: ["lodash", "utility", "collections"],
     defaultImportStyle: "namespace",
     runtimeId: "lodash",
+    docsUrl: "https://lodash.com/docs/",
+    version: "4.17.21",
   },
 ];
 

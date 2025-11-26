@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RiBox3Line } from "@react-icons/all-files/ri/RiBox3Line";
+import { EditorView } from "@codemirror/view";
+import { toast } from "utils/Toast";
 import "./scriptEditor.scss";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
+import { LibraryPickerPopover, insertImportStatement } from "../LibraryPicker";
+import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
 
 interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
@@ -22,6 +27,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
+  const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
+  const editorViewRef = useRef<EditorView | null>(null);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   React.useEffect(() => {
@@ -29,6 +36,22 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
     }
   }, [focusPostResponse, hasPostResponseScript]);
+
+  const handleEditorReady = useCallback((view: EditorView) => {
+    editorViewRef.current = view;
+  }, []);
+
+  const handlePackageSelect = useCallback((pkg: ExternalPackage) => {
+    const result = insertImportStatement(editorViewRef.current ?? undefined, pkg);
+
+    if (result.success) {
+      toast.success(result.message);
+    } else if (result.alreadyImported) {
+      toast.info(result.message);
+    } else {
+      toast.error(result.message);
+    }
+  }, []);
 
   const scriptTypeOptions = useMemo(() => {
     return (
@@ -56,6 +79,23 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     );
   }, [scriptType]);
 
+  const libraryPickerButton = useMemo(() => {
+    return (
+      <LibraryPickerPopover
+        open={isLibraryPickerOpen}
+        onOpenChange={setIsLibraryPickerOpen}
+        onPackageSelect={handlePackageSelect}
+      >
+        <Tooltip title="Browse available packages" placement="top">
+          <button className="api-client-script-packages-btn" onClick={() => setIsLibraryPickerOpen(true)}>
+            <RiBox3Line />
+            <span>Packages</span>
+          </button>
+        </Tooltip>
+      </LibraryPickerPopover>
+    );
+  }, [isLibraryPickerOpen, handlePackageSelect]);
+
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">
       <Editor
@@ -67,8 +107,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
           title: "",
           options: [scriptTypeOptions],
         }}
+        toolbarRightContent={libraryPickerButton}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
+        onEditorReady={handleEditorReady}
       />
     </div>
   );

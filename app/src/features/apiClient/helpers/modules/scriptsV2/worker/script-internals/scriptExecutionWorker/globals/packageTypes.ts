@@ -52,6 +52,17 @@ export interface ExternalPackage {
   runtimeId: string;
 
   /**
+   * Optional URL to the package's documentation site.
+   * Used in the UI to provide quick access to documentation.
+   */
+  docsUrl?: string;
+
+  /**
+   * Package version string for display in the UI.
+   */
+  version?: string;
+
+  /**
    * Optional provider-specific metadata that does not belong in
    * the core contract but is useful for particular sources or UIs.
    *
