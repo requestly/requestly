@@ -8,7 +8,7 @@ import "./aiPromptPopover.scss";
 interface PromptPopoverProps {
   isLoading: boolean;
   isPopoverOpen: boolean;
-  onGenerateClick: () => void;
+  onGenerateClick: (query: string) => void;
   onCancelClick: () => void;
 }
 
@@ -57,7 +57,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
           <RQButton onClick={onCancelClick} size="small">
             Close
           </RQButton>
-          <RQButton type="primary" onClick={onGenerateClick} size="small">
+          <RQButton type="primary" onClick={() => onGenerateClick(prompt)} size="small">
             Generate
           </RQButton>
         </div>

@@ -131,7 +131,7 @@ const HttpRequestTabs: React.FC<Props> = ({
         ),
         children: (
           <ScriptEditor
-            scripts={requestEntry.scripts}
+            entry={requestEntry}
             onScriptsChange={(newScripts) => {
               setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
             }}
@@ -140,12 +140,7 @@ const HttpRequestTabs: React.FC<Props> = ({
       },
     ];
   }, [
-    requestEntry.request.body,
-    requestEntry.request.bodyContainer,
-    requestEntry.request.contentType,
-    requestEntry.request.headers,
-    requestEntry.auth,
-    requestEntry.scripts,
+    requestEntry,
     queryParams.length,
     requestId,
     setRequestEntry,
