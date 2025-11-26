@@ -112,12 +112,16 @@ export const trackExportCollectionsClicked = () => {
 };
 
 // Environment & Variables
-export const trackNewEnvironmentClicked = () => {
-  trackEvent(API_CLIENT.ENVIRONMENT_CLICKED);
+export const trackNewEnvironmentClicked = (source) => {
+  trackEvent(API_CLIENT.ENVIRONMENT_CLICKED, { source });
 };
 
 export const trackVariablesSaved = (params) => {
   trackEvent(API_CLIENT.VARIABLES_UPDATED, params);
+};
+
+export const trackVariableCreated = (params) => {
+  trackEvent(API_CLIENT.VARIABLE_CREATED, params);
 };
 
 export const trackEnvironmentSwitched = () => {

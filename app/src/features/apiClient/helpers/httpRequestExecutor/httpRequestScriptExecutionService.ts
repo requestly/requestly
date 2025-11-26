@@ -1,4 +1,5 @@
 import { RQAPI } from "../../types";
+import { BaseExecutionMetadata } from "../modules/scriptsV2/worker/script-internals/types";
 import { APIClientWorkloadManager } from "../modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import {
   PostResponseScriptWorkload,
@@ -10,6 +11,7 @@ import { ScriptExecutionContext } from "./scriptExecutionContext";
 export class HttpRequestScriptExecutionService {
   constructor(
     private readonly executionContext: ScriptExecutionContext,
+    private readonly executionMetadata: BaseExecutionMetadata,
     private readonly workloadManager: APIClientWorkloadManager
   ) {}
 
@@ -21,7 +23,13 @@ export class HttpRequestScriptExecutionService {
     return this.workloadManager.execute(
       new PreRequestScriptWorkload(
         entry.scripts?.preRequest,
-        this.executionContext.getContext(),
+        {
+          executionContext: this.executionContext.getContext(),
+          executionMetadata: {
+            ...this.executionMetadata,
+            eventName: "prerequest",
+          },
+        },
         (context: ScriptExecutionContext["context"]) => {
           this.executionContext.updateContext(context);
           postExecutionCallback(context);
@@ -39,7 +47,13 @@ export class HttpRequestScriptExecutionService {
     return this.workloadManager.execute(
       new PostResponseScriptWorkload(
         entry.scripts?.postResponse,
-        this.executionContext.getContext(),
+        {
+          executionContext: this.executionContext.getContext(),
+          executionMetadata: {
+            ...this.executionMetadata,
+            eventName: "postresponse",
+          },
+        },
         (context: ScriptExecutionContext["context"]) => {
           this.executionContext.updateContext(context);
           postExecutionCallback(context);
