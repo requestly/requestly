@@ -258,11 +258,8 @@ const HttpClientView: React.FC<Props> = ({
     }
 
     isDefaultPlacementRef.current = true;
-    const savedPlacement = localStorage.getItem("sheet_placement");
-    if (!savedPlacement) {
-      const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-      toggleSheetPlacement(bottomSheetPlacement);
-    }
+    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+    toggleSheetPlacement(bottomSheetPlacement);
   }, [toggleSheetPlacement]);
 
   useEffect(() => {

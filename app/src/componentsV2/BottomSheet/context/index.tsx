@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback, useEffect } from "react";
+import React, { createContext, useState, useContext, useCallback } from "react";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
@@ -28,10 +28,7 @@ export const BottomSheetProvider: React.FC<{
   isSheetOpenByDefault?: boolean;
 }> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
-  const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(() => {
-    const savedPlacement = localStorage.getItem("sheet_placement");
-    return (savedPlacement as BottomSheetPlacement) || defaultPlacement;
-  });
+  const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(defaultPlacement);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleBottomSheet = ({ isOpen, isTrack = false, action = "" }: toggleParams = {}) => {
@@ -62,10 +59,6 @@ export const BottomSheetProvider: React.FC<{
       }
     }
   };
-
-  useEffect(() => {
-    localStorage.setItem("sheet_placement", sheetPlacement);
-  }, [sheetPlacement]);
 
   const toggleSheetPlacement = useCallback(
     (placement?: BottomSheetPlacement) => {
