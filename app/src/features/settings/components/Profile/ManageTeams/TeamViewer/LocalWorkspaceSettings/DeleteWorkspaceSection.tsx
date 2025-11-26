@@ -28,7 +28,7 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
     if (!workspaceId || isDeleting) return;
     setIsDeleting(true);
     try {
-      const previousPath = (location?.state as any)?.previousPath;
+      const previousPath = location?.state?.previousPath;
       const isPreviousValid = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
 
       await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
