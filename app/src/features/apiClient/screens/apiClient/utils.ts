@@ -26,6 +26,7 @@ import Logger from "lib/logger";
 import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
+import { getBoundary, parse as multipartParser } from "parse-multipart-data";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -308,6 +309,56 @@ export const generateMultipartFormKeyValuePairs = (
       } as RQAPI.FormDataKeyValuePair);
     }
   });
+
+  return result;
+};
+
+export const parseMultipartFormDataString = (
+  body: string,
+  contentTypeHeader: string | null
+): { key: string; value: string; isFile?: boolean; fileName?: string }[] => {
+  const result: { key: string; value: string; isFile?: boolean; fileName?: string }[] = [];
+
+  const boundary = (() => {
+    if (contentTypeHeader) {
+      return getBoundary(contentTypeHeader);
+    }
+
+    // Fallback: try to extract boundary from body
+    // Extract boundary from the first line
+    // In the body, boundaries appear with 2 extra leading dashes (e.g., ------WebKit...)
+    // But the actual boundary for parsing should have 2 fewer dashes (e.g., ----WebKit...)
+    const boundaryMatch = body.match(/^--(-+\S+)/);
+    if (!boundaryMatch) {
+      return null;
+    }
+    return boundaryMatch[1].trim();
+  })();
+
+  if (!boundary) {
+    return result;
+  }
+
+  try {
+    const bodyBuffer = Buffer.from(body, "utf-8");
+
+    const parts = multipartParser(bodyBuffer, boundary);
+
+    parts.forEach((part) => {
+      const fieldName = part.name;
+      if (fieldName) {
+        const isFile = !!part.filename;
+        result.push({
+          key: fieldName,
+          value: !isFile ? part.data.toString("utf-8") : "",
+          isFile: isFile,
+          fileName: part.filename || undefined,
+        });
+      }
+    });
+  } catch (error) {
+    Logger.log("[parseMultipartFormDataString] Failed to parse multipart data:", error);
+  }
 
   return result;
 };
