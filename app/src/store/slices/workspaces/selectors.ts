@@ -1,7 +1,7 @@
 import { RootState } from "store/types";
 import { workspacesEntityAdapter } from "./slice";
 import { ReducerKeys } from "store/constants";
-import { Workspace } from "features/workspaces/types";
+import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { captureException } from "@sentry/react";
 
 const sliceRootState = (state: RootState) => state[ReducerKeys.WORKSPACE];
@@ -17,7 +17,7 @@ export const getAllWorkspaces = (state: RootState) => workspacesEntitySelectors.
 
 export const getNonLocalWorkspaces = (state: RootState) => {
   const all = getAllWorkspaces(state) as Workspace[];
-  return all.filter((w) => w?.workspaceType !== "LOCAL");
+  return all.filter((w) => w?.workspaceType !== WorkspaceType.LOCAL);
 };
 
 export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0];
