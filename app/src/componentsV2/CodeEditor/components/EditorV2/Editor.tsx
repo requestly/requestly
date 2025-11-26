@@ -28,6 +28,7 @@ import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { MergeViewEditor } from "componentsV2/CodeEditor/components/EditorV2/components/MergeViewEditor/MergeViewEditor";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -47,6 +48,9 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
+  mergeConfig?: {
+    newValue: string;
+  };
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -65,6 +69,7 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
+  mergeConfig,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -374,7 +379,8 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {editor}
+        {/* {editor} */}
+        {mergeConfig ? <MergeViewEditor originalValue={value} newValue={mergeConfig.newValue} /> : editor}
       </ResizableBox>
     </>
   );

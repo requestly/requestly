@@ -28,6 +28,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
+  // TEMP FLAG
+  const showMergeView = true;
+
   React.useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
@@ -99,6 +102,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
+        mergeConfig={{
+          newValue: `
+          fetch('https://app.requestly.io/echo')
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.error('Error:', err));
+        `,
+        }}
       />
     </div>
   );
