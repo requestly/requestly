@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast";
 import { getAppMode } from "store/selectors";
-import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, getNonLocalWorkspaces } from "store/slices/workspaces/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { removeWorkspace, getAllWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
@@ -20,6 +20,7 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
   const location = useLocation();
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
+  const sharedWorkspaces = useSelector(getNonLocalWorkspaces);
 
   const [deleteDirectory, setDeleteDirectory] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -48,14 +49,7 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
           workspaceType: "LOCAL",
           rootPath: partialWorkspace.path,
         }));
-        const state: any = (window as any).store?.getState?.();
-        let shared: any[] = [];
-        if (state && state.WORKSPACE && state.WORKSPACE.allWorkspaces && state.WORKSPACE.allWorkspaces.entities) {
-          shared = Object.values(state.WORKSPACE.allWorkspaces.entities).filter(
-            (w: any) => w && w.workspaceType !== "LOCAL"
-          );
-        }
-        dispatch(workspaceActions.setAllWorkspaces([...shared, ...localRecords] as any));
+        dispatch(workspaceActions.setAllWorkspaces([...sharedWorkspaces, ...localRecords] as any));
       } catch (e) {
         /* ignore */
       }
@@ -72,7 +66,17 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
     } finally {
       setIsDeleting(false);
     }
-  }, [workspaceId, deleteDirectory, isDeleting, location, activeWorkspaceId, dispatch, appMode, navigate]);
+  }, [
+    workspaceId,
+    deleteDirectory,
+    isDeleting,
+    location,
+    activeWorkspaceId,
+    dispatch,
+    appMode,
+    navigate,
+    sharedWorkspaces,
+  ]);
 
   return (
     <div className="local-workspace-delete-section">
