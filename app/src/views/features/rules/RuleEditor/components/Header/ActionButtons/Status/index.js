@@ -22,7 +22,7 @@ import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { useRBAC } from "features/rbac";
 
-const getRuleStatusMessage = (isValidPermission, newStatus) => {
+const getRuleStatusMessage = (newStatus, isValidCreatePersmission) => {
   const isActive = newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
 
   if (isValidPermission) {
