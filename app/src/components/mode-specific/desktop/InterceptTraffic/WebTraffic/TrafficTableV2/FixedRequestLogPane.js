@@ -94,9 +94,43 @@ const BodyTabView = ({ body, requestState, timestamp }) => {
   );
 };
 
+const canRenderInCM = (contentType) => {
+  const binaryMIMETypes = [
+    "image/",
+    "video/",
+    "audio/",
+    "application/octet-stream",
+    "application/pdf",
+    "application/zip",
+    "application/x-zip-compressed",
+    "application/x-rar-compressed",
+    "application/x-tar",
+    "application/x-gzip",
+    "application/x-7z-compressed",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument",
+    "application/msword",
+    "application/vnd.ms-powerpoint",
+    "font/",
+    "woff2",
+    "application/x-protobuf",
+    "application/protobuf",
+  ];
+
+  //show values if content type is empty
+  if (contentType === "") return true;
+
+  // Check if it's a binary type
+  if (binaryMIMETypes.some((type) => contentType.includes(type))) return false;
+
+  // non binary types are true to be shown in code mirror
+  return true;
+};
+
 const LogPane = ({ log_id, title, requestState, timestamp, data: request_data }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const { queryParams, headers, body } = request_data;
+  const contentType = headers["content-type"] || "";
 
   const tabs = [
     {
@@ -172,14 +206,20 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
       ),
       body: (
         <div className="navigation-panel-wrapper">
-          <Editor
-            scriptId={`${title}-${log_id}`}
-            value={typeof body === "object" ? JSON.stringify(body) : String(body ?? "")}
-            language={EditorLanguage.JSON}
-            isReadOnly
-            isResizable={false}
-            analyticEventProperties={{ source: "traffic_table" }}
-          />
+          {canRenderInCM(contentType) ? (
+            <Editor
+              scriptId={`${title}-${log_id}`}
+              value={body || ""}
+              language={EditorLanguage.JSON}
+              isReadOnly
+              isResizable={false}
+              analyticEventProperties={{ source: "traffic_table" }}
+            />
+          ) : (
+            <>
+              <span>Binary data can not be displayed</span>
+            </>
+          )}
         </div>
       ),
     },
