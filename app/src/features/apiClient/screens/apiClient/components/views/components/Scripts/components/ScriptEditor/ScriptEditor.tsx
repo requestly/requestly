@@ -54,8 +54,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
   // TEMP FLAG
   const showMergeView = true;
 
+  console.log("Rendering ScriptEditor with entry:", entry);
+
   const { object, submit, isLoading, error } = useObject({
-    api: "",
+    api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
     schema: TestGenerationOutputSchema,
   });
 
@@ -99,7 +101,12 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
             <AIPromptPopover
               isLoading={false}
               isPopoverOpen={isGenerateTestPopoverOpen}
-              onGenerateClick={(query) => submit({ userQuery: query, apiRecord: entry })}
+              onGenerateClick={(query) => {
+                console.log("Submitting with entry:", entry);
+                console.log("Entry type:", typeof entry);
+                console.log("Entry keys:", entry ? Object.keys(entry) : "entry is null/undefined");
+                submit({ userQuery: query, apiRecord: entry });
+              }}
               onCancelClick={() => {}}
             />
           }
