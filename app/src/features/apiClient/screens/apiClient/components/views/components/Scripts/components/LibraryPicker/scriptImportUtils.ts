@@ -118,31 +118,3 @@ export function getDefaultVariableName(packageId: string): string {
 
   return specialCases[packageId] || camelCase;
 }
-
-export function calculateInsertPosition(
-  code: string
-): { position: number; needsNewlineBefore: boolean; needsNewlineAfter: boolean } {
-  const analysis = analyzeScriptImports(code);
-
-  if (analysis.hasRequires) {
-    const position = analysis.lastRequireEnd;
-
-    const afterPosition = code.slice(position, position + 2);
-    const needsNewlineAfter = !afterPosition.includes("\n\n");
-
-    return {
-      position,
-      needsNewlineBefore: true,
-      needsNewlineAfter,
-    };
-  }
-
-  const leadingWhitespaceMatch = code.match(/^(\s*)/);
-  const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[1] : "";
-
-  return {
-    position: leadingWhitespace.length,
-    needsNewlineBefore: false,
-    needsNewlineAfter: code.trim().length > 0, // Add newline after if there's content
-  };
-}
