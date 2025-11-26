@@ -269,8 +269,7 @@ export function removeWorkspace(
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
       method: "removeWorkspace",
-      // Folder deletion can take time; giving generous timeout.
-      timeout: 80000,
+      timeout: 10000,
     },
     workspaceId,
     opts
