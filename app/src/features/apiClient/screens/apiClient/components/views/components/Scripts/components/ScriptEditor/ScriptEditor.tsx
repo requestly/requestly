@@ -9,15 +9,38 @@ import Editor from "componentsV2/CodeEditor";
 import { AIPromptPopover } from "../AIPromptPopover/AIPromptPopover";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdOutlineAutoAwesome } from "@react-icons/all-files/md/MdOutlineAutoAwesome";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
 import "./scriptEditor.scss";
+import { z } from "zod/v4";
+
+const TestGenerationOutputSchema = z.object({
+  text: z
+    .string()
+    .min(1, "Text explanation cannot be empty")
+    .max(2000, "Text explanation is too long")
+    .describe("Explanation or guidance message"),
+
+  code: z
+    .object({
+      language: z.string().describe('Programming language (e.g., "javascript")'),
+      content: z.string().describe("The generated test script code"),
+    })
+    .optional()
+    .describe("Code block with generated test script"),
+});
 
 interface ScriptEditorProps {
-  scripts: RQAPI.ApiEntry["scripts"];
+  entry: RQAPI.ApiEntry;
   onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
   focusPostResponse?: boolean;
 }
 // FIX: Editor does not re-render when scripts are undefined
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsChange, focusPostResponse }) => {
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChange, focusPostResponse }) => {
+  const scripts = entry?.scripts || {
+    preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
+    postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
+  };
+
   const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
@@ -27,6 +50,16 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
+
+  // TEMP FLAG
+  const showMergeView = true;
+
+  const { object, submit, isLoading, error } = useObject({
+    api: "",
+    schema: TestGenerationOutputSchema,
+  });
+
+  console.log({ obj: object, isLoading, error });
 
   React.useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
@@ -66,7 +99,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
             <AIPromptPopover
               isLoading={false}
               isPopoverOpen={isGenerateTestPopoverOpen}
-              onGenerateClick={() => {}}
+              onGenerateClick={(query) => submit({ userQuery: query, apiRecord: entry })}
               onCancelClick={() => {}}
             />
           }
@@ -84,7 +117,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         </Popover>
       </div>
     );
-  }, [scriptType, isGenerateTestPopoverOpen]);
+  }, [scriptType, isGenerateTestPopoverOpen, submit, entry]);
 
   return (
     <div className="api-client-script-editor-container">
@@ -99,6 +132,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
+        mergeConfig={{
+          newValue: `
+          fetch('https://app.requestly.io/echo')
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.error('Error:', err));
+        `,
+        }}
       />
     </div>
   );
