@@ -22,10 +22,10 @@ import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { useRBAC } from "features/rbac";
 
-const getRuleStatusMessage = (newStatus, isValidCreatePersmission) => {
+const getRuleStatusMessage = (newStatus, isValidCreatePermission) => {
   const isActive = newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
 
-  if (isValidCreatePersmission) {
+  if (isValidCreatePermission) {
     return isActive ? "Rule saved and activated" : "Rule saved and deactivated";
   }
 
@@ -47,7 +47,7 @@ const Status = ({
 
   // to Check if user has permission to create/save rules (viewers don't have this permission)
   const { validatePermission } = useRBAC();
-  const { isValidCreatePersmission } = validatePermission("http_rule", "create");
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
@@ -94,7 +94,7 @@ const Status = ({
       saveRule(appMode, dispatch, syntaxValidatedAndTransformedRule)
         .then(() => {
           // Showing different messages based on user permissions
-          toast.success(getRuleStatusMessage(newValue, isValidCreatePersmission));
+          toast.success(getRuleStatusMessage(newValue, isValidPermission));
         })
         .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
         .catch((error) => {
@@ -107,7 +107,7 @@ const Status = ({
     currentlySelectedRuleData,
     dispatch,
     mode,
-    isValidCreatePersmission,
+    isValidPermission,
   ]);
 
   const toggleRuleStatus = (event) => {
