@@ -6,8 +6,7 @@ import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
 import { useContentListTableContext } from "./context";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import Logger from "lib/logger";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { useDrag, useDrop } from "react-dnd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./contentListTable.scss";
 
@@ -229,29 +228,27 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       {isDragAndDropEnabled && dragAndDrop ? (
-        <DndProvider backend={HTML5Backend}>
-          <Table
-            {...commonProps}
-            components={{
-              body: {
-                row: DraggableBodyRow,
-              },
-            }}
-            onRow={(record, index) => {
-              const onRowAttr = onRowCallback(record);
+        <Table
+          {...commonProps}
+          components={{
+            body: {
+              row: DraggableBodyRow,
+            },
+          }}
+          onRow={(record, index) => {
+            const onRowAttr = onRowCallback(record);
 
-              const attr = {
-                index,
-                onRowDrop,
-                recordId: record[rowKey],
-                record: record,
-                ...onRowAttr,
-              };
+            const attr = {
+              index,
+              onRowDrop,
+              recordId: record[rowKey],
+              record: record,
+              ...onRowAttr,
+            };
 
-              return attr as React.HTMLAttributes<any>;
-            }}
-          />
-        </DndProvider>
+            return attr as React.HTMLAttributes<any>;
+          }}
+        />
       ) : (
         <Table {...commonProps} onRow={onRowCallback} />
       )}
