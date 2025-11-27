@@ -8,6 +8,7 @@ import { PackageListItem } from "./PackageListItem";
 import "./libraryPickerPopover.scss";
 import { getPackageRegistry } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageRegistry";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
+import { PackageOpenIcon } from "components/misc/PackageOpenIcon";
 
 export interface LibraryPickerPopoverProps {
   open: boolean;
@@ -118,7 +119,7 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
 
   const renderEmptyState = () => (
     <div className="library-picker-empty">
-      <RiBox3Line className="library-picker-empty-icon" />
+      <PackageOpenIcon className="library-picker-empty-icon" />
       <div className="library-picker-empty-content">
         <div className="library-picker-empty-title">No results for "{searchQuery}"</div>
         <div className="library-picker-empty-description">Try another package name or check your spelling.</div>

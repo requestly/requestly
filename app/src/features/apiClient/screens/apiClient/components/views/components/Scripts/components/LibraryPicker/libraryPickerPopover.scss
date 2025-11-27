@@ -117,10 +117,10 @@
     text-align: center;
 
     .library-picker-empty-icon {
-      font-size: 48px;
-      color: var(--requestly-color-text-subtle);
+      height: 48px;
+      width: 48px;
+      color: var(--requestly-color-surface-3);
       margin-bottom: 16px;
-      opacity: 0.5;
     }
 
     .library-picker-empty-content {
