@@ -5,7 +5,6 @@ import {
   Collection,
   EnvironmentEntity,
   ErroredRecord,
-  FileSystemResult,
   FileType,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
@@ -259,12 +258,26 @@ export function getAllWorkspaces() {
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
 }
 
+export type FileSystemError = {
+  type: "error";
+  error: {
+    message: string;
+    path: string;
+    fileType: FileType;
+    code: ErrorCode;
+  };
+};
+
+export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
+
+export type FileSystemResult<T> = ContentfulSuccess<T> | FileSystemError;
+
 // Remove a local workspace. If opts.deleteDirectory is true, attempts recursive delete of the workspace folder.
 // Treat non-existent workspace id as success (idempotent). Propagates permission errors so caller can retry without deleteDirectory.
 export function removeWorkspace(
   workspaceId: string,
   opts: { deleteDirectory?: boolean } = {}
-): Promise<{ type: string } | void> {
+): Promise<FileSystemResult<void>> {
   return rpc(
     {
       namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
@@ -273,5 +286,5 @@ export function removeWorkspace(
     },
     workspaceId,
     opts
-  ) as Promise<{ type: string } | void>;
+  ) as Promise<FileSystemResult<void>>;
 }
