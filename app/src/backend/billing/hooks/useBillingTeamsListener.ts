@@ -55,7 +55,7 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      if (user.details?.emailType && isCompanyEmail(user.details.emailType)) {
+      if (user.details?.emailType && isCompanyEmail(user.detailsk.emailType)) {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),
           where("ownerDomains", "array-contains", domain)
