@@ -27,7 +27,6 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   return (
     <Split
-      key={splitDirection}
       ref={splitPane}
       direction={splitDirection}
       sizes={isSheetPlacedAtBottom ? initialSizes : [55, 45]}
