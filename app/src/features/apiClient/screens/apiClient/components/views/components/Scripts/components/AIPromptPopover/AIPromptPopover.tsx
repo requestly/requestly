@@ -1,27 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Input, InputRef } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { LuBrain } from "@react-icons/all-files/lu/LuBrain";
 import "./aiPromptPopover.scss";
+import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 
 interface PromptPopoverProps {
   isLoading: boolean;
   isPopoverOpen: boolean;
+  userQuery: string;
+  onUserQueryChange: (query: string) => void;
   onGenerateClick: (query: string) => void;
+  onCloseClick: () => void;
   onCancelClick: () => void;
 }
 
 export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
+  userQuery,
   isLoading,
   isPopoverOpen,
+  onUserQueryChange,
   onGenerateClick,
   onCancelClick,
+  onCloseClick,
 }) => {
   const inputRef = useRef<InputRef>(null);
-  const [prompt, setPrompt] = useState(
-    "Generate test cases for this request and check status 200, response JSON has accountId"
-  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -40,8 +44,8 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
       <Input.TextArea
         className="ai-generate-test-popover-content__input"
         ref={inputRef}
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        value={userQuery}
+        onChange={(e) => onUserQueryChange(e.target.value)}
         autoSize={{ minRows: 2, maxRows: 8 }}
       />
       {isLoading && (
@@ -50,15 +54,21 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
         </span>
       )}
       <div className="ai-generate-test-popover-content__actions-container">
-        <RQButton type="transparent" icon={<MdInfoOutline />} size="small" className="ai-generate-test-help-btn">
-          Need help
-        </RQButton>
-        <div className="ai-generate-test-popover-content__actions">
-          <RQButton onClick={onCancelClick} size="small">
-            Close
+        {isLoading ? (
+          <RQButton size="small" icon={<MdOutlineStopCircle />} onClick={onCancelClick}>
+            Stop
           </RQButton>
-          <RQButton type="primary" onClick={() => onGenerateClick(prompt)} size="small">
-            Generate
+        ) : (
+          <RQButton type="transparent" icon={<MdInfoOutline />} size="small" className="ai-generate-test-help-btn">
+            Need help
+          </RQButton>
+        )}
+        <div className="ai-generate-test-popover-content__actions">
+          <RQButton onClick={onCloseClick} size="small">
+            {isLoading ? "Continue in background" : "Close"}
+          </RQButton>
+          <RQButton type="primary" loading={isLoading} onClick={() => onGenerateClick(userQuery)} size="small">
+            {isLoading ? "Generating..." : "Generate"}
           </RQButton>
         </div>
       </div>
