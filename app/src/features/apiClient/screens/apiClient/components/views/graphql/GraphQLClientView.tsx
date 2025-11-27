@@ -408,7 +408,16 @@ const GraphQLClientView: React.FC<Props> = ({
           delete apiRecord.data.request.operationName;
         }
 
-        const apiClientExecutionResult = await graphQLRequestExecutor.executeGraphQLRequest(recordId, apiRecord.data);
+        const apiClientExecutionResult = await graphQLRequestExecutor.executeGraphQLRequest(
+          {
+            entry: apiRecord.data,
+            recordId,
+          },
+          {
+            iteration: 0,
+            iterationCount: 1,
+          }
+        );
 
         const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
         updateEntryResponse(entryWithResponse.response);
@@ -445,6 +454,7 @@ const GraphQLClientView: React.FC<Props> = ({
       updateEntryResponse,
       updateEntryTestResults,
       notifyApiRequestFinished,
+      dispatch,
     ]
   );
 
