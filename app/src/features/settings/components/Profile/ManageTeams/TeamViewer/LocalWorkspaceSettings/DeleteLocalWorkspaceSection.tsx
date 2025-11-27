@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import "./deleteLocalWorkspaceSection.scss";
 import { Alert, Button, Checkbox } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
