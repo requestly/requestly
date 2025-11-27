@@ -10,6 +10,7 @@ import { experimental_useObject as useObject } from "@ai-sdk/react";
 import "./scriptEditor.scss";
 import { z } from "zod/v4";
 import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
+import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -127,6 +128,16 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
         mergeView={mergeViewConfig}
       />
+      {object?.code?.content && (
+        <AIResultReviewPanel
+          onDiscard={() => clear()}
+          onAccept={() => {
+            onScriptsChange({ ...scripts, postResponse: object?.code?.content as string });
+            clear();
+          }}
+          onEditInstructions={() => setIsGenerateTestPopoverOpen(true)}
+        />
+      )}
     </div>
   );
 };

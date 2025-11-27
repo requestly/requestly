@@ -1,0 +1,26 @@
+.ai-result-review-panel-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+
+  .ai-result-review-panel-content {
+    border-radius: 6px;
+    border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+    background: var(--requestly-color-surface-0, #212121);
+    padding: var(--requestly-space-5, 12px);
+    max-width: 520px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &__right-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--requestly-space-4, 8px);
+    }
+  }
+}
