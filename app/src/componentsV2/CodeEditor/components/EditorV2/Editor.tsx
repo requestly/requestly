@@ -48,8 +48,9 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
-  mergeConfig?: {
-    newValue: string;
+  mergeView?: {
+    incomingValue: string;
+    source: "ai" | "user";
   };
 }
 const Editor: React.FC<EditorProps> = ({
@@ -69,7 +70,7 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
-  mergeConfig,
+  mergeView,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -380,7 +381,7 @@ const Editor: React.FC<EditorProps> = ({
       >
         {toastContainer}
         {/* {editor} */}
-        {mergeConfig ? <MergeViewEditor originalValue={value} newValue={mergeConfig.newValue} /> : editor}
+        {mergeView ? <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} /> : editor}
       </ResizableBox>
     </>
   );
