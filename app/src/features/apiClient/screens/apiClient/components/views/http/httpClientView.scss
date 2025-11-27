@@ -75,4 +75,10 @@
     font-weight: var(--requestly-font-weight-medium);
     margin-bottom: var(--requestly-space-3);
   }
+
+  .api-request-tabs.ant-tabs.ant-tabs-small {
+    .ant-tabs-content-holder {
+      padding: 4px;
+    }
+  }
 }

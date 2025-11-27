@@ -2,16 +2,14 @@ import React from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
-import { Popover, Radio, Tooltip } from "antd";
+import { Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
-import { AIPromptPopover } from "../AIPromptPopover/AIPromptPopover";
-import { RQButton } from "lib/design-system-v2/components";
-import { MdOutlineAutoAwesome } from "@react-icons/all-files/md/MdOutlineAutoAwesome";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import "./scriptEditor.scss";
 import { z } from "zod/v4";
+import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -51,17 +49,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
-  // TEMP FLAG
-  const showMergeView = true;
-
-  console.log("Rendering ScriptEditor with entry:", entry);
-
-  const { object, submit, isLoading, error } = useObject({
+  const { object, isLoading, error, stop, submit, clear } = useObject({
     api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
     schema: TestGenerationOutputSchema,
   });
 
-  console.log({ obj: object, isLoading, error });
+  const mergeViewConfig = useMemo(() => {
+    const isPostResponseScript = scriptType === RQAPI.ScriptType.POST_RESPONSE;
+    const hasGeneratedCode = Boolean(object?.code?.content);
+
+    if (isPostResponseScript && hasGeneratedCode) {
+      return {
+        incomingValue: object?.code?.content,
+        source: "ai",
+      };
+    }
+
+    return undefined;
+  }, [scriptType, object?.code?.content]);
 
   React.useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
@@ -93,38 +98,19 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
             />
           </Tooltip>
         </span>
-        <Popover
-          open={isGenerateTestPopoverOpen}
-          onOpenChange={setIsGenerateTestPopoverOpen}
-          trigger="click"
-          content={
-            <AIPromptPopover
-              isLoading={false}
-              isPopoverOpen={isGenerateTestPopoverOpen}
-              onGenerateClick={(query) => {
-                console.log("Submitting with entry:", entry);
-                console.log("Entry type:", typeof entry);
-                console.log("Entry keys:", entry ? Object.keys(entry) : "entry is null/undefined");
-                submit({ userQuery: query, apiRecord: entry });
-              }}
-              onCancelClick={() => {}}
-            />
-          }
-          placement="bottomRight"
-          overlayClassName="ai-generate-test-popover"
-          showArrow={false}
-        >
-          <RQButton
-            className="ai-generate-test-btn ai-generate-test-btn__new"
-            size="small"
-            icon={<MdOutlineAutoAwesome />}
-          >
-            Generate tests
-          </RQButton>
-        </Popover>
+        <GenerateTestsButton
+          isLoading={isLoading}
+          isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
+          togglePopover={setIsGenerateTestPopoverOpen}
+          onGenerateClick={(query) => {
+            submit({ userQuery: query, apiRecord: entry });
+          }}
+          disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry.response}
+          onCancelClick={stop}
+        />
       </div>
     );
-  }, [scriptType, isGenerateTestPopoverOpen, submit, entry]);
+  }, [scriptType, isGenerateTestPopoverOpen, submit, entry, isLoading, stop]);
 
   return (
     <div className="api-client-script-editor-container">
@@ -139,14 +125,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
         }}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
-        //     mergeConfig={{
-        //       newValue: `
-        //       fetch('https://app.requestly.io/echo')
-        // .then(res => res.json())
-        // .then(data => console.log(data))
-        // .catch(err => console.error('Error:', err));
-        //     `,
-        //     }}
+        mergeView={mergeViewConfig}
       />
     </div>
   );
