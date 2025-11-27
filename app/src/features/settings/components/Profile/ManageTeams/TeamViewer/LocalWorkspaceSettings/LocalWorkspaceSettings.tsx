@@ -7,10 +7,9 @@ import DeleteLocalWorkspaceSection from "./DeleteLocalWorkspaceSection";
 
 interface LocalWorkspaceSettingsProps {
   workspacePath: string;
-  workspaceId: string;
 }
 
-export const LocalWorkspaceSettings: React.FC<LocalWorkspaceSettingsProps> = ({ workspacePath, workspaceId }) => {
+export const LocalWorkspaceSettings: React.FC<LocalWorkspaceSettingsProps> = ({ workspacePath }) => {
   return (
     <>
       <Divider />
@@ -40,7 +39,7 @@ export const LocalWorkspaceSettings: React.FC<LocalWorkspaceSettingsProps> = ({ 
           </div>
         </div>
       </div>
-      <DeleteLocalWorkspaceSection workspaceId={workspaceId} />
+      <DeleteLocalWorkspaceSection />
     </>
   );
 };
