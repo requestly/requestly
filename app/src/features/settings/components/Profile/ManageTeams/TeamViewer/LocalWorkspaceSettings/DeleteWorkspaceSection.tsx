@@ -9,6 +9,7 @@ import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { removeWorkspace, getAllWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
+import { captureException } from "@sentry/react";
 
 interface Props {
   workspaceId: string;
@@ -25,16 +26,8 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
   const [deleteDirectory, setDeleteDirectory] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = useCallback(async () => {
-    if (!workspaceId || isDeleting) return;
-    setIsDeleting(true);
-    try {
-      const previousPath = location?.state?.previousPath;
-      const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
-
-      await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
-
-      // Refresh local workspaces list to remove stale reference
+  const refreshAndNavigate = useCallback(
+    async (previousPath?: string, canNavigateToPreviousPath?: boolean) => {
       try {
         const allLocalWorkspacesResult = await getAllWorkspaces();
         const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
@@ -50,33 +43,37 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
           rootPath: partialWorkspace.path,
         }));
         dispatch(workspaceActions.setAllWorkspaces([...sharedWorkspaces, ...localRecords] as any));
+        if (canNavigateToPreviousPath) navigate(previousPath as string, { replace: true });
+        else redirectToRules(navigate);
       } catch (e) {
-        /* ignore */
+        captureException(e);
       }
+    },
+    [dispatch, navigate, sharedWorkspaces]
+  );
 
-      toast.info("Workspace deleted successfully");
+  const handleDelete = useCallback(async () => {
+    if (!workspaceId || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      const previousPath = location?.state?.previousPath;
+      const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
+
+      await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
+
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
-      if (canNavigateToPreviousPath) navigate(previousPath, { replace: true });
-      else redirectToRules(navigate);
+      toast.info("Workspace deleted successfully");
+
+      await refreshAndNavigate(previousPath, canNavigateToPreviousPath);
     } catch (err: any) {
       toast.error(err?.message || "Failed to delete workspace");
       if (deleteDirectory) setDeleteDirectory(false);
     } finally {
       setIsDeleting(false);
     }
-  }, [
-    workspaceId,
-    deleteDirectory,
-    isDeleting,
-    location,
-    activeWorkspaceId,
-    dispatch,
-    appMode,
-    navigate,
-    sharedWorkspaces,
-  ]);
+  }, [workspaceId, deleteDirectory, isDeleting, location, activeWorkspaceId, dispatch, appMode, refreshAndNavigate]);
 
   return (
     <div className="local-workspace-delete-section">
