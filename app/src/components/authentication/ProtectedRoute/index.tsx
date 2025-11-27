@@ -30,7 +30,7 @@ function ProtectedRoute<P>({
 
   useEffect(() => {
     if (!isPremiumUser) {
-      setIsPremiumUser(user.details?.isPremium);
+      setIsPremiumUser(user.details?.isPremium ?? false);
     }
   }, [user, isPremiumUser]);
 
