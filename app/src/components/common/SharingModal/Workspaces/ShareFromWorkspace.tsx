@@ -129,7 +129,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
               <>
                 <CopyButton
                   title="Copy link"
-                  type="default"
+                  type="secondary"
                   copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?wId=${activeWorkspace.id}`}
                   showIcon={false}
                   disableTooltip
