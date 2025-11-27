@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import "./deleteLocalWorkspaceSection.scss";
 import { Alert, Button, Checkbox } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "utils/Toast";
 import { getAppMode } from "store/selectors";
 import { getActiveWorkspaceId, getNonLocalWorkspaces } from "store/slices/workspaces/selectors";
@@ -12,14 +12,11 @@ import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { captureException } from "@sentry/react";
 
-interface Props {
-  workspaceId: string;
-}
-
-export const DeleteLocalWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
+export const DeleteLocalWorkspaceSection: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { teamId: workspaceId } = useParams();
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sharedWorkspaces = useSelector(getNonLocalWorkspaces);
