@@ -17,7 +17,7 @@ export const getAllWorkspaces = (state: RootState) => workspacesEntitySelectors.
 
 export const getNonLocalWorkspaces = (state: RootState) => {
   const all = getAllWorkspaces(state) as Workspace[];
-  return all.filter((w) => w?.workspaceType !== WorkspaceType.LOCAL);
+  return all.filter((w) => w.workspaceType !== WorkspaceType.LOCAL);
 };
 
 export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0];
