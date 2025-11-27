@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { Checkbox, Form, FormInstance } from "antd";
+import React, { useContext, useState, useRef, useEffect } from "react";
+import { Checkbox, Form, FormInstance, Tooltip, Input } from "antd";
 import { KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
@@ -46,6 +46,14 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   ...restProps
 }) => {
   const form = useContext(EditableContext);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const inputRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (editingDescription && inputRef.current) {
+      inputRef.current.focus({ cursor: "end" });
+    }
+  }, [editingDescription]);
 
   const save = async () => {
     try {
@@ -59,6 +67,8 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   if (!editable) {
     return <td {...restProps}>{children}</td>;
   }
+
+  const isDescription = dataIndex === "description";
 
   return (
     <td {...restProps}>
@@ -82,16 +92,56 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
           }
         `}
           >
-            <SingleLineEditor
-              className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
-              placeholder={dataIndex === "key" ? "Key" : "Value"}
-              defaultValue={record?.[dataIndex] as string}
-              onChange={(value) => {
-                form.setFieldsValue({ [dataIndex]: value });
-                save();
-              }}
-              variables={variables}
-            />
+            {isDescription ? (
+              <>
+                {!editingDescription && (
+                  <Tooltip
+                    title={record?.[dataIndex]}
+                    overlayClassName="key-value-description-tooltip"
+                    placement="bottom"
+                    color="#000000"
+                    mouseEnterDelay={0.5}
+                  >
+                    <div className="key-value-description-view" onClick={() => setEditingDescription(true)}>
+                      {record?.[dataIndex] || <span className="placeholder">Description</span>}
+                    </div>
+                  </Tooltip>
+                )}
+
+                {editingDescription && (
+                  <div className="key-value-description-floating-editor">
+                    <Input.TextArea
+                      ref={inputRef}
+                      className="key-value-description-textarea"
+                      autoSize={{ minRows: 1 }}
+                      placeholder="Description"
+                      defaultValue={record?.[dataIndex] as string}
+                      onBlur={() => {
+                        save();
+                        setEditingDescription(false);
+                      }}
+                      onChange={(e) => {
+                        form.setFieldsValue({ [dataIndex]: e.target.value });
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <SingleLineEditor
+                className={`key-value-table-input ${
+                  record.isEnabled === false ? "key-value-table-input-disabled" : ""
+                }`}
+                placeholder={dataIndex === "key" ? "Key" : "Value"}
+                defaultValue={record?.[dataIndex] as string}
+                onChange={(value) => {
+                  form.setFieldsValue({ [dataIndex]: value });
+                  save();
+                }}
+                variables={variables}
+              />
+            )}
+
             <Conditional
               condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
             >
