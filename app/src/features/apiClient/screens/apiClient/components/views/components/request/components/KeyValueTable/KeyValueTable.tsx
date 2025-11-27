@@ -30,6 +30,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       key: "",
       value: "",
       isEnabled: true,
+      description: "",
     }),
     []
   );
@@ -109,7 +110,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       {
         title: "key",
         dataIndex: "key",
-        width: "45%",
+        // width: "45%",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -130,6 +131,20 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           editable: true,
           dataIndex: "value",
           title: "value",
+          variables,
+          handleUpdatePair,
+        }),
+      },
+      {
+        title: "description",
+        dataIndex: "description",
+        minWidth: 200,
+        editable: true,
+        onCell: (record: KeyValuePair) => ({
+          record,
+          editable: true,
+          dataIndex: "description",
+          title: "description",
           variables,
           handleUpdatePair,
         }),
