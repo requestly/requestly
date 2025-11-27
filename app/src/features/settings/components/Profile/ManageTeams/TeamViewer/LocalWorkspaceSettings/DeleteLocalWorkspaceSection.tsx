@@ -11,6 +11,7 @@ import { removeWorkspace, getAllWorkspaces as getAllLocalWorkspaces } from "serv
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { captureException } from "@sentry/react";
+import { WorkspaceType } from "features/workspaces/types";
 
 export const DeleteLocalWorkspaceSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -37,7 +38,7 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
           adminCount: 1,
           members: {},
           appsumo: false,
-          workspaceType: "LOCAL",
+          workspaceType: WorkspaceType.LOCAL,
           rootPath: partialWorkspace.path,
         }));
         dispatch(workspaceActions.setAllWorkspaces([...sharedWorkspaces, ...localRecords] as any));
