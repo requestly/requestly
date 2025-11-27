@@ -6,7 +6,7 @@ import { toast } from "utils/Toast";
 import { getAppMode } from "store/selectors";
 import { getActiveWorkspaceId, getNonLocalWorkspaces } from "store/slices/workspaces/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
-import { removeWorkspace, getAllWorkspaces } from "services/fsManagerServiceAdapter";
+import { removeWorkspace, getAllWorkspaces as getAllLocalWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { captureException } from "@sentry/react";
@@ -29,7 +29,7 @@ export const DeleteLocalWorkspaceSection: React.FC<Props> = ({ workspaceId }) =>
   const refreshAndNavigate = useCallback(
     async (previousPath?: string, canNavigateToPreviousPath?: boolean) => {
       try {
-        const allLocalWorkspacesResult = await getAllWorkspaces();
+        const allLocalWorkspacesResult = await getAllLocalWorkspaces();
         const allLocalWorkspaces = allLocalWorkspacesResult.type === "success" ? allLocalWorkspacesResult.content : [];
         const localRecords = allLocalWorkspaces.map((partialWorkspace) => ({
           id: partialWorkspace.id,
