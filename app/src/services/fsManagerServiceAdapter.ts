@@ -6,6 +6,7 @@ import {
   EnvironmentEntity,
   ErroredRecord,
   FileType,
+  FileSystemResult,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
@@ -267,10 +268,6 @@ export type FileSystemError = {
     code: ErrorCode;
   };
 };
-
-export type ContentfulSuccess<T> = T extends void ? { type: "success" } : { type: "success"; content: T };
-
-export type FileSystemResult<T> = ContentfulSuccess<T> | FileSystemError;
 
 // Remove a local workspace. If opts.deleteDirectory is true, attempts recursive delete of the workspace folder.
 // Treat non-existent workspace id as success (idempotent). Propagates permission errors so caller can retry without deleteDirectory.
