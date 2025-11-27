@@ -3,7 +3,7 @@ import "./localWorkspaceSettings.scss";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { MdOutlineTipsAndUpdates } from "@react-icons/all-files/md/MdOutlineTipsAndUpdates";
 import { Divider } from "antd";
-import DeleteWorkspaceSection from "./DeleteWorkspaceSection";
+import DeleteLocalWorkspaceSection from "./DeleteWorkspaceSection";
 
 interface LocalWorkspaceSettingsProps {
   workspacePath: string;
@@ -40,7 +40,7 @@ export const LocalWorkspaceSettings: React.FC<LocalWorkspaceSettingsProps> = ({ 
           </div>
         </div>
       </div>
-      <DeleteWorkspaceSection workspaceId={workspaceId} />
+      <DeleteLocalWorkspaceSection workspaceId={workspaceId} />
     </>
   );
 };

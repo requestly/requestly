@@ -15,7 +15,7 @@ interface Props {
   workspaceId: string;
 }
 
-export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
+export const DeleteLocalWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -112,4 +112,4 @@ export const DeleteWorkspaceSection: React.FC<Props> = ({ workspaceId }) => {
   );
 };
 
-export default DeleteWorkspaceSection;
+export default DeleteLocalWorkspaceSection;
