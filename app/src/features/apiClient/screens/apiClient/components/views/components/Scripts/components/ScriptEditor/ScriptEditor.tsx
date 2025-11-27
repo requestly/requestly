@@ -10,6 +10,7 @@ import { experimental_useObject as useObject } from "@ai-sdk/react";
 import "./scriptEditor.scss";
 import { z } from "zod/v4";
 import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
+import { toast } from "utils/Toast";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -25,6 +26,8 @@ const TestGenerationOutputSchema = z.object({
     })
     .optional()
     .describe("Code block with generated test script"),
+
+  err: z.string().optional().describe("Error code if user request could not be processed"),
 });
 
 interface ScriptEditorProps {
@@ -49,12 +52,25 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
-  const { object, isLoading, error, stop, submit, clear } = useObject({
+  const { object, isLoading, stop, submit } = useObject({
     api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
     schema: TestGenerationOutputSchema,
   });
 
   const mergeViewConfig = useMemo(() => {
+    if (object?.err) {
+      switch (object.err) {
+        case "UNRELATED_QUERY":
+          toast.error("Please provide a query related to test generation.");
+          break;
+        case "TEST_NOT_REQUESTED":
+          toast.info("The query does not request any tests to be generated.");
+          break;
+        default:
+          toast.error("An error occurred while generating tests. Please try again.");
+      }
+      return undefined;
+    }
     const isPostResponseScript = scriptType === RQAPI.ScriptType.POST_RESPONSE;
     const hasGeneratedCode = Boolean(object?.code?.content);
 
@@ -66,7 +82,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content]);
+  }, [scriptType, object?.code?.content, object?.err]);
 
   React.useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
