@@ -38,7 +38,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const [memberEmails, setMemberEmails] = useState([]);
+  const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInviteMembers = useCallback(() => {
