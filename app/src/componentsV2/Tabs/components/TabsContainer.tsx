@@ -31,6 +31,7 @@ export const TabsContainer: React.FC = () => {
     incrementVersion,
     resetPreviewTab,
     consumeIgnorePath,
+    closeAllTabs,
     cleanupCloseBlockers,
   ] = useTabServiceWithSelector((state) => [
     state.activeTabId,
@@ -43,6 +44,7 @@ export const TabsContainer: React.FC = () => {
     state.incrementVersion,
     state.resetPreviewTab,
     state.consumeIgnorePath,
+    state.closeAllTabs,
     state.cleanupCloseBlockers,
   ]);
 
@@ -56,6 +58,13 @@ export const TabsContainer: React.FC = () => {
     [setActiveTab]
   );
 
+  const closeAllOpenTabs = (type: string) => {
+    if (type === "close-with-close-modal") {
+      closeAllTabs(true); // Skip unsaved prompt when closing all tabs
+    } else {
+      closeAllTabs(); // Normal close all tabs
+    }
+  };
   const operations = useMemo(
     () => (
       <Popover
@@ -63,7 +72,13 @@ export const TabsContainer: React.FC = () => {
         placement="topRight"
         overlayClassName="tabs-operations-popover"
         destroyTooltipOnHide
-        content={<TabsMorePopover onTabItemClick={onTabItemClick} onCloseTab={closeTabById} />}
+        content={
+          <TabsMorePopover
+            onTabItemClick={onTabItemClick}
+            onCloseTab={closeTabById}
+            closeAllOpenTabs={closeAllOpenTabs}
+          />
+        }
         open={isMorePopoverOpen}
         onOpenChange={setIsMorePopoverOpen}
       >
