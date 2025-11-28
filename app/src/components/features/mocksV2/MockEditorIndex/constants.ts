@@ -4,7 +4,7 @@ import { MockEditorDataSchema, RequestMethod } from "./types";
 export const defaultEditorMock: MockEditorDataSchema = {
   id: "",
   type: MockType.API,
-  fileType: undefined,
+  fileType: null,
   name: "",
   desc: "",
   method: RequestMethod.GET,

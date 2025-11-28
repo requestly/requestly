@@ -137,7 +137,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         <span className="workspace-card-description">
           <div className="text-white">{workspace.name}</div>
           <div className="text-gray">
-            {workspace.accessCount} {workspace.accessCount && workspace.accessCount > 1 ? "members" : "member"}
+            {workspace.accessCount ?? 0} {(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}
           </div>
         </span>
       </Row>
