@@ -127,9 +127,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   return (
     <div
       className={`workspace-share-menu-item-card ${
-        showArrow && availableWorkspaces?.length
-          ? availableWorkspaces.length > 1 && "workspace-share-menu-dropdown"
-          : ""
+        showArrow && (availableWorkspaces?.length ?? 0) > 1 ? "workspace-share-menu-dropdown" : ""
       }`}
     >
       <Row align="middle" className="items-center">
