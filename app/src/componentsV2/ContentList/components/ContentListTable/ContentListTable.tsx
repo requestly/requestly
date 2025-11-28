@@ -6,7 +6,8 @@ import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
 import { useContentListTableContext } from "./context";
 import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import Logger from "lib/logger";
-import { useDrag, useDrop } from "react-dnd";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./contentListTable.scss";
 
@@ -228,27 +229,29 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       {isDragAndDropEnabled && dragAndDrop ? (
-        <Table
-          {...commonProps}
-          components={{
-            body: {
-              row: DraggableBodyRow,
-            },
-          }}
-          onRow={(record, index) => {
-            const onRowAttr = onRowCallback(record);
+        <DndProvider backend={HTML5Backend} context={window}>
+          <Table
+            {...commonProps}
+            components={{
+              body: {
+                row: DraggableBodyRow,
+              },
+            }}
+            onRow={(record, index) => {
+              const onRowAttr = onRowCallback(record);
 
-            const attr = {
-              index,
-              onRowDrop,
-              recordId: record[rowKey],
-              record: record,
-              ...onRowAttr,
-            };
+              const attr = {
+                index,
+                onRowDrop,
+                recordId: record[rowKey],
+                record: record,
+                ...onRowAttr,
+              };
 
-            return attr as React.HTMLAttributes<any>;
-          }}
-        />
+              return attr as React.HTMLAttributes<any>;
+            }}
+          />
+        </DndProvider>
       ) : (
         <Table {...commonProps} onRow={onRowCallback} />
       )}
