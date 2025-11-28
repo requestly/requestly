@@ -19,6 +19,9 @@ async function _addRunResultInFirebase(
   runResult: RunResult
 ): ResponsePromise<SavedRunResult> {
   try {
+    if (!collectionId) {
+      throw new Error("Collection ID is required to add run result");
+    }
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, APIS_NODE, collectionId, RUN_RESULT_NODE);
 

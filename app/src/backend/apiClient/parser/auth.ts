@@ -7,7 +7,13 @@ import { RQAPI } from "features/apiClient/types";
 
 export function patchAuthSchema(record: Partial<RQAPI.ApiClientRecord>): RQAPI.ApiClientRecord["data"]["auth"] {
   const newRecord = { ...record };
-  const oldAuth = newRecord.data.auth as any;
+
+  // Ensure data object exists
+  if (!newRecord.data) {
+    newRecord.data = {} as RQAPI.ApiClientRecord["data"];
+  }
+
+  const oldAuth = newRecord.data.auth;
   if (!oldAuth) {
     newRecord.data.auth = getDefaultAuth(newRecord.collectionId === null);
   } else {
@@ -17,8 +23,8 @@ export function patchAuthSchema(record: Partial<RQAPI.ApiClientRecord>): RQAPI.A
   return newRecord.data.auth;
 }
 
-/* 
-  note that this does not run any validations on the existing auth config 
+/*
+  note that this does not run any validations on the existing auth config
   hence if there are empty keys in the old auth config, they will be retained
   => if the request for a record for such a auth is processed, it will get undefined fields
   => => this leads to the empty string replacements inside the extractAuthHeadersAndParams (part of processAuthForEntry)

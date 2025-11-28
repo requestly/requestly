@@ -82,6 +82,10 @@ export const getDesktopAppAuthParams = (): URLSearchParams | null => {
   try {
     const EXPIRY_DURATION = 3 * 60 * 1000; // 3mins -> milliseconds
     const value = window.localStorage.getItem(STORAGE.LOCAL_STORAGE.RQ_DESKTOP_APP_AUTH_PARAMS);
+    if (!value) {
+      return null;
+    }
+
     const paramsObj = JSON.parse(value) as { params: string; createdAt: number };
 
     if (Date.now() - paramsObj.createdAt > EXPIRY_DURATION) {
