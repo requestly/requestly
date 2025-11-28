@@ -21,7 +21,7 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
     {
       key: "accept-only",
       label: "Accept tests",
-      onClick: () => onAccept(false),
+      onClick: () => onAccept(true),
     },
   ];
 
@@ -41,7 +41,9 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
             icon={<MdOutlineKeyboardArrowDown />}
             menu={{ items: menuItems }}
             placement="top"
-            onClick={() => onAccept(true)}
+            onClick={() => {
+              onAccept(false);
+            }}
           >
             Accept & run tests
           </Dropdown.Button>
