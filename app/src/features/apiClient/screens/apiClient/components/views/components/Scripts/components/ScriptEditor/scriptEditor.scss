@@ -1,5 +1,6 @@
 .api-client-script-editor-container {
   height: inherit;
+  position: relative;
 
   .react-resizable {
     height: calc(100% - 35px) !important;
