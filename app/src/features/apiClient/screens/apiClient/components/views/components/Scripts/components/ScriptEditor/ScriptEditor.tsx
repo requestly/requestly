@@ -10,6 +10,7 @@ import { experimental_useObject as useObject } from "@ai-sdk/react";
 import "./scriptEditor.scss";
 import { z } from "zod/v4";
 import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
+import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -50,7 +51,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const { object, isLoading, error, stop, submit, clear } = useObject({
-    api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
+    api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
   });
 
