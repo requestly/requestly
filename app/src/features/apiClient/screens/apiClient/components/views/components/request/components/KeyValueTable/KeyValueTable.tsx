@@ -16,6 +16,7 @@ interface KeyValueTableProps {
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: ScopedVariables;
   checkInvalidCharacter?: boolean;
+  showDescription?: boolean;
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({
@@ -23,6 +24,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   variables,
   onChange,
   checkInvalidCharacter = false,
+  showDescription = true,
 }) => {
   const createEmptyPair = useCallback(
     () => ({
@@ -135,20 +137,22 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           handleUpdatePair,
         }),
       },
-      {
-        title: "description",
-        dataIndex: "description",
-        minWidth: 200,
-        editable: true,
-        onCell: (record: KeyValuePair) => ({
-          record,
-          editable: true,
-          dataIndex: "description",
-          title: "description",
-          variables,
-          handleUpdatePair,
-        }),
-      },
+      showDescription
+        ? {
+            title: "description",
+            dataIndex: "description",
+            minWidth: 200,
+            editable: true,
+            onCell: (record: KeyValuePair) => ({
+              record,
+              editable: true,
+              dataIndex: "description",
+              title: "description",
+              variables,
+              handleUpdatePair,
+            }),
+          }
+        : null,
       {
         title: "",
         width: "50px",
@@ -169,8 +173,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           );
         },
       },
-    ];
-  }, [variables, handleUpdatePair, checkInvalidCharacter, data.length, handleDeletePair]);
+    ].filter(Boolean);
+  }, [variables, handleUpdatePair, checkInvalidCharacter, data.length, handleDeletePair, showDescription]);
 
   return (
     <ContentListTable
