@@ -3,16 +3,25 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { RQAPI } from "features/apiClient/types";
 import { enforceLatestRecordSchema } from "./parser";
 
-export const getApiRecord = async (
-  recordId: string
-): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> => {
+type GetApiRecordResult = (
+  | {
+      success: true;
+      data: RQAPI.ApiClientRecord;
+    }
+  | {
+      success: false;
+      data: null;
+    }
+) & {
+  message?: string;
+};
+
+export const getApiRecord = async (recordId: string): Promise<GetApiRecordResult> => {
   const result = await getApiRecordFromFirebase(recordId);
   return result;
 };
 
-const getApiRecordFromFirebase = async (
-  recordId: string
-): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> => {
+const getApiRecordFromFirebase = async (recordId: string): Promise<GetApiRecordResult> => {
   const db = getFirestore(firebaseApp);
   const docRef = doc(db, "apis", recordId);
 
