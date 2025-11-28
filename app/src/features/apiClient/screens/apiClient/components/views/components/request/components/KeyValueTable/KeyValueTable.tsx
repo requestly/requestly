@@ -8,6 +8,8 @@ import { KeyValuePair } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import "./keyValueTable.scss";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -137,7 +139,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           handleUpdatePair,
         }),
       },
-      showDescription
+      showDescription && isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY)
         ? {
             title: "description",
             dataIndex: "description",
