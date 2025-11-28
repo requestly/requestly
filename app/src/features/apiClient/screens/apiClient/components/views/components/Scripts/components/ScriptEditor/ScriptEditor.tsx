@@ -16,6 +16,7 @@ import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutor
 import { toast } from "utils/Toast";
 import "./scriptEditor.scss";
 
+
 const TestGenerationOutputSchema = z.object({
   text: z
     .string()
@@ -30,6 +31,8 @@ const TestGenerationOutputSchema = z.object({
     })
     .optional()
     .describe("Code block with generated test script"),
+
+  err: z.string().optional().describe("Error code if user request could not be processed"),
 });
 
 interface ScriptEditorProps {
@@ -71,6 +74,19 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   });
 
   const mergeViewConfig = useMemo(() => {
+    if (object?.err) {
+      switch (object.err) {
+        case "UNRELATED_QUERY":
+          toast.error("Please provide a query related to test generation.");
+          break;
+        case "TEST_NOT_REQUESTED":
+          toast.info("The query does not request any tests to be generated.");
+          break;
+        default:
+          toast.error("An error occurred while generating tests. Please try again.");
+      }
+      return undefined;
+    }
     const isPostResponseScript = scriptType === RQAPI.ScriptType.POST_RESPONSE;
     const hasGeneratedCode = Boolean(object?.code?.content);
 
@@ -82,7 +98,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content]);
+  }, [scriptType, object?.code?.content, object?.err]);
 
   const handleAcceptAndRunTests = (onlyAccept: boolean) => {
     onScriptsChange({
