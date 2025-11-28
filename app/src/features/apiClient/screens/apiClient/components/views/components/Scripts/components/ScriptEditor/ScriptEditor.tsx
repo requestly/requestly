@@ -9,6 +9,7 @@ import Editor from "componentsV2/CodeEditor";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { z } from "zod/v4";
 import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
+import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
 import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
@@ -65,7 +66,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const httpRequestExecutor = useHttpRequestExecutor(getData(requestId)?.collectionId);
 
   const { object, isLoading, error, stop, submit, clear } = useObject({
-    api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
+    api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
   });
 
