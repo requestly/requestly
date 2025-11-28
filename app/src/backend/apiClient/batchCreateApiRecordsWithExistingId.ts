@@ -10,7 +10,13 @@ export const batchCreateApiRecordsWithExistingId = async (
   records: RQAPI.ApiClientRecord[]
 ): Promise<RQAPI.RecordsPromise> => {
   if (!uid) {
-    return { success: false, data: null };
+    return {
+      success: false,
+      data: {
+        records: [],
+        erroredRecords: [],
+      },
+    };
   }
 
   const ownerId = getOwnerId(uid, teamId);
@@ -49,6 +55,13 @@ const batchCreateApiRecordsWithExistingIdInFirebase = async (
     return { success: true, data: { records: updatedRecords, erroredRecords: [] } };
   } catch (error) {
     captureException(error);
-    return { success: false, data: null, message: error?.message };
+    return {
+      success: false,
+      data: {
+        records: [],
+        erroredRecords: [],
+      },
+      message: error?.message,
+    };
   }
 };
