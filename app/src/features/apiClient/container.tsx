@@ -22,6 +22,9 @@ import Split from "react-split";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+// Create a separate context for API Client DnD to avoid conflicts with ContentListTable
+const apiClientDndContext = document.createElement("div");
+
 const ApiClientFeatureContainer: React.FC = () => {
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
@@ -86,7 +89,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={HTML5Backend} context={apiClientDndContext}>
       <TabServiceProvider>
         <LocalSyncRefreshHandler />
         <div className="api-client-container">
