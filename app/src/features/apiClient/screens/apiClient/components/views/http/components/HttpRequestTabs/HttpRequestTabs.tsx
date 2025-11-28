@@ -3,7 +3,6 @@ import { QueryParamsTable } from "../../../components/request/components/QueryPa
 import RequestBody from "../../../components/request/RequestBody";
 import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import React, { useMemo } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
@@ -16,6 +15,7 @@ import { Checkbox } from "antd";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import { PathVariableTable } from "../PathVariableTable";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { HttpRequestScripts } from "../HttpRequestScripts/HttpRequestScripts";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -154,13 +154,12 @@ const HttpRequestTabs: React.FC<Props> = ({
           />
         ),
         children: (
-          <ScriptEditor
+          <HttpRequestScripts
             key={`${scriptEditorVersion}`}
+            requestId={requestId}
             entry={requestEntry}
-            onScriptsChange={(newScripts) => {
-              setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
-            }}
-            focusPostResponse={focusPostResponseScriptEditor}
+            setEntry={setRequestEntry}
+            focusPostResponse={focusPostResponseScriptEditor ?? false}
           />
         ),
       },

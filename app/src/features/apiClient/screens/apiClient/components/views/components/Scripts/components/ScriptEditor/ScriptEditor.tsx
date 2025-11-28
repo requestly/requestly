@@ -7,10 +7,15 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import "./scriptEditor.scss";
 import { z } from "zod/v4";
 import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
+import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
+import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
+import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
+import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { toast } from "utils/Toast";
+import "./scriptEditor.scss";
+
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -31,12 +36,20 @@ const TestGenerationOutputSchema = z.object({
 });
 
 interface ScriptEditorProps {
+  requestId: string;
   entry: RQAPI.ApiEntry;
-  onScriptsChange: (scripts: RQAPI.ApiEntry["scripts"]) => void;
+  onScriptsChange: (scripts: RQAPI.ApiEntryMetaData["scripts"]) => void;
+  aiTestsExcutionCallback: (testResults: RQAPI.ApiEntryMetaData["testResults"]) => void;
   focusPostResponse?: boolean;
 }
 // FIX: Editor does not re-render when scripts are undefined
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChange, focusPostResponse }) => {
+export const ScriptEditor: React.FC<ScriptEditorProps> = ({
+  requestId,
+  entry,
+  onScriptsChange,
+  aiTestsExcutionCallback,
+  focusPostResponse,
+}) => {
   const scripts = entry?.scripts || {
     preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
     postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
@@ -52,8 +65,11 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
-  const { object, isLoading, stop, submit } = useObject({
-    api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
+  const [getData] = useAPIRecords((state) => [state.getData]);
+  const httpRequestExecutor = useHttpRequestExecutor(getData(requestId)?.collectionId);
+
+  const { object, isLoading, error, stop, submit, clear } = useObject({
+    api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
   });
 
@@ -83,6 +99,31 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
 
     return undefined;
   }, [scriptType, object?.code?.content, object?.err]);
+
+  const handleAcceptAndRunTests = (onlyAccept: boolean) => {
+    onScriptsChange({
+      preRequest: scripts?.preRequest || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
+      postResponse: object?.code?.content as string,
+    });
+
+    if (onlyAccept) {
+      clear();
+      return;
+    }
+
+    const newEntry = { ...entry, scripts: { ...scripts, postResponse: object?.code?.content as string } };
+    httpRequestExecutor
+      .rerun(requestId, newEntry as RQAPI.HttpApiEntry)
+      .then((result) => {
+        if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
+          aiTestsExcutionCallback(result.artifacts.testResults);
+          clear();
+        } else throw new Error(result.error.message);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Something went wrong while running tests");
+      });
+  };
 
   React.useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
@@ -121,7 +162,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
           onGenerateClick={(query) => {
             submit({ userQuery: query, apiRecord: entry });
           }}
-          disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry.response}
+          disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
           onCancelClick={stop}
         />
       </div>
@@ -143,6 +184,13 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
         mergeView={mergeViewConfig}
       />
+      {object?.code?.content && !isLoading && !error && (
+        <AIResultReviewPanel
+          onDiscard={() => clear()}
+          onAccept={handleAcceptAndRunTests}
+          onEditInstructions={() => setIsGenerateTestPopoverOpen(true)}
+        />
+      )}
     </div>
   );
 };
