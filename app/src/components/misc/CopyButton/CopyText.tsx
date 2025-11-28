@@ -1,7 +1,11 @@
+import React from "react";
 import { Button } from "antd";
 import { copyToClipBoard } from "utils/Misc";
 
-const CopyText = ({ text, size }) => {
+const CopyText: React.FC<{
+  text: string;
+  size: "small" | "middle" | "large";
+}> = ({ text, size }) => {
   return (
     <Button
       type="text"
