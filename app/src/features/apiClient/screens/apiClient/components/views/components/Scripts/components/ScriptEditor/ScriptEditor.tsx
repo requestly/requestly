@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
@@ -11,6 +11,8 @@ import "./scriptEditor.scss";
 import { z } from "zod/v4";
 import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
 import { toast } from "utils/Toast";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import firebaseApp from "firebase";
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -37,6 +39,9 @@ interface ScriptEditorProps {
 }
 // FIX: Editor does not re-render when scripts are undefined
 export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChange, focusPostResponse }) => {
+  const auth = getAuth(firebaseApp);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
   const scripts = entry?.scripts || {
     preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
     postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
@@ -55,6 +60,11 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
   const { object, isLoading, stop, submit } = useObject({
     api: "http://127.0.0.1:5001/requestly-dev/us-central1/ai/test-cases/generate",
     schema: TestGenerationOutputSchema,
+    headers: authToken
+      ? {
+          Authorization: authToken,
+        }
+      : {},
   });
 
   const mergeViewConfig = useMemo(() => {
@@ -84,11 +94,23 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ entry, onScriptsChan
     return undefined;
   }, [scriptType, object?.code?.content, object?.err]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (focusPostResponse && hasPostResponseScript) {
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
     }
   }, [focusPostResponse, hasPostResponseScript]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        user.getIdToken().then((token) => {
+          setAuthToken(token);
+        });
+      } else {
+        setAuthToken(null);
+      }
+    });
+  }, []);
 
   const scriptTypeOptions = useMemo(() => {
     return (
