@@ -47,6 +47,7 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
+  onHeightChange?: (height: number) => void;
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -65,6 +66,7 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
+  onHeightChange,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -87,6 +89,8 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
+    // Notify parent component about manual resize
+    onHeightChange?.(size.height);
   };
 
   const handleFullScreenToggle = useCallback(() => {

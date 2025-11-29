@@ -7,9 +7,11 @@ import { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 import Editor from "componentsV2/CodeEditor";
+import { useEditorHeight } from "hooks/useEditorHeight";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const { editorHeight, editorContainerRef, setEditorHeight } = useEditorHeight(300, 150);
 
   /*
   useRef is not the idle way to handle this, useState should be used to control the behaviour of updating the value in
@@ -123,7 +125,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
               justifyContent: "center",
             }}
           >
-            <Col xl="12" span={24}>
+            <Col xl="12" span={24} ref={editorContainerRef}>
               <Editor
                 // key={pair.request.type}
                 language={
@@ -140,6 +142,8 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                   title: "Request Body",
                   options: [EditorRadioGroupOptions],
                 }}
+                height={editorHeight}
+                onHeightChange={setEditorHeight}
                 isResizable
               />
             </Col>
