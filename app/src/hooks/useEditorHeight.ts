@@ -57,7 +57,7 @@ export const useEditorHeight = (minHeight: number = 300, bottomOffset: number = 
 
   useEffect(() => {
     // Debounced version for resize events
-    let timeoutId: ReturnType<typeof setTimeout>;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const debouncedCalculate = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(calculateHeight, 150);
