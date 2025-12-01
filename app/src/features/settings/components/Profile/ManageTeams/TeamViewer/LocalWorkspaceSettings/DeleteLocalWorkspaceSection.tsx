@@ -42,11 +42,11 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
           rootPath: partialWorkspace.path,
         }));
         dispatch(workspaceActions.setAllWorkspaces([...sharedWorkspaces, ...localRecords] as any));
-        toast.info("Workspace deleted successfully");
         if (canNavigateToPreviousPath) navigate(previousPath as string, { replace: true });
         else redirectToRules(navigate);
       } catch (e) {
         captureException(e);
+        toast.error("Could not refresh workspaces");
       }
     },
     [dispatch, navigate, sharedWorkspaces]
@@ -64,6 +64,7 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
+      toast.info("Workspace deleted successfully");
 
       await refreshAndNavigate(previousPath, canNavigateToPreviousPath);
     } catch (err: any) {
