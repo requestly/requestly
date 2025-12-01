@@ -248,30 +248,5 @@ export const PricingFeatures: PlanFeatures = {
         },
       ],
     },
-    session_professional: {
-      planTitle: "Plus",
-      features: [
-        {
-          title: "Unlimited sessions",
-          enabled: true,
-        },
-        {
-          title: "Download session file",
-          enabled: true,
-        },
-        {
-          title: "Collaborate with teammates",
-          enabled: true,
-        },
-        {
-          title: "Integrations : Jira, Linear (coming soon)",
-          enabled: true,
-        },
-        {
-          title: "AI powered insights (coming soon)",
-          enabled: true,
-        },
-      ],
-    },
   },
 };
