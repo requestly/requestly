@@ -35,7 +35,9 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
   const sortedTeams: Workspace[] = useMemo(
     () =>
       filteredAvailableWorkspaces
-        ? [...filteredAvailableWorkspaces].sort((a: Workspace, b: Workspace) => b.accessCount - a.accessCount)
+        ? [...filteredAvailableWorkspaces].sort(
+            (a: Workspace, b: Workspace) => (b.accessCount ?? 0) - (a.accessCount ?? 0)
+          )
         : [],
     [filteredAvailableWorkspaces]
   );
@@ -101,7 +103,7 @@ export const WorkspaceShareMenu: React.FC<Props> = ({ onTransferClick, isLoading
           menu={{ items: menuItems }}
           placement="bottom"
           overlayClassName="workspace-share-menu-wrapper"
-          trigger={filteredAvailableWorkspaces?.length > 1 ? ["click"] : [null]}
+          trigger={filteredAvailableWorkspaces?.length > 1 ? ["click"] : undefined}
           onOpenChange={(open) => {
             if (open) trackShareModalWorkspaceDropdownClicked();
           }}
@@ -125,7 +127,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
   return (
     <div
       className={`workspace-share-menu-item-card ${
-        showArrow && availableWorkspaces?.length > 1 && "workspace-share-menu-dropdown"
+        showArrow && (availableWorkspaces?.length ?? 0) > 1 ? "workspace-share-menu-dropdown" : ""
       }`}
     >
       <Row align="middle" className="items-center">
@@ -133,12 +135,12 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
         <span className="workspace-card-description">
           <div className="text-white">{workspace.name}</div>
           <div className="text-gray">
-            {workspace.accessCount} {workspace.accessCount > 1 ? "members" : "member"}
+            {workspace.accessCount ?? 0} {(workspace.accessCount ?? 0) !== 1 ? "members" : "member"}
           </div>
         </span>
       </Row>
       {showArrow ? (
-        availableWorkspaces?.length > 1 ? (
+        availableWorkspaces?.length && availableWorkspaces?.length > 1 ? (
           <MdOutlineKeyboardArrowDown className="text-gray header mr-8" />
         ) : null
       ) : (
@@ -146,7 +148,7 @@ const WorkspaceItem: React.FC<WorkspaceItemProps> = ({
           disabled={isLoading}
           type="link"
           className="workspace-menu-item-transfer-btn"
-          onClick={() => onTransferClick(workspace)}
+          onClick={() => onTransferClick?.(workspace)}
         >
           Copy here
         </RQButton>
