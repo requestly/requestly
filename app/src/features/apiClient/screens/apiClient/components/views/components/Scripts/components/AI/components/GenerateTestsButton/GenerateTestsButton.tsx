@@ -9,6 +9,7 @@ interface GenerateTestsButtonProps {
   isLoading: boolean;
   isGenerateTestPopoverOpen: boolean;
   disabled: boolean;
+  negativeFeedback: string | null;
   togglePopover: (open: boolean) => void;
   onGenerateClick: (query: string) => void;
   onCancelClick: () => void;
@@ -18,6 +19,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
   isLoading,
   isGenerateTestPopoverOpen,
   disabled,
+  negativeFeedback,
   onCancelClick,
   onGenerateClick,
   togglePopover,
@@ -39,6 +41,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
             onCloseClick={() => togglePopover(false)}
             onGenerateClick={onGenerateClick}
             onCancelClick={onCancelClick}
+            negativeFeedback={negativeFeedback}
           />
         }
         placement="bottomRight"

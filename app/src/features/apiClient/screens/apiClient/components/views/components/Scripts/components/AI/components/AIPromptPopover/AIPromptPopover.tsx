@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { Input, InputRef } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
-import { LuBrain } from "@react-icons/all-files/lu/LuBrain";
 import "./aiPromptPopover.scss";
 import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCircle";
 
@@ -10,6 +9,7 @@ interface PromptPopoverProps {
   isLoading: boolean;
   isPopoverOpen: boolean;
   userQuery: string;
+  negativeFeedback: string | null;
   onUserQueryChange: (query: string) => void;
   onGenerateClick: (query: string) => void;
   onCloseClick: () => void;
@@ -20,6 +20,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
   userQuery,
   isLoading,
   isPopoverOpen,
+  negativeFeedback,
   onUserQueryChange,
   onGenerateClick,
   onCancelClick,
@@ -48,10 +49,11 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
         onChange={(e) => onUserQueryChange(e.target.value)}
         autoSize={{ minRows: 2, maxRows: 8 }}
       />
-      {isLoading && (
-        <span className="ai-generate-test-generating-text">
-          <LuBrain /> Generating response...
-        </span>
+      {negativeFeedback && (
+        <div className="ai-generate-test-popover-content__negative-feedback">
+          <MdInfoOutline />
+          <span>{negativeFeedback}</span>
+        </div>
       )}
       <div className="ai-generate-test-popover-content__actions-container">
         {isLoading ? (

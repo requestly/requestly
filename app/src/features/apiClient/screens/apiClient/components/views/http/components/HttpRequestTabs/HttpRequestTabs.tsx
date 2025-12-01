@@ -15,7 +15,7 @@ import { Checkbox } from "antd";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import { PathVariableTable } from "../PathVariableTable";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
-import { HttpRequestScripts } from "../HttpRequestScripts/HttpRequestScripts";
+import { HttpRequestScripts } from "../../components/HttpScriptEditors/HttpRequestScripts";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",

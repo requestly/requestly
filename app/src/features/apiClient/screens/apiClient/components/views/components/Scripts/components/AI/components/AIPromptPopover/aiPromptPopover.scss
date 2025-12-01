@@ -22,7 +22,7 @@
         margin-top: var(--requestly-space-2);
       }
       &__input {
-        margin: var(--requestly-space-5) 0;
+        margin-top: var(--requestly-space-5);
         font-size: var(--requestly-font-size-sm, 12px);
         color: var(--requestly-color-text-default);
         border-radius: 4px;
@@ -55,6 +55,15 @@
         color: var(--requestly-color-text-subtle);
         font-size: var(--requestly-font-size-xs, 11px);
         line-height: 17px;
+      }
+
+      &__negative-feedback {
+        display: flex;
+        align-items: center;
+        gap: var(--requestly-space-2);
+        color: var(--requestly-color-error-300);
+        font-size: var(--requestly-font-size-xs);
+        margin-top: var(--requestly-space-4);
       }
     }
   }
