@@ -51,7 +51,9 @@ export const renderTemplate = <T extends string | Record<string, T>>(
     if (typeof value.localValue === "number") {
       envVars[key] = value.localValue ?? value.syncValue;
     } else {
-      envVars[key] = isEmpty(value.localValue) ? value.syncValue : value.localValue;
+      envVars[key] = isEmpty(value.localValue)
+        ? (value.syncValue as string | number | boolean)
+        : (value.localValue as string | number | boolean);
     }
 
     return envVars;

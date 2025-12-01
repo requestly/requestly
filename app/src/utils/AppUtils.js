@@ -45,9 +45,6 @@ export const isAppOpenedInIframe = () => {
 };
 
 export const getAppFlavour = () => {
-  if (isSetappBuild()) {
-    return GLOBAL_CONSTANTS.APP_FLAVOURS.SETAPP;
-  }
   // TEMP: ADDED PARAMS FOR SESSIONBEAR, FOR TESTING ON LOCAL ENV. TO BE REMOVED BEFORE RELEASE
   const queryParams = new URLSearchParams(window.location.search);
   if (
@@ -63,4 +60,11 @@ export const getAppFlavour = () => {
 
 export const isSetappBuild = () => {
   return isDesktopMode() && !!window.RQ?.DESKTOP?.IS_SETAPP_BUILD;
+};
+
+export const getDesktopFlavour = () => {
+  if (isSetappBuild()) {
+    return GLOBAL_CONSTANTS.DESKTOP_FLAVOURS.SETAPP;
+  }
+  return null;
 };
