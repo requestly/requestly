@@ -229,7 +229,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       {isDragAndDropEnabled && dragAndDrop ? (
-        <DndProvider backend={HTML5Backend}>
+        <DndProvider backend={HTML5Backend} context={window}>
           <Table
             {...commonProps}
             components={{

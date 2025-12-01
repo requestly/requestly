@@ -19,6 +19,10 @@ async function _getRunConfigFromFirebase(
   runConfigId: RQAPI.RunConfig["id"]
 ): ResponsePromise<SavedRunConfig> {
   try {
+    if (!collectionId) {
+      throw new Error("Collection ID is required");
+    }
+
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfigId);
     const snapshot = await getDoc(docRef);

@@ -102,7 +102,7 @@ const LoginHandler: React.FC = () => {
       clearRedirectMetadata();
     }
 
-    redirect(redirectURLFromParam ?? redirectURLFromLocalStorage);
+    redirect(redirectURLFromParam ?? redirectURLFromLocalStorage ?? "");
   }, [redirect, params, postLoginDesktopAppRedirect, isNewUser]);
 
   useEffect(() => {
@@ -121,6 +121,7 @@ const LoginHandler: React.FC = () => {
     if (!accessToken) {
       // this route is only meant to be accessed programmatically
       redirectToHome(appMode, navigate);
+      return;
     }
 
     const desktopAuthParams = getDesktopAppAuthParams();
@@ -144,7 +145,7 @@ const LoginHandler: React.FC = () => {
           // @ts-ignore
           trackSignupSuccessEvent({
             email: result.user.email,
-            domain: result.user.email.split("@")[1],
+            domain: result.user.email?.split("@")[1],
             auth_provider: AUTH_PROVIDERS.BROWSERSTACK,
             source: redirectMetadata?.source,
           });

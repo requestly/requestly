@@ -38,7 +38,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const [memberEmails, setMemberEmails] = useState([]);
+  const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInviteMembers = useCallback(() => {
@@ -129,7 +129,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
               <>
                 <CopyButton
                   title="Copy link"
-                  type="default"
+                  type="secondary"
                   copyText={`${window.location.origin}${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${selectedRules[0]}?wId=${activeWorkspace.id}`}
                   showIcon={false}
                   disableTooltip

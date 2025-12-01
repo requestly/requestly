@@ -29,7 +29,7 @@ export const updateUsername = async (uid: string, newUsername: string): Promise<
       }
 
       // Get current username
-      let currentUsername: string = null;
+      let currentUsername: string | null = null;
       const userDoc = await transaction.get(userDocRef);
       if (userDoc.exists()) {
         currentUsername = userDoc.data()?.username;
@@ -67,7 +67,7 @@ export const getUsername = async (uid: string): Promise<string | null> => {
 
   const userDocRef = doc(db, "users", uid);
   const userDoc = await getDoc(userDocRef);
-  let username: string = null;
+  let username: string | null = null;
   if (userDoc.exists()) {
     username = userDoc.data()?.username;
   }
@@ -82,7 +82,7 @@ export const getUsername = async (uid: string): Promise<string | null> => {
  */
 export const getUsernameStatus = async (username: string): Promise<boolean> => {
   if (!username) {
-    return null;
+    return false;
   }
 
   const db = getFirestore(firebaseApp);
