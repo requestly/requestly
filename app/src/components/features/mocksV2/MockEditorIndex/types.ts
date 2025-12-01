@@ -3,7 +3,7 @@ import { FileType, MockType } from "../types";
 export interface MockEditorDataSchema {
   id: string;
   type?: MockType;
-  fileType?: FileType;
+  fileType?: FileType | null;
   name: string;
   desc: string;
   method: RequestMethod;

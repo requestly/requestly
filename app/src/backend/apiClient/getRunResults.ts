@@ -20,6 +20,10 @@ async function _getRunResultsFromFirebase(
   collectionId: RQAPI.ApiClientRecord["collectionId"]
 ): ResponsePromise<RunResult[]> {
   try {
+    if (!collectionId) {
+      throw new Error("Collection ID is required");
+    }
+
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, APIS_NODE, collectionId, RUN_RESULT_NODE);
     const snapshot = await getDocs(collectionRef);

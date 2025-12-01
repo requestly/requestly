@@ -43,7 +43,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
     (workspace) => !workspace.browserstackDetails
   ); // Filtering our Browserstack Workspaces)
 
-  const [memberEmails, setMemberEmails] = useState([]);
+  const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSharingInNewWorkspace = useCallback(async () => {
@@ -58,7 +58,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
     );
     try {
       const teamName = isBusinessUser
-        ? generateDefaultTeamName(user.details?.profile?.displayName, user?.details?.profile?.email)
+        ? generateDefaultTeamName(user.details?.profile?.displayName ?? "", user?.details?.profile?.email ?? "")
         : "My Team";
       createTeam({
         teamName: teamName,
