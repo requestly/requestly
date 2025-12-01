@@ -190,6 +190,12 @@
   overflow-y: auto;
   height: 100%;
   padding: 12px;
+  color: var(--requestly-color-text-default);
+}
+
+.navigation-panel-wrapper .binary-data {
+  font-style: italic;
+  color: var(--requestly-color-text-subtle);
 }
 
 .navigation-panel-wrapper .react-resizable {

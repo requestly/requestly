@@ -43,7 +43,7 @@ const AppSumoModal: React.FC = () => {
   const availableWorkspaces = useSelector(getAllWorkspaces);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
-  const [emailValidationError, setEmailValidationError] = useState(null);
+  const [emailValidationError, setEmailValidationError] = useState<string | null>(null);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
@@ -333,7 +333,7 @@ const AppSumoModal: React.FC = () => {
         <Row className="rq-modal-footer" justify={"end"}>
           <RQButton
             type="primary"
-            disabled={!isAllCodeCheckPassed || emailValidationError}
+            disabled={!isAllCodeCheckPassed || !!emailValidationError}
             loading={isUpdatingSubscription}
             onClick={handleUnlockDealClick}
           >

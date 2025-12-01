@@ -1,15 +1,18 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
-import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
-import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
+import {
+  customKeyBinding,
+  highlightVariablesPlugin,
+  generateCompletionsForVariables,
+} from "componentsV2/CodeEditor/components/EditorV2/plugins";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
@@ -37,8 +40,9 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     onChangeRef.current = onChange;
   }, [onBlur, onChange]);
 
-  const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -66,39 +70,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
         extensions: [
           history(),
           keymap.of(historyKeymap),
-          Prec.highest(
-            keymap.of([
-              {
-                key: "Mod-s",
-                run: (view) => {
-                  const event = new KeyboardEvent("keydown", {
-                    key: "s",
-                    metaKey: navigator.platform.includes("Mac"),
-                    ctrlKey: !navigator.platform.includes("Mac"),
-                    bubbles: true,
-                    cancelable: true,
-                  });
-                  view.dom.dispatchEvent(event);
-                  return true;
-                },
-              },
-              {
-                key: "Mod-Enter",
-                run: (view) => {
-                  const event = new KeyboardEvent("keydown", {
-                    key: "Enter",
-                    metaKey: navigator.platform.includes("Mac"),
-                    ctrlKey: !navigator.platform.includes("Mac"),
-                    bubbles: true,
-                    cancelable: true,
-                  });
-                  view.dom.dispatchEvent(event);
-                  return true;
-                },
-              },
-            ])
-          ),
-
+          customKeyBinding,
           EditorState.transactionFilter.of((tr) => {
             return tr.newDoc.lines > 1 ? [] : [tr];
           }),
@@ -163,18 +135,31 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinned) {
+      setHoveredVariable(null);
+    }
+  }, [isPopoverPinned]);
+
+  const handleClosePopover = useCallback(() => {
+    setHoveredVariable(null);
+    setIsPopoverPinned(false);
+  }, []);
+
   return (
     <div
       ref={editorRef}
       className={`${className ?? ""} editor-popup-container ant-input`}
-      onMouseLeave={() => setHoveredVariable(null)}
+      onMouseLeave={handleMouseLeave}
     >
       <Conditional condition={hoveredVariable}>
         <VariablePopover
           editorRef={editorRef}
-          hoveredVariable={hoveredVariable}
+          hoveredVariable={hoveredVariable!}
           popupPosition={popupPosition}
-          variables={variables}
+          variables={variables!}
+          onClose={handleClosePopover}
+          onPinChange={setIsPopoverPinned}
         />
       </Conditional>
     </div>

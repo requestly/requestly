@@ -35,8 +35,6 @@ import { getApiClientFeatureContext } from "features/apiClient/commands/store.ut
 import { useApiClientContext } from "features/apiClient/contexts";
 import { PostmanExportModal } from "../../../../modals/postmanCollectionExportModal/PostmanCollectionExportModal";
 import { CollectionRecordState } from "features/apiClient/store/apiRecords/apiRecords.store";
-import { useSelector } from "react-redux";
-import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { MdOutlineVideoLibrary } from "@react-icons/all-files/md/MdOutlineVideoLibrary";
 import { CollectionRowOptionsCustomEvent, dispatchCustomEvent } from "./utils";
 

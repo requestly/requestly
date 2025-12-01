@@ -15,7 +15,7 @@ export class AssertionHandler {
   }
 
   checkStatus(expectedValue: number | string | string[], checkEquality: boolean) {
-    const actualCode = this.response.code;
+    const actualCode = this.response?.code;
     if (typeof expectedValue === "number") {
       try {
         verify(expectedValue, actualCode, checkEquality);
@@ -23,7 +23,7 @@ export class AssertionHandler {
         this.throwAssertionError(expectedValue, actualCode, checkEquality, "response code");
       }
     } else {
-      const actualInitialDigit = actualCode.toString()[0];
+      const actualInitialDigit = actualCode?.toString()?.[0];
       const expectedValues = Array.isArray(expectedValue) ? expectedValue : [expectedValue];
 
       expectedValues.forEach((status) => {
@@ -39,14 +39,14 @@ export class AssertionHandler {
 
   haveBody(expectedValue: string, checkEquality: boolean) {
     try {
-      verify(this.response.body, expectedValue, checkEquality);
+      verify(this.response?.body, expectedValue, checkEquality);
     } catch {
-      this.throwAssertionError(expectedValue, this.response.body, checkEquality, "response body");
+      this.throwAssertionError(expectedValue, this.response?.body, checkEquality, "response body");
     }
   }
 
   haveStatus(expectedValue: number | string, checkEquality: boolean) {
-    const actualValue = typeof expectedValue === "string" ? this.response.status : this.response.code;
+    const actualValue = typeof expectedValue === "string" ? this.response?.status : this.response?.code;
 
     try {
       verify(actualValue, expectedValue, checkEquality);
@@ -56,7 +56,7 @@ export class AssertionHandler {
   }
 
   haveHeader(expectedValue: string, checkEquality: boolean) {
-    const isHeaderFound = this.response.headers.some(
+    const isHeaderFound = this.response?.headers?.some(
       (header) => header.key.toLowerCase() === expectedValue.toLowerCase()
     );
     try {
@@ -74,19 +74,19 @@ export class AssertionHandler {
   haveJsonBody(path?: string, isEqualityCheck?: boolean, value?: any): void | boolean {
     if (path === undefined) {
       try {
-        this.response.json();
+        this.response?.json();
       } catch {
         this.throwAssertionError(
           "a valid JSON",
           `${isEqualityCheck ? "invalid JSON" : "valid JSON"}`,
-          isEqualityCheck,
+          !!isEqualityCheck,
           "response body"
         );
       }
     }
 
     if (typeof path === "string") {
-      const responseBody = this.response.json();
+      const responseBody = this.response?.json();
       const pathValue = lodashGet(responseBody, path);
 
       if (typeof value !== "undefined") {
@@ -118,7 +118,7 @@ export class AssertionHandler {
     const ajv = new Ajv(config || { allErrors: true });
     const validate = ajv.compile(expectedSchema);
 
-    const isValid = validate(this.response.json());
+    const isValid = validate(this.response?.json());
     try {
       verify(isValid, true, isEqualityCheck);
     } catch {
