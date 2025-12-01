@@ -15,7 +15,7 @@ import APP_CONSTANTS from "config/constants";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
-let unsubscribeBillingTeamsListener: () => void = null;
+let unsubscribeBillingTeamsListener: () => void;
 
 export const useBillingTeamsListener = () => {
   const dispatch = useDispatch();
@@ -55,7 +55,7 @@ export const useBillingTeamsListener = () => {
         };
       });
 
-      if (isCompanyEmail(user.details?.emailType)) {
+      if (user.details?.emailType && isCompanyEmail(user.details.emailType)) {
         const domainBillingTeamsQuery = query(
           collection(db, "billing"),
           where("ownerDomains", "array-contains", domain)

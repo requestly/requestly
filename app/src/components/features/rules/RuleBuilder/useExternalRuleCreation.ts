@@ -21,7 +21,7 @@ const useExternalRuleCreation = (mode: string): void => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const hasSentReadyEventRef = useRef(false); // solves react18 issue of double mounting
-  const inputSelectorRefToFocus = useRef<string>();
+  const inputSelectorRefToFocus = useRef<string>("");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
