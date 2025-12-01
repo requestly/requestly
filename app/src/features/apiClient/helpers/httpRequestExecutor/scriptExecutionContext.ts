@@ -45,7 +45,7 @@ export class ScriptExecutionContext {
     }
 
     this.context.request = entry.request;
-    this.context.response = null;
+    this.context.response = entry.response ?? null;
 
     const scopedVariables = getScopedVariables([], this.ctx.stores, this.scopes);
     const variablesByScope = this.convertScopedVariablesToRecord(scopedVariables);
