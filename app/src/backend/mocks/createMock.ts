@@ -14,7 +14,7 @@ export const createMock = async (
   teamId?: string,
   collectionId?: string,
   collectionPath?: string
-): Promise<string> => {
+): Promise<string | null> => {
   if (!uid) {
     return null;
   }

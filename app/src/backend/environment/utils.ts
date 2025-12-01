@@ -51,7 +51,9 @@ export const renderTemplate = <T extends string | Record<string, T>>(
     if (typeof value.localValue === "number") {
       envVars[key] = value.localValue ?? value.syncValue;
     } else {
-      envVars[key] = isEmpty(value.localValue) ? value.syncValue : value.localValue;
+      envVars[key] = isEmpty(value.localValue)
+        ? (value.syncValue as string | number | boolean)
+        : (value.localValue as string | number | boolean);
     }
 
     return envVars;
@@ -105,7 +107,7 @@ const processObject = <T extends Record<string, any>>(input: T, variables: Varia
 const processTemplateString = <T extends string>(input: T, variables: Variables): RenderResult<T> => {
   try {
     const { wrappedTemplate, usedVariables } = collectAndEscapeVariablesFromTemplate(input, variables);
-    const hbsTemplate = compile(wrappedTemplate);
+    const hbsTemplate = compile(wrappedTemplate, { noEscape: true });
     const renderedTemplate = hbsTemplate(variables) as T; // since handlebars generic types resolve to any; not string
 
     return {

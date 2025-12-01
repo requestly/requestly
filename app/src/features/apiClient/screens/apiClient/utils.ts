@@ -26,6 +26,7 @@ import Logger from "lib/logger";
 import { getFileContents } from "components/mode-specific/desktop/DesktopFilePicker/desktopFileAccessActions";
 import { NativeError } from "errors/NativeError";
 import { trackCollectionRunnerRecordLimitExceeded } from "modules/analytics/events/features/apiClient";
+import { getBoundary, parse as multipartParser } from "parse-multipart-data";
 
 const createAbortError = (signal: AbortSignal) => {
   if (signal && signal.reason === AbortReason.USER_CANCELLED) {
@@ -254,14 +255,14 @@ export const generateKeyValuePairs = (data: string | Record<string, string | str
   return result;
 };
 
-export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]): RequestContentType => {
+export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]) => {
   const contentTypeHeader = headers.find((header) => header.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase());
   const contentTypeHeaderValue = contentTypeHeader?.value as RequestContentType;
 
-  const contentType: RequestContentType =
+  const contentType: RequestContentType | undefined =
     contentTypeHeaderValue && Object.values(RequestContentType).find((type) => contentTypeHeaderValue.includes(type));
 
-  return contentType || RequestContentType.RAW;
+  return contentType;
 };
 
 export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {
@@ -312,9 +313,58 @@ export const generateMultipartFormKeyValuePairs = (
   return result;
 };
 
+export const parseMultipartFormDataString = (
+  body: string,
+  contentTypeHeader: string | null
+): { key: string; value: string; isFile?: boolean; fileName?: string }[] => {
+  const result: { key: string; value: string; isFile?: boolean; fileName?: string }[] = [];
+
+  const boundary = (() => {
+    if (contentTypeHeader) {
+      return getBoundary(contentTypeHeader);
+    }
+
+    // Fallback: try to extract boundary from body
+    // Extract boundary from the first line
+    // In the body, boundaries appear with 2 extra leading dashes (e.g., ------WebKit...)
+    // But the actual boundary for parsing should have 2 fewer dashes (e.g., ----WebKit...)
+    const boundaryMatch = body.match(/^--(-+\S+)/);
+    if (!boundaryMatch) {
+      return null;
+    }
+    return boundaryMatch[1].trim();
+  })();
+
+  if (!boundary) {
+    return result;
+  }
+
+  try {
+    const bodyBuffer = Buffer.from(body, "utf-8");
+
+    const parts = multipartParser(bodyBuffer, boundary);
+
+    parts.forEach((part) => {
+      const fieldName = part.name;
+      if (fieldName) {
+        const isFile = !!part.filename;
+        result.push({
+          key: fieldName,
+          value: !isFile ? part.data.toString("utf-8") : "",
+          isFile: isFile,
+          fileName: part.filename || undefined,
+        });
+      }
+    });
+  } catch (error) {
+    Logger.log("[parseMultipartFormDataString] Failed to parse multipart data:", error);
+  }
+
+  return result;
+};
+
 export const parseCurlRequest = (curl: string): RQAPI.Request => {
-  const requestJsonString = curlconverter.toJsonString(curl);
-  const requestJson = JSON.parse(requestJsonString);
+  const requestJson = curlconverter.toJsonObject(curl);
   const queryParamsFromJson = generateKeyValuePairs(requestJson.queries);
   /*
       cURL converter is not able to parse query params from url for some cURL requests
@@ -322,7 +372,9 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     */
   const requestUrlParams = new URL(requestJson.url).searchParams;
   const paramsFromUrl = generateKeyValuePairs(Object.fromEntries(requestUrlParams.entries()));
-  const headers = filterHeadersToImport(generateKeyValuePairs(requestJson.headers));
+  const headersObj = (requestJson.headers ?? {}) as Record<string, string>;
+  const headers = filterHeadersToImport(generateKeyValuePairs(headersObj));
+
   let contentType = getContentTypeFromRequestHeaders(headers);
 
   // For multipart-form data we need to check the json structure
@@ -331,6 +383,27 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
 
   if (hasFiles) {
     contentType = RequestContentType.MULTIPART_FORM;
+  }
+
+  // Fallback: If content-type is still undefined, check the HTTP string for content-type
+  if (!contentType) {
+    const httpString = curlconverter.toHTTP(curl);
+    if (httpString) {
+      const match = httpString.match(/content-type:\s*([^\r\n]+)/i); // stops matching at line break
+      if (match) {
+        const httpContentType = match[1].trim().toLowerCase();
+
+        if (httpContentType.includes("multipart/form-data")) {
+          contentType = RequestContentType.MULTIPART_FORM;
+        } else if (httpContentType.includes("application/x-www-form-urlencoded")) {
+          contentType = RequestContentType.FORM;
+        } else if (httpContentType.includes("application/json")) {
+          contentType = RequestContentType.JSON;
+        } else {
+          contentType = RequestContentType.RAW;
+        }
+      }
+    }
   }
 
   let body: RQAPI.RequestBody;
@@ -744,16 +817,20 @@ export const resolveAuth = (
 export const parseHttpRequestEntry = (
   entry: RQAPI.HttpApiEntry,
   childDetails: { id: string; parentId: string },
-  getParentChain: (id: string) => string[],
-  getData: (id: string) => RQAPI.ApiClientRecord
+  helpers: {
+    getParentChain: (id: string) => string[];
+    getData: (id: string) => RQAPI.ApiClientRecord;
+    resolver: <U extends Record<string, any>>(input: U) => U;
+  }
 ): AutogeneratedFieldsStore["namespaces"] => {
+  const { getParentChain, getData, resolver } = helpers;
   const result: AutogeneratedFieldsStore["namespaces"] = {};
   if (!entry) {
     return result;
   }
   const { auth } = entry;
   const currentAuth = resolveAuth(auth, childDetails, getParentChain, getData);
-  const authNamespaceContents = parseAuth(currentAuth);
+  const authNamespaceContents = parseAuth(currentAuth, resolver);
   result.auth = authNamespaceContents;
 
   const contentType = entry.request.contentType;
@@ -857,7 +934,13 @@ export const extractPathVariablesFromUrl = (url: string) => {
   }
 
   const urlWithScheme = addUrlSchemeIfMissing(url);
-  const pathname = new URL(urlWithScheme).pathname;
+  let pathname: string = "";
+  try {
+    pathname = new URL(urlWithScheme).pathname;
+  } catch (error) {
+    Logger.log("Invalid URL while extracting path variables:", error);
+    return [];
+  }
 
   // Allow all characters except URL reserved characters: : / ? # [ ] @ ! $ & ' ( ) * + , ; =
   // Also exclude whitespace and control characters for practical reasons

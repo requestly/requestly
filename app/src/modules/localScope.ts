@@ -1,13 +1,20 @@
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
+
+export type LocalScopeInitialState = Pick<
+  ExecutionContext,
+  "collectionVariables" | "environment" | "global" | "request" | "response" | "variables"
+>;
+
 export class LocalScope {
-  private state: any;
+  private state: LocalScopeInitialState;
   private isStateMutated: boolean;
 
-  constructor(initialState: any) {
+  constructor(initialState: LocalScopeInitialState) {
     this.state = { ...initialState };
     this.isStateMutated = false;
   }
 
-  public set(key: string, value: any): void {
+  public set(key: keyof LocalScopeInitialState, value: any): void {
     if (!key) {
       throw new Error("Key cannot be empty");
     }
@@ -18,7 +25,7 @@ export class LocalScope {
     this.state[key] = value;
   }
 
-  public get(key: string): any {
+  public get(key: keyof LocalScopeInitialState): any {
     return this.state[key];
   }
 

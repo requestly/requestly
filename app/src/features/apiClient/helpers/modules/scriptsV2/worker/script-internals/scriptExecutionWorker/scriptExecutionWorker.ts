@@ -5,32 +5,82 @@ import {
   ScriptWorkloadCallback,
 } from "../../../workloadManager/workLoadTypes";
 import { RQ } from "../RQmethods";
-import { ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
-import { LocalScope } from "../../../../../../../../modules/localScope";
+import { ScriptContext, ScriptExecutionWorkerInterface } from "./scriptExecutionWorkerInterface";
+import { LocalScope, LocalScopeInitialState } from "../../../../../../../../modules/localScope";
 import { TestResult } from "../types";
+import { globals, getGlobalScript } from "./globals";
 
 export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   private localScope: LocalScope;
   private testResults: TestResult[] = [];
+  private executionMetadata: ScriptContext["executionMetadata"];
+  private executionContext: ScriptContext["executionContext"];
 
-  async executeScript(script: string, initialState: any, callback: ScriptWorkloadCallback) {
-    this.localScope = new LocalScope(initialState);
+  private getGlobals() {
+    const rq = new RQ(
+      {
+        localScope: this.localScope,
+        executionMetadata: this.executionMetadata,
+        iterationData: this.executionContext.iterationData,
+      },
+      this.testResults
+    );
+    const responseCode = {
+      code: rq.response?.code,
+    };
+    const responseBody = rq.response?.body;
+    const globalObject = {
+      ...globals,
+      rq,
+      responseCode,
+      responseBody,
+    };
 
+    const globalScript = getGlobalScript(globalObject);
+
+    return {
+      globalObject,
+      globalScript,
+    };
+  }
+
+  async executeScript(userScript: string, scriptContext: ScriptContext, callback: ScriptWorkloadCallback) {
+    const { executionContext, executionMetadata } = scriptContext;
+
+    const localScopeInitialState: LocalScopeInitialState = {
+      collectionVariables: executionContext.collectionVariables,
+      environment: executionContext.environment,
+      global: executionContext.global,
+      request: executionContext.request,
+      response: executionContext.response,
+      variables: executionContext.variables,
+    };
+    this.localScope = new LocalScope(localScopeInitialState);
+    this.executionMetadata = executionMetadata;
+    this.executionContext = executionContext;
+
+    const { globalObject, globalScript } = this.getGlobals();
     // eslint-disable-next-line no-new-func
     const scriptFunction = new Function(
-      "rq",
+      "globals",
       `
       "use strict";
-      ${script}
+      ${globalScript}
+      try {
+        ${userScript}
+      } catch (error) {
+        console.error(\`\${error.name}: \${error.message}\`);
+        throw error;
+      }
       `
-    );
+    ) as (globals: Record<string, any>) => void;
     try {
-      scriptFunction(new RQ(this.localScope, this.testResults));
+      scriptFunction(globalObject);
     } catch (error) {
       throw new ScriptExecutionError(error);
     }
     try {
-      await this.syncLocalDump(callback);
+      this.syncLocalDump(callback);
       return {
         testResults: this.testResults,
       };
@@ -40,11 +90,11 @@ export class ScriptExecutionWorker implements ScriptExecutionWorkerInterface {
   }
 
   private async syncLocalDump(callback: ScriptWorkloadCallback) {
-    if (!this.localScope.getIsStateMutated()) {
-      return;
-    }
+    const isStateMutated = this.localScope.getIsStateMutated();
     const dump = this.localScope.getAll();
-    await callback(dump);
+    if (isStateMutated) {
+      await callback(dump);
+    }
   }
 }
 

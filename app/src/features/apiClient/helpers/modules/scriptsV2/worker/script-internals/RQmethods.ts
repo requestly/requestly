@@ -1,5 +1,13 @@
 import { LocalScope } from "modules/localScope";
-import { LocalScopeRequest, LocalScopeResponse, SandboxAPI, TestFunction, TestResult } from "./types";
+import {
+  ExecutionMetadata,
+  InfoObject,
+  LocalScopeRequest,
+  LocalScopeResponse,
+  SandboxAPI,
+  TestFunction,
+  TestResult,
+} from "./types";
 import { VariableScope } from "./variableScope";
 import { RQAPI } from "features/apiClient/types";
 import { expect } from "chai";
@@ -7,6 +15,9 @@ import { Options as AjvOptions } from "ajv";
 import { TestExecutor } from "./testExecutor";
 import { AssertionHandler } from "./assertionHandler";
 import { status } from "http-status";
+import { IterationData } from "./IterationData";
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
+import { ScriptLogger } from "./scriptExecutionWorker/ScriptLogger";
 
 // unsupported methods
 const createInfiniteChainable = (methodName: string) => {
@@ -15,7 +26,7 @@ const createInfiniteChainable = (methodName: string) => {
   const handler = {
     get: () => {
       if (!hasLogged) {
-        console.log(`Using unsupported method: ${methodName}`);
+        ScriptLogger.logInfo(`Using unsupported method: ${methodName}`);
         hasLogged = true;
       }
       return new Proxy(() => {}, handler);
@@ -49,12 +60,12 @@ export class RQ implements SandboxAPI {
   public collectionVariables: VariableScope;
   public expect: Chai.ExpectStatic;
   public test: TestFunction;
+  public iterationData: IterationData;
+  public info: InfoObject;
 
   // Add other sandbox properties
   public cookies = createInfiniteChainable("cookie");
   public execution = createInfiniteChainable("execution");
-  public info = createInfiniteChainable("info");
-  public iterationData = createInfiniteChainable("iterationData");
   public require = createInfiniteChainable("require");
   public sendRequest = createInfiniteChainable("sendRequest");
   public vault = createInfiniteChainable("vault");
@@ -62,7 +73,16 @@ export class RQ implements SandboxAPI {
 
   private assertionHandler: AssertionHandler;
 
-  constructor(localScope: LocalScope, private testResults: TestResult[]) {
+  constructor(
+    context: {
+      localScope: LocalScope;
+      executionMetadata: ExecutionMetadata;
+      iterationData: ExecutionContext["iterationData"];
+    },
+    private testResults: TestResult[]
+  ) {
+    const { localScope, executionMetadata, iterationData } = context;
+
     this.environment = new VariableScope(localScope, "environment");
     this.globals = new VariableScope(localScope, "global");
     this.collectionVariables = new VariableScope(localScope, "collectionVariables");
@@ -71,8 +91,20 @@ export class RQ implements SandboxAPI {
     this.test = this.createTestObject();
     this.request = this.createRequestObject(localScope.get("request"));
     this.response = this.createResponseObject(localScope.get("response"));
+    this.iterationData = new IterationData(iterationData);
+    this.info = this.createInfoObject(executionMetadata);
 
     this.assertionHandler = new AssertionHandler(this.response);
+  }
+
+  private createInfoObject(executionMetadata: ExecutionMetadata) {
+    return {
+      requestId: executionMetadata.requestId,
+      eventName: executionMetadata.eventName,
+      iteration: executionMetadata.iterationContext.iteration,
+      iterationCount: executionMetadata.iterationContext.iterationCount,
+      requestName: executionMetadata.requestName,
+    };
   }
 
   private createTestObject(): TestFunction {
@@ -123,7 +155,7 @@ export class RQ implements SandboxAPI {
           };
         },
         json: () => jsonifyObject(originalResponse.body),
-        text: () => this.response.body,
+        text: () => this.response?.body,
         to: {
           be: this.createBeAssertions(true),
           have: this.createHaveAssertions(true),

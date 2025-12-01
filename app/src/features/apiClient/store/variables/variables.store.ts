@@ -150,9 +150,9 @@ export const createVariablesStore = (props?: { variables: VariableValues }) => {
   }));
 };
 
-export const createDummyVariablesStore = (variables: Record<string, VariableValueType>) => {
+const _createDummyVariablesStore = (data: Map<VariableKey, VariableData>) => {
   return create<VariablesState>()((_, get) => ({
-    data: parsePrimitiveVariables(variables),
+    data,
 
     reset() {},
 
@@ -183,4 +183,20 @@ export const createDummyVariablesStore = (variables: Record<string, VariableValu
       return new Map(searchResults);
     },
   }));
+};
+
+/**
+ * Creates a dummy variables store from primitive values (string, number, boolean).
+ */
+export const createDummyVariablesStoreFromPrimitives = (variables: Record<string, VariableValueType>) => {
+  const data = parsePrimitiveVariables(variables);
+  return _createDummyVariablesStore(data);
+};
+
+/**
+ * Creates a dummy variables store from VariableData objects.
+ */
+export const createDummyVariablesStoreFromData = (variables: Record<string, VariableData>) => {
+  const data = new Map(Object.entries(variables));
+  return _createDummyVariablesStore(data);
 };

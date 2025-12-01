@@ -33,7 +33,7 @@ export const TestThisRule = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
-  const [testReports, setTestReports] = useState<TestReport[]>(null);
+  const [testReports, setTestReports] = useState<TestReport[] | null>(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
@@ -76,7 +76,7 @@ export const TestThisRule = () => {
           ]);
 
           saveRecording(
-            user.details?.profile?.uid,
+            user.details?.profile?.uid ?? null,
             activeWorkspaceId,
             sessionMetadata,
             compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
@@ -133,7 +133,7 @@ export const TestThisRule = () => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
       (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
-        fetchAndUpdateTestReports(message?.record ? message.testReportId : null);
+        fetchAndUpdateTestReports(message?.record ? message.testReportId : undefined);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
         if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
           toggleBottomSheet({ isOpen: true, isTrack: false, action: "test_rule_bottom_sheet" });

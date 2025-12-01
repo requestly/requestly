@@ -143,6 +143,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       {
         title: "",
         width: "50px",
+        fixed: "right",
         render: (_: any, record: KeyValuePair) => {
           if (record.key === "" && record.value === "" && data.length === 1) {
             return null;
@@ -178,7 +179,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           cell: KeyValueTableEditableCell,
         },
       }}
-      scroll={{ x: true }}
+      scroll={{ x: 550 }}
       footer={() => (
         <div className="api-key-value-table-footer">
           <RQButton icon={<MdAdd />} size="small" onClick={handleAddPair}>
