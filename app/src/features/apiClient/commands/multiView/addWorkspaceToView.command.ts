@@ -6,7 +6,7 @@ import {
   ApiClientViewMode,
 } from "features/apiClient/store/multiWorkspaceView/multiWorkspaceView.store";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
-import * as Sentry from "@sentry/react";
+import { captureException } from "@sentry/react";
 
 export const addWorkspaceToView = async (workspace: Workspace, userId?: string) => {
   if (workspace.workspaceType !== WorkspaceType.LOCAL) {
@@ -52,6 +52,6 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
       errored: true,
       error: errorMessage,
     });
-    Sentry.captureException(error);
+    captureException(error);
   }
 };
