@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
@@ -40,8 +40,9 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     onChangeRef.current = onChange;
   }, [onBlur, onChange]);
 
-  const [hoveredVariable, setHoveredVariable] = useState(null); // Track hovered variable
+  const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
   useEffect(() => {
     if (editorViewRef.current) {
@@ -134,18 +135,31 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
+  const handleMouseLeave = useCallback(() => {
+    if (!isPopoverPinned) {
+      setHoveredVariable(null);
+    }
+  }, [isPopoverPinned]);
+
+  const handleClosePopover = useCallback(() => {
+    setHoveredVariable(null);
+    setIsPopoverPinned(false);
+  }, []);
+
   return (
     <div
       ref={editorRef}
       className={`${className ?? ""} editor-popup-container ant-input`}
-      onMouseLeave={() => setHoveredVariable(null)}
+      onMouseLeave={handleMouseLeave}
     >
       <Conditional condition={hoveredVariable}>
         <VariablePopover
           editorRef={editorRef}
-          hoveredVariable={hoveredVariable}
+          hoveredVariable={hoveredVariable!}
           popupPosition={popupPosition}
-          variables={variables}
+          variables={variables!}
+          onClose={handleClosePopover}
+          onPinChange={setIsPopoverPinned}
         />
       </Conditional>
     </div>
