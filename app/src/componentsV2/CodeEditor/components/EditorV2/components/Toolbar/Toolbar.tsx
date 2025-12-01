@@ -35,7 +35,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
   code,
   onCodeFormat,
   customOptions,
-  rightContent,
+  rightContent = null,
   isFullScreen = false,
   handleFullScreenToggle = () => {},
   isCodePrettified,
@@ -113,7 +113,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
 
       <div className="code-editor-actions">
         {rightContent}
-        <div className="code-editor-actions-separator" />
+        {rightContent && <div className="code-editor-actions-separator" />}
         <Tooltip title={isCopied ? "Copied" : "Copy code"} color={theme.colors.black} mouseEnterDelay={0.6}>
           <RQButton type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
         </Tooltip>

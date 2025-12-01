@@ -10,7 +10,7 @@ import { toast } from "utils/Toast";
 import "./scriptEditor.scss";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
-import { LibraryPickerPopover, insertImportStatement } from "../LibraryPicker";
+import { LibraryPickerPopover, insertImportStatement, getImportedPackageCount } from "../LibraryPicker";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
 
 interface ScriptEditorProps {
@@ -79,6 +79,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     );
   }, [scriptType]);
 
+  const currentScriptValue = scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType];
+  const importCount = useMemo(() => getImportedPackageCount(currentScriptValue), [currentScriptValue]);
+
   const libraryPickerButton = useMemo(() => {
     return (
       <LibraryPickerPopover
@@ -90,11 +93,12 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
           <button className="api-client-script-packages-btn" onClick={() => setIsLibraryPickerOpen(true)}>
             <RiBox3Line />
             <span>Packages</span>
+            {importCount > 0 && <span className="api-client-script-packages-btn__count">{importCount}</span>}
           </button>
         </Tooltip>
       </LibraryPickerPopover>
     );
-  }, [isLibraryPickerOpen, handlePackageSelect]);
+  }, [isLibraryPickerOpen, handlePackageSelect, importCount]);
 
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">

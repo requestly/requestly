@@ -20,6 +20,10 @@ export function require(id: string) {
     }
   }
 
+  // Direct binding lookup allows users to require packages using alternative identifiers
+  // (e.g., "xml2Js" vs "xml2js") that may not be registered in the package registry
+  // but are available in runtimeBindings. This provides flexibility for legacy aliases
+  // and alternative casing conventions.
   const directBinding = resolveRuntimeModule(id);
   if (directBinding) {
     return directBinding;

@@ -31,7 +31,7 @@ export function insertImportStatement(view: EditorView | undefined, pkg: Externa
     };
   }
 
-  const variableName = getDefaultVariableName(pkg.id);
+  const variableName = getDefaultVariableName(pkg.id, pkg);
   const importStyle = pkg.defaultImportStyle || "default";
   const requireStatement = generateRequireStatement(pkg.id, variableName, importStyle);
 

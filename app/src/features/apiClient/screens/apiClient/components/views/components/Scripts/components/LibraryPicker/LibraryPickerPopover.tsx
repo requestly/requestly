@@ -2,13 +2,11 @@ import React, { useState, useMemo, useCallback } from "react";
 import { Popover, Input, Select } from "antd";
 import { MdSearch } from "@react-icons/all-files/md/MdSearch";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import { RiBox3Line } from "@react-icons/all-files/ri/RiBox3Line";
 import { RiGithubLine } from "@react-icons/all-files/ri/RiGithubLine";
 import { PackageListItem } from "./PackageListItem";
 import "./libraryPickerPopover.scss";
 import { getPackageRegistry } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageRegistry";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
-import { PackageOpenIcon } from "components/misc/PackageOpenIcon";
 
 export interface LibraryPickerPopoverProps {
   open: boolean;
@@ -31,7 +29,10 @@ const FILTER_OPTIONS: FilterOption[] = [
   { value: "jsr", label: "JSR" },
 ];
 
-const GITHUB_ISSUE_URL = "https://github.com/requestly/requestly/issues";
+// TODO: Create dedicated GitHub issues for NPM and JSR support tracking
+// and update these URLs accordingly
+const GITHUB_NPM_JSR_ISSUE_URL =
+  "https://github.com/requestly/requestly/issues/new?labels=enhancement&title=NPM/JSR%20Package%20Support";
 
 export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
   open,
@@ -104,7 +105,7 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
   const isComingSoon = filter === "npm" || filter === "jsr";
   const hasNoResults = !isComingSoon && filteredPackages.length === 0 && searchQuery.trim();
 
-  const renderPackageList = () => (
+  const packageList = (
     <div className="library-picker-listing">
       {filteredPackages.map((pkg) => (
         <PackageListItem
@@ -117,12 +118,14 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
     </div>
   );
 
-  const renderEmptyState = () => (
+  const emptyState = (
     <div className="library-picker-empty">
-      <PackageOpenIcon className="library-picker-empty-icon" />
+      <img src="/assets/media/apiClient/package-open.svg" alt="" width={48} height={48} />
       <div className="library-picker-empty-content">
-        <div className="library-picker-empty-title">No results for "{searchQuery}"</div>
-        <div className="library-picker-empty-description">Try another package name or check your spelling.</div>
+        <div>
+          <div className="library-picker-empty-title">No results for "{searchQuery}"</div>
+          <div className="library-picker-empty-description">Try another package name or check your spelling.</div>
+        </div>
         <button className="library-picker-empty-clear-btn" onClick={handleClearSearch}>
           <MdClose />
           <span>Clear search</span>
@@ -131,21 +134,23 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
     </div>
   );
 
-  const renderComingSoon = () => {
+  const comingSoonState = useMemo(() => {
     const sourceName = filter === "npm" ? "NPM" : "JSR";
     return (
       <div className="library-picker-coming-soon">
-        <RiBox3Line className="library-picker-coming-soon-icon" />
+        <img src="/assets/media/apiClient/package-open.svg" alt="" width={48} height={48} />
         <div className="library-picker-coming-soon-content">
-          <div className="library-picker-coming-soon-title">{sourceName} packages coming soon</div>
-          <div className="library-picker-coming-soon-description">
-            Support for importing packages from {sourceName} is in progress.
-            <br />
-            Follow the GitHub issue for updates.
+          <div>
+            <div className="library-picker-coming-soon-title">{sourceName} packages coming soon</div>
+            <div className="library-picker-coming-soon-description">
+              Support for importing packages from {sourceName} is in progress.
+              <br />
+              Follow the GitHub issue for updates.
+            </div>
           </div>
           <button
             className="library-picker-coming-soon-btn"
-            onClick={() => window.open(GITHUB_ISSUE_URL, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(GITHUB_NPM_JSR_ISSUE_URL, "_blank", "noopener,noreferrer")}
           >
             <RiGithubLine />
             <span>Track on Github</span>
@@ -153,7 +158,7 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
         </div>
       </div>
     );
-  };
+  }, [filter]);
 
   const content = (
     <div className="library-picker-popover">
@@ -176,12 +181,13 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
           onChange={handleFilterChange}
           options={FILTER_OPTIONS}
           className="library-picker-filter-select"
+          popupClassName="library-picker-filter-dropdown"
         />
       </div>
       <div className="library-picker-content">
-        {isComingSoon && renderComingSoon()}
-        {hasNoResults && renderEmptyState()}
-        {!isComingSoon && !hasNoResults && renderPackageList()}
+        {isComingSoon && comingSoonState}
+        {hasNoResults && emptyState}
+        {!isComingSoon && !hasNoResults && packageList}
       </div>
     </div>
   );

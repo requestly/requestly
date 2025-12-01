@@ -64,9 +64,7 @@
         .ant-input {
           background: transparent;
           color: var(--requestly-color-text-default);
-          font-size: 13px;
-          /* height: auto; */
-          /* padding: 0; */
+          font-size: var(--requestly-font-size-xs);
 
           &::placeholder {
             color: var(--requestly-color-text-placeholder);
@@ -90,6 +88,7 @@
 
       .ant-select-selector {
         background: var(--requestly-color-surface-1);
+        font-size: var(--requestly-font-size-xs);
       }
     }
   }
@@ -115,26 +114,30 @@
     justify-content: center;
     padding: 48px 16px;
     text-align: center;
+    gap: 16px;
 
     .library-picker-empty-icon {
       height: 48px;
       width: 48px;
-      color: var(--requestly-color-surface-3);
       margin-bottom: 16px;
     }
 
     .library-picker-empty-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+
       .library-picker-empty-title {
         font-size: 14px;
         font-weight: 500;
         color: var(--requestly-color-text-default);
-        margin-bottom: 8px;
       }
 
       .library-picker-empty-description {
         font-size: 13px;
         color: var(--requestly-color-text-subtle);
-        margin-bottom: 16px;
       }
 
       .library-picker-empty-clear-btn {
@@ -170,6 +173,7 @@
     justify-content: center;
     padding: 48px 16px;
     text-align: center;
+    gap: 16px;
 
     .library-picker-coming-soon-icon {
       font-size: 48px;
@@ -182,7 +186,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 16px;
 
       .library-picker-coming-soon-title {
         font-size: var(--requestly-font-size-sm);
@@ -223,7 +227,7 @@
 .library-picker-filter-dropdown {
   .ant-select-item {
     color: var(--requestly-color-text-default);
-    font-size: 13px;
+    font-size: var(--requestly-font-size-xs);
     padding: 8px 12px;
 
     &:hover {

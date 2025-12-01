@@ -1,5 +1,8 @@
 import { parse, Node } from "acorn";
 import { simple } from "acorn-walk";
+import * as Sentry from "@sentry/react";
+import { camelCase } from "lodash";
+import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
 
 interface RequireInfo {
   variableName: string;
@@ -46,7 +49,10 @@ export function analyzeScriptImports(code: string): ScriptAnalysis {
       },
     });
   } catch (error) {
-    // TODO If parsing fails, return empty analysis catch in sentry
+    Sentry.captureException(error, {
+      tags: { source: "script_import_utils" },
+      extra: { codeLength: code.length },
+    });
     console.warn("Failed to parse script for import analysis:", error);
   }
 
@@ -98,23 +104,16 @@ export function generateRequireStatement(
   }
 }
 
-export function getDefaultVariableName(packageId: string): string {
+export function getDefaultVariableName(packageId: string, pkg?: ExternalPackage): string {
+  if (pkg?.defaultVariableName) {
+    return pkg.defaultVariableName;
+  }
+
   const packageName = packageId.includes("/") ? packageId.split("/").pop()! : packageId;
+  return camelCase(packageName);
+}
 
-  const camelCase = packageName
-    .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
-    .replace(/^(.)/, (char) => char.toLowerCase());
-
-  const specialCases: Record<string, string> = {
-    xml2js: "xml2js",
-    "csv-parse/lib/sync": "csvParse",
-    lodash: "_",
-    cheerio: "cheerio",
-    moment: "moment",
-    uuid: "uuid",
-    chai: "chai",
-    ajv: "Ajv",
-  };
-
-  return specialCases[packageId] || camelCase;
+export function getImportedPackageCount(code: string): number {
+  const analysis = analyzeScriptImports(code);
+  return analysis.existingRequires.length;
 }
