@@ -32,7 +32,7 @@ export const CloseAllTabsModal = ({
         className="close-without-saving-button"
         onClick={() => closeAllOpenTabs("close-with-close-modal")}
       >
-        Close all without saving
+        Discard and close tabs
       </RQButton>
     </div>
   );
