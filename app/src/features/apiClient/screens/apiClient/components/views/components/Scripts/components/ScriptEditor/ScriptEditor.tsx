@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
@@ -8,14 +8,14 @@ import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { z } from "zod/v4";
-import { GenerateTestsButton } from "../GenerateTestsButton/GenerateTestsButton";
+import { GenerateTestsButton } from "../AI/components/GenerateTestsButton/GenerateTestsButton";
 import { getAIEndpointUrl, AI_ENDPOINTS } from "config/ai.config";
 import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel";
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { toast } from "utils/Toast";
+import { AITestGenerationError } from "../AI/types";
 import "./scriptEditor.scss";
-
 
 const TestGenerationOutputSchema = z.object({
   text: z
@@ -63,30 +63,43 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
+  const [isTestsStreamingFinished, setIsTestsStreamingFinished] = useState(false);
+  const [negativeFeedback, setNegativeFeedback] = useState<string | null>(null);
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
+
+  const isPopoverOpenRef = useRef(isGenerateTestPopoverOpen);
 
   const [getData] = useAPIRecords((state) => [state.getData]);
   const httpRequestExecutor = useHttpRequestExecutor(getData(requestId)?.collectionId);
-
   const { object, isLoading, error, stop, submit, clear } = useObject({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
+    onFinish: (result) => {
+      setIsTestsStreamingFinished(true);
+      if (result.object?.err) {
+        switch (result.object?.err) {
+          case AITestGenerationError.UNRELATED_QUERY:
+            if (!isPopoverOpenRef.current) {
+              toast.error("Please provide a query related to test generation.");
+            }
+            setNegativeFeedback("Please provide a query related to test generation.");
+            break;
+          case AITestGenerationError.TEST_NOT_REQUESTED:
+            if (!isPopoverOpenRef.current) {
+              toast.info("The query does not request any tests to be generated.");
+            }
+            setNegativeFeedback("The query does not request any tests to be generated.");
+            break;
+          default:
+            toast.error("An error occurred while generating tests. Please try again.");
+            break;
+        }
+      }
+      setIsTestsStreamingFinished(true);
+    },
   });
 
   const mergeViewConfig = useMemo(() => {
-    if (object?.err) {
-      switch (object.err) {
-        case "UNRELATED_QUERY":
-          toast.error("Please provide a query related to test generation.");
-          break;
-        case "TEST_NOT_REQUESTED":
-          toast.info("The query does not request any tests to be generated.");
-          break;
-        default:
-          toast.error("An error occurred while generating tests. Please try again.");
-      }
-      return undefined;
-    }
     const isPostResponseScript = scriptType === RQAPI.ScriptType.POST_RESPONSE;
     const hasGeneratedCode = Boolean(object?.code?.content);
 
@@ -98,7 +111,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content, object?.err]);
+  }, [scriptType, object?.code?.content]);
 
   const handleAcceptAndRunTests = (onlyAccept: boolean) => {
     onScriptsChange({
@@ -158,16 +171,22 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         <GenerateTestsButton
           isLoading={isLoading}
           isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
-          togglePopover={setIsGenerateTestPopoverOpen}
+          togglePopover={(open) => {
+            setIsGenerateTestPopoverOpen(open);
+            isPopoverOpenRef.current = open;
+          }}
           onGenerateClick={(query) => {
+            setNegativeFeedback(null);
+            setIsTestsStreamingFinished(false);
             submit({ userQuery: query, apiRecord: entry });
           }}
           disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
           onCancelClick={stop}
+          negativeFeedback={negativeFeedback}
         />
       </div>
     );
-  }, [scriptType, isGenerateTestPopoverOpen, submit, entry, isLoading, stop]);
+  }, [scriptType, isGenerateTestPopoverOpen, submit, entry, isLoading, stop, negativeFeedback]);
 
   return (
     <div className="api-client-script-editor-container">
@@ -184,11 +203,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
         mergeView={mergeViewConfig}
       />
-      {object?.code?.content && !isLoading && !error && (
+      {isTestsStreamingFinished && object?.code?.content && !error && (
         <AIResultReviewPanel
           onDiscard={() => clear()}
           onAccept={handleAcceptAndRunTests}
-          onEditInstructions={() => setIsGenerateTestPopoverOpen(true)}
+          onEditInstructions={() => {
+            setIsGenerateTestPopoverOpen(true);
+            isPopoverOpenRef.current = true;
+          }}
         />
       )}
     </div>
