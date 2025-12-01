@@ -26,7 +26,7 @@ const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ recor
 
   return (
     <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
-      {!editingDescription && (
+      {!editingDescription ? (
         <Tooltip
           title={record?.[dataIndex]}
           overlayClassName="key-value-description-tooltip"
@@ -38,9 +38,7 @@ const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ recor
             {record?.[dataIndex] || <span className="placeholder">Description</span>}
           </div>
         </Tooltip>
-      )}
-
-      {editingDescription && (
+      ) : (
         <div className="key-value-description-floating-editor">
           <Input.TextArea
             ref={inputRef}
