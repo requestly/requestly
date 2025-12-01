@@ -74,5 +74,19 @@
     svg {
       font-size: 14px;
     }
+
+    &__count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-size: var(--requestly-font-size-3xs);
+      font-weight: var(--requestly-font-weight-bold);
+      color: var(--requestly-color-text-default);
+      background: var(--requestly-color-white-t-10);
+      border-radius: 9px;
+    }
   }
 }

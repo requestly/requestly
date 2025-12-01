@@ -43,6 +43,13 @@ export interface ExternalPackage {
   defaultImportStyle?: PackageImportStyle;
 
   /**
+   * Preferred variable name when generating require statements.
+   * If not specified, a camelCase conversion of the package name is used.
+   * Examples: "_" for lodash, "Ajv" for ajv, "csvParse" for csv-parse
+   */
+  defaultVariableName?: string;
+
+  /**
    * Identifier used by the runtime layer to resolve the actual module.
    *
    * For builtin packages this might be the same as `id` or a more
