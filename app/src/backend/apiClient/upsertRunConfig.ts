@@ -19,6 +19,10 @@ async function _upsertRunConfigInFirebase(
   runConfig: SavedRunConfig
 ): ResponsePromise<SavedRunConfig> {
   try {
+    if (!collectionId) {
+      throw new Error("Collection ID is required to upsert run config");
+    }
+
     const db = getFirestore(firebaseApp);
     const docRef = doc(db, APIS_NODE, collectionId, RUN_CONFIGS_NODE, runConfig.id);
 

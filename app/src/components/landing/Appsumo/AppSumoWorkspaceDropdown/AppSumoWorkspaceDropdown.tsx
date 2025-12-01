@@ -30,7 +30,10 @@ const AppSumoWorkspaceDropdown: React.FC<{
   const filteredAvailableTeams = useMemo(() => {
     return (
       availableWorkspaces?.filter(
-        (team: any) => !team?.archived && team.members?.[user?.details?.profile?.uid]?.role === "admin"
+        (team: any) =>
+          !team?.archived &&
+          user?.details?.profile?.uid &&
+          team.members?.[user?.details?.profile?.uid]?.role === "admin"
       ) ?? []
     );
   }, [availableWorkspaces, user?.details?.profile?.uid]);

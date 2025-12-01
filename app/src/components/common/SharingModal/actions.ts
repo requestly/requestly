@@ -105,7 +105,7 @@ export const duplicateRulesToTargetWorkspace = async (
   }, []);
 
   const formattedRules: NewRule[] = rules.map((rule: NewRule) => {
-    const newGroupId = groupIdMapping[rule.groupId] || "";
+    const newGroupId = rule.groupId ? groupIdMapping[rule.groupId] ?? "" : "";
     return formatRule(rule, newGroupId);
   });
 
