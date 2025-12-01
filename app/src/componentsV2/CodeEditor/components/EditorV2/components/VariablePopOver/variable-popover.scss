@@ -81,7 +81,7 @@ div.n-popup {
 
   .variable-info-body {
     display: flex;
-    max-width: 300px;
+    width: 300px;
     min-width: 240px;
     max-height: 480px;
     gap: 8px;
@@ -93,12 +93,22 @@ div.n-popup {
 
     .variable-info-property-container {
       display: flex;
-      padding: 10px 12px 8px 12px;
+      padding: 8px 12px 8px 12px;
       flex-direction: row;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
       align-self: stretch;
       border-bottom: 1px solid var(--requestly-color-white-t-10);
+
+      .edit-variable-btn {
+        height: 24px;
+        margin: 0px;
+        margin-left: auto;
+        border-radius: 4px !important;
+        font-size: var(--requestly-font-size-xs);
+        color: var(--requestly-color-text-subtle);
+        padding: 8px;
+      }
     }
 
     .variable-info-header {
@@ -190,6 +200,270 @@ div.n-popup {
 
     .add-new-variable-btn.rq-custom-btn.ant-btn.ant-btn-block {
       border-radius: 4px;
+      height: 24px;
+    }
+
+    .variable-not-found-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .switch-environment-btn {
+      background: transparent;
+      height: 24px;
+      border: 1px solid var(--requestly-color-white-t-20);
+      border-radius: 4px !important;
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  // Create Variable Form View
+  &.create-form-view {
+    .ant-popover-inner {
+      width: 304px;
+    }
+  }
+}
+
+// =====================================
+// Create Variable View Styles
+// =====================================
+.create-variable-view {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 8px;
+  width: 100%;
+
+  // ----------------------------
+  // Header
+  // ----------------------------
+  .create-variable-header {
+    display: flex;
+    align-items: center;
+
+    .create-variable-title {
+      margin: 0;
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-md);
+      font-weight: var(--requestly-font-weight-medium);
+      color: var(--requestly-color-text-default);
+    }
+  }
+
+  // ----------------------------
+  // Edit Mode Header
+  // ----------------------------
+  .edit-variable-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 8px;
+    padding-bottom: 6px;
+    margin: 0px -12px;
+    border-bottom: 1px solid var(--requestly-color-white-t-10);
+
+    .edit-variable-scope-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .scope-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 16px;
+        background-color: var(--requestly-color-primary);
+        border-radius: 4px;
+        color: var(--requestly-color-text-default);
+        font-size: 12px;
+      }
+
+      .scope-name {
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-size-sm);
+        font-weight: var(--requestly-font-weight-medium);
+        color: var(--requestly-color-text-default);
+        margin-right: 4px;
+      }
+    }
+
+    .edit-variable-actions {
+      display: flex;
+      gap: 8px;
+
+      .rq-custom-btn {
+        height: 24px;
+        border-radius: 4px !important;
+      }
+    }
+  }
+
+  // Variable Name in Edit Mode
+  .edit-variable-name {
+    font-family: var(--requestly-font-family-default);
+    font-size: var(--requestly-font-size-lg);
+    font-weight: var(--requestly-font-weight-medium);
+    color: var(--requestly-color-text-default);
+    padding: 8px 0;
+  }
+
+  .create-variable-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .form-label {
+        width: 72px;
+        font-family: var(--requestly-font-family-default);
+        font-size: var(--requestly-font-size-xs);
+        color: var(--requestly-color-text-subtle);
+        margin: 0;
+      }
+
+      .form-input-wrapper {
+        position: relative;
+        flex: 1;
+
+        // Common input styling
+        .form-input,
+        .ant-input,
+        .ant-input-number,
+        .ant-input-affix-wrapper {
+          width: 100%;
+          background: none;
+          height: 24px;
+          font-size: var(--requestly-font-size-xs);
+          color: var(--requestly-color-text-default);
+          border-radius: 4px;
+        }
+
+        .ant-input {
+          padding: 6px 11px;
+          height: 24px;
+          font-size: var(--requestly-font-size-xs);
+        }
+
+        .ant-input-number {
+          align-items: center;
+          display: flex;
+          padding: 2px 0;
+          height: 24px;
+          font-size: var(--requestly-font-size-xs);
+        }
+
+        .ant-input-affix-wrapper {
+          padding: 0;
+          height: 24px;
+          font-size: var(--requestly-font-size-xs);
+          padding-right: 8px;
+        }
+
+        // Boolean switch wrapper
+        .boolean-input {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          padding: 7px 0;
+        }
+      }
+
+      // Ant Select Styles
+      .form-select {
+        flex: 1;
+        height: 24px !important;
+
+        .ant-select-selector {
+          background: none;
+          border-radius: 4px !important;
+          align-items: center;
+          height: 24px;
+          font-size: var(--requestly-font-size-xs);
+          color: var(--requestly-color-text-default);
+        }
+
+        .ant-select-selection-item {
+          color: var(--requestly-color-text-default);
+          align-items: center;
+          display: flex;
+        }
+      }
+    }
+
+    // Validation error
+    .form-error {
+      color: var(--requestly-color-error-text);
+      font-size: var(--requestly-font-size-xs);
+      margin-top: -4px;
+      padding-left: 112px;
+    }
+  }
+
+  .create-variable-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    .rq-custom-btn {
+      height: 30px;
+      border-radius: 4px !important;
+      font-size: var(--requestly-font-size-sm);
+
+      &:not(:last-child) {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.scope-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .scope-option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 16px;
+    background-color: var(--requestly-color-surface-2);
+    border-radius: 4px;
+  }
+
+  .scope-option-label {
+    font-family: var(--requestly-font-family-default);
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-default);
+  }
+}
+
+.ant-select-dropdown {
+  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+  background: var(--requestly-color-surface-0);
+
+  .ant-select-item {
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-xs);
+    height: 24px;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: var(--requestly-color-primary);
+      border-radius: 4px;
+    }
+
+    &.ant-select-item-option-disabled {
+      color: var(--requestly-color-text-disabled);
+      opacity: 0.5;
     }
   }
 }
