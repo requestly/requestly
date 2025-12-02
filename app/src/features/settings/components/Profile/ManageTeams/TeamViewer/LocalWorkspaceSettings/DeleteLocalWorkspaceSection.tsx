@@ -59,7 +59,10 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
       const previousPath = location?.state?.previousPath;
       const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
 
-      await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
+      const result = await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
+      if (result.type === "error") {
+        throw new Error(result.error.message || "Failed to delete workspace");
+      }
 
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
