@@ -46,8 +46,14 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
         className="ai-generate-test-popover-content__input"
         ref={inputRef}
         value={userQuery}
+        disabled={isLoading}
         onChange={(e) => onUserQueryChange(e.target.value)}
         autoSize={{ minRows: 2, maxRows: 8 }}
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+            onGenerateClick(userQuery);
+          }
+        }}
       />
       {negativeFeedback && (
         <div className="ai-generate-test-popover-content__negative-feedback">

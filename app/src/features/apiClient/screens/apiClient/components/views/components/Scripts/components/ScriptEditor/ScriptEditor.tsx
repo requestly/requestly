@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { useDispatch } from "react-redux";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
@@ -16,6 +17,7 @@ import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutor
 import { toast } from "utils/Toast";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
+import { globalActions } from "store/slices/global/slice";
 import "./scriptEditor.scss";
 
 const TestGenerationOutputSchema = z.object({
@@ -51,6 +53,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   aiTestsExcutionCallback,
   focusPostResponse,
 }) => {
+  const dispatch = useDispatch();
+
   const scripts = entry?.scripts || {
     preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
     postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
@@ -99,6 +103,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
       }
       setIsTestsStreamingFinished(true);
+      dispatch(globalActions.updateHasGeneratedAITests(true));
     },
   });
 
