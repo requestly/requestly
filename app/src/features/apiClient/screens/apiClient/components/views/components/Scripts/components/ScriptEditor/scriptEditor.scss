@@ -1,9 +1,12 @@
 .api-client-script-editor-container {
   height: inherit;
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   .react-resizable {
-    height: calc(100% - 35px) !important;
+    // height: calc(100% - 35px) !important;
+    flex: 1;
     min-height: unset !important;
   }
 
