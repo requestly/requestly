@@ -256,10 +256,12 @@ const HttpClientView: React.FC<Props> = ({
     if (isDefaultPlacementRef.current) {
       return;
     }
-
-    isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
+    const savedPlacement = localStorage.getItem("sheet_placement");
+    if (!savedPlacement) {
+      isDefaultPlacementRef.current = true;
+      const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+      toggleSheetPlacement(bottomSheetPlacement);
+    }
   }, [toggleSheetPlacement]);
 
   useEffect(() => {

@@ -26,7 +26,10 @@ export const BottomSheetProvider: React.FC<{
   isSheetOpenByDefault?: boolean;
 }> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
-  const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
+  const [sheetPlacement, setSheetPlacement] = useState(() => {
+    const savedPlacement = localStorage.getItem("sheet_placement");
+    return savedPlacement || defaultPlacement;
+  });
 
   const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
     if (isOpen) {
@@ -46,13 +49,16 @@ export const BottomSheetProvider: React.FC<{
     (placement?: BottomSheetPlacement) => {
       if (placement) {
         setSheetPlacement(placement);
+        localStorage.setItem("sheet_placement", placement);
         return;
       }
       if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
         setSheetPlacement(BottomSheetPlacement.RIGHT);
+        localStorage.setItem("sheet_placement", BottomSheetPlacement.RIGHT);
         trackViewBottomSheetOnRightClicked();
       } else {
         setSheetPlacement(BottomSheetPlacement.BOTTOM);
+        localStorage.setItem("sheet_placement", BottomSheetPlacement.BOTTOM);
         trackViewBottomSheetOnBottomClicked();
       }
     },
