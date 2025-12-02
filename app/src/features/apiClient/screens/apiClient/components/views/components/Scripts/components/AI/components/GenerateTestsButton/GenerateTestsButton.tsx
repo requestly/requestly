@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { getHasGeneratedAITests } from "store/selectors";
 import { Popover } from "antd";
 import { RQButton } from "lib/design-system-v2/components";
 import { AIPromptPopover } from "../AIPromptPopover/AIPromptPopover";
@@ -26,6 +28,8 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
   onGenerateClick,
   togglePopover,
 }) => {
+  const hasGeneratedAITests = useSelector(getHasGeneratedAITests);
+
   const [userQuery, setUserQuery] = useState("Generate test cases for this request and check status 200");
 
   return (
@@ -51,7 +55,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
         showArrow={false}
       >
         <RQButton
-          className="ai-generate-test-btn ai-generate-test-btn__new"
+          className={`ai-generate-test-btn ${!hasGeneratedAITests ? "ai-generate-test-btn__new" : ""}`}
           size="small"
           icon={<MdOutlineAutoAwesome />}
           disabled={disabled}

@@ -371,3 +371,7 @@ export const getIsAcquisitionAnnouncementModalVisible = (state) => {
 export const getPopupConfig = (state) => {
   return getGlobalState(state).popupConfig;
 };
+
+export const getHasGeneratedAITests = (state) => {
+  return getGlobalState(state).misc.persist?.hasGeneratedAITests;
+};
