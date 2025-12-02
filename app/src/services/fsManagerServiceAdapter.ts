@@ -259,8 +259,6 @@ export function getAllWorkspaces() {
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
 }
 
-// Remove a local workspace. If opts.deleteDirectory is true, attempts recursive delete of the workspace folder.
-// Treat non-existent workspace id as success (idempotent). Propagates permission errors so caller can retry without deleteDirectory.
 export function removeWorkspace(
   workspaceId: string,
   opts: { deleteDirectory?: boolean } = {}
