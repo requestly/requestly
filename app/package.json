@@ -44,7 +44,8 @@
     "extends": "react-app"
   },
   "dependencies": {
-    "@amplitude/analytics-browser": "^1.12.1",
+    "@amplitude/analytics-browser": "^2",
+    "@amplitude/plugin-session-replay-browser": "^1.23.6",
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-card": "^1.20.6",
     "@ant-design/pro-table": "^2.75.1",
@@ -64,7 +65,7 @@
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.4.0/react-icons-all-files-5.4.0.tgz",
     "@readme/httpsnippet": "^11.0.0",
     "@reduxjs/toolkit": "^1.9.0",
-    "@requestly/alternative-importers": "^0.0.5",
+    "@requestly/alternative-importers": "^0.0.6",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/shared": "file:../shared",

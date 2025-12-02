@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ComponentType } from "react";
+import React, { ComponentType } from "react";
 import { useSelector } from "react-redux";
 // UTILS
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
@@ -24,15 +24,7 @@ function ProtectedRoute<P>({
 }: Props<P> & Partial<P>) {
   // Global State
   const user = useSelector(getUserAuthDetails);
-
-  // Component State
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
-
-  useEffect(() => {
-    if (!isPremiumUser) {
-      setIsPremiumUser(user.details?.isPremium);
-    }
-  }, [user, isPremiumUser]);
+  const isPremiumUser = !!user.details?.isPremium;
 
   return (
     <React.Fragment>

@@ -8,7 +8,7 @@ export const updateMocksCollection = async (
   updatedCollectionId: string,
   updatedCollectionPath: string = "",
   teamId?: string
-): Promise<boolean> => {
+): Promise<boolean | null> => {
   if (!uid) {
     return null;
   }
