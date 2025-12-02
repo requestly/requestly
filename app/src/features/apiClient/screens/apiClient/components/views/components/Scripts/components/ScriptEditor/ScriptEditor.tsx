@@ -174,26 +174,30 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         {isAITestsGenerationEnabled && (
           <Tooltip
             showArrow={false}
-            title={"Send the request first to generate tests from its response."}
+            title={!entry?.response ? "Send the request first to generate tests from its response." : null}
             placement="bottom"
+            color="#000"
+            overlayClassName="ai-generate-test-btn-tooltip"
           >
-            <GenerateTestsButton
-              hidden={scriptType !== RQAPI.ScriptType.POST_RESPONSE}
-              isLoading={isLoading}
-              isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
-              togglePopover={(open) => {
-                setIsGenerateTestPopoverOpen(open);
-                isPopoverOpenRef.current = open;
-              }}
-              onGenerateClick={(query) => {
-                setNegativeFeedback(null);
-                setIsTestsStreamingFinished(false);
-                submit({ userQuery: query, apiRecord: entry });
-              }}
-              disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
-              onCancelClick={stop}
-              negativeFeedback={negativeFeedback}
-            />
+            <>
+              <GenerateTestsButton
+                hidden={scriptType !== RQAPI.ScriptType.POST_RESPONSE}
+                isLoading={isLoading}
+                isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
+                togglePopover={(open) => {
+                  setIsGenerateTestPopoverOpen(open);
+                  isPopoverOpenRef.current = open;
+                }}
+                onGenerateClick={(query) => {
+                  setNegativeFeedback(null);
+                  setIsTestsStreamingFinished(false);
+                  submit({ userQuery: query, apiRecord: entry });
+                }}
+                disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
+                onCancelClick={stop}
+                negativeFeedback={negativeFeedback}
+              />
+            </>
           </Tooltip>
         )}
       </div>

@@ -75,3 +75,9 @@
     }
   }
 }
+
+.ai-generate-test-btn-tooltip {
+  &.ant-tooltip.ant-tooltip-placement-bottom {
+    padding-top: 4px;
+  }
+}
