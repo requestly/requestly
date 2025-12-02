@@ -4,31 +4,82 @@ import {
   extractPathVariablesFromUrl,
   extractQueryParams,
   queryParamsToURLString,
+  parseCurlRequest,
 } from "features/apiClient/screens/apiClient/utils";
-import { KeyValuePair } from "features/apiClient/types";
+import { toast } from "utils/Toast";
+import { KeyValuePair, RQAPI } from "features/apiClient/types";
 import { useCallback, memo } from "react";
 import { ApiClientUrl } from "../../../components/request/components/ApiClientUrl/ApiClientUrl";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { getEmptyApiEntry } from "features/apiClient/screens/apiClient/utils";
 
 interface ApiClientUrlProps {
   url: string;
   currentEnvironmentVariables: ScopedVariables;
-  onEnterPress: (e: KeyboardEvent) => void;
+  onEnterPress: (e: KeyboardEvent, text: string) => void;
   onUrlChange: (value: string, finalParams: KeyValuePair[]) => void;
+  onFullEntryChange: (entry: RQAPI.HttpApiEntry) => void;
+  apiEntryDetails?: RQAPI.HttpApiEntry;
 }
 
-const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange }: ApiClientUrlProps) => {
+//prettier-ignore
+const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUrlChange, onFullEntryChange }: ApiClientUrlProps) => {
   const [queryParams, setQueryParams] = useQueryParamStore((state) => [state.queryParams, state.setQueryParams]);
-
   const updatePathVariableKeys = usePathVariablesStore((state) => state.updateVariableKeys);
+
+  const parseAndHandleCurl = useCallback((curlString: string) => {
+    try {
+      const cleanedCurl = curlString.trim();
+      const requestFromCurl = parseCurlRequest(cleanedCurl);
+
+      if (!requestFromCurl || !requestFromCurl.url) {
+        toast.error("Failed to parse cURL command. Please ensure it is valid.");
+        return;
+      }
+
+      const apiEntry = getEmptyApiEntry(RQAPI.ApiEntryType.HTTP, requestFromCurl) as RQAPI.HttpApiEntry;
+      onFullEntryChange(apiEntry);
+      toast.success("cURL command imported successfully!");
+
+      const urlWithoutParams = requestFromCurl.url.split("?")[0];
+      const finalParams = (requestFromCurl as any).queryParams || extractQueryParams(requestFromCurl.url);
+      
+      setQueryParams(finalParams);
+      onUrlChange(urlWithoutParams, finalParams);
+
+    } catch (error) {
+      toast.error(error.message || "Failed to parse cURL command. Please ensure it is valid.");
+    }
+  }, [onFullEntryChange, onUrlChange, setQueryParams]);
+
+
+  const handleUrlPaste = useCallback((pastedValue: string) => {
+    const trimmedValue = pastedValue.trim();
+    if (trimmedValue.toLowerCase().startsWith("curl ")) {
+      parseAndHandleCurl(trimmedValue);
+      return true; 
+    }
+    return false; 
+  }, [parseAndHandleCurl]);
+
+  const handleEnterPress = useCallback((event: KeyboardEvent, text: string) => {
+    const trimmedValue = text.trim();
+    if (trimmedValue.toLowerCase().startsWith("curl ")) {
+      parseAndHandleCurl(trimmedValue);
+    } else {
+      onEnterPress(event, text);
+    }
+  }, [onEnterPress, parseAndHandleCurl]);
+
 
   const handleUrlChange = useCallback(
     (value: string) => {
+
       const pathVariables = extractPathVariablesFromUrl(value);
       updatePathVariableKeys(pathVariables);
 
       const paramsFromUrl = extractQueryParams(value);
-      const finalParams = [];
+      const finalParams: KeyValuePair[] = [];
 
       const disabledPositions = new Map();
       queryParams.forEach((param, index) => {
@@ -59,10 +110,11 @@ const HttpApiClientUrl = ({ url, currentEnvironmentVariables, onEnterPress, onUr
   return (
     <ApiClientUrl
       url={queryParamsToURLString(queryParams, url)}
-      placeholder="Enter or paste HTTP URL"
+      placeholder="Enter or paste HTTP URL or cURL command"
       currentEnvironmentVariables={currentEnvironmentVariables}
-      onEnterPress={onEnterPress}
+      onEnterPress={handleEnterPress}
       onUrlChange={handleUrlChange}
+      onUrlPaste={handleUrlPaste}
     />
   );
 };
