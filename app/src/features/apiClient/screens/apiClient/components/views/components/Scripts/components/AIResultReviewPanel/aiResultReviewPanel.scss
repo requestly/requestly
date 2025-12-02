@@ -1,10 +1,7 @@
 .ai-result-review-panel-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: center;
+  width: 100%;
 
   .ai-result-review-panel-content {
     border-radius: 6px;

@@ -6,6 +6,7 @@ import { MdOutlineStopCircle } from "@react-icons/all-files/md/MdOutlineStopCirc
 import { MdOutlineAutoAwesome } from "@react-icons/all-files/md/MdOutlineAutoAwesome";
 
 interface GenerateTestsButtonProps {
+  hidden: boolean;
   isLoading: boolean;
   isGenerateTestPopoverOpen: boolean;
   disabled: boolean;
@@ -16,6 +17,7 @@ interface GenerateTestsButtonProps {
 }
 
 export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
+  hidden,
   isLoading,
   isGenerateTestPopoverOpen,
   disabled,
@@ -27,7 +29,7 @@ export const GenerateTestsButton: React.FC<GenerateTestsButtonProps> = ({
   const [userQuery, setUserQuery] = useState("Generate test cases for this request and check status 200");
 
   return (
-    <div className="ai-generate-test-btn-container">
+    <div className={`ai-generate-test-btn-container ${hidden ? "hidden" : ""}`}>
       <Popover
         open={isGenerateTestPopoverOpen}
         onOpenChange={togglePopover}
