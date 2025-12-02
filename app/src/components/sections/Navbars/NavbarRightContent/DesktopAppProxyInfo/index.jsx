@@ -21,6 +21,17 @@ const DesktopAppProxyInfo = () => {
 
   const hasInterceptionStarted = useRef(false);
 
+  // Debug logs for no-proxy issue
+  useEffect(() => {
+    console.log("[DesktopAppProxyInfo] Redux State Updated:", {
+      isBackgroundProcessActive,
+      isProxyServerRunning,
+      proxyPort,
+      proxyIp,
+      fullDesktopSpecificDetails: desktopSpecificDetails,
+    });
+  }, [isBackgroundProcessActive, isProxyServerRunning, proxyPort, proxyIp, desktopSpecificDetails]);
+
   useEffect(() => {
     if (!hasInterceptionStarted.current && networkLogs.length > 0) {
       hasInterceptionStarted.current = true;
@@ -44,6 +55,17 @@ const DesktopAppProxyInfo = () => {
 
   if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) return null;
 
+  console.log("[DesktopAppProxyInfo] Render values:", {
+    isBackgroundProcessActive,
+    isProxyServerRunning,
+    proxyIp,
+    proxyPort,
+    displayText: isBackgroundProcessActive
+      ? isProxyServerRunning
+        ? `${proxyIp}:${proxyPort}`
+        : "No Proxy"
+      : "Waiting for proxy server to start",
+  });
   return (
     <div className="desktop-app-proxy-info-container">
       <ProxyServerStatusIcon />

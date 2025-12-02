@@ -87,7 +87,9 @@ const AppModeInitializer = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       if (!isBackgroundProcessActive) {
         // Start the bg process
+        console.log("[AppModeInitializer] Starting background process...");
         startBackgroundProcess().then((newStatus) => {
+          console.log("[AppModeInitializer] Background process status:", newStatus);
           dispatch(
             globalActions.updateDesktopSpecificDetails({
               isBackgroundProcessActive: !!newStatus,
@@ -96,97 +98,127 @@ const AppModeInitializer = () => {
           trackBackgroundProcessStartedEvent();
           if (newStatus === true) {
             //Start proxy server
-            window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("start-proxy-server").then((res) => {
-              const { success, port, proxyIp, helperServerPort } = res;
-              dispatch(
-                globalActions.updateDesktopSpecificDetails({
+
+            // LOGS for Proxy startup
+            console.log("[AppModeInitializer] Starting proxy server...");
+            console.log(
+              "[AppModeInitializer] window.RQ.DESKTOP.SERVICES.IPC exists?",
+              !!window.RQ?.DESKTOP?.SERVICES?.IPC
+            );
+            console.log(
+              "[AppModeInitializer] invokeEventInBG exists?",
+              typeof window.RQ?.DESKTOP?.SERVICES?.IPC?.invokeEventInBG
+            );
+
+            window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("start-proxy-server")
+              .then((res) => {
+                console.log("[AppModeInitializer] Proxy server response:", res);
+                const { success, port, proxyIp, helperServerPort } = res;
+                console.log("[AppModeInitializer] Dispatching updateDesktopSpecificDetails:", {
                   isProxyServerRunning: !!success,
                   proxyPort: port,
                   proxyIp: proxyIp,
                   helperServerPort,
-                })
-              );
-              trackProxyServerStartedEvent();
-              // Set handler for windows closed
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-closed", (payload) => {
-                dispatch(
-                  globalActions.updateDesktopSpecificAppProperty({
-                    appId: payload.appId,
-                    property: "isActive",
-                    value: false,
-                  })
-                );
-                trackAppDisconnectedEvent(appsListRef.current[payload.appId]?.name);
-              });
-              // Set handler for activable sources
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("app-detected", (payload) => {
-                dispatch(
-                  globalActions.updateDesktopSpecificAppProperty({
-                    appId: payload.id,
-                    property: "isScanned",
-                    value: true,
-                  })
-                );
-                dispatch(
-                  globalActions.updateDesktopSpecificAppProperty({
-                    appId: payload.id,
-                    property: "isAvailable",
-                    value: payload.isAppActivatable,
-                  })
-                );
-
-                if (payload.isAppActivatable) {
-                  trackAppDetectedEvent(appsListRef.current[payload.id].name);
-                }
-              });
-              // Get Active sources
-              const appsListArray = Object.values(appsListRef.current);
-              invokeAppDetectionInBackground(appsListArray);
-
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("proxy-restarted", (payload) => {
-                const { port, proxyIp } = payload;
+                });
                 dispatch(
                   globalActions.updateDesktopSpecificDetails({
+                    isProxyServerRunning: !!success,
                     proxyPort: port,
                     proxyIp: proxyIp,
+                    helperServerPort,
                   })
                 );
-                trackProxyReStartedEvent();
-              });
+                trackProxyServerStartedEvent();
+                // Set handler for windows closed
+                window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-closed", (payload) => {
+                  dispatch(
+                    globalActions.updateDesktopSpecificAppProperty({
+                      appId: payload.appId,
+                      property: "isActive",
+                      value: false,
+                    })
+                  );
+                  trackAppDisconnectedEvent(appsListRef.current[payload.appId]?.name);
+                });
+                // Set handler for activable sources
+                window.RQ.DESKTOP.SERVICES.IPC.registerEvent("app-detected", (payload) => {
+                  dispatch(
+                    globalActions.updateDesktopSpecificAppProperty({
+                      appId: payload.id,
+                      property: "isScanned",
+                      value: true,
+                    })
+                  );
+                  dispatch(
+                    globalActions.updateDesktopSpecificAppProperty({
+                      appId: payload.id,
+                      property: "isAvailable",
+                      value: payload.isAppActivatable,
+                    })
+                  );
 
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-connected", (payload) => {
-                toast.success(`${getAppName(payload.appId)} profile connected`);
-                dispatch(
-                  globalActions.updateDesktopSpecificAppProperty({
-                    appId: payload.appId,
-                    property: "isActive",
-                    value: true,
-                    connectedExtensionClientId: payload.connectedExtensionClientId,
-                  })
-                );
-                dispatch(
-                  globalActions.updateDesktopSpecificAppProperty({
-                    appId: payload.appId,
-                    property: "connectedExtensionClientId",
-                    value: payload.connectedExtensionClientId,
-                  })
-                );
-                trackAppConnectedEvent(payload.appId);
-              });
+                  if (payload.isAppActivatable) {
+                    trackAppDetectedEvent(appsListRef.current[payload.id].name);
+                  }
+                });
+                // Get Active sources
+                const appsListArray = Object.values(appsListRef.current);
+                invokeAppDetectionInBackground(appsListArray);
 
-              window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-disconnected", (payload) => {
-                toast.info(`${getAppName(payload.appId)} profile disconnected`);
-                dispatch(
-                  globalActions.updateDesktopSpecificAppProperty({
-                    appId: payload.appId,
-                    property: "isActive",
-                    value: false,
-                    connectedExtensionClientId: null,
-                  })
-                );
-                trackAppDisconnectedEvent(payload.appId);
+                window.RQ.DESKTOP.SERVICES.IPC.registerEvent("proxy-restarted", (payload) => {
+                  const { port, proxyIp } = payload;
+                  dispatch(
+                    globalActions.updateDesktopSpecificDetails({
+                      proxyPort: port,
+                      proxyIp: proxyIp,
+                    })
+                  );
+                  trackProxyReStartedEvent();
+                });
+
+                window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-connected", (payload) => {
+                  toast.success(`${getAppName(payload.appId)} profile connected`);
+                  dispatch(
+                    globalActions.updateDesktopSpecificAppProperty({
+                      appId: payload.appId,
+                      property: "isActive",
+                      value: true,
+                      connectedExtensionClientId: payload.connectedExtensionClientId,
+                    })
+                  );
+                  dispatch(
+                    globalActions.updateDesktopSpecificAppProperty({
+                      appId: payload.appId,
+                      property: "connectedExtensionClientId",
+                      value: payload.connectedExtensionClientId,
+                    })
+                  );
+                  trackAppConnectedEvent(payload.appId);
+                });
+
+                window.RQ.DESKTOP.SERVICES.IPC.registerEvent("browser-disconnected", (payload) => {
+                  toast.info(`${getAppName(payload.appId)} profile disconnected`);
+                  dispatch(
+                    globalActions.updateDesktopSpecificAppProperty({
+                      appId: payload.appId,
+                      property: "isActive",
+                      value: false,
+                      connectedExtensionClientId: null,
+                    })
+                  );
+                  trackAppDisconnectedEvent(payload.appId);
+                });
+              })
+              .catch((error) => {
+                // added a catch statement here for the help!!
+                console.error("[AppModeInitializer] ERROR: Failed to start proxy server:", error);
+                console.error("[AppModeInitializer] Error details:", {
+                  message: error?.message,
+                  stack: error?.stack,
+                  name: error?.name,
+                  fullError: error,
+                });
               });
-            });
           }
           window.RQ.DESKTOP.SERVICES.IPC.registerEvent("analytics-event", (payload) => {
             if (payload?.origin && payload?.origin === "main") {
