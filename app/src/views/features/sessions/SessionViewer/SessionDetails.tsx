@@ -41,9 +41,9 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
   const attributes = useSelector(getSessionRecordingAttributes);
   const events = useSelector(getSessionRecordingEvents);
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
-  const startTime = attributes?.startTime;
+  const startTime = attributes.startTime ?? 0;
 
-  const playerContainer = useRef<HTMLDivElement>();
+  const playerContainer = useRef<HTMLDivElement | null>(null);
   const currentTimeRef = useRef<number>(0);
   const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
   const isPlayerSkippingInactivity = useRef(false);
@@ -52,7 +52,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
   const [player, setPlayer] = useState<Replayer>();
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
   const [expandLogsPanel, setExpandLogsPanel] = useState(false);
-  const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
+  const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element | null>(null);
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
 
   const pageNavigationLogs = useMemo<PageNavigationLog[]>(() => {
@@ -107,10 +107,10 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
 
       setPlayer(
         new Replayer({
-          target: playerContainer.current,
+          target: playerContainer.current!,
           props: {
             events: rrwebEvents,
-            width: playerContainer.current.clientWidth,
+            width: playerContainer.current?.clientWidth ?? 0,
             height: 400,
             autoPlay: true,
             // prevents elements inside rrweb-player to steal focus
@@ -130,9 +130,20 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
       controllerButtonContainer.id = "rq-controller-btns";
 
       const rr_controller__btns = playerContainer.current.querySelector(".rr-controller__btns");
-      setRQControllerButtonContainer(
-        rr_controller__btns.children[0].insertAdjacentElement("afterend", controllerButtonContainer)
+      if (!rr_controller__btns) {
+        return;
+      }
+
+      const insertedButton = rr_controller__btns.children[0].insertAdjacentElement(
+        "afterend",
+        controllerButtonContainer
       );
+
+      if (!insertedButton) {
+        return;
+      }
+
+      setRQControllerButtonContainer(insertedButton);
 
       const rrSkipInactiveToggleHandler = (e: InputEvent) => {
         skipInactiveSegments.current = (e.target as HTMLInputElement).checked;
@@ -163,10 +174,12 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
     };
   }, [player]);
 
-  const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const skippingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const resetPlayerSkippingState = () => {
-    clearTimeout(skippingTimeoutRef.current);
+    if (skippingTimeoutRef.current) {
+      clearTimeout(skippingTimeoutRef.current);
+    }
     setPlayerState(PlayerState.PLAYING);
     isPlayerSkippingInactivity.current = false;
     skippingTimeoutRef.current = null;
@@ -189,7 +202,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
           setPlayerState(PlayerState.SKIPPING);
           isPlayerSkippingInactivity.current = true;
           skippingTimeoutRef.current = setTimeout(() => {
-            player.goto(skipEvent[1] - startTime - 2000);
+            player?.goto(skipEvent[1] - startTime - 2000);
             resetPlayerSkippingState();
           }, 2000);
         }
@@ -247,19 +260,22 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
         icon: <MdOutlineReplay10 />,
         onClick: () => {
           if (playerTimeOffset > 10) {
-            player.goto((playerTimeOffset - 10) * 1000);
+            player?.goto((playerTimeOffset - 10) * 1000);
           } else {
-            player.goto(0);
+            player?.goto(0);
           }
         },
       },
       {
         icon: <MdOutlineForward10 />,
         onClick: () => {
+          if (attributes?.duration === undefined) {
+            return;
+          }
           if ((playerTimeOffset + 10) * 1000 < attributes?.duration) {
-            player.goto((playerTimeOffset + 10) * 1000);
+            player?.goto((playerTimeOffset + 10) * 1000);
           } else {
-            player.goto(attributes?.duration);
+            player?.goto(attributes?.duration);
           }
         },
       },
@@ -356,7 +372,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
             )),
             RQControllerButtonContainer
           )}
-        <PlayerFrameOverlay playerContainer={playerContainer.current} playerState={playerState} />
+        <PlayerFrameOverlay playerContainer={playerContainer.current!} playerState={playerState} />
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} isMobileView={isMobileView} />
       </div>
       <ProCard
