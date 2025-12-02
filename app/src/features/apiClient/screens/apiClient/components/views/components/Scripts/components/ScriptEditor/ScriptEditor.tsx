@@ -14,6 +14,7 @@ import { AIResultReviewPanel } from "../AIResultReviewPanel/AIResultReviewPanel"
 import { useAPIRecords } from "features/apiClient/store/apiRecords/ApiRecordsContextProvider";
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { toast } from "utils/Toast";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
 import "./scriptEditor.scss";
 
@@ -60,6 +61,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
     ? RQAPI.ScriptType.POST_RESPONSE
     : RQAPI.ScriptType.PRE_REQUEST;
+
+  const isAITestsGenerationEnabled = useFeatureValue("ai_tests_generation", false);
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
@@ -168,25 +171,43 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             />
           </Tooltip>
         </span>
-        <GenerateTestsButton
-          isLoading={isLoading}
-          isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
-          togglePopover={(open) => {
-            setIsGenerateTestPopoverOpen(open);
-            isPopoverOpenRef.current = open;
-          }}
-          onGenerateClick={(query) => {
-            setNegativeFeedback(null);
-            setIsTestsStreamingFinished(false);
-            submit({ userQuery: query, apiRecord: entry });
-          }}
-          disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
-          onCancelClick={stop}
-          negativeFeedback={negativeFeedback}
-        />
+        {isAITestsGenerationEnabled && (
+          <Tooltip
+            showArrow={false}
+            title={"Send the request first to generate tests from its response."}
+            placement="bottom"
+          >
+            <GenerateTestsButton
+              hidden={scriptType !== RQAPI.ScriptType.POST_RESPONSE}
+              isLoading={isLoading}
+              isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
+              togglePopover={(open) => {
+                setIsGenerateTestPopoverOpen(open);
+                isPopoverOpenRef.current = open;
+              }}
+              onGenerateClick={(query) => {
+                setNegativeFeedback(null);
+                setIsTestsStreamingFinished(false);
+                submit({ userQuery: query, apiRecord: entry });
+              }}
+              disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
+              onCancelClick={stop}
+              negativeFeedback={negativeFeedback}
+            />
+          </Tooltip>
+        )}
       </div>
     );
-  }, [scriptType, isGenerateTestPopoverOpen, submit, entry, isLoading, stop, negativeFeedback]);
+  }, [
+    scriptType,
+    isGenerateTestPopoverOpen,
+    submit,
+    entry,
+    isLoading,
+    stop,
+    negativeFeedback,
+    isAITestsGenerationEnabled,
+  ]);
 
   return (
     <div className="api-client-script-editor-container">
