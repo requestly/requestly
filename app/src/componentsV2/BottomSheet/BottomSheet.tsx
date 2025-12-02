@@ -5,6 +5,7 @@ import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
 import { BiDockBottom } from "@react-icons/all-files/bi/BiDockBottom";
 import { BottomSheetPlacement } from "./types";
 import { RQButton } from "lib/design-system-v2/components";
+import { RQTooltip } from "lib/design-system-v2/components";
 import "./BottomSheet.scss";
 
 interface BottomSheetProps extends TabsProps {
@@ -33,14 +34,15 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         {utilities}
 
         {disableDocking ? null : (
-          <RQButton
-            size="small"
-            type="transparent"
-            title="Toggle"
-            onClick={() => toggleSheetPlacement()}
-            className="bottom-sheet-toggle-btn"
-            icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
-          />
+          <RQTooltip title={isSheetPlacedAtBottom ? "Dock to right" : "Dock to bottom"}>
+            <RQButton
+              size="small"
+              type="transparent"
+              onClick={() => toggleSheetPlacement()}
+              className="bottom-sheet-toggle-btn"
+              icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
+            />
+          </RQTooltip>
         )}
       </div>
     </div>
