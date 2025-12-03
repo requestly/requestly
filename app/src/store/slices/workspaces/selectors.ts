@@ -20,7 +20,7 @@ export const getNonLocalWorkspaces = (state: RootState) => {
   return all.filter((w) => w.workspaceType !== WorkspaceType.LOCAL);
 };
 
-export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0];
+export const getActiveWorkspaceId = (state: RootState): string | null => getActiveWorkspaceIds(state)?.[0] ?? null;
 
 export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;

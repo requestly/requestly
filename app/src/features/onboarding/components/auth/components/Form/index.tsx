@@ -90,7 +90,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       sendEmailLinkForSignin(email, source)
         .then(() => {
           updateTimeToResendEmailLogin(dispatch, 30);
-          setIsVerifyEmailPopupVisible(true);
+          setIsVerifyEmailPopupVisible?.(true);
         })
         .catch((error) => {
           Logger.log(error);
@@ -182,22 +182,22 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
   const handleEmailPasswordSignUp = useCallback(() => {
     setIsLoading(true);
-    handleEmailSignUp(email, password, null, source)
+    handleEmailSignUp(email!, password, null, source)
       .then(({ status }) => {
         if (status) {
-          handleEmailSignIn(email, password, true, source)
+          handleEmailSignIn(email!, password, true, source)
             .then(({ result }) => {
               if (result.user.uid) {
                 const greatingName = result.user.displayName?.split(" ")?.[0];
                 !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
-                setEmail("");
+                setEmail?.("");
                 setPassword("");
                 callback?.();
               }
             })
             .catch((err) => {
               toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
-              setEmail("");
+              setEmail?.("");
               setPassword("");
             });
         }
@@ -217,7 +217,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         if (result.user.uid) {
           const greatingName = result.user.displayName?.split(" ")?.[0];
           !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
-          setEmail("");
+          setEmail?.("");
           setPassword("");
           callback?.();
         } else {
@@ -226,7 +226,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       })
       .catch((err) => {
         toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorCode));
-        setEmail("");
+        setEmail?.("");
         setPassword("");
       })
       .finally(() => {
@@ -249,12 +249,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   }, [dispatch, user.loggedIn, isNewUser, isOnboarding, appMode]);
 
   if (authMode === AUTH.ACTION_LABELS.SSO) {
-    return <SSOSignInForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} source={source} />;
+    return <SSOSignInForm email={email!} setEmail={setEmail!} setAuthMode={setAuthMode} source={source} />;
   }
 
   if (authMode === AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD) {
     return (
-      <RequestPasswordResetForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} toggleModal={toggleModal} />
+      <RequestPasswordResetForm
+        email={email!}
+        setEmail={setEmail!}
+        setAuthMode={setAuthMode}
+        toggleModal={toggleModal}
+      />
     );
   }
   return onboardingVariation === "variant3" ? (
@@ -289,12 +294,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <AuthFormInput
           id="work-email"
           type="email"
-          value={email}
+          value={email!}
           onValueChange={(email) => {
             setIsInputEmailDisposable(false);
-            setEmail(email);
+            setEmail?.(email);
           }}
-          status={isInputEmailDisposable ? "error" : null}
+          status={isInputEmailDisposable ? "error" : undefined}
           placeholder="E.g., you@company.com"
           label={
             <label>
@@ -312,7 +317,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               </Row>
             </label>
           }
-          onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : null}
+          onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : undefined}
         />
         {isInputEmailDisposable && (
           <div className="auth-email-disposable-error ">
@@ -437,12 +442,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <AuthFormInput
         id="work-email"
         type="email"
-        value={email}
+        value={email!}
         onValueChange={(email) => {
           setIsInputEmailDisposable(false);
-          setEmail(email);
+          setEmail?.(email);
         }}
-        status={isInputEmailDisposable ? "error" : null}
+        status={isInputEmailDisposable ? "error" : undefined}
         placeholder="E.g., you@company.com"
         label={
           <label>
@@ -460,7 +465,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             </Row>
           </label>
         }
-        onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : null}
+        onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : undefined}
       />
       {isInputEmailDisposable && (
         <div className="auth-email-disposable-error ">
