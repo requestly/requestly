@@ -34,6 +34,14 @@ interface EditableCellProps {
   checkInvalidCharacter: boolean;
 }
 
+const useEditableContext = () => {
+  const form = useContext(EditableContext);
+  if (!form) {
+    throw new Error("useEditableContext must be used within an EditableContext.Provider");
+  }
+  return form;
+};
+
 export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
   title,
   editable,
@@ -45,7 +53,7 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   checkInvalidCharacter,
   ...restProps
 }) => {
-  const form = useContext(EditableContext);
+  const form = useEditableContext();
 
   const save = async () => {
     try {
