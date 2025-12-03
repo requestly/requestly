@@ -6,6 +6,7 @@ import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatu
 import { getScopedVariables, Scope } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { getApiClientRecordsStore } from "features/apiClient/commands/store.utils";
 import { EnvironmentVariableData, VariableData } from "features/apiClient/store/variables/types";
+import { RQAPI } from "features/apiClient/types";
 
 type Variables = Record<string, string | number | boolean>;
 interface RenderResult<T> {
@@ -15,7 +16,7 @@ interface RenderResult<T> {
 
 export function renderVariables<T extends string | Record<string, any>>(
   template: T,
-  recordId: string,
+  recordId: RQAPI.ApiClientRecord["id"],
   ctx: ApiClientFeatureContext,
   scopes?: Scope[]
 ): {
