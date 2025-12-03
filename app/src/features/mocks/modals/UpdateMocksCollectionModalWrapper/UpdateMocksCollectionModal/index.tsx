@@ -36,7 +36,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
   const activeWorkspace = useSelector(getActiveWorkspace);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [collectionId, setCollectionId] = useState("");
+  const [collectionId, setCollectionId] = useState<string>();
   const [collectionName, setCollectionName] = useState("");
   const [collectionPath, setCollectionPath] = useState("");
   const [searchValue, setSearchValue] = useState("");
