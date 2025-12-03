@@ -28,6 +28,13 @@ export const batchCreateCollectionRunDetailsInFirebase = async (
     return { success: true, data: { records: [], erroredRecords: [] } };
   } catch (error) {
     captureException(error);
-    return { success: false, data: null, message: error?.message };
+    return {
+      success: false,
+      data: {
+        records: [],
+        erroredRecords: [],
+      },
+      message: error?.message,
+    };
   }
 };

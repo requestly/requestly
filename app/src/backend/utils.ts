@@ -4,7 +4,7 @@ import { updateRecordMetaData } from "./apiClient/utils";
 
 export const LOGGED_OUT_STATE_UID = "local";
 
-export const getOwnerId = (uid: string | undefined, teamId?: string) => {
+export const getOwnerId = (uid: string | undefined, teamId?: string | null) => {
   if (teamId) {
     return `team-${teamId}`;
   }

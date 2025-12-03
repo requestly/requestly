@@ -1,0 +1,1 @@
+export { TabsMorePopover } from "./TabsMorePopover";

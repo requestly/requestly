@@ -6,10 +6,6 @@
 $theme-primary-color: #0a48b3;
 $theme-primary-color-gradient: linear-gradient(87deg, #0b52cb 0, $theme-primary-color 100%);
 
-body {
-  background-color: var(--requestly-color-background-dark) !important;
-}
-
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
