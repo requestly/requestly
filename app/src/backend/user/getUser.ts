@@ -4,7 +4,7 @@ import { User } from "../models/users";
 
 export const getUser = async (userId: string): Promise<User | undefined> => {
   if (!userId) {
-    return null;
+    return undefined;
   }
 
   const user = await getUserFromFirebase(userId);

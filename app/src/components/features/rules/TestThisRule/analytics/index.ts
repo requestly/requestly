@@ -11,7 +11,7 @@ export const trackTestRuleReportGenerated = (rule_type: string, success: boolean
   trackEvent(TEST_THIS_RULE.TEST_RULE_REPORT_GENERATED, params);
 };
 
-export const trackTestRuleResultClicked = (rule_type: string, session_link: string) => {
+export const trackTestRuleResultClicked = (rule_type: string, session_link: string | null) => {
   const params = { rule_type, session_link };
   trackEvent(TEST_THIS_RULE.TEST_RULE_RESULT_CLICKED, params);
 };

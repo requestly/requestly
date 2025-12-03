@@ -7,6 +7,9 @@ export function enforceLatestRecordSchema(id: DocumentData["id"], rawData: Docum
   let record = rawData as Partial<RQAPI.ApiClientRecord>;
   record.id = id;
   const auth = patchAuthSchema(record);
+  if (!record.data) {
+    record.data = {} as RQAPI.ApiClientRecord["data"];
+  }
   record.data.auth = auth;
   return record as RQAPI.ApiClientRecord;
 }

@@ -20,6 +20,7 @@ export const updateUserProfileInFirestore = async (
 
       return true;
     });
+    return true;
   } catch (e) {
     Logger.error("Error while updating new username");
     return false;

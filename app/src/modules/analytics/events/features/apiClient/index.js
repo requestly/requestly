@@ -120,6 +120,10 @@ export const trackVariablesSaved = (params) => {
   trackEvent(API_CLIENT.VARIABLES_UPDATED, params);
 };
 
+export const trackVariableCreated = (params) => {
+  trackEvent(API_CLIENT.VARIABLE_CREATED, params);
+};
+
 export const trackEnvironmentSwitched = () => {
   trackEvent(API_CLIENT.ENVIRONMENT_SWITCHED);
 };
