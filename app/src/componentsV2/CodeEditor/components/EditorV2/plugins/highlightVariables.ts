@@ -71,12 +71,14 @@ export const highlightVariablesPlugin = (setters: VariableSetters, variables: Sc
             const token = doc.sliceString(hoveredVar.start, hoveredVar.end);
             const coords = this.view.coordsAtPos(hoveredVar.start);
 
-            const variable = token.slice(2, -2);
-            setters.setHoveredVariable(variable);
-            setters.setPopupPosition({
-              x: coords.left,
-              y: coords.top,
-            });
+            if (coords) {
+              const variable = token.slice(2, -2);
+              setters.setHoveredVariable(variable);
+              setters.setPopupPosition({
+                x: coords.left,
+                y: coords.top,
+              });
+            }
           } else {
             setters.setHoveredVariable(null); // Hide popup if not hovering over a variable
           }
