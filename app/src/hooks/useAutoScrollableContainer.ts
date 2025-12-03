@@ -7,6 +7,8 @@ const useAutoScrollableContainer = <T extends HTMLElement>(
   const autoScrollRef = useRef<boolean>(true);
 
   const onScroll = () => {
+    if (!containerRef.current) return;
+
     const container = containerRef.current;
     const overflowHeight = container.scrollHeight - container.clientHeight;
     if (container.scrollTop < overflowHeight) {
