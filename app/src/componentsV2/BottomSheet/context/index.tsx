@@ -6,10 +6,8 @@ import {
   trackViewBottomSheetOnRightClicked,
 } from "../analytics";
 
-const SHEET_PLACEMENT_STORAGE_KEY = "sheet_placement";
-
 const getStoredPlacement = (): BottomSheetPlacement | null => {
-  const storedValue = localStorage.getItem(SHEET_PLACEMENT_STORAGE_KEY);
+  const storedValue = localStorage.getItem("sheet_placement");
   return storedValue === BottomSheetPlacement.BOTTOM || storedValue === BottomSheetPlacement.RIGHT ? storedValue : null;
 };
 
@@ -40,7 +38,7 @@ export const BottomSheetProvider: React.FC<{
 
   const persistPlacement = (placement: BottomSheetPlacement) => {
     setSheetPlacement(placement);
-    localStorage.setItem(SHEET_PLACEMENT_STORAGE_KEY, placement);
+    localStorage.setItem("sheet_placement", placement);
   };
 
   useEffect(() => {
@@ -49,7 +47,7 @@ export const BottomSheetProvider: React.FC<{
     if (sheetPlacement !== nextPlacement) {
       setSheetPlacement(nextPlacement);
     }
-  }, [defaultPlacement, sheetPlacement]);
+  }, [defaultPlacement]);
 
   const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
     if (isOpen) {
@@ -74,7 +72,7 @@ export const BottomSheetProvider: React.FC<{
       const nextPlacement =
         prev === BottomSheetPlacement.BOTTOM ? BottomSheetPlacement.RIGHT : BottomSheetPlacement.BOTTOM;
 
-      localStorage.setItem(SHEET_PLACEMENT_STORAGE_KEY, nextPlacement);
+      localStorage.setItem("sheet_placement", nextPlacement);
 
       if (nextPlacement === BottomSheetPlacement.RIGHT) {
         trackViewBottomSheetOnRightClicked();
