@@ -3,5 +3,5 @@ export function getColumnKey(dataIndex: string | string[], defaultKey?: string):
     return Array.isArray(dataIndex) ? dataIndex.join(".") : dataIndex;
   }
 
-  return defaultKey;
+  return defaultKey ?? null;
 }
