@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { HttpRuleImporterMethod, HttpRuleImporterOutput } from "@requestly/alternative-importers";
+import { HttpRuleImporterMethod, HttpRuleImporterOutput } from "alternative-importers-beta-sd";
 import { FilePicker } from "components/common/FilePicker";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
