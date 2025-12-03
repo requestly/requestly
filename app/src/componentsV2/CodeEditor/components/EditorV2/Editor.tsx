@@ -380,7 +380,6 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {/* {editor} */}
         {mergeView ? <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} /> : editor}
       </ResizableBox>
     </>
