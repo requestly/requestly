@@ -372,7 +372,9 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
             )),
             RQControllerButtonContainer
           )}
-        <PlayerFrameOverlay playerContainer={playerContainer.current!} playerState={playerState} />
+        {playerContainer.current && (
+          <PlayerFrameOverlay playerContainer={playerContainer.current} playerState={playerState} />
+        )}
         <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} isMobileView={isMobileView} />
       </div>
       <ProCard
