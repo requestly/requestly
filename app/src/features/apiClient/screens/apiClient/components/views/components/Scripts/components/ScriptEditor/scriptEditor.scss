@@ -11,8 +11,7 @@
   }
 
   .code-editor-custom-options-row {
-    margin-top: 0;
-    margin-left: 4px;
+    margin: 0 4px;
     flex: 1;
 
     .code-editor-custom-options-block {
@@ -33,7 +32,7 @@
     &__btn.ant-radio-button-wrapper {
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-xs);
-      border: none;
+      border: 1px solid transparent;
       border-radius: 4px !important;
 
       &::before {
@@ -44,11 +43,11 @@
       }
       &:focus,
       &:active {
-        border: none;
+        border: 1px solid transparent;
       }
 
       &.ant-radio-button-wrapper-checked {
-        border: none;
+        border: 1px solid var(--requestly-color-surface-2) !important;
         background: var(--requestly-color-white-t-10);
         color: var(--requestly-color-text-default);
         font-weight: var(--requestly-font-weight-medium) !important;
