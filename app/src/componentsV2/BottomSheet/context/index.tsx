@@ -41,14 +41,6 @@ export const BottomSheetProvider: React.FC<{
     localStorage.setItem("sheet_placement", placement);
   };
 
-  useEffect(() => {
-    const storedPlacement = getStoredPlacement();
-    const nextPlacement = storedPlacement ?? defaultPlacement;
-    if (sheetPlacement !== nextPlacement) {
-      setSheetPlacement(nextPlacement);
-    }
-  }, [defaultPlacement]);
-
   const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
     if (isOpen) {
       setIsBottomSheetOpen(isOpen);
