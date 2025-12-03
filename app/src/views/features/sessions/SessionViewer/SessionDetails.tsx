@@ -101,13 +101,13 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false,
   }, []);
 
   useEffect(() => {
-    if (events?.rrweb?.length) {
+    if (events?.rrweb?.length && playerContainer.current) {
       // rrweb mutates events object whereas redux does not allow mutating state, so cloning.
       const rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
 
       setPlayer(
         new Replayer({
-          target: playerContainer.current!,
+          target: playerContainer.current,
           props: {
             events: rrwebEvents,
             width: playerContainer.current?.clientWidth ?? 0,
