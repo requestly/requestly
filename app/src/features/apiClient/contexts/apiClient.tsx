@@ -105,7 +105,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [onNewClickContextId, setOnNewClickContextId] = useState<string | null>(null); // FIXME: temp fix, to be removed
 
   const [history, setHistory] = useState<RQAPI.ApiEntry[]>(getHistoryFromStore());
-  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(undefined);
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number | undefined>(undefined);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
@@ -158,14 +158,14 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
       setOnNewClickContextId(contextId);
       const context = getApiClientFeatureContext(contextId);
-      const recordsRepository = context.repositories.apiClientRecordsRepository;
+      const recordsRepository = context?.repositories?.apiClientRecordsRepository;
 
       switch (recordType) {
         case RQAPI.RecordType.API: {
           trackNewRequestClicked(analyticEventSource);
 
           if (["api_client_sidebar_header", "home_screen"].includes(analyticEventSource)) {
-            openTab(new DraftRequestContainerTabSource({ apiEntryType: entryType, context: { id: context.id } }));
+            openTab(new DraftRequestContainerTabSource({ apiEntryType: entryType, context: { id: context?.id } }));
             return;
           }
 
@@ -243,7 +243,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
                   title: newEnvironment.name,
                   isNewTab: true,
                   context: {
-                    id: context.id,
+                    id: context?.id,
                   },
                 })
               );
@@ -277,7 +277,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
 
       const context = getApiClientFeatureContext();
       return onNewClickV2({
-        contextId: context.id,
+        contextId: context?.id,
         analyticEventSource,
         recordType,
         collectionId,
