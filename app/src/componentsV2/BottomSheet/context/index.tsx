@@ -1,10 +1,17 @@
-import React, { createContext, useState, useContext, useCallback } from "react";
+import React, { createContext, useState, useContext, useCallback, useEffect } from "react";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
   trackViewBottomSheetOnBottomClicked,
   trackViewBottomSheetOnRightClicked,
 } from "../analytics";
+
+const SHEET_PLACEMENT_STORAGE_KEY = "sheet_placement";
+
+const getStoredPlacement = (): BottomSheetPlacement | null => {
+  const storedValue = localStorage.getItem(SHEET_PLACEMENT_STORAGE_KEY);
+  return storedValue === BottomSheetPlacement.BOTTOM || storedValue === BottomSheetPlacement.RIGHT ? storedValue : null;
+};
 
 interface toggleParams {
   isOpen: boolean;
@@ -27,9 +34,22 @@ export const BottomSheetProvider: React.FC<{
 }> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState(() => {
-    const savedPlacement = localStorage.getItem("sheet_placement");
-    return savedPlacement || defaultPlacement;
+    const savedPlacement = getStoredPlacement();
+    return savedPlacement ?? defaultPlacement;
   });
+
+  const persistPlacement = (placement: BottomSheetPlacement) => {
+    setSheetPlacement(placement);
+    localStorage.setItem(SHEET_PLACEMENT_STORAGE_KEY, placement);
+  };
+
+  useEffect(() => {
+    const storedPlacement = getStoredPlacement();
+    const nextPlacement = storedPlacement ?? defaultPlacement;
+    if (sheetPlacement !== nextPlacement) {
+      setSheetPlacement(nextPlacement);
+    }
+  }, [defaultPlacement, sheetPlacement]);
 
   const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
     if (isOpen) {
@@ -45,25 +65,26 @@ export const BottomSheetProvider: React.FC<{
     }
   };
 
-  const toggleSheetPlacement = useCallback(
-    (placement?: BottomSheetPlacement) => {
-      if (placement) {
-        setSheetPlacement(placement);
-        localStorage.setItem("sheet_placement", placement);
-        return;
-      }
-      if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-        setSheetPlacement(BottomSheetPlacement.RIGHT);
-        localStorage.setItem("sheet_placement", BottomSheetPlacement.RIGHT);
+  const toggleSheetPlacement = useCallback((placement?: BottomSheetPlacement) => {
+    if (placement) {
+      persistPlacement(placement);
+      return;
+    }
+    setSheetPlacement((prev) => {
+      const nextPlacement =
+        prev === BottomSheetPlacement.BOTTOM ? BottomSheetPlacement.RIGHT : BottomSheetPlacement.BOTTOM;
+
+      localStorage.setItem(SHEET_PLACEMENT_STORAGE_KEY, nextPlacement);
+
+      if (nextPlacement === BottomSheetPlacement.RIGHT) {
         trackViewBottomSheetOnRightClicked();
       } else {
-        setSheetPlacement(BottomSheetPlacement.BOTTOM);
-        localStorage.setItem("sheet_placement", BottomSheetPlacement.BOTTOM);
         trackViewBottomSheetOnBottomClicked();
       }
-    },
-    [sheetPlacement]
-  );
+
+      return nextPlacement;
+    });
+  }, []);
 
   return (
     <BottomSheetContext.Provider
