@@ -15,7 +15,7 @@ import { Checkbox } from "antd";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import { PathVariableTable } from "../PathVariableTable";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
-import { HttpRequestScripts } from "../../components/HttpScriptEditors/HttpRequestScripts";
+import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -154,11 +154,12 @@ const HttpRequestTabs: React.FC<Props> = ({
           />
         ),
         children: (
-          <HttpRequestScripts
+          <ScriptEditor
             key={`${scriptEditorVersion}`}
             requestId={requestId}
             entry={requestEntry}
-            setEntry={setRequestEntry}
+            onScriptsChange={(scripts) => setRequestEntry((prev) => ({ ...prev, scripts }))}
+            aiTestsExcutionCallback={(testResults) => setRequestEntry((prev) => ({ ...prev, testResults }))}
             focusPostResponse={focusPostResponseScriptEditor ?? false}
           />
         ),
