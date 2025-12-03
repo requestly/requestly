@@ -14,7 +14,6 @@ import { RQModal } from "lib/design-system/components";
 import { MdOutlineClose } from "@react-icons/all-files/md/MdOutlineClose";
 import {
   trackCollectionRunnerFileCleared,
-  trackCollectionRunnerSelectFileClicked,
   trackCollectionRunnerTruncatedFileUsed,
 } from "modules/analytics/events/features/apiClient";
 import { API_CLIENT_DOCS } from "features/apiClient/constants";
@@ -98,6 +97,10 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
   const confirmUseDataFile = useCallback(() => {
     // remove previously set data file
     removeDataFile();
+    if (!dataFileMetadata) {
+      onClose();
+      throw new Error("Data file metadata is missing");
+    }
 
     const fileId = dataFileMetadata.name + "-" + Date.now();
     setDataFile({
@@ -139,7 +142,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
         };
 
       case DataFileModalViewMode.PREVIEW:
-        if (parsedData?.count > 1000) {
+        if (parsedData?.count && parsedData.count > 1000) {
           return {
             secondaryButton: {
               label: "Replace file",
@@ -240,10 +243,10 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
     >
       {viewMode === DataFileModalViewMode.LOADING && <LoadingView />}
       {viewMode === DataFileModalViewMode.ACTIVE && <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count > 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count && parsedData.count > 1000 && (
         <WarningView buttonOptions={buttonOptions} />
       )}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count <= 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count !== undefined && parsedData.count <= 1000 && (
         <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />
       )}
       {viewMode === DataFileModalViewMode.ERROR && <ErroredStateView buttonOptions={buttonOptions} />}
