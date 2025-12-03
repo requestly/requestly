@@ -14,6 +14,15 @@ import { FileFeature, useApiClientFileStore } from "features/apiClient/store/api
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
+const useEditableForm = () => {
+  const form = useContext(EditableContext);
+  if (!form) {
+    Sentry.captureException("EditableContext used outside of provider");
+    throw new Error("useEditableForm must be used within EditableContext.Provider");
+  }
+  return form;
+};
+
 interface EditableRowProps {
   index: number;
 }
@@ -51,7 +60,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
   ...restProps
 }) => {
   const [addFile, removeFile] = useApiClientFileStore((state) => [state.addFile, state.removeFile]);
-  const form = useContext(EditableContext);
+  const form = useEditableForm();
 
   const save = async () => {
     try {
@@ -178,7 +187,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
             )}
 
             <Conditional
-              condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
+              condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && !!checkInvalidCharacter}
             >
               <div className="key-value-table-error-icon">
                 <InfoIcon
