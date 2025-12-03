@@ -12,6 +12,7 @@ import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 import { LibraryPickerPopover, insertImportStatement, getImportedPackageCount } from "../LibraryPicker";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
+import { trackPackageAdded } from "features/apiClient/helpers/modules/scriptsV2/analytics";
 
 interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
@@ -45,6 +46,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
     const result = insertImportStatement(editorViewRef.current ?? undefined, pkg);
 
     if (result.success) {
+      trackPackageAdded(pkg.name, pkg.source);
       toast.success(result.message);
     } else if (result.alreadyImported) {
       toast.info(result.message);
