@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback, useEffect } from "react";
+import React, { createContext, useState, useContext, useCallback, SetStateAction } from "react";
 import { BottomSheetPlacement } from "../types";
 import {
   trackBottomSheetToggled,
@@ -6,7 +6,7 @@ import {
   trackViewBottomSheetOnRightClicked,
 } from "../analytics";
 
-const getStoredPlacement = (): BottomSheetPlacement | null => {
+export const getStoredPlacement = (): BottomSheetPlacement | null => {
   const storedValue = localStorage.getItem("sheet_placement");
   return storedValue === BottomSheetPlacement.BOTTOM || storedValue === BottomSheetPlacement.RIGHT ? storedValue : null;
 };
@@ -23,31 +23,28 @@ interface BottomSheetContextProps {
   toggleSheetPlacement: (placement?: BottomSheetPlacement) => void;
 }
 
+interface BottomSheetProviderProps {
+  children: React.ReactNode;
+  isSheetOpenByDefault?: boolean;
+  sheetPlacement: BottomSheetPlacement;
+  defaultPlacement?: BottomSheetPlacement;
+  setSheetPlacement: React.Dispatch<SetStateAction<BottomSheetPlacement>>;
+}
+
 const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
 
-export const BottomSheetProvider: React.FC<{
-  children: React.ReactNode;
-  defaultPlacement: BottomSheetPlacement;
-  isSheetOpenByDefault?: boolean;
-}> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
+export const BottomSheetProvider: React.FC<BottomSheetProviderProps> = ({
+  children,
+  isSheetOpenByDefault = false,
+  sheetPlacement,
+  setSheetPlacement,
+}) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
-  const [sheetPlacement, setSheetPlacement] = useState(() => {
-    const savedPlacement = getStoredPlacement();
-    return savedPlacement ?? defaultPlacement;
-  });
 
   const persistPlacement = (placement: BottomSheetPlacement) => {
     setSheetPlacement(placement);
     localStorage.setItem("sheet_placement", placement);
   };
-
-  useEffect(() => {
-    const storedPlacement = getStoredPlacement();
-    const nextPlacement = storedPlacement ?? defaultPlacement;
-    if (sheetPlacement !== nextPlacement) {
-      setSheetPlacement(nextPlacement);
-    }
-  }, [defaultPlacement]);
 
   const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
     if (isOpen) {

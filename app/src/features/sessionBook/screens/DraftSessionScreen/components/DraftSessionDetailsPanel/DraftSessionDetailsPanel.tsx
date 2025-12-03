@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { RQInput } from "lib/design-system/components";
 import { Input } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
@@ -11,6 +11,7 @@ import { trackDraftSessionNamed, trackSessionRecordingDescriptionUpdated } from 
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SheetLayout } from "componentsV2/BottomSheet/types";
 import "./draftSessionDetailsPanel.scss";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 interface DraftSessionDetailsPanelProps {
   isReadOnly?: boolean;
@@ -43,8 +44,13 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ isR
     [dispatch, desbouncedTrackNameUpdated]
   );
 
+  const [sheetPlacement, setSheetPlacement] = useState(() => {
+    const savedPlacement = getStoredPlacement();
+    return savedPlacement ?? BottomSheetPlacement.BOTTOM;
+  });
+
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+    <BottomSheetProvider sheetPlacement={sheetPlacement} setSheetPlacement={setSheetPlacement}>
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
           layout={SheetLayout.DRAWER}

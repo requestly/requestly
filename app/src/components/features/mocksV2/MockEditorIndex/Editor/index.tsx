@@ -32,6 +32,7 @@ import { ExportMocksModalWrapper } from "features/mocks/modals";
 import { globalActions } from "store/slices/global/slice";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import Editor from "componentsV2/CodeEditor";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 interface Props {
   isNew?: boolean;
@@ -90,6 +91,11 @@ const MockEditor: React.FC<Props> = ({
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
   const collectionPath = mockCollectionData?.path ?? "";
+
+  const [sheetPlacement, setSheetPlacement] = useState(() => {
+    const savedPlacement = getStoredPlacement();
+    return savedPlacement ?? BottomSheetPlacement.RIGHT;
+  });
 
   const finalUrl = useMemo(
     () =>
@@ -451,7 +457,7 @@ const MockEditor: React.FC<Props> = ({
 
       {areLogsVisible ? (
         <div className="mock-parent mock-editor-layout-container">
-          <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+          <BottomSheetProvider setSheetPlacement={setSheetPlacement} sheetPlacement={sheetPlacement}>
             <MockEditorHeader
               isNewMock={isNew}
               mockType={mockType}

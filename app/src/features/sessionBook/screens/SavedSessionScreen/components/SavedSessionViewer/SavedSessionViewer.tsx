@@ -29,6 +29,7 @@ import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { useRBAC } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { copyToClipBoard } from "utils/Misc";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -106,9 +107,14 @@ export const SavedSessionViewer = () => {
     }
   }, [isMobileView]);
 
+  const [sheetPlacement, setSheetPlacement] = useState(() => {
+    const savedPlacement = getStoredPlacement();
+    return savedPlacement ?? BottomSheetPlacement.RIGHT;
+  });
+
   return (
     <div className="saved-session-viewer-container">
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+      <BottomSheetProvider sheetPlacement={sheetPlacement} setSheetPlacement={setSheetPlacement}>
         <div className="saved-session-header">
           <SessionTitle />
 

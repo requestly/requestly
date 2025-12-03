@@ -1,5 +1,5 @@
 import { Modal } from "antd";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { APIClientRequest } from "./types";
 import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import {
@@ -19,6 +19,7 @@ import { AutogenerateProvider } from "features/apiClient/store/autogenerateConte
 import { ClientViewFactory } from "features/apiClient/screens/apiClient/clientView/ClientViewFactory";
 import { ContextId } from "features/apiClient/contexts/contextId.context";
 import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 interface Props {
   request: string | APIClientRequest; // string for cURL request
@@ -119,6 +120,11 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
     return createDummyApiRecord(entry);
   }, [request]);
 
+  const [sheetPlacement, setSheetPlacement] = useState(() => {
+    const savedPlacement = getStoredPlacement();
+    return savedPlacement ?? BottomSheetPlacement.BOTTOM;
+  });
+
   if (!apiRecord.data) {
     return null;
   }
@@ -135,7 +141,7 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       destroyOnClose
     >
       <WindowsAndLinuxGatedHoc featureName="API client">
-        <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+        <BottomSheetProvider sheetPlacement={sheetPlacement} setSheetPlacement={setSheetPlacement}>
           <ContextId id={NoopContextId}>
             <AutogenerateProvider>
               <ClientViewFactory
