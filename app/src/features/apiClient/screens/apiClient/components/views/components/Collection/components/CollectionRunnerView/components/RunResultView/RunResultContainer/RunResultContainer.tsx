@@ -56,6 +56,10 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
 const RunningRequestPlaceholder: React.FC<{
   runningRequest: CurrentlyExecutingRequest;
 }> = ({ runningRequest }) => {
+  if (!runningRequest) {
+    return null;
+  }
+
   return (
     <div className="test-details-container">
       <div className="request-details">
@@ -195,9 +199,7 @@ const TestResultList: React.FC<{
     }
   });
 
-  const currentRunningRequest = currentlyExecutingRequest ? (
-    <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />
-  ) : null;
+  const currentRunningRequest = <RunningRequestPlaceholder runningRequest={currentlyExecutingRequest} />;
 
   const rowVirtualizer = useVirtualizer({
     count: resultsToShow.length,

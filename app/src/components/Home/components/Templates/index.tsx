@@ -17,8 +17,8 @@ import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft
 import "./index.scss";
 
 export const Templates: React.FC = () => {
-  const scrollContainerRef = useRef(null);
-  const [ruleToPreview, setRuleToPreview] = useState(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null!);
+  const [ruleToPreview, setRuleToPreview] = useState<any>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
   const [isRowScrolledRight, setIsRowScrolledRight] = useState(false);
