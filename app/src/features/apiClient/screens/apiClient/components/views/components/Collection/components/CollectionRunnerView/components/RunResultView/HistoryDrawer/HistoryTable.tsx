@@ -14,8 +14,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
 
   const [history] = useRunResultStore((s) => [s.history]);
   const formattedHistory = useMemo(() => {
-    const sortedHistory = [...history].sort((a, b) => b.startTime - a.startTime);
-    return sortedHistory;
+    return [...history].sort((a, b) => (b.startTime ?? 0) - (a.startTime ?? 0));
   }, [history]);
 
   const liveRunResult: LiveRunResult[] = useMemo(() => {
