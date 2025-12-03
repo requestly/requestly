@@ -49,6 +49,10 @@ export const TabItem: React.FC<React.PropsWithChildren<{ store: StoreApi<TabStat
           return activeTabId === props.store.getState().id;
         }, [activeTabId, props.store]),
 
+        getSourceId: useCallback(() => {
+          return props.store.getState()?.source?.metadata?.id;
+        }, [props.store]),
+
         addCloseBlocker: useCallback(
           (topic: ActiveBlocker["topic"], id: ActiveBlocker["id"], details: ActiveBlocker["details"]) => {
             props.store.getState().addCloseBlocker(topic, id, {
