@@ -44,6 +44,7 @@
     "extends": "react-app"
   },
   "dependencies": {
+    "@ai-sdk/react": "^2.0.106",
     "@amplitude/analytics-browser": "^2",
     "@amplitude/plugin-session-replay-browser": "^1.23.6",
     "@ant-design/icons": "^4.7.0",
