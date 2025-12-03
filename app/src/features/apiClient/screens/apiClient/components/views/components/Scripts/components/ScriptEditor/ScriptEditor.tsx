@@ -81,6 +81,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
 
   const currentScriptValue = scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType];
   const importCount = useMemo(() => getImportedPackageCount(currentScriptValue), [currentScriptValue]);
+  const scriptLineCount = useMemo(() => currentScriptValue.split("\n").length, [currentScriptValue]);
 
   const libraryPickerButton = useMemo(() => {
     return (
@@ -88,6 +89,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         open={isLibraryPickerOpen}
         onOpenChange={setIsLibraryPickerOpen}
         onPackageSelect={handlePackageSelect}
+        scriptLineCount={scriptLineCount}
       >
         <Tooltip title="Browse available packages" placement="top">
           <button className="api-client-script-packages-btn" onClick={() => setIsLibraryPickerOpen(true)}>
@@ -98,7 +100,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         </Tooltip>
       </LibraryPickerPopover>
     );
-  }, [isLibraryPickerOpen, handlePackageSelect, importCount]);
+  }, [isLibraryPickerOpen, handlePackageSelect, importCount, scriptLineCount]);
 
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">

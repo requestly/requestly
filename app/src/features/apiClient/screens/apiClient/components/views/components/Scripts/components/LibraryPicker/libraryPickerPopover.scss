@@ -93,6 +93,24 @@
     }
   }
 
+  .library-picker-warning.ant-alert.ant-alert-warning {
+    border: none;
+    /* padding: 8px 12px; */
+    background: #2e1b00;
+    align-items: flex-start;
+
+    .ant-alert-icon {
+      color: #fdba0f;
+      font-size: 12px;
+      padding: 0px;
+    }
+
+    .ant-alert-message {
+      color: #fdba0f;
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
+
   .library-picker-content {
     flex: 1;
     overflow-y: auto;
