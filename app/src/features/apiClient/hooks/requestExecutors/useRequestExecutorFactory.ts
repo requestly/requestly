@@ -14,6 +14,7 @@ import { toast } from "utils/Toast";
 import { ApiClientFeatureContext } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
 import { APIClientWorkloadManager } from "features/apiClient/helpers/modules/scriptsV2/workloadManager/APIClientWorkloadManager";
 import { BaseExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
+import { RQAPI } from "features/apiClient/types";
 
 type ExecutorConstructor<T> = new (
   ctx: ApiClientFeatureContext,
@@ -24,7 +25,10 @@ type ExecutorConstructor<T> = new (
   appMode: "EXTENSION" | "DESKTOP"
 ) => T;
 
-export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<T>, collectionId: string): T => {
+export const useRequestExecutorFactory = <T>(
+  ExecutorClass: ExecutorConstructor<T>,
+  collectionId: RQAPI.CollectionRecord["collectionId"]
+): T => {
   const ctx = useApiClientFeatureContext();
   const appMode = useSelector(getAppMode);
   const { apiClientWorkloadManager } = useApiClientContext();

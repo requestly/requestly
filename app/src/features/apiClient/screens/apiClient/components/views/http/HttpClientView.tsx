@@ -153,8 +153,8 @@ const HttpClientView: React.FC<Props> = ({
   const [scriptEditorVersion, setScriptEditorVersion] = useState(0);
 
   const [focusPostResponseScriptEditor, setFocusPostResponseScriptEditor] = useState(false);
-  const [error, setError] = useState<RQAPI.ExecutionError>(null);
-  const [warning, setWarning] = useState<RQAPI.ExecutionWarning>(null);
+  const [error, setError] = useState<RQAPI.ExecutionError | null>(null);
+  const [warning, setWarning] = useState<RQAPI.ExecutionWarning | null>(null);
   const [isRequestSaving, setIsRequestSaving] = useState(false);
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const [isLongRequest, setIsLongRequest] = useState(false);
@@ -167,7 +167,7 @@ const HttpClientView: React.FC<Props> = ({
 
   const { response, testResults = undefined, ...entryWithoutResponse } = entry;
 
-  const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails.collectionId);
+  const httpRequestExecutor = useHttpRequestExecutor(apiEntryDetails?.collectionId ?? null);
 
   const handleGenerateTests = useCallback(async () => {
     if (!entry?.response || isGeneratingTests) {
@@ -228,7 +228,7 @@ const HttpClientView: React.FC<Props> = ({
     } finally {
       setIsGeneratingTests(false);
     }
-  }, [entry, isGeneratingTests, setEntry]);
+  }, [entry.request.method, entry.response, entry.scripts?.postResponse, isGeneratingTests, setDeepLinkState]);
 
   const canGenerateTests = useMemo(() => {
     const responseExists = Boolean(entry?.response);
@@ -293,7 +293,7 @@ const HttpClientView: React.FC<Props> = ({
       };
 
       if (!supportsRequestBody(method)) {
-        newEntry.request.body = null;
+        newEntry.request.body = undefined;
         newEntry.request.headers = newEntry.request.headers.filter((header) => header.key !== CONTENT_TYPE_HEADER);
         newEntry.request.contentType = RequestContentType.RAW;
       }
