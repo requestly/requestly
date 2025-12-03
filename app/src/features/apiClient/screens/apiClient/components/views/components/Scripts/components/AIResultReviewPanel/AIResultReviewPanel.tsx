@@ -7,12 +7,14 @@ import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineK
 import "./aiResultReviewPanel.scss";
 
 interface AIResultReviewPanelProps {
+  isExecutionInProgress: boolean;
   onDiscard: () => void;
   onEditInstructions: () => void;
   onAccept: (runTests: boolean) => void;
 }
 
 export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
+  isExecutionInProgress,
   onDiscard,
   onAccept,
   onEditInstructions,
@@ -44,6 +46,7 @@ export const AIResultReviewPanel: React.FC<AIResultReviewPanelProps> = ({
             onClick={() => {
               onAccept(false);
             }}
+            loading={isExecutionInProgress}
           >
             Accept & run tests
           </Dropdown.Button>

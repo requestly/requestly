@@ -72,6 +72,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const [isTestsStreamingFinished, setIsTestsStreamingFinished] = useState(false);
   const [negativeFeedback, setNegativeFeedback] = useState<string | null>(null);
+  const [isScriptExecutionInProgress, setIsScriptExecutionInProgress] = useState(false);
+
   const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const isPopoverOpenRef = useRef(isGenerateTestPopoverOpen);
@@ -132,6 +134,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       return;
     }
 
+    setIsScriptExecutionInProgress(true);
     const newEntry = { ...entry, scripts: { ...scripts, postResponse: object?.code?.content as string } };
     httpRequestExecutor
       .rerun(requestId, newEntry as RQAPI.HttpApiEntry)
@@ -143,6 +146,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       })
       .catch((error) => {
         toast.error(error.message || "Something went wrong while running tests");
+      })
+      .finally(() => {
+        setIsScriptExecutionInProgress(false);
       });
   };
 
@@ -169,7 +175,12 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
               Post-response
             </Radio.Button>
           </Radio.Group>
-          <Tooltip title="Learn more about using scripts in API requests" showArrow={false} placement="right">
+          <Tooltip
+            title="Learn more about using scripts in API requests"
+            showArrow={false}
+            placement="right"
+            color="#000"
+          >
             <MdInfoOutline
               className="api-client-script-type-selector__info-icon"
               onClick={() => window.open("https://docs.requestly.com/general/api-client/scripts", "_blank")}
@@ -241,6 +252,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             setIsGenerateTestPopoverOpen(true);
             isPopoverOpenRef.current = true;
           }}
+          isExecutionInProgress={isScriptExecutionInProgress}
         />
       )}
     </div>
