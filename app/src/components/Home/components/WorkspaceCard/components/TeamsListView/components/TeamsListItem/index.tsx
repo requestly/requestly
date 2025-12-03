@@ -20,6 +20,16 @@ import "./teamsListItem.scss";
 import WorkspaceAvatar from "features/workspaces/components/WorkspaceAvatar";
 import { Workspace } from "features/workspaces/types";
 
+type Member = {
+  id: any;
+  displayName: any;
+  photoUrl: any;
+  email: any;
+  role: "read" | "write" | "admin";
+  isAdmin: boolean;
+  isOwner: boolean;
+};
+
 interface Props {
   inviteId?: string;
   workspace: Workspace;
@@ -29,14 +39,14 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, workspace }) => {
   const MAX_MEMBERS_TO_SHOW = 3;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [members, setMembers] = useState(null);
+  const [members, setMembers] = useState<Member[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasJoined, setHasJoined] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     if (workspace?.id) {
-      const getTeamUsers = httpsCallable(getFunctions(), "teams-getTeamUsers");
+      const getTeamUsers = httpsCallable<{ teamId: string }, Member[] | null>(getFunctions(), "teams-getTeamUsers");
 
       getTeamUsers({ teamId: workspace?.id })
         .then((res: any) => {
