@@ -1,5 +1,5 @@
 import React from "react";
-import { importHeaderEditor } from "@requestly/alternative-importers";
+import { importHeaderEditor } from "alternative-importers-beta-sd";
 
 import { CommonRulesImporter } from "../CommonRulesImporter/CommonRulesImporter";
 
