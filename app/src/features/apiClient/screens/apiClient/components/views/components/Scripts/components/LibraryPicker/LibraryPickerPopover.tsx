@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { Popover, Input, Select } from "antd";
+import { Popover, Input, Select, Alert } from "antd";
 import { MdSearch } from "@react-icons/all-files/md/MdSearch";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { RiGithubLine } from "@react-icons/all-files/ri/RiGithubLine";
@@ -7,12 +7,14 @@ import { PackageListItem } from "./PackageListItem";
 import "./libraryPickerPopover.scss";
 import { getPackageRegistry } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageRegistry";
 import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 
 export interface LibraryPickerPopoverProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onPackageSelect: (pkg: ExternalPackage) => void;
   children: React.ReactNode;
+  scriptLineCount?: number;
 }
 
 type FilterKey = "all" | "builtin" | "npm" | "jsr";
@@ -29,16 +31,16 @@ const FILTER_OPTIONS: FilterOption[] = [
   { value: "jsr", label: "JSR" },
 ];
 
-// TODO: Create dedicated GitHub issues for NPM and JSR support tracking
-// and update these URLs accordingly
-const GITHUB_NPM_JSR_ISSUE_URL =
-  "https://github.com/requestly/requestly/issues/new?labels=enhancement&title=NPM/JSR%20Package%20Support";
+const GITHUB_NPM_JSR_ISSUE_URL = "https://github.com/requestly/requestly/issues/3948";
+
+const LARGE_SCRIPT_LINE_THRESHOLD = 10000;
 
 export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
   open,
   onOpenChange,
   onPackageSelect,
   children,
+  scriptLineCount = 0,
 }) => {
   const [filter, setFilter] = useState<FilterKey>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,6 +106,17 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
 
   const isComingSoon = filter === "npm" || filter === "jsr";
   const hasNoResults = !isComingSoon && filteredPackages.length === 0 && searchQuery.trim();
+  const isLargeScript = scriptLineCount > LARGE_SCRIPT_LINE_THRESHOLD;
+
+  const largeScriptWarning = isLargeScript && (
+    <Alert
+      type="warning"
+      icon={<MdOutlineWarningAmber />}
+      showIcon
+      message={`This script is over ${LARGE_SCRIPT_LINE_THRESHOLD.toLocaleString()} lines. Importing packages may be slow or temporarily freeze the editor.`}
+      className="library-picker-warning"
+    />
+  );
 
   const packageList = (
     <div className="library-picker-listing">
@@ -184,6 +197,7 @@ export const LibraryPickerPopover: React.FC<LibraryPickerPopoverProps> = ({
           popupClassName="library-picker-filter-dropdown"
         />
       </div>
+      {largeScriptWarning}
       <div className="library-picker-content">
         {isComingSoon && comingSoonState}
         {hasNoResults && emptyState}
