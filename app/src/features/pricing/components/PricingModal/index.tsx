@@ -40,8 +40,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const dispatch = useDispatch();
 
   const [duration, setDuration] = useState(planDuration || PRICING.DURATION.ANNUALLY);
-  const [stripeClientSecret, setStripeClientSecret] = useState(null);
-  const [stripeError, setStripeError] = useState(null);
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
+  const [stripeError, setStripeError] = useState<Error | null>(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
@@ -51,7 +51,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     isSafariBrowser() ? PRICING.PRODUCTS.API_CLIENT : PRICING.PRODUCTS.HTTP_RULES
   );
 
-  const tableRef = useRef(null);
+  const tableRef = useRef<HTMLDivElement>(null!);
 
   const handleSubscribe = useCallback(
     (planName: string) => {
@@ -95,7 +95,11 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
   const checkIfScrollable = useCallback(() => {
     if (tableRef.current) {
-      const isScrollable = tableRef.current.scrollWidth > tableRef.current.clientWidth;
+      const isScrollable = !!(
+        tableRef.current?.scrollWidth &&
+        tableRef.current?.clientWidth &&
+        tableRef.current.scrollWidth > tableRef.current.clientWidth
+      );
       setIsTableScrollable(isScrollable);
       tableRef.current.scrollLeft ? setIsTableScrolledToRight(true) : setIsTableScrolledToRight(false);
     }
@@ -122,11 +126,11 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     return () => {
       window.removeEventListener("resize", checkIfScrollable);
     };
-  }, []);
+  }, [checkIfScrollable]);
 
   useEffect(() => {
     checkIfScrollable();
-  }, [activeProduct]);
+  }, [activeProduct, checkIfScrollable]);
 
   return (
     <Modal

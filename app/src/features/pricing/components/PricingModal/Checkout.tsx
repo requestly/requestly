@@ -16,8 +16,8 @@ import PATHS from "config/constants/sub/paths";
 import { trackCheckoutCompleted } from "modules/analytics/events/misc/business/checkout";
 
 interface CheckoutProps {
-  clientSecret: string;
-  stripeError: Error;
+  clientSecret: string | null;
+  stripeError: Error | null;
   isLoading: boolean;
   onCancel: () => void;
   toggleModal: () => void;
