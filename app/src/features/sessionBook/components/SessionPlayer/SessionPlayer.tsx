@@ -26,6 +26,7 @@ import { useHasChanged } from "hooks";
 import PATHS from "config/constants/sub/paths";
 import { SessionTrimmer } from "features/sessionBook/screens/DraftSessionScreen/components/SessionTrimmer/SessionTrimmer";
 import "./sessionPlayer.scss";
+import rrwebPlayer from "rrweb-player";
 
 interface SessionPlayerProps {
   onPlayerTimeOffsetChange: (timeOffset: number) => void;
@@ -37,7 +38,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const attributes = useSelector(getSessionRecordingAttributes);
   const startTime = attributes?.startTime;
 
-  const [player, setPlayer] = useState(null);
+  const [player, setPlayer] = useState<rrwebPlayer | null>(null);
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
   const [playerTimeOffset, setPlayerTimeOffset] = useState(0);
   const [isSkipInactiveEnabled, setIsSkipInactiveEnabled] = useState(true);
@@ -51,7 +52,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const currentTimeRef = useRef<number>(0);
   const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
-  const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const skippingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const trimmedSessionData = useSelector(getTrimmedSessionData);
   const hasSessionTrimmedDataChanged = useHasChanged(trimmedSessionData);
   const isDraftSession = useMemo(() => location.pathname.includes(PATHS.SESSIONS.DRAFT.INDEX), [location.pathname]);
