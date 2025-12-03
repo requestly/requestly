@@ -1,0 +1,116 @@
+import { useMemo } from "react";
+import React from "react";
+import { VariableScope } from "backend/environment/types";
+import { ScopeOption } from "../types";
+import { useActiveEnvironment } from "features/apiClient/hooks/useActiveEnvironment.hook";
+import { MdOutlineCategory } from "@react-icons/all-files/md/MdOutlineCategory";
+import { BiNote } from "@react-icons/all-files/bi/BiNote";
+import { BsGlobeCentralSouthAsia } from "@react-icons/all-files/bs/BsGlobeCentralSouthAsia";
+import { MdHorizontalSplit } from "@react-icons/all-files/md/MdHorizontalSplit";
+import { useContextId } from "features/apiClient/contexts/contextId.context";
+import { NoopContextId } from "features/apiClient/store/apiClientFeatureContext/apiClientFeatureContext.store";
+
+interface UseScopeOptionsResult {
+  scopeOptions: ScopeOption[];
+  defaultScope: VariableScope;
+}
+
+const createIconWithWrapper = (
+  IconComponent: React.ComponentType<any>,
+  iconColor: string,
+  bgColor: string = "transparent"
+) => {
+  return React.createElement(
+    "div",
+    {
+      style: {
+        width: "20px",
+        height: "16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: bgColor,
+        borderRadius: "4px",
+      },
+    },
+    React.createElement(IconComponent, {
+      style: { color: iconColor, height: "12px", width: "12px" },
+    })
+  );
+};
+
+export const getScopeIcon = (scope: VariableScope): React.ReactNode => {
+  switch (scope) {
+    case VariableScope.ENVIRONMENT:
+      return createIconWithWrapper(
+        MdHorizontalSplit,
+        "var(--requestly-color-primary-text)",
+        "var(--requestly-color-primary-darker)"
+      );
+    case VariableScope.COLLECTION:
+      return createIconWithWrapper(BiNote, "var(--requestly-color-text-subtle)", "var(--requestly-color-surface-2)");
+    case VariableScope.GLOBAL:
+      return createIconWithWrapper(
+        BsGlobeCentralSouthAsia,
+        "var(--requestly-color-success-text)",
+        "var(--requestly-color-success-darker)"
+      );
+    case VariableScope.RUNTIME:
+      return createIconWithWrapper(
+        MdOutlineCategory,
+        "var(--requestly-color-text-subtle)",
+        "var(--requestly-color-warning-darker)"
+      );
+    default:
+      return null;
+  }
+};
+
+export const useScopeOptions = (collectionId?: string): UseScopeOptionsResult => {
+  const activeEnvironment = useActiveEnvironment();
+  const contextId = useContextId();
+  const isNoopContext = contextId === NoopContextId;
+
+  return useMemo(() => {
+    const options: ScopeOption[] = [
+      {
+        value: VariableScope.ENVIRONMENT,
+        label: activeEnvironment ? `Current environment` : "No Active Environment",
+        icon: getScopeIcon(VariableScope.ENVIRONMENT),
+        disabled: !activeEnvironment,
+      },
+      {
+        value: VariableScope.COLLECTION,
+        label: "Current collection",
+        icon: getScopeIcon(VariableScope.COLLECTION),
+        disabled: !collectionId,
+      },
+      {
+        value: VariableScope.GLOBAL,
+        label: "Global",
+        icon: getScopeIcon(VariableScope.GLOBAL),
+        disabled: isNoopContext,
+      },
+      {
+        value: VariableScope.RUNTIME,
+        label: "Runtime variables",
+        icon: getScopeIcon(VariableScope.RUNTIME),
+        disabled: false,
+      },
+    ];
+
+    // Determine default scope based on availability
+    let defaultScope: VariableScope;
+    if (isNoopContext) {
+      defaultScope = VariableScope.RUNTIME;
+    } else if (activeEnvironment) {
+      defaultScope = VariableScope.ENVIRONMENT;
+    } else if (collectionId) {
+      defaultScope = VariableScope.COLLECTION;
+    } else {
+      defaultScope = VariableScope.GLOBAL;
+    }
+
+    return { scopeOptions: options, defaultScope };
+  }, [activeEnvironment, collectionId, isNoopContext]);
+};
