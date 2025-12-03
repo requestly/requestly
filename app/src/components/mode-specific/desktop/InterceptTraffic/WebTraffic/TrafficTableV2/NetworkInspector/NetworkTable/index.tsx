@@ -24,9 +24,9 @@ interface Props {
   logs: any;
   onRow: Function;
   isStaticPreview: boolean;
-  setSelectedMockRequests?: Function;
-  showMockRequestSelector?: boolean;
-  selectedMockRequests?: Record<string, any>;
+  setSelectedMockRequests: Function;
+  showMockRequestSelector: boolean;
+  selectedMockRequests: Record<string, any>;
 }
 
 const NetworkTable: React.FC<Props> = ({
@@ -37,12 +37,12 @@ const NetworkTable: React.FC<Props> = ({
   showMockRequestSelector,
   selectedMockRequests,
 }) => {
-  const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
+  const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>({} as RQNetworkLog);
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const isConnectedAppsTourCompleted = useSelector(getIsConnectedAppsTourCompleted);
-  const apiClientRequestForSelectedRowRef = useRef<APIClientRequest>(null);
+  const apiClientRequestForSelectedRowRef = useRef<APIClientRequest | null>(null);
 
   const onReplayRequest = useCallback(() => {
     apiClientRequestForSelectedRowRef.current = {
