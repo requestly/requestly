@@ -86,7 +86,7 @@ const ApiClientFeatureContainer: React.FC = () => {
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={HTML5Backend} context={window}>
       <TabServiceProvider>
         <LocalSyncRefreshHandler />
         <div className="api-client-container">
