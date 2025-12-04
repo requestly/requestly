@@ -27,10 +27,10 @@ export const OtherBillingTeamDetails: React.FC = () => {
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
   const [isPlanDetailsPopoverOpen, setIsPlanDetailsPopoverOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const hasJoinedAnyTeam = useMemo(
-    () => billingTeams.some((team) => user?.details?.profile?.uid && user?.details?.profile?.uid in team.members),
-    [billingTeams, user?.details?.profile?.uid]
-  );
+  const hasJoinedAnyTeam = useMemo(() => billingTeams.some((team) => user?.details?.profile?.uid in team.members), [
+    billingTeams,
+    user?.details?.profile?.uid,
+  ]);
   const hasBillingIdChanged = useHasChanged(billingId);
   const [isLoading, setIsLoading] = useState(false);
   const isAcceleratorTeam = billingTeamDetails?.isAcceleratorTeam;
@@ -49,13 +49,13 @@ export const OtherBillingTeamDetails: React.FC = () => {
     })
       .then(() => {
         setIsLoading(true);
-        toast.success(`${billingTeams[0].name} joined successfully!`);
+        toast.success(`${billingTeamDetails.name} joined successfully!`);
       })
       .catch((err) => {
         setIsLoading(true);
         toast.error("Failed to join the team! Please try again, or contact support if the problem persists");
       });
-  }, [billingTeams, user?.details?.profile?.email]);
+  }, [billingTeamDetails.name, billingTeams, user.details.profile.email]);
 
   const columns = useMemo(
     () => [
@@ -113,10 +113,6 @@ export const OtherBillingTeamDetails: React.FC = () => {
       setIsPlanDetailsPopoverOpen(false);
     }
   }, [hasBillingIdChanged]);
-
-  if (!billingTeamDetails) {
-    return null;
-  }
 
   return (
     <>
@@ -217,7 +213,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
         <RequestBillingTeamAccessModal
           isOpen={isRequestModalOpen}
           onClose={() => setIsRequestModalOpen(false)}
-          billingId={billingId!}
+          billingId={billingId}
         />
       )}
     </>

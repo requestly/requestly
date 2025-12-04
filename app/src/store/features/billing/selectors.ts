@@ -6,20 +6,12 @@ export const getAvailableBillingTeams = (state: RootState): BillingTeamDetails[]
   return state[ReducerKeys.BILLING].availableBillingTeams;
 };
 
-export const getBillingTeamById = (id: string | undefined) => (state: RootState): BillingTeamDetails | undefined => {
-  if (!id) {
-    return;
-  }
-
+export const getBillingTeamById = (id: string) => (state: RootState): BillingTeamDetails | undefined => {
   const allAvailableBillingTeams = getAvailableBillingTeams(state);
   return allAvailableBillingTeams.find((billingTeam) => billingTeam.id === id);
 };
 
-export const getBillingTeamMembers = (billingId: string | undefined) => (state: RootState): Record<string, any> => {
-  if (!billingId) {
-    return {};
-  }
-
+export const getBillingTeamMembers = (billingId: string) => (state: RootState): Record<string, any> => {
   return state[ReducerKeys.BILLING].billingTeamMembers[billingId];
 };
 
