@@ -5,7 +5,7 @@ import { billingActions } from "store/features/billing/slice";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import Logger from "lib/logger";
 
-export const useCheckCurrentTeamAccess = (billingId: string | undefined) => {
+export const useCheckCurrentTeamAccess = (billingId: string) => {
   const [isTeamMember, setIsTeamMember] = useState(false);
   const dispatch = useDispatch();
   const billingTeams = useSelector(getAvailableBillingTeams);
@@ -33,10 +33,6 @@ export const useCheckCurrentTeamAccess = (billingId: string | undefined) => {
         });
     }
   }, [billingId, dispatch, billingTeams]);
-
-  if (!billingId) {
-    return false;
-  }
 
   return isTeamMember;
 };
