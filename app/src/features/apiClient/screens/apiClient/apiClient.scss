@@ -73,7 +73,8 @@
 
   .api-client-body {
     flex: auto;
-    height: calc(100% - 43px);
+    height: 100%;
+
     min-height: 0;
     position: sticky;
     overflow: hidden;
