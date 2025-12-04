@@ -1,6 +1,6 @@
 import { Collapse } from "antd";
 import { DetailsTab } from "@requestly-ui/resource-table";
-import { HarEntry, NetworkEntry } from "./types";
+import { NetworkEntry } from "./types";
 import { NetworkLogProperty } from "./components/NetworkLogProperty";
 import { NetworkStatusField } from "./components/NetworkStatusField";
 import { NetworkPayload } from "./components/NetworkPayload";
@@ -11,7 +11,7 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
       key: "headers",
       label: "Headers",
       render: (log: NetworkLog) => {
-        const harEntry = networkEntrySelector(log) as HarEntry;
+        const harEntry = networkEntrySelector(log);
         return (
           <Collapse defaultActiveKey={[0, 1, 2]}>
             <Collapse.Panel header="General" key={0}>
@@ -66,16 +66,16 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
 
         return (
           <Collapse defaultActiveKey={[0, 1]}>
-            {harEntry.request && harEntry.request.queryString.length > 0 && (
+            {harEntry.request.queryString.length > 0 && (
               <Collapse.Panel header="Query String" key={0}>
-                {harEntry.request?.queryString?.map(({ name, value }) => (
+                {harEntry.request.queryString.map(({ name, value }) => (
                   <NetworkLogProperty key={name} label={name}>
                     {value}
                   </NetworkLogProperty>
                 ))}
               </Collapse.Panel>
             )}
-            {harEntry.request?.postData && harEntry.request.postData.text && (
+            {harEntry.request.postData && harEntry.request.postData.text && (
               <Collapse.Panel header="Request Payload" key={1}>
                 <NetworkPayload payload={harEntry.request.postData.text} />
               </Collapse.Panel>
@@ -97,7 +97,7 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
               <NetworkLogProperty label="Response Time">{responseTimeInSeconds} sec</NetworkLogProperty>
             )}
 
-            <NetworkPayload label="Body" payload={harEntry.response?.content?.text} />
+            <NetworkPayload label="Body" payload={harEntry.response.content.text} />
           </>
         );
       },
