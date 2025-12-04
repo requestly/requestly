@@ -160,7 +160,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       });
     }
 
-    if (!log.requestShellCurl) {
+    if (!log?.requestShellCurl) {
       menuItems.splice(0, 1);
     }
 
