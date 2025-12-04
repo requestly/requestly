@@ -100,7 +100,7 @@ export const ContextualCollectionsSidebar: React.FC<{
       selectedRecordsAcrossWorkspaces.current[contextId].recordIds = recordIds;
 
       const isAll = Object.values(selectedRecordsAcrossWorkspaces.current ?? {}).every((value) => {
-        return value?.isAllRecordsSelected;
+        return value.isAllRecordsSelected;
       });
 
       setIsAllRecordsSelected(isAll);
@@ -131,7 +131,7 @@ export const ContextualCollectionsSidebar: React.FC<{
     try {
       const promises = Object.entries(selectedRecordsAcrossWorkspaces.current).map(([ctxId, value]) => {
         const context = getApiClientFeatureContext(ctxId);
-        return duplicateRecords(context, { recordIds: value?.recordIds });
+        return duplicateRecords(context, { recordIds: value.recordIds });
       });
 
       // TODO: TBD, what to do in partial fail cases?
@@ -153,7 +153,7 @@ export const ContextualCollectionsSidebar: React.FC<{
 
     if (workspacesWithSelectedRecords.length === 1) {
       const [ctxId, value] = workspacesWithSelectedRecords[0];
-      return [ctxId, getProcessedRecords(ctxId, value?.recordIds)];
+      return [ctxId, getProcessedRecords(ctxId, value.recordIds)];
     }
 
     return [undefined, []];

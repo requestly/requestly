@@ -7,9 +7,9 @@ interface Props {
   logs: any;
   onRow: Function;
   isStaticPreview: boolean;
-  setSelectedMockRequests: Function;
-  showMockRequestSelector: boolean;
-  selectedMockRequests: Record<string, any>;
+  setSelectedMockRequests?: Function;
+  showMockRequestSelector?: boolean;
+  selectedMockRequests?: Record<string, any>;
 }
 
 const NetworkInspector: React.FC<Props> = (props) => {
