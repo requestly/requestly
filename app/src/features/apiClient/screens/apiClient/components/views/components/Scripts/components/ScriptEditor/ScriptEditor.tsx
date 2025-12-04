@@ -43,16 +43,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
           <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
             Pre-request
             <RequestTabLabelIndicator
-              count={scripts?.preRequest.length && scripts?.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest ? 1 : 0}
+              count={scripts?.preRequest && scripts?.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest ? 1 : 0}
               showDot={true}
             />
           </Radio.Button>
           <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.POST_RESPONSE}>
             Post-response
             <RequestTabLabelIndicator
-              count={
-                scripts?.postResponse.length && scripts.postResponse !== DEFAULT_SCRIPT_VALUES.postResponse ? 1 : 0
-              }
+              count={scripts?.postResponse && scripts.postResponse !== DEFAULT_SCRIPT_VALUES.postResponse ? 1 : 0}
               showDot={true}
             />
           </Radio.Button>
