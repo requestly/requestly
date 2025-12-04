@@ -28,11 +28,16 @@
     "lint": "eslint --fix --ext .js,.jsx .",
     "type-check": "tsc --noEmit",
     "build": "vite build",
-    "preview": "npm run build && vite preview",
+    "build:emulator": "vite build --mode dev-emulator",
+    "preview": "npm run build && vite preview --port 3000",
+    "preview:emulator": "npm run build:emulator && vite preview --port 3000",
+    "dev": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"vite\"",
+    "dev:emulator": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"vite --mode dev-emulator\"",
     "start": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"vite\"",
-    "dev": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"cross-env REACT_APP_ENV=DEV vite\"",
-    "emulated-dev": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"cross-env REACT_APP_ENV=EMULATOR vite --mode dev-emulator\"",
-    "emulated-start": "cross-env REACT_APP_ENV=EMULATOR vite --mode dev-emulator"
+    "start:emulator": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"vite --mode dev-emulator\"",
+    "//": "****Deprecated****",
+    "emulated-dev": "concurrently --kill-others --names \"@requestly/shared, @requestly/app\" \"cd ../shared && npm run watch\" \"vite --mode dev-emulator\"",
+    "emulated-start": "vite --mode dev-emulator"
   },
   "browserslist": [
     ">0.2%",
