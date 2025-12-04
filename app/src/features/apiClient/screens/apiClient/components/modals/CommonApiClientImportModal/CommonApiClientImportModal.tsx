@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "antd";
 import { CommonApiClientImporter } from "../../CommonApiClientImporter/CommonApiClientImporter";
-import { ApiClientImporterMethod } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod } from "alternative-importers-beta-sd";
 import { ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
 
 interface Props {

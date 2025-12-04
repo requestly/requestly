@@ -20,6 +20,17 @@ import { useLocation } from "react-router-dom";
 import { trackSampleRuleToggled } from "features/rules/analytics";
 import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { useRBAC } from "features/rbac";
+
+const getRuleStatusMessage = (newStatus, isValidCreatePermission) => {
+  const isActive = newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
+
+  if (isValidCreatePermission) {
+    return isActive ? "Rule saved and activated" : "Rule saved and deactivated";
+  }
+
+  return isActive ? "Rule activated" : "Rule deactivated";
+};
 
 const Status = ({
   mode,
@@ -33,6 +44,10 @@ const Status = ({
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+
+  // to Check if user has permission to create/save rules (viewers don't have this permission)
+  const { validatePermission } = useRBAC();
+  const { isValidPermission } = validatePermission("http_rule", "create");
 
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
@@ -52,12 +67,14 @@ const Status = ({
     if (ruleData.isSample && !isCreateMode) {
       setCurrentlySelectedRule(dispatch, ruleData);
       saveRule(appMode, dispatch, ruleData)
-        .then(() =>
-          newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-            ? toast.success("Rule activated")
-            : toast.success("Rule deactivated")
-        )
-        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
+        .then(() => {
+          // for Sample rules always show simple messages
+          toast.success(getRuleStatusMessage(newValue, false));
+        })
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
+        .catch((error) => {
+          toast.error("Failed to update rule status. Please try again.");
+        });
       return;
     }
 
@@ -75,15 +92,23 @@ const Status = ({
     // Toggling the status also saves the rule by running all the validations. Any unsaved change is saved when the status is toggled.
     !isCreateMode &&
       saveRule(appMode, dispatch, syntaxValidatedAndTransformedRule)
-        .then(() =>
-          newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-            ? toast.success("Rule saved and activated")
-            : toast.success("Rule saved and deactivated")
-        )
-        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
+        .then(() => {
+          // Showing different messages based on user permissions
+          toast.success(getRuleStatusMessage(newValue, isValidPermission));
+        })
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false))
+        .catch((error) => {
+          toast.error("Failed to update rule status. Please try again.");
+        });
   };
 
-  const stableChangeRuleStatus = useCallback(changeRuleStatus, [appMode, currentlySelectedRuleData, dispatch, mode]);
+  const stableChangeRuleStatus = useCallback(changeRuleStatus, [
+    appMode,
+    currentlySelectedRuleData,
+    dispatch,
+    mode,
+    isValidPermission,
+  ]);
 
   const toggleRuleStatus = (event) => {
     // event.preventDefault();

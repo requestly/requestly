@@ -3,7 +3,7 @@ import { FilePicker } from "components/common/FilePicker";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { Col } from "antd";
 import { RQAPI, ApiClientImporterType } from "@requestly/shared/types/entities/apiClient";
-import { ApiClientImporterMethod, ApiClientImporterOutput } from "@requestly/alternative-importers";
+import { ApiClientImporterMethod, ApiClientImporterOutput } from "alternative-importers-beta-sd";
 import { EnvironmentData } from "backend/environment/types";
 import { toast } from "utils/Toast";
 import { getApiClientFeatureContext } from "features/apiClient/commands/store.utils";
