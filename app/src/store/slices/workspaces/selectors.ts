@@ -15,7 +15,7 @@ export const getWorkspaceById = (id?: Workspace["id"]) => (state: RootState) =>
 
 export const getAllWorkspaces = (state: RootState) => workspacesEntitySelectors.selectAll(state);
 
-export const getActiveWorkspaceId = (state: RootState): string | null => getActiveWorkspaceIds(state)?.[0] ?? null;
+export const getActiveWorkspaceId = (state: RootState): string => getActiveWorkspaceIds(state)?.[0];
 
 export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
