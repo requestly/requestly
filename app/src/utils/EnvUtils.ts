@@ -17,11 +17,10 @@ const getNodeEnv = () => {
   return process.env.NODE_ENV as NODE_ENV;
 };
 
-console.log("getBackendEnv()", getBackendEnv());
-console.log("VITE_BACKEND_ENV", process.env.VITE_BACKEND_ENV);
-console.log("getBuildEnv()", getNodeEnv());
-console.log("VITE_BACKEND_BASE_URL", process.env.VITE_BACKEND_BASE_URL);
-console.log("MODE", import.meta.env.MODE);
+window.__rq_debug__ = window.__rq_debug__ || {};
+window.__rq_debug__.backendEnv = getBackendEnv();
+window.__rq_debug__.nodeEnv = getNodeEnv();
+window.__rq_debug__.mode = import.meta?.env?.MODE;
 
 /* When running local emulator */
 export const isBackendEnvEmulator = (): boolean => {
