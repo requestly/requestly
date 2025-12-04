@@ -24,7 +24,7 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
   const filtered = tabList.filter((tab) => (tab.title ?? "").toLowerCase().includes(query.toLowerCase()));
   const unSavedTabs = useMemo(() => {
     return tabList.filter((tab) => tab.unsaved);
-  }, [tabs.size]);
+  }, [tabList]);
 
   useEffect(() => {
     if (inputRef.current) {

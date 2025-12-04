@@ -27,11 +27,7 @@ export const CloseAllTabsModal = ({
       <RQButton type="secondary" className="text-bold" onClick={onClose}>
         Cancel
       </RQButton>
-      <RQButton
-        type="danger"
-        className="close-without-saving-button"
-        onClick={() => closeAllOpenTabs("close-with-close-modal")}
-      >
+      <RQButton type="danger" className="close-without-saving-button" onClick={() => closeAllOpenTabs("force")}>
         Discard and close tabs
       </RQButton>
     </div>

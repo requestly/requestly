@@ -20,7 +20,7 @@ export const CloseAllTabsButton: React.FC<Props> = ({ unSavedTabsCount, closeAll
     if (unSavedTabsCount > 1) {
       setShowUnSavedModal(true);
     } else {
-      closeAllOpenTabs("close-without-close-modal");
+      closeAllOpenTabs("normal");
     }
   };
 

@@ -58,8 +58,8 @@ export const TabsContainer: React.FC = () => {
     [setActiveTab]
   );
 
-  const closeAllOpenTabs = (type: string) => {
-    if (type === "close-with-close-modal") {
+  const closeAllOpenTabs = (mode: string) => {
+    if (mode === "force") {
       closeAllTabs(true); // Skip unsaved prompt when closing all tabs
     } else {
       closeAllTabs(); // Normal close all tabs
