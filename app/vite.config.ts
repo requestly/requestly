@@ -23,7 +23,6 @@ const config = async ({ mode }) => {
       "process.env": {
         ...loadEnv(mode, process.cwd(), "VITE_"),
         NODE_ENV: process.env.NODE_ENV,
-        REACT_APP_ENV: process.env.REACT_APP_ENV,
         GITHUB_SHA: process.env.GITHUB_SHA,
       },
     },
