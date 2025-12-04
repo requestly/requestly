@@ -49,6 +49,7 @@ type TabActions = {
   resetPreviewTab: () => void;
   setPreviewTab: (tabId: TabId) => void;
   setActiveTab: (tabId: TabId) => void;
+  reorderTabs: (draggedTabId: TabId, targetTabId: TabId) => void;
   _generateNewTabId: () => TabId;
   incrementVersion: () => void;
   getTabIdBySource: (sourceId: SourceId, sourceName: SourceName) => TabId | undefined;
@@ -377,6 +378,23 @@ const createTabServiceStore = () => {
           }
 
           return tabs.get(tabId)?.getState();
+        },
+
+        reorderTabs(draggedId, targetId) {
+          const { tabs } = get();
+
+          const arr = Array.from(tabs.entries());
+
+          const from = arr.findIndex(([id]) => id === draggedId);
+          const to = arr.findIndex(([id]) => id === targetId);
+
+          if (from === -1 || to === -1 || from === to) return;
+
+          const [moved] = arr.splice(from, 1);
+
+          arr.splice(to, 0, moved);
+
+          set({ tabs: new Map(arr) });
         },
       }),
       {
