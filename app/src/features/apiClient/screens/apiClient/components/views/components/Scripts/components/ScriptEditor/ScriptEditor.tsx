@@ -146,7 +146,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         if (result.status === RQAPI.ExecutionStatus.SUCCESS) {
           aiTestsExcutionCallback(result.artifacts.testResults);
           clear();
-        } else throw new Error(result.error.message);
+        } else throw new Error(result.error?.message || "Something went wrong while running tests");
       })
       .catch((error) => {
         toast.error(error.message || "Something went wrong while running tests");
