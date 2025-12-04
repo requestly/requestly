@@ -7,6 +7,7 @@ import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import "./scriptEditor.scss";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
+import { RequestTabLabelIndicator } from "../../../request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 
 interface ScriptEditorProps {
   scripts: RQAPI.ApiEntry["scripts"];
@@ -41,9 +42,17 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         >
           <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
             Pre-request
+            <RequestTabLabelIndicator
+              count={scripts?.preRequest && scripts?.preRequest !== DEFAULT_SCRIPT_VALUES.preRequest ? 1 : 0}
+              showDot={true}
+            />
           </Radio.Button>
           <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.POST_RESPONSE}>
             Post-response
+            <RequestTabLabelIndicator
+              count={scripts?.postResponse && scripts.postResponse !== DEFAULT_SCRIPT_VALUES.postResponse ? 1 : 0}
+              showDot={true}
+            />
           </Radio.Button>
         </Radio.Group>
         <Tooltip title="Learn more about using scripts in API requests" showArrow={false} placement="right">
@@ -54,7 +63,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({ scripts, onScriptsCh
         </Tooltip>
       </>
     );
-  }, [scriptType]);
+  }, [scriptType, scripts]);
 
   return (
     <div className=" api-client-code-editor-container api-client-script-editor-container">
