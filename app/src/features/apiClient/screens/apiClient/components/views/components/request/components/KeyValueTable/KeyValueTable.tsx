@@ -16,6 +16,7 @@ interface KeyValueTableProps {
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: ScopedVariables;
   checkInvalidCharacter?: boolean;
+  enableHeaderSuggestions?: boolean;
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({
@@ -23,6 +24,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   variables,
   onChange,
   checkInvalidCharacter = false,
+  enableHeaderSuggestions = false,
 }) => {
   const createEmptyPair = useCallback(
     () => ({
@@ -118,6 +120,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           title: "key",
           variables,
           checkInvalidCharacter,
+          enableHeaderSuggestions,
           handleUpdatePair,
         }),
       },
