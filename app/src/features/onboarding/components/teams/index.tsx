@@ -30,7 +30,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const user = useSelector(getUserAuthDetails);
-  const [pendingInvites, setPendingInvites] = useState(null);
+  const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleSwitchWorkspace = useCallback(
@@ -67,7 +67,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         );
       }
     },
-    [dispatch]
+    [dispatch, navigate]
   );
 
   useEffect(() => {
