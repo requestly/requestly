@@ -28,14 +28,14 @@ const PlayerFrameOverlay: React.FC<{ playerContainer: HTMLDivElement; playerStat
   playerContainer,
   playerState,
 }) => {
-  const [overlayContainer, setOverlayContainer] = useState<Element | null>(null);
+  const [overlayContainer, setOverlayContainer] = useState<Element>(null);
 
   useEffect(() => {
     if (playerContainer && !playerContainer.querySelector(".overlay-frame")) {
       const overlayFrame = document.createElement("div");
       overlayFrame.className = "overlay-frame";
       const rr_player = playerContainer.querySelector(".replayer-wrapper");
-      setOverlayContainer(rr_player?.insertAdjacentElement("afterbegin", overlayFrame) ?? null);
+      setOverlayContainer(rr_player.insertAdjacentElement("afterbegin", overlayFrame));
     }
   }, [playerContainer]);
 
