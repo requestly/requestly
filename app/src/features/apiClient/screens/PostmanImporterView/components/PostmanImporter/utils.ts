@@ -261,7 +261,7 @@ export const processRequestHeaders = (request: any): RequestHeadersProcessingRes
         key: header.key,
         value: header.value,
         isEnabled: !header?.disabled,
-        description: header?.description,
+        description: header?.description || "",
       })
     ) ?? [];
 
@@ -282,7 +282,7 @@ const createApiRecord = (
       key: query.key,
       value: query.value,
       isEnabled: true,
-      description: query.description,
+      description: query.description || "",
     })) ?? [];
 
   const { requestBody, contentType } = processRequestBody(request);
