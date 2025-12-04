@@ -917,7 +917,7 @@ const HttpClientView: React.FC<Props> = ({
   );
 };
 
-const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC => {
+const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<Props> => {
   const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
     const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
