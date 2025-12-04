@@ -50,7 +50,7 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
         onChange={(e) => onUserQueryChange(e.target.value)}
         autoSize={{ minRows: 2, maxRows: 8 }}
         onKeyDown={(e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !isLoading) {
             onGenerateClick(userQuery);
           }
         }}
