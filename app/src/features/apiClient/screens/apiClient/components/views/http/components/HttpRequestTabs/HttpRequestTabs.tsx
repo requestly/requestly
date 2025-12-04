@@ -52,11 +52,10 @@ const HttpRequestTabs: React.FC<Props> = ({
 
   const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
-  const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
+  const queryParams = useQueryParamStore((state) => state.queryParams);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
-  
 
   const items = useMemo(() => {
     return [
@@ -93,7 +92,11 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          <RequestTabLabel
+            label="Body"
+            count={requestEntry.request.body?.length ? 1 : 0}
+            showDot={isRequestBodySupported}
+          />
         ),
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
@@ -173,6 +176,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     handleAuthChange,
     isRequestBodySupported,
     queryParams.length,
+    pathVariables.length,
     requestEntry.auth,
     requestEntry.request.body,
     requestEntry.request.bodyContainer,
@@ -181,7 +185,6 @@ const HttpRequestTabs: React.FC<Props> = ({
     requestEntry.scripts,
     setContentType,
     setRequestEntry,
-    pathVariables.length,
     focusPostResponseScriptEditor,
     scriptEditorVersion,
   ]);
