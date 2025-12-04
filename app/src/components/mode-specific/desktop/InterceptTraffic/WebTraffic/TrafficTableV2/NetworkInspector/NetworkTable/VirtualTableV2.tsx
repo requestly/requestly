@@ -138,19 +138,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
           onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
         >
           {header}
-          {selectedRowData ? (
-            <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
-              <Table.Body id="vtbody">
-                {/* Hack to fix alternate colors flickering due to virtualization*/}
-                {items[0]?.index % 2 === 0 ? null : <tr></tr>}
-
-                {items.map((virtualRow) => {
-                  const log = logs[virtualRow.index];
-                  return renderLogRow(log, virtualRow.index);
-                })}
-              </Table.Body>
-            </ContextMenu>
-          ) : (
+          <ContextMenu log={selectedRowData ?? ({} as RQNetworkLog)} onReplayRequest={onReplayRequest}>
             <Table.Body id="vtbody">
               {/* Hack to fix alternate colors flickering due to virtualization*/}
               {items[0]?.index % 2 === 0 ? null : <tr></tr>}
@@ -160,7 +148,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
                 return renderLogRow(log, virtualRow.index);
               })}
             </Table.Body>
-          )}
+          </ContextMenu>
         </Table>
         {newLogsButton}
       </div>
