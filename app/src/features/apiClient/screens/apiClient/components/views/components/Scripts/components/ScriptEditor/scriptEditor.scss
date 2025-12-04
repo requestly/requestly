@@ -96,3 +96,12 @@
     padding-top: 4px;
   }
 }
+
+.request-tab-dot-success {
+  display: inline-block;
+  margin-left: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--requestly-color-success);
+}

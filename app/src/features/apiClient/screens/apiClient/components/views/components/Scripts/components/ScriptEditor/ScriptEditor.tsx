@@ -18,6 +18,7 @@ import { toast } from "utils/Toast";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { AITestGenerationError } from "../AI/types";
 import { globalActions } from "store/slices/global/slice";
+import { RequestTabLabelIndicator } from "../../../request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import "./scriptEditor.scss";
 
 const TestGenerationOutputSchema = z.object({
@@ -55,14 +56,14 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const scripts = entry?.scripts || {
+  const defaultScripts = {
     preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
     postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
   };
 
-  const activeScriptType = scripts?.[RQAPI.ScriptType.PRE_REQUEST]
+  const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
-    : scripts?.[RQAPI.ScriptType.POST_RESPONSE]
+    : entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]
     ? RQAPI.ScriptType.POST_RESPONSE
     : RQAPI.ScriptType.PRE_REQUEST;
 
@@ -74,7 +75,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const [negativeFeedback, setNegativeFeedback] = useState<string | null>(null);
   const [isScriptExecutionInProgress, setIsScriptExecutionInProgress] = useState(false);
 
-  const hasPostResponseScript = Boolean(scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
+  const hasPostResponseScript = Boolean(entry?.scripts?.[RQAPI.ScriptType.POST_RESPONSE]);
 
   const isPopoverOpenRef = useRef(isGenerateTestPopoverOpen);
 
@@ -125,7 +126,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
   const handleAcceptAndRunTests = (onlyAccept: boolean) => {
     onScriptsChange({
-      preRequest: scripts?.preRequest || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
+      preRequest: entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST] || DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
       postResponse: object?.code?.content as string,
     });
 
@@ -135,7 +136,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     }
 
     setIsScriptExecutionInProgress(true);
-    const newEntry = { ...entry, scripts: { ...scripts, postResponse: object?.code?.content as string } };
+    const newEntry = {
+      ...entry,
+      scripts: { ...(entry?.scripts || defaultScripts), postResponse: object?.code?.content as string },
+    };
     httpRequestExecutor
       .rerun(requestId, newEntry as RQAPI.HttpApiEntry)
       .then((result) => {
@@ -158,83 +162,108 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     }
   }, [focusPostResponse, hasPostResponseScript]);
 
-  const scriptTypeOptions = useMemo(() => {
-    return (
-      <div className="api-client-script-editor-actions-container">
-        <span>
-          <Radio.Group
-            className="api-client-script-type-selector"
-            value={scriptType}
-            onChange={(e) => setScriptType(e.target.value)}
-            size="small"
-          >
-            <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
-              Pre-request
-            </Radio.Button>
-            <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.POST_RESPONSE}>
-              Post-response
-            </Radio.Button>
-          </Radio.Group>
-          <Tooltip
-            title="Learn more about using scripts in API requests"
-            showArrow={false}
-            placement="right"
-            color="#000"
-          >
-            <MdInfoOutline
-              className="api-client-script-type-selector__info-icon"
-              onClick={() => window.open("https://docs.requestly.com/general/api-client/scripts", "_blank")}
-            />
-          </Tooltip>
-        </span>
-        {isAITestsGenerationEnabled && (
-          <Tooltip
-            showArrow={false}
-            title={!entry?.response ? "Send the request first to generate tests from its response." : null}
-            placement="bottom"
-            color="#000"
-            overlayClassName="ai-generate-test-btn-tooltip"
-          >
-            <>
-              <GenerateTestsButton
-                hidden={scriptType !== RQAPI.ScriptType.POST_RESPONSE}
-                isLoading={isLoading}
-                isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
-                togglePopover={(open) => {
-                  setIsGenerateTestPopoverOpen(open);
-                  isPopoverOpenRef.current = open;
-                }}
-                onGenerateClick={(query) => {
-                  setNegativeFeedback(null);
-                  setIsTestsStreamingFinished(false);
-                  submit({ userQuery: query, apiRecord: entry });
-                }}
-                disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
-                onCancelClick={stop}
-                negativeFeedback={negativeFeedback}
+  const scriptTypeOptions = useMemo(
+    () => {
+      return (
+        <div className="api-client-script-editor-actions-container">
+          <span>
+            <Radio.Group
+              className="api-client-script-type-selector"
+              value={scriptType}
+              onChange={(e) => setScriptType(e.target.value)}
+              size="small"
+            >
+              <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.PRE_REQUEST}>
+                Pre-request
+                <RequestTabLabelIndicator
+                  count={
+                    entry?.scripts?.preRequest &&
+                    entry?.scripts?.preRequest !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST]
+                      ? 1
+                      : 0
+                  }
+                  showDot={true}
+                />
+              </Radio.Button>
+              <Radio.Button className="api-client-script-type-selector__btn" value={RQAPI.ScriptType.POST_RESPONSE}>
+                Post-response
+                <RequestTabLabelIndicator
+                  count={
+                    entry?.scripts?.postResponse &&
+                    entry?.scripts?.postResponse !== DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]
+                      ? 1
+                      : 0
+                  }
+                  showDot={true}
+                />
+              </Radio.Button>
+            </Radio.Group>
+            <Tooltip
+              title="Learn more about using scripts in API requests"
+              showArrow={false}
+              placement="right"
+              color="#000"
+            >
+              <MdInfoOutline
+                className="api-client-script-type-selector__info-icon"
+                onClick={() => window.open("https://docs.requestly.com/general/api-client/scripts", "_blank")}
               />
-            </>
-          </Tooltip>
-        )}
-      </div>
-    );
-  }, [
-    scriptType,
-    isGenerateTestPopoverOpen,
-    submit,
-    entry,
-    isLoading,
-    stop,
-    negativeFeedback,
-    isAITestsGenerationEnabled,
-  ]);
+            </Tooltip>
+          </span>
+          {isAITestsGenerationEnabled && (
+            <Tooltip
+              showArrow={false}
+              title={!entry?.response ? "Send the request first to generate tests from its response." : null}
+              placement="bottom"
+              color="#000"
+              overlayClassName="ai-generate-test-btn-tooltip"
+            >
+              <>
+                <GenerateTestsButton
+                  hidden={scriptType !== RQAPI.ScriptType.POST_RESPONSE}
+                  isLoading={isLoading}
+                  isGenerateTestPopoverOpen={isGenerateTestPopoverOpen}
+                  togglePopover={(open) => {
+                    setIsGenerateTestPopoverOpen(open);
+                    isPopoverOpenRef.current = open;
+                  }}
+                  onGenerateClick={(query) => {
+                    setNegativeFeedback(null);
+                    setIsTestsStreamingFinished(false);
+                    submit({ userQuery: query, apiRecord: entry });
+                  }}
+                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
+                  onCancelClick={stop}
+                  negativeFeedback={negativeFeedback}
+                />
+              </>
+            </Tooltip>
+          )}
+        </div>
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      scriptType,
+      isGenerateTestPopoverOpen,
+      submit,
+      entry,
+      isLoading,
+      stop,
+      negativeFeedback,
+      isAITestsGenerationEnabled,
+      entry?.scripts,
+    ]
+  );
 
   return (
     <div className="api-client-script-editor-container">
       <Editor
         key={`${scriptType}`}
-        value={scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
-        handleChange={(value: string) => onScriptsChange({ ...scripts, [scriptType]: value })}
+        value={entry?.scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType]}
+        handleChange={(value: string) =>
+          onScriptsChange({ ...(entry?.scripts || defaultScripts), [scriptType]: value })
+        }
         language={EditorLanguage.JAVASCRIPT}
         toolbarOptions={{
           title: "",

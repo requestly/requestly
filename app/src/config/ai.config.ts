@@ -1,4 +1,4 @@
-import { isEnvEmulator } from "utils/EnvUtils";
+import { isBackendEnvEmulator } from "utils/EnvUtils";
 
 const getAIServiceBaseUrl = (): string => {
   const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
@@ -8,7 +8,7 @@ const getAIServiceBaseUrl = (): string => {
     return "";
   }
 
-  return isEnvEmulator() ? `http://127.0.0.1:5001/requestly-dev/us-central1/ai` : `${backendBaseUrl}/ai`;
+  return isBackendEnvEmulator() ? `http://127.0.0.1:5001/requestly-dev/us-central1/ai` : `${backendBaseUrl}/ai`;
 };
 
 export const AI_ENDPOINTS = {
