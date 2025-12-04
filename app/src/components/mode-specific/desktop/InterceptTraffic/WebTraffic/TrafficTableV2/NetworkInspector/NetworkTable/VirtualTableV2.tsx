@@ -7,12 +7,13 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import "./virtualTableV2.css";
 import { Button } from "antd";
 import { ArrowDownOutlined } from "@ant-design/icons";
+import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 
 interface Props {
   logs: any;
   header: React.ReactNode;
   renderLogRow: any;
-  selectedRowData: any;
+  selectedRowData: RQNetworkLog | null;
   onReplayRequest: () => void;
 }
 
@@ -137,7 +138,19 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
           onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
         >
           {header}
-          <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
+          {selectedRowData ? (
+            <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
+              <Table.Body id="vtbody">
+                {/* Hack to fix alternate colors flickering due to virtualization*/}
+                {items[0]?.index % 2 === 0 ? null : <tr></tr>}
+
+                {items.map((virtualRow) => {
+                  const log = logs[virtualRow.index];
+                  return renderLogRow(log, virtualRow.index);
+                })}
+              </Table.Body>
+            </ContextMenu>
+          ) : (
             <Table.Body id="vtbody">
               {/* Hack to fix alternate colors flickering due to virtualization*/}
               {items[0]?.index % 2 === 0 ? null : <tr></tr>}
@@ -147,7 +160,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
                 return renderLogRow(log, virtualRow.index);
               })}
             </Table.Body>
-          </ContextMenu>
+          )}
         </Table>
         {newLogsButton}
       </div>
