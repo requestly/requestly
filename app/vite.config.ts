@@ -17,6 +17,8 @@ const config = async ({ mode }) => {
 
   const { viteStaticCopy } = await import("vite-plugin-static-copy");
 
+  const generateSourcemap = process.env.VITE_GENERATE_SOURCEMAP === "true";
+
   return defineConfig({
     define: {
       global: "globalThis",
@@ -54,14 +56,15 @@ const config = async ({ mode }) => {
           { src: "node_modules/curlconverter/dist/tree-sitter-bash.wasm", dest: "." },
         ],
       }),
-      sentryVitePlugin({
-        authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
-        org: "requestly",
-        project: "web-app",
-        sourcemaps: {
-          filesToDeleteAfterUpload: ["**/*.js.map"],
-        },
-      }),
+      generateSourcemap &&
+        sentryVitePlugin({
+          authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
+          org: "requestly",
+          project: "web-app",
+          sourcemaps: {
+            filesToDeleteAfterUpload: ["**/*.js.map"],
+          },
+        }),
     ],
     resolve: {
       // { find: '@', replacement: path.resolve(__dirname, 'src') },
@@ -95,7 +98,7 @@ const config = async ({ mode }) => {
     build: {
       outDir: "build",
       target: "esnext",
-      sourcemap: true,
+      sourcemap: generateSourcemap,
     },
     server: {
       open: false,
