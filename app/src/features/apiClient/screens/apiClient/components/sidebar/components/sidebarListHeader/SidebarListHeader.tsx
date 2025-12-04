@@ -1,7 +1,7 @@
 import React from "react";
 import { Input, Tooltip } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { BiSelectMultiple } from "@react-icons/all-files/bi/BiSelectMultiple";
 import { NewApiRecordDropdown, NewRecordDropdownItemType } from "../NewApiRecordDropdown/NewApiRecordDropdown";
 import { RQAPI } from "features/apiClient/types";
@@ -55,16 +55,17 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
 
       {listType ? (
         listType === ApiClientSidebarTabKey.ENVIRONMENTS ? (
-          <RQButton
-            size="small"
-            type="transparent"
-            icon={<MdAdd />}
-            title="Create new environment"
-            className="sidebar-list-header-button"
-            onClick={() => {
-              onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
-            }}
-          />
+          <RQTooltip title="New Environment">
+            <RQButton
+              size="small"
+              type="transparent"
+              icon={<MdAdd />}
+              className="sidebar-list-header-button"
+              onClick={() => {
+                onNewRecordClick("api_client_sidebar_header", RQAPI.RecordType.ENVIRONMENT);
+              }}
+            />
+          </RQTooltip>
         ) : null
       ) : (
         showNewRecordAction && (
@@ -74,7 +75,9 @@ export const SidebarListHeader: React.FC<ListHeaderProps> = ({
               onNewRecordClick("api_client_sidebar_header", params.recordType, undefined, params.entryType);
             }}
           >
-            <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+            <RQTooltip title="New Request or Collection">
+              <RQButton size="small" type="transparent" icon={<MdAdd />} className="sidebar-list-header-button" />
+            </RQTooltip>
           </NewApiRecordDropdown>
         )
       )}

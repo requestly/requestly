@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Typography, Dropdown, MenuProps, Checkbox, notification } from "antd";
 import { REQUEST_METHOD_BACKGROUND_COLORS, REQUEST_METHOD_COLORS } from "../../../../../../../../../constants";
 import { RequestMethod, RQAPI } from "features/apiClient/types";
-import { RQButton } from "lib/design-system-v2/components";
+import { RQButton, RQTooltip } from "lib/design-system-v2/components";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { NewRecordNameInput } from "../newRecordNameInput/NewRecordNameInput";
 import { toast } from "utils/Toast";
@@ -283,15 +283,17 @@ export const RequestRow: React.FC<Props> = ({
                   open={isDropdownVisible}
                   onOpenChange={handleDropdownVisibleChange}
                 >
-                  <RQButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSelection(false);
-                    }}
-                    size="small"
-                    type="transparent"
-                    icon={<MdOutlineMoreHoriz />}
-                  />
+                  <RQTooltip title="More Actions">
+                    <RQButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSelection(false);
+                      }}
+                      size="small"
+                      type="transparent"
+                      icon={<MdOutlineMoreHoriz />}
+                    />
+                  </RQTooltip>
                 </Dropdown>
               </div>
             </Conditional>
