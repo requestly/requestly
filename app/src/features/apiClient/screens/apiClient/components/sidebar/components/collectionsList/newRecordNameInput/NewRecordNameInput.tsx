@@ -35,7 +35,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
   const updateRecord = useCallback(async () => {
     setIsLoading(true);
 
-    if (!recordName || recordName === recordToBeEdited.name) {
+    if (!recordName || recordName === recordToBeEdited?.name) {
       setIsLoading(false);
       onSuccess?.();
       return;
@@ -49,7 +49,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
     const result =
       record.type === RQAPI.RecordType.API
         ? await apiClientRecordsRepository.updateRecord(record, record.id)
-        : await apiClientRecordsRepository.renameCollection(record.id, record.name);
+        : await apiClientRecordsRepository.renameCollection(record.id, record?.name);
 
     if (result.success) {
       const tabSourceName = record.type === RQAPI.RecordType.API ? "request" : "collection";

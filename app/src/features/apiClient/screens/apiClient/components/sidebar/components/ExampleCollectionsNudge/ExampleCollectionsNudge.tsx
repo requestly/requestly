@@ -50,7 +50,7 @@ export const ExampleCollectionsNudge: React.FC<ExampleCollectionsNudgeProps> = (
     trackExampleCollectionsNudgeImportClicked();
     try {
       const result = await importExampleCollections({
-        ownerId: uid,
+        ownerId: uid ?? null,
         respository: syncRepository,
         recordsStore: recordsStore,
         envsStore: { createEnvironments },
