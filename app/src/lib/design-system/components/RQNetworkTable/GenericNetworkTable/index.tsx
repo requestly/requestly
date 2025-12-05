@@ -91,7 +91,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   const isFailed = useCallback(
     (log: NetworkLog) => {
       const harEntry = networkEntrySelector(log);
-      const { status } = harEntry.response;
+      const status = harEntry.response?.status;
       return !status || status >= 400;
     },
     [networkEntrySelector]
@@ -108,7 +108,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   const methodsFilter = useCallback(
     (logEntry: NetworkEntry) => {
       if (!filters.method.length) return true;
-      return filters.method.some((method) => method === logEntry?.request.method);
+      return filters.method.some((method) => method === logEntry?.request?.method);
     },
     [filters.method]
   );
