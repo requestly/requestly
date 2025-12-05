@@ -112,7 +112,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
       <div className="code-editor-actions">
         {/* TODO: ADD toggle search button */}
         <Tooltip title={isCopied ? "Copied" : "Copy code"} color={theme.colors.black} mouseEnterDelay={0.6}>
-          <RQButton type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
+          <RQButton size="small" type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
         </Tooltip>
         {enablePrettify && (
           <Tooltip
@@ -121,6 +121,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
             mouseEnterDelay={0.6}
           >
             <RQButton
+              size="small"
               type="text"
               icon={isCodePrettified && code?.length > 0 ? <BsFiletypeRaw /> : <PiBracketsCurlyBold />}
               onClick={handleCodeFormatting}
@@ -133,6 +134,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
           placement="bottomLeft"
         >
           <RQButton
+            size="small"
             type="text"
             icon={isFullScreen ? <MdCloseFullscreen /> : <MdOpenInFull />}
             onClick={handleFullScreenToggle}

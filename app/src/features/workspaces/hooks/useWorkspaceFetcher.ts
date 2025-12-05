@@ -9,6 +9,7 @@ import { getActiveWorkspace } from "store/slices/workspaces/selectors";
 import { WorkspaceType } from "features/workspaces/types";
 import { getAppMode } from "store/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
+import { captureException } from "@sentry/react";
 
 export const useWorkspaceFetcher = () => {
   const dispatch = useDispatch();
@@ -21,9 +22,14 @@ export const useWorkspaceFetcher = () => {
   useActiveWorkspacesMembersListener();
 
   useEffect(() => {
-    fetchLocalWorkspaces().then((allLocalWorkspaces) => {
-      dispatch(workspaceActions.setAllWorkspaces([...allLocalWorkspaces, ...sharedWorkspaces]));
-    });
+    (async () => {
+      try {
+        const allLocalWorkspaces = await fetchLocalWorkspaces();
+        dispatch(workspaceActions.setAllWorkspaces([...allLocalWorkspaces, ...sharedWorkspaces]));
+      } catch (e) {
+        captureException(e);
+      }
+    })();
   }, [dispatch, fetchLocalWorkspaces, sharedWorkspaces]);
 
   useEffect(() => {

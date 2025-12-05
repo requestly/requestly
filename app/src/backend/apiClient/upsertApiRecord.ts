@@ -10,7 +10,7 @@ export function sanitizeRecord(record: Partial<RQAPI.ApiClientRecord>) {
   const sanitizedRecord = lodash.cloneDeep(record);
   if (sanitizedRecord.type === RQAPI.RecordType.API) {
     if (sanitizedRecord.data) {
-      delete sanitizedRecord.data.response;
+      sanitizedRecord.data.response = null;
       delete sanitizedRecord.data.testResults;
     }
   }
@@ -105,6 +105,10 @@ export const updateApiRecord = async (
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string
 ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
+  if (!record.id) {
+    throw new Error("Record id is required for updating an api record");
+  }
+
   const db = getFirestore(firebaseApp);
   const apiRecordDocRef = doc(db, "apis", record.id);
 

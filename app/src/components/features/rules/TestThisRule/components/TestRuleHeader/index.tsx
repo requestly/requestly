@@ -28,7 +28,7 @@ export const TestRuleHeader = () => {
   const { isValidPermission } = validatePermission("http_rule", "create");
 
   const [pageUrl, setPageUrl] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [doCaptureSession, setDoCaptureSession] = useState(user.loggedIn);
   const { sheetPlacement } = useBottomSheetContext();
 
