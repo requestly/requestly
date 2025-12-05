@@ -265,7 +265,6 @@ const AuthHandler: React.FC<{}> = () => {
         dispatch(
           globalActions.updateUserInfo({
             loggedIn: false,
-            // @ts-ignore
             details: planDetails ? { planDetails, isPremium: isPremiumUser(planDetails) } : null,
           })
         );
