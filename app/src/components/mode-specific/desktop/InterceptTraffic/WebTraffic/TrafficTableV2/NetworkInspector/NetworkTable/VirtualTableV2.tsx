@@ -7,21 +7,22 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import "./virtualTableV2.css";
 import { Button } from "antd";
 import { ArrowDownOutlined } from "@ant-design/icons";
+import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 
 interface Props {
   logs: any;
   header: React.ReactNode;
   renderLogRow: any;
-  selectedRowData: any;
+  selectedRowData: RQNetworkLog | null;
   onReplayRequest: () => void;
 }
 
 const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, selectedRowData, onReplayRequest }) => {
-  const [selected, setSelected] = useState(null);
-  const [lastKnownBottomIndex, setLastKnownBottomIndex] = useState(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [lastKnownBottomIndex, setLastKnownBottomIndex] = useState<number | null>(null);
   const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(true);
   const mounted = useRef(false);
-  const parentRef = useRef(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
   const isListAtBottom = useCallback(() => {
@@ -129,7 +130,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
               "--virtualPaddingBottom": paddingBottom + "px",
             } as React.CSSProperties
           }
-          selected={selected}
+          selected={selected ?? undefined}
           onSelected={(id: string) => {
             setSelected(id);
             setIsScrollToBottomEnabled(false); // Disable autoscroll when row is selected
@@ -137,7 +138,7 @@ const VirtualTableV2: React.FC<Props> = ({ logs = [], header, renderLogRow, sele
           onContextMenu={(e: any) => setSelected(e.target?.parentElement.id)}
         >
           {header}
-          <ContextMenu log={selectedRowData} onReplayRequest={onReplayRequest}>
+          <ContextMenu log={selectedRowData ?? ({} as RQNetworkLog)} onReplayRequest={onReplayRequest}>
             <Table.Body id="vtbody">
               {/* Hack to fix alternate colors flickering due to virtualization*/}
               {items[0]?.index % 2 === 0 ? null : <tr></tr>}
