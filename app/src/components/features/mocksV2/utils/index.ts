@@ -1,6 +1,6 @@
 import { createMock } from "backend/mocks/createMock";
 import APP_CONSTANTS from "config/constants";
-import { isEnvBeta, isEnvDevWithBeta, isEnvEmulator } from "utils/EnvUtils";
+import { isBackendEnvBeta, isBackendEnvEmulator } from "utils/EnvUtils";
 import { v4 as uuidv4 } from "uuid";
 import {
   defaultCssEditorMock,
@@ -84,9 +84,9 @@ export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorD
 const generateEndpointPrefix = (username: string = null, teamId?: string, collectionPath?: string) => {
   let prefix = "";
 
-  if (isEnvBeta() || isEnvDevWithBeta()) {
+  if (isBackendEnvBeta()) {
     prefix = `${APP_CONSTANTS.mock_base_url.beta}/`;
-  } else if (isEnvEmulator()) {
+  } else if (isBackendEnvEmulator()) {
     prefix = `${APP_CONSTANTS.mock_base_url.local}/`;
   } else {
     if (teamId) {
@@ -110,7 +110,7 @@ const generateEndpointSuffix = (username: string, uid?: string, teamId?: string,
 
   if (teamId) {
     searchParamsObj["teamId"] = teamId;
-  } else if (!username || isEnvBeta() || isEnvDevWithBeta() || isEnvEmulator()) {
+  } else if (!username || isBackendEnvBeta() || isBackendEnvEmulator()) {
     searchParamsObj["rq_uid"] = uid;
   }
 

@@ -216,6 +216,7 @@ const INITIAL_GLOBAL_SLICE_STATE: GlobalSliceState = {
       isManageBillingTeamAlertVisible: true,
       isSupportChatOpened: false,
       lastUsedFeaturePath: "/",
+      hasGeneratedAITests: false,
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried
