@@ -258,7 +258,7 @@ const HttpClientView: React.FC<Props> = ({
     }
 
     isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
     toggleSheetPlacement(bottomSheetPlacement);
   }, [toggleSheetPlacement]);
 
@@ -892,7 +892,7 @@ const HttpClientView: React.FC<Props> = ({
             executeRequest={onSendButtonClick}
           />
         }
-        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
+        minSize={25}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
         <div
