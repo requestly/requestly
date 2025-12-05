@@ -7,7 +7,9 @@ import { onVariableChange, Variable } from "../variable";
 import { apiRequestCorrelationManager } from "./apiClient/ApiRequestCorrelationManager";
 import { REQUESTLY_ID_HEADER } from "./apiClient";
 
-const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
+const onBeforeRequest = async (
+  details: chrome.webRequest.WebRequestBodyDetails
+): Promise<chrome.webRequest.BlockingResponse | void> => {
   // Firefox and Safari do not have documentLifecycle
   // @ts-ignore
   if (details?.documentLifecyle) {
@@ -25,29 +27,46 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
     return;
   }
 
-  rulesStorageService.getEnabledRules().then((enabledRules) => {
-    enabledRules.forEach((rule) => {
-      switch (rule.ruleType) {
-        case RuleType.REDIRECT:
-        case RuleType.REPLACE:
-        case RuleType.QUERYPARAM:
-        case RuleType.CANCEL:
-        case RuleType.DELAY:
-          const { isApplied } = matchRuleWithRequest(rule, {
-            url: details.url,
-            method: details.method,
-            type: details.type as any,
-            initiator: details.initiator,
-          });
-          if (isApplied) {
-            ruleExecutionHandler.onRuleExecuted(rule, details, isMainOrPrerenderedFrame);
-          }
-          break;
-        default:
-          break;
+  const enabledRules = await rulesStorageService.getEnabledRules();
+
+  for (const rule of enabledRules) {
+    switch (rule.ruleType) {
+      case RuleType.REDIRECT:
+      case RuleType.REPLACE: {
+        const { isApplied, destinationUrl } = matchRuleWithRequest(rule, {
+          url: details.url,
+          method: details.method,
+          type: details.type as any,
+          initiator: details.initiator,
+        });
+
+        if (isApplied && destinationUrl) {
+          ruleExecutionHandler.onRuleExecuted(rule, details, isMainOrPrerenderedFrame);
+          return { redirectUrl: destinationUrl };
+        }
+        break;
       }
-    });
-  });
+
+      case RuleType.QUERYPARAM:
+      case RuleType.CANCEL:
+      case RuleType.DELAY: {
+        const { isApplied } = matchRuleWithRequest(rule, {
+          url: details.url,
+          method: details.method,
+          type: details.type as any,
+          initiator: details.initiator,
+        });
+
+        if (isApplied) {
+          ruleExecutionHandler.onRuleExecuted(rule, details, isMainOrPrerenderedFrame);
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
 };
 
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
@@ -123,7 +142,7 @@ export const addListeners = () => {
   //@ts-ignore
   if (!chrome.webRequest.onBeforeRequest.hasListener(onBeforeRequest)) {
     //@ts-ignore
-    chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ["<all_urls>"] });
+    chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ["<all_urls>"] }, ["blocking"]);
   }
 
   //@ts-ignore
