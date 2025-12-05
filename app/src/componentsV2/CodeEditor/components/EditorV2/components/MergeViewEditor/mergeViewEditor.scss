@@ -1,0 +1,30 @@
+.merge-view-editor {
+  .cm-chunkButtons {
+    display: none;
+  }
+
+  .cm-deletedChunk {
+    background: #df25251f;
+  }
+
+  .cm-deletedLineGutter {
+    background: #dd6b55;
+  }
+
+  .cm-changedLineGutter {
+    background: #3fb9504d;
+  }
+
+  .cm-changedLine {
+    background-color: #163f2961;
+  }
+
+  .cm-insertedLine {
+    .cm-changedText {
+      background: #18912e40;
+    }
+    span {
+      color: unset;
+    }
+  }
+}

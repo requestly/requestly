@@ -24,6 +24,7 @@ import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { MergeViewEditor } from "componentsV2/CodeEditor/components/EditorV2/components/MergeViewEditor/MergeViewEditor";
 import {
   customKeyBinding,
   highlightVariablesPlugin,
@@ -48,6 +49,10 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
+  mergeView?: {
+    incomingValue: string;
+    source: "ai" | "user";
+  };
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -66,6 +71,7 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
+  mergeView,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -338,7 +344,7 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {editor}
+        {mergeView ? <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} /> : editor}
       </ResizableBox>
     </>
   );
