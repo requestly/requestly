@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Row, Col, Tabs, Alert } from "antd";
 import MembersDetails from "./MembersDetails";
 import TeamSettings from "./TeamSettings";
@@ -19,6 +19,7 @@ import { redirectTo404 } from "utils/RedirectionUtils";
 
 const TeamViewer = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
   const availableWorkspaces = useSelector(getAllWorkspaces);
@@ -72,7 +73,10 @@ const TeamViewer = () => {
   );
 
   if (!teamDetails) {
-    redirectTo404(navigate);
+    if (!(location?.state && location.state.previousPath)) {
+      redirectTo404(navigate);
+    }
+    return null;
   }
 
   return (
@@ -116,7 +120,7 @@ const TeamViewer = () => {
         </Row>
 
         {isLocalWorkspace ? (
-          <LocalWorkspaceSettings workspacePath={teamDetails?.rootPath} />
+          <LocalWorkspaceSettings workspaceId={teamId} workspacePath={teamDetails?.rootPath} />
         ) : (
           <Tabs
             defaultActiveKey="0"
