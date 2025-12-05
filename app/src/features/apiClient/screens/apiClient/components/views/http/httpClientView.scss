@@ -69,17 +69,16 @@
     }
   }
 
-  //TABS
-  .api-request-tabs.ant-tabs.ant-tabs-small {
-    .ant-tabs-content-holder {
-      padding: 12px 16px;
-    }
-  }
-
   .params-table-title {
     color: var(--requestly-color-text-subtle);
     font-size: var(--requestly-font-size-sm, 12px);
     font-weight: var(--requestly-font-weight-medium);
     margin-bottom: var(--requestly-space-3);
+  }
+
+  .api-request-tabs.ant-tabs.ant-tabs-small {
+    .ant-tabs-content-holder {
+      padding: 6px;
+    }
   }
 }
