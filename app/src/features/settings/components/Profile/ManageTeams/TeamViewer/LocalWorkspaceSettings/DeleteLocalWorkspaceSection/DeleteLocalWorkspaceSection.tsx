@@ -13,6 +13,7 @@ import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { captureException } from "@sentry/react";
 import { WorkspaceType } from "features/workspaces/types";
+import { trackWorkspaceDeleteClicked, trackWorkspaceDeleted } from "modules/analytics/events/common/teams";
 
 export const DeleteLocalWorkspaceSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -109,7 +110,10 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
         danger
         type="primary"
         loading={isDeleting}
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => {
+          trackWorkspaceDeleteClicked();
+          setIsModalOpen(true);
+        }}
         className="local-workspace-delete-button"
       >
         {deleteDirectory ? "Delete workspace and all data" : "Delete workspace"}
@@ -121,6 +125,7 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
         handleModalClose={() => setIsModalOpen(false)}
         handleDeleteTeam={async () => {
           await handleDelete();
+          trackWorkspaceDeleted({ device_data_deleted: deleteDirectory });
           setIsModalOpen(false);
         }}
       />
