@@ -25,7 +25,7 @@ export const trackWorkspaceDeleteClicked = () => {
   trackEvent(TEAMS.WORKSPACE_DELETE_CLICKED);
 };
 
-export const trackWorkspaceDeleted = ({ device_data_deleted } = {}) => {
+export const trackWorkspaceDeleted = (device_data_deleted) => {
   trackEvent(TEAMS.WORKSPACE_DELETED, { device_data_deleted });
 };
 
