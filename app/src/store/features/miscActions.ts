@@ -12,3 +12,7 @@ export const updateLastUsedFeaturePath = (prevState: any, action: PayloadAction<
 export const updatePopupConfig = (prevState: any, action: PayloadAction<any>) => {
   prevState.popupConfig = action.payload;
 };
+
+export const updateHasGeneratedAITests = (prevState: any, action: PayloadAction<boolean>) => {
+  prevState.misc.persist.hasGeneratedAITests = action.payload;
+};
