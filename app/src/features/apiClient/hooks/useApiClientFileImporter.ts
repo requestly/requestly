@@ -88,7 +88,7 @@ const useApiClientFileImporter = (importer: ImporterType) => {
                 throw new Error(`Unsupported importer: ${importer}`);
               }
 
-              const processedData = processor(content, uid, apiClientRecordsRepository);
+              const processedData = processor(content, uid ?? null, apiClientRecordsRepository);
               resolve(processedData);
             } catch (error) {
               Logger.error("Error processing file:", error);

@@ -21,14 +21,15 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/views/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 
 interface ContextMenuProps {
-  log: any;
+  log: RQNetworkLog;
   children: ReactNode;
   onReplayRequest: () => void;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, onReplayRequest }) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log, onReplayRequest }) => {
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const selectedRequestResponse = useSelector(getLogResponseById(log?.id)) || log?.response?.body;
