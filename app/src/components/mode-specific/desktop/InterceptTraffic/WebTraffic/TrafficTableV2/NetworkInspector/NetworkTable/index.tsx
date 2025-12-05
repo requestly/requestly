@@ -37,7 +37,7 @@ const NetworkTable: React.FC<Props> = ({
   showMockRequestSelector,
   selectedMockRequests,
 }) => {
-  const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
+  const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog | null>(null);
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);

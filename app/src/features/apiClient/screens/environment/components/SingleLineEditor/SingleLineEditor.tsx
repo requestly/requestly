@@ -2,15 +2,17 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
 import { EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
-import { highlightVariablesPlugin } from "./plugins/highlightVariables";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
-import generateCompletionsForVariables from "componentsV2/CodeEditor/components/EditorV2/plugins/generateAutoCompletions";
 import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
-import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import {
+  customKeyBinding,
+  highlightVariablesPlugin,
+  generateCompletionsForVariables,
+} from "componentsV2/CodeEditor/components/EditorV2/plugins";
 
 export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   className,
