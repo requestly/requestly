@@ -1,17 +1,19 @@
 import React, { useCallback, useState } from "react";
+import DeleteWorkspaceModal from "../../TeamSettings/DeleteWorkspaceModal";
 import "./deleteLocalWorkspaceSection.scss";
 import { Alert, Button, Checkbox } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "utils/Toast";
 import { getAppMode } from "store/selectors";
-import { getActiveWorkspaceId, getNonLocalWorkspaces } from "store/slices/workspaces/selectors";
+import { getActiveWorkspaceId, getNonLocalWorkspaces, getWorkspaceById } from "store/slices/workspaces/selectors";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { removeWorkspace, getAllWorkspaces as getAllLocalWorkspaces } from "services/fsManagerServiceAdapter";
 import { workspaceActions } from "store/slices/workspaces/slice";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { captureException } from "@sentry/react";
 import { WorkspaceType } from "features/workspaces/types";
+import { trackWorkspaceDeleteClicked, trackWorkspaceDeleted } from "modules/analytics/events/common/teams";
 
 export const DeleteLocalWorkspaceSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -21,9 +23,11 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
   const sharedWorkspaces = useSelector(getNonLocalWorkspaces);
+  const currentWorkspace = useSelector(getWorkspaceById(workspaceId));
 
   const [deleteDirectory, setDeleteDirectory] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const refreshAndNavigate = useCallback(
     async (previousPath?: string, canNavigateToPreviousPath?: boolean) => {
@@ -106,11 +110,25 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
         danger
         type="primary"
         loading={isDeleting}
-        onClick={handleDelete}
+        onClick={() => {
+          trackWorkspaceDeleteClicked();
+          setIsModalOpen(true);
+        }}
         className="local-workspace-delete-button"
       >
         {deleteDirectory ? "Delete workspace and all data" : "Delete workspace"}
       </Button>
+      <DeleteWorkspaceModal
+        name={currentWorkspace?.name || "Workspace"}
+        isOpen={isModalOpen}
+        deleteInProgress={isDeleting}
+        handleModalClose={() => setIsModalOpen(false)}
+        handleDeleteTeam={async () => {
+          await handleDelete();
+          trackWorkspaceDeleted({ device_data_deleted: deleteDirectory });
+          setIsModalOpen(false);
+        }}
+      />
     </div>
   );
 };
