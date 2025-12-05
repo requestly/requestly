@@ -1,23 +1,38 @@
 .api-client-script-editor-container {
   height: inherit;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 
   .react-resizable {
-    height: calc(100% - 35px) !important;
+    // height: calc(100% - 35px) !important;
+    flex: 1;
     min-height: unset !important;
   }
 
   .code-editor-custom-options-row {
-    margin-top: 0;
-    margin-left: 4px;
+    margin: 0 4px;
+    flex: 1;
+
+    .code-editor-custom-options-block {
+      width: 100%;
+    }
   }
 
   overflow: hidden;
+
+  .api-client-script-editor-actions-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+  }
 
   .api-client-script-type-selector {
     &__btn.ant-radio-button-wrapper {
       color: var(--requestly-color-text-subtle);
       font-size: var(--requestly-font-size-xs);
-      border: none;
+      border: 1px solid transparent;
       border-radius: 4px !important;
 
       &::before {
@@ -28,11 +43,11 @@
       }
       &:focus,
       &:active {
-        border: none;
+        border: 1px solid transparent;
       }
 
       &.ant-radio-button-wrapper-checked {
-        border: none;
+        border: 1px solid var(--requestly-color-surface-2) !important;
         background: var(--requestly-color-white-t-10);
         color: var(--requestly-color-text-default);
         font-weight: var(--requestly-font-weight-medium) !important;
@@ -47,6 +62,38 @@
     vertical-align: middle;
     cursor: pointer;
     margin: 0 4px;
+  }
+
+  .ai-generate-test-btn-container {
+    display: flex;
+    align-items: center;
+    gap: var(--requestly-space-2);
+
+    &.hidden {
+      display: none;
+    }
+
+    .ai-generate-test-btn__new,
+    .ai-generate-test-btn__new.ant-btn:disabled {
+      background: linear-gradient(95deg, #7c3aed -7.68%, #db2777 102.42%) !important;
+      color: var(--requestly-color-text-default) !important;
+      border: 1px solid var(--requestly-color-surface-2);
+
+      &:hover {
+        background: linear-gradient(95deg, #7c3aed -7.68%, #db2777 102.42%);
+        border: 1px solid var(--requestly-color-surface-3) !important;
+      }
+    }
+
+    .ai-generate-test-btn__new.ant-btn:disabled {
+      opacity: 0.6;
+    }
+  }
+}
+
+.ai-generate-test-btn-tooltip {
+  &.ant-tooltip.ant-tooltip-placement-bottom {
+    padding-top: 4px;
   }
 }
 

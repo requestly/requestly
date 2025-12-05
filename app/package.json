@@ -49,6 +49,7 @@
     "extends": "react-app"
   },
   "dependencies": {
+    "@ai-sdk/react": "^2.0.106",
     "@amplitude/analytics-browser": "^2",
     "@amplitude/plugin-session-replay-browser": "^1.23.6",
     "@ant-design/icons": "^4.7.0",
@@ -59,6 +60,7 @@
     "@codemirror/lang-html": "^6.4.9",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/merge": "^6.11.2",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.34.1",
     "@devtools-ds/navigation": "^1.1.2",
@@ -70,7 +72,7 @@
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v5.4.0/react-icons-all-files-5.4.0.tgz",
     "@readme/httpsnippet": "^11.0.0",
     "@reduxjs/toolkit": "^1.9.0",
-    "@requestly/alternative-importers": "^0.0.6",
+    "@requestly/alternative-importers": "^0.0.8",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/shared": "file:../shared",
@@ -159,6 +161,7 @@
     "uuid": "^8.3.2",
     "validator": "^13.7.0",
     "xml2js": "^0.6.2",
+    "zod": "^4.1.13",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

@@ -78,6 +78,10 @@
     position: sticky;
     overflow: hidden;
 
+    &__vertical {
+      height: inherit;
+    }
+
     .gutter:hover {
       background-color: #1e69ff;
     }
