@@ -14,7 +14,7 @@ import { getAllWorkspaces } from "store/slices/workspaces/selectors";
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const availableWorkspaces = useSelector(getAllWorkspaces);
-  const [pendingInvites, setPendingInvites] = useState(null);
+  const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,11 +27,11 @@ export const TeamsCard: React.FC = () => {
         if (res?.pendingInvites) {
           const invites = res?.pendingInvites;
           const sortedInvites = invites.sort(
-            (a: Invite, b: Invite) => (b.metadata.teamAccessCount as number) - (a.metadata.teamAccessCount as number)
+            (a: Invite, b: Invite) => (b.metadata?.teamAccessCount as number) - (a.metadata?.teamAccessCount as number)
           );
           // Removing duplicate invites and showing most recent invites for each team
           const uniqueInvites: Record<string, Invite> = {};
-          sortedInvites.forEach((invite: Invite) => (uniqueInvites[invite.metadata.teamId as string] = invite));
+          sortedInvites.forEach((invite: Invite) => (uniqueInvites[invite.metadata?.teamId as string] = invite));
 
           setPendingInvites(Object.values(uniqueInvites));
         } else setPendingInvites([]);
@@ -67,7 +67,7 @@ export const TeamsCard: React.FC = () => {
         </m.div>
       </AnimatePresence>
     );
-  if (pendingInvites?.length > 0)
+  if ((pendingInvites?.length ?? 0) > 0)
     return (
       <TeamsListView
         heading="We found your team on Requestly"

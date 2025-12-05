@@ -38,10 +38,16 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     }),
     []
   );
-  const memoizedData: KeyValuePair[] = useMemo(() => (data.length ? data : [createEmptyPair()]), [
-    data,
-    createEmptyPair,
-  ]);
+
+  const memoizedData: KeyValuePair[] = useMemo(() => {
+    if (data.length) {
+      return data;
+    } else {
+      const emptyData = createEmptyPair();
+      emptyData.isEnabled = false;
+      return [emptyData];
+    }
+  }, [data, createEmptyPair]);
 
   const handleUpdateRequestPairs = useCallback(
     (pair: KeyValuePair, action: "add" | "update" | "delete") => {

@@ -24,7 +24,10 @@ type ExecutorConstructor<T> = new (
   appMode: "EXTENSION" | "DESKTOP"
 ) => T;
 
-export const useRequestExecutorFactory = <T>(ExecutorClass: ExecutorConstructor<T>, collectionId: string): T => {
+export const useRequestExecutorFactory = <T>(
+  ExecutorClass: ExecutorConstructor<T>,
+  collectionId?: string | null
+): T => {
   const ctx = useApiClientFeatureContext();
   const appMode = useSelector(getAppMode);
   const { apiClientWorkloadManager } = useApiClientContext();

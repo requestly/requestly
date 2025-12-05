@@ -85,7 +85,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports,
                   type="default"
                   icon={<MdOndemandVideo />}
                   onClick={() => {
-                    trackTestRuleResultClicked(currentlySelectedRuleData.ruleType, record.sessionLink);
+                    trackTestRuleResultClicked(currentlySelectedRuleData.ruleType, record.sessionLink ?? null);
                     redirectToUrl(record?.sessionLink, true);
                   }}
                 >

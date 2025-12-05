@@ -10,6 +10,7 @@
         window.location.hostname !== "app.sessionbear.com" &&
         window.location.hostname !== "beta.sessionbear.com" &&
         window.location.hostname !== "localhost" &&
+        !window.location.hostname.startsWith("requestly-dev") &&
         isNaN(parseInt(window.location.hostname.replace(/\./g, ""))) // dumb check for an IP (or any number really)
       ) {
         window.location.href = "https://app.requestly.io";
@@ -107,6 +108,7 @@
         font-family: var(--requestly-font-family-default), Inter;
         font-size: 13px;
         -webkit-font-smoothing: antialiased;
+        background-color: var(--requestly-color-background-dark,#141414) !important;
       }
 
       .ipl-progress-indicator.available {
