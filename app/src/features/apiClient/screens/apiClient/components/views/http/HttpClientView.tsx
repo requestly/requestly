@@ -82,6 +82,7 @@ import ErrorBoundary from "features/apiClient/components/ErrorBoundary/ErrorBoun
 import { useHttpRequestExecutor } from "features/apiClient/hooks/requestExecutors/useHttpRequestExecutor";
 import { PathVariablesProvider } from "features/apiClient/store/pathVariables/PathVariablesContextProvider";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 const requestMethodOptions = Object.values(RequestMethod).map((method) => ({
   value: method,
@@ -256,7 +257,7 @@ const HttpClientView: React.FC<Props> = ({
     if (isDefaultPlacementRef.current) {
       return;
     }
-    const savedPlacement = localStorage.getItem("sheet_placement");
+    const savedPlacement = getStoredPlacement();
     if (!savedPlacement) {
       isDefaultPlacementRef.current = true;
       const bottomSheetPlacement = window.innerWidth < 1440 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
