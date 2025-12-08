@@ -53,6 +53,10 @@ div.team-delete-title {
   display: inline-block;
 }
 
+.delete-team-workspace-name {
+  font-weight: 700;
+}
+
 .delete-team-input.ant-input {
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
