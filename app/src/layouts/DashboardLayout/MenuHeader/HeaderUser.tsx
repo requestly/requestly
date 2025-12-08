@@ -37,6 +37,7 @@ export default function HeaderUser() {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+
   const isSharedWorkspaceMode = useSelector(isActiveWorkspaceShared);
   const appMode = useSelector(getAppMode);
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
@@ -62,6 +63,7 @@ export default function HeaderUser() {
   const menuPropItems = useMemo(
     () => [
       {
+        key: "profile",
         icon: <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer header-user-avatar" />,
         onClick: () => redirectToAccountDetails(navigate),
         label: (
@@ -71,27 +73,32 @@ export default function HeaderUser() {
           </div>
         ),
       },
-      { type: "divider" },
+      { key: "divider1", type: "divider" },
       {
+        key: "profile-settings",
         disabled: appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR,
         label: "Profile",
         onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
       },
       {
+        key: "workspace-settings",
         label: "Manage team workspaces",
         onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
       },
       {
+        key: "plans-billing",
         disabled: appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR,
         label: "Plans and Billing",
         onClick: () => redirectToMyPlan(navigate, window.location.pathname, "header"),
       },
       {
+        key: "settings",
         label: "Settings",
         onClick: () => redirectToSettings(navigate, window.location.pathname, "header"),
       },
-      { type: "divider" },
+      { key: "divider2", type: "divider" },
       {
+        key: "signout",
         label: "Sign out",
         onClick: () => {
           setLoading(true);
@@ -112,7 +119,7 @@ export default function HeaderUser() {
     [appMode, dispatch, isSharedWorkspaceMode, navigate, userEmail, userPhoto, userName, appFlavour]
   );
 
-  const handleAuthButtonClick = (authMode) => {
+  const handleAuthButtonClick = (authMode: string) => {
     getTabServiceActions().resetTabs(true);
     dispatch(
       globalActions.toggleActiveModal({
@@ -170,7 +177,7 @@ export default function HeaderUser() {
               menu={{ items: menuPropItems }}
               placement="bottomLeft"
               className="header-profile-dropdown-trigger no-drag"
-              onOpenChange={(open) => {
+              onOpenChange={(open: boolean) => {
                 open && trackHeaderClicked("user_menu");
               }}
             >

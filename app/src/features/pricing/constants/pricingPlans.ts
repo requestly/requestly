@@ -2,7 +2,7 @@ import { PricingPlansType } from "../types";
 import { PRICING } from "./pricing";
 
 export const PricingPlans: PricingPlansType = {
-  free: {
+  [PRICING.PLAN_NAMES.FREE]: {
     plans: {
       monthly: {
         usd: {
@@ -16,7 +16,7 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  lite: {
+  [PRICING.PLAN_NAMES.LITE]: {
     plans: {
       monthly: {
         usd: {
@@ -30,7 +30,7 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  basic: {
+  [PRICING.PLAN_NAMES.BASIC]: {
     plans: {
       monthly: {
         usd: {
@@ -44,7 +44,7 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  professional: {
+  [PRICING.PLAN_NAMES.PROFESSIONAL]: {
     plans: {
       monthly: {
         usd: {
@@ -58,7 +58,7 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
-  session_free: {
+  [PRICING.PLAN_NAMES.SESSION_FREE]: {
     plans: {
       monthly: {
         usd: {
@@ -68,20 +68,6 @@ export const PricingPlans: PricingPlansType = {
       annually: {
         usd: {
           price: 0,
-        },
-      },
-    },
-  },
-  session_professional: {
-    plans: {
-      monthly: {
-        usd: {
-          price: 10,
-        },
-      },
-      annually: {
-        usd: {
-          price: 120,
         },
       },
     },

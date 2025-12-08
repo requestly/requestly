@@ -2,7 +2,6 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { PRICING } from "features/pricing";
 import { capitalize } from "lodash";
-import { isSetappBuild } from "./AppUtils";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -24,21 +23,34 @@ export const getPrettyString = (string) => {
 
 export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
-  if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
-  if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
-  if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Enterprise";
-  if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
-  if (planName === PRICING.PLAN_NAMES.LITE) return "Lite";
-  if (planName === PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT) return "Professional (Student Program)";
-  if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) return "API Client Enterprise";
-
-  return planName
-    .toLowerCase()
-    .split(" ")
-    .map(function (word) {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(" ");
+  switch (planName) {
+    case PRICING.PLAN_NAMES.BRONZE:
+    case PRICING.PLAN_NAMES.FREE:
+    case PRICING.PLAN_NAMES.SESSION_FREE:
+      return "Free";
+    case PRICING.PLAN_NAMES.GOLD:
+    case PRICING.PLAN_NAMES.PROFESSIONAL:
+      return "Professional";
+    case PRICING.PLAN_NAMES.ENTERPRISE:
+      return "Enterprise";
+    case PRICING.PLAN_NAMES.BASIC_V2:
+    case PRICING.PLAN_NAMES.BASIC:
+      return "Basic";
+    case PRICING.PLAN_NAMES.LITE:
+      return "Lite";
+    case PRICING.PLAN_NAMES.PROFESSIONAL_STUDENT:
+      return "Professional (Student Program)";
+    case PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE:
+      return "API Client Enterprise";
+    default:
+      return planName
+        .toLowerCase()
+        .split(" ")
+        .map(function (word) {
+          return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(" ");
+  }
 };
 
 export const isValidUrl = (string) => {

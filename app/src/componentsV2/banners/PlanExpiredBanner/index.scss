@@ -11,39 +11,9 @@
   align-items: center;
   gap: 8px;
 
-  &-badge {
-    padding: 4px 8px;
-    color: var(--requestly-color-text-default);
-    font-weight: 900;
-    letter-spacing: 1.5px;
-    font-size: 10px;
-    line-height: 12px;
-    background: var(--requestly-color-error);
-    border-radius: 4px;
-  }
-
-  &-btn.ant-btn.ant-btn-default {
-    border: 1px solid var(--requestly-color-text-default);
-    color: var(--requestly-color-text-default);
-    font-weight: 500;
-    background: transparent;
-    cursor: pointer;
-
-    &:hover,
-    &:focus,
-    &:active {
-      border: 1px solid var(--requestly-color-text-default) !important;
-      color: var(--requestly-color-text-default) !important;
-      background-color: var(--requestly-color-error) !important;
-    }
-  }
-
   &-close-btn {
     position: absolute;
-    right: 18px;
-    top: 12px;
-    font-size: 20px;
+    right: var(--requestly-space-10);
     color: var(--requestly-color-text-default);
-    cursor: pointer;
   }
 }

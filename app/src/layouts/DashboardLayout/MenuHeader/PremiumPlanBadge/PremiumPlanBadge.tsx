@@ -1,28 +1,39 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/slices/global/user/selectors";
 import Logger from "lib/logger";
 import { globalActions } from "store/slices/global/slice";
-import { Tooltip } from "antd";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import "./premiumPlanBadge.scss";
 import { getActiveWorkspaceId } from "store/slices/workspaces/selectors";
 import { getPrettyPlanName } from "utils/FormattingHelper";
+import { PRICING } from "features/pricing";
+import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
+import { FiGift } from "@react-icons/all-files/fi/FiGift";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import UpgradePlanBadge from "./UpgradePlanBadge";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const activeWorkspaceId = useSelector(getActiveWorkspaceId);
-  const userPlanDetails = user?.details?.planDetails;
-  const planId = userPlanDetails?.planId;
-  const planStatus = userPlanDetails?.status;
-  const planEndDateString = userPlanDetails?.subscription?.endDate;
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
 
-  let daysLeft = 0;
+  const userPlanDetails = user?.details?.planDetails;
+  const planStatus = userPlanDetails?.status ?? "";
+  const planEndDateString = userPlanDetails?.subscription?.endDate ?? "";
+  const planName = userPlanDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
+  const prettyPlanName = planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "Pro" : getPrettyPlanName(planName);
+  const isUserLoggedIn = user?.loggedIn ?? false;
+  const daysLeft = useMemo(() => {
+    const endMs = Date.parse(planEndDateString);
+    if (!Number.isFinite(endMs)) return 0;
+
+    const days = Math.ceil((endMs - Date.now()) / (1000 * 60 * 60 * 24));
+    return Number.isFinite(days) ? days : 0;
+  }, [planEndDateString]);
 
   const handleBadgeClick = useCallback(() => {
     dispatch(
@@ -60,46 +71,57 @@ const PremiumPlanBadge = () => {
       });
   }, [activeWorkspaceId]);
 
-  try {
-    const planEndDate = new Date(planEndDateString);
-    const currentDate = new Date();
-    // @ts-ignore
-    let diffTime: any = planEndDate - currentDate;
-    daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  } catch (err) {
-    Logger.log(err);
-  }
-
   if (
-    !isAppSumoDeal &&
-    planId &&
-    [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus)
+    isAppSumoDeal ||
+    [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus) ||
+    daysLeft > 30 ||
+    !isUserLoggedIn
   ) {
-    if (daysLeft > 30) {
-      return null;
-    }
-
-    const planName =
-      userPlanDetails?.planName === "professional" ? "Pro" : getPrettyPlanName(userPlanDetails?.planName);
-
-    return (
-      <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
-        <div
-          className="premium-plan-badge-container cursor-pointer"
-          role="button"
-          onKeyDown={handleBadgeClick}
-          onClick={handleBadgeClick}
-        >
-          <div className="premium-plan-name">{`${planName} (Trial)`}</div>
-          <div className="premium-plan-days-left">
-            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING ? `${daysLeft}d left` : "Expired"}
-          </div>
-        </div>
-      </Tooltip>
-    );
+    return null;
   }
 
-  return null;
+  switch (planName) {
+    case PRICING.PLAN_NAMES.FREE:
+    case PRICING.PLAN_NAMES.SESSION_FREE:
+    case PRICING.PLAN_NAMES.BRONZE:
+      // User is on free plan
+      return (
+        <UpgradePlanBadge
+          icon={<FiGift size={16} />}
+          planStatusInfo="Free plan"
+          handleBadgeClick={handleBadgeClick}
+          badgeText="Upgrade"
+        />
+      );
+
+    default:
+      // Plan end date has been exceeded
+      if (daysLeft <= 0) {
+        return (
+          <UpgradePlanBadge
+            icon={<MdOutlineWarningAmber size={16} />}
+            planStatusInfo="Plan expired"
+            handleBadgeClick={handleBadgeClick}
+            badgeText="Renew now"
+            containerClassName="expired-plan"
+          />
+        );
+      }
+
+      // Plan is about to expire
+      return (
+        <UpgradePlanBadge
+          icon={<GrDiamond size={16} />}
+          planStatusInfo={
+            daysLeft === 1
+              ? `${prettyPlanName} plan: ${daysLeft} day left`
+              : `${prettyPlanName} plan: ${daysLeft} days left`
+          }
+          handleBadgeClick={handleBadgeClick}
+          badgeText="Upgrade"
+        />
+      );
+  }
 };
 
 export default PremiumPlanBadge;
