@@ -41,7 +41,8 @@ export const CloseAllTabsModal = ({ onClose, open, unSavedTabsCount, closeAllOpe
       footer={footer}
     >
       <div className="close-all-tabs-content">
-        Closing all tabs will discard unsaved changes in 3 tabs. Do you want to continue and discard them?
+        Closing all tabs will discard unsaved changes in {unSavedTabsCount} tabs. Do you want to continue and discard
+        them?
       </div>
     </Modal>
   );

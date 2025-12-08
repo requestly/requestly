@@ -24,9 +24,9 @@ export const CloseAllTabsButton: React.FC<Props> = ({ unSavedTabsCount, closeAll
     <>
       <Tooltip
         title="Close all opened tabs"
-        mouseEnterDelay={0.5}
         overlayClassName="tab-title-tooltip"
         placement="bottomLeft"
+        showArrow={false}
       >
         <RQButton
           type="transparent"
