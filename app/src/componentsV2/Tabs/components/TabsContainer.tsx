@@ -87,7 +87,7 @@ export const TabsContainer: React.FC = () => {
         </div>
       </Popover>
     ),
-    [tabs, isMorePopoverOpen, onTabItemClick, closeTabById]
+    [tabs, isMorePopoverOpen, onTabItemClick, closeTabById, closeAllOpenTabs]
   );
 
   // Reset popover state when no tabs are present

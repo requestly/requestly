@@ -2,19 +2,14 @@ import { Modal } from "antd";
 import "./closeAllTabsModal.scss";
 import { BsExclamationTriangle } from "@react-icons/all-files/bs/BsExclamationTriangle";
 import { RQButton } from "lib/design-system-v2/components";
-interface ApiClientSnippetModalProps {
+interface CloseAllTabsModalProps {
   open: boolean;
   onClose: () => void;
   unSavedTabsCount: number;
   closeAllOpenTabs: (type: string) => void;
 }
 
-export const CloseAllTabsModal = ({
-  onClose,
-  open,
-  unSavedTabsCount,
-  closeAllOpenTabs,
-}: ApiClientSnippetModalProps) => {
+export const CloseAllTabsModal = ({ onClose, open, unSavedTabsCount, closeAllOpenTabs }: CloseAllTabsModalProps) => {
   const header = (
     <div className="close-all-tabs-modal-header">
       <BsExclamationTriangle />
@@ -46,8 +41,7 @@ export const CloseAllTabsModal = ({
       footer={footer}
     >
       <div className="close-all-tabs-content">
-        Closing all tabs will discard unsaved changes in {unSavedTabsCount} tabs. Would you like to save them before
-        closing?
+        Closing all tabs will discard unsaved changes in 3 tabs. Do you want to continue and discard them?
       </div>
     </Modal>
   );

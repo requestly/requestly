@@ -12,10 +12,6 @@ interface Props {
 export const CloseAllTabsButton: React.FC<Props> = ({ unSavedTabsCount, closeAllOpenTabs }) => {
   const [showUnSavedModal, setShowUnSavedModal] = useState(false);
 
-  const onToggleModal = (state: boolean) => {
-    setShowUnSavedModal(state);
-  };
-
   const onCloseAllButtonClick = () => {
     if (unSavedTabsCount > 1) {
       setShowUnSavedModal(true);
@@ -42,10 +38,10 @@ export const CloseAllTabsButton: React.FC<Props> = ({ unSavedTabsCount, closeAll
           <span className="close-all-tabs-text">Close all</span>
         </RQButton>
       </Tooltip>
-      {showUnSavedModal && unSavedTabsCount > 1 && (
+      {showUnSavedModal && (
         <CloseAllTabsModal
           open={true}
-          onClose={() => onToggleModal(false)}
+          onClose={() => setShowUnSavedModal(false)}
           unSavedTabsCount={unSavedTabsCount}
           closeAllOpenTabs={closeAllOpenTabs}
         />
