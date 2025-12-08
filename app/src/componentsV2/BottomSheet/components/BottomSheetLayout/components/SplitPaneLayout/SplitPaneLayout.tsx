@@ -25,6 +25,14 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     }
   }, []);
 
+  // Handle direction changes without remounting to preserve child component state
+  useEffect(() => {
+    if (splitPane.current) {
+      // Update sizes when direction changes
+      splitPane.current.split.setSizes(isSheetPlacedAtBottom ? initialSizes : [55, 45]);
+    }
+  }, [splitDirection, isSheetPlacedAtBottom, initialSizes]);
+
   return (
     <Split
       ref={splitPane}
