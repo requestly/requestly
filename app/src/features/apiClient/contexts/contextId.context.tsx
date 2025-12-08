@@ -8,8 +8,5 @@ export function ContextId(props: { id: string | null; children: React.ReactNode 
 
 export function useContextId() {
   const contextId = useContext(ContextIdContext);
-  if (!contextId) {
-    throw new Error("ContextId is not available in the useContextId hook");
-  }
   return contextId;
 }
