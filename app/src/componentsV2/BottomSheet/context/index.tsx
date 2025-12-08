@@ -27,7 +27,6 @@ interface BottomSheetProviderProps {
   children: React.ReactNode;
   isSheetOpenByDefault?: boolean;
   sheetPlacement: BottomSheetPlacement;
-  defaultPlacement?: BottomSheetPlacement;
   setSheetPlacement: React.Dispatch<SetStateAction<BottomSheetPlacement>>;
 }
 
