@@ -5,8 +5,8 @@ import {
   Collection,
   EnvironmentEntity,
   ErroredRecord,
-  FileSystemResult,
   FileType,
+  FileSystemResult,
 } from "features/apiClient/helpers/modules/sync/local/services/types";
 import BackgroundServiceAdapter, { rpc, rpcWithRetry } from "./DesktopBackgroundService";
 import { EnvironmentData, EnvironmentVariables } from "backend/environment/types";
@@ -257,4 +257,19 @@ export function getAllWorkspaces() {
     retryCount: 10,
     timeout: 1000,
   }) as Promise<FileSystemResult<{ id: string; name: string; path: string }[]>>;
+}
+
+export function removeWorkspace(
+  workspaceId: string,
+  opts: { deleteDirectory?: boolean } = {}
+): Promise<FileSystemResult<void>> {
+  return rpc(
+    {
+      namespace: LOCAL_SYNC_BUILDER_NAMESPACE,
+      method: "removeWorkspace",
+      timeout: 10000,
+    },
+    workspaceId,
+    opts
+  ) as Promise<FileSystemResult<void>>;
 }
