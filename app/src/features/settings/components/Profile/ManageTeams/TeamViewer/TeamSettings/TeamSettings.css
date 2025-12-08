@@ -65,13 +65,24 @@ div.team-delete-title {
 
 .delete-team-btn.ant-btn {
   font-weight: 500;
+}
+
+.delete-team-btn.ant-btn:disabled,
+.delete-team-btn.ant-btn.ant-btn-disabled {
+  color: var(--requestly-color-text-default);
+  background-color: var(--requestly-color-surface-2);
+  border: 1px solid var(--border-dark);
+  cursor: not-allowed;
+}
+
+.delete-team-btn.ant-btn:not(:disabled) {
   color: var(--requestly-color-text-default);
   background-color: rgba(250, 40, 40, 0.2);
   border: 1px solid rgba(250, 40, 40, 0.6);
 }
 
-.delete-team-btn.ant-btn:hover,
-.delete-team-btn.ant-btn:focus {
+.delete-team-btn.ant-btn:not(:disabled):hover,
+.delete-team-btn.ant-btn:not(:disabled):focus {
   color: var(--requestly-color-text-default);
   background-color: rgba(250, 40, 40, 0.5);
 }
