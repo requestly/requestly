@@ -86,6 +86,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     schema: TestGenerationOutputSchema,
     onFinish: (result) => {
       setIsTestsStreamingFinished(true);
+      setIsGenerateTestPopoverOpen(false);
+      isPopoverOpenRef.current = false;
       if (result.object?.err) {
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
