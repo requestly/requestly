@@ -26,6 +26,7 @@ export default function MockLogs({ mockId }: Props) {
     return [
       {
         key: "Logs",
+        icon: MdNetworkCheck,
         label: (
           <div className="bottom-sheet-tab">
             <MdNetworkCheck />
