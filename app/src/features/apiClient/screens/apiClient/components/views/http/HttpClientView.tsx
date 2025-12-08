@@ -840,6 +840,7 @@ const HttpClientView: React.FC<Props> = ({
               hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
               type="primary"
               className="text-bold"
+              enableHotKey={enableHotkey}
               disabled={
                 !entry.request.url ||
                 (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
@@ -894,7 +895,11 @@ const HttpClientView: React.FC<Props> = ({
         minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
-        <div className="api-client-body">
+        <div
+          className={`api-client-body ${
+            sheetPlacement === BottomSheetPlacement.BOTTOM ? "api-client-body__vertical" : "api-client-body__horizontal"
+          }`}
+        >
           <HttpRequestTabs
             error={error}
             requestEntry={entry}
