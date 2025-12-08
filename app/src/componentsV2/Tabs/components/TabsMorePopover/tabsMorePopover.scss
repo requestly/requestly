@@ -130,7 +130,6 @@
 }
 
 .tab-title-tooltip {
-  top: 100px !important;
   .ant-tooltip-inner {
     background-color: var(--requestly-color-black);
     color: var(--requestly-color-text-default);
@@ -141,10 +140,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: 250px;
     word-wrap: break-word;
-  }
-
-  .ant-tooltip-arrow {
-    display: none;
   }
 }
 
@@ -217,7 +212,7 @@
 
     .opened-tabs-count {
       color: var(--requestly-color-text-subtle);
-      font-family: var(--font-family-default, Inter);
+      font-family: var(--requestly-font-family-default);
       font-size: var(--requestly-font-size-sm);
       font-style: normal;
       font-weight: 400;

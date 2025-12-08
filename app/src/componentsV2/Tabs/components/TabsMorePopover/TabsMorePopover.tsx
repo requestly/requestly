@@ -63,7 +63,12 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
             <div className="tab-ops-item-container">
               {tab.icon ?? null}
               {(tab.title ?? "Untitled").length > 30 ? (
-                <Tooltip title={tab.title ?? "Untitled"} overlayClassName="tab-title-tooltip" placement="top">
+                <Tooltip
+                  title={tab.title ?? "Untitled"}
+                  overlayClassName="tab-title-tooltip"
+                  placement="top"
+                  showArrow={false}
+                >
                   <span className="tab-ops-item-title">{tab.title ?? "Untitled"}</span>
                 </Tooltip>
               ) : (
