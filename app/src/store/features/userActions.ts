@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { captureException } from "@sentry/react";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { GlobalSliceState } from "store/slices/global/types";
@@ -15,14 +16,19 @@ export const updateUserInfo = (
       ...action.payload.details,
     };
   } else {
-    prevState.user.details = null;
+    prevState.user.details = undefined;
   }
 };
 
 export const updateUserProfile = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{ userProfile: UserAuth["details"]["profile"] }>
+  action: PayloadAction<{ userProfile: NonNullable<UserAuth["details"]>["profile"] }>
 ) => {
+  if (!prevState.user.details) {
+    captureException(new Error("Trying to update user profile when user details is undefined"));
+    return;
+  }
+
   prevState.user.details.profile = action.payload.userProfile;
 
   prevState.user.details.isSyncEnabled = action.payload.userProfile?.isSyncEnabled || false;
@@ -32,8 +38,13 @@ export const updateUserProfile = (
 
 export const updateUserPlanDetails = (
   prevState: GlobalSliceState,
-  action: PayloadAction<{ userPlanDetails: UserAuth["details"]["planDetails"]; isUserPremium: boolean }>
+  action: PayloadAction<{ userPlanDetails: NonNullable<UserAuth["details"]>["planDetails"]; isUserPremium: boolean }>
 ) => {
+  if (!prevState.user.details) {
+    captureException(new Error("Trying to update user plan details when user details is undefined"));
+    return;
+  }
+
   prevState.user.details.planDetails = action.payload.userPlanDetails;
   prevState.user.details.isPremium = action.payload.isUserPremium;
 };
@@ -54,10 +65,18 @@ export const updateSecondarySidebarCollapse = (
 };
 
 export const updateUsername = (prevState: GlobalSliceState, action: PayloadAction<{ username: string }>) => {
+  if (!prevState.user.details) {
+    captureException(new Error("Trying to update username when user details is undefined"));
+    return;
+  }
   prevState.user.details.username = action.payload.username;
 };
 
 export const updateUserDisplayName = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+  if (!prevState.user.details?.profile) {
+    captureException(new Error("Trying to update user display name when user profile is undefined"));
+    return;
+  }
   prevState.user.details.profile.displayName = action.payload;
 };
 
@@ -66,6 +85,10 @@ export const updateUserLimitReached = (prevState: GlobalSliceState, action: Payl
 };
 
 export const updateOrganizationDetails = (prevState: GlobalSliceState, action: PayloadAction<string>) => {
+  if (!prevState.user.details) {
+    captureException(new Error("Trying to update organization details when user details is undefined"));
+    return;
+  }
   prevState.user.details.organization = action.payload;
 };
 
@@ -143,13 +166,13 @@ export const updateProductTourCompleted = (
     tour: TOUR_TYPES;
   }>
 ) => {
-  if (action.payload.tour === TOUR_TYPES.MISCELLANEOUS) {
+  if (action.payload.tour === TOUR_TYPES.MISCELLANEOUS && action.payload.subTour) {
     prevState.misc.persist.isMiscTourCompleted = {
       ...prevState.misc.persist.isMiscTourCompleted,
       [action.payload.subTour]: true,
     };
   } else {
-    prevState.misc.persist[action.payload.tour] = true;
+    (prevState.misc.persist as any)[action.payload.tour] = true;
   }
 };
 

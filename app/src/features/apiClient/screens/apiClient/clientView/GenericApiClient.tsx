@@ -8,8 +8,8 @@ import "../apiClient.scss";
 
 type Props = {
   apiEntryDetails: RQAPI.ApiRecord;
-  onSaveCallback?: (apiEntryDetails: RQAPI.ApiRecord) => void;
-  handleAppRequestFinished?: (entry: RQAPI.ApiEntry) => void;
+  onSaveCallback: (apiEntryDetails: RQAPI.ApiRecord) => void;
+  handleAppRequestFinished: (entry: RQAPI.ApiEntry) => void;
   isCreateMode: boolean;
   isOpenInModal?: boolean;
 };
