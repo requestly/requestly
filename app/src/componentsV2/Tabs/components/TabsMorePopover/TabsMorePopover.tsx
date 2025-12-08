@@ -9,11 +9,19 @@ import { CloseAllTabsButton } from "../CloseAllTabsButton/CloseAllTabsButton";
 import { RQButton } from "lib/design-system-v2/components";
 interface TabsMorePopoverProps {
   onTabItemClick: (id: number) => void;
-  onCloseTab: (id: number) => void;
-  closeAllOpenTabs: (type: string) => void;
 }
 
-export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick, onCloseTab, closeAllOpenTabs }) => {
+export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick }) => {
+  const [closeAllTabs, closeTabById] = useTabServiceWithSelector((state) => [state.closeAllTabs, state.closeTabById]);
+
+  const closeAllOpenTabs = (mode: string) => {
+    if (mode === "force") {
+      closeAllTabs(true); // Skip unsaved prompt when closing all tabs
+    } else {
+      closeAllTabs(); // Normal close all tabs
+    }
+  };
+
   const [query, setQuery] = useState("");
   const inputRef = useRef<InputRef>(null);
   const tabs = useTabServiceWithSelector((state) => state.tabs);
@@ -83,7 +91,7 @@ export const TabsMorePopover: React.FC<TabsMorePopoverProps> = ({ onTabItemClick
                 className="tab-ops-item-close-button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onCloseTab(tab.id);
+                  closeTabById(tab.id);
                 }}
                 icon={<MdClose />}
               />
