@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Checkbox, Form, FormInstance } from "antd";
+import { Checkbox, Form, FormInstance, Tooltip } from "antd";
 import { KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
@@ -7,8 +7,18 @@ import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
+import KeyValueTypeCell from "./KeyValueTableTypeCell";
+import { AiFillWarning } from "@react-icons/all-files/ai/AiFillWarning";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
+
+const ValidationWarning = ({ error }: { error: string }) => (
+  <Tooltip title={error} color="#000">
+    <span style={{ display: "flex", alignItems: "center" }}>
+      <AiFillWarning style={{ color: "#E09400", fontSize: "16px" }} />
+    </span>
+  </Tooltip>
+);
 
 interface EditableRowProps {
   index: number;
@@ -33,6 +43,7 @@ interface EditableCellProps {
   variables: ScopedVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
   checkInvalidCharacter: boolean;
+  error?: string | null;
 }
 
 export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -44,6 +55,7 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   variables,
   handleUpdatePair,
   checkInvalidCharacter,
+  error,
   ...restProps
 }) => {
   const form = useContext(EditableContext);
@@ -62,11 +74,20 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   }
 
   const isDescription = dataIndex === "description";
+  const isDataTypeField = dataIndex === "dataType";
 
   if (isDescription) {
     return (
       <td {...restProps}>
         <KeyValueDescriptionCell record={record} dataIndex={dataIndex} form={form} onSave={save} />
+      </td>
+    );
+  }
+
+  if (isDataTypeField) {
+    return (
+      <td {...restProps}>
+        <KeyValueTypeCell record={record} dataIndex={dataIndex} form={form} onSave={save} />
       </td>
     );
   }
@@ -120,6 +141,11 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
                     fontFamily: "Material Symbols Outlined",
                   }}
                 />
+              </div>
+            </Conditional>
+            <Conditional condition={!!error && dataIndex === "value"}>
+              <div className="key-value-table-error-icon">
+                <ValidationWarning error={error!} />
               </div>
             </Conditional>
           </div>

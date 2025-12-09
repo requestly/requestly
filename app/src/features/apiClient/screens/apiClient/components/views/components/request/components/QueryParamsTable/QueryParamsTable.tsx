@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { KeyValuePair } from "features/apiClient/types";
 import { useQueryParamStore } from "features/apiClient/hooks/useQueryParamStore";
 import { useAutogenerateStore } from "features/apiClient/hooks/useAutogenerateStore";
@@ -17,8 +17,17 @@ function Data(props: {
   handleUpdateQueryParams: (updatedPairs: KeyValuePair[]) => void;
 }) {
   const scopedVariables = useScopedVariables(props.recordId);
+  const [showDescription, setShowDescription] = useState(false);
   return (
-    <KeyValueTable data={props.queryParams} variables={scopedVariables} onChange={props.handleUpdateQueryParams} />
+    <KeyValueTable
+      data={props.queryParams}
+      variables={scopedVariables}
+      onChange={props.handleUpdateQueryParams}
+      showDescription={showDescription}
+      onToggleDescription={(show) => {
+        setShowDescription(show);
+      }}
+    />
   );
 }
 

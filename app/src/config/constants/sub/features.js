@@ -105,5 +105,6 @@ FEATURES.LOCAL_FIRST_DESKTOP_APP = "local_first_desktop_app";
 FEATURES.LOCAL_WORKSPACE_COMPATIBILITY = "local_workspace_compatibility";
 
 FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY = "api_client_description_compatibility";
+FEATURES.API_CLIENT_TYPE_COMPATIBILITY = "api_client_type_compatibility";
 
 export default FEATURES;

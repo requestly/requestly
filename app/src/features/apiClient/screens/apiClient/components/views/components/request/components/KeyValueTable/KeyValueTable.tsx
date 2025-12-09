@@ -4,12 +4,14 @@ import { ContentListTable } from "componentsV2/ContentList";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { KeyValueTableEditableRow, KeyValueTableEditableCell } from "./KeyValueTableRow";
-import { KeyValuePair } from "features/apiClient/types";
+import { KeyValueTableSettingsDropdown } from "./KeyValueTableSettingsDropdown";
+import { KeyValuePair, ValueType } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import "./keyValueTable.scss";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { validateValue } from "features/apiClient/screens/apiClient/utils";
 
 type ColumnTypes = Exclude<TableProps<KeyValuePair>["columns"], undefined>;
 
@@ -19,6 +21,7 @@ interface KeyValueTableProps {
   variables: ScopedVariables;
   checkInvalidCharacter?: boolean;
   showDescription?: boolean;
+  onToggleDescription?: (show: boolean) => void;
 }
 
 export const KeyValueTable: React.FC<KeyValueTableProps> = ({
@@ -27,6 +30,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   onChange,
   checkInvalidCharacter = false,
   showDescription = true,
+  onToggleDescription = () => {},
 }) => {
   const createEmptyPair = useCallback(
     () => ({
@@ -35,6 +39,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       value: "",
       isEnabled: true,
       description: "",
+      dataType: ValueType.STRING,
     }),
     []
   );
@@ -104,7 +109,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   const columns = useMemo(() => {
     return [
       {
-        title: "isEnabled",
+        title: "",
         dataIndex: "isEnabled",
         width: "50px",
         editable: true,
@@ -118,9 +123,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         }),
       },
       {
-        title: "key",
+        title: "Key",
         dataIndex: "key",
-        // width: "45%",
         editable: true,
         onCell: (record: KeyValuePair) => ({
           record,
@@ -133,7 +137,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         }),
       },
       {
-        title: "value",
+        title: "Value",
         dataIndex: "value",
         editable: true,
         onCell: (record: KeyValuePair) => ({
@@ -143,11 +147,28 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           title: "value",
           variables,
           handleUpdatePair,
+          error: validateValue(record.value, record.dataType),
         }),
       },
+      isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY)
+        ? {
+            title: "Type",
+            dataIndex: "dataType",
+            width: 120,
+            editable: true,
+            onCell: (record: KeyValuePair) => ({
+              record,
+              editable: true,
+              dataIndex: "dataType",
+              title: "type",
+              variables,
+              handleUpdatePair,
+            }),
+          }
+        : null,
       showDescription && isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY)
         ? {
-            title: "description",
+            title: "Description",
             dataIndex: "description",
             minWidth: 200,
             editable: true,
@@ -162,9 +183,11 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           }
         : null,
       {
-        title: "",
         width: "50px",
         fixed: "right",
+        title: () => (
+          <KeyValueTableSettingsDropdown showDescription={showDescription} onToggleDescription={onToggleDescription} />
+        ),
         render: (_: any, record: KeyValuePair) => {
           if (record.key === "" && record.value === "" && data.length === 1) {
             return null;
@@ -182,14 +205,22 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         },
       },
     ].filter(Boolean);
-  }, [variables, handleUpdatePair, checkInvalidCharacter, data.length, handleDeletePair, showDescription]);
+  }, [
+    variables,
+    handleUpdatePair,
+    checkInvalidCharacter,
+    data,
+    handleDeletePair,
+    showDescription,
+    onToggleDescription,
+  ]);
 
   return (
     <ContentListTable
       id="api-key-value-table"
       className="api-key-value-table"
       bordered
-      showHeader={false}
+      showHeader={true}
       rowKey="id"
       columns={columns as ColumnTypes}
       data={memoizedData}
