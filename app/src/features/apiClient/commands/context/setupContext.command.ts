@@ -12,14 +12,14 @@ export function createRepository(workspace: Workspace, user: UserDetails) {
   const workspaceType = workspace.workspaceType;
 
   if (workspaceType === WorkspaceType.LOCAL) {
-    return new ApiClientLocalRepository({ rootPath: workspace.rootPath });
+    return new ApiClientLocalRepository({ rootPath: workspace.rootPath as string });
   }
 
   if (!user.loggedIn) {
     return localStoreRepository;
   }
   const userId = user.uid;
-  return new ApiClientCloudRepository({ uid: userId, teamId: workspaceId });
+  return new ApiClientCloudRepository({ uid: userId, teamId: workspaceId as string });
 }
 
 export const setupContext = async (
@@ -27,7 +27,7 @@ export const setupContext = async (
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
   const repository = createRepository(workspace, user);
-  const id = await setupContextWithRepo(workspace.id, repository);
+  const id = await setupContextWithRepo(workspace.id as string, repository);
   return { id };
 };
 
@@ -36,6 +36,6 @@ export const setupContextWithoutMarkingLoaded = async (
   user: UserDetails
 ): Promise<{ id: ApiClientFeatureContext["id"]; name?: string }> => {
   const repository = createRepository(workspace, user);
-  const id = await setupContextWithRepoWithoutMarkingLoaded(workspace.id, repository);
+  const id = await setupContextWithRepoWithoutMarkingLoaded(workspace.id as string, repository);
   return { id };
 };
