@@ -70,6 +70,7 @@ FEATURES.USERNAME_UPDATE_SUPPORT = "feat-username-update-support";
 FEATURES.WORKSPACES = "workspaces";
 FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
 FEATURES.LOCAL_WORKSPACE_REFRESH = "local_workspace_refresh";
+FEATURES.LOCAL_WORKSPACE_DELETION = "local_workspace_deletion";
 
 // PERSONA SURVEY
 FEATURES.PERSONA_SURVEY = "persona-survey";
@@ -103,5 +104,7 @@ FEATURES.NON_BREAKING_DESKTOP_APP = "non_breaking_desktop_app";
 FEATURES.GRAPHQL_SUPPORT = "graphql_support";
 FEATURES.LOCAL_FIRST_DESKTOP_APP = "local_first_desktop_app";
 FEATURES.LOCAL_WORKSPACE_COMPATIBILITY = "local_workspace_compatibility";
+
+FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY = "api_client_description_compatibility";
 
 export default FEATURES;
