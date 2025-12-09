@@ -61,6 +61,7 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
     setIsDeleting(true);
     try {
       let hadRmdirPermissionError = false;
+      let hadScandirPermissionError = false;
       const previousPath = location?.state?.previousPath;
       const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
 
@@ -68,12 +69,16 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
       if (result.type === "error") {
         const err = result.error;
         const message = err?.message || "";
-        const isRmdirPermissionError =
-          String(err?.code).toLowerCase() === "permission_denied" &&
-          (/eacces/i.test(message) || /rmdir/i.test(message));
+        const code = String(err?.code).toLowerCase();
+        const isPermissionDenied = code === "permission_denied";
+        const isRmdirPermissionError = isPermissionDenied && (/eacces/i.test(message) || /rmdir/i.test(message));
+        const isEpermScandirError = /eperm/i.test(message) && /scandir/i.test(message);
         if (isRmdirPermissionError) {
           hadRmdirPermissionError = true;
           captureException(new Error(`Permission denied during rmdir: ${message}`));
+        } else if (isEpermScandirError) {
+          hadScandirPermissionError = true;
+          captureException(new Error(`EPERM during scandir: ${message}`));
         } else {
           throw new Error(result.error.message || "Failed to delete workspace");
         }
@@ -82,7 +87,9 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
-      if (hadRmdirPermissionError) {
+      if (hadScandirPermissionError) {
+        toast.info("Workspace deleted, but failed to delete files. Please retry or delete manually.");
+      } else if (hadRmdirPermissionError) {
         toast.info("Workspace deleted, but failed to delete files. Please delete manually.");
       } else {
         toast.info("Workspace deleted successfully");
