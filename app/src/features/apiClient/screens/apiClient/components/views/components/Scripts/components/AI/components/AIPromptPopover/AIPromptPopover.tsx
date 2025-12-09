@@ -40,7 +40,8 @@ export const AIPromptPopover: React.FC<PromptPopoverProps> = ({
     <div className="ai-generate-test-popover-content">
       <div className="ai-generate-test-popover-content__header">Generate tests</div>
       <div className="ai-generate-test-popover-content__description">
-        AI will use the request URL, method, and most recent response body to generate the tests.
+        Describe what you'd like to test. You can also update any existing tests. AI will use the URL, method, and
+        latest response body to generate relevant test cases.
       </div>
       <Input.TextArea
         className="ai-generate-test-popover-content__input"
