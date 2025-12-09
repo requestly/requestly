@@ -842,7 +842,15 @@ const HttpClientView: React.FC<Props> = ({
 
             {isSendButtonDisabled ? (
               <Tooltip
-                title={isLoadingResponse ? "Request in progress" : !entry.request.url ? "Please enter a URL" : ""}
+                title={
+                  isLoadingResponse
+                    ? "Request in progress"
+                    : !entry.request.url
+                    ? "Please enter a URL"
+                    : appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM
+                    ? "Multipart form is not supported in extension mode"
+                    : ""
+                }
                 placement="bottom"
               >
                 <span>
