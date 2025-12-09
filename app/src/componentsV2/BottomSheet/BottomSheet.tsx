@@ -26,9 +26,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   tabBarExtraContent = null,
   ...props
 }) => {
-  const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement, isCollapsed } = useBottomSheetContext();
+  const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
-  const isCollapsedSheetPlacedAtBottom = isCollapsed && isSheetPlacedAtBottom;
+  const isCollapsedSheetPlacedAtBottom = !isBottomSheetOpen && isSheetPlacedAtBottom;
 
   const tabExtraContent = (
     <div className={`bottom-sheet-tab-extra-content ${isCollapsedSheetPlacedAtBottom ? "collapsed-bottom-state" : ""}`}>
@@ -52,9 +52,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           size="small"
           type="transparent"
           title="Collapse"
-          onClick={() => toggleBottomSheet({ isTrack: true, action: "bottom_sheet_collapse_expand" })}
+          onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
           icon={
-            isSheetPlacedAtBottom && isCollapsed ? (
+            isSheetPlacedAtBottom && !isBottomSheetOpen ? (
               <MdOutlineKeyboardArrowUp />
             ) : isSheetPlacedAtBottom ? (
               <MdOutlineKeyboardArrowDown />
@@ -67,7 +67,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     </div>
   );
 
-  return isCollapsed && !isSheetPlacedAtBottom ? (
+  return !isBottomSheetOpen && !isSheetPlacedAtBottom ? (
     <div className="bottom-sheet-vertical-collapsed-view">
       <Tooltip key="expand-btn" title="Expand" placement="left">
         <RQButton
@@ -75,7 +75,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           type="transparent"
           title="Expand"
           icon={<MdOutlineKeyboardArrowLeft />}
-          onClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
+          onClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
         />
       </Tooltip>
       {items?.map((item: any, index: number) => (
@@ -85,7 +85,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             type="transparent"
             title={item.key}
             icon={item.icon ? <item.icon /> : null}
-            onClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
+            onClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
           />
         </Tooltip>
       ))}
@@ -105,7 +105,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       data-tour-id={tourId}
       className={`${isCollapsedSheetPlacedAtBottom ? "collapsed-bottom-sheet" : ""}`}
       defaultActiveKey={defaultActiveKey}
-      onTabClick={() => toggleBottomSheet({ isOpen: true, isTrack: true, action: "bottom_sheet_utility_toggle" })}
+      onTabClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
       tabBarExtraContent={tabExtraContent}
       {...props}
     />
