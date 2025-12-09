@@ -58,7 +58,7 @@ export function getApiClientFeatureContext(contextId?: string): ApiClientFeature
   const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
   const throwIfUndefined = (context: ApiClientFeatureContext | undefined) => {
     if (!context) {
-      throw new NativeError("No context found in getApiClientFeatureContext");
+      throw new NativeError("No context found in getApiClientFeatureContext").addContext({ contextId });
     }
     return context;
   };
