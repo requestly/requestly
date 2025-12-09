@@ -113,8 +113,8 @@ export type RunResultState = {
 
   reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
-  setStartTime(time: Timestamp | number): void;
-  setEndtime(time: Timestamp | number): void;
+  setStartTime(time: Timestamp | null): void;
+  setEndtime(time: Timestamp | null): void;
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: Exclude<RunStatus, RunStatus.ERRORED>): void;
   getRunSummary(): LiveRunResult;

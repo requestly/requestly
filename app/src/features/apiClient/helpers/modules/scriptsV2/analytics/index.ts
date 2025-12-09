@@ -3,9 +3,10 @@ import { RQAPI } from "features/apiClient/types";
 import { WorkErrorType } from "../workloadManager/workLoadTypes";
 
 const SCRIPT_EVENTS = {
-  SCRIPT_EXECUTION_STARTED: "SCRIPT_EXECUTION_STARTED",
-  SCRIPT_EXECUTION_COMPLETED: "SCRIPT_EXECUTION_COMPLETED",
-  SCRIPT_EXECUTION_FAILED: "SCRIPT_EXECUTION_FAILED",
+  SCRIPT_EXECUTION_STARTED: "script_execution_started",
+  SCRIPT_EXECUTION_COMPLETED: "script_execution_completed",
+  SCRIPT_EXECUTION_FAILED: "script_execution_failed",
+  API_CLIENT_PACKAGE_ADDED: "api_client_package_added",
 };
 
 export const trackScriptExecutionStarted = (scriptType: RQAPI.ScriptType) => {
@@ -18,6 +19,10 @@ export const trackScriptExecutionCompleted = (scriptType: RQAPI.ScriptType) => {
 
 export const trackScriptExecutionFailed = (scriptType: RQAPI.ScriptType, errorType: WorkErrorType, message: string) => {
   trackEvent(SCRIPT_EVENTS.SCRIPT_EXECUTION_FAILED, { errorType, scriptType, message });
+};
+
+export const trackPackageAdded = (packageName: string, packageType: "builtin" | "npm" | "jsr") => {
+  trackEvent(SCRIPT_EVENTS.API_CLIENT_PACKAGE_ADDED, { package_name: packageName, package_type: packageType });
 };
 
 export { SCRIPT_EVENTS };

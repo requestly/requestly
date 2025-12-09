@@ -54,9 +54,10 @@ function parseExecutingRequestEntry(entry: RQAPI.ApiEntry): RequestExecutionResu
 
 function prepareExecutionResult(params: {
   result: RQAPI.ExecutionResult;
-  currentExecutingRequest: CurrentlyExecutingRequest;
+  currentExecutingRequest: Exclude<CurrentlyExecutingRequest, null>; // excluding null as we are calling this function only when request is executed
 }): RequestExecutionResult {
   const { result, currentExecutingRequest } = params;
+
   const { iteration, recordId, recordName, collectionName, startTime } = currentExecutingRequest;
 
   if (result.status === RQAPI.ExecutionStatus.ERROR) {
@@ -106,13 +107,17 @@ class Runner {
     }
   }
 
-  private getRequest(requestIndex: number): RQAPI.ApiRecord {
+  private getRequest(requestIndex: number): RQAPI.ApiRecord | undefined {
     const { runOrder } = this.runContext.runConfigStore.getState();
 
     if (!runOrder[requestIndex].isSelected) {
       return;
     }
-    const request = this.ctx.stores.records.getState().getData(runOrder[requestIndex].id) as RQAPI.ApiRecord;
+    const request = this.ctx.stores.records.getState().getData(runOrder[requestIndex].id);
+
+    if (request?.type !== RQAPI.RecordType.API) {
+      return;
+    }
 
     return request;
   }
@@ -250,7 +255,7 @@ class Runner {
   }
 
   private afterRequestExecutionComplete(
-    currentExecutingRequest: CurrentlyExecutingRequest,
+    currentExecutingRequest: Exclude<CurrentlyExecutingRequest, null>,
     result: RQAPI.ExecutionResult
   ) {
     this.throwIfRunCancelled();
