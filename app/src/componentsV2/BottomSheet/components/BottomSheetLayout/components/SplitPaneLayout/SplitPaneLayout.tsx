@@ -57,7 +57,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
   );
 
   return (
-    <div ref={splitContainerRef} style={{ width: "100%", height: "100%" }}>
+    <div ref={splitContainerRef} className="bottomsheet-split-layout-container">
       <Split
         direction={splitDirection}
         sizes={sizes}
