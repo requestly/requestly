@@ -60,22 +60,38 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
     if (!workspaceId || isDeleting) return;
     setIsDeleting(true);
     try {
+      let hadRmdirPermissionError = false;
       const previousPath = location?.state?.previousPath;
       const canNavigateToPreviousPath = previousPath && !previousPath.includes(`/teams/${workspaceId}`);
 
       const result = await removeWorkspace(workspaceId, deleteDirectory ? { deleteDirectory: true } : {});
       if (result.type === "error") {
-        throw new Error(result.error.message || "Failed to delete workspace");
+        const err = result.error;
+        const message = err?.message || "";
+        const isRmdirPermissionError =
+          String(err?.code).toLowerCase() === "permission_denied" &&
+          (/eacces/i.test(message) || /rmdir/i.test(message));
+        if (isRmdirPermissionError) {
+          hadRmdirPermissionError = true;
+          captureException(new Error(`Permission denied during rmdir: ${message}`));
+        } else {
+          throw new Error(result.error.message || "Failed to delete workspace");
+        }
       }
 
       if (activeWorkspaceId === workspaceId) {
         await clearCurrentlyActiveWorkspace(dispatch, appMode);
       }
-      toast.info("Workspace deleted successfully");
+      if (hadRmdirPermissionError) {
+        toast.info("Workspace deleted, but failed to delete files. Please delete manually.");
+      } else {
+        toast.info("Workspace deleted successfully");
+      }
 
       await refreshAndNavigate(previousPath, canNavigateToPreviousPath);
     } catch (err: any) {
       toast.error(err?.message || "Failed to delete workspace");
+      captureException(err?.message || "Failed to delete workspace");
       if (deleteDirectory) setDeleteDirectory(false);
     } finally {
       setIsDeleting(false);
