@@ -7,7 +7,7 @@ export function closeCorruptedTabs() {
   tabs.forEach((tab) => {
     const { source } = tab.getState();
 
-    const contextId = source.metadata.context?.id;
+    const contextId = source.metadata.context.id as string;
     const context = getApiClientFeatureContext(contextId);
 
     // "getIsValidTab" will always give false for local workspace,
