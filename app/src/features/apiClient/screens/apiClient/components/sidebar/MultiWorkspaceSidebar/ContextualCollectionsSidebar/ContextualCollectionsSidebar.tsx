@@ -46,8 +46,8 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   const [recordsToBeDeleted, setRecordsToBeDeleted] = useState<{
     records: RQAPI.ApiClientRecord[];
-    context: ApiClientFeatureContext;
-  } | null>({ context: null, records: [] });
+    context: ApiClientFeatureContext | undefined;
+  }>({ context: undefined, records: [] });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleRecordsToBeDeleted = useCallback((records: RQAPI.ApiClientRecord[], context: ApiClientFeatureContext) => {
@@ -55,14 +55,9 @@ export const ContextualCollectionsSidebar: React.FC<{
     setIsDeleteModalOpen(true);
   }, []);
 
-  const selectedRecordsAcrossWorkspaces = useRef<{
-    [contextId: string]:
-      | undefined
-      | {
-          recordIds: Set<string>;
-          isAllRecordsSelected: boolean;
-        };
-  } | null>(null);
+  const selectedRecordsAcrossWorkspaces = useRef<
+    Record<string, { recordIds: Set<string>; isAllRecordsSelected: boolean }>
+  >({});
 
   useEffect(() => {
     if (!selectedRecordsAcrossWorkspaces.current) {
@@ -116,7 +111,7 @@ export const ContextualCollectionsSidebar: React.FC<{
   );
 
   const deselect = useCallback(() => {
-    selectedRecordsAcrossWorkspaces.current = null;
+    selectedRecordsAcrossWorkspaces.current = {};
     setSelectAll({ value: false, takeAction: true });
     setIsAllRecordsSelected(false);
     setIsSelectionAcrossWorkspaces(false);
@@ -223,7 +218,10 @@ export const ContextualCollectionsSidebar: React.FC<{
 
   const onDeleteModalClose = useCallback(() => {
     deselect();
-    setRecordsToBeDeleted(null);
+    setRecordsToBeDeleted({
+      context: undefined,
+      records: [],
+    });
     setIsDeleteModalOpen(false);
   }, [deselect]);
 
@@ -312,7 +310,7 @@ export const ContextualCollectionsSidebar: React.FC<{
 
       {isMoveCollectionModalOpen ? (
         // TODO: TBD on modals
-        <ContextId id={selectedRecordsInSingleContext[0]}>
+        <ContextId id={selectedRecordsInSingleContext[0] ?? null}>
           <MoveToCollectionModal
             isBulkActionMode={showSelection}
             recordsToMove={selectedRecordsInSingleContext[1]}
