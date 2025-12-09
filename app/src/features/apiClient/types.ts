@@ -41,6 +41,14 @@ export interface KeyValuePair {
   isEnabled: boolean;
   type?: string; // added for special identifiers like auth
   description?: string;
+  dataType?: ValueType;
+}
+
+export enum ValueType {
+  STRING = "String",
+  INTEGER = "Integer",
+  BOOLEAN = "Boolean",
+  FLOAT = "Number",
 }
 
 export enum KeyValueFormType {

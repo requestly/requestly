@@ -1,6 +1,14 @@
 import { getAPIResponse as getAPIResponseViaExtension } from "actions/ExtensionActions";
 import { getAPIResponse as getAPIResponseViaProxy } from "actions/DesktopActions";
-import { AbortReason, FormDropDownOptions, KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../types";
+import {
+  AbortReason,
+  FormDropDownOptions,
+  KeyValuePair,
+  RQAPI,
+  RequestContentType,
+  RequestMethod,
+  ValueType,
+} from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import {
   CONTENT_TYPE_HEADER,
@@ -1112,3 +1120,17 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
     }
   }
 };
+
+export function validateValue(value: string, type: ValueType | undefined): string | null {
+  if (!value || value.includes("{{")) return null;
+  switch (type) {
+    case ValueType.INTEGER:
+      return /^-?\d+$/.test(value) ? null : "Value must be an Integer";
+    case ValueType.FLOAT:
+      return /^-?\d+(\.\d+)?$/.test(value) ? null : "Value must be a Number";
+    case ValueType.BOOLEAN:
+      return ["true", "false"].includes(value.toLowerCase()) ? null : "Value must be 'True' or 'False'";
+    default:
+      return null;
+  }
+}

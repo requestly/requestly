@@ -70,6 +70,7 @@
       overflow-x: auto;
       overflow-y: hidden;
       min-width: 100%;
+      margin-left: -8px;
 
       .cm-content {
         white-space: nowrap;
@@ -89,7 +90,7 @@
   .key-value-description-view {
     width: 100%;
     height: 24px;
-    padding: 2px 2px 0px 6px;
+    padding: 2px 2px 0px 4px;
     font-size: var(--requestly-font-size-sm);
     line-height: 1.5;
     cursor: pointer;
@@ -133,6 +134,11 @@
     position: relative;
     z-index: 1;
   }
+
+  .ant-table-thead > tr > th {
+    font-weight: 600;
+    padding: 8px 14px !important;
+  }
 }
 
 .key-value-description-tooltip {
@@ -141,4 +147,40 @@
     max-width: 200px;
     text-align: center;
   }
+}
+
+.key-value-type-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--requestly-font-size-sm);
+  padding: 0;
+  cursor: pointer;
+}
+
+.key-value-type-text {
+  flex-grow: 1;
+  flex-shrink: 1;
+  padding: 4px 0px 4px 2px;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.key-value-type-arrow {
+  padding: 0 8px;
+  flex-shrink: 0;
+  opacity: 0;
+  visibility: hidden;
+  margin-left: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.key-value-type-view:hover .key-value-type-arrow {
+  opacity: 1;
+  visibility: visible;
 }
