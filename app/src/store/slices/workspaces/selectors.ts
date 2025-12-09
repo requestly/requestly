@@ -20,7 +20,7 @@ export const getNonLocalWorkspaces = (state: RootState) => {
   return all.filter((w) => w.workspaceType !== WorkspaceType.LOCAL);
 };
 
-export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0];
+export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0]; // TODO@nafeesn: it should ideally return null when [] array is there
 
 export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;

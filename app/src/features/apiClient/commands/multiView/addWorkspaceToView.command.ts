@@ -21,13 +21,18 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
   }
 
   const contextId = workspace.id; // assumes contextId is the same as workspace id
-  const existingContext = apiClientMultiWorkspaceViewStore.getState().getSelectedWorkspace(contextId!);
+
+  if (contextId === null) {
+    return;
+  }
+
+  const existingContext = apiClientMultiWorkspaceViewStore.getState().getSelectedWorkspace(contextId);
   if (existingContext) {
     return;
   }
 
   const renderableParam = {
-    id: contextId!,
+    id: contextId,
     name: workspace.name,
     type: workspace.workspaceType,
     rawWorkspace: workspace,
@@ -35,7 +40,7 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
   apiClientMultiWorkspaceViewStore.getState().addWorkspace(renderableParam);
   apiClientMultiWorkspaceViewStore
     .getState()
-    .setStateForSelectedWorkspace(contextId!, { loading: true, errored: false });
+    .setStateForSelectedWorkspace(contextId, { loading: true, errored: false });
   try {
     await setupContext(workspace, {
       loggedIn: !!userId,
@@ -43,11 +48,11 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
     });
     apiClientMultiWorkspaceViewStore
       .getState()
-      .setStateForSelectedWorkspace(contextId!, { loading: false, errored: false });
+      .setStateForSelectedWorkspace(contextId, { loading: false, errored: false });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred while adding workspace to view";
-    apiClientMultiWorkspaceViewStore.getState().setStateForSelectedWorkspace(contextId!, {
+    apiClientMultiWorkspaceViewStore.getState().setStateForSelectedWorkspace(contextId, {
       loading: false,
       errored: true,
       error: errorMessage,
