@@ -9,6 +9,7 @@ import {
   apiClientMultiWorkspaceViewStore,
   ApiClientViewMode,
 } from "../store/multiWorkspaceView/multiWorkspaceView.store";
+import { NativeError } from "errors/NativeError";
 
 export function getStores(ctx: ApiClientFeatureContext) {
   return ctx.stores;
@@ -57,7 +58,7 @@ export function getApiClientFeatureContext(contextId?: string): ApiClientFeature
   const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
   const throwIfUndefined = (context: ApiClientFeatureContext | undefined) => {
     if (!context) {
-      throw new Error("No context found in getApiClientFeatureContext");
+      throw new NativeError("No context found in getApiClientFeatureContext");
     }
     return context;
   };
