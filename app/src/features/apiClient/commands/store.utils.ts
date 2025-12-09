@@ -53,8 +53,15 @@ export function getOrderedApiClientRecords(
 }
 
 // Multiview
-export function getApiClientFeatureContext(contextId?: string) {
+export function getApiClientFeatureContext(contextId?: string): ApiClientFeatureContext {
   const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
+  const throwIfUndefined = (context: ApiClientFeatureContext | undefined) => {
+    if (!context) {
+      throw new Error("No context found in getApiClientFeatureContext");
+    }
+    return context;
+  };
+
   if (contextId === NoopContextId) {
     return NoopContext;
   }
@@ -62,10 +69,12 @@ export function getApiClientFeatureContext(contextId?: string) {
   if (viewMode === ApiClientViewMode.SINGLE) {
     return getSingleViewContext();
   }
+
   if (!contextId) {
-    return getLastUsedContext();
+    return throwIfUndefined(getLastUsedContext());
   }
-  return getContext(contextId);
+
+  return throwIfUndefined(getContext(contextId));
 }
 
 export function getChildParentMap(context: ApiClientFeatureContext) {
