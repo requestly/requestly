@@ -9,6 +9,7 @@ import {
   apiClientMultiWorkspaceViewStore,
   ApiClientViewMode,
 } from "../store/multiWorkspaceView/multiWorkspaceView.store";
+import { NativeError } from "errors/NativeError";
 
 export function getStores(ctx: ApiClientFeatureContext) {
   return ctx.stores;
@@ -53,8 +54,15 @@ export function getOrderedApiClientRecords(
 }
 
 // Multiview
-export function getApiClientFeatureContext(contextId?: string) {
+export function getApiClientFeatureContext(contextId?: string): ApiClientFeatureContext {
   const { getSingleViewContext, getContext, getLastUsedContext } = apiClientFeatureContextProviderStore.getState();
+  const throwIfUndefined = (context: ApiClientFeatureContext | undefined) => {
+    if (!context) {
+      throw new NativeError("No context found in getApiClientFeatureContext").addContext({ contextId });
+    }
+    return context;
+  };
+
   if (contextId === NoopContextId) {
     return NoopContext;
   }
@@ -62,10 +70,12 @@ export function getApiClientFeatureContext(contextId?: string) {
   if (viewMode === ApiClientViewMode.SINGLE) {
     return getSingleViewContext();
   }
+
   if (!contextId) {
-    return getLastUsedContext();
+    return throwIfUndefined(getLastUsedContext());
   }
-  return getContext(contextId);
+
+  return throwIfUndefined(getContext(contextId));
 }
 
 export function getChildParentMap(context: ApiClientFeatureContext) {
