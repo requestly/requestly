@@ -94,7 +94,7 @@ const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
       {getFileIcon(file.type)}
 
       <div className="file-item-title">
-        <div className="workspace-name">{workspace.getState().name}</div>
+        <div className="workspace-name">{workspace?.getState().name}</div>
         <div className="file-name">{file.name}</div>
       </div>
     </div>
@@ -193,7 +193,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
 
   return (
     <>
-      {isErrorFileViewerModalOpen && (
+      {isErrorFileViewerModalOpen && errorFileToView && (
         <ErrorFileViewerModal
           errorFile={errorFileToView}
           isOpen={isErrorFileViewerModalOpen}
