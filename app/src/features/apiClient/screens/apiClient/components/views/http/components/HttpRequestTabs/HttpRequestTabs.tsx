@@ -3,7 +3,6 @@ import { QueryParamsTable } from "../../../components/request/components/QueryPa
 import RequestBody from "../../../components/request/RequestBody";
 import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 import React, { useMemo } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
@@ -16,6 +15,7 @@ import { Checkbox } from "antd";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import { PathVariableTable } from "../PathVariableTable";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -160,11 +160,11 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: (
           <ScriptEditor
             key={`${scriptEditorVersion}`}
-            scripts={requestEntry.scripts}
-            onScriptsChange={(newScripts) => {
-              setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
-            }}
-            focusPostResponse={focusPostResponseScriptEditor}
+            requestId={requestId}
+            entry={requestEntry}
+            onScriptsChange={(scripts) => setRequestEntry((prev) => ({ ...prev, scripts }))}
+            aiTestsExcutionCallback={(testResults) => setRequestEntry((prev) => ({ ...prev, testResults }))}
+            focusPostResponse={focusPostResponseScriptEditor ?? false}
           />
         ),
       },
@@ -177,12 +177,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     isRequestBodySupported,
     queryParams.length,
     pathVariables.length,
-    requestEntry.auth,
-    requestEntry.request.body,
-    requestEntry.request.bodyContainer,
-    requestEntry.request.contentType,
-    requestEntry.request.headers,
-    requestEntry.scripts,
+    requestEntry,
     setContentType,
     setRequestEntry,
     focusPostResponseScriptEditor,
