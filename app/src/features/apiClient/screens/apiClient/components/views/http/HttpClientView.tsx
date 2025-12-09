@@ -919,7 +919,11 @@ const HttpClientView: React.FC<Props> = ({
         minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [50, 50]}
       >
-        <div className="api-client-body">
+        <div
+          className={`api-client-body ${
+            sheetPlacement === BottomSheetPlacement.BOTTOM ? "api-client-body__vertical" : "api-client-body__horizontal"
+          }`}
+        >
           <HttpRequestTabs
             error={error}
             requestEntry={entry}
@@ -941,7 +945,7 @@ const HttpClientView: React.FC<Props> = ({
   );
 };
 
-const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC => {
+const WithQueryParamsProvider = (Component: React.ComponentType<any>): React.FC<Props> => {
   const WrappedComponent: React.FC = (props: any) => {
     const record = useAPIRecordsStore().getState().getData(props.apiEntryDetails.id) as RQAPI.ApiClientRecord;
     const entry = (record?.data as RQAPI.HttpApiEntry) || props.apiEntryDetails.data;
