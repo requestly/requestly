@@ -137,7 +137,6 @@ const RuleEditor = (props) => {
           <BottomSheetLayout
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
             hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isSampleRule}
-            minSize={26}
             initialSizes={[60, 40]}
           >
             <ProCard

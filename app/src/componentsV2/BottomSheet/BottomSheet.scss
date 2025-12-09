@@ -59,7 +59,7 @@
   }
 
   & .ant-tabs-content-holder {
-    padding: 8px 8px 28px 8px;
+    padding: 8px 8px 0 8px;
     overflow: hidden;
   }
 
@@ -78,9 +78,6 @@
 }
 
 .bottom-sheet-tab-extra-content {
-  &.collapsed-bottom-state {
-    margin-right: 56px;
-  }
   &,
   .bottom-sheet-utilites {
     display: flex;
