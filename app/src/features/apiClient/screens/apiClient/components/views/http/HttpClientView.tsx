@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState, useContext, useMemo } from "react";
-import { notification, Select, Space } from "antd";
+import { notification, Select, Space, Tooltip } from "antd";
 import { useDispatch } from "react-redux";
 import * as Sentry from "@sentry/react";
 import { KeyValuePair, RQAPI, RequestContentType, RequestMethod } from "../../../../../types";
@@ -834,19 +834,26 @@ const HttpClientView: React.FC<Props> = ({
                 currentEnvironmentVariables={scopedVariables}
               />
             </Space.Compact>
-            <RQButton
-              showHotKeyText
-              onClick={onSendButtonClick}
-              hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
-              type="primary"
-              className="text-bold"
-              disabled={
-                !entry.request.url ||
-                (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
-              }
+            <Tooltip
+              title={isLoadingResponse ? "Request in progress" : !entry.request.url ? "Please enter a URL" : ""}
+              open={isLoadingResponse || !entry.request.url}
+              placement="bottom"
             >
-              Send
-            </RQButton>
+              <RQButton
+                showHotKeyText
+                onClick={onSendButtonClick}
+                hotKey={KEYBOARD_SHORTCUTS.API_CLIENT.SEND_REQUEST.hotKey}
+                type="primary"
+                className="text-bold"
+                disabled={
+                  isLoadingResponse ||
+                  !entry.request.url ||
+                  (appMode === "EXTENSION" && entry.request.contentType === RequestContentType.MULTIPART_FORM)
+                }
+              >
+                Send
+              </RQButton>
+            </Tooltip>
 
             <Conditional condition={!openInModal}>
               <RBACButton
