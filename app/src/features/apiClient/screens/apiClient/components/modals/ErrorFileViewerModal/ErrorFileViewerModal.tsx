@@ -17,7 +17,7 @@ interface ErrorFileViewerModalProps {
 }
 
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
-  const [fileContent, setFileContent] = useState(null);
+  const [fileContent, setFileContent] = useState<unknown>(null);
   const { apiClientRecordsRepository } = useApiClientRepository();
   const {
     env: { forceRefreshEnvironments },
