@@ -86,6 +86,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     schema: TestGenerationOutputSchema,
     onFinish: (result) => {
       setIsTestsStreamingFinished(true);
+      setIsGenerateTestPopoverOpen(false);
+      isPopoverOpenRef.current = false;
       if (result.object?.err) {
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
@@ -109,6 +111,16 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       dispatch(globalActions.updateHasGeneratedAITests(true));
     },
   });
+
+  const handleGenerateTests = (query: string) => {
+    setNegativeFeedback(null);
+    setIsTestsStreamingFinished(false);
+    const preparedApiRecord = {
+      ...entry,
+      type: entry.type ?? RQAPI.ApiEntryType.HTTP,
+    };
+    submit({ userQuery: query, apiRecord: preparedApiRecord });
+  };
 
   const mergeViewConfig = useMemo(() => {
     const isPostResponseScript = scriptType === RQAPI.ScriptType.POST_RESPONSE;
@@ -227,11 +239,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     setIsGenerateTestPopoverOpen(open);
                     isPopoverOpenRef.current = open;
                   }}
-                  onGenerateClick={(query) => {
-                    setNegativeFeedback(null);
-                    setIsTestsStreamingFinished(false);
-                    submit({ userQuery: query, apiRecord: entry });
-                  }}
+                  onGenerateClick={handleGenerateTests}
                   disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
