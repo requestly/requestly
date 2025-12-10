@@ -2,6 +2,7 @@ import { RQAPI } from "features/apiClient/types";
 import { isGraphQLApiRecord, isHttpApiRecord } from "../utils";
 import GraphQLClientView from "../components/views/graphql/GraphQLClientView";
 import HttpClientView from "../components/views/http/HttpClientView";
+import { HttpClientViewCreateMode } from "../components/views/http/HttpClientViewCreateMode";
 
 interface Props {
   apiRecord: RQAPI.ApiRecord;
@@ -18,6 +19,18 @@ export const ClientViewFactory = ({
   isCreateMode,
   isOpenInModal,
 }: Props) => {
+  if (isCreateMode) {
+    return (
+      <HttpClientViewCreateMode
+        apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
+        onSaveCallback={onSaveCallback}
+        openInModal={isOpenInModal}
+        isCreateMode={isCreateMode}
+        notifyApiRequestFinished={handleRequestFinished}
+      />
+    );
+  }
+
   if (isHttpApiRecord(apiRecord)) {
     return (
       <HttpClientView

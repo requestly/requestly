@@ -794,9 +794,9 @@ export const processRecordsForDuplication = (
 
 export const resolveAuth = (
   auth: RQAPI.Auth,
-  childDetails: { id: string; parentId: string },
+  childDetails: { id: string; parentId: string | null },
   getParentChain: (id: string) => string[],
-  getData: (id: string) => RQAPI.ApiClientRecord
+  getData: (id: string | null) => RQAPI.ApiClientRecord | undefined
 ): RQAPI.Auth => {
   //create a record array
   const apiRecords: RQAPI.ApiClientRecord[] = [];
