@@ -171,7 +171,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   ): Promise<{ success: boolean; data: string; message?: string }> {
     const result = await this.updateRecord({ id, description }, id);
 
-    if (result.success && result.data) {
+    if (result.success) {
       return {
         success: result.success,
         data: result.data.description || "",
