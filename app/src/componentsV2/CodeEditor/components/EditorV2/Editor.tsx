@@ -38,6 +38,7 @@ interface EditorProps {
   isResizable?: boolean;
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
+  toolbarRightContent?: React.ReactNode;
   hideCharacterCount?: boolean;
   handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
@@ -49,6 +50,7 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
+  onEditorReady?: (view: EditorView) => void;
   mergeView?: {
     incomingValue: string;
     source: "ai" | "user";
@@ -63,6 +65,7 @@ const Editor: React.FC<EditorProps> = ({
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
+  toolbarRightContent,
   analyticEventProperties = {},
   scriptId = "",
   prettifyOnInit = false,
@@ -71,6 +74,7 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
+  onEditorReady,
   mergeView,
 }) => {
   const location = useLocation();
@@ -136,6 +140,7 @@ const Editor: React.FC<EditorProps> = ({
     if (editor?.editor && editor?.state && editor?.view) {
       editorRef.current = editor;
       setIsEditorInitialized(true);
+      onEditorReady?.(editor.view);
     }
   };
 
@@ -223,6 +228,7 @@ const Editor: React.FC<EditorProps> = ({
         handleFullScreenToggle={handleFullScreenToggle}
         customOptions={toolbarOptions}
         enablePrettify={showOptions.enablePrettify}
+        rightContent={toolbarRightContent}
       />
     ),
     [
@@ -232,6 +238,7 @@ const Editor: React.FC<EditorProps> = ({
       language,
       showOptions.enablePrettify,
       toolbarOptions,
+      toolbarRightContent,
       handleEditorSilentUpdate,
       value,
     ]
