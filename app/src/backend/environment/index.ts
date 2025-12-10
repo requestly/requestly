@@ -187,7 +187,7 @@ export const duplicateEnvironmentInDB = async (
 ) => {
   const environmentToDuplicate = allEnvironmentData[environmentId];
   if (!environmentToDuplicate) {
-    return;
+    throw new Error("Environment to duplicate not found");
   }
 
   const newEnvironment = await createNonGlobalEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
