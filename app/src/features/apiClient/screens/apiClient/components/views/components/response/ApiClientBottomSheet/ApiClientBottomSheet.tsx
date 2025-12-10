@@ -5,7 +5,7 @@ import { getContentTypeFromResponseHeaders } from "features/apiClient/screens/ap
 import ResponseBody from "../ResponseBody/ResponseBody";
 import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
-import { Tag } from "antd";
+import { TabsProps, Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
 import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
@@ -80,35 +80,35 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   }, [testResults]);
 
   const bottomSheetTabItems = useMemo(() => {
-    const baseTabItems = [
+    const baseTabItems: TabsProps["items"] = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.RESPONSE,
-        icon: MdDataObject,
         label: (
-          <span className="tab-items">
-            <MdDataObject /> Body
+          <span className="bottom-sheet-tab">
+            <MdDataObject />
+            <span>Body</span>
           </span>
         ),
         children: <ResponseBody responseText={response?.body} contentTypeHeader={contentTypeHeader} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.HEADERS,
-        icon: PiTag,
         label: (
-          <span className="tab-items">
+          <span className="bottom-sheet-tab">
             <PiTag />
-            Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}
+            <span>
+              Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}
+            </span>
           </span>
         ),
         children: <ResponseHeaders headers={response?.headers} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        icon: MdOutlineScience,
         label: (
-          <span className="tab-items">
+          <span className="bottom-sheet-tab">
             <MdOutlineScience />
-            Test results {testResultsStats}
+            <span>Test results {testResultsStats}</span>
           </span>
         ),
         children: (

@@ -45,7 +45,7 @@ export const BottomSheetLayout: React.FC<Props> = (props) => {
       <SplitPaneLayout
         bottomSheet={bottomSheet}
         children={children}
-        minSize={(props as SplitLayoutProps).minSize ?? 25}
+        minSize={(props as SplitLayoutProps).minSize}
         initialSizes={(props as SplitLayoutProps).initialSizes ?? [40, 60]}
       />
     );

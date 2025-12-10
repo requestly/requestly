@@ -1,16 +1,11 @@
 .api-client-sheet-panel-container {
   display: flex;
   flex-direction: column;
-  height: 99%;
+  height: 100%;
 
   .api-client-sheet-panel {
     flex: 1;
     overflow-y: hidden;
-
-    .ant-tabs-extra-content {
-      margin-top: -6px;
-      margin-right: 4px;
-    }
   }
 
   .test-results-stats {
@@ -26,10 +21,4 @@
       background-color: var(--requestly-color-error-800);
     }
   }
-}
-
-.tab-items {
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }

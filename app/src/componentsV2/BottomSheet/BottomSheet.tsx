@@ -1,15 +1,15 @@
 import React, { ReactNode } from "react";
-import { Tabs, TabsProps, Tooltip } from "antd";
+import { Tabs, TabsProps } from "antd";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
 import { BiDockBottom } from "@react-icons/all-files/bi/BiDockBottom";
 import { BottomSheetPlacement } from "./types";
 import { RQButton } from "lib/design-system-v2/components";
-import "./BottomSheet.scss";
 import { MdOutlineKeyboardArrowLeft } from "@react-icons/all-files/md/MdOutlineKeyboardArrowLeft";
 import { MdOutlineKeyboardArrowRight } from "@react-icons/all-files/md/MdOutlineKeyboardArrowRight";
 import { MdOutlineKeyboardArrowUp } from "@react-icons/all-files/md/MdOutlineKeyboardArrowUp";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
+import "./BottomSheet.scss";
 
 interface BottomSheetProps extends TabsProps {
   tourId?: string;
@@ -28,10 +28,10 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
   const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
-  const isCollapsedSheetPlacedAtBottom = !isBottomSheetOpen && isSheetPlacedAtBottom;
+  const isCollapsedSheetPlacedToRight = !isSheetPlacedAtBottom;
 
-  const tabExtraContent = (
-    <div className={`bottom-sheet-tab-extra-content ${isCollapsedSheetPlacedAtBottom ? "collapsed-bottom-state" : ""}`}>
+  const verticalTabExtraContent = (
+    <div className="bottom-sheet-tab-extra-content">
       {tabBarExtraContent as ReactNode}
 
       <div className="bottom-sheet-utilites">
@@ -52,61 +52,51 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           size="small"
           type="transparent"
           title="Collapse"
+          className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__vertical"
           onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
-          icon={
-            isSheetPlacedAtBottom && !isBottomSheetOpen ? (
-              <MdOutlineKeyboardArrowUp />
-            ) : isSheetPlacedAtBottom ? (
-              <MdOutlineKeyboardArrowDown />
-            ) : (
-              <MdOutlineKeyboardArrowRight />
-            )
-          }
+          icon={isBottomSheetOpen ? <MdOutlineKeyboardArrowDown /> : <MdOutlineKeyboardArrowUp />}
         />
       </div>
     </div>
   );
 
-  return !isBottomSheetOpen && !isSheetPlacedAtBottom ? (
-    <div className="bottom-sheet-vertical-collapsed-view">
-      <Tooltip key="expand-btn" title="Expand" placement="left">
+  const horizontalTabExtraContent = {
+    left: (
+      <div className="bottom-sheet-collapse-btn__horizontal-container">
         <RQButton
-          size="default"
+          size="small"
           type="transparent"
-          title="Expand"
-          icon={<MdOutlineKeyboardArrowLeft />}
-          onClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
+          title="Collapse"
+          className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__horizontal"
+          onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
+          icon={isBottomSheetOpen ? <MdOutlineKeyboardArrowRight /> : <MdOutlineKeyboardArrowLeft />}
         />
-      </Tooltip>
-      {items?.map((item: any, index: number) => (
-        <Tooltip key={index} title={item.key} placement="left">
-          <RQButton
-            size="default"
-            type="transparent"
-            title={item.key}
-            icon={item.icon ? <item.icon /> : null}
-            onClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
-          />
-        </Tooltip>
-      ))}
+      </div>
+    ),
+    right: (
       <RQButton
         size="small"
         type="transparent"
         title="Toggle"
         onClick={() => toggleSheetPlacement()}
-        className="bottom-sheet-toggle-btn-collapsed"
+        className="bottom-sheet-toggle-btn"
         icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
       />
-    </div>
-  ) : (
+    ),
+  };
+
+  return (
     <Tabs
+      tabPosition={isCollapsedSheetPlacedToRight ? "left" : "top"}
       items={items}
       moreIcon={null}
       data-tour-id={tourId}
-      className={`${isCollapsedSheetPlacedAtBottom ? "collapsed-bottom-sheet" : ""}`}
+      className={`${isCollapsedSheetPlacedToRight ? "collapsed-bottom-sheet__horizontal" : ""}`}
       defaultActiveKey={defaultActiveKey}
       onTabClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
-      tabBarExtraContent={tabExtraContent}
+      tabBarExtraContent={
+        sheetPlacement === BottomSheetPlacement.BOTTOM ? verticalTabExtraContent : horizontalTabExtraContent
+      }
       {...props}
     />
   );

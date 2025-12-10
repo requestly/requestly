@@ -11,7 +11,7 @@ interface Props {
   initialSizes?: Array<number>;
 }
 
-export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 25, initialSizes = [40, 60] }) => {
+export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 26, initialSizes = [40, 60] }) => {
   const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
