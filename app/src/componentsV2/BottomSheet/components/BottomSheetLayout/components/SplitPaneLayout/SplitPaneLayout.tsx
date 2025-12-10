@@ -44,8 +44,6 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       const containerDimension = isSheetPlacedAtBottom ? containerRect?.height : containerRect?.width;
       const snapOffsetPercentage = (SNAP_OFFSET_PIXELS / containerDimension) * 100;
 
-      console.log({ size: newSizes[1], snapOffsetPercentage });
-
       if (newSizes[1] <= snapOffsetPercentage) {
         console.log("collapse karo");
         toggleBottomSheet({ isOpen: false, action: "bottom_sheet_collapse_expand" });

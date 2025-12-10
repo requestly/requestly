@@ -31,10 +31,9 @@
 .bottom-sheet-container.ant-col,
 .bottom-sheet-panel-container.ant-col {
   & .ant-tabs-nav {
-    padding: 8px;
-    padding-top: 2px;
+    padding: 0 8px;
     margin-bottom: 0;
-    padding-bottom: 0;
+    height: 35px;
   }
 
   & .ant-tabs-nav-list .ant-tabs-tab {
@@ -127,6 +126,7 @@
     padding: 0px !important;
     padding-right: 2px;
     width: 35px;
+    height: unset !important;
     min-width: unset !important;
     overflow: hidden;
 
