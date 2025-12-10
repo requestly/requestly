@@ -27,10 +27,13 @@ export const BottomSheetProvider: React.FC<{
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
   const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(defaultPlacement);
 
-  const toggleBottomSheet = ({ isOpen, action }: toggleParams) => {
+  const toggleBottomSheet = (params: toggleParams) => {
+    if (!params) {
+      return;
+    }
+    const { isOpen, action } = params;
     if (typeof isOpen !== "undefined") {
       setIsBottomSheetOpen(isOpen);
-
       trackBottomSheetToggled(isOpen, action);
     } else {
       const newOpenState = !isBottomSheetOpen;
