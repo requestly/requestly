@@ -82,7 +82,8 @@ const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
   ]);
 
   const ctx = useApiClientFeatureContext();
-  const workspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId), [getSelectedWorkspace, ctx.workspaceId]);
+  // Workspace cannot be null in this component context - using non-null assertion
+  const workspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId)!, [getSelectedWorkspace, ctx.workspaceId]);
 
   return getViewMode() === ApiClientViewMode.SINGLE ? (
     <>
@@ -94,7 +95,7 @@ const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
       {getFileIcon(file.type)}
 
       <div className="file-item-title">
-        <div className="workspace-name">{workspace?.getState().name}</div>
+        <div className="workspace-name">{workspace.getState().name}</div>
         <div className="file-name">{file.name}</div>
       </div>
     </div>
