@@ -143,16 +143,14 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     };
   }
 
-  async updateCollectionAuthData(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> {
+  async updateCollectionAuthData(collection: RQAPI.CollectionRecord): RQAPI.ApiClientRecordPromise {
     return this.updateRecord(collection, collection.id);
   }
 
-  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> {
+  async writeToRawFile(): RQAPI.ApiClientRecordPromise {
     return {
       success: true,
-      data: null,
+      data: {} as RQAPI.ApiClientRecord,
     };
   }
 
@@ -163,10 +161,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     };
   }
 
-  async createCollectionFromImport(
-    collection: RQAPI.CollectionRecord,
-    id: string
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null; message?: string }> {
+  async createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise {
     return this.createRecordWithId(collection, id);
   }
 
