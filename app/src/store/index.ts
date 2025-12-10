@@ -12,6 +12,7 @@ import { workspaceReducerWithLocal } from "./slices/workspaces/slice";
 import { variablesReducer } from "./features/variables/slice";
 
 import { globalReducers } from "./slices/global/slice";
+import { multiWorkspaceViewReducer } from "features/apiClient/slices";
 
 export const reduxStore = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.BILLING]: billingReducer,
     [ReducerKeys.WORKSPACE]: workspaceReducerWithLocal,
     [ReducerKeys.VARIABLES]: variablesReducer,
+    [ReducerKeys.MULTI_WORKSPACE_VIEW]: multiWorkspaceViewReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will
