@@ -154,7 +154,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   @FsErrorHandler
   async getRawFileData(id: string) {
-    return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
+    return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<string>>;
   }
 
   @FsErrorHandler
