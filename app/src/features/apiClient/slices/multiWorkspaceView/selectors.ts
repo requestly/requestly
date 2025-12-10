@@ -1,8 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { MultiWorkspaceViewState } from "./types";
 import { multiWorkspaceViewAdapter, multiWorkspaceViewSlice } from "./multiWorkspaceViewSlice";
-
-export type RootState = { multiWorkspaceView: MultiWorkspaceViewState };
+import { RootState } from "store/types";
 
 const workspacesSelectors = multiWorkspaceViewAdapter.getSelectors();
 

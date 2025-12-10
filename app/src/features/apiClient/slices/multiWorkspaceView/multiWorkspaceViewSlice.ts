@@ -10,8 +10,10 @@ const initialState: MultiWorkspaceViewState = {
   selectedWorkspaces: multiWorkspaceViewAdapter.getInitialState(),
 };
 
+export const MULTI_WORKSPACE_VIEW_SLICE = "multiWorkspaceView";
+
 export const multiWorkspaceViewSlice = createSlice({
-  name: "multiWorkspaceView",
+  name: MULTI_WORKSPACE_VIEW_SLICE,
   initialState,
   reducers: {
     setViewMode(state, action: PayloadAction<ApiClientViewMode>) {
