@@ -129,6 +129,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     description: string
   ): Promise<{ success: boolean; data: string; message?: string }> {
     const result = await this.updateRecord({ id, description }, id);
+
     if (result.success && result.data) {
       return {
         success: true,
@@ -138,7 +139,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
     return {
       success: result.success,
-      data: "",
+      data: result.data?.description || "",
       message: "Something went wrong while updating collection description",
     };
   }
@@ -149,7 +150,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     return this.updateRecord(collection, collection.id);
   }
 
-  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> {
+  async writeToRawFile(): RQAPI.ApiClientRecordPromise {
     return {
       success: true,
       data: null,

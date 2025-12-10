@@ -65,14 +65,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       ...sanitizedRecord,
       id: this.getNewId(),
       name: record.name || "Untitled request",
-      type: record.type,
-      data: sanitizedRecord.data,
+      type: record.type!,
+      data: sanitizedRecord.data!,
       collectionId: record.collectionId || "",
       description: record.description || "",
       deleted: false,
-      ownerId: null,
-      createdBy: null,
-      updatedBy: null,
+      ownerId: "",
+      createdBy: "",
+      updatedBy: "",
       createdTs: Timestamp.now().toMillis(),
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.ApiClientRecord;
@@ -93,14 +93,14 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       ...sanitizedRecord,
       id,
       name: record.name || "Untitled request",
-      type: record.type,
-      data: sanitizedRecord.data,
+      type: record.type!,
+      data: sanitizedRecord.data!,
       collectionId: record.collectionId || "",
       description: record.description || "",
       deleted: false,
-      ownerId: null,
-      createdBy: null,
-      updatedBy: null,
+      ownerId: "",
+      createdBy: "",
+      updatedBy: "",
       createdTs: Timestamp.now().toMillis(),
       updatedTs: Timestamp.now().toMillis(),
     } as RQAPI.ApiClientRecord;
@@ -147,11 +147,13 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
       return { success: false, data: null, message: "Collection not found!" };
     }
 
+    const collectionRecord: RQAPI.CollectionRecord = record.data as RQAPI.CollectionRecord;
+
     const updatedRecord: RQAPI.CollectionRecord = {
-      ...record.data,
+      ...collectionRecord,
       type: RQAPI.RecordType.COLLECTION,
       data: {
-        ...record.data.data,
+        ...collectionRecord.data,
         variables,
       },
     };
@@ -163,19 +165,22 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return this.updateRecord({ id, name: newName }, id);
   }
 
-  async updateCollectionDescription(id: string, description: string) {
+  async updateCollectionDescription(
+    id: string,
+    description: string
+  ): Promise<{ success: boolean; data: string; message?: string }> {
     const result = await this.updateRecord({ id, description }, id);
 
-    if (result.success) {
+    if (result.success && result.data) {
       return {
         success: result.success,
-        data: result.data.description,
+        data: result.data.description || "",
       };
     }
 
     return {
       success: result.success,
-      data: result.data.description,
+      data: result.data?.description || "",
       message: "Something went wrong while updating collection description",
     };
   }
@@ -196,17 +201,17 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     return this.getNewId();
   }
 
-  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async writeToRawFile(): RQAPI.ApiClientRecordPromise {
     return {
       success: true,
-      data: undefined,
+      data: null,
     };
   }
 
-  async getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }> {
+  async getRawFileData(id: string): Promise<{ success: boolean; data: null; message?: string }> {
     return {
       success: true,
-      data: undefined,
+      data: null,
     };
   }
 
@@ -311,6 +316,10 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   private async getCollectionDetails(
     collectionId: RQAPI.ApiClientRecord["collectionId"]
   ): Promise<LocalStore.CollectionRecord | null> {
+    if (collectionId == null) {
+      return null;
+    }
+
     const result = await this.getRecord(collectionId);
 
     if (!result.success) {
