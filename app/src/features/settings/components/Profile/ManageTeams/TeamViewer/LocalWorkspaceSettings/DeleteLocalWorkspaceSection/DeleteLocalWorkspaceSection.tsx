@@ -69,7 +69,7 @@ export const DeleteLocalWorkspaceSection: React.FC = () => {
       if (result.type === "error") {
         const err = result.error;
         const isPermissionIssue = err.code === ErrorCode.PermissionDenied || err.code === ErrorCode.NotPermitted;
-        if (!isPermissionIssue) {
+        if (isPermissionIssue) {
           hadPermissionIssue = true;
           Sentry.withScope((scope) => {
             scope.setTag("error_type", "workspace_delete_permission_issue");
