@@ -62,12 +62,12 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async createRecord(record: API["data"], collectionId?: string) {
+  async createRecord(record: API["data"], collectionId?: RQAPI.CollectionRecord["collectionId"]) {
     return this.invokeProcedureInBG("createRecord", record, collectionId) as Promise<FileSystemResult<API>>;
   }
 
   @FsErrorHandler
-  async createRecordWithId(record: API["data"], id: string, collectionId: string) {
+  async createRecordWithId(record: API["data"], id: string, collectionId: RQAPI.CollectionRecord["collectionId"]) {
     return this.invokeProcedureInBG("createRecordWithId", record, id, collectionId) as Promise<FileSystemResult<API>>;
   }
 
@@ -92,7 +92,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async createCollection(name: string, collectionId?: string) {
+  async createCollection(name: string, collectionId?: RQAPI.CollectionRecord["collectionId"]) {
     return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
   }
 
