@@ -17,7 +17,7 @@ interface ErrorFileViewerModalProps {
 }
 
 export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileViewerModalProps) => {
-  const [fileContent, setFileContent] = useState<unknown>(null);
+  const [fileContent, setFileContent] = useState<string | null>(null);
   const { apiClientRecordsRepository } = useApiClientRepository();
   const {
     env: { forceRefreshEnvironments },
@@ -90,7 +90,7 @@ export const ErrorFileViewerModal = ({ isOpen, onClose, errorFile }: ErrorFileVi
           <Editor
             language={EditorLanguage.JSON}
             handleChange={setFileContent}
-            value={fileContent}
+            value={fileContent ?? ""}
             isResizable={true}
             hideCharacterCount
             hideToolbar
