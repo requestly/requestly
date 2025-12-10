@@ -19,7 +19,7 @@ const PremiumPlanBadge = () => {
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;
-  const planEndDateString = userPlanDetails?.subscription?.endDate;
+  const planEndDateString = userPlanDetails?.subscription?.endDate ?? 0;
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
 
   let daysLeft = 0;
@@ -73,7 +73,7 @@ const PremiumPlanBadge = () => {
   if (
     !isAppSumoDeal &&
     planId &&
-    [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus)
+    [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus ?? "")
   ) {
     if (daysLeft > 30) {
       return null;

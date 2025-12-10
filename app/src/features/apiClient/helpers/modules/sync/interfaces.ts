@@ -61,7 +61,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     record: any,
     fileType: FileType
   ): Promise<{ success: boolean; data: unknown; message?: string }>;
-  getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }>;
+  getRawFileData(id: string): Promise<{ success: boolean; data: string | null; message?: string }>;
   createCollectionFromImport(
     collection: RQAPI.CollectionRecord,
     id: string
