@@ -50,7 +50,7 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
   const handleDeleteApiRecord = async () => {
     try {
       recordsWithContext.forEach(async ({ context, records }) => {
-        const { deletedApiRecords, deletedCollectionRecords } = await deleteRecords(context, {
+        const { deletedApiRecords, deletedCollectionRecords } = await deleteRecords(context!, {
           records,
         });
 
