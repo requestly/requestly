@@ -86,7 +86,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   }
 
   // TODO: refactor this to avoid code duplication
-  async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string) {
+  async createRecordWithId(record: Partial<RQAPI.ApiClientRecord>, id: string): RQAPI.ApiClientRecordPromise {
     const sanitizedRecord = sanitizeRecord(record as RQAPI.ApiClientRecord);
 
     const newRecord = {
@@ -180,7 +180,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
 
     return {
       success: result.success,
-      data: result.data?.description || "",
+      data: "",
       message: "Something went wrong while updating collection description",
     };
   }
@@ -204,7 +204,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
   async writeToRawFile(): RQAPI.ApiClientRecordPromise {
     return {
       success: true,
-      data: null,
+      data: {} as RQAPI.ApiClientRecord, // dummy response
     };
   }
 
@@ -215,10 +215,7 @@ export class LocalStoreRecordsSync implements ApiClientRecordsInterface<ApiClien
     };
   }
 
-  async createCollectionFromImport(
-    collection: RQAPI.CollectionRecord,
-    id: string
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise {
     return this.createRecordWithId(collection, id);
   }
 

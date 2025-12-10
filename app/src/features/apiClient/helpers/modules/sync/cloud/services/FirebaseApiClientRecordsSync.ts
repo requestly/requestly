@@ -139,7 +139,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
 
     return {
       success: result.success,
-      data: result.data?.description || "",
+      data: "",
       message: "Something went wrong while updating collection description",
     };
   }
