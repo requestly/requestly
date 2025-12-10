@@ -23,7 +23,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
     switch (requestDetails.type) {
-      case "http":
+      case RQAPI.ApiEntryType.HTTP:
         return {
           url: requestDetails.url,
           queryParams: requestDetails.queryParams,
@@ -34,7 +34,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           contentType: requestDetails.contentType,
           pathVariables: requestDetails.pathVariables,
         };
-      case "graphql":
+      case RQAPI.ApiEntryType.GRAPHQL:
         return {
           operation: requestDetails.operation,
           variables: requestDetails.variables,
