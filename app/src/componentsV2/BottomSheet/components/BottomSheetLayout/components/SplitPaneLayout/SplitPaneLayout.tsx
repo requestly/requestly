@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import Split from "react-split";
 import { Col, Row } from "antd";
 import { useBottomSheetContext } from "componentsV2/BottomSheet/context";
@@ -11,15 +11,15 @@ interface Props {
   initialSizes?: Array<number>;
 }
 
+const getDefaultSizes = (isSheetPlacedAtBottom: boolean, initialSizes: Array<number>) => {
+  return isSheetPlacedAtBottom ? initialSizes : [55, 45];
+};
+
 export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSize = 26, initialSizes = [40, 60] }) => {
   const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
-  const defaultSizes = useMemo(() => {
-    return isSheetPlacedAtBottom ? initialSizes : [55, 45];
-  }, [isSheetPlacedAtBottom, initialSizes]);
-
-  const [sizes, setSizes] = useState<number[]>(defaultSizes);
+  const [sizes, setSizes] = useState<number[]>(() => getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
   const splitContainerRef = useRef<HTMLDivElement>(null);
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
@@ -30,9 +30,9 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     if (!isBottomSheetOpen) {
       setSizes([100, 0]);
     } else {
-      setSizes(defaultSizes);
+      setSizes(getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
     }
-  }, [isBottomSheetOpen, defaultSizes]);
+  }, [isBottomSheetOpen, isSheetPlacedAtBottom, initialSizes]);
 
   const handleDrag = useCallback(
     (newSizes: number[]) => {
@@ -45,7 +45,6 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
       const snapOffsetPercentage = (SNAP_OFFSET_PIXELS / containerDimension) * 100;
 
       if (newSizes[1] <= snapOffsetPercentage) {
-        console.log("collapse karo");
         toggleBottomSheet({ isOpen: false, action: "bottom_sheet_collapse_expand" });
       } else {
         toggleBottomSheet({ isOpen: true, action: "bottom_sheet_collapse_expand" });
