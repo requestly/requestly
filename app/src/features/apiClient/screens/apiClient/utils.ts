@@ -587,7 +587,7 @@ export const queryParamsToURLString = (queryParams: KeyValuePair[], inputString:
 
 export const filterRecordsBySearch = (
   records: RQAPI.ApiClientRecord[],
-  searchValue: string
+  searchValue?: string
 ): RQAPI.ApiClientRecord[] => {
   if (!searchValue) return records;
 
