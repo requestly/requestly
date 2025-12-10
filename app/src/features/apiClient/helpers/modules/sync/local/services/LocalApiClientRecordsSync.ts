@@ -402,26 +402,25 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     if (result.type === "error") {
       return {
         success: false,
-        data: undefined,
+        data: "",
         message: result.error.message,
       };
     }
+
     return {
       success: true,
       data: result.content,
     };
   }
 
-  async updateCollectionAuthData(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async updateCollectionAuthData(collection: RQAPI.CollectionRecord): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
 
     if (result.type === "error") {
       return {
         success: false,
-        data: undefined,
+        data: null,
         message: result.error.message,
       };
     }
@@ -474,10 +473,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createCollectionFromImport(
-    collection: RQAPI.CollectionRecord,
-    id: string
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.createCollectionFromCompleteRecord(collection, id);
     if (result.type === "error") {
@@ -649,7 +645,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   ): ResponsePromise<SavedRunResult> {
     return {
       success: true,
-      data: null,
+      data: {} as SavedRunResult,
     };
   }
 }

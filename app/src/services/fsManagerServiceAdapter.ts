@@ -184,17 +184,20 @@ class FsManagerServiceAdapterProvider {
     console.log("provider created");
   }
 
-  async get(rootPath: string) {
+  async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
       lock = withTimeout(new Mutex(), 10 * 1000);
       this.lockMap.set(rootPath, lock);
     }
     await lock.acquire();
-    if (this.cache.has(rootPath)) {
+
+    const fsManagerServiceAdapter = this.cache.get(rootPath);
+
+    if (fsManagerServiceAdapter) {
       console.log("got provider from cache");
       lock.release();
-      return this.cache.get(rootPath);
+      return fsManagerServiceAdapter;
     }
     try {
       console.log("calling build", Date.now());
