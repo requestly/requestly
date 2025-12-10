@@ -31,7 +31,6 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
     const tabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.CONSOLE,
-        icon: MdOutlineTerminal,
         label: (
           <div className="bottom-sheet-tab">
             <MdOutlineTerminal />
@@ -43,7 +42,6 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.NETWORK,
-        icon: MdNetworkCheck,
         label: (
           <div className="bottom-sheet-tab">
             <MdNetworkCheck />
@@ -54,7 +52,6 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.ENVIRONMENT,
-        icon: MdConnectedTv,
         label: (
           <div className="bottom-sheet-tab">
             <MdConnectedTv />
@@ -65,7 +62,6 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.STORAGE,
-        icon: HiOutlineDatabase,
         label: (
           <div className="bottom-sheet-tab">
             <HiOutlineDatabase />
@@ -79,7 +75,6 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
     if (!isDraftSession) {
       tabItems.unshift({
         key: BOTTOM_SHEET_TAB_KEYS.INFO,
-        icon: MdOutlineInfo,
         label: (
           <div className="bottom-sheet-tab">
             <MdOutlineInfo />

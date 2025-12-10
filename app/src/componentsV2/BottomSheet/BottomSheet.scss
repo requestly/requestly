@@ -115,24 +115,24 @@
   }
 }
 
-.collapsed-bottom-sheet__horizontal {
+.collapsed-bottom-sheet__horizontal.ant-tabs {
   overflow: hidden;
 
   .ant-tabs-content-holder .ant-tabs-content-left .ant-tabs-tabpane {
-    padding-left: unset !important;
+    padding-left: unset;
   }
 
   .ant-tabs-nav {
-    padding: 0px !important;
+    padding: 0px;
     padding-right: 2px;
     width: 35px;
-    height: unset !important;
-    min-width: unset !important;
+    height: unset;
+    min-width: unset;
     overflow: hidden;
 
     .ant-tabs-nav-wrap {
-      padding: unset !important;
-      align-self: unset !important;
+      padding: unset;
+      align-self: unset;
     }
   }
 
