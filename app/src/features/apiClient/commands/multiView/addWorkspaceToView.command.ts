@@ -21,6 +21,11 @@ export const addWorkspaceToView = async (workspace: Workspace, userId?: string) 
   }
 
   const contextId = workspace.id; // assumes contextId is the same as workspace id
+
+  if (contextId === null) {
+    return;
+  }
+
   const existingContext = apiClientMultiWorkspaceViewStore.getState().getSelectedWorkspace(contextId);
   if (existingContext) {
     return;
