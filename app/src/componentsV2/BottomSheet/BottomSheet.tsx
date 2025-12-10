@@ -28,7 +28,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
   const { sheetPlacement, toggleBottomSheet, toggleSheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
-  const isCollapsedSheetPlacedToRight = !isSheetPlacedAtBottom;
+  const isCollapsedSheetPlacedToRight = !isSheetPlacedAtBottom && !isBottomSheetOpen;
 
   const verticalTabExtraContent = (
     <div className="bottom-sheet-tab-extra-content">
@@ -54,7 +54,15 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
           title="Collapse"
           className="bottom-sheet-collapse-btn bottom-sheet-collapse-btn__vertical"
           onClick={() => toggleBottomSheet({ action: "bottom_sheet_collapse_expand" })}
-          icon={isBottomSheetOpen ? <MdOutlineKeyboardArrowDown /> : <MdOutlineKeyboardArrowUp />}
+          icon={
+            !isBottomSheetOpen ? (
+              <MdOutlineKeyboardArrowUp />
+            ) : isSheetPlacedAtBottom ? (
+              <MdOutlineKeyboardArrowDown />
+            ) : (
+              <MdOutlineKeyboardArrowRight />
+            )
+          }
         />
       </div>
     </div>
@@ -91,12 +99,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       items={items}
       moreIcon={null}
       data-tour-id={tourId}
-      className={`${isCollapsedSheetPlacedToRight ? "collapsed-bottom-sheet__horizontal" : ""}`}
+      className={`${isCollapsedSheetPlacedToRight ? "collapsed-bottom-sheet__horizontal" : ""} ${
+        isBottomSheetOpen ? "bottom-sheet-open" : "bottom-sheet-closed"
+      }`}
       defaultActiveKey={defaultActiveKey}
       onTabClick={() => toggleBottomSheet({ isOpen: true, action: "bottom_sheet_utility_toggle" })}
-      tabBarExtraContent={
-        sheetPlacement === BottomSheetPlacement.BOTTOM ? verticalTabExtraContent : horizontalTabExtraContent
-      }
+      tabBarExtraContent={isCollapsedSheetPlacedToRight ? horizontalTabExtraContent : verticalTabExtraContent}
       {...props}
     />
   );

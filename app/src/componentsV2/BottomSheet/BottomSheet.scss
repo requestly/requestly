@@ -157,3 +157,14 @@
     margin-bottom: 8px;
   }
 }
+
+.bottom-sheet-closed {
+  // Removing active state styling from tabs when bottom sheet is closed
+  .ant-tabs-tab.ant-tabs-tab-active {
+    border: none;
+
+    .bottom-sheet-tab {
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+}
