@@ -17,7 +17,7 @@ export const useCheckLocalSyncSupport = (options: Props = { skipWorkspaceCheck: 
   const localSyncSupportFlag = useFeatureValue("local_sync_support", {
     whitelist: ["macOS", "Linux", "Windows"],
   });
-  const isOsSupported = localSyncSupportFlag?.whitelist?.includes(os);
+  const isOsSupported = os !== null && localSyncSupportFlag?.whitelist?.includes(os);
   const rawIsWorkspaceLocal = useSelector(getActiveWorkspace)?.workspaceType === WorkspaceType.LOCAL;
   const isWorkspaceLocal = options.skipWorkspaceCheck ? true : rawIsWorkspaceLocal;
   const appMode = useSelector(getAppMode);
