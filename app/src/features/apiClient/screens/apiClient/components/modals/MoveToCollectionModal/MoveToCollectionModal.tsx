@@ -49,10 +49,11 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
   const [selectedWorkspace, setSelectedWorkspace] = useState<{
     label: string;
     value: string;
-  } | null>(() =>
-    workspacesOptions.find((w) => {
-      return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
-    })
+  } | null>(
+    () =>
+      workspacesOptions.find((w) => {
+        return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
+      }) ?? null
   );
 
   const context = useMemo(() => (selectedWorkspace ? getApiClientFeatureContext(selectedWorkspace.value) : null), [
