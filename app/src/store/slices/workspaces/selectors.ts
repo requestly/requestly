@@ -11,7 +11,7 @@ const workspacesEntitySelectors = workspacesEntityAdapter.getSelectors(
 );
 
 export const getWorkspaceById = (id?: Workspace["id"]) => (state: RootState) =>
-  workspacesEntitySelectors.selectById(state, id);
+  workspacesEntitySelectors.selectById(state, id as string);
 
 export const getAllWorkspaces = (state: RootState) => workspacesEntitySelectors.selectAll(state);
 
@@ -20,18 +20,18 @@ export const getNonLocalWorkspaces = (state: RootState) => {
   return all.filter((w) => w.workspaceType !== WorkspaceType.LOCAL);
 };
 
-export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0];
+export const getActiveWorkspaceId = (state: RootState) => getActiveWorkspaceIds(state)?.[0]; // TODO@nafeesn: it should ideally return null when [] array is there
 
 export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
 };
 
-const dummyPersonalWorkspace = {
+const dummyPersonalWorkspace: Workspace = {
   id: null,
   name: "Private Workspace",
-  membersCount: null,
-  workspaceType: "PERSONAL",
-} as Workspace;
+  membersCount: 1,
+  workspaceType: WorkspaceType.PERSONAL,
+};
 
 export const getActiveWorkspace = (state: RootState) => {
   const activeWorkspaceId = getActiveWorkspaceId(state);
