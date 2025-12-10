@@ -7,7 +7,7 @@ export function closeCorruptedTabs() {
   tabs.forEach((tab) => {
     const { source } = tab.getState();
 
-    const contextId = source.metadata.context.id;
+    const contextId = source.metadata.context?.id;
     if (!contextId) {
       return;
     }
