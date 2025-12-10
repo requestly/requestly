@@ -43,8 +43,10 @@ export const makeRequest = async (
 ): Promise<RQAPI.HttpResponse> => {
   return new Promise((resolve, reject) => {
     const abortListener = () => {
-      signal?.removeEventListener("abort", abortListener);
-      reject(createAbortError(signal));
+      if (signal) {
+        signal?.removeEventListener("abort", abortListener);
+        reject(createAbortError(signal));
+      }
     };
 
     if (signal) {
@@ -192,7 +194,7 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = tr
 
   if (entry.request.body != null) {
     if (!supportsRequestBody(entry.request.method)) {
-      sanitizedEntry.request.body = null;
+      delete sanitizedEntry.request.body;
     } else if (entry.request.contentType === RequestContentType.FORM) {
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
         entry.request.body as RQAPI.RequestFormBody,
@@ -473,7 +475,7 @@ const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
 const sortNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
   records.forEach((record) => {
     if (isApiCollection(record)) {
-      record.data.children = sortRecords(record.data.children);
+      record.data.children = sortRecords(record.data.children ?? []);
       sortNestedRecords(record.data.children);
     }
   });
@@ -497,9 +499,9 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord
 
   recordsCopy.forEach((record) => {
     const recordState = recordsMap[record.id];
-    const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
+    const parentNode = recordsMap[record.collectionId as string] as RQAPI.CollectionRecord;
     if (parentNode) {
-      parentNode.data.children.push(recordState);
+      parentNode.data.children?.push(recordState);
     } else {
       updatedRecords.push({ ...recordState, collectionId: "" });
     }
@@ -603,7 +605,7 @@ export const filterRecordsBySearch = (
       if (!childrenMap.has(record.collectionId)) {
         childrenMap.set(record.collectionId, new Set());
       }
-      childrenMap.get(record.collectionId).add(record.id);
+      childrenMap.get(record.collectionId)?.add(record.id);
     }
   });
 
@@ -749,7 +751,7 @@ export const filterOutChildrenRecords = (
   recordsMap: Record<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord>
 ) =>
   [...selectedRecords]
-    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id)))
+    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id) ?? ""))
     .map((id) => recordsMap[id]);
 
 export const processRecordsForDuplication = (
@@ -763,7 +765,10 @@ export const processRecordsForDuplication = (
     const record = queue.shift()!;
 
     if (record.type === RQAPI.RecordType.COLLECTION) {
-      const newId = apiClientRecordsRepository.generateCollectionId(`(Copy) ${record.name}`, record.collectionId);
+      const newId = apiClientRecordsRepository.generateCollectionId(
+        `(Copy) ${record.name}`,
+        record.collectionId ?? undefined
+      );
 
       const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
         id: newId,
@@ -781,7 +786,7 @@ export const processRecordsForDuplication = (
       }
     } else {
       const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
-        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId),
+        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined),
         name: `(Copy) ${record.name}`,
       });
 
@@ -883,11 +888,11 @@ export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEnt
 };
 
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
-  return "redirectUrl" in response;
+  return !!response && "redirectedUrl" in response;
 };
 
 export const isGraphQLResponse = (response: RQAPI.Response): response is RQAPI.GraphQLResponse => {
-  return "type" in response;
+  return !!response && "type" in response;
 };
 
 export const getFileExtension = (fileName: string) => {
