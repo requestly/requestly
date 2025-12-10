@@ -139,7 +139,7 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
         };
 
       case DataFileModalViewMode.PREVIEW:
-        if (parsedData?.count && parsedData?.count > 1000) {
+        if (parsedData?.count !== undefined && parsedData?.count > 1000) {
           return {
             secondaryButton: {
               label: "Replace file",
@@ -240,10 +240,10 @@ export const DataFileModalWrapper: React.FC<PreviewModalProps> = ({ onClose, onF
     >
       {viewMode === DataFileModalViewMode.LOADING && <LoadingView />}
       {viewMode === DataFileModalViewMode.ACTIVE && <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count && parsedData?.count > 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count !== undefined && parsedData?.count > 1000 && (
         <WarningView buttonOptions={buttonOptions} />
       )}
-      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count && parsedData?.count <= 1000 && (
+      {viewMode === DataFileModalViewMode.PREVIEW && parsedData?.count !== undefined && parsedData?.count <= 1000 && (
         <DataFileView buttonOptions={buttonOptions} viewMode={viewMode} />
       )}
       {viewMode === DataFileModalViewMode.ERROR && <ErroredStateView buttonOptions={buttonOptions} />}
