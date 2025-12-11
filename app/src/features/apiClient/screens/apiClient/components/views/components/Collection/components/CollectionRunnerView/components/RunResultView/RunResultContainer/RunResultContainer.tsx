@@ -309,7 +309,7 @@ const TestResultTabTitle: React.FC<{ title: string; count: number; loading?: boo
 };
 
 export const RunResultContainer: React.FC<{
-  ranAt: number | null;
+  ranAt: number;
   result: LiveRunResult | RunResult;
   running?: boolean;
   totalIterationCount?: number;
