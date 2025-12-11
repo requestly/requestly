@@ -1,6 +1,25 @@
+import { createSelector } from "@reduxjs/toolkit";
+import { getMultiWorkspaceViewSlice, getAllSelectedWorkspaces } from "./selectors";
 import { useSelector } from "react-redux";
-import { RootState } from "store/types";
 
-export function useMultiWorkspaceView() {
-  return useSelector((state: RootState) => state.multiWorkspaceView);
+const selectAllSelectedWorkspaces = createSelector([getMultiWorkspaceViewSlice], (slice) =>
+  getAllSelectedWorkspaces(slice)
+);
+
+export function useGetAllSelectedWorkspaces() {
+  return useSelector(selectAllSelectedWorkspaces);
+}
+
+const selectIsAllWorkspacesLoaded = createSelector([selectAllSelectedWorkspaces], (workspaces) =>
+  workspaces.every((w) => !w.state.loading)
+);
+
+export function useIsAllWorkspacesLoaded() {
+  return useSelector(selectIsAllWorkspacesLoaded);
+}
+
+const selectViewMode = createSelector([getMultiWorkspaceViewSlice], (s) => s.viewMode);
+
+export function useViewMode() {
+  return useSelector(selectViewMode);
 }
