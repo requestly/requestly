@@ -28,7 +28,7 @@ export type ApiClientStore = Store<ApiClientStoreState>;
 
 export type ContextId = string;
 
-export interface ApiClientContext {
+export interface ApiClientFeatureContext {
   id: ContextId;
   workspaceId: WorkspaceViewState["id"];
   store: ApiClientStore;

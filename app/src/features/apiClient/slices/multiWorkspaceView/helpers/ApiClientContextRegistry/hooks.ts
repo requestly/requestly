@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { NativeError } from "errors/NativeError";
-import { ApiClientContext, ContextId } from "./types";
+import { ApiClientFeatureContext, ContextId } from "./types";
 import { apiClientContextRegistry } from "./ApiClientContextRegistry";
 
-export function useApiClientFeatureContext(contextId: ContextId): ApiClientContext {
+export function useApiClientFeatureContext(contextId: ContextId): ApiClientFeatureContext {
   const context = useMemo(() => apiClientContextRegistry.getContext(contextId), [contextId]);
 
   if (!context) {
