@@ -40,7 +40,7 @@ export const WorkspaceProvider: React.FC<{
   }
 
   return (
-    <ContextId id={getContext(workspaceId)?.id}>
+    <ContextId id={getContext(workspaceId)?.id ?? null}>
       {collapsible ? (
         <WorkspaceCollapse showEnvSwitcher={showEnvSwitcher} workspaceId={workspaceId} type={type}>
           {children}
