@@ -1,10 +1,16 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { EditorLanguage } from "componentsV2/CodeEditor";
 import { useMemo, useState } from "react";
 import { RQAPI } from "features/apiClient/types";
 import { Radio, Tooltip } from "antd";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RiBox3Line } from "@react-icons/all-files/ri/RiBox3Line";
+import { EditorView } from "@codemirror/view";
+import "./scriptEditor.scss";
+import { LibraryPickerPopover, insertImportStatement, getImportedPackageCount } from "../LibraryPicker";
+import { ExternalPackage } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/scriptExecutionWorker/globals/packageTypes";
+import { trackPackageAdded } from "features/apiClient/helpers/modules/scriptsV2/analytics";
 import { DEFAULT_SCRIPT_VALUES } from "features/apiClient/constants";
 import Editor from "componentsV2/CodeEditor";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
@@ -70,6 +76,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   const isAITestsGenerationEnabled = useFeatureValue("ai_tests_generation", false);
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
+  const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
+  const editorViewRef = useRef<EditorView | null>(null);
   const [isGenerateTestPopoverOpen, setIsGenerateTestPopoverOpen] = useState(false);
   const [isTestsStreamingFinished, setIsTestsStreamingFinished] = useState(false);
   const [negativeFeedback, setNegativeFeedback] = useState<string | null>(null);
@@ -86,6 +94,8 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     schema: TestGenerationOutputSchema,
     onFinish: (result) => {
       setIsTestsStreamingFinished(true);
+      setIsGenerateTestPopoverOpen(false);
+      isPopoverOpenRef.current = false;
       if (result.object?.err) {
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
@@ -109,6 +119,16 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       dispatch(globalActions.updateHasGeneratedAITests(true));
     },
   });
+
+  const handleGenerateTests = (query: string) => {
+    setNegativeFeedback(null);
+    setIsTestsStreamingFinished(false);
+    const preparedApiRecord = {
+      ...entry,
+      type: entry.type ?? RQAPI.ApiEntryType.HTTP,
+    };
+    submit({ userQuery: query, apiRecord: preparedApiRecord });
+  };
 
   const mergeViewConfig = useMemo(() => {
     const isPostResponseScript = scriptType === RQAPI.ScriptType.POST_RESPONSE;
@@ -161,6 +181,23 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       setScriptType(RQAPI.ScriptType.POST_RESPONSE);
     }
   }, [focusPostResponse, hasPostResponseScript]);
+
+  const handleEditorReady = useCallback((view: EditorView) => {
+    editorViewRef.current = view;
+  }, []);
+
+  const handlePackageSelect = useCallback((pkg: ExternalPackage) => {
+    const result = insertImportStatement(editorViewRef.current ?? undefined, pkg);
+
+    if (result.success) {
+      trackPackageAdded(pkg.name, pkg.source);
+      toast.success(result.message);
+    } else if (result.alreadyImported) {
+      toast.info(result.message);
+    } else {
+      toast.error(result.message);
+    }
+  }, []);
 
   const scriptTypeOptions = useMemo(
     () => {
@@ -227,11 +264,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     setIsGenerateTestPopoverOpen(open);
                     isPopoverOpenRef.current = open;
                   }}
-                  onGenerateClick={(query) => {
-                    setNegativeFeedback(null);
-                    setIsTestsStreamingFinished(false);
-                    submit({ userQuery: query, apiRecord: entry });
-                  }}
+                  onGenerateClick={handleGenerateTests}
                   disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
@@ -256,6 +289,29 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     ]
   );
 
+  const currentScriptValue = entry?.scripts?.[scriptType] || DEFAULT_SCRIPT_VALUES[scriptType];
+  const importCount = useMemo(() => getImportedPackageCount(currentScriptValue), [currentScriptValue]);
+  const scriptLineCount = useMemo(() => currentScriptValue.split("\n").length, [currentScriptValue]);
+
+  const libraryPickerButton = useMemo(() => {
+    return (
+      <LibraryPickerPopover
+        open={isLibraryPickerOpen}
+        onOpenChange={setIsLibraryPickerOpen}
+        onPackageSelect={handlePackageSelect}
+        scriptLineCount={scriptLineCount}
+      >
+        <Tooltip title="Browse available packages" placement="top">
+          <button className="api-client-script-packages-btn" onClick={() => setIsLibraryPickerOpen(true)}>
+            <RiBox3Line />
+            <span>Packages</span>
+            {importCount > 0 && <span className="api-client-script-packages-btn__count">{importCount}</span>}
+          </button>
+        </Tooltip>
+      </LibraryPickerPopover>
+    );
+  }, [isLibraryPickerOpen, handlePackageSelect, importCount, scriptLineCount]);
+
   return (
     <div className="api-client-script-editor-container">
       <Editor
@@ -269,8 +325,10 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
           title: "",
           options: [scriptTypeOptions],
         }}
+        toolbarRightContent={libraryPickerButton}
         analyticEventProperties={{ source: "api_client_script_editor" }}
         autoFocus={focusPostResponse && scriptType === RQAPI.ScriptType.POST_RESPONSE}
+        onEditorReady={handleEditorReady}
         mergeView={mergeViewConfig}
       />
       {isTestsStreamingFinished && object?.code?.content && !error && (

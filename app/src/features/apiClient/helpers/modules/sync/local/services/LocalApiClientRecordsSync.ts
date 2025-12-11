@@ -458,7 +458,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }> {
+  async getRawFileData(id: string): Promise<{ success: boolean; data: string | null; message?: string }> {
     const service = await this.getAdapter();
     const result = await service.getRawFileData(id);
     if (result.type === "error") {

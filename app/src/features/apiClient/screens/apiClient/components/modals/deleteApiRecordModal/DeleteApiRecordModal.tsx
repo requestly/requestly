@@ -44,11 +44,14 @@ export const DeleteApiRecordModal: React.FC<DeleteApiRecordModalProps> = ({
     return null;
   }
 
-  let apiRequestCount = records.length === 1 ? (isApiCollection(records[0]) ? records[0].data.children.length : 1) : "";
+  let apiRequestCount =
+    records.length === 1 ? (isApiCollection(records[0]) ? records[0]?.data?.children?.length : 1) : "";
 
   const handleDeleteApiRecord = async () => {
     try {
       recordsWithContext.forEach(async ({ context, records }) => {
+        if (!context) return;
+
         const { deletedApiRecords, deletedCollectionRecords } = await deleteRecords(context, {
           records,
         });

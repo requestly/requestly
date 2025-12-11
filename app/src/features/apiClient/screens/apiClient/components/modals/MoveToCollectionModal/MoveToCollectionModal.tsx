@@ -26,12 +26,18 @@ interface Props {
   onClose: () => void;
 }
 
+interface CollectionOption {
+  label: string;
+  value: string;
+  __isNew__?: boolean;
+}
+
 const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, recordsToMove }) => {
   const currentContextId = useContextId();
   const [selectedWorkspaces] = useApiClientMultiWorkspaceView((s) => [s.selectedWorkspaces]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [selectedCollection, setSelectedCollection] = useState<CollectionOption | null>(null);
 
   const workspacesOptions = useMemo(() => {
     return selectedWorkspaces.map((w) => ({
@@ -43,10 +49,11 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
   const [selectedWorkspace, setSelectedWorkspace] = useState<{
     label: string;
     value: string;
-  } | null>(() =>
-    workspacesOptions.find((w) => {
-      return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
-    })
+  } | null>(
+    () =>
+      workspacesOptions.find((w) => {
+        return w.value === getApiClientFeatureContext(currentContextId).workspaceId;
+      }) ?? null
   );
 
   const context = useMemo(() => (selectedWorkspace ? getApiClientFeatureContext(selectedWorkspace.value) : null), [
@@ -70,7 +77,7 @@ const MoveRecordAcrossWorkspaceModal: React.FC<Props> = ({ isOpen, onClose, reco
       setIsLoading(true);
       const collectionId = selectedCollection?.__isNew__
         ? await createNewCollection(context, selectedCollection?.label)
-        : selectedCollection.value;
+        : selectedCollection?.value;
 
       if (collectionId) {
         await moveRecordsToCollection({
@@ -187,7 +194,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
   const contextId = useContextId();
   const [viewMode] = useApiClientMultiWorkspaceView((s) => [s.viewMode]);
 
-  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [selectedCollection, setSelectedCollection] = useState<CollectionOption | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const collectionOptions = useMemo(() => {
@@ -201,7 +208,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
       const context = getApiClientFeatureContext(contextId);
       const collectionId = selectedCollection?.__isNew__
         ? await createNewCollection(context, selectedCollection?.label)
-        : selectedCollection.value;
+        : selectedCollection?.value;
 
       if (collectionId) {
         await moveRecordsToCollection({
@@ -271,7 +278,7 @@ const MoveRecordInSameWorkspaceModal: React.FC<Props> = ({
           },
         })}
         value={selectedCollection}
-        onChange={(newSelectedOption) => setSelectedCollection(newSelectedOption)}
+        onChange={(newSelectedOption: CollectionOption) => setSelectedCollection(newSelectedOption)}
       />
 
       {viewMode === ApiClientViewMode.MULTI && isBulkActionMode ? (
