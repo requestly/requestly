@@ -53,7 +53,7 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     };
   }
 
-  getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void> {
+  async getRecordsForForceRefresh(): Promise<void> {
     return;
   }
 
@@ -110,12 +110,13 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
         { syncValue: value.syncValue, type: value.type, id: value.id, isPersisted: true },
       ])
     );
+    const collectionRecord: RQAPI.CollectionRecord = record.data as RQAPI.CollectionRecord;
 
     const updatedRecord: RQAPI.CollectionRecord = {
-      ...record.data,
+      ...collectionRecord,
       type: RQAPI.RecordType.COLLECTION,
       data: {
-        ...record.data.data,
+        ...collectionRecord.data,
         variables: variablesToSet,
       },
     };
@@ -128,37 +129,39 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     description: string
   ): Promise<{ success: boolean; data: string; message?: string }> {
     const result = await this.updateRecord({ id, description }, id);
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.description || "",
+      };
+    }
+
     return {
       success: result.success,
-      data: result.data.description,
+      data: "",
       message: "Something went wrong while updating collection description",
     };
   }
 
-  async updateCollectionAuthData(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async updateCollectionAuthData(collection: RQAPI.CollectionRecord): RQAPI.ApiClientRecordPromise {
     return this.updateRecord(collection, collection.id);
   }
 
-  async writeToRawFile(): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async writeToRawFile(): RQAPI.ApiClientRecordPromise {
     return {
       success: true,
-      data: undefined,
+      data: {} as RQAPI.ApiClientRecord,
     };
   }
 
-  async getRawFileData(id: string): Promise<{ success: boolean; data: unknown; message?: string }> {
+  async getRawFileData(id: string): Promise<{ success: boolean; data: null; message?: string }> {
     return {
       success: true,
-      data: undefined,
+      data: null,
     };
   }
 
-  async createCollectionFromImport(
-    collection: RQAPI.CollectionRecord,
-    id: string
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise {
     return this.createRecordWithId(collection, id);
   }
 

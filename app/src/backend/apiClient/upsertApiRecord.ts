@@ -29,7 +29,7 @@ export const upsertApiRecord = async (
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
   docId?: string
-): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
+): RQAPI.ApiClientRecordPromise => {
   let result;
 
   const sanitizedRecord = sanitizeRecord(record);
@@ -48,7 +48,7 @@ const createApiRecord = async (
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string,
   docId?: string
-): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
+): RQAPI.ApiClientRecordPromise => {
   const db = getFirestore(firebaseApp);
   const rootApiRecordsCollectionRef = collection(db, "apis");
   const ownerId = getOwnerId(uid, teamId);
@@ -104,7 +104,7 @@ export const updateApiRecord = async (
   uid: string,
   record: Partial<RQAPI.ApiClientRecord>,
   teamId?: string
-): Promise<{ success: boolean; data: RQAPI.ApiClientRecord | null }> => {
+): RQAPI.ApiClientRecordPromise => {
   if (!record.id) {
     throw new Error("Record id is required for updating an api record");
   }
