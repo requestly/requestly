@@ -1,8 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { multiWorkspaceViewAdapter, multiWorkspaceViewSlice } from "./multiWorkspaceViewSlice";
+import { multiWorkspaceViewAdapter } from "./multiWorkspaceViewSlice";
 import { RootState } from "store/types";
+import { MultiWorkspaceViewState } from "./types";
 
-const workspacesSelectors = multiWorkspaceViewAdapter.getSelectors();
+const workspacesSelectors = multiWorkspaceViewAdapter.getSelectors<MultiWorkspaceViewState>(
+  (s) => s.selectedWorkspaces
+);
 
 export const getSelectedWorkspaceIds = workspacesSelectors.selectIds;
 export const getAllSelectedWorkspaces = workspacesSelectors.selectAll;
@@ -19,7 +22,7 @@ export const getIsAllWorkspacesLoaded = createSelector([getAllSelectedWorkspaces
 });
 
 function getMultiWorkspaceViewSlice(state: RootState) {
-  return state[multiWorkspaceViewSlice.name];
+  return state.multiWorkspaceView;
 }
 
 export const getViewMode = createSelector(
