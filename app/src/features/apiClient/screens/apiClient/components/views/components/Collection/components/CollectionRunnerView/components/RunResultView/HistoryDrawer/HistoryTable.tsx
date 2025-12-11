@@ -14,7 +14,7 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
 
   const [history] = useRunResultStore((s) => [s.history]);
   const formattedHistory = useMemo(() => {
-    const sortedHistory = [...history].sort((a, b) => b.startTime - a.startTime);
+    const sortedHistory = [...history].sort((a, b) => (b.startTime ?? 0) - (a.startTime ?? 0));
     return sortedHistory;
   }, [history]);
 
@@ -37,7 +37,9 @@ export const HistoryTable: React.FC<{ onHistoryClick: (result: RunResult) => voi
       {
         title: "Ran at",
         width: 175,
-        render: (_: any, record: RunResult) => <span>{getFormattedStartTime(record.startTime)}</span>,
+        render: (_: any, record: RunResult) => (
+          <span>{record.startTime ? getFormattedStartTime(record.startTime) : "..."}</span>
+        ),
       },
       {
         title: "Duration",

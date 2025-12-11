@@ -23,6 +23,7 @@ import {
 } from "features/apiClient/screens/environment/analytics";
 import { captureException, patchMissingIdInVariables } from "backend/apiClient/utils";
 import { isGlobalEnvironment } from "features/apiClient/screens/environment/utils";
+import { NativeError } from "errors/NativeError";
 
 const db = getFirestore(firebaseApp);
 
@@ -187,7 +188,10 @@ export const duplicateEnvironmentInDB = async (
 ) => {
   const environmentToDuplicate = allEnvironmentData[environmentId];
   if (!environmentToDuplicate) {
-    throw new Error("Environment to duplicate not found");
+    throw new NativeError("Environment to duplicate not found").addContext({
+      ownerId,
+      environmentId,
+    });
   }
 
   const newEnvironment = await createNonGlobalEnvironmentInDB(ownerId, `${environmentToDuplicate.name} Copy`);
