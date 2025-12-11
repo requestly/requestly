@@ -6,6 +6,7 @@ import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import LINKS from "config/constants/sub/links";
 import { RQButton } from "lib/design-system-v2/components";
+import { RQTooltip } from "lib/design-system-v2/components";
 import { globalActions } from "store/slices/global/slice";
 import BotIcon from "assets/icons/bot.svg?react";
 import Settings from "assets/icons/settings.svg?react";
@@ -103,7 +104,9 @@ export const MenuHeader = () => {
         </div>
 
         <div className="app-primary-header__right-section">
-          <RQButton type="transparent" icon={<Settings />} onClick={() => redirectToSettings(navigate)} />
+          <RQTooltip title="Settings">
+            <RQButton type="transparent" icon={<Settings />} onClick={() => redirectToSettings(navigate)} />
+          </RQTooltip>
           <HeaderUser />
         </div>
       </div>

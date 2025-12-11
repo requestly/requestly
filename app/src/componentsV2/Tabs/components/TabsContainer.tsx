@@ -6,6 +6,7 @@ import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
 import { Outlet, unstable_useBlocker } from "react-router-dom";
 import { DraftRequestContainerTabSource } from "features/apiClient/screens/apiClient/components/views/components/DraftRequestContainer/draftRequestContainerTabSource";
 import { RQButton } from "lib/design-system-v2/components";
+import { RQTooltip } from "lib/design-system-v2/components";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { IoIosArrowDown } from "@react-icons/all-files/io/IoIosArrowDown";
 import { useSetUrl } from "../hooks/useSetUrl";
@@ -186,16 +187,18 @@ export const TabsContainer: React.FC = () => {
             </div>
 
             <div className="tab-actions">
-              <RQButton
-                size="small"
-                type="transparent"
-                className="tab-close-button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeTabById(tabState.id);
-                }}
-                icon={<MdClose />}
-              />
+              <RQTooltip title="Close Tab">
+                <RQButton
+                  size="small"
+                  type="transparent"
+                  className="tab-close-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTabById(tabState.id);
+                  }}
+                  icon={<MdClose />}
+                />
+              </RQTooltip>
               {tabState.unsaved ? <div className="unsaved-changes-indicator" /> : null}
             </div>
           </div>
@@ -229,6 +232,11 @@ export const TabsContainer: React.FC = () => {
             openTab(new DraftRequestContainerTabSource());
           }
         }}
+        addIcon={
+          <RQTooltip title="New request">
+            <span>+</span>
+          </RQTooltip>
+        }
       />
     </div>
   );
