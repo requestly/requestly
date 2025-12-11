@@ -19,19 +19,19 @@ export const ClientViewFactory = ({
   isCreateMode,
   isOpenInModal,
 }: Props) => {
-  if (isCreateMode) {
-    return (
-      <HttpClientViewCreateMode
-        apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
-        onSaveCallback={onSaveCallback}
-        openInModal={isOpenInModal}
-        isCreateMode={isCreateMode}
-        notifyApiRequestFinished={handleRequestFinished}
-      />
-    );
-  }
-
   if (isHttpApiRecord(apiRecord)) {
+    if (isCreateMode) {
+      return (
+        <HttpClientViewCreateMode
+          apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
+          onSaveCallback={onSaveCallback}
+          openInModal={isOpenInModal}
+          isCreateMode={isCreateMode}
+          notifyApiRequestFinished={handleRequestFinished}
+        />
+      );
+    }
+
     return (
       <HttpClientView
         apiEntryDetails={apiRecord}
