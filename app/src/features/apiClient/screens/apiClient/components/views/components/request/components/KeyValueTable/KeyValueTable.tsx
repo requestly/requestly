@@ -21,6 +21,8 @@ interface KeyValueTableProps {
   variables: ScopedVariables;
   checkInvalidCharacter?: boolean;
   showDescription?: boolean;
+  showType?: boolean;
+  showSettings?: boolean;
   onToggleDescription?: (show: boolean) => void;
 }
 
@@ -30,6 +32,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
   onChange,
   checkInvalidCharacter = false,
   showDescription = true,
+  showType = true,
+  showSettings = true,
   onToggleDescription = () => {},
 }) => {
   const createEmptyPair = useCallback(
@@ -150,7 +154,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           error: validateValue(record.value, record.dataType),
         }),
       },
-      isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY)
+      showType && isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY)
         ? {
             title: "Type",
             dataIndex: "dataType",
@@ -185,9 +189,14 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       {
         width: "50px",
         fixed: "right",
-        title: () => (
-          <KeyValueTableSettingsDropdown showDescription={showDescription} onToggleDescription={onToggleDescription} />
-        ),
+        title: () =>
+          showSettings &&
+          isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY) && (
+            <KeyValueTableSettingsDropdown
+              showDescription={showDescription}
+              onToggleDescription={onToggleDescription}
+            />
+          ),
         render: (_: any, record: KeyValuePair) => {
           if (record.key === "" && record.value === "" && data.length === 1) {
             return null;

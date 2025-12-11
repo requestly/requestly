@@ -31,6 +31,13 @@ export function FormBody(props: { recordId: string; setRequestEntry: RequestBody
   );
 
   return (
-    <KeyValueTable data={formBody} variables={scopedVariables} onChange={handleFormChange} showDescription={false} />
+    <KeyValueTable
+      data={formBody}
+      variables={scopedVariables}
+      onChange={handleFormChange}
+      showDescription={false}
+      showType={false}
+      showSettings={false}
+    />
   );
 }
