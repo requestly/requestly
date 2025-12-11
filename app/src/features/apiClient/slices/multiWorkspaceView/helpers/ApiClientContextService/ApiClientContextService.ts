@@ -27,7 +27,7 @@ type ContextSetupData = {
 };
 
 class ApiClientContextService {
-  createRepository(workspace: Workspace, user: UserDetails): ApiClientRepositoryInterface {
+  private createRepository(workspace: Workspace, user: UserDetails): ApiClientRepositoryInterface {
     const workspaceId = workspace.id;
     const workspaceType = workspace.workspaceType;
 
