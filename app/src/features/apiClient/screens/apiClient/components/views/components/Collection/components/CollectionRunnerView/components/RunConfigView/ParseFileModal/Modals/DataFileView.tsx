@@ -16,7 +16,7 @@ export const DataFileView: React.FC<ModalProps> = ({ buttonOptions, viewMode }) 
   const { dataFileMetadata, parsedData } = useDataFileModalContext();
 
   if (!dataFileMetadata) {
-    return;
+    return null;
   }
 
   if (!parsedData) {

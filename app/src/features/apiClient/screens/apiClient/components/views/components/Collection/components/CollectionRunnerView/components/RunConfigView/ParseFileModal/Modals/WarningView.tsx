@@ -11,7 +11,7 @@ export const WarningView: React.FC<WarningModalProps> = ({ buttonOptions }) => {
   const { dataFileMetadata, parsedData } = useDataFileModalContext();
 
   if (!dataFileMetadata) {
-    return;
+    return null;
   }
 
   if (!parsedData) {
