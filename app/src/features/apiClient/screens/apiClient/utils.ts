@@ -1134,3 +1134,25 @@ export function validateValue(value: string, type: ValueType | undefined): strin
       return null;
   }
 }
+
+export function getInferredType(value: any): ValueType {
+  if (value === null || value === undefined) {
+    return ValueType.STRING;
+  }
+
+  const strValue = String(value).trim();
+
+  if (/^(true|false)$/i.test(strValue)) {
+    return ValueType.BOOLEAN;
+  }
+
+  if (/^-?\d+$/.test(strValue)) {
+    return ValueType.INTEGER;
+  }
+
+  if (/^-?\d+(\.\d+)?$/.test(strValue)) {
+    return ValueType.FLOAT;
+  }
+
+  return ValueType.STRING;
+}

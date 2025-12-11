@@ -8,14 +8,14 @@ import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
 import KeyValueDescriptionCell from "./KeyValueTableDescriptionCell";
 import KeyValueTypeCell from "./KeyValueTableTypeCell";
-import { AiFillWarning } from "@react-icons/all-files/ai/AiFillWarning";
+import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
 const ValidationWarning = ({ error }: { error: string }) => (
   <Tooltip title={error} color="#000">
     <span style={{ display: "flex", alignItems: "center" }}>
-      <AiFillWarning style={{ color: "#E09400", fontSize: "16px" }} />
+      <AiOutlineWarning style={{ color: "#E09400", fontSize: "16px" }} />
     </span>
   </Tooltip>
 );

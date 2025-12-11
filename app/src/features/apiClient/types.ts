@@ -46,9 +46,9 @@ export interface KeyValuePair {
 
 export enum ValueType {
   STRING = "String",
+  FLOAT = "Number",
   INTEGER = "Integer",
   BOOLEAN = "Boolean",
-  FLOAT = "Number",
 }
 
 export enum KeyValueFormType {
