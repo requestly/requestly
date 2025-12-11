@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { multiWorkspaceViewActions } from "./multiWorkspaceViewSlice";
 import { ApiClientViewMode } from "./types";
-import { getAllSelectedWorkspaces, getIsSelected, getViewMode, getWorkspaceById } from "./selectors";
+import { getAllSelectedWorkspaces, getIsSelected, getViewMode } from "./selectors";
 import { RootState } from "store/types";
 import { getTabServiceActions } from "componentsV2/Tabs/tabUtils";
 import { apiClientContextService } from "./helpers/ApiClientContextService";
@@ -115,9 +115,9 @@ export const loadWorkspaces = createAsyncThunk<
   const workspacesToLoad = selectedWorkspaces.filter((w) => !w.state.loading);
 
   const tasks = workspacesToLoad.map(async (workspaceState) => {
-    const workspace = getWorkspaceById(getState().multiWorkspaceView, workspaceState.id);
+    const workspaceDetails = getWorkspaceDetailsById(workspaceState.id)(getState());
 
-    if (!workspace) {
+    if (!workspaceDetails) {
       throw new NativeError(`Workspace not found: ${workspaceState.id}`);
     }
 
@@ -130,10 +130,9 @@ export const loadWorkspaces = createAsyncThunk<
 
     try {
       const userDetails = userId ? { uid: userId, loggedIn: true as const } : { loggedIn: false as const };
-      const workspaceDetails = getWorkspaceDetailsById(workspace.id)(getState());
 
       if (!workspaceDetails) {
-        throw new NativeError(`Workspace details not found: ${workspace.id}`);
+        throw new NativeError(`Workspace details not found: ${workspaceState.id}`);
       }
 
       await apiClientContextService.setupContext(workspaceDetails, userDetails);

@@ -7,7 +7,7 @@ export {
   multiWorkspaceViewAdapter,
 } from "./multiWorkspaceViewSlice";
 
-export { getAllSelectedWorkspaces, getWorkspaceById, getIsSelected } from "./selectors";
+export { getAllSelectedWorkspaces, getWorkspaceById, getIsSelected, getViewMode } from "./selectors";
 
 export { addWorkspaceToView, removeWorkspaceFromView, resetToSingleView, loadWorkspaces } from "./thunks";
 
