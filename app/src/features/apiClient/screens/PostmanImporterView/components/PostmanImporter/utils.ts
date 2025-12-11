@@ -252,18 +252,12 @@ const processRequestBody = (request: any): RequestBodyProcessingResult => {
 
 export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
   const headers =
-    request.header?.map(
-      (
-        header: { key: string; value: string; disabled: boolean; type: string; description?: string },
-        index: number
-      ) => ({
-        id: index,
-        key: header.key,
-        value: header.value,
-        isEnabled: !header?.disabled,
-        description: header?.description || "",
-      })
-    ) ?? [];
+    request.header?.map((header: { key: string; value: string; disabled: boolean; type: string }, index: number) => ({
+      id: index,
+      key: header.key,
+      value: header.value,
+      isEnabled: !header?.disabled,
+    })) ?? [];
 
   return { headers };
 };
@@ -282,7 +276,6 @@ const createApiRecord = (
       key: query.key,
       value: query.value,
       isEnabled: true,
-      description: query.description || "",
     })) ?? [];
 
   const { requestBody, contentType } = processRequestBody(request);
