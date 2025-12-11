@@ -56,11 +56,15 @@ export const RunResultView: React.FC = () => {
       {runStatus === RunStatus.ERRORED ? (
         error instanceof RenderableError ? (
           error.render()
-        ) : (
+        ) : error ? (
           <DefaultErrorComponent error={error} />
-        )
+        ) : null
       ) : (
-        <RunResultContainer result={testResults} ranAt={startTime} totalIterationCount={totalIterationCount} />
+        <RunResultContainer
+          result={testResults}
+          ranAt={startTime ?? Date.now()}
+          totalIterationCount={totalIterationCount}
+        />
       )}
       {runStatus === RunStatus.RUNNING ? <TestsRunningLoader /> : null}
       <HistoryDrawer isHistoryDrawerOpen={isHistoryDrawerOpen} setIsHistoryDrawerOpen={setIsHistoryDrawerOpen} />
