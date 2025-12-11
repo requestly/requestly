@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useEffect } from "react";
 import { Form, Dropdown, Menu, MenuProps, FormInstance } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { KeyValuePair, ValueType } from "features/apiClient/types";
+import { getInferredType } from "features/apiClient/screens/apiClient/utils";
 
 const ALL_VALUE_TYPES: ValueType[] = Object.values(ValueType);
 
@@ -34,15 +35,24 @@ const KeyValueTypeCell: React.FC<KeyValueTypeCellProps> = ({ record, dataIndex, 
 
   const menu = <Menu items={menuItems} onClick={handleMenuClick} />;
 
-  const currentValue = record?.[dataIndex] as string;
+  const displayType = useMemo(() => {
+    const explicitType = record?.[dataIndex] as ValueType | undefined;
+    return explicitType || getInferredType((record as any).value);
+  }, [record, dataIndex]);
+
+  useEffect(() => {
+    const currentSavedType = record?.[dataIndex];
+    if (!currentSavedType) {
+      form.setFieldsValue({ [dataIndex]: displayType });
+      onSave();
+    }
+  }, [record, dataIndex, displayType, form, onSave]);
 
   return (
-    <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={currentValue} validateTrigger={[]}>
+    <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={displayType} validateTrigger={[]}>
       <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft">
         <div className="key-value-type-view">
-          <span className="key-value-type-text">
-            {currentValue || <span className="placeholder">Select Type</span>}
-          </span>
+          <span className="key-value-type-text">{displayType}</span>
           <DownOutlined className="key-value-type-arrow" />
         </div>
       </Dropdown>
