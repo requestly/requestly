@@ -19,3 +19,5 @@ export {
 } from "./selectors";
 
 export { addWorkspaceToView, removeWorkspaceFromView, resetToSingleView, loadWorkspaces } from "./thunks";
+
+export { useMultiWorkspaceView } from "./hooks";
