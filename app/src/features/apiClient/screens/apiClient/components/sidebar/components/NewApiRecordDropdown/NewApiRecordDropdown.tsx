@@ -52,7 +52,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         label: "HTTP request",
         icon: <MdOutlineSyncAlt />,
         onClick: ({ domEvent: e }) => {
-          e?.stopPropagation();
+          e.stopPropagation();
           onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.HTTP });
         },
       },
@@ -62,7 +62,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         icon: <GrGraphQl />,
         hidden: !isGraphQLSupportEnabled || !isFeatureCompatible(FEATURES.GRAPHQL_SUPPORT),
         onClick: ({ domEvent: e }) => {
-          e?.stopPropagation();
+          e.stopPropagation();
           onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.GRAPHQL });
         },
       },
@@ -71,7 +71,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
         label: "Collection",
         icon: <BsCollection />,
         onClick: ({ domEvent: e }) => {
-          e?.stopPropagation();
+          e.stopPropagation();
           onSelect({ recordType: RQAPI.RecordType.COLLECTION });
         },
       },
