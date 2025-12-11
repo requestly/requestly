@@ -106,16 +106,18 @@ export const addUrlSchemeIfMissing = (url: string): string => {
 };
 
 export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry => {
+  const httpRequest = (request || {}) as RQAPI.HttpRequest;
+
   return {
     type: RQAPI.ApiEntryType.HTTP,
     request: {
-      url: DEMO_HTTP_API_URL,
-      method: RequestMethod.GET,
-      headers: [],
-      queryParams: [],
-      body: null,
-      contentType: RequestContentType.RAW,
-      ...(request || {}),
+      ...httpRequest,
+      url: httpRequest?.url || DEMO_HTTP_API_URL,
+      method: httpRequest?.method || RequestMethod.GET,
+      headers: httpRequest?.headers || [],
+      queryParams: httpRequest?.queryParams || [],
+      body: httpRequest?.body ?? "",
+      contentType: httpRequest?.contentType || RequestContentType.RAW,
     },
     response: null,
     scripts: {
@@ -127,15 +129,17 @@ export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry =
 };
 
 export const getEmptyGraphQLEntry = (request?: RQAPI.Request): RQAPI.GraphQLApiEntry => {
+  const graphqlRequest = (request || {}) as RQAPI.GraphQLRequest;
+
   return {
     type: RQAPI.ApiEntryType.GRAPHQL,
     request: {
-      url: "",
-      headers: [],
-      operation: "",
-      variables: "",
-      operationName: "",
-      ...(request || {}),
+      ...graphqlRequest,
+      url: graphqlRequest?.url || "",
+      headers: graphqlRequest?.headers || [],
+      operation: graphqlRequest?.operation || "",
+      variables: graphqlRequest?.variables || "",
+      operationName: graphqlRequest?.operationName || "",
     },
     response: null,
     scripts: {
@@ -267,7 +271,7 @@ export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]) => {
   return contentType;
 };
 
-export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {
+export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]) => {
   return headers.find((header) => header.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase())?.value;
 };
 
@@ -528,7 +532,7 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.API) {
     newRecord.name = "Untitled request";
     newRecord.type = RQAPI.RecordType.API;
-    newRecord.data = getEmptyApiEntry(entryType);
+    newRecord.data = getEmptyApiEntry(entryType ?? RQAPI.ApiEntryType.HTTP);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }
@@ -844,7 +848,7 @@ export const parseHttpRequestEntry = (
 
   const contentType = entry.request.contentType;
   if (contentType) {
-    result.content_type = parseContentType(entry.request.contentType);
+    result.content_type = parseContentType(contentType);
   }
   return result;
 };

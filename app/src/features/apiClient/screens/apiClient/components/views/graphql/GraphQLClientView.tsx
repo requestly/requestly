@@ -164,7 +164,7 @@ const GraphQLClientView: React.FC<Props> = ({
 
     let hasJsonObjectBody = false;
     try {
-      const contentType = getContentTypeFromResponseHeaders(entry.response.headers);
+      const contentType = getContentTypeFromResponseHeaders(entry.response.headers) ?? "";
       const isJson = /application\/json/i.test(contentType);
       if (isJson) {
         const parsed = JSON.parse(entry.response.body || "null");
