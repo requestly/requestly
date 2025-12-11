@@ -42,7 +42,7 @@ const ShareWorkspaceActions = ({
   workspaceId,
   toggleDropdown,
 }: {
-  workspaceId: string;
+  workspaceId: Workspace["id"];
   toggleDropdown: () => void;
 }) => {
   const navigate = useNavigate();

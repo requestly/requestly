@@ -5,7 +5,7 @@ import { getDatabase, connectDatabaseEmulator } from "firebase/database";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
-import { isEnvEmulator } from "utils/EnvUtils";
+import { isBackendEnvEmulator } from "utils/EnvUtils";
 
 const firebaseApp = initializeApp({
   apiKey: process.env.VITE_REACT_APP_FIREBASE_API_KEY,
@@ -16,7 +16,7 @@ const firebaseApp = initializeApp({
   messagingSenderId: process.env.VITE_REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
 });
 
-if (isEnvEmulator()) {
+if (isBackendEnvEmulator()) {
   if (window.location.host.includes("localhost") || window.location.host.includes("127.0.0.1")) {
     const functions = getFunctions(firebaseApp);
     connectFunctionsEmulator(functions, "localhost", 5001);

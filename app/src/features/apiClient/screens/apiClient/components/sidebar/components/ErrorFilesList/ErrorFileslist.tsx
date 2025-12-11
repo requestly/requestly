@@ -82,7 +82,8 @@ const ErrorFileItemTitle: React.FC<{ file: ErroredRecord }> = ({ file }) => {
   ]);
 
   const ctx = useApiClientFeatureContext();
-  const workspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId), [getSelectedWorkspace, ctx.workspaceId]);
+  // Workspace cannot be null in this component context - using non-null assertion
+  const workspace = useMemo(() => getSelectedWorkspace(ctx.workspaceId)!, [getSelectedWorkspace, ctx.workspaceId]);
 
   return getViewMode() === ApiClientViewMode.SINGLE ? (
     <>
@@ -193,7 +194,7 @@ export const ErrorFilesList: React.FC<{ updateErrorRecordsCount?: (value: number
 
   return (
     <>
-      {isErrorFileViewerModalOpen && (
+      {isErrorFileViewerModalOpen && errorFileToView && (
         <ErrorFileViewerModal
           errorFile={errorFileToView}
           isOpen={isErrorFileViewerModalOpen}
