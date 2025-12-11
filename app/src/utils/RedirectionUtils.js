@@ -358,17 +358,19 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
   if (redirectBackToMyTeams) {
     url.searchParams.set("redirectBackToMyTeams", "true");
   }
+  const previousPath = window.location.pathname;
   if (hardRedirect) {
     window.location = PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`;
   } else if (state) {
-    navigate(url.pathname + url.search, { state });
+    navigate(url.pathname + url.search, { state: { ...state, previousPath } });
   } else {
-    navigate(url.pathname + url.search);
+    navigate(url.pathname + url.search, { state: { previousPath } });
   }
 };
 
-export const redirectToManageWorkspace = (navigate, teamId) => {
-  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`);
+export const redirectToManageWorkspace = (navigate, teamId, state = {}) => {
+  const previousPath = window.location.pathname;
+  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`, { state: { ...state, previousPath } });
 };
 
 export const redirectToMyTeams = (navigate, hardRedirect) => {
