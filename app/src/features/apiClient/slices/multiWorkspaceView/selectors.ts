@@ -19,3 +19,7 @@ export function getIsSelected(state: RootState, id: string) {
 export function getMultiWorkspaceViewSlice(state: RootState) {
   return state.multiWorkspaceView;
 }
+
+export function getViewMode(state: RootState) {
+  return getMultiWorkspaceViewSlice(state).viewMode;
+}
