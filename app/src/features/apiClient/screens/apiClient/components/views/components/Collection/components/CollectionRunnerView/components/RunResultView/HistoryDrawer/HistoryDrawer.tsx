@@ -46,7 +46,7 @@ export const HistoryDrawer: React.FC<{
             icon={<MdArrowBack />}
             onClick={() => setOpenedResult(null)}
           />
-          <RunResultContainer result={openedResult} ranAt={openedResult.startTime} />
+          <RunResultContainer result={openedResult} ranAt={openedResult.startTime ?? 0} />
         </div>
       ) : (
         <HistoryTable onHistoryClick={onHistoryClick} />

@@ -408,6 +408,10 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     }
   }
 
+  if (!contentType) {
+    contentType = RequestContentType.RAW; // Default fallback
+  }
+
   let body: RQAPI.RequestBody;
   switch (contentType) {
     case RequestContentType.JSON:
@@ -425,7 +429,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       }
 
       if (hasFiles) {
-        for (const [key, filePath] of Object.entries(requestJson.files)) {
+        for (const [key, filePath] of Object.entries(requestJson.files ?? {})) {
           multipartData.push({ key, value: `@${filePath}` });
         }
       }

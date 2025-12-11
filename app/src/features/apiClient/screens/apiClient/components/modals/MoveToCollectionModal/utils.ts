@@ -22,7 +22,7 @@ export async function createNewCollection(context: ApiClientFeatureContext, coll
   const { apiClientRecordsRepository } = context.repositories;
   const newCollection = await apiClientRecordsRepository.createCollection(collectionToBeCreated);
 
-  if (!newCollection.success || !newCollection.data) {
+  if (!newCollection.success) {
     throw new Error("Failed to create a new collection");
   }
 
