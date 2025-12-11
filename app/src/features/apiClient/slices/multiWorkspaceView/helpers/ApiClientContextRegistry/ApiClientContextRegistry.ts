@@ -1,15 +1,15 @@
 import { NativeError } from "errors/NativeError";
-import { ApiClientContext, ContextId } from "./types";
+import { ApiClientFeatureContext, ContextId } from "./types";
 
 class ApiClientContextRegistry {
-  private contexts: Map<ContextId, ApiClientContext>;
-  private lastUsedContext?: ApiClientContext;
+  private contexts: Map<ContextId, ApiClientFeatureContext>;
+  private lastUsedContext?: ApiClientFeatureContext;
 
   constructor() {
     this.contexts = new Map();
   }
 
-  addContext(context: ApiClientContext) {
+  addContext(context: ApiClientFeatureContext) {
     this.contexts.set(context.id, context);
     this.lastUsedContext = context;
   }
@@ -25,7 +25,7 @@ class ApiClientContextRegistry {
     }
   }
 
-  setLastUsedContext(context?: ApiClientContext) {
+  setLastUsedContext(context?: ApiClientFeatureContext) {
     this.lastUsedContext = context;
   }
 
@@ -38,7 +38,7 @@ class ApiClientContextRegistry {
       throw new NativeError("Context does not exist in single mode");
     }
 
-    return this.contexts.values().next().value as ApiClientContext;
+    return this.contexts.values().next().value as ApiClientFeatureContext;
   }
 
   getLastUsedContext() {
@@ -47,7 +47,7 @@ class ApiClientContextRegistry {
     }
 
     if (this.contexts.size) {
-      const topContext = this.contexts.values().next().value as ApiClientContext;
+      const topContext = this.contexts.values().next().value as ApiClientFeatureContext;
       this.lastUsedContext = topContext;
       return topContext;
     }
@@ -60,6 +60,10 @@ class ApiClientContextRegistry {
 
   hasContext(id: ContextId) {
     return this.contexts.has(id);
+  }
+
+  getAllContexts(): ApiClientFeatureContext[] {
+    return Array.from(this.contexts.values());
   }
 }
 
