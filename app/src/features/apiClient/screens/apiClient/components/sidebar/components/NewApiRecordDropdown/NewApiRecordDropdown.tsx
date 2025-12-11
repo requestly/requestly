@@ -1,4 +1,4 @@
-import { Dropdown, DropDownProps } from "antd";
+import { Dropdown, MenuProps } from "antd";
 import React, { useMemo } from "react";
 import { BsCollection } from "@react-icons/all-files/bs/BsCollection";
 import { GrGraphQl } from "@react-icons/all-files/gr/GrGraphQl";
@@ -45,7 +45,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
 
   const { onSelect, buttonProps, children, disabled, invalidActions } = props;
 
-  const allDropdownItems: DropDownProps["menu"]["items"] = useMemo(() => {
+  const allDropdownItems: MenuProps["items"] = useMemo(() => {
     return [
       {
         key: NewRecordDropdownItemType.HTTP,
@@ -90,7 +90,9 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
     if (!invalidActions) {
       return allDropdownItems;
     }
-    return allDropdownItems.filter((item) => !invalidActions.includes(item.key as NewRecordDropdownItemType));
+    return (
+      allDropdownItems?.filter((item) => item && !invalidActions.includes(item.key as NewRecordDropdownItemType)) || []
+    );
   }, [allDropdownItems, invalidActions]);
 
   if (children) {
@@ -114,7 +116,7 @@ export const NewApiRecordDropdown: React.FC<NewRecordDropdownProps> = (props) =>
       icon={<MdOutlineKeyboardArrowDown />}
       disabled={disabled}
       {...buttonProps}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         onSelect({ recordType: RQAPI.RecordType.API, entryType: RQAPI.ApiEntryType.HTTP });
       }}
