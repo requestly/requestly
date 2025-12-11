@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 import { RQAPI } from "features/apiClient/types";
 import { AutogenerateProvider } from "features/apiClient/store/autogenerateContextProvider";
 import { ClientViewFactory } from "./ClientViewFactory";
@@ -15,8 +16,16 @@ type Props = {
 
 export const GenericApiClient: React.FC<Props> = React.memo(
   ({ apiEntryDetails, onSaveCallback, handleAppRequestFinished, isCreateMode, isOpenInModal = false }) => {
+    const [sheetPlacement, setSheetPlacement] = useState(() => {
+      const savedPlacement = getStoredPlacement();
+      return savedPlacement ?? BottomSheetPlacement.RIGHT;
+    });
     return (
-      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM} isSheetOpenByDefault={true}>
+      <BottomSheetProvider
+        sheetPlacement={sheetPlacement}
+        setSheetPlacement={setSheetPlacement}
+        isSheetOpenByDefault={true}
+      >
         <div className="api-client-container-content">
           <AutogenerateProvider>
             <ClientViewFactory

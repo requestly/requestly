@@ -56,6 +56,7 @@ import {
 } from "features/apiClient/helpers/testGeneration/buildPostResponseTests";
 import { useDeepLinkState } from "hooks";
 import { RequestTab } from "../http/components/HttpRequestTabs/HttpRequestTabs";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 interface Props {
   recordId: string;
@@ -503,9 +504,12 @@ const GraphQLClientView: React.FC<Props> = ({
       return;
     }
 
-    isDefaultPlacementRef.current = true;
-    const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
-    toggleSheetPlacement(bottomSheetPlacement);
+    const savedPlacement = getStoredPlacement();
+    if (!savedPlacement) {
+      isDefaultPlacementRef.current = true;
+      const bottomSheetPlacement = window.innerWidth <= 1280 ? BottomSheetPlacement.BOTTOM : BottomSheetPlacement.RIGHT;
+      toggleSheetPlacement(bottomSheetPlacement);
+    }
   }, [toggleSheetPlacement]);
 
   return (

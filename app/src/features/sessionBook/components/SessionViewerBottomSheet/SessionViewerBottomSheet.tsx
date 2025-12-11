@@ -28,7 +28,8 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
   const bottomSheetTabItems = useSessionBottomSheetTabItems({ playerTimeOffset });
 
   useEffect(() => {
-    if (bottomSheetBottomBreakpoint && location.pathname.includes(PATHS.SESSIONS.INDEX)) {
+    const savedPlacement = localStorage.getItem("sheet_placement");
+    if (bottomSheetBottomBreakpoint && location.pathname.includes(PATHS.SESSIONS.INDEX) && !savedPlacement) {
       toggleSheetPlacement(BottomSheetPlacement.BOTTOM);
     }
   }, [bottomSheetBottomBreakpoint, toggleSheetPlacement, location.pathname]);

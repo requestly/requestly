@@ -6,9 +6,15 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled, isSafariBrowser } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import { SafariLimitedSupportView } from "componentsV2/SafariExtension/SafariLimitedSupportView";
+import { useState } from "react";
+import { getStoredPlacement } from "componentsV2/BottomSheet/context";
 
 const RuleEditorView = () => {
   const appMode = useSelector(getAppMode);
+  const [sheetPlacement, setSheetPlacement] = useState(() => {
+    const savedPlacement = getStoredPlacement();
+    return savedPlacement ?? BottomSheetPlacement.BOTTOM;
+  });
 
   if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
     if (isSafariBrowser()) {
@@ -20,7 +26,7 @@ const RuleEditorView = () => {
   }
 
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
+    <BottomSheetProvider setSheetPlacement={setSheetPlacement} sheetPlacement={sheetPlacement}>
       <RuleEditor />
     </BottomSheetProvider>
   );
