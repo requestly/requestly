@@ -222,6 +222,13 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       source
     );
 
+    // Allow CONTACT_US to proceed without requiring login
+    if (functionName === CTA_ONCLICK_FUNCTIONS.CONTACT_US) {
+      window.open(LINKS.BOOK_A_DEMO, "_blank");
+      setIsButtonLoading(false);
+      return;
+    }
+
     if (!user?.details?.isLoggedIn) {
       let redirectURL = window.location.href;
       if (functionName === CTA_ONCLICK_FUNCTIONS.CHECKOUT) {
@@ -395,17 +402,30 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         });
         break;
       }
-      case CTA_ONCLICK_FUNCTIONS.CONTACT_US: {
-        window.open(LINKS.BOOK_A_DEMO, "_blank");
-        break;
-      }
       default: {
         setIsButtonLoading(false);
       }
     }
   };
 
-  let buttonConfig = pricingButtonsMap.default[userPlanName][columnPlanName];
+  // Check for Enterprise and API Client Professional plans first - these always show Contact Sales
+  if (
+    columnPlanName === PRICING.PLAN_NAMES.ENTERPRISE ||
+    columnPlanName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
+  ) {
+    return (
+      <RQButton
+        onClick={() => {
+          onButtonClick(CTA_ONCLICK_FUNCTIONS.CONTACT_US);
+        }}
+        type="primary"
+      >
+        Contact Sales
+      </RQButton>
+    );
+  }
+
+  let buttonConfig = pricingButtonsMap.default[userPlanName]?.[columnPlanName];
 
   if (buttonConfig?.onClick === CTA_ONCLICK_FUNCTIONS.USE_NOW && !user?.details?.isLoggedIn) {
     buttonConfig = CTA_BUTTONS_CONFIG["signup"];
@@ -438,22 +458,6 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         type="primary"
       >
         Contact us
-      </RQButton>
-    );
-  }
-
-  if (
-    userPlanName !== columnPlanName &&
-    (columnPlanName === PRICING.PLAN_NAMES.ENTERPRISE || columnPlanName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL)
-  ) {
-    return (
-      <RQButton
-        onClick={() => {
-          onButtonClick(CTA_ONCLICK_FUNCTIONS.CONTACT_US);
-        }}
-        type="primary"
-      >
-        Contact sales
       </RQButton>
     );
   }
