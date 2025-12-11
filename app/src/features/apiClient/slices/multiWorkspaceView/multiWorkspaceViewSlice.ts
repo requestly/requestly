@@ -1,5 +1,6 @@
 import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ApiClientViewMode, MultiWorkspaceViewState, WorkspaceState, WorkspaceViewState } from "./types";
+import { ReducerKeys } from "store/constants";
 
 export const multiWorkspaceViewAdapter = createEntityAdapter<WorkspaceViewState>({
   selectId: (workspace) => workspace.id,
@@ -10,10 +11,8 @@ const initialState: MultiWorkspaceViewState = {
   selectedWorkspaces: multiWorkspaceViewAdapter.getInitialState(),
 };
 
-export const MULTI_WORKSPACE_VIEW_SLICE = "multiWorkspaceView";
-
 export const multiWorkspaceViewSlice = createSlice({
-  name: MULTI_WORKSPACE_VIEW_SLICE,
+  name: ReducerKeys.MULTI_WORKSPACE_VIEW,
   initialState,
   reducers: {
     setViewMode(state, action: PayloadAction<ApiClientViewMode>) {
