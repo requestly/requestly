@@ -122,7 +122,7 @@ export type ApiRecordsState = {
    * This is called to update/sync the internal data with external changes happening in apiClientRecords.
    */
   refresh: (records: RQAPI.ApiClientRecord[]) => void;
-  getData: (id: string) => RQAPI.ApiClientRecord | undefined;
+  getData: (id: RQAPI.ApiClientRecord["id"] | null) => RQAPI.ApiClientRecord | undefined;
   getParent: (id: string) => string | undefined;
   getRecordStore: (id: string) => StoreApi<RecordState> | undefined;
   getAllRecords: () => RQAPI.ApiClientRecord[];

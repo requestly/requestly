@@ -118,7 +118,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
   const handleRulesTransfer = useCallback(
     (teamData: Workspace) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules).then(() => {
         setIsLoading(false);
         trackSharingModalRulesDuplicated("personal", selectedRules.length);
         setPostShareViewData({
