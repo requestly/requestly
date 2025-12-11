@@ -211,7 +211,6 @@ export interface KeyValuePair {
   value: string;
   isEnabled: boolean;
   type?: string; // added for special identifiers like auth
-  description?: string;
 }
 
 export enum KeyValueFormType {
