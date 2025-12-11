@@ -9,7 +9,7 @@ import { RQAPI } from "features/apiClient/types";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
 import { apiClientContextRegistry } from "../ApiClientContextRegistry";
-import { ApiClientFeatureContext, ContextId } from "../ApiClientContextRegistry/types";
+import { ApiClientFeatureContext } from "../ApiClientContextRegistry/types";
 import { ApiClientViewMode } from "../../types";
 import { reduxStore } from "store";
 import { getViewMode } from "../../selectors";
@@ -58,13 +58,13 @@ class ApiClientContextService {
     return {} as ApiClientFeatureContext["store"];
   }
 
-  async setupContext(workspace: Workspace, user: UserDetails): Promise<ApiClientFeatureContext["id"]> {
+  setupContext(workspace: Workspace, user: UserDetails): ApiClientFeatureContext["id"] {
     const repository = this.createRepository(workspace, user);
-    const id = await this.setupContextWithRepo(workspace.id, repository);
+    const id = this.setupContextWithRepo(workspace.id, repository);
     return id;
   }
 
-  async setupContextWithRepo(workspaceId: string, repository: ApiClientRepositoryInterface): Promise<ContextId> {
+  setupContextWithRepo(workspaceId: string, repository: ApiClientRepositoryInterface): ApiClientFeatureContext["id"] {
     if (apiClientContextRegistry.hasContext(workspaceId)) {
       return workspaceId;
     }
@@ -90,7 +90,7 @@ class ApiClientContextService {
     return context.id;
   }
 
-  async refreshContext(contextId: ContextId): Promise<void> {
+  async refreshContext(contextId: ApiClientFeatureContext["id"]): Promise<void> {
     try {
       const context = apiClientContextRegistry.getContext(contextId);
 
