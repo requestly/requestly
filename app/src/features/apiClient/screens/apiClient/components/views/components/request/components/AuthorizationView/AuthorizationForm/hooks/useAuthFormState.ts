@@ -45,15 +45,21 @@ const getDefaultFormState = (
   }
   switch (formType) {
     case Authorization.Type.BASIC_AUTH: {
-      const { username, password } = defaultAuth.authConfigStore[Authorization.Type.BASIC_AUTH];
+      const config = defaultAuth.authConfigStore[Authorization.Type.BASIC_AUTH];
+      if (!config) return {};
+      const { username = "", password = "" } = config;
       return { username, password };
     }
     case Authorization.Type.BEARER_TOKEN: {
-      const { bearer } = defaultAuth.authConfigStore[Authorization.Type.BEARER_TOKEN];
+      const config = defaultAuth.authConfigStore[Authorization.Type.BEARER_TOKEN];
+      if (!config) return {};
+      const { bearer } = config;
       return { bearer };
     }
     case Authorization.Type.API_KEY: {
-      const { key, value, addTo } = defaultAuth.authConfigStore[Authorization.Type.API_KEY];
+      const config = defaultAuth.authConfigStore[Authorization.Type.API_KEY];
+      if (!config) return {};
+      const { key, value, addTo } = config;
       return { key, value, addTo };
     }
     default:
