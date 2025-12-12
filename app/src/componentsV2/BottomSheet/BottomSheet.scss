@@ -71,7 +71,11 @@
 .bottom-sheet-tab {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+
+  svg {
+    top: unset;
+  }
 }
 
 .bottom-sheet-tab-extra-content {
