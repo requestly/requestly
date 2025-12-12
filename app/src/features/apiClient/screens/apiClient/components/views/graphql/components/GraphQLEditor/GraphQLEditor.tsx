@@ -19,7 +19,7 @@ interface BaseEditorProps {
 
 interface OperationEditorProps extends BaseEditorProps {
   type: "operation";
-  introspectionData: IntrospectionData;
+  introspectionData: IntrospectionData | null;
 }
 
 interface VariablesEditorProps extends BaseEditorProps {
