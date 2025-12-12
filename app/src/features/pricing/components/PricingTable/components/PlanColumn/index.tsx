@@ -7,11 +7,9 @@ import { CloseOutlined } from "@ant-design/icons";
 import { capitalize, kebabCase } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
-import { trackGetFreeTrialClicked, trackPricingPlansQuantityChanged } from "features/pricing/analytics";
+import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
-import GiftIcon from "../../../../assets/gift-icon.svg?react";
-import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
 import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
@@ -43,7 +41,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 
   const isBrowserstackIntegrationOn = useIsBrowserStackIntegrationOn();
   const isBrowserstackCheckoutEnabled = useFeatureValue("browserstack_checkout", true);
-  const isAcceleratorProgramEnabled = useFeatureIsOn("display_accelerator_on_pricing");
 
   const currentSeats = user.details?.planDetails?.subscription?.quantity ?? 1;
 
@@ -59,7 +56,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     }
   }, [user.loggedIn]);
 
-  const getHeaderPlanName = () => {
+  const getPreviousPlanName = () => {
     const pricingPlansOrder = [
       PRICING.PLAN_NAMES.FREE,
       PRICING.PLAN_NAMES.LITE,
@@ -76,8 +73,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
-    if (planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE) {
-      return capitalize(PRICING.PLAN_NAMES.PROFESSIONAL);
+    if (planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL) {
+      return capitalize(PRICING.PLAN_NAMES.FREE);
     }
 
     const index = pricingPlansOrder.indexOf(planName);
@@ -107,7 +104,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 <span>
                   Everything <img src={"/assets/media/common/yellow-highlight.svg"} alt="highlight" />
                 </span>{" "}
-                in {getHeaderPlanName()} plan +
+                in {getPreviousPlanName()} plan +
               </Col>
             )}
           </>
@@ -124,7 +121,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       planName === PRICING.PLAN_NAMES.BASIC ||
       planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
       planName === PRICING.PLAN_NAMES.LITE ||
-      planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE
+      planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL
     )
       return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
     return null;
@@ -266,7 +263,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 planName !== PRICING.PLAN_NAMES.FREE &&
                 planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
                 planName !== PRICING.PLAN_NAMES.LITE) ||
-                (product === PRICING.PRODUCTS.API_CLIENT && planName === PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE)) && (
+                (product === PRICING.PRODUCTS.API_CLIENT &&
+                  planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL)) && (
                 <PlanQuantitySelector
                   columnPlanName={planName}
                   currentPlanName={user.details?.planDetails?.planName}
@@ -336,33 +334,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           })}
         </Space>
       </div>
-
-      {[PRICING.PLAN_NAMES.PROFESSIONAL, PRICING.PLAN_NAMES.API_CLIENT_ENTERPRISE].includes(planName) &&
-      isAcceleratorProgramEnabled &&
-      isOpenedFromModal &&
-      product === PRICING.PRODUCTS.API_CLIENT ? (
-        <div className="student-plan-footer">
-          <GiftIcon className="gift-plan-icon" width={16} height={16} />
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={`https://rqst.ly/accelerator-program?page_source=${
-              product === PRICING.PRODUCTS.API_CLIENT ? "api_client_pricing_page" : "rules_pricing_page"
-            }`}
-            onClick={() => {
-              trackGetFreeTrialClicked(source);
-            }}
-          >
-            Get Requestly free for 1 year!
-          </a>
-          <Tooltip
-            color="var(--requestly-color-black)"
-            title="Unlimited access, no cost, no commitment — perfect for individuals and teams evaluating their next API tool."
-          >
-            <MdOutlineHelpOutline className="info-icon" />
-          </Tooltip>
-        </div>
-      ) : null}
     </Col>
   );
 };
