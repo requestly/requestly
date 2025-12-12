@@ -19,10 +19,6 @@ export const selectRecordIds = adapterSelectors.selectIds;
 export const selectTotalRecords = adapterSelectors.selectTotal;
 export const selectRecordById = adapterSelectors.selectById;
 
-export const selectRecordsLoading = createSelector(selectRecordsSlice, (slice) => slice.loading);
-
-export const selectRecordsError = createSelector(selectRecordsSlice, (slice) => slice.error);
-
 export const selectTreeIndices = createSelector(selectRecordsSlice, (slice) => slice.tree);
 
 export const selectChildToParent = createSelector(selectTreeIndices, (tree) => tree.childToParent);
@@ -31,9 +27,8 @@ export const selectParentToChildren = createSelector(selectTreeIndices, (tree) =
 
 export const selectRootIds = createSelector(selectTreeIndices, (tree) => tree.rootIds);
 
-export const selectRootRecords = createSelector(
-  [selectRootIds, selectRecordsEntities],
-  (rootIds, entities) => rootIds.map((id) => entities[id]).filter(Boolean) as RQAPI.ApiClientRecord[]
+export const selectRootRecords = createSelector([selectRootIds, selectRecordsEntities], (rootIds, entities) =>
+  rootIds.map((id) => entities[id]).filter((r): r is RQAPI.ApiClientRecord => r != null)
 );
 
 export const selectParentId = createSelector(
@@ -50,7 +45,7 @@ export const selectAncestorRecords = createSelector(
   [selectRecordsEntities, selectChildToParent, (_state: StateWithRecords, id: EntityId) => id],
   (entities, childToParent, id) => {
     const ancestorIds = getParentChain(id, childToParent);
-    return ancestorIds.map((ancestorId) => entities[ancestorId]).filter(Boolean) as RQAPI.ApiClientRecord[];
+    return ancestorIds.map((ancestorId) => entities[ancestorId]).filter((r): r is RQAPI.ApiClientRecord => r != null);
   }
 );
 
@@ -63,7 +58,7 @@ export const selectChildRecords = createSelector(
   [selectRecordsEntities, selectParentToChildren, (_state: StateWithRecords, id: EntityId) => id],
   (entities, parentToChildren, id) => {
     const childIds = getImmediateChildren(id, parentToChildren);
-    return childIds.map((childId) => entities[childId]).filter(Boolean) as RQAPI.ApiClientRecord[];
+    return childIds.map((childId) => entities[childId]).filter((r): r is RQAPI.ApiClientRecord => r != null);
   }
 );
 
@@ -76,7 +71,7 @@ export const selectAllDescendantRecords = createSelector(
   [selectRecordsEntities, selectParentToChildren, (_state: StateWithRecords, id: EntityId) => id],
   (entities, parentToChildren, id) => {
     const descendantIds = getAllDescendants(id, parentToChildren);
-    return descendantIds.map((descId) => entities[descId]).filter(Boolean) as RQAPI.ApiClientRecord[];
+    return descendantIds.map((descId) => entities[descId]).filter((r): r is RQAPI.ApiClientRecord => r != null);
   }
 );
 
@@ -110,7 +105,9 @@ export const selectRecordWithAncestors = createSelector(
     if (!record) return null;
 
     const ancestorIds = getParentChain(id, childToParent);
-    const ancestors = ancestorIds.map((ancestorId) => entities[ancestorId]).filter(Boolean) as RQAPI.ApiClientRecord[];
+    const ancestors = ancestorIds
+      .map((ancestorId) => entities[ancestorId])
+      .filter((r): r is RQAPI.ApiClientRecord => r != null);
 
     return { record, ancestors };
   }
@@ -123,7 +120,10 @@ export const selectCollectionPath = createSelector(
     if (!record) return [];
 
     const ancestorIds = getParentChain(id, childToParent);
-    const path = [record, ...ancestorIds.map((aid) => entities[aid]).filter(Boolean)] as RQAPI.ApiClientRecord[];
+    const path = [
+      record,
+      ...ancestorIds.map((aid) => entities[aid]).filter((r): r is RQAPI.ApiClientRecord => r != null),
+    ];
     return path.reverse();
   }
 );

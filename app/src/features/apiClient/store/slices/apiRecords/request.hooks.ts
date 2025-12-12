@@ -15,28 +15,24 @@ import { useApiClientDispatch, useApiClientSelector } from "../../hooks/base.hoo
 import { ApiClientRootState } from "../../hooks/types";
 
 const makeSelectRequestRecord = () =>
-  createSelector(
-    [(state: ApiClientRootState, id: EntityId) => selectRecordById(state, id)],
-    (record) => record as RQAPI.ApiRecord | undefined
-  );
+  createSelector([(state: ApiClientRootState, id: EntityId) => selectRecordById(state, id)], (record) => {
+    if (record?.type === RQAPI.RecordType.API) {
+      return record;
+    }
+    return undefined;
+  });
 
 const makeSelectRequestBuffer = () =>
-  createSelector(
-    [(state: ApiClientRootState, id: EntityId) => selectBufferById(state, id)],
-    (buffer) => buffer as BufferWrapper<RQAPI.ApiRecord> | undefined
-  );
+  createSelector([(state: ApiClientRootState, id: EntityId) => selectBufferById(state, id)], (buffer) => {
+    const data = buffer?.data;
+    if (data != null && typeof data === "object" && "type" in data && data.type === RQAPI.RecordType.API) {
+      return buffer as BufferWrapper<RQAPI.ApiRecord>;
+    }
+    return undefined;
+  });
 
 const makeSelectRequestData = () =>
-  createSelector(
-    [
-      (state: ApiClientRootState, id: EntityId) => selectRecordById(state, id),
-      (state: ApiClientRootState, id: EntityId) => selectBufferById(state, id),
-    ],
-    (record, buffer) => ({
-      record: record as RQAPI.ApiRecord | undefined,
-      buffer: buffer as BufferWrapper<RQAPI.ApiRecord> | undefined,
-    })
-  );
+  createSelector([makeSelectRequestRecord(), makeSelectRequestBuffer()], (record, buffer) => ({ record, buffer }));
 
 export function useRequestRecord(id: EntityId) {
   const selectRecord = useMemo(makeSelectRequestRecord, []);

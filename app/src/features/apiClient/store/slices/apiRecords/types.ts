@@ -5,6 +5,4 @@ import { TreeIndices } from "../types";
 export interface ApiRecordsState {
   records: EntityState<RQAPI.ApiClientRecord>;
   tree: TreeIndices;
-  loading: boolean;
-  error: string | null;
 }

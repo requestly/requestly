@@ -13,8 +13,6 @@ import {
   selectCollections,
   selectApiRecords,
   selectTotalRecords,
-  selectRecordsLoading,
-  selectRecordsError,
   selectCollectionPath,
   makeSelectRecordById,
   makeSelectChildrenIds,
@@ -30,9 +28,9 @@ export function useRecordById(id: EntityId): RQAPI.ApiClientRecord | undefined {
   return useApiClientSelector((state) => selectRecordById(state, id));
 }
 
-export function useRecordByIdMemoized(id: EntityId): RQAPI.ApiClientRecord | null {
+export function useRecordByIdMemoized(id: EntityId): RQAPI.ApiClientRecord | undefined {
   const selectRecord = useMemo(makeSelectRecordById, []);
-  return useApiClientSelector((state) => selectRecord(state, id));
+  return useApiClientSelector((state) => selectRecord(state, id)) ?? undefined;
 }
 
 export function useAncestorIds(id: EntityId): EntityId[] {
@@ -79,14 +77,6 @@ export function useApiRecordsOnly(): RQAPI.ApiRecord[] {
 
 export function useTotalRecords(): number {
   return useApiClientSelector(selectTotalRecords);
-}
-
-export function useRecordsLoading(): boolean {
-  return useApiClientSelector(selectRecordsLoading);
-}
-
-export function useRecordsError(): string | null {
-  return useApiClientSelector(selectRecordsError);
 }
 
 export function useCollectionPath(id: EntityId): RQAPI.ApiClientRecord[] {

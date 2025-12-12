@@ -1,184 +1,174 @@
 import { Dispatch } from "@reduxjs/toolkit";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import { DeepPartialWithNull, DeleteMarker, UpdateCommand } from "../types";
+import { UpdateCommand } from "../types";
 import { apiRecordsActions } from "../apiRecords/slice";
 import { buffersActions } from "../buffers/slice";
 import { BaseUpdater, UpdaterMeta } from "./base";
 
-export abstract class RequestUpdater<T extends RQAPI.ApiRecord> extends BaseUpdater<T> {
-  constructor(dispatch: Dispatch, meta: UpdaterMeta) {
-    super(dispatch, meta);
+export class HttpRequestUpdater extends BaseUpdater<RQAPI.HttpApiRecord> {
+  protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
+    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
   setName(name: string): void {
-    this.dispatchCommand({ type: "SET", value: { name } as DeepPartialWithNull<T> });
+    this.SET({ name });
   }
 
   setDescription(description: string): void {
-    this.dispatchCommand({ type: "SET", value: { description } as DeepPartialWithNull<T> });
+    this.SET({ description });
   }
 
   setCollectionId(collectionId: string | null): void {
-    this.dispatchCommand({ type: "SET", value: { collectionId } as DeepPartialWithNull<T> });
+    this.SET({ collectionId });
   }
 
   deleteName(): void {
-    this.dispatchCommand({ type: "DELETE", value: { name: true } as DeleteMarker<T> });
+    this.DELETE({ name: true });
   }
 
   deleteDescription(): void {
-    this.dispatchCommand({ type: "DELETE", value: { description: true } as DeleteMarker<T> });
-  }
-}
-
-export class HttpRequestUpdater extends RequestUpdater<RQAPI.HttpApiRecord> {
-  constructor(dispatch: Dispatch, meta: UpdaterMeta) {
-    super(dispatch, meta);
+    this.DELETE({ description: true });
   }
 
-  protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
-    this.dispatch(
-      apiRecordsActions.executeCommand({
-        id: this.meta.id,
-        command: command as UpdateCommand<RQAPI.ApiClientRecord>,
-      })
-    );
-  }
+  // ─── HTTP-Specific Methods ─────────────────────────────────────────────────
 
   setUrl(url: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { url } } } });
+    this.SET({ data: { request: { url } } });
   }
 
   setMethod(method: RequestMethod): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { method } } } });
+    this.SET({ data: { request: { method } } });
   }
 
   setHeaders(headers: KeyValuePair[]): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { headers } } } });
+    this.SET({ data: { request: { headers } } });
   }
 
   setQueryParams(queryParams: KeyValuePair[]): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { queryParams } } } });
+    this.SET({ data: { request: { queryParams } } });
   }
 
   setBody(body: RQAPI.RequestBody): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { body } } } });
+    this.SET({ data: { request: { body } } });
   }
 
   setContentType(contentType: RequestContentType): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { contentType } } } });
+    this.SET({ data: { request: { contentType } } });
   }
 
   setAuth(auth: RQAPI.Auth): void {
-    this.dispatchCommand({ type: "SET", value: { data: { auth } } });
+    this.SET({ data: { auth } });
   }
 
   setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
-    this.dispatchCommand({ type: "SET", value: { data: { scripts } } });
+    this.SET({ data: { scripts } });
   }
 
   setPreRequestScript(script: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { scripts: { preRequest: script } } } });
+    this.SET({ data: { scripts: { preRequest: script } } });
   }
 
   setPostResponseScript(script: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { scripts: { postResponse: script } } } });
+    this.SET({ data: { scripts: { postResponse: script } } });
   }
 
   deleteUrl(): void {
-    this.dispatchCommand({ type: "DELETE", value: { data: { request: { url: true } } } });
+    this.DELETE({ data: { request: { url: true } } });
   }
 
   deleteBody(): void {
-    this.dispatchCommand({ type: "DELETE", value: { data: { request: { body: true } } } });
+    this.DELETE({ data: { request: { body: true } } });
   }
 
   deleteAuth(): void {
-    this.dispatchCommand({ type: "DELETE", value: { data: { auth: true } } });
+    this.DELETE({ data: { auth: true } });
   }
 }
 
 export class HttpRequestBufferUpdater extends HttpRequestUpdater {
   protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
-    this.dispatch(
-      buffersActions.executeBufferCommand({
-        id: this.meta.id,
-        command: command as UpdateCommand,
-      })
-    );
+    const apiClientCommand: UpdateCommand<RQAPI.ApiClientRecord> = command;
+    this.dispatch(buffersActions.applyPatch({ id: this.meta.id, command: apiClientCommand }));
   }
 }
 
-export class GraphQLRequestUpdater extends RequestUpdater<RQAPI.GraphQLApiRecord> {
-  constructor(dispatch: Dispatch, meta: UpdaterMeta) {
-    super(dispatch, meta);
+export class GraphQLRequestUpdater extends BaseUpdater<RQAPI.GraphQLApiRecord> {
+  protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
+    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
-    this.dispatch(
-      apiRecordsActions.executeCommand({
-        id: this.meta.id,
-        command: command as UpdateCommand<RQAPI.ApiClientRecord>,
-      })
-    );
+  setName(name: string): void {
+    this.SET({ name });
+  }
+
+  setDescription(description: string): void {
+    this.SET({ description });
+  }
+
+  setCollectionId(collectionId: string | null): void {
+    this.SET({ collectionId });
+  }
+
+  deleteName(): void {
+    this.DELETE({ name: true });
+  }
+
+  deleteDescription(): void {
+    this.DELETE({ description: true });
   }
 
   setUrl(url: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { url } } } });
+    this.SET({ data: { request: { url } } });
   }
 
   setHeaders(headers: KeyValuePair[]): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { headers } } } });
+    this.SET({ data: { request: { headers } } });
   }
 
   setOperation(operation: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { operation } } } });
+    this.SET({ data: { request: { operation } } });
   }
 
   setVariables(variables: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { variables } } } });
+    this.SET({ data: { request: { variables } } });
   }
 
   setOperationName(operationName: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { request: { operationName } } } });
+    this.SET({ data: { request: { operationName } } });
   }
 
   setAuth(auth: RQAPI.Auth): void {
-    this.dispatchCommand({ type: "SET", value: { data: { auth } } });
+    this.SET({ data: { auth } });
   }
 
   setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
-    this.dispatchCommand({ type: "SET", value: { data: { scripts } } });
+    this.SET({ data: { scripts } });
   }
 
   setPreRequestScript(script: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { scripts: { preRequest: script } } } });
+    this.SET({ data: { scripts: { preRequest: script } } });
   }
 
   setPostResponseScript(script: string): void {
-    this.dispatchCommand({ type: "SET", value: { data: { scripts: { postResponse: script } } } });
+    this.SET({ data: { scripts: { postResponse: script } } });
   }
 
   deleteOperation(): void {
-    this.dispatchCommand({ type: "DELETE", value: { data: { request: { operation: true } } } });
+    this.DELETE({ data: { request: { operation: true } } });
   }
 
   deleteVariables(): void {
-    this.dispatchCommand({ type: "DELETE", value: { data: { request: { variables: true } } } });
+    this.DELETE({ data: { request: { variables: true } } });
   }
 
   deleteAuth(): void {
-    this.dispatchCommand({ type: "DELETE", value: { data: { auth: true } } });
+    this.DELETE({ data: { auth: true } });
   }
 }
 
 export class GraphQLRequestBufferUpdater extends GraphQLRequestUpdater {
   protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
-    this.dispatch(
-      buffersActions.executeBufferCommand({
-        id: this.meta.id,
-        command: command as UpdateCommand,
-      })
-    );
+    const apiClientCommand: UpdateCommand<RQAPI.ApiClientRecord> = command;
+    this.dispatch(buffersActions.applyPatch({ id: this.meta.id, command: apiClientCommand }));
   }
 }
