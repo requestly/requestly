@@ -5,7 +5,7 @@ import { getContentTypeFromResponseHeaders } from "features/apiClient/screens/ap
 import ResponseBody from "../ResponseBody/ResponseBody";
 import { BottomSheet } from "componentsV2/BottomSheet";
 import StatusLine from "../StatusLine";
-import { TabsProps, Tag } from "antd";
+import { Tag } from "antd";
 import { TestsView } from "../TestsView/TestsView";
 import { TestResult, TestStatus } from "features/apiClient/helpers/modules/scriptsV2/worker/script-internals/types";
 import { ApiClientErrorPanel } from "../../errors/ApiClientErrorPanel/ApiClientErrorPanel";
@@ -16,10 +16,6 @@ import { RequestError } from "../../errors/RequestError";
 import { ApiClientWarningPanel } from "../../errors/ApiClientWarningPanel/ApiClientWarningPanel";
 import "./apiclientBottomSheet.scss";
 import { ApiClientLargeFileLoader } from "../../../../clientView/components/response/LargeFileLoadingPlaceholder";
-import { MdDataObject } from "@react-icons/all-files/md/MdDataObject";
-import { PiTag } from "@react-icons/all-files/pi/PiTag";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
 
 interface Props {
   onGenerateTests?: () => void;
@@ -71,7 +67,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
 
     const passedTestsCount = testResults.filter((testResult) => testResult.status === TestStatus.PASSED).length;
 
-    const isAnyTestFailed = testResults.some((testResult) => testResult.status === "failed");
+    const isAnyTestFailed = testResults.some((testResult) => testResult.status == "failed");
 
     return (
       <Tag className={`count test-results-stats ${isAnyTestFailed ? "failed" : "passed"}`}>
@@ -81,43 +77,22 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   }, [testResults]);
 
   const bottomSheetTabItems = useMemo(() => {
-    const baseTabItems: TabsProps["items"] = [
+    const baseTabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.RESPONSE,
-        label: (
-          <BottomSheetTabLabel label="Body">
-            <span className="bottom-sheet-tab">
-              <MdDataObject />
-              <span>Body</span>
-            </span>
-          </BottomSheetTabLabel>
-        ),
+        label: "Body",
         children: <ResponseBody responseText={response?.body} contentTypeHeader={contentTypeHeader} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.HEADERS,
         label: (
-          <BottomSheetTabLabel label="Headers">
-            <span className="bottom-sheet-tab">
-              <PiTag />
-              <span>
-                Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}
-              </span>
-            </span>
-          </BottomSheetTabLabel>
+          <>Headers {response?.headers?.length ? <Tag className="count">{response?.headers?.length}</Tag> : null}</>
         ),
         children: <ResponseHeaders headers={response?.headers} />,
       },
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RESULTS,
-        label: (
-          <BottomSheetTabLabel label="Test results">
-            <span className="bottom-sheet-tab">
-              <MdOutlineScience />
-              <span>Test results {testResultsStats}</span>
-            </span>
-          </BottomSheetTabLabel>
-        ),
+        label: <>Test results {testResultsStats}</>,
         children: (
           <TestsView
             testResults={testResults}

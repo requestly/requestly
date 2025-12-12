@@ -21,7 +21,6 @@ import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEd
 import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "@requestly/shared/types/entities/rules";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
-import { SheetLayout } from "componentsV2/BottomSheet/types";
 import "./RuleEditor.scss";
 
 const RuleEditor = (props) => {
@@ -138,8 +137,8 @@ const RuleEditor = (props) => {
           <BottomSheetLayout
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
             hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isSampleRule}
+            minSize={26}
             initialSizes={[60, 40]}
-            layout={SheetLayout.SPLIT}
           >
             <ProCard
               className={`rule-editor-procard ${

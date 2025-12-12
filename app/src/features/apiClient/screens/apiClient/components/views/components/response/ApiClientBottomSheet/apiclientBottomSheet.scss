@@ -1,11 +1,16 @@
 .api-client-sheet-panel-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 99%;
 
   .api-client-sheet-panel {
     flex: 1;
     overflow-y: hidden;
+
+    .ant-tabs-extra-content {
+      margin-top: -6px;
+      margin-right: 4px;
+    }
   }
 
   .test-results-stats {

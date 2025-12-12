@@ -7,7 +7,8 @@ import {
 } from "../analytics";
 
 interface toggleParams {
-  isOpen?: boolean;
+  isOpen: boolean;
+  isTrack: boolean;
   action: string;
 }
 interface BottomSheetContextProps {
@@ -25,20 +26,19 @@ export const BottomSheetProvider: React.FC<{
   isSheetOpenByDefault?: boolean;
 }> = ({ children, defaultPlacement, isSheetOpenByDefault = false }) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(isSheetOpenByDefault);
-  const [sheetPlacement, setSheetPlacement] = useState<BottomSheetPlacement>(defaultPlacement);
+  const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
 
-  const toggleBottomSheet = (params: toggleParams) => {
-    if (!params) {
-      return;
-    }
-    const { isOpen, action } = params;
-    if (typeof isOpen !== "undefined") {
+  const toggleBottomSheet = ({ isOpen, isTrack, action }: toggleParams) => {
+    if (isOpen) {
       setIsBottomSheetOpen(isOpen);
-      trackBottomSheetToggled(isOpen, action);
+      if (isTrack) {
+        trackBottomSheetToggled(isOpen, action);
+      }
     } else {
-      const newOpenState = !isBottomSheetOpen;
-      setIsBottomSheetOpen(newOpenState);
-      trackBottomSheetToggled(newOpenState, action);
+      setIsBottomSheetOpen((prev) => !prev);
+      if (isTrack) {
+        trackBottomSheetToggled(!isBottomSheetOpen, action);
+      }
     }
   };
 
