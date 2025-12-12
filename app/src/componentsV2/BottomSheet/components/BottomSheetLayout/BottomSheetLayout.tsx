@@ -30,11 +30,9 @@ export const BottomSheetLayout: React.FC<Props> = (props) => {
 
   if (props.layout === SheetLayout.DRAWER) {
     return (
-      <DrawerLayout
-        bottomSheet={props.bottomSheet}
-        children={props.children}
-        initialOffset={props.initialOffset ?? 0}
-      />
+      <DrawerLayout bottomSheet={props.bottomSheet} initialOffset={props.initialOffset ?? 0}>
+        {props.children}
+      </DrawerLayout>
     );
   }
 
@@ -42,10 +40,11 @@ export const BottomSheetLayout: React.FC<Props> = (props) => {
     return (
       <SplitPaneLayout
         bottomSheet={props.bottomSheet}
-        children={props.children}
         minSize={props.minSize}
         initialSizes={props.initialSizes ?? [40, 60]}
-      />
+      >
+        {props.children}
+      </SplitPaneLayout>
     );
   }
 
