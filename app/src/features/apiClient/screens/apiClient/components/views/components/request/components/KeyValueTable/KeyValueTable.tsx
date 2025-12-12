@@ -222,6 +222,8 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     handleDeletePair,
     showDescription,
     onToggleDescription,
+    showSettings,
+    showType,
   ]);
 
   return (
