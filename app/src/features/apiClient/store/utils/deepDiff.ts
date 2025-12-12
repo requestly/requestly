@@ -1,14 +1,33 @@
 import { isPlainObject, isEqual, forOwn, isEmpty } from "lodash";
 
-export function getDeepDiff<T extends Record<string, unknown>>(newData: T, originalData: T): Record<string, unknown> {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return isPlainObject(value) && !Array.isArray(value);
+}
+
+/**
+ * Computes the deep difference between two objects.
+ *
+ * - Changed values are included as-is
+ * - Nested objects are recursively diffed
+ * - Deleted keys (present in original but missing in new) are marked with `null`
+ * - Arrays are compared by value equality (not merged)
+ *
+ * @param newData - The new state of the object
+ * @param originalData - The original state to compare against
+ * @returns An object containing only the differences
+ */
+export function getDeepDiff(
+  newData: Record<string, unknown>,
+  originalData: Record<string, unknown>
+): Record<string, unknown> {
   const diff: Record<string, unknown> = {};
 
   forOwn(newData, (value, key) => {
     const originalValue = originalData[key];
 
     if (!isEqual(value, originalValue)) {
-      if (isPlainObject(value) && isPlainObject(originalValue) && !Array.isArray(value)) {
-        const nestedDiff = getDeepDiff(value as Record<string, unknown>, originalValue as Record<string, unknown>);
+      if (isRecord(value) && isRecord(originalValue)) {
+        const nestedDiff = getDeepDiff(value, originalValue);
         if (!isEmpty(nestedDiff)) {
           diff[key] = nestedDiff;
         }
@@ -18,8 +37,10 @@ export function getDeepDiff<T extends Record<string, unknown>>(newData: T, origi
     }
   });
 
+  // Detect deleted keys: present in original but missing in new
+  // Uses hasOwnProperty to distinguish "key removed" from "key set to undefined"
   forOwn(originalData, (_, key) => {
-    if (newData[key] === undefined) {
+    if (!Object.prototype.hasOwnProperty.call(newData, key)) {
       diff[key] = null;
     }
   });
