@@ -196,6 +196,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           onSaveRecord(newCollection.data);
           importedCollectionsCount++;
           return newCollection.data.id;
+        } else {
+          failedCollectionsCount++;
+          return null;
         }
       } catch (error) {
         failedCollectionsCount++;
@@ -228,6 +231,9 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
           onSaveRecord(newApi.data);
           importedApisCount++;
           return newApi.data.id;
+        } else {
+          failedCollectionsCount++;
+          return null;
         }
       } catch (error) {
         failedCollectionsCount++;
