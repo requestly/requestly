@@ -41,7 +41,7 @@ export const useVariablesListColumns = ({
     [visibleSecretsRowIds]
   );
 
-  const allColumns: (ColumnTypes[number] & { editable: boolean })[] = [
+  const allColumns: ((ColumnTypes[number] & { editable: boolean }) | null)[] = [
     {
       title: "Key",
       editable: true,
