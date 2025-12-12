@@ -26,7 +26,7 @@ export const getActiveWorkspaceIds = (state: RootState) => {
   return sliceRootState(state).activeWorkspaceIds;
 };
 
-const dummyPersonalWorkspace: Workspace = {
+export const defaultPersonalWorkspace: Workspace = {
   id: null,
   name: "Private Workspace",
   membersCount: 1,
@@ -38,7 +38,7 @@ export const getActiveWorkspace = (state: RootState) => {
 
   if (!activeWorkspaceId) {
     // Backward compatibility for Private Workspacese
-    return dummyPersonalWorkspace;
+    return defaultPersonalWorkspace;
   }
 
   const activeWorkspace = getWorkspaceById(activeWorkspaceId)(state);
@@ -49,7 +49,7 @@ export const getActiveWorkspace = (state: RootState) => {
     });
   }
 
-  return activeWorkspace ?? dummyPersonalWorkspace;
+  return activeWorkspace ?? defaultPersonalWorkspace;
 };
 
 /**
