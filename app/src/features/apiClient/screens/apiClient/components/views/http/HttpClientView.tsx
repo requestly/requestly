@@ -508,7 +508,7 @@ const HttpClientView: React.FC<Props> = ({
         trackRQDesktopLastActivity(API_CLIENT.REQUEST_FAILED);
       }
 
-      notifyApiRequestFinished?.(executedEntry);
+      notifyApiRequestFinished(executedEntry);
     } catch (e) {
       setIsFailed(true);
       setError({
