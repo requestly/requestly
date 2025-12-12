@@ -147,9 +147,13 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
         const newCollection = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
-        onSaveRecord(newCollection.data);
-        importedCollectionsCount++;
-        return newCollection.data.id;
+        // for the cases newCollection.success is false
+        // inside createRecordWithId we are already capturing the exception in sentry
+        if (newCollection.success) {
+          onSaveRecord(newCollection.data);
+          importedCollectionsCount++;
+          return newCollection.data.id;
+        }
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing collection:", error);
@@ -168,6 +172,8 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
 
     const handleApiWrites = async (api: RQAPI.ApiRecord) => {
       const newCollectionId = collections.find((collection) => collection.id === api.collectionId)?.id;
+      // for the cases where newApi.success is false
+      // inside createRecordWithId we are already capturing the exception in sentry
       if (!newCollectionId) {
         throw new Error(`Failed to find new collection ID for API: ${api.name || api.id}`);
       }
@@ -175,8 +181,10 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
-        onSaveRecord(newApi.data);
-        importedApisCount++;
+        if (newApi.success) {
+          onSaveRecord(newApi.data);
+          importedApisCount++;
+        }
       } catch (error) {
         failedApisCount++;
         Logger.error("Error importing API:", error);

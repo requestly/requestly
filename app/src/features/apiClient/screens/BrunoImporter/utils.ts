@@ -93,6 +93,9 @@ const createApiRecord = (
         requestBody = "";
         break;
     }
+  } else {
+    contentType = RequestContentType.RAW;
+    requestBody = "";
   }
 
   return {
