@@ -108,7 +108,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState<number | undefined>(undefined);
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isRecordBeingCreated, setIsRecordBeingCreated] = useState(null);
+  const [isRecordBeingCreated, setIsRecordBeingCreated] = useState<RQAPI.RecordType | null>(null);
 
   const debouncedTrackUserProperties = debounce(() => trackUserProperties(apiClientRecords), 1000);
 
