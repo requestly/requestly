@@ -268,7 +268,8 @@ export const createApiRecordsStore = (
 
     getData(id) {
       const { index } = get();
-      return index.get(id)!;
+      if (id === null) return undefined;
+      return index.get(id);
     },
 
     getParent(id) {
@@ -341,7 +342,7 @@ export const createApiRecordsStore = (
       get().triggerUpdateForChildren(patch.id);
 
       if (existingCollectionId !== newCollectionId) {
-        treeBusEmitEffect();
+        treeBusEmitEffect?.();
         context.treeBus.emit(new TreeChanged(patch.id));
       }
     },
@@ -372,7 +373,7 @@ export const createApiRecordsStore = (
           get().triggerUpdateForChildren(patch.id);
 
           if (existingCollectionId !== newCollectionId) {
-            treeBusEmitEffect();
+            treeBusEmitEffect?.();
             context.treeBus.emit(new TreeChanged(patch.id));
           }
         }
@@ -396,7 +397,7 @@ export const createApiRecordsStore = (
 
       get().refresh(updatedRecords);
 
-      treeBusEmitEffect.forEach((emit) => emit());
+      treeBusEmitEffect.forEach((emit) => emit?.());
     },
 
     getRecordStore(id) {
