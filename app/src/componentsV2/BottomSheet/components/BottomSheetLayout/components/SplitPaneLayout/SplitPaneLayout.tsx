@@ -63,7 +63,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         sizes={sizes}
         onDrag={handleDrag}
         snapOffset={[0, SNAP_OFFSET_PIXELS]}
-        minSize={[500, minSize]}
+        minSize={[isSheetPlacedAtBottom ? 150 : 500, minSize]}
         className={`bottomsheet-layout-container ${
           splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
         }`}
