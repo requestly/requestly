@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from "react";
+import React, { useCallback, useMemo, useEffect, useRef } from "react";
 import { Form, Dropdown, Menu, MenuProps, FormInstance } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { KeyValuePair, ValueType } from "features/apiClient/types";
@@ -40,11 +40,13 @@ const KeyValueTypeCell: React.FC<KeyValueTypeCellProps> = ({ record, dataIndex, 
     return explicitType || getInferredType((record as any).value);
   }, [record, dataIndex]);
 
+  const initializedRef = useRef(false);
   useEffect(() => {
     const currentSavedType = record?.[dataIndex];
-    if (!currentSavedType) {
+    if (!currentSavedType && !initializedRef.current) {
       form.setFieldsValue({ [dataIndex]: displayType });
       onSave();
+      initializedRef.current = true;
     }
   }, [record, dataIndex, displayType, form, onSave]);
 
