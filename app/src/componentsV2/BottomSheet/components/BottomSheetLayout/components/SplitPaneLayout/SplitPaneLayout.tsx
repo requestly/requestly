@@ -32,7 +32,10 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
     } else {
       setSizes(getDefaultSizes(isSheetPlacedAtBottom, initialSizes));
     }
-  }, [isBottomSheetOpen, isSheetPlacedAtBottom, initialSizes]);
+    // Adding initialSizes to dependencies will cause the bottomsheet split sizes to reset when parent re-renders.
+    // TODO: move size state to context
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBottomSheetOpen, isSheetPlacedAtBottom]);
 
   const handleDrag = useCallback(
     (newSizes: number[]) => {
@@ -60,7 +63,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
         sizes={sizes}
         onDrag={handleDrag}
         snapOffset={[0, SNAP_OFFSET_PIXELS]}
-        minSize={minSize}
+        minSize={[500, minSize]}
         className={`bottomsheet-layout-container ${
           splitDirection === SplitDirection.HORIZONTAL ? "horizontal-split" : "vertical-split"
         }`}
