@@ -12,6 +12,8 @@ export const updateRecordSelection = (
   const queue = [record];
   while (queue.length) {
     const current = queue.pop();
+    if (!current) continue;
+
     if (checked) {
       newSelectedRecords.add(current.id);
     } else {
