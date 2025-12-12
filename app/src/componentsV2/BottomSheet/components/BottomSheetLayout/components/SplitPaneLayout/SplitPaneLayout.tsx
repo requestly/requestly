@@ -24,7 +24,7 @@ export const SplitPaneLayout: React.FC<Props> = ({ bottomSheet, children, minSiz
 
   const splitDirection = isSheetPlacedAtBottom ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
-  const SNAP_OFFSET_PIXELS = isSheetPlacedAtBottom ? 150 : 200;
+  const SNAP_OFFSET_PIXELS = isSheetPlacedAtBottom ? 100 : 200;
 
   useEffect(() => {
     if (!isBottomSheetOpen) {
