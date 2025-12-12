@@ -127,7 +127,12 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       ...entry,
       type: entry.type ?? RQAPI.ApiEntryType.HTTP,
     };
-    submit({ userQuery: query, apiRecord: preparedApiRecord });
+    submit({
+      userQuery: query,
+      apiRecord: preparedApiRecord,
+      existingScript: entry.scripts?.postResponse ?? "",
+      lastGeneration: { code: object?.code },
+    });
   };
 
   const mergeViewConfig = useMemo(() => {
