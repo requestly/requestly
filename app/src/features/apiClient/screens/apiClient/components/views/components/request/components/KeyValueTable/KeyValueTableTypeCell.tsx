@@ -37,16 +37,16 @@ const KeyValueTypeCell: React.FC<KeyValueTypeCellProps> = ({ record, dataIndex, 
 
   const displayType = useMemo(() => {
     const explicitType = record?.[dataIndex] as ValueType | undefined;
-    return explicitType || getInferredType((record as any).value);
+    return explicitType || getInferredType(record.value);
   }, [record, dataIndex]);
 
-  const initializedRef = useRef(false);
+  const initializedRef = useRef<Set<number>>(new Set());
   useEffect(() => {
     const currentSavedType = record?.[dataIndex];
-    if (!currentSavedType && !initializedRef.current) {
+    if (!currentSavedType && !initializedRef.current.has(record.id)) {
       form.setFieldsValue({ [dataIndex]: displayType });
       onSave();
-      initializedRef.current = true;
+      initializedRef.current.add(record.id);
     }
   }, [record, dataIndex, displayType, form, onSave]);
 
