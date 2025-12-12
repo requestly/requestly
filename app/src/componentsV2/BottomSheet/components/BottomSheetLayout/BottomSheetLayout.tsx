@@ -17,37 +17,34 @@ type SplitLayoutProps = BottomSheetLayoutProps & {
 };
 
 type DrawerLayoutProps = BottomSheetLayoutProps & {
-  layout?: SheetLayout.DRAWER;
+  layout: SheetLayout.DRAWER;
   initialOffset?: number;
 };
 
 type Props = SplitLayoutProps | DrawerLayoutProps;
 
 export const BottomSheetLayout: React.FC<Props> = (props) => {
-  const { bottomSheet, children, hideBottomSheet = false, layout = SheetLayout.SPLIT } = props;
-
-  if (hideBottomSheet) {
-    return children;
+  if (props.hideBottomSheet) {
+    return props.children;
   }
 
-  if (layout === SheetLayout.DRAWER) {
+  if (props.layout === SheetLayout.DRAWER) {
     return (
-      <DrawerLayout
-        bottomSheet={bottomSheet}
-        children={children}
-        initialOffset={(props as DrawerLayoutProps).initialOffset ?? 0}
-      />
+      <DrawerLayout bottomSheet={props.bottomSheet} initialOffset={props.initialOffset ?? 0}>
+        {props.children}
+      </DrawerLayout>
     );
   }
 
-  if (layout === SheetLayout.SPLIT) {
+  if (props.layout === SheetLayout.SPLIT) {
     return (
       <SplitPaneLayout
-        bottomSheet={bottomSheet}
-        children={children}
-        minSize={(props as SplitLayoutProps).minSize ?? 100}
-        initialSizes={(props as SplitLayoutProps).initialSizes ?? [40, 60]}
-      />
+        bottomSheet={props.bottomSheet}
+        minSize={props.minSize}
+        initialSizes={props.initialSizes ?? [40, 60]}
+      >
+        {props.children}
+      </SplitPaneLayout>
     );
   }
 
