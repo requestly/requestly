@@ -597,6 +597,7 @@ const GraphQLClientView: React.FC<Props> = ({
             executeRequest={handleSend}
           />
         }
+        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [60, 40]}
       >
         <div className="api-client-body">

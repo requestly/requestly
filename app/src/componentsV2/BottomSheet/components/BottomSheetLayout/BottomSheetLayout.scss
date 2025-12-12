@@ -1,6 +1,5 @@
 .bottomsheet-layout-container {
-  height: 100%;
-  overflow: hidden;
+  height: calc(100% - 53px);
   position: relative;
 
   .ant-tabs {
@@ -85,8 +84,4 @@
       }
     }
   }
-}
-
-.bottomsheet-split-layout-container {
-  width: 100%;
 }

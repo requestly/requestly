@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "store/slices/global/slice";
 import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { SUB_TOUR_TYPES, TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
-import { BottomSheetTabLabel } from "componentsV2/BottomSheet/components/BottomSheetLayout/components/BottomSheetTabLabel/BottomSheetTabLabel";
 
 interface RuleEditorBottomSheetProps {
   mode: string;
@@ -35,12 +34,10 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RULE,
         label: (
-          <BottomSheetTabLabel label="Test">
-            <div className="bottom-sheet-tab">
-              <MdOutlineScience />
-              <span>Test</span>
-            </div>
-          </BottomSheetTabLabel>
+          <div className="bottom-sheet-tab">
+            <MdOutlineScience />
+            <span>Test</span>
+          </div>
         ),
         children: <TestThisRule />,
         forceRender: true,
