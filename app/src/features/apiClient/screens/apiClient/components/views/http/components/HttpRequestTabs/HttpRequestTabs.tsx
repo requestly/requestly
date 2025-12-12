@@ -26,10 +26,10 @@ export enum RequestTab {
 }
 
 interface Props {
-  error: RQAPI.ExecutionError;
+  error: RQAPI.ExecutionError | null;
   requestEntry: RQAPI.HttpApiEntry;
   requestId: RQAPI.ApiRecord["id"];
-  collectionId: string;
+  collectionId: RQAPI.ApiRecord["collectionId"];
   setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
   setContentType: (contentType: RequestContentType) => void;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
