@@ -12,7 +12,7 @@ export const AUTH_SELECTOR_LABELS = [
 const FORM_FIELDS_LAYOUT: Record<AuthConfigMeta.AuthWithConfig, AuthForm.FormField[]> = {
   [Authorization.Type.API_KEY]: [
     { id: "key", type: AuthForm.FIELD_TYPE.INPUT, label: "Key", placeholder: "Key" },
-    { id: "value", type: AuthForm.FIELD_TYPE.INPUT, label: "Value", placeholder: "Value" },
+    { id: "value", type: AuthForm.FIELD_TYPE.INPUT, label: "Value", placeholder: "Value", isSecret: true },
     {
       id: "addTo",
       type: AuthForm.FIELD_TYPE.SELECT,
@@ -25,11 +25,11 @@ const FORM_FIELDS_LAYOUT: Record<AuthConfigMeta.AuthWithConfig, AuthForm.FormFie
     },
   ],
   [Authorization.Type.BEARER_TOKEN]: [
-    { id: "bearer", type: AuthForm.FIELD_TYPE.INPUT, label: "Token", placeholder: "Token" },
+    { id: "bearer", type: AuthForm.FIELD_TYPE.INPUT, label: "Token", placeholder: "Token", isSecret: true },
   ],
   [Authorization.Type.BASIC_AUTH]: [
     { id: "username", type: AuthForm.FIELD_TYPE.INPUT, label: "Username", placeholder: "Username" },
-    { id: "password", type: AuthForm.FIELD_TYPE.INPUT, label: "Password", placeholder: "Password" },
+    { id: "password", type: AuthForm.FIELD_TYPE.INPUT, label: "Password", placeholder: "Password", isSecret: true },
   ],
 };
 
