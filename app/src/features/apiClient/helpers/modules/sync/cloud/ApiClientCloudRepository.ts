@@ -10,4 +10,8 @@ export class ApiClientCloudRepository implements ApiClientRepositoryInterface {
     this.environmentVariablesRepository = new FirebaseEnvSync(meta);
     this.apiClientRecordsRepository = new FirebaseApiClientRecordsSync(meta);
   }
+
+  async validateConnection() {
+    return { isValid: true };
+  }
 }
