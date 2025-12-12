@@ -26,7 +26,6 @@ export const ClientViewFactory = ({
           apiEntryDetails={apiRecord as RQAPI.HttpApiRecord}
           onSaveCallback={onSaveCallback}
           openInModal={isOpenInModal}
-          isCreateMode={isCreateMode}
           notifyApiRequestFinished={handleRequestFinished}
         />
       );

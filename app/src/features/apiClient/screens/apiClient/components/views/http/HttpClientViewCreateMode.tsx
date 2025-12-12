@@ -11,7 +11,6 @@ type BaseProps = {
 };
 
 type CreateModeProps = BaseProps & {
-  isCreateMode: true;
   apiEntryDetails:
     | null
     | ({
