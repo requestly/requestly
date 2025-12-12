@@ -153,6 +153,9 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
           onSaveRecord(newCollection.data);
           importedCollectionsCount++;
           return newCollection.data.id;
+        } else {
+          failedCollectionsCount++;
+          return null;
         }
       } catch (error) {
         failedCollectionsCount++;
@@ -184,6 +187,9 @@ export const BrunoImporter: React.FC<BrunoImporterProps> = ({ onSuccess }) => {
         if (newApi.success) {
           onSaveRecord(newApi.data);
           importedApisCount++;
+          return;
+        } else {
+          failedApisCount++;
         }
       } catch (error) {
         failedApisCount++;
