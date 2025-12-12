@@ -19,22 +19,26 @@ export const multiWorkspaceViewSlice = createSlice({
       state.viewMode = action.payload;
     },
 
-    addWorkspace(state, action: PayloadAction<WorkspaceViewState["id"]>) {
-      const id = action.payload;
+    addWorkspace(state, action: PayloadAction<WorkspaceViewState>) {
+      const id = action.payload.id;
 
       if (state.selectedWorkspaces.entities[id]) {
-        console.log("workspace already added!");
         return;
       }
 
-      multiWorkspaceViewAdapter.addOne(state.selectedWorkspaces, {
-        id,
-        state: { loading: false, errored: false },
-      });
+      multiWorkspaceViewAdapter.addOne(state.selectedWorkspaces, action.payload);
+    },
+
+    addWorkspaces(state, action: PayloadAction<WorkspaceViewState[]>) {
+      multiWorkspaceViewAdapter.addMany(state.selectedWorkspaces, action.payload);
     },
 
     removeWorkspace(state, action: PayloadAction<WorkspaceViewState["id"]>) {
       multiWorkspaceViewAdapter.removeOne(state.selectedWorkspaces, action.payload);
+    },
+
+    removeWorkspaces(state, action: PayloadAction<WorkspaceViewState["id"][]>) {
+      multiWorkspaceViewAdapter.removeMany(state.selectedWorkspaces, action.payload);
     },
 
     setWorkspaceState(state, action: PayloadAction<{ id: WorkspaceViewState["id"]; workspaceState: WorkspaceState }>) {
