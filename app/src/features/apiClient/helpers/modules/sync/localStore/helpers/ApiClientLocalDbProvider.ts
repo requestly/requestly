@@ -2,7 +2,7 @@ import { ApiClientLocalStoreMeta } from "../../interfaces";
 import { ApiClientLocalDb } from "./ApiClientLocalDb";
 
 class ApiClientLocalDbProvider {
-  private cache: ApiClientLocalDb = null;
+  private cache: ApiClientLocalDb | null = null;
 
   get(metadata: ApiClientLocalStoreMeta) {
     if (!this.cache) {
