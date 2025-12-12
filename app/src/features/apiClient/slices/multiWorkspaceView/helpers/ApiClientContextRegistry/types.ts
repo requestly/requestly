@@ -26,11 +26,10 @@ export interface ApiClientStoreState {
 
 export type ApiClientStore = Store<ApiClientStoreState>;
 
-export type ContextId = string;
-
 export interface ApiClientFeatureContext {
-  id: ContextId;
-  workspaceId: WorkspaceViewState["id"];
   store: ApiClientStore;
+  workspaceId: WorkspaceViewState["id"] | null;
   repositories: ApiClientRepositoryInterface;
 }
+
+export type WorkspaceId = ApiClientFeatureContext["workspaceId"];
