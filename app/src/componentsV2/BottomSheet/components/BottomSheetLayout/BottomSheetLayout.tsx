@@ -17,7 +17,7 @@ type SplitLayoutProps = BottomSheetLayoutProps & {
 };
 
 type DrawerLayoutProps = BottomSheetLayoutProps & {
-  layout?: SheetLayout.DRAWER;
+  layout: SheetLayout.DRAWER;
   initialOffset?: number;
 };
 
