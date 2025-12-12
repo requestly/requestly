@@ -37,8 +37,8 @@ const BATCH_SIZE = 25;
 
 export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) => {
   const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>("idle");
-  const [isImporting, setIsImporting] = useState(false);
-  const [importError, setImportError] = useState(null);
+  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [importError, setImportError] = useState<string | null>(null);
   const [processedFileData, setProcessedFileData] = useState<ProcessedData>({
     environments: [],
     apiRecords: [],
@@ -190,9 +190,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
     const handleCollectionWrites = async (collection: RQAPI.CollectionRecord) => {
       try {
         const newCollection = await apiClientRecordsRepository.createCollectionFromImport(collection, collection.id);
-        onSaveRecord(newCollection.data);
-        importedCollectionsCount++;
-        return newCollection.data.id;
+        // for the cases newCollection .success is false
+        // inside createRecordWithId we are already capturing the exception in sentry
+        if (newCollection.success) {
+          onSaveRecord(newCollection.data);
+          importedCollectionsCount++;
+          return newCollection.data.id;
+        }
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing collection:", error);
@@ -218,9 +222,13 @@ export const PostmanImporter: React.FC<PostmanImporterProps> = ({ onSuccess }) =
       const updatedApi = { ...api, collectionId: newCollectionId };
       try {
         const newApi = await apiClientRecordsRepository.createRecordWithId(updatedApi, updatedApi.id);
-        onSaveRecord(newApi.data);
-        importedApisCount++;
-        return newApi.data.id;
+        // for the cases where newApi.success is false
+        // inside createRecordWithId we are already capturing the exception in sentry
+        if (newApi.success) {
+          onSaveRecord(newApi.data);
+          importedApisCount++;
+          return newApi.data.id;
+        }
       } catch (error) {
         failedCollectionsCount++;
         Logger.error("Error importing API:", error);
