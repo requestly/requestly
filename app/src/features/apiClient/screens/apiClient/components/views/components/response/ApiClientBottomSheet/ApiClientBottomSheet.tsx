@@ -63,7 +63,7 @@ export const ApiClientBottomSheet: React.FC<Props> = ({
   onDismissError,
 }) => {
   const contentTypeHeader = useMemo(() => {
-    return response?.headers ? getContentTypeFromResponseHeaders(response.headers) : "";
+    return response?.headers ? getContentTypeFromResponseHeaders(response.headers) ?? "" : "";
   }, [response?.headers]);
 
   const testResultsStats = useMemo(() => {
