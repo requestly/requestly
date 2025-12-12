@@ -56,9 +56,9 @@ export const RunResultView: React.FC = () => {
       {runStatus === RunStatus.ERRORED ? (
         error instanceof RenderableError ? (
           error.render()
-        ) : error ? (
+        ) : (
           <DefaultErrorComponent error={error} />
-        ) : null
+        )
       ) : (
         <RunResultContainer
           result={testResults}
