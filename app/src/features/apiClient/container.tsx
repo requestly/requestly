@@ -23,6 +23,8 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 const ApiClientFeatureContainer: React.FC = () => {
+  const MINIMUM_SIDEBAR_WIDTH = 280;
+  const SCREEN_CONTENT_GAP = 70;
   const user: Record<string, any> = useSelector(getUserAuthDetails);
   const activeWorkspace = useSelector(getActiveWorkspace);
   const [viewMode, isLoaded, getViewMode] = useApiClientMultiWorkspaceView((s) => [
@@ -41,8 +43,8 @@ const ApiClientFeatureContainer: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const getSecondPaneMinSize = () => {
-    return screenWidth < 1440 ? 700 : 800;
+  const getContentHalfScreenSize = () => {
+    return screenWidth / 2 - SCREEN_CONTENT_GAP;
   };
 
   useEffect(() => {
@@ -96,7 +98,8 @@ const ApiClientFeatureContainer: React.FC = () => {
               className="api-client-container__split"
               direction="horizontal"
               sizes={[20, 80]}
-              minSize={[300, getSecondPaneMinSize()]}
+              minSize={[MINIMUM_SIDEBAR_WIDTH]}
+              maxSize={[getContentHalfScreenSize()]}
               gutter={(index, direction) => {
                 const gutterContainer = document.createElement("div");
                 gutterContainer.style.position = "relative";
