@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
-import { Checkbox, Form, FormInstance } from "antd";
+import { Checkbox, Form, FormInstance, AutoComplete, Input } from "antd";
+import HEADER_SUGGESTIONS from "config/constants/sub/header-suggestions";
 import { KeyValuePair } from "features/apiClient/types";
 import SingleLineEditor from "features/apiClient/screens/environment/components/SingleLineEditor";
 import InfoIcon from "components/misc/InfoIcon";
@@ -32,6 +33,7 @@ interface EditableCellProps {
   variables: ScopedVariables;
   handleUpdatePair: (record: KeyValuePair) => void;
   checkInvalidCharacter: boolean;
+  enableHeaderSuggestions?: boolean;
 }
 
 export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<EditableCellProps>> = ({
@@ -49,6 +51,7 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
 
   const save = async () => {
     try {
+      if (!form) return;
       const values = await form.validateFields();
       handleUpdatePair({ ...record, ...values });
     } catch (error) {
@@ -68,33 +71,63 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
             className="key-value-table-checkbox"
             checked={record?.isEnabled ?? true}
             onChange={(e) => {
+              if (!form) return;
               form.setFieldsValue({ [dataIndex]: e.target.checked });
               save();
             }}
           />
-        ) : (
-          <div
-            className={`key-value-input-container
-          ${
-            INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter
-              ? "error-state"
-              : ""
-          }
-        `}
-          >
-            <SingleLineEditor
-              className={`key-value-table-input ${record.isEnabled === false ? "key-value-table-input-disabled" : ""}`}
-              placeholder={dataIndex === "key" ? "Key" : "Value"}
-              defaultValue={record?.[dataIndex] as string}
+        ) : dataIndex === "key" ? (
+          restProps.enableHeaderSuggestions ? (
+            <AutoComplete
+              options={HEADER_SUGGESTIONS.Request}
+              filterOption={(input, option) => !!option?.value?.toLowerCase().includes(input.toLowerCase())}
+              value={record?.key}
               onChange={(value) => {
-                form.setFieldsValue({ [dataIndex]: value });
+                if (!form) return;
+                form.setFieldsValue({ key: value });
+                save();
+              }}
+            >
+              <Input
+                placeholder="Key"
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  boxShadow: "none",
+                }}
+              />
+            </AutoComplete>
+          ) : (
+            <SingleLineEditor
+              className="key-value-table-input"
+              placeholder="Key"
+              defaultValue={record?.key as string}
+              onChange={(value) => {
+                if (!form) return;
+                form.setFieldsValue({ key: value });
                 save();
               }}
               variables={variables}
             />
-            <Conditional
-              condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
-            >
+          )
+        ) : (
+          <div
+            className={`key-value-input-container
+          ${INVALID_KEY_CHARACTERS.test(record?.key) && checkInvalidCharacter ? "error-state" : ""}
+        `}
+          >
+            <SingleLineEditor
+              className="key-value-table-input"
+              placeholder="Value"
+              defaultValue={record?.value}
+              onChange={(value) => {
+                if (!form) return;
+                form.setFieldsValue({ value });
+                save();
+              }}
+              variables={variables}
+            />
+            <Conditional condition={INVALID_KEY_CHARACTERS.test(record?.key) && checkInvalidCharacter}>
               <div className="key-value-table-error-icon">
                 <InfoIcon
                   text="Invalid character used in key"
