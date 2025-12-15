@@ -18,6 +18,7 @@ export namespace AuthForm {
 
   export interface InputField extends BaseAuthFormField {
     type: FIELD_TYPE.INPUT;
+    isSecret?: boolean;
     placeholder?: string;
   }
 

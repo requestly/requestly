@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
-import { EditorState, Prec } from "@codemirror/state";
+import { Compartment, EditorState, Prec } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
@@ -8,6 +8,8 @@ import * as Sentry from "@sentry/react";
 import "./singleLineEditor.scss";
 import { SingleLineEditorProps } from "./types";
 import { Conditional } from "components/common/Conditional";
+import { maskInput } from "./plugins/secretMaskExtension";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import {
   customKeyBinding,
   highlightVariablesPlugin,
@@ -22,9 +24,10 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onPressEnter,
   onBlur,
   variables,
+  isSecret,
 }) => {
-  const editorRef = useRef(null);
-  const editorViewRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
   which causes the editor to be recreated when onKeyDown changes
@@ -34,6 +37,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
+  const maskSecretCompartment = useRef(new Compartment()).current;
+  // It reconfigures the extension on dependency change
 
   useEffect(() => {
     onBlurRef.current = onBlur;
@@ -42,6 +47,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
 
   const [hoveredVariable, setHoveredVariable] = useState<string | null>(null); // Track hovered variable
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isHidden, setIsHidden] = useState<boolean>(isSecret ?? false);
   const [isPopoverPinned, setIsPopoverPinned] = useState(false);
 
   useEffect(() => {
@@ -98,6 +104,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           ),
           generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
+          maskSecretCompartment.of(maskInput(isHidden)),
         ],
       }),
     });
@@ -135,6 +142,13 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
     }
   }, [defaultValue]);
 
+  useEffect(() => {
+    if (editorViewRef.current) {
+      editorViewRef.current.dispatch({
+        effects: maskSecretCompartment.reconfigure(maskInput(isHidden)),
+      });
+    }
+  }, [isHidden]);
   const handleMouseLeave = useCallback(() => {
     if (!isPopoverPinned) {
       setHoveredVariable(null);
@@ -162,6 +176,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
           onPinChange={setIsPopoverPinned}
         />
       </Conditional>
+      {isSecret ? (
+        <button type="button" className="eye-icon" onClick={() => setIsHidden((prev) => !prev)}>
+          {isHidden ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+        </button>
+      ) : null}
     </div>
   );
 };
