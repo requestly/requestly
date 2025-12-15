@@ -471,7 +471,7 @@ const HttpClientView: React.FC<Props> = ({
         }
         trackResponseLoaded({
           type: getContentTypeFromResponseHeaders(executedEntry.response.headers),
-          time: Math.round(executedEntry.response.time / 1000),
+          time: Math.round(executedEntry.response?.time / 1000),
         });
         trackApiRequestDone({
           url: executedEntry.request.url,

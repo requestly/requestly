@@ -207,8 +207,17 @@ export class RQ implements SandboxAPI {
       status: (expectedValue: number | string) => this.assertionHandler.haveStatus(expectedValue, isEqualityCheck),
       header: (expectedValue: string) => this.assertionHandler.haveHeader(expectedValue, isEqualityCheck),
       jsonSchema: (schema: any, ajvOptions?: AjvOptions) =>
-        this.assertionHandler.haveJsonSchema(schema, isEqualityCheck, ajvOptions),
-      jsonBody: (path?: string, value?: any) => this.assertionHandler.haveJsonBody(path, isEqualityCheck, value),
+        ajvOptions !== undefined
+          ? this.assertionHandler.haveJsonSchema(schema, isEqualityCheck, ajvOptions)
+          : this.assertionHandler.haveJsonSchema(schema, isEqualityCheck),
+      jsonBody: (path?: string, value?: any) => {
+        if (path !== undefined) {
+          return value !== undefined
+            ? this.assertionHandler.haveJsonBody(path, isEqualityCheck, value)
+            : this.assertionHandler.haveJsonBody(path, isEqualityCheck);
+        }
+        return this.assertionHandler.haveJsonBody();
+      },
     };
   }
 }
