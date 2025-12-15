@@ -44,6 +44,7 @@ export const PathVariableTableEditableCell: React.FC<React.PropsWithChildren<Edi
   ...restProps
 }) => {
   const form = useContext(EditableContext);
+
   if (!form) {
     Sentry.captureException(new Error("EditableCell rendered outside Path variables context"));
     return <td {...restProps}>{children}</td>;
