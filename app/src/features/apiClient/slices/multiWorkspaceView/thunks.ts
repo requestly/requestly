@@ -77,12 +77,12 @@ async function addWorkspaceIntoView(params: { workspace: Workspace; userDetails:
     multiWorkspaceViewSlice.actions.addWorkspace({
       id: workspace.id!,
       state: result.isError()
-        ? { loading: false, state: { success: false, error: result.unwrapError() } }
+        ? { loading: false, state: result.serialize() }
         : { loading: false, state: { success: true, result: null } },
     })
   );
 
-  return result.isError() ? result : new Ok(null);
+  return result.andThen(() => new Ok(null));
 }
 
 const addWorkspacesIntoMultiView = createAsyncThunk<

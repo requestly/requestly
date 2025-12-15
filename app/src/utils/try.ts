@@ -171,6 +171,14 @@ export abstract class Result<T, E extends Error = Error> {
 
     return fn(this.result.error);
   }
+
+  serialize(): RawResult<T, E> {
+    if (this.isError()) {
+      return { success: false, error: this.unwrapError() };
+    }
+
+    return { success: true, result: this.unwrap() };
+  }
 }
 
 export class Ok<T> extends Result<T> {
