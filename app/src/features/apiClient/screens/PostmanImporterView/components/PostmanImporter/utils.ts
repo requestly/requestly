@@ -10,6 +10,7 @@ import {
 import { ApiClientRecordsInterface } from "features/apiClient/helpers/modules/sync/interfaces";
 import { EnvironmentVariableData } from "features/apiClient/store/variables/types";
 import { createBodyContainer } from "features/apiClient/screens/apiClient/utils";
+import { captureException } from "backend/apiClient/utils";
 
 interface PostmanCollectionExport {
   info: {
@@ -371,7 +372,9 @@ export const processPostmanCollectionData = (
         result.collections.push(subCollection);
 
         if (!subCollection.id) {
-          throw new Error(`Failed to generate collection ID for: ${item.name}`);
+          const error = new Error(`Failed to generate collection ID for: ${item.name}`);
+          captureException(error);
+          return;
         }
         const subItems = processItems(item.item, subCollection.id);
         result.collections.push(...subItems.collections);
