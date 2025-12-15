@@ -1,4 +1,4 @@
-type RawResult<T, E extends Error = Error> =
+export type RawResult<T, E extends Error = Error> =
   | {
       success: true;
       result: T;
