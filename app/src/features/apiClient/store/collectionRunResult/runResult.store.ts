@@ -14,15 +14,15 @@ type BaseRequestExecutionResult = {
     | {
         type: RQAPI.ApiEntryType.HTTP;
         method: RQAPI.HttpRequest["method"];
-        responseTime: RQAPI.HttpResponse["time"] | null;
-        statusCode: RQAPI.HttpResponse["status"] | null;
-        statusText: RQAPI.HttpResponse["statusText"] | null;
+        responseTime: NonNullable<RQAPI.HttpResponse>["time"] | null;
+        statusCode: NonNullable<RQAPI.HttpResponse>["status"] | null;
+        statusText: NonNullable<RQAPI.HttpResponse>["statusText"] | null;
       }
     | {
         type: RQAPI.ApiEntryType.GRAPHQL;
-        responseTime: RQAPI.GraphQLResponse["time"] | null;
-        statusCode: RQAPI.GraphQLResponse["status"] | null;
-        statusText: RQAPI.GraphQLResponse["statusText"] | null;
+        responseTime: NonNullable<RQAPI.GraphQLResponse>["time"] | null;
+        statusCode: NonNullable<RQAPI.GraphQLResponse>["status"] | null;
+        statusText: NonNullable<RQAPI.GraphQLResponse>["statusText"] | null;
       };
 };
 
@@ -113,8 +113,8 @@ export type RunResultState = {
 
   reset(): void;
   setCurrentlyExecutingRequest(request: CurrentlyExecutingRequest): void;
-  setStartTime(time: Timestamp | number): void;
-  setEndtime(time: Timestamp | number): void;
+  setStartTime(time: Timestamp | null): void;
+  setEndtime(time: Timestamp | null): void;
   addResult(result: RequestExecutionResult): void;
   setRunStatus(status: Exclude<RunStatus, RunStatus.ERRORED>): void;
   getRunSummary(): LiveRunResult;

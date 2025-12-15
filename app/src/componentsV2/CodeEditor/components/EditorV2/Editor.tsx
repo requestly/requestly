@@ -18,15 +18,18 @@ import { toast } from "utils/Toast";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
-import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
 import { VariablePopover } from "./components/VariablePopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
-import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
-import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
+import { MergeViewEditor } from "componentsV2/CodeEditor/components/EditorV2/components/MergeViewEditor/MergeViewEditor";
+import {
+  customKeyBinding,
+  highlightVariablesPlugin,
+  generateCompletionsForVariables,
+} from "componentsV2/CodeEditor/components/EditorV2/plugins";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -35,6 +38,7 @@ interface EditorProps {
   isResizable?: boolean;
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
+  toolbarRightContent?: React.ReactNode;
   hideCharacterCount?: boolean;
   handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
@@ -47,6 +51,11 @@ interface EditorProps {
   autoFocus?: boolean;
   onFocus?: () => void;
   onHeightChange?: (height: number) => void;
+  onEditorReady?: (view: EditorView) => void;
+  mergeView?: {
+    incomingValue: string;
+    source: "ai" | "user";
+  };
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -57,6 +66,7 @@ const Editor: React.FC<EditorProps> = ({
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
+  toolbarRightContent,
   analyticEventProperties = {},
   scriptId = "",
   prettifyOnInit = false,
@@ -66,6 +76,8 @@ const Editor: React.FC<EditorProps> = ({
   autoFocus = false,
   onFocus,
   onHeightChange,
+  onEditorReady,
+  mergeView,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -132,6 +144,7 @@ const Editor: React.FC<EditorProps> = ({
     if (editor?.editor && editor?.state && editor?.view) {
       editorRef.current = editor;
       setIsEditorInitialized(true);
+      onEditorReady?.(editor.view);
     }
   };
 
@@ -219,6 +232,7 @@ const Editor: React.FC<EditorProps> = ({
         handleFullScreenToggle={handleFullScreenToggle}
         customOptions={toolbarOptions}
         enablePrettify={showOptions.enablePrettify}
+        rightContent={toolbarRightContent}
       />
     ),
     [
@@ -228,6 +242,7 @@ const Editor: React.FC<EditorProps> = ({
       language,
       showOptions.enablePrettify,
       toolbarOptions,
+      toolbarRightContent,
       handleEditorSilentUpdate,
       value,
     ]
@@ -340,7 +355,7 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {editor}
+        {mergeView ? <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} /> : editor}
       </ResizableBox>
     </>
   );

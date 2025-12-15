@@ -1,10 +1,10 @@
 import { RequestContentType, RQAPI } from "features/apiClient/types";
 import { QueryParamsTable } from "../../../components/request/components/QueryParamsTable/QueryParamsTable";
 import RequestBody from "../../../components/request/RequestBody";
+import { captureException } from "@sentry/react";
 import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -16,6 +16,7 @@ import { Checkbox } from "antd";
 import { RequestTabLabel } from "../../../components/request/components/ApiClientRequestTabs/components/RequestTabLabel/RequestTabLabel";
 import { PathVariableTable } from "../PathVariableTable";
 import { usePathVariablesStore } from "features/apiClient/hooks/usePathVariables.store";
+import { ScriptEditor } from "../../../components/Scripts/components/ScriptEditor/ScriptEditor";
 
 export enum RequestTab {
   QUERY_PARAMS = "query_params",
@@ -26,10 +27,10 @@ export enum RequestTab {
 }
 
 interface Props {
-  error: RQAPI.ExecutionError;
+  error: RQAPI.ExecutionError | null;
   requestEntry: RQAPI.HttpApiEntry;
   requestId: RQAPI.ApiRecord["id"];
-  collectionId: string;
+  collectionId: RQAPI.ApiRecord["collectionId"];
   setRequestEntry: (updater: (prev: RQAPI.HttpApiEntry) => RQAPI.HttpApiEntry) => void;
   setContentType: (contentType: RequestContentType) => void;
   handleAuthChange: (newAuth: RQAPI.Auth) => void;
@@ -50,13 +51,28 @@ const HttpRequestTabs: React.FC<Props> = ({
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
 
+  const getContentTypeWithAlert = useCallback(
+    (contentType: RequestContentType | undefined): RequestContentType => {
+      if (contentType === undefined) {
+        captureException(new Error("Request contentType is undefined"), {
+          extra: {
+            requestId,
+            requestEntry,
+          },
+        });
+        return RequestContentType.RAW;
+      }
+      return contentType;
+    },
+    [requestEntry, requestId]
+  );
+
   const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
-  const queryParams = useQueryParamStore((state) => state.queryParams);
   const pathVariables = usePathVariablesStore((state) => state.pathVariables);
+  const queryParams = useQueryParamStore((state) => state.queryParams);
 
   const hasScriptError = error?.type === RQAPI.ApiClientErrorType.SCRIPT;
-  
 
   const items = useMemo(() => {
     return [
@@ -93,14 +109,18 @@ const HttpRequestTabs: React.FC<Props> = ({
       {
         key: RequestTab.BODY,
         label: (
-          <RequestTabLabel label="Body" count={requestEntry.request.body ? 1 : 0} showDot={isRequestBodySupported} />
+          <RequestTabLabel
+            label="Body"
+            count={requestEntry.request.body?.length ? 1 : 0}
+            showDot={isRequestBodySupported}
+          />
         ),
         children: requestEntry.request.bodyContainer ? (
           <RequestBody
             mode="multiple"
             recordId={requestId}
             bodyContainer={requestEntry.request.bodyContainer}
-            contentType={requestEntry.request.contentType}
+            contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
@@ -108,8 +128,8 @@ const HttpRequestTabs: React.FC<Props> = ({
           <RequestBody
             mode="single"
             recordId={requestId}
-            body={requestEntry.request.body}
-            contentType={requestEntry.request.contentType}
+            body={requestEntry.request.body ?? ""}
+            contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
@@ -157,11 +177,11 @@ const HttpRequestTabs: React.FC<Props> = ({
         children: (
           <ScriptEditor
             key={`${scriptEditorVersion}`}
-            scripts={requestEntry.scripts}
-            onScriptsChange={(newScripts) => {
-              setRequestEntry((prev) => ({ ...prev, scripts: newScripts }));
-            }}
-            focusPostResponse={focusPostResponseScriptEditor}
+            requestId={requestId}
+            entry={requestEntry}
+            onScriptsChange={(scripts) => setRequestEntry((prev) => ({ ...prev, scripts }))}
+            aiTestsExcutionCallback={(testResults) => setRequestEntry((prev) => ({ ...prev, testResults }))}
+            focusPostResponse={focusPostResponseScriptEditor ?? false}
           />
         ),
       },
@@ -173,17 +193,13 @@ const HttpRequestTabs: React.FC<Props> = ({
     handleAuthChange,
     isRequestBodySupported,
     queryParams.length,
-    requestEntry.auth,
-    requestEntry.request.body,
-    requestEntry.request.bodyContainer,
-    requestEntry.request.contentType,
-    requestEntry.request.headers,
-    requestEntry.scripts,
+    pathVariables.length,
+    requestEntry,
     setContentType,
     setRequestEntry,
-    pathVariables.length,
     focusPostResponseScriptEditor,
     scriptEditorVersion,
+    getContentTypeWithAlert,
   ]);
 
   return (

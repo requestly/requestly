@@ -2,9 +2,6 @@
   overflow: auto;
   height: 100%;
   font-size: var(--requestly-font-size-sm, 12px);
-  border-radius: 4px 4px 0 0;
-  border: 1px solid var(--requestly-color-white-t-10);
-  border-bottom: 0;
 
   .cm-editor {
     height: 100%;
@@ -14,9 +11,13 @@
       padding-top: 4px;
     }
   }
+
+  .cm-gutters {
+    background: transparent;
+  }
+
   .cm-gutter.cm-lineNumbers {
-    width: 44px;
-    background: var(--requestly-color-surface-0);
+    width: 20px;
 
     .cm-gutterElement {
       text-align: left;
@@ -26,7 +27,6 @@
   }
 
   .cm-gutter.cm-foldGutter {
-    background: var(--requestly-color-surface-0);
     padding-top: 2px;
   }
 }
