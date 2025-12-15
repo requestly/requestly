@@ -12,6 +12,17 @@
     justify-content: space-between;
     align-items: center;
 
+    &__accept-btn.ant-btn.ant-btn-default {
+      background: var(--requestly-color-success);
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: var(--requestly-color-success-600);
+        border-color: var(--requestly-color-success-600);
+      }
+    }
+
     &__right-actions {
       display: flex;
       align-items: center;
