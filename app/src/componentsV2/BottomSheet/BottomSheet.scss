@@ -20,23 +20,20 @@
 
 .vertical-split .bottom-sheet-container.ant-col,
 .bottomsheet-layout-container.vertical-split .bottom-sheet-panel-container.ant-col {
-  background: var(--requestly-color-surface-0);
   border-top: 1px solid var(--requestly-color-white-t-10);
 }
 
 .horizontal-split .bottom-sheet-container.ant-col,
 .bottomsheet-layout-container.horizontal-split .bottom-sheet-panel-container.ant-col {
-  background: var(--requestly-color-surface-0);
   border-left: 1px solid var(--requestly-color-white-t-10);
 }
 
 .bottom-sheet-container.ant-col,
 .bottom-sheet-panel-container.ant-col {
   & .ant-tabs-nav {
-    padding: 8px;
-    padding-top: 2px;
+    padding: 0 8px;
     margin-bottom: 0;
-    padding-bottom: 0;
+    height: 35px;
   }
 
   & .ant-tabs-nav-list .ant-tabs-tab {
@@ -59,7 +56,7 @@
   }
 
   & .ant-tabs-content-holder {
-    padding: 8px 8px 28px 8px;
+    padding: 8px 8px 0 8px;
     overflow: hidden;
   }
 
@@ -74,7 +71,11 @@
 .bottom-sheet-tab {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+
+  svg {
+    top: unset;
+  }
 }
 
 .bottom-sheet-tab-extra-content {
@@ -84,8 +85,86 @@
     align-items: center;
     gap: 4px;
   }
+}
+
+.bottom-sheet-toggle-btn.ant-btn.rq-custom-btn,
+.bottom-sheet-collapse-btn.ant-btn.rq-custom-btn {
+  color: var(--requestly-color-text-subtle);
+
+  &:hover {
+    color: var(--requestly-color-text-default);
+  }
+}
+
+.bottom-sheet-vertical-collapsed-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+
+  .bottom-sheet-toggle-btn-collapsed.ant-btn {
+    margin-top: auto;
+    margin-bottom: 56px;
+  }
+}
+
+.collapsed-bottom-sheet__horizontal.ant-tabs {
+  overflow: hidden;
+
+  .ant-tabs-content-holder .ant-tabs-content-left .ant-tabs-tabpane {
+    padding-left: unset;
+  }
+
+  .ant-tabs-nav {
+    padding: 0px;
+    padding-right: 2px;
+    width: 35px;
+    height: unset;
+    min-width: unset;
+    overflow: hidden;
+
+    .ant-tabs-nav-wrap {
+      padding: unset;
+      align-self: unset;
+    }
+  }
+
+  .bottom-sheet-tab span {
+    display: none;
+  }
+
+  .bottom-sheet-collapse-btn__horizontal-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--requestly-color-white-t-20);
+  }
+
+  .ant-tabs-tab {
+    margin: 12px 0 0 0 !important;
+  }
 
   .bottom-sheet-toggle-btn.ant-btn {
-    color: var(--requestly-color-text-subtle);
+    margin-bottom: 8px;
+  }
+}
+
+.bottom-sheet-closed {
+  // Removing active state styling from tabs when bottom sheet is closed
+  .ant-tabs-tab.ant-tabs-tab-active {
+    border: none;
+
+    .bottom-sheet-tab {
+      color: var(--requestly-color-text-subtle);
+    }
+  }
+
+  .ant-tabs-nav-list {
+    .ant-tabs-ink-bar {
+      display: none !important;
+    }
   }
 }
