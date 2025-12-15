@@ -131,23 +131,16 @@ const removeWorkspacesFromView = createAsyncThunk<
   return results;
 });
 
-const singleToMultiView = createAsyncThunk<
-  PromiseSettledResult<{ workspace: Workspace; result: Result<null, Error> }>[],
-  { workspaces: Workspace[]; userId?: string },
-  { state: RootState }
->(`${SLICE_NAME}/singleToMultiView`, async ({ workspaces, userId }, { dispatch }) => {
-  getTabServiceActions().resetTabs(true);
-  apiClientContextRegistry.clearAll();
-  dispatch(multiWorkspaceViewSlice.actions.setViewMode(ApiClientViewMode.MULTI));
+const singleToMultiView = createAsyncThunk(
+  `${SLICE_NAME}/singleToMultiView`,
+  async (params: { workspaces: Workspace[]; userId?: string }, { dispatch }) => {
+    getTabServiceActions().resetTabs(true);
+    apiClientContextRegistry.clearAll();
+    dispatch(multiWorkspaceViewSlice.actions.setViewMode(ApiClientViewMode.MULTI));
 
-  const action = await dispatch(addWorkspacesIntoMultiView({ workspaces, userId }));
-
-  if (addWorkspacesIntoMultiView.fulfilled.match(action)) {
-    return action.payload;
+    return dispatch(addWorkspacesIntoMultiView(params));
   }
-
-  return [];
-});
+);
 
 const multiViewToSingle = createAsyncThunk<
   { workspace: Workspace; result: Result<null, Error> },
