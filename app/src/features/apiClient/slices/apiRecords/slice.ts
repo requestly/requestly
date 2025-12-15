@@ -1,0 +1,122 @@
+import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
+import { set, unset } from "lodash";
+import { RQAPI } from "features/apiClient/types";
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
+import { buildTreeIndices } from "../utils/treeUtils";
+import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
+import { EntityId, TreeIndices, UpdateCommand } from "../types";
+import { ApiRecordsState } from "./types";
+
+export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
+  selectId: (record) => record.id,
+  sortComparer: (a, b) => (a.createdTs || 0) - (b.createdTs || 0),
+});
+
+const emptyTreeIndices: TreeIndices = {
+  childToParent: {},
+  parentToChildren: {},
+  rootIds: [],
+};
+
+const initialState: ApiRecordsState = {
+  records: apiRecordsAdapter.getInitialState(),
+  tree: emptyTreeIndices,
+};
+
+function rebuildTreeIndices(state: ApiRecordsState): void {
+  const allRecords = Object.values(state.records.entities).filter(
+    (entity): entity is RQAPI.ApiClientRecord => entity != null && "id" in entity && "type" in entity
+  );
+  state.tree = buildTreeIndices(allRecords);
+}
+
+export const apiRecordsSlice = createSlice({
+  name: "apiClient/records",
+  initialState,
+  reducers: {
+    setAllRecords(state, action: PayloadAction<RQAPI.ApiClientRecord[]>) {
+      apiRecordsAdapter.setAll(state.records, action.payload);
+      rebuildTreeIndices(state);
+    },
+
+    recordUpserted(state, action: PayloadAction<RQAPI.ApiClientRecord>) {
+      apiRecordsAdapter.upsertOne(state.records, action.payload);
+      rebuildTreeIndices(state);
+    },
+
+    applyPatch(
+      state,
+      action: PayloadAction<{
+        id: EntityId;
+        command: UpdateCommand<RQAPI.ApiClientRecord>;
+      }>
+    ) {
+      const { id, command } = action.payload;
+      const entity = state.records.entities[id];
+      if (entity == null) return;
+
+      let shouldRebuildTree = false;
+
+      if (command.type === "SET") {
+        const operations = objectToSetOperations(command.value);
+
+        for (const { path, value } of operations) {
+          set(entity, [...path], value);
+
+          if (path[0] === "collectionId") {
+            shouldRebuildTree = true;
+          }
+        }
+      } else if (command.type === "DELETE") {
+        const paths = objectToDeletePaths(command.value);
+
+        for (const path of paths) {
+          unset(entity, [...path]);
+
+          if (path[0] === "collectionId") {
+            shouldRebuildTree = true;
+          }
+        }
+      }
+
+      if (shouldRebuildTree) {
+        rebuildTreeIndices(state);
+      }
+    },
+
+    recordDeleted(state, action: PayloadAction<EntityId>) {
+      apiRecordsAdapter.removeOne(state.records, action.payload);
+      rebuildTreeIndices(state);
+    },
+
+    recordsDeleted(state, action: PayloadAction<EntityId[]>) {
+      apiRecordsAdapter.removeMany(state.records, action.payload);
+      rebuildTreeIndices(state);
+    },
+
+    clearAllRecords(state) {
+      apiRecordsAdapter.removeAll(state.records);
+      state.tree = emptyTreeIndices;
+    },
+
+    hydrateRecords(
+      state,
+      action: PayloadAction<{
+        success: boolean;
+        data: {
+          records: RQAPI.ApiClientRecord[];
+          erroredRecords: ErroredRecord[];
+        };
+        message?: string;
+      }>
+    ) {
+      if (!action.payload.success) return;
+
+      apiRecordsAdapter.setAll(state.records, action.payload.data.records);
+      rebuildTreeIndices(state);
+    },
+  },
+});
+
+export const apiRecordsActions = apiRecordsSlice.actions;
+export const apiRecordsReducer = apiRecordsSlice.reducer;
