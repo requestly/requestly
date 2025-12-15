@@ -93,9 +93,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     api: getAIEndpointUrl(AI_ENDPOINTS.TEST_GENERATION),
     schema: TestGenerationOutputSchema,
     onFinish: (result) => {
-      setIsTestsStreamingFinished(true);
-      setIsGenerateTestPopoverOpen(false);
-      isPopoverOpenRef.current = false;
       if (result.object?.err) {
         switch (result.object?.err) {
           case AITestGenerationError.UNRELATED_QUERY:
@@ -114,6 +111,9 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             toast.error("An error occurred while generating tests. Please try again.");
             break;
         }
+      } else {
+        setIsGenerateTestPopoverOpen(false);
+        isPopoverOpenRef.current = false;
       }
       setIsTestsStreamingFinished(true);
       dispatch(globalActions.updateHasGeneratedAITests(true));
