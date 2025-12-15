@@ -9,7 +9,7 @@ export const DeleteRecordsModalWrapper: React.FC<Props> = () => {
   const { setOpenDeleteRecordsModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
-  const [records, setRecords] = useState<StorageRecord[]>([]);
+  const [records, setRecords] = useState<StorageRecord[] | null>([]);
   const [onSuccess, setOnSuccess] = useState<() => void>(() => {});
 
   useEffect(() => {
