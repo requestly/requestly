@@ -1,8 +1,8 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { set, unset } from "lodash";
 import { RQAPI } from "features/apiClient/types";
-import { buildTreeIndices } from "../../utils/treeUtils";
-import { objectToSetOperations, objectToDeletePaths } from "../../utils/pathConverter";
+import { buildTreeIndices } from "../utils/treeUtils";
+import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { EntityId, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
 

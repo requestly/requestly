@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RQAPI } from "features/apiClient/types";
-import { getParentChain, getAllDescendants, getImmediateChildren } from "../../utils/treeUtils";
+import { getParentChain, getAllDescendants, getImmediateChildren } from "../utils/treeUtils";
 import { EntityId } from "../types";
 import { apiRecordsAdapter } from "./slice";
 import { ApiRecordsState } from "./types";

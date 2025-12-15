@@ -11,8 +11,8 @@ import {
   GraphQLRequestUpdater,
   GraphQLRequestBufferUpdater,
 } from "../updaters";
-import { useApiClientDispatch, useApiClientSelector } from "../../hooks/base.hooks";
-import { ApiClientRootState } from "../../hooks/types";
+import { useApiClientDispatch, useApiClientSelector } from "../hooks";
+import { ApiClientRootState } from "../hooks";
 
 const makeSelectRequestRecord = () =>
   createSelector([(state: ApiClientRootState, id: EntityId) => selectRecordById(state, id)], (record) => {

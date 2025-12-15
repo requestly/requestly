@@ -18,7 +18,7 @@ import {
   makeSelectChildrenIds,
   makeSelectAncestorIds,
 } from "./selectors";
-import { useApiClientSelector } from "../../hooks/base.hooks";
+import { useApiClientSelector } from "../hooks";
 
 export function useAllRecords(): RQAPI.ApiClientRecord[] {
   return useApiClientSelector(selectAllRecords);
