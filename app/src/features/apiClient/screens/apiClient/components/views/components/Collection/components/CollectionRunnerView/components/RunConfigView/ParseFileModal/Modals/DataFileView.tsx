@@ -15,6 +15,10 @@ export const getformattedFileSize = (bytes: number): string => {
 export const DataFileView: React.FC<ModalProps> = ({ buttonOptions, viewMode }) => {
   const { dataFileMetadata, parsedData } = useDataFileModalContext();
 
+  if (!dataFileMetadata) {
+    return null;
+  }
+
   if (!parsedData) {
     throw new NativeError("Parsed data is required for DataFileView").addContext({
       dataFileMetadata,
