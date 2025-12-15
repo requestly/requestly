@@ -273,6 +273,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                   disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
+                  label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
                 />
               </>
             </Tooltip>
