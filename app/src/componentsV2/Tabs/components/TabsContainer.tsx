@@ -63,7 +63,7 @@ export const TabsContainer: React.FC = () => {
         placement="topRight"
         overlayClassName="tabs-operations-popover"
         destroyTooltipOnHide
-        content={<TabsMorePopover onTabItemClick={onTabItemClick} onCloseTab={closeTabById} />}
+        content={<TabsMorePopover onTabItemClick={onTabItemClick} />}
         open={isMorePopoverOpen}
         onOpenChange={setIsMorePopoverOpen}
       >
@@ -72,7 +72,7 @@ export const TabsContainer: React.FC = () => {
         </div>
       </Popover>
     ),
-    [tabs, isMorePopoverOpen, onTabItemClick, closeTabById]
+    [tabs, isMorePopoverOpen, onTabItemClick]
   );
 
   // Reset popover state when no tabs are present
