@@ -6,6 +6,7 @@ import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../../../src/constants/keyboardShortcuts";
 import { RoleBasedComponent } from "features/rbac";
 import { useGenericState } from "hooks/useGenericState";
+import { getDefaultAuth } from "../../../request/components/AuthorizationView/defaults";
 
 interface Props {
   collectionId: string;
@@ -28,7 +29,7 @@ const CollectionAuthorizationView: React.FC<Props> = ({
   updateAuthData,
   rootLevelRecord,
 }) => {
-  const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions);
+  const [authOptionsState, setAuthOptionsState] = useState<RQAPI.Auth>(authOptions || getDefaultAuth(rootLevelRecord));
   const [isSaving, setIsSaving] = useState(false);
   const { setPreview, setUnsaved, getIsActive } = useGenericState();
   const { hasUnsavedChanges, resetChanges } = useHasUnsavedChanges(authOptionsState);
