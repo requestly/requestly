@@ -209,6 +209,6 @@ export const useVariablesListColumns = ({
       },
     },
   ];
-  const columns: VariableColumn[] = allColumns.filter((c): c is VariableColumn => c !== null);
+  const columns: VariableColumn[] = allColumns.filter((c): c is VariableColumn => Boolean(c));
   return columns;
 };
