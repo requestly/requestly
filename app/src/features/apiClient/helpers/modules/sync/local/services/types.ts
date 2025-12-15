@@ -1,5 +1,5 @@
 import { EnvironmentVariableType, VariableValueType } from "backend/environment/types";
-import { KeyValuePair, RequestContentType, RQAPI } from "features/apiClient/types";
+import { RQAPI } from "features/apiClient/types";
 import { ErrorCode } from "../../../../../../../errors/types";
 
 export type FileSystemError = {
@@ -24,25 +24,6 @@ export type Collection = {
   auth?: RQAPI.Auth;
 };
 
-export type GraphQLRequestDetails = {
-  type: "graphql";
-  headers: KeyValuePair[];
-  operation: string;
-  variables: string;
-  operationName?: string;
-};
-
-export type HTTPRequestDetails = {
-  type: "http";
-  method: string;
-  queryParams: KeyValuePair[];
-  headers: KeyValuePair[];
-  body?: RQAPI.RequestBody;
-  bodyContainer: RQAPI.RequestBodyContainer;
-  contentType: RequestContentType;
-  pathVariables?: RQAPI.PathVariable[];
-};
-
 export type BaseApiRequestDetails = {
   url: string;
   auth: RQAPI.Auth;
@@ -53,8 +34,8 @@ export type BaseApiRequestDetails = {
 };
 
 export type ApiRequestDetails =
-  | (BaseApiRequestDetails & HTTPRequestDetails)
-  | (BaseApiRequestDetails & GraphQLRequestDetails);
+  | (BaseApiRequestDetails & RQAPI.HttpRequest & { type: RQAPI.ApiEntryType.HTTP })
+  | (BaseApiRequestDetails & RQAPI.GraphQLRequest & { type: RQAPI.ApiEntryType.GRAPHQL });
 
 export type API = {
   type: "api";

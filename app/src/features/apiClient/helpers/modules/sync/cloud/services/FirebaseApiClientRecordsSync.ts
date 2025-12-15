@@ -129,7 +129,8 @@ export class FirebaseApiClientRecordsSync implements ApiClientRecordsInterface<A
     description: string
   ): Promise<{ success: boolean; data: string; message?: string }> {
     const result = await this.updateRecord({ id, description }, id);
-    if (result.success && result.data) {
+
+    if (result.success) {
       return {
         success: true,
         data: result.data.description || "",
