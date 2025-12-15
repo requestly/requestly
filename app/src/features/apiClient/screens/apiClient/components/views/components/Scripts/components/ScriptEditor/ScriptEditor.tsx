@@ -43,6 +43,11 @@ const TestGenerationOutputSchema = z.object({
   err: z.string().optional().describe("Error code if user request could not be processed"),
 });
 
+const defaultScripts = {
+  preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
+  postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
+};
+
 interface ScriptEditorProps {
   requestId: string;
   entry: RQAPI.ApiEntry;
@@ -59,11 +64,6 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
   focusPostResponse,
 }) => {
   const dispatch = useDispatch();
-
-  const defaultScripts = {
-    preRequest: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.PRE_REQUEST],
-    postResponse: DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE],
-  };
 
   const activeScriptType = entry?.scripts?.[RQAPI.ScriptType.PRE_REQUEST]
     ? RQAPI.ScriptType.PRE_REQUEST
@@ -138,11 +138,21 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       return {
         incomingValue: object?.code?.content,
         source: "ai",
+        onPartialMerge: (value: string) => {
+          onScriptsChange({
+            ...(entry?.scripts || defaultScripts),
+            postResponse: value,
+          });
+          // Fix this: default script values are assigned to editor by the compoennt and not the store
+          if (value === object?.code?.content || value === DEFAULT_SCRIPT_VALUES[RQAPI.ScriptType.POST_RESPONSE]) {
+            clear();
+          }
+        },
       };
     }
 
     return undefined;
-  }, [scriptType, object?.code?.content]);
+  }, [scriptType, object?.code?.content, clear, onScriptsChange, entry?.scripts]);
 
   const handleAcceptAndRunTests = () => {
     onScriptsChange({

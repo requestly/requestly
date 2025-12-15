@@ -1,8 +1,4 @@
 .merge-view-editor {
-  .cm-chunkButtons {
-    display: none;
-  }
-
   .cm-deletedChunk {
     background: #df25251f;
   }
@@ -25,6 +21,22 @@
     }
     span {
       color: unset;
+    }
+  }
+
+  .merge-view-chunk-button {
+    color: var(--requestly-color-text-default);
+    font-weight: var(--requestly-font-weight-medium);
+    font-size: var(--requestly-font-size-xs);
+    border-radius: 4px !important;
+    font-family: var(--requestly-font-family-default), Inter;
+    padding: auto 10px;
+
+    &__accept {
+      background: var(--requestly-color-success-darker);
+    }
+    &__reject {
+      background: var(--requestly-color-error-darker);
     }
   }
 }
