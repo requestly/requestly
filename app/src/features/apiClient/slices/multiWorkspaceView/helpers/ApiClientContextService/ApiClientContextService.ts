@@ -18,6 +18,7 @@ import {
   apiClientContextRegistry,
   ApiClientContextRegistry,
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
+import { Err, Ok, Result } from "utils/try";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -65,28 +66,32 @@ class ApiClientContextService {
     return {} as ApiClientFeatureContext["store"];
   }
 
-  async createContext(workspace: Workspace, userDetails: UserDetails): Promise<ApiClientFeatureContext> {
+  async createContext(workspace: Workspace, userDetails: UserDetails): Promise<Result<ApiClientFeatureContext>> {
     const workspaceId = workspace.id;
 
-    const existing = this.contextRegistry.getContext(workspaceId);
-    if (existing) {
-      return existing;
+    try {
+      const existing = this.contextRegistry.getContext(workspaceId);
+      if (existing) {
+        return new Ok(existing);
+      }
+
+      const repo = this.createRepository(workspace, userDetails);
+      await repo.validateConnection();
+
+      const store = this.createStore(workspaceId);
+
+      const result = await this.extractSetupDataFromRepository(repo);
+
+      // TODO: at integration
+      // store.dispatch(recordsSlice.actions.setInitialData(result.apiClientRecords.records));
+      // store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
+
+      const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
+      this.contextRegistry.addContext(ctx);
+      return new Ok(ctx);
+    } catch (error) {
+      return new Err(error);
     }
-
-    const repo = this.createRepository(workspace, userDetails);
-    await repo.validateConnection();
-
-    const store = this.createStore(workspaceId);
-
-    const result = await this.extractSetupDataFromRepository(repo);
-
-    // TODO: at integration
-    // store.dispatch(recordsSlice.actions.setInitialData(result.apiClientRecords.records));
-    // store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
-
-    const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
-    this.contextRegistry.addContext(ctx);
-    return ctx;
   }
 
   async refreshContext(workspaceId: WorkspaceId): Promise<void> {
@@ -107,11 +112,13 @@ class ApiClientContextService {
     } catch (e) {
       reduxStore.dispatch(
         multiWorkspaceViewActions.setWorkspaceState({
-          id: workspaceId,
+          id: workspaceId!,
           workspaceState: {
             loading: false,
-            errored: true,
-            error: e instanceof Error ? e.message : e,
+            state: {
+              success: false,
+              error: e instanceof Error ? e : new Error(String(e)),
+            },
           },
         })
       );

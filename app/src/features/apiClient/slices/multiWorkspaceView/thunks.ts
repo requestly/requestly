@@ -17,94 +17,86 @@ const SLICE_NAME = ReducerKeys.MULTI_WORKSPACE_VIEW;
 
 type UserAction = "add" | "remove";
 
-export const workspaceViewManager = createAsyncThunk<
-  void,
-  { workspaces: Workspace[]; action: UserAction; userId?: string },
-  { state: RootState }
->(`${SLICE_NAME}/workspaceViewManager`, async (params, { dispatch, getState, rejectWithValue }) => {
-  try {
-    const { workspaces, action, userId } = params;
-    const viewMode = getViewMode(getState());
+export const workspaceViewManager = createAsyncThunk(
+  `${SLICE_NAME}/workspaceViewManager`,
+  async (
+    params: { workspaces: Workspace[]; action: UserAction; userId?: string },
+    { dispatch, getState, rejectWithValue }
+  ) => {
+    try {
+      const { workspaces, action, userId } = params;
+      const viewMode = getViewMode(getState() as RootState);
 
-    if (action === "add") {
-      if (viewMode === "SINGLE") {
-        dispatch(singleToMultiView({ workspaces, userId }));
-        return;
+      if (action === "add") {
+        if (viewMode === "SINGLE") {
+          return dispatch(singleToMultiView({ workspaces, userId }));
+        }
+
+        if (viewMode === "MULTI") {
+          return dispatch(addWorkspacesIntoMultiView({ workspaces, userId }));
+        }
       }
 
-      if (viewMode === "MULTI") {
-        dispatch(addWorkspacesIntoMultiView({ workspaces, userId }));
-        return;
-      }
-    }
-
-    if (action === "remove") {
-      const selectedWorkspacesCount = getSelectedWorkspaceCount(getState().multiWorkspaceView);
-      const remaining = selectedWorkspacesCount - workspaces.length;
-
-      if (viewMode === "MULTI" && remaining === 0) {
-        dispatch(multiViewToSingle({ userId }));
-        return;
-      }
-
-      if (viewMode === "MULTI" && remaining >= 1) {
+      if (action === "remove") {
+        const selectedWorkspacesCount = getSelectedWorkspaceCount((getState() as RootState).multiWorkspaceView);
+        const remaining = selectedWorkspacesCount - workspaces.length;
         const ids = workspaces.map((w) => w.id!);
-        dispatch(removeWorkspacesFromView({ workspaceIds: ids, userId }));
-        return;
-      }
-    }
-  } catch (error) {
-    // TODO: handle error
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
 
-    return rejectWithValue(errorMessage);
+        if (viewMode === "MULTI" && remaining === 0) {
+          const lastUncheckedWorkspace = workspaces[workspaces.length - 1];
+          return dispatch(multiViewToSingle({ workspace: lastUncheckedWorkspace, userId }));
+        }
+
+        if (viewMode === "MULTI" && remaining >= 1) {
+          return dispatch(removeWorkspacesFromView({ workspaceIds: ids, userId }));
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      return rejectWithValue(errorMessage);
+    }
   }
-});
+);
 
 function getUserDetails(userId?: string) {
   const userDetails: UserDetails = userId ? { uid: userId, loggedIn: true } : { loggedIn: false };
   return userDetails;
 }
 
-async function _addWorkspaceIntoView(params: {
-  workspace: Workspace;
-  userDetails: UserDetails;
-}): Promise<Result<null>> {
+async function addWorkspaceIntoView(params: { workspace: Workspace; userDetails: UserDetails }): Promise<Result<null>> {
   const { workspace, userDetails } = params;
 
-  try {
-    reduxStore.dispatch(
-      multiWorkspaceViewSlice.actions.addWorkspace({
-        id: workspace.id!,
-        state: { loading: true },
-      })
-    );
+  reduxStore.dispatch(
+    multiWorkspaceViewSlice.actions.addWorkspace({
+      id: workspace.id!,
+      state: { loading: true },
+    })
+  );
 
-    await apiClientContextService.createContext(workspace, userDetails);
+  const result = await apiClientContextService.createContext(workspace, userDetails);
 
-    reduxStore.dispatch(
-      multiWorkspaceViewSlice.actions.addWorkspace({
-        id: workspace.id!,
-        state: { loading: false, state: { success: true, result: null } },
-      })
-    );
+  reduxStore.dispatch(
+    multiWorkspaceViewSlice.actions.addWorkspace({
+      id: workspace.id!,
+      state: result.isError()
+        ? { loading: false, state: { success: false, error: result.unwrapError() } }
+        : { loading: false, state: { success: true, result: null } },
+    })
+  );
 
-    return new Ok(null);
-  } catch (error) {
-    return new Err(error);
-  }
+  return result.isError() ? result : new Ok(null);
 }
 
 const addWorkspacesIntoMultiView = createAsyncThunk<
-  { workspace: Workspace; result: Result<null, Error> }[],
+  PromiseSettledResult<{ workspace: Workspace; result: Result<null, Error> }>[],
   { workspaces: Workspace[]; userId?: string },
   { state: RootState }
 >(`${SLICE_NAME}/addWorkspacesIntoMultiView`, async ({ workspaces, userId }) => {
   const userDetails = getUserDetails(userId);
 
-  const results = await Promise.all(
+  const results = await Promise.allSettled(
     workspaces.map(async (workspace) => {
-      const result = await _addWorkspaceIntoView({ workspace, userDetails });
+      const result = await addWorkspaceIntoView({ workspace, userDetails });
       return { workspace, result };
     })
   );
@@ -112,7 +104,7 @@ const addWorkspacesIntoMultiView = createAsyncThunk<
   return results;
 });
 
-async function _removeWorkspaceFromView(params: { workspaceId: string }): Promise<Result<null>> {
+function removeWorkspaceFromView(params: { workspaceId: string }): Result<null> {
   const { workspaceId } = params;
 
   try {
@@ -127,13 +119,13 @@ async function _removeWorkspaceFromView(params: { workspaceId: string }): Promis
 }
 
 const removeWorkspacesFromView = createAsyncThunk<
-  { workspaceId: string; result: Result<null, Error> }[],
+  PromiseSettledResult<{ workspaceId: string; result: Result<null, Error> }>[],
   { workspaceIds: string[]; userId?: string },
   { state: RootState }
 >(`${SLICE_NAME}/removeWorkspacesFromView`, async ({ workspaceIds, userId }, { getState }) => {
-  const results = await Promise.all(
-    workspaceIds.map(async (workspaceId) => {
-      const result = await _removeWorkspaceFromView({ workspaceId });
+  const results = await Promise.allSettled(
+    workspaceIds.map((workspaceId) => {
+      const result = removeWorkspaceFromView({ workspaceId });
       return { workspaceId, result };
     })
   );
@@ -142,7 +134,7 @@ const removeWorkspacesFromView = createAsyncThunk<
 });
 
 const singleToMultiView = createAsyncThunk<
-  { workspace: Workspace; result: Result<null, Error> }[],
+  PromiseSettledResult<{ workspace: Workspace; result: Result<null, Error> }>[],
   { workspaces: Workspace[]; userId?: string },
   { state: RootState }
 >(`${SLICE_NAME}/singleToMultiView`, async ({ workspaces, userId }, { dispatch }) => {
@@ -161,18 +153,25 @@ const singleToMultiView = createAsyncThunk<
 
 const multiViewToSingle = createAsyncThunk<
   { workspace: Workspace; result: Result<null, Error> },
-  { userId?: string },
+  { workspace: Workspace; userId?: string },
   { state: RootState }
->(`${SLICE_NAME}/multiViewToSingle`, async ({ userId }, { dispatch }) => {
+>(`${SLICE_NAME}/multiViewToSingle`, async ({ workspace, userId }, { dispatch, getState }) => {
   // TODO: to be updated after tabs migration
   getTabServiceActions().resetTabs(true);
   apiClientContextRegistry.clearAll();
   dispatch(multiWorkspaceViewActions.resetToSingleView());
 
   const userDetails = getUserDetails(userId);
-  const result = await _addWorkspaceIntoView({ workspace: defaultPersonalWorkspace, userDetails });
+  const result = await addWorkspaceIntoView({ workspace, userDetails });
   return { workspace: defaultPersonalWorkspace, result };
 });
+
+export const switchContext = createAsyncThunk(
+  `${SLICE_NAME}/switchContext`,
+  async (params: { workspace: Workspace; userId?: string }, { dispatch }) => {
+    return dispatch(multiViewToSingle(params));
+  }
+);
 
 // TODO:
 // export const loadWorkspaces = createAsyncThunk<
