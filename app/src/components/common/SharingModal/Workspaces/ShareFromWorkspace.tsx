@@ -61,7 +61,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
           is_admin: false,
           source: "sharing_modal",
           num_users_added: memberEmails.length,
-          workspace_type: isWorkspaceMappedToBillingTeam(activeWorkspace.id, billingTeams)
+          workspace_type: isWorkspaceMappedToBillingTeam(activeWorkspace.id!, billingTeams)
             ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
             : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
         });
@@ -82,7 +82,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Workspace) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id!, selectedRules).then(() => {
         setIsLoading(false);
         trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({

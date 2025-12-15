@@ -54,7 +54,7 @@ const testResultListEmptyStateMessage: Record<RunResultTabKey, { title: string; 
 };
 
 const RunningRequestPlaceholder: React.FC<{
-  runningRequest: CurrentlyExecutingRequest;
+  runningRequest: Exclude<CurrentlyExecutingRequest, null>;
 }> = ({ runningRequest }) => {
   return (
     <div className="test-details-container">

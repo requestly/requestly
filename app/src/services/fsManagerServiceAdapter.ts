@@ -62,12 +62,12 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async createRecord(record: API["data"], collectionId?: string) {
+  async createRecord(record: API["data"], collectionId?: RQAPI.CollectionRecord["collectionId"]) {
     return this.invokeProcedureInBG("createRecord", record, collectionId) as Promise<FileSystemResult<API>>;
   }
 
   @FsErrorHandler
-  async createRecordWithId(record: API["data"], id: string, collectionId: string) {
+  async createRecordWithId(record: API["data"], id: string, collectionId: RQAPI.CollectionRecord["collectionId"]) {
     return this.invokeProcedureInBG("createRecordWithId", record, id, collectionId) as Promise<FileSystemResult<API>>;
   }
 
@@ -92,7 +92,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
   }
 
   @FsErrorHandler
-  async createCollection(name: string, collectionId?: string) {
+  async createCollection(name: string, collectionId?: RQAPI.CollectionRecord["collectionId"]) {
     return this.invokeProcedureInBG("createCollection", name, collectionId) as Promise<FileSystemResult<Collection>>;
   }
 
@@ -154,7 +154,7 @@ export class FsManagerServiceAdapter extends BackgroundServiceAdapter {
 
   @FsErrorHandler
   async getRawFileData(id: string) {
-    return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<unknown>>;
+    return this.invokeProcedureInBG("getRawFileData", id) as Promise<FileSystemResult<string>>;
   }
 
   @FsErrorHandler
@@ -184,17 +184,20 @@ class FsManagerServiceAdapterProvider {
     console.log("provider created");
   }
 
-  async get(rootPath: string) {
+  async get(rootPath: string): Promise<FsManagerServiceAdapter> {
     let lock = this.lockMap.get(rootPath);
     if (!lock) {
       lock = withTimeout(new Mutex(), 10 * 1000);
       this.lockMap.set(rootPath, lock);
     }
     await lock.acquire();
-    if (this.cache.has(rootPath)) {
+
+    const fsManagerServiceAdapter = this.cache.get(rootPath);
+
+    if (fsManagerServiceAdapter) {
       console.log("got provider from cache");
       lock.release();
-      return this.cache.get(rootPath);
+      return fsManagerServiceAdapter;
     }
     try {
       console.log("calling build", Date.now());

@@ -30,6 +30,7 @@ import { useRBAC } from "features/rbac";
 import { Conditional } from "components/common/Conditional";
 import { copyToClipBoard } from "utils/Misc";
 import { getStoredPlacement } from "componentsV2/BottomSheet/context";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -143,6 +144,7 @@ export const SavedSessionViewer = () => {
           initialSizes={[58, 42]}
           hideBottomSheet={bottomSheetLayoutBreakpoint}
           bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}
+          layout={SheetLayout.SPLIT}
         >
           <div className="saved-session-viewer-body">
             <SessionPlayer onPlayerTimeOffsetChange={handleSessionPlayerTimeOffsetChange} />
