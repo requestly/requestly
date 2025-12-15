@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { NativeError } from "errors/NativeError";
-import { ApiClientFeatureContext, ContextId } from "./types";
+import { ApiClientFeatureContext } from "./types";
 import { apiClientContextRegistry } from "./ApiClientContextRegistry";
 
-export function useApiClientFeatureContext(contextId: ContextId): ApiClientFeatureContext {
-  const context = useMemo(() => apiClientContextRegistry.getContext(contextId), [contextId]);
+function useApiClientFeatureContext(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext {
+  const context = useMemo(() => apiClientContextRegistry.getContext(workspaceId), [workspaceId]);
 
   if (!context) {
     throw new NativeError("No context found!");
@@ -13,12 +13,12 @@ export function useApiClientFeatureContext(contextId: ContextId): ApiClientFeatu
   return context;
 }
 
-export function useApiClientRepository(contextId: ContextId) {
-  const context = useApiClientFeatureContext(contextId);
+function useApiClientRepository(workspaceId: ApiClientFeatureContext["workspaceId"]) {
+  const context = useApiClientFeatureContext(workspaceId);
   return context.repositories;
 }
 
-export function useApiClientStore(contextId: ContextId) {
-  const context = useApiClientFeatureContext(contextId);
+function useApiClientStore(workspaceId: ApiClientFeatureContext["workspaceId"]) {
+  const context = useApiClientFeatureContext(workspaceId);
   return context.store;
 }
