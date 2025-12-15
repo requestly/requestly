@@ -74,9 +74,9 @@ const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ recor
             defaultValue={safeValue as string}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            onChange={(e) => {
+            onChange={async (e) => {
               form.setFieldsValue({ [dataIndex]: e.target.value });
-              onSave();
+              await onSave();
             }}
           />
         </div>
