@@ -12,30 +12,41 @@ interface KeyValueDescriptionCellProps {
 const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ record, dataIndex, form, onSave }) => {
   const [editingDescription, setEditingDescription] = useState(false);
   const inputRef = useRef<any>(null);
+  const safeValue = record?.[dataIndex] ?? "";
 
   useEffect(() => {
-    if (editingDescription && inputRef.current) {
-      inputRef.current.focus({ cursor: "end" });
+    if (editingDescription) {
+      if (inputRef.current) {
+        inputRef.current.focus({ cursor: "end" });
+      }
+      const currentFormVal = form.getFieldValue(dataIndex);
+      if (currentFormVal === undefined || currentFormVal === null) {
+        form.setFieldsValue({ [dataIndex]: "" });
+      }
     }
-  }, [editingDescription]);
+  }, [editingDescription, dataIndex, form]);
 
   const handleBlur = () => {
+    const currentVal = form.getFieldValue(dataIndex);
+    if (currentVal === undefined) {
+      form.setFieldsValue({ [dataIndex]: "" });
+    }
     onSave();
     setEditingDescription(false);
   };
 
   return (
-    <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={record?.[dataIndex]}>
+    <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={safeValue}>
       {!editingDescription ? (
         <Tooltip
-          title={record?.[dataIndex]}
+          title={safeValue}
           overlayClassName="key-value-description-tooltip"
           placement="bottom"
           color="#000000"
           mouseEnterDelay={0.5}
         >
           <div className="key-value-description-view" onClick={() => setEditingDescription(true)}>
-            {record?.[dataIndex] || <span className="placeholder">Description</span>}
+            {safeValue || <span className="placeholder">Description</span>}
           </div>
         </Tooltip>
       ) : (
@@ -45,7 +56,7 @@ const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ recor
             className="key-value-description-textarea"
             autoSize={{ minRows: 1 }}
             placeholder="Description"
-            defaultValue={record?.[dataIndex] as string}
+            defaultValue={safeValue as string}
             onBlur={handleBlur}
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.value });
