@@ -1,4 +1,4 @@
-type RawResult<T, E extends Error = Error> =
+export type RawResult<T, E extends Error = Error> =
   | {
       success: true;
       result: T;
@@ -170,6 +170,14 @@ export abstract class Result<T, E extends Error = Error> {
     }
 
     return fn(this.result.error);
+  }
+
+  serialize(): RawResult<T, E> {
+    if (this.isError()) {
+      return { success: false, error: this.unwrapError() };
+    }
+
+    return { success: true, result: this.unwrap() };
   }
 }
 

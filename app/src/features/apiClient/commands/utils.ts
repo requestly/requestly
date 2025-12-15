@@ -159,10 +159,10 @@ export const getCollectionOptionsToMoveIn = (contextId: string, recordsToMove: R
     record.collectionId && exclusions.add(record.collectionId);
     while (stack.length) {
       const current = stack.pop();
-      exclusions.add(current.id);
+      exclusions.add(current?.id);
 
-      if (isApiCollection(current) && !isEmpty(current.data?.children)) {
-        stack.push(...current.data.children);
+      if (current && isApiCollection(current) && !isEmpty(current.data?.children)) {
+        stack.push(...current.data.children!); // non-null assertion as we check for emptiness in the if condition
       }
     }
   }
@@ -183,9 +183,11 @@ export function getAllRecords(records: RQAPI.ApiClientRecord[]): RQAPI.ApiClient
 
   while (stack.length) {
     const record = stack.pop();
-    result.push(record);
-    if (isApiCollection(record) && record.data.children) {
-      stack.push(...record.data.children);
+    if (record) {
+      result.push(record);
+      if (isApiCollection(record) && record.data.children) {
+        stack.push(...record.data.children);
+      }
     }
   }
 
