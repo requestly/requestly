@@ -1,4 +1,4 @@
-import { EntityId, TreeIndices } from "../slices/types";
+import { EntityId, TreeIndices } from "../types";
 
 /**
  * Returns the chain of parent IDs from the given ID up to the root.

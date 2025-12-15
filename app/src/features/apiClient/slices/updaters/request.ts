@@ -1,36 +1,55 @@
-import { Dispatch } from "@reduxjs/toolkit";
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { UpdateCommand } from "../types";
 import { apiRecordsActions } from "../apiRecords/slice";
 import { buffersActions } from "../buffers/slice";
-import { BaseUpdater, UpdaterMeta } from "./base";
+import { BaseUpdater } from "./base";
 
-export class HttpRequestUpdater extends BaseUpdater<RQAPI.HttpApiRecord> {
-  protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
-    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
-  }
-
+export abstract class RequestUpdater<T extends RQAPI.ApiClientRecord> extends BaseUpdater<T> {
   setName(name: string): void {
-    this.SET({ name });
+    this.setCommon({ name });
   }
 
   setDescription(description: string): void {
-    this.SET({ description });
+    this.setCommon({ description });
   }
 
   setCollectionId(collectionId: string | null): void {
-    this.SET({ collectionId });
+    this.setCommon({ collectionId });
   }
 
   deleteName(): void {
-    this.DELETE({ name: true });
+    this.deleteCommon({ name: null });
   }
 
   deleteDescription(): void {
-    this.DELETE({ description: true });
+    this.deleteCommon({ description: null });
   }
 
-  // ─── HTTP-Specific Methods ─────────────────────────────────────────────────
+  setAuth(auth: RQAPI.Auth): void {
+    this.setCommon({ data: { auth } });
+  }
+
+  deleteAuth(): void {
+    this.deleteCommon({ data: { auth: null } });
+  }
+
+  setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
+    this.setCommon({ data: { scripts } });
+  }
+
+  setPreRequestScript(script: string): void {
+    this.setCommon({ data: { scripts: { preRequest: script } } });
+  }
+
+  setPostResponseScript(script: string): void {
+    this.setCommon({ data: { scripts: { postResponse: script } } });
+  }
+}
+
+export class HttpRequestUpdater extends RequestUpdater<RQAPI.HttpApiRecord> {
+  protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
+    this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
+  }
 
   setUrl(url: string): void {
     this.SET({ data: { request: { url } } });
@@ -56,32 +75,12 @@ export class HttpRequestUpdater extends BaseUpdater<RQAPI.HttpApiRecord> {
     this.SET({ data: { request: { contentType } } });
   }
 
-  setAuth(auth: RQAPI.Auth): void {
-    this.SET({ data: { auth } });
-  }
-
-  setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
-    this.SET({ data: { scripts } });
-  }
-
-  setPreRequestScript(script: string): void {
-    this.SET({ data: { scripts: { preRequest: script } } });
-  }
-
-  setPostResponseScript(script: string): void {
-    this.SET({ data: { scripts: { postResponse: script } } });
-  }
-
   deleteUrl(): void {
-    this.DELETE({ data: { request: { url: true } } });
+    this.DELETE({ data: { request: { url: null } } });
   }
 
   deleteBody(): void {
-    this.DELETE({ data: { request: { body: true } } });
-  }
-
-  deleteAuth(): void {
-    this.DELETE({ data: { auth: true } });
+    this.DELETE({ data: { request: { body: null } } });
   }
 }
 
@@ -92,29 +91,9 @@ export class HttpRequestBufferUpdater extends HttpRequestUpdater {
   }
 }
 
-export class GraphQLRequestUpdater extends BaseUpdater<RQAPI.GraphQLApiRecord> {
+export class GraphQLRequestUpdater extends RequestUpdater<RQAPI.GraphQLApiRecord> {
   protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
-  }
-
-  setName(name: string): void {
-    this.SET({ name });
-  }
-
-  setDescription(description: string): void {
-    this.SET({ description });
-  }
-
-  setCollectionId(collectionId: string | null): void {
-    this.SET({ collectionId });
-  }
-
-  deleteName(): void {
-    this.DELETE({ name: true });
-  }
-
-  deleteDescription(): void {
-    this.DELETE({ description: true });
   }
 
   setUrl(url: string): void {
@@ -137,32 +116,12 @@ export class GraphQLRequestUpdater extends BaseUpdater<RQAPI.GraphQLApiRecord> {
     this.SET({ data: { request: { operationName } } });
   }
 
-  setAuth(auth: RQAPI.Auth): void {
-    this.SET({ data: { auth } });
-  }
-
-  setScripts(scripts: { preRequest?: string; postResponse?: string }): void {
-    this.SET({ data: { scripts } });
-  }
-
-  setPreRequestScript(script: string): void {
-    this.SET({ data: { scripts: { preRequest: script } } });
-  }
-
-  setPostResponseScript(script: string): void {
-    this.SET({ data: { scripts: { postResponse: script } } });
-  }
-
   deleteOperation(): void {
-    this.DELETE({ data: { request: { operation: true } } });
+    this.DELETE({ data: { request: { operation: null } } });
   }
 
   deleteVariables(): void {
-    this.DELETE({ data: { request: { variables: true } } });
-  }
-
-  deleteAuth(): void {
-    this.DELETE({ data: { auth: true } });
+    this.DELETE({ data: { request: { variables: null } } });
   }
 }
 
