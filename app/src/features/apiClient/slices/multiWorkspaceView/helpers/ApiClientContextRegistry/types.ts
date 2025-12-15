@@ -1,8 +1,8 @@
 import { Store } from "@reduxjs/toolkit";
 import { ApiClientRepositoryInterface } from "features/apiClient/helpers/modules/sync/interfaces";
-import { WorkspaceViewState } from "../../types";
 import { RQAPI } from "features/apiClient/types";
 import { EnvironmentData } from "backend/environment/types";
+import { Workspace } from "features/workspaces/types";
 
 // STUB
 export interface RecordsState {
@@ -28,8 +28,6 @@ export type ApiClientStore = Store<ApiClientStoreState>;
 
 export interface ApiClientFeatureContext {
   store: ApiClientStore;
-  workspaceId: WorkspaceViewState["id"] | null;
+  workspaceId: Workspace["id"];
   repositories: ApiClientRepositoryInterface;
 }
-
-export type WorkspaceId = ApiClientFeatureContext["workspaceId"];

@@ -8,7 +8,7 @@ import localStoreRepository from "features/apiClient/helpers/modules/sync/localS
 import { RQAPI } from "features/apiClient/types";
 import { Workspace, WorkspaceType } from "features/workspaces/types";
 import { toast } from "utils/Toast";
-import { ApiClientFeatureContext, WorkspaceId } from "../ApiClientContextRegistry/types";
+import { ApiClientFeatureContext } from "../ApiClientContextRegistry/types";
 import { reduxStore } from "store";
 import { forceRefreshRecords } from "features/apiClient/commands/records";
 import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
@@ -51,7 +51,7 @@ class ApiClientContextService {
     return new ApiClientCloudRepository({ uid: userId, teamId: workspaceId }) as ApiClientRepositoryInterface;
   }
 
-  private createStore(workspaceId: WorkspaceId): ApiClientFeatureContext["store"] {
+  private createStore(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext["store"] {
     // TODO: integration pending
     // const store = configureStore({
     //   reducer: {
@@ -94,7 +94,7 @@ class ApiClientContextService {
     }
   }
 
-  async refreshContext(workspaceId: WorkspaceId): Promise<void> {
+  async refreshContext(workspaceId: ApiClientFeatureContext["workspaceId"]): Promise<void> {
     try {
       const context = this.contextRegistry.getContext(workspaceId);
 

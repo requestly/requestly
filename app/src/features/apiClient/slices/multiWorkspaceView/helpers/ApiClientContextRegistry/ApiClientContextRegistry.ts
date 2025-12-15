@@ -1,8 +1,8 @@
 import { NativeError } from "errors/NativeError";
-import { ApiClientFeatureContext, WorkspaceId } from "./types";
+import { ApiClientFeatureContext } from "./types";
 
 export class ApiClientContextRegistry {
-  private contexts: Map<WorkspaceId, ApiClientFeatureContext>;
+  private contexts: Map<ApiClientFeatureContext["workspaceId"], ApiClientFeatureContext>;
   private lastUsedContext?: ApiClientFeatureContext;
 
   constructor() {
@@ -14,7 +14,7 @@ export class ApiClientContextRegistry {
     this.lastUsedContext = context;
   }
 
-  removeContext(id: WorkspaceId) {
+  removeContext(id: ApiClientFeatureContext["workspaceId"]) {
     const context = this.contexts.get(id);
     if (!context) return;
 
@@ -29,7 +29,7 @@ export class ApiClientContextRegistry {
     this.lastUsedContext = context;
   }
 
-  getContext(id: WorkspaceId) {
+  getContext(id: ApiClientFeatureContext["workspaceId"]) {
     return this.contexts.get(id);
   }
 
@@ -58,7 +58,7 @@ export class ApiClientContextRegistry {
     this.lastUsedContext = undefined;
   }
 
-  hasContext(id: WorkspaceId) {
+  hasContext(id: ApiClientFeatureContext["workspaceId"]) {
     return this.contexts.has(id);
   }
 
