@@ -23,7 +23,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   private parseApiRequestDetails(requestDetails: ApiRequestDetails): RQAPI.Request {
     switch (requestDetails.type) {
-      case "http":
+      case RQAPI.ApiEntryType.HTTP:
         return {
           url: requestDetails.url,
           queryParams: requestDetails.queryParams,
@@ -34,7 +34,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           contentType: requestDetails.contentType,
           pathVariables: requestDetails.pathVariables,
         };
-      case "graphql":
+      case RQAPI.ApiEntryType.GRAPHQL:
         return {
           operation: requestDetails.operation,
           variables: requestDetails.variables,
@@ -50,7 +50,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       if (e.type === "collection") {
         const collection: RQAPI.CollectionRecord = {
           id: parseFsId(e.id),
-          collectionId: e.collectionId,
+          collectionId: e.collectionId ?? null,
           name: e.name,
           description: e.description || "",
           ownerId: this.meta.rootPath,
@@ -73,7 +73,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       } else {
         const api: RQAPI.ApiRecord = {
           id: parseFsId(e.id),
-          collectionId: e.collectionId,
+          collectionId: e.collectionId ?? null,
           name: e.data.name,
           ownerId: this.meta.rootPath,
           deleted: false,
@@ -102,19 +102,19 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   }
 
   private parseApiRecordRequest(record: Partial<RQAPI.ApiRecord>): API["data"] {
-    switch (record.data.type) {
+    switch (record.data?.type) {
       case RQAPI.ApiEntryType.HTTP:
         return {
           name: record.name || "Untitled request",
           request: {
             type: record.data.type,
             url: record.data.request.url,
-            scripts: record.data.scripts,
+            scripts: record.data.scripts ?? { postResponse: "", preRequest: "" },
             method: record.data.request.method,
             queryParams: record.data.request.queryParams,
             headers: record.data.request.headers,
             body: record.data.request?.body,
-            bodyContainer: record.data.request?.bodyContainer,
+            bodyContainer: record.data.request?.bodyContainer, // should be present Partial type is wrongly used
             contentType: record.data.request?.contentType,
             auth: record.data.auth,
             pathVariables: record.data.request?.pathVariables,
@@ -126,7 +126,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           request: {
             type: record.data.type,
             url: record.data.request.url,
-            scripts: record.data.scripts,
+            scripts: record.data.scripts ?? { postResponse: "", preRequest: "" },
             operation: record.data.request.operation,
             variables: record.data.request.variables,
             operationName: record.data.request.operationName,
@@ -141,7 +141,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
           request: {
             type: httpRecord.data.type,
             url: httpRecord.data.request.url,
-            scripts: httpRecord.data.scripts,
+            scripts: httpRecord.data.scripts ?? { postResponse: "", preRequest: "" },
             method: httpRecord.data.request.method,
             queryParams: httpRecord.data.request.queryParams,
             headers: httpRecord.data.request.headers,
@@ -215,7 +215,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
       {
         ...this.parseApiRecordRequest(record),
       },
-      record.collectionId
+      record.collectionId ?? null
     );
 
     if (result.type === "error") {
@@ -235,7 +235,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
 
   async createCollection(record: Partial<Omit<RQAPI.CollectionRecord, "id">>): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
-    const result = await service.createCollection(record.name, record.collectionId);
+    const result = await service.createCollection(record.name ?? "Untitled Collection", record.collectionId);
 
     if (result.type === "error") {
       const message = result.error.message;
@@ -264,7 +264,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
         ...this.parseApiRecordRequest(record),
       },
       id,
-      record.collectionId
+      record.collectionId ?? null
     );
 
     if (result.type === "error") {
@@ -402,26 +402,25 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     if (result.type === "error") {
       return {
         success: false,
-        data: undefined,
+        data: "",
         message: result.error.message,
       };
     }
+
     return {
       success: true,
       data: result.content,
     };
   }
 
-  async updateCollectionAuthData(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async updateCollectionAuthData(collection: RQAPI.CollectionRecord): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.updateCollectionAuthData(collection.id, collection.data.auth);
 
     if (result.type === "error") {
       return {
         success: false,
-        data: undefined,
+        data: null,
         message: result.error.message,
       };
     }
@@ -474,10 +473,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
     };
   }
 
-  async createCollectionFromImport(
-    collection: RQAPI.CollectionRecord,
-    id: string
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }> {
+  async createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise {
     const service = await this.getAdapter();
     const result = await service.createCollectionFromCompleteRecord(collection, id);
     if (result.type === "error") {
@@ -649,7 +645,7 @@ export class LocalApiClientRecordsSync implements ApiClientRecordsInterface<ApiC
   ): ResponsePromise<SavedRunResult> {
     return {
       success: true,
-      data: null,
+      data: {} as SavedRunResult,
     };
   }
 }

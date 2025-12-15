@@ -10,6 +10,10 @@ type WarningModalProps = ModalProps;
 export const WarningView: React.FC<WarningModalProps> = ({ buttonOptions }) => {
   const { dataFileMetadata, parsedData } = useDataFileModalContext();
 
+  if (!dataFileMetadata) {
+    return null;
+  }
+
   if (!parsedData) {
     throw new NativeError("Parsed data is required for WarningView").addContext({
       dataFileMetadata,

@@ -13,10 +13,12 @@ import { apiClientMultiWorkspaceViewStore } from "features/apiClient/store/multi
 export const refreshContext = async (ctxId: ApiClientFeatureContext["id"]) => {
   try {
     const contexts = apiClientFeatureContextProviderStore.getState().contexts;
-
-    if (!contexts.has(ctxId)) throw new NativeError("Add the context to the store before trying to refresh it");
-
     const context = contexts.get(ctxId);
+
+    if (!context) {
+      throw new NativeError("Add the context to the store before trying to refresh it");
+    }
+
     if (context.repositories instanceof ApiClientLocalRepository) {
       await reloadFsManager(context.repositories.apiClientRecordsRepository.meta.rootPath);
     }

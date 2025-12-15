@@ -51,9 +51,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     id: string,
     description: string
   ): Promise<{ success: boolean; data: string; message?: string }>;
-  updateCollectionAuthData(
-    collection: RQAPI.CollectionRecord
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }>;
+  updateCollectionAuthData(collection: RQAPI.CollectionRecord): RQAPI.ApiClientRecordPromise;
 
   getRecordsForForceRefresh(): RQAPI.RecordsPromise | Promise<void>;
   writeToRawFile(
@@ -62,10 +60,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
     fileType: FileType
   ): Promise<{ success: boolean; data: unknown; message?: string }>;
   getRawFileData(id: string): Promise<{ success: boolean; data: string | null; message?: string }>;
-  createCollectionFromImport(
-    collection: RQAPI.CollectionRecord,
-    id: string
-  ): Promise<{ success: boolean; data: RQAPI.ApiClientRecord; message?: string }>;
+  createCollectionFromImport(collection: RQAPI.CollectionRecord, id: string): RQAPI.ApiClientRecordPromise;
   generateCollectionId(name: string, parentId?: string): string;
   generateApiRecordId(parentId?: string): string;
   batchWriteApiEntities(
@@ -106,6 +101,7 @@ export interface ApiClientRecordsInterface<Meta extends Record<string, any>> {
 export interface ApiClientRepositoryInterface {
   environmentVariablesRepository: EnvironmentInterface<Record<string, any>>;
   apiClientRecordsRepository: ApiClientRecordsInterface<Record<string, any>>;
+  validateConnection(): Promise<{ isValid: boolean }>;
 }
 
 export type ApiClientCloudMeta = {
