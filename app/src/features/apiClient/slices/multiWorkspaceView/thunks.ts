@@ -52,8 +52,7 @@ export const workspaceViewManager = createAsyncThunk(
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error);
     }
   }
 );
