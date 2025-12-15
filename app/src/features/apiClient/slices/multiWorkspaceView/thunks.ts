@@ -11,7 +11,6 @@ import { UserDetails } from "./helpers/ApiClientContextService/ApiClientContextS
 import { ReducerKeys } from "store/constants";
 import { reduxStore } from "store";
 import { Err, Ok, Result } from "utils/try";
-import { defaultPersonalWorkspace } from "store/slices/workspaces/selectors";
 
 const SLICE_NAME = ReducerKeys.MULTI_WORKSPACE_VIEW;
 
@@ -162,7 +161,7 @@ const multiViewToSingle = createAsyncThunk<
 
   const userDetails = getUserDetails(userId);
   const result = await addWorkspaceIntoView({ workspace, userDetails });
-  return { workspace: defaultPersonalWorkspace, result };
+  return { workspace, result };
 });
 
 export const switchContext = createAsyncThunk(
