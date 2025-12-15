@@ -1,7 +1,6 @@
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
 import { UpdateCommand } from "../types";
 import { apiRecordsActions } from "../apiRecords/slice";
-import { buffersActions } from "../buffers/slice";
 import { BaseUpdater } from "./base";
 
 export abstract class RequestUpdater<T extends RQAPI.ApiClientRecord> extends BaseUpdater<T> {
@@ -84,13 +83,6 @@ export class HttpRequestUpdater extends RequestUpdater<RQAPI.HttpApiRecord> {
   }
 }
 
-export class HttpRequestBufferUpdater extends HttpRequestUpdater {
-  protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
-    const apiClientCommand: UpdateCommand<RQAPI.ApiClientRecord> = command;
-    this.dispatch(buffersActions.applyPatch({ id: this.meta.id, command: apiClientCommand }));
-  }
-}
-
 export class GraphQLRequestUpdater extends RequestUpdater<RQAPI.GraphQLApiRecord> {
   protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
@@ -122,12 +114,5 @@ export class GraphQLRequestUpdater extends RequestUpdater<RQAPI.GraphQLApiRecord
 
   deleteVariables(): void {
     this.DELETE({ data: { request: { variables: null } } });
-  }
-}
-
-export class GraphQLRequestBufferUpdater extends GraphQLRequestUpdater {
-  protected dispatchCommand(command: UpdateCommand<RQAPI.GraphQLApiRecord>): void {
-    const apiClientCommand: UpdateCommand<RQAPI.ApiClientRecord> = command;
-    this.dispatch(buffersActions.applyPatch({ id: this.meta.id, command: apiClientCommand }));
   }
 }
