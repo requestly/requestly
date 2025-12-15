@@ -268,7 +268,7 @@ export const createApiRecordsStore = (
 
     getData(id) {
       const { index } = get();
-      if (id === null) return undefined;
+      if (!id) return undefined;
       return index.get(id);
     },
 
