@@ -5,7 +5,6 @@ import { EnvironmentEntity, FileSystemResult } from "./types";
 import { parseEntityVariables } from "../../utils";
 import { NativeError } from "errors/NativeError";
 
-
 export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   private globalId?: string;
   constructor(readonly meta: ApiClientLocalMeta) {}
@@ -15,7 +14,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private setGlobalId(id: string) {
-    if(!this.globalId) {
+    if (!this.globalId) {
       this.globalId = id;
     }
   }
@@ -26,7 +25,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
 
   private parseEnvironmentEntitiesToMap(entities: EnvironmentEntity[]): EnvironmentMap {
     const environmentsMap = entities.reduce((acc, cur) => {
-      if(cur.isGlobal) {
+      if (cur.isGlobal) {
         this.setGlobalId(cur.id);
         cur.id = this.getDisasterousGlobalId();
       }
@@ -35,7 +34,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
         name: cur.name,
         variables: parseEntityVariables(cur?.variables || {}),
       };
-      
+
       return acc;
     }, {} as EnvironmentMap);
 
@@ -49,7 +48,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
       variables: parseEntityVariables(entity?.variables || {}),
     };
 
-    if(entity.isGlobal) {
+    if (entity.isGlobal) {
       this.setGlobalId(entity.id);
       environment.id = this.getDisasterousGlobalId();
     }
@@ -64,13 +63,13 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
       const parsedEnvs = this.parseEnvironmentEntitiesToMap(result.content.environments);
       try {
         this.getActualGlobalEnvironmentId();
-      } catch(e) {
+      } catch (e) {
         const globalEnv = await this.createGlobalEnvironment();
         this.setGlobalId(globalEnv.id);
-        
+
         parsedEnvs[globalEnv.id] = globalEnv;
       }
-     return {
+      return {
         success: true,
         data: {
           environments: parsedEnvs,
@@ -166,7 +165,7 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   private translateDisasterousId(id: string) {
-    if(id !== this.getDisasterousGlobalId()) {
+    if (id !== this.getDisasterousGlobalId()) {
       return id;
     }
 
@@ -178,8 +177,8 @@ export class LocalEnvSync implements EnvironmentInterface<ApiClientLocalMeta> {
   }
 
   getActualGlobalEnvironmentId(): string {
-    if(!this.globalId) {
-      throw new NativeError('Global environment id has not been set yet!');
+    if (!this.globalId) {
+      throw new NativeError("Global environment id has not been set yet!");
     }
     return this.globalId;
   }
