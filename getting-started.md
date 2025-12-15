@@ -10,7 +10,9 @@ This repository contains most of the modules that make up Requestly.
 
 Please make sure that Node version >= 18.18.0 is installed on your system.
 
-#### Windows Users
+
+--TODO: This windows should be an info messages not heading
+#### Windows Users 
 
 If you're using Windows and encounter issues while cloning this repository (due to long file paths), run this command first:
 
