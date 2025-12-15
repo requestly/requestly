@@ -1,6 +1,7 @@
 import { createSlice, createEntityAdapter, PayloadAction } from "@reduxjs/toolkit";
 import { set, unset } from "lodash";
 import { RQAPI } from "features/apiClient/types";
+import { ErroredRecord } from "features/apiClient/helpers/modules/sync/local/services/types";
 import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { EntityId, TreeIndices, UpdateCommand } from "../types";
@@ -96,6 +97,23 @@ export const apiRecordsSlice = createSlice({
     clearAllRecords(state) {
       apiRecordsAdapter.removeAll(state.records);
       state.tree = emptyTreeIndices;
+    },
+
+    hydrateRecords(
+      state,
+      action: PayloadAction<{
+        success: boolean;
+        data: {
+          records: RQAPI.ApiClientRecord[];
+          erroredRecords: ErroredRecord[];
+        };
+        message?: string;
+      }>
+    ) {
+      if (!action.payload.success) return;
+
+      apiRecordsAdapter.setAll(state.records, action.payload.data.records);
+      rebuildTreeIndices(state);
     },
   },
 });
