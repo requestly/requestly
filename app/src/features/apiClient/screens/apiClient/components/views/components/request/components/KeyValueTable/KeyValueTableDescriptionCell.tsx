@@ -35,6 +35,20 @@ const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ recor
     setEditingDescription(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.metaKey || e.ctrlKey) && (e.key === "s" || e.key === "Enter")) {
+      form.setFieldsValue({ [dataIndex]: e.currentTarget.value });
+      e.currentTarget.parentElement?.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: e.key,
+          metaKey: e.metaKey,
+          ctrlKey: e.ctrlKey,
+          bubbles: true,
+        })
+      );
+    }
+  };
+
   return (
     <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={safeValue}>
       {!editingDescription ? (
@@ -58,8 +72,10 @@ const KeyValueDescriptionCell: React.FC<KeyValueDescriptionCellProps> = ({ recor
             placeholder="Description"
             defaultValue={safeValue as string}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               form.setFieldsValue({ [dataIndex]: e.target.value });
+              onSave();
             }}
           />
         </div>
