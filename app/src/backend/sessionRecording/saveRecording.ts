@@ -10,7 +10,7 @@ import { getAppFlavour } from "utils/AppUtils";
 import { RuleType } from "@requestly/shared/types/entities/rules";
 
 export const saveRecording = async (
-  uid: string,
+  uid: string | null,
   workspaceId: string | null,
   payload: SessionRecordingMetadata,
   events: any,
@@ -21,6 +21,14 @@ export const saveRecording = async (
     ruleType: RuleType;
   }
 ): Promise<any> => {
+  if (!uid) {
+    return {
+      success: false,
+      firestoreId: null,
+      message: "Please login to perform the action",
+    };
+  }
+
   const db = getFirestore(firebaseApp);
   const ownerId = getOwnerId(uid, workspaceId);
   const fileName = uuidv4();

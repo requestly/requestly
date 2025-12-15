@@ -55,8 +55,8 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
   const billingTeams = useSelector(getAvailableBillingTeams);
 
   const handlePostTeamCreationStep = useCallback(
-    (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
-      switchWorkspace(
+    async (teamId: string, newTeamName: string, hasMembersInSameDomain: boolean) => {
+      await switchWorkspace(
         {
           teamId: teamId,
           teamName: newTeamName,
@@ -200,7 +200,7 @@ export const WorkspaceCreationView: React.FC<Props> = ({ workspaceType, analytic
           args.workspaceType === WorkspaceType.SHARED ? args.isNotifyAllSelected : false
         );
 
-        handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
+        await handlePostTeamCreationStep(teamId, workspaceName, hasMembersInSameDomain);
 
         callback?.();
       } catch (err) {

@@ -12,9 +12,10 @@ const isOwner = (recording: SessionRecordingMetadata, uid: string) => {
   return false;
 };
 
-const fetchRecordingEvents = async (filePath: string) => {
-  if (filePath) return await getFile(filePath);
-
+const fetchRecordingEvents = async (filePath: string | undefined) => {
+  if (filePath) {
+    return await getFile(filePath);
+  }
   return null;
 };
 
@@ -24,6 +25,10 @@ export const getRecording = async (
   workspaceId: string | null,
   email: string
 ): Promise<any> => {
+  if (workspaceId === undefined) {
+    throw new Error("Workspace ID is undefined");
+  }
+
   const db = getFirestore(firebaseApp);
   const sessionRecordingRef = doc(db, COLLECTION_NAME, sessionId);
   const snapshot = await getDoc(sessionRecordingRef);

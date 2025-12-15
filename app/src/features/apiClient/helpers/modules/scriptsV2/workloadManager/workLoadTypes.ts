@@ -1,30 +1,31 @@
-import {
-  BaseSnapshot,
-  SnapshotForPostResponse,
-  SnapshotForPreRequest,
-} from "features/apiClient/helpers/httpRequestExecutor/snapshotTypes";
-import { TestResult } from "../worker/script-internals/types";
+import { ExecutionMetadata, TestResult } from "../worker/script-internals/types";
+import { ExecutionContext } from "features/apiClient/helpers/httpRequestExecutor/scriptExecutionContext";
 
-export type ScriptWorkloadCallback = (state: BaseSnapshot) => void | Promise<void>;
+export type ScriptWorkloadCallback = (state: ExecutionContext) => void | Promise<void>;
 
-export interface ScriptWorkload<T extends BaseSnapshot = BaseSnapshot> {
+export interface ScriptWorkload<T extends ScriptContext = ScriptContext> {
   readonly script: string;
-  readonly initialState: T;
+  readonly scriptContext: T;
   readonly postScriptExecutionCallback: ScriptWorkloadCallback;
 }
 
-export class PreRequestScriptWorkload implements ScriptWorkload<SnapshotForPreRequest> {
+type ScriptContext = {
+  executionContext: ExecutionContext;
+  executionMetadata: ExecutionMetadata;
+};
+
+export class PreRequestScriptWorkload implements ScriptWorkload<ScriptContext> {
   constructor(
     readonly script: string,
-    readonly initialState: SnapshotForPreRequest,
+    readonly scriptContext: ScriptContext,
     readonly postScriptExecutionCallback: ScriptWorkloadCallback
   ) {}
 }
 
-export class PostResponseScriptWorkload implements ScriptWorkload<SnapshotForPostResponse> {
+export class PostResponseScriptWorkload implements ScriptWorkload<ScriptContext> {
   constructor(
     readonly script: string,
-    readonly initialState: SnapshotForPostResponse,
+    readonly scriptContext: ScriptContext,
     readonly postScriptExecutionCallback: ScriptWorkloadCallback
   ) {}
 }

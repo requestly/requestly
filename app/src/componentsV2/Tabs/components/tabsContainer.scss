@@ -25,22 +25,6 @@
       margin-bottom: 0;
       position: relative;
 
-      // Add shadow effect when more icon is visible (indicating overflow)
-      &:has(.ant-tabs-nav-more) {
-        &::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          right: 56px;
-          bottom: 0;
-          width: 42px;
-          background: linear-gradient(270deg, #1a1a1a 0%, rgba(26, 26, 26, 0) 100%);
-          pointer-events: none;
-          z-index: 1;
-          margin-bottom: 1px;
-        }
-      }
-
       .ant-tabs-nav-wrap {
         height: 32px;
         display: flex;
@@ -76,7 +60,7 @@
 
         .ant-tabs-tab {
           padding: 0 4px;
-          width: auto;
+          width: 144px;
           max-width: 144px;
           border-radius: 4px;
           background: rgba(255, 255, 255, 0.04);
@@ -137,41 +121,37 @@
         height: 24px;
         margin-top: 2px;
         gap: var(--requestly-space-4, 8px);
-        width: 60px;
+        width: 30px;
         .ant-tabs-nav-more {
-          cursor: pointer;
-          width: 24px;
-          height: 24px;
-          border-radius: 4px;
-          padding: 0;
-          border: none;
-          background-color: transparent;
-          color: var(--requestly-color-text-default);
-          order: 2; // Move more icon to the left
-
-          &:hover {
-            background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
-          }
-
-          svg {
-            width: 10px;
-            height: 14px;
-            margin-top: 5px;
-          }
+          display: none;
         }
 
         .ant-tabs-nav-add {
           width: 24px;
+          height: 24px;
           min-width: 24px;
           border-radius: 4px;
           padding: 0;
           border: none;
           background-color: transparent;
           color: var(--requestly-color-text-default);
-          order: 1; // Move add icon to the right
-
+          margin-top: 1px;
           &:hover {
             background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+          }
+
+          // Add shadow effect when more icon is visible (indicating overflow)
+          &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 55px;
+            bottom: 0;
+            width: 42px;
+            background: linear-gradient(270deg, #1a1a1a 0%, rgba(26, 26, 26, 0) 100%);
+            pointer-events: none;
+            z-index: 1;
+            margin-bottom: 1px;
           }
 
           svg {
@@ -208,8 +188,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      flex: 1;
-      min-width: 0;
 
       .icon {
         display: flex;
@@ -239,7 +217,7 @@
 
     .tab-actions {
       flex-shrink: 0;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       position: absolute;
@@ -323,5 +301,45 @@
         margin-left: auto;
       }
     }
+  }
+}
+
+.tabs-more-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 25px;
+  border-radius: 4px;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  color: var(--requestly-color-text-default);
+  font-size: small;
+  margin-top: -1px;
+  margin-left: 5px;
+  &:hover {
+    background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+  }
+}
+.tabs-more-icon-open {
+  background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+}
+
+.tabs-operations-popover {
+  width: 280px;
+  max-height: 532px;
+  background-color: var(--requestly-space-4-color-surface-1, #282828);
+  border-radius: 4px;
+  padding: 0;
+  top: 75px !important;
+  overflow: hidden;
+
+  .ant-popover-inner-content {
+    padding: 0;
+    background-color: var(--requestly-color-surface-1, #282828);
+    width: 100%;
+    padding-right: 0px;
   }
 }

@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { Prec } from "@codemirror/state";
-import { keymap } from "@codemirror/view";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
@@ -20,14 +18,18 @@ import { toast } from "utils/Toast";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
-import { highlightVariablesPlugin } from "features/apiClient/screens/environment/components/SingleLineEditor/plugins/highlightVariables";
 import { VariablePopover } from "./components/VariablePopOver";
 import "./editor.scss";
 import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import "./components/VariablePopOver/variable-popover.scss";
 import { useDebounce } from "hooks/useDebounce";
-import generateCompletionsForVariables from "./plugins/generateAutoCompletions";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { MergeViewEditor } from "componentsV2/CodeEditor/components/EditorV2/components/MergeViewEditor/MergeViewEditor";
+import {
+  customKeyBinding,
+  highlightVariablesPlugin,
+  generateCompletionsForVariables,
+} from "componentsV2/CodeEditor/components/EditorV2/plugins";
 interface EditorProps {
   value: string;
   language: EditorLanguage | null;
@@ -36,6 +38,7 @@ interface EditorProps {
   isResizable?: boolean;
   scriptId?: string;
   toolbarOptions?: EditorCustomToolbar;
+  toolbarRightContent?: React.ReactNode;
   hideCharacterCount?: boolean;
   handleChange?: (value: string, triggerUnsavedChanges?: boolean) => void;
   prettifyOnInit?: boolean;
@@ -47,6 +50,11 @@ interface EditorProps {
   hideToolbar?: boolean;
   autoFocus?: boolean;
   onFocus?: () => void;
+  onEditorReady?: (view: EditorView) => void;
+  mergeView?: {
+    incomingValue: string;
+    source: "ai" | "user";
+  };
 }
 const Editor: React.FC<EditorProps> = ({
   value,
@@ -57,6 +65,7 @@ const Editor: React.FC<EditorProps> = ({
   hideCharacterCount = false,
   handleChange = () => {},
   toolbarOptions,
+  toolbarRightContent,
   analyticEventProperties = {},
   scriptId = "",
   prettifyOnInit = false,
@@ -65,6 +74,8 @@ const Editor: React.FC<EditorProps> = ({
   hideToolbar = false,
   autoFocus = false,
   onFocus,
+  onEditorReady,
+  mergeView,
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -129,6 +140,7 @@ const Editor: React.FC<EditorProps> = ({
     if (editor?.editor && editor?.state && editor?.view) {
       editorRef.current = editor;
       setIsEditorInitialized(true);
+      onEditorReady?.(editor.view);
     }
   };
 
@@ -202,43 +214,6 @@ const Editor: React.FC<EditorProps> = ({
     handleChange(value, isUnsaveChange.current);
   }, 200);
 
-  const customKeyBinding = useMemo(
-    () =>
-      Prec.highest(
-        keymap.of([
-          {
-            key: "Mod-s",
-            run: (view) => {
-              const event = new KeyboardEvent("keydown", {
-                key: "s",
-                metaKey: navigator.platform.includes("Mac"),
-                ctrlKey: !navigator.platform.includes("Mac"),
-                bubbles: true,
-                cancelable: true,
-              });
-              view.dom.dispatchEvent(event);
-              return true;
-            },
-          },
-          {
-            key: "Mod-Enter",
-            run: (view) => {
-              const event = new KeyboardEvent("keydown", {
-                key: "Enter",
-                metaKey: navigator.platform.includes("Mac"),
-                ctrlKey: !navigator.platform.includes("Mac"),
-                bubbles: true,
-                cancelable: true,
-              });
-              view.dom.dispatchEvent(event);
-              return true;
-            },
-          },
-        ])
-      ),
-    []
-  );
-
   const toolbar = useMemo(
     () => (
       <CodeEditorToolbar
@@ -253,6 +228,7 @@ const Editor: React.FC<EditorProps> = ({
         handleFullScreenToggle={handleFullScreenToggle}
         customOptions={toolbarOptions}
         enablePrettify={showOptions.enablePrettify}
+        rightContent={toolbarRightContent}
       />
     ),
     [
@@ -262,6 +238,7 @@ const Editor: React.FC<EditorProps> = ({
       language,
       showOptions.enablePrettify,
       toolbarOptions,
+      toolbarRightContent,
       handleEditorSilentUpdate,
       value,
     ]
@@ -374,7 +351,7 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {editor}
+        {mergeView ? <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} /> : editor}
       </ResizableBox>
     </>
   );

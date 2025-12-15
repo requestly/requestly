@@ -11,7 +11,7 @@ export const updateMock = async (
   mockId: string,
   mockData: RQMockSchema,
   teamId?: string
-): Promise<boolean> => {
+): Promise<boolean | null> => {
   if (!uid) {
     return null;
   }

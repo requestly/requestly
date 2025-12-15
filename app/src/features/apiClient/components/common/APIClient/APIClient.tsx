@@ -5,9 +5,11 @@ import { RequestContentType, RequestMethod, RQAPI } from "features/apiClient/typ
 import {
   filterHeadersToImport,
   generateKeyValuePairs,
+  generateMultipartFormKeyValuePairs,
   getContentTypeFromRequestHeaders,
   getEmptyApiEntry,
   parseCurlRequest,
+  parseMultipartFormDataString,
 } from "features/apiClient/screens/apiClient/utils";
 import { CONTENT_TYPE_HEADER } from "features/apiClient/constants";
 import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
@@ -25,7 +27,7 @@ interface Props {
   modalTitle?: string;
 }
 
-const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord => {
+export const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord => {
   // This record is created only for cases when client view is opened without any option to save the request.
   // if saving is enabled in such cases, please take the necessary fields into account (eg. id, ownerId...).
   return {
@@ -47,7 +49,7 @@ const createDummyApiRecord = (apiEntry: RQAPI.ApiEntry): RQAPI.ApiRecord => {
 export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalClose, modalTitle }) => {
   const apiRecord = useMemo<RQAPI.ApiRecord>(() => {
     if (!request) {
-      return null;
+      return createDummyApiRecord(getEmptyApiEntry(RQAPI.ApiEntryType.HTTP));
     }
 
     if (typeof request === "string") {
@@ -79,6 +81,19 @@ export const APIClientModal: React.FC<Props> = ({ request, isModalOpen, onModalC
       if (entry.request.contentType === RequestContentType.FORM) {
         const searchParams = new URLSearchParams(request.body);
         entry.request.body = generateKeyValuePairs(Object.fromEntries(searchParams));
+      } else if (entry.request.contentType === RequestContentType.MULTIPART_FORM) {
+        const contentTypeHeaderValue = entry.request.headers.find(
+          (h) => h.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase()
+        )?.value;
+        const parsedParts = parseMultipartFormDataString(request.body, contentTypeHeaderValue ?? null);
+        const multipartData = parsedParts.map(({ key, value, isFile, fileName }) => ({
+          key,
+          //The @ prefix is not a standard multipart form-data thing.
+          // It's a cURL convention used to indicate file uploads in command-line cURL requests.
+          // Using it here to maintain consistency with cURL import/export and to reuse the same util
+          value: isFile && fileName ? `@${fileName}` : value,
+        }));
+        entry.request.body = generateMultipartFormKeyValuePairs(multipartData);
       }
     } else if (request.body instanceof FormData) {
       if (entry.request.contentType !== RequestContentType.FORM) {

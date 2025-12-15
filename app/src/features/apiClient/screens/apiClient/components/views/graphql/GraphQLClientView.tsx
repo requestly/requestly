@@ -143,7 +143,7 @@ const GraphQLClientView: React.FC<Props> = ({
   const [isSchemaBuilderOpen, setIsSchemaBuilderOpen] = useState(true);
 
   const originalRecord = useRef(getEntry());
-  const graphQLRequestExecutor = useGraphQLRequestExecutor(record.collectionId);
+  const graphQLRequestExecutor = useGraphQLRequestExecutor(record.collectionId ?? "");
 
   const isHistoryView = location.pathname.includes(PATHS.API_CLIENT.HISTORY.RELATIVE);
 
@@ -164,7 +164,7 @@ const GraphQLClientView: React.FC<Props> = ({
 
     let hasJsonObjectBody = false;
     try {
-      const contentType = getContentTypeFromResponseHeaders(entry.response.headers);
+      const contentType = getContentTypeFromResponseHeaders(entry.response.headers) ?? "";
       const isJson = /application\/json/i.test(contentType);
       if (isJson) {
         const parsed = JSON.parse(entry.response.body || "null");
@@ -277,8 +277,8 @@ const GraphQLClientView: React.FC<Props> = ({
     }
     setIsSaving(true);
     const result = isCreateMode
-      ? await apiClientRecordsRepository.createRecordWithId(recordToSave, recordToSave.id)
-      : await apiClientRecordsRepository.updateRecord(recordToSave, recordToSave.id);
+      ? await apiClientRecordsRepository.createRecordWithId(recordToSave, recordToSave.id!) //not the ideal way but had to assert because record is typed as Partial here
+      : await apiClientRecordsRepository.updateRecord(recordToSave, recordToSave.id!);
 
     if (result.success && result.data.type === RQAPI.RecordType.API) {
       onSaveRecord({ ...(apiRecord ?? {}), ...result.data, data: { ...result.data.data, ...recordToSave.data } });
@@ -339,7 +339,7 @@ const GraphQLClientView: React.FC<Props> = ({
 
       const result = isCreateMode
         ? await apiClientRecordsRepository.createRecord(recordToUpdate)
-        : await apiClientRecordsRepository.updateRecord(recordToUpdate, recordToUpdate.id);
+        : await apiClientRecordsRepository.updateRecord(recordToUpdate, recordToUpdate.id!);
 
       if (result.success && result.data.type === RQAPI.RecordType.API) {
         setTitle(newName);
@@ -408,7 +408,16 @@ const GraphQLClientView: React.FC<Props> = ({
           delete apiRecord.data.request.operationName;
         }
 
-        const apiClientExecutionResult = await graphQLRequestExecutor.executeGraphQLRequest(recordId, apiRecord.data);
+        const apiClientExecutionResult = await graphQLRequestExecutor.executeGraphQLRequest(
+          {
+            entry: apiRecord.data,
+            recordId,
+          },
+          {
+            iteration: 0,
+            iterationCount: 1,
+          }
+        );
 
         const entryWithResponse = apiClientExecutionResult.executedEntry as RQAPI.GraphQLApiEntry;
         updateEntryResponse(entryWithResponse.response);
@@ -445,6 +454,7 @@ const GraphQLClientView: React.FC<Props> = ({
       updateEntryResponse,
       updateEntryTestResults,
       notifyApiRequestFinished,
+      dispatch,
     ]
   );
 
@@ -572,7 +582,7 @@ const GraphQLClientView: React.FC<Props> = ({
           <ApiClientBottomSheet
             key={recordId}
             response={response}
-            testResults={testResults}
+            testResults={testResults ?? []}
             onGenerateTests={handleGenerateTests}
             isGeneratingTests={isGeneratingTests}
             canGenerateTests={canGenerateTests}
@@ -581,13 +591,12 @@ const GraphQLClientView: React.FC<Props> = ({
             isRequestCancelled={isRequestCancelled}
             onCancelRequest={handleCancelRequest}
             handleTestResultRefresh={handleTestResultRefresh}
-            error={error}
+            error={error ?? null}
             onDismissError={resetState}
-            warning={warning}
+            warning={warning ?? null}
             executeRequest={handleSend}
           />
         }
-        minSize={sheetPlacement === BottomSheetPlacement.BOTTOM ? 25 : 350}
         initialSizes={sheetPlacement === BottomSheetPlacement.BOTTOM ? [60, 40] : [60, 40]}
       >
         <div className="api-client-body">

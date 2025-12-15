@@ -1,46 +1,33 @@
 import { NativeError } from "../../../../../../../../../errors/NativeError";
-import moment from 'moment';
-import * as xml2Js from 'xml2js';
-import * as uuid from 'uuid';
-import { parse } from 'csv-parse/sync';
-//@ts-ignore
-import * as cheerio from 'cheerio';
-import * as chai from 'chai';
-import ajv from 'ajv';
-import * as lodash from 'lodash';
-
+import { resolveRuntimeModule } from "./runtimeBindings";
+import { getPackageRegistry } from "./packageRegistry";
 
 export class PackageNotFound extends NativeError {
   constructor(id: string) {
     super(`Could not find package ${id}`);
   }
 }
-export class PackageImportError extends NativeError {
-	constructor(id: string, readonly internalError: any) {
-		super(`Could not import "${id}"!!`);
-	}
-}
-
-const packageMap: {[key: string]: Object | undefined} = {
-  moment,
-  xml2Js,
-  xml2js: xml2Js,
-  uuid,
-  'csv-parse/lib/sync': parse,
-  cheerio,
-  //@ts-ignore
-  chai,
-  ajv,
-  //@ts-ignore
-  lodash,
-}
 
 export function require(id: string) {
-  const packageImport = packageMap[id];
-  if(!packageImport) {
-    throw new PackageNotFound(id);
+  const registry = getPackageRegistry();
+
+  const pkg = registry.getPackage("builtin", id);
+
+  if (pkg) {
+    const moduleBinding = resolveRuntimeModule(pkg.runtimeId);
+    if (moduleBinding) {
+      return moduleBinding;
+    }
   }
 
-  return packageImport;
-}
+  // Direct binding lookup allows users to require packages using alternative identifiers
+  // (e.g., "xml2Js" vs "xml2js") that may not be registered in the package registry
+  // but are available in runtimeBindings. This provides flexibility for legacy aliases
+  // and alternative casing conventions.
+  const directBinding = resolveRuntimeModule(id);
+  if (directBinding) {
+    return directBinding;
+  }
 
+  throw new PackageNotFound(id);
+}

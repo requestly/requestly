@@ -9,6 +9,7 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import "./graphQLEditor.css";
 import { IntrospectionData } from "features/apiClient/helpers/introspectionQuery";
 import { indentWithTab } from "@codemirror/commands";
+import { customKeyBinding } from "componentsV2/CodeEditor/components/EditorV2/plugins";
 
 interface BaseEditorProps {
   initialDoc?: string;
@@ -18,7 +19,7 @@ interface BaseEditorProps {
 
 interface OperationEditorProps extends BaseEditorProps {
   type: "operation";
-  introspectionData: IntrospectionData;
+  introspectionData: IntrospectionData | null;
 }
 
 interface VariablesEditorProps extends BaseEditorProps {
@@ -135,7 +136,7 @@ export const GraphQLEditor: React.FC<EditorProps> = (props) => {
       }
     });
 
-    let extensions = [...basicExtensions, updateListener, myTheme];
+    let extensions = [...basicExtensions, updateListener, myTheme, customKeyBinding];
 
     if (props.type === "operation") {
       const introspectionData = (props as OperationEditorProps).introspectionData;

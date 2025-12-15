@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { Col, Row } from "antd";
 import Typography from "antd/lib/typography";
 import { RQButton, RQModal } from "lib/design-system/components";

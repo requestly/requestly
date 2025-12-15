@@ -34,9 +34,10 @@ interface PostmanEnvironmentExport {
 interface RequestBodyProcessingResult {
   requestBody: RQAPI.RequestBody;
   contentType: RequestContentType;
+}
+interface RequestHeadersProcessingResult {
   headers: KeyValuePair[];
 }
-
 export const getUploadedPostmanFileType = (fileContent: PostmanCollectionExport | PostmanEnvironmentExport) => {
   if ("info" in fileContent && fileContent.info?.schema) {
     return "collection";
@@ -177,49 +178,31 @@ const getContentTypeForRawBody = (bodyType: string) => {
   }
 };
 
-const addImplicitContentTypeHeader = (headers: KeyValuePair[], contentType: RequestContentType): KeyValuePair[] => {
-  const isContentTypeHeaderSet = headers.find((header: KeyValuePair) => header.key === "Content-Type");
-  if (!isContentTypeHeaderSet) {
-    return [
-      ...headers,
-      {
-        id: headers.length,
-        key: "Content-Type",
-        value: contentType,
-        isEnabled: true,
-      },
-    ];
-  }
-  return headers;
-};
-
-const processRawRequestBody = (raw: string, options: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+const processRawRequestBody = (raw: string, options: any): RequestBodyProcessingResult => {
   const contentType = getContentTypeForRawBody(options?.raw?.language);
-  const updatedHeaders = raw?.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
 
   return {
     requestBody: raw,
     contentType,
-    headers: updatedHeaders,
   };
 };
 
-const processFormDataBody = (formdata: any[]): Omit<RequestBodyProcessingResult, "headers"> => {
+const processFormDataBody = (formdata: any[]): RequestBodyProcessingResult => {
   return {
     requestBody:
-      formdata?.map((formData: { key: string; value: string }) => ({
+      formdata?.map((formData: { key: string; value?: any; src?: any; type: "file" | "text" }) => ({
         id: Date.now(),
         key: formData.key,
-        value: formData.value,
+        value: formData.type === "file" ? formData.src : formData.value,
         isEnabled: true,
+        type: formData.type,
       })) || [],
-    contentType: RequestContentType.FORM,
+    contentType: RequestContentType.MULTIPART_FORM,
   };
 };
 
-const processUrlEncodedBody = (urlencoded: any[], headers: KeyValuePair[]): RequestBodyProcessingResult => {
+const processUrlEncodedBody = (urlencoded: any[]): RequestBodyProcessingResult => {
   const contentType = RequestContentType.FORM;
-  const updatedHeaders = urlencoded.length ? addImplicitContentTypeHeader(headers, contentType) : headers;
 
   return {
     requestBody: urlencoded.map((data: { key: string; value: string }) => ({
@@ -229,54 +212,54 @@ const processUrlEncodedBody = (urlencoded: any[], headers: KeyValuePair[]): Requ
       isEnabled: true,
     })),
     contentType,
-    headers: updatedHeaders,
   };
 };
 
 const processRequestBody = (request: any): RequestBodyProcessingResult => {
   if (!request.body) {
     return {
-      requestBody: null,
+      requestBody: "",
       contentType: RequestContentType.RAW,
-      headers: request.header || [],
     };
   }
 
-  const processGraphqlBody = (graphql: any, headers: KeyValuePair[]): RequestBodyProcessingResult => {
+  const processGraphqlBody = (graphql: any): RequestBodyProcessingResult => {
     const contentType = RequestContentType.JSON;
-    const updatedHeaders = addImplicitContentTypeHeader(headers, contentType);
     return {
       requestBody: JSON.stringify(graphql),
       contentType,
-      headers: updatedHeaders,
     };
   };
 
   const { mode, raw, formdata, options, urlencoded, graphql } = request.body;
-  const headers =
-    request.header?.map((header: KeyValuePair, index: number) => ({
-      id: index,
-      key: header.key,
-      value: header.value,
-      isEnabled: true,
-    })) ?? [];
 
   switch (mode) {
     case PostmanBodyMode.RAW:
-      return processRawRequestBody(raw, options, headers);
+      return processRawRequestBody(raw, options);
     case PostmanBodyMode.FORMDATA:
-      return { ...processFormDataBody(formdata), headers };
+      return processFormDataBody(formdata);
     case PostmanBodyMode.URL_ENCODED:
-      return processUrlEncodedBody(urlencoded, headers);
+      return processUrlEncodedBody(urlencoded);
     case PostmanBodyMode.GRAPHQL:
-      return processGraphqlBody(graphql, headers);
+      return processGraphqlBody(graphql);
     default:
       return {
-        requestBody: null,
+        requestBody: "",
         contentType: RequestContentType.RAW,
-        headers,
       };
   }
+};
+
+export const processRequestHeaders = (request: any): RequestHeadersProcessingResult => {
+  const headers =
+    request.header?.map((header: { key: string; value: string; disabled: boolean; type: string }, index: number) => ({
+      id: index,
+      key: header.key,
+      value: header.value,
+      isEnabled: !header?.disabled,
+    })) ?? [];
+
+  return { headers };
 };
 
 const createApiRecord = (
@@ -295,7 +278,8 @@ const createApiRecord = (
       isEnabled: true,
     })) ?? [];
 
-  const { requestBody, contentType, headers } = processRequestBody(request);
+  const { requestBody, contentType } = processRequestBody(request);
+  const { headers } = processRequestHeaders(request);
 
   return {
     id: apiClientRecordsRepository.generateApiRecordId(parentCollectionId),
@@ -390,7 +374,8 @@ export const processPostmanCollectionData = (
         result.apis.push(...subItems.apis);
       } else if (item.request) {
         // This is an API endpoint
-        result.apis.push(createApiRecord(item, parentCollectionId, apiClientRecordsRepository));
+        const data = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
+        result.apis.push(data);
       }
     });
 

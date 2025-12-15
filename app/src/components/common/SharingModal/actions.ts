@@ -6,6 +6,7 @@ import { StorageService } from "init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
 import { StorageRecord } from "@requestly/shared/types/entities/rules";
+import { Workspace } from "features/workspaces/types";
 
 export const createSharedList = async ({
   appMode,
@@ -105,7 +106,7 @@ export const duplicateRulesToTargetWorkspace = async (
   }, []);
 
   const formattedRules: NewRule[] = rules.map((rule: NewRule) => {
-    const newGroupId = groupIdMapping[rule.groupId] || "";
+    const newGroupId = rule.groupId ? groupIdMapping[rule.groupId] ?? "" : "";
     return formatRule(rule, newGroupId);
   });
 
@@ -117,14 +118,14 @@ export const updateSharedListNotificationStatus = async ({
   teamId,
   notifyOnImport,
 }: {
-  teamId: string;
+  teamId: Workspace["id"];
   id: string;
   notifyOnImport: boolean;
 }) => {
   const functions = getFunctions();
   const updateStatus = httpsCallable<
     {
-      teamId: string;
+      teamId: Workspace["id"];
       sharedListId: string;
       notifyOnImport: boolean;
     },

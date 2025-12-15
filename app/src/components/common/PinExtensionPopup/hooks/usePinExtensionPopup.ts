@@ -12,7 +12,9 @@ export const usePinExtensionPopup = () => {
   const [isPinExtensionPopupActive, setIsPinExtensionPopupActive] = useState<boolean>(
     !isDesktopMode() &&
       isExtensionInstalled() &&
-      (JSON.parse(window.localStorage.getItem(IS_PIN_EXTENSION_POPUP_ACTIVE)) ?? rulesCount > 0)
+      (window.localStorage.getItem(IS_PIN_EXTENSION_POPUP_ACTIVE) !== null
+        ? JSON.parse(window.localStorage.getItem(IS_PIN_EXTENSION_POPUP_ACTIVE)!)
+        : rulesCount > 0)
   );
 
   const closePinExtensionPopup = useCallback(() => {

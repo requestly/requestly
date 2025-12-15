@@ -10,6 +10,12 @@
     align-items: center;
     gap: 6px;
 
+    .code-editor-actions-separator {
+      width: 1px;
+      height: 16px;
+      background: var(--requestly-color-white-t-20);
+    }
+
     .ant-btn {
       color: var(--requestly-color-text-default);
 
@@ -24,7 +30,6 @@
   .code-editor-custom-options-row {
     display: flex;
     align-items: center;
-    margin-top: 8px;
     gap: 1rem;
 
     .code-editor-custom-options-title {

@@ -21,14 +21,15 @@ import { RuleType } from "@requestly/shared/types/entities/rules";
 import { useCheckLocalSyncSupport } from "features/apiClient/helpers/modules/sync/useCheckLocalSyncSupport";
 import { LocalWorkspaceTooltip } from "features/apiClient/screens/apiClient/components/views/components/LocalWorkspaceTooltip/LocalWorkspaceTooltip";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/types";
+import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 
 interface ContextMenuProps {
-  log: any;
+  log: RQNetworkLog;
   children: ReactNode;
   onReplayRequest: () => void;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, onReplayRequest }) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log, onReplayRequest }) => {
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const selectedRequestResponse = useSelector(getLogResponseById(log?.id)) || log?.response?.body;
@@ -57,7 +58,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
     const menuItems: MenuProps["items"] = [
       {
         key: "copy_curl",
-        label: <LocalWorkspaceTooltip featureName="Copy cURL">Copy cURL</LocalWorkspaceTooltip>,
+        label: "Copy cURL",
         onClick: () => {
           copyToClipBoard(log.requestShellCurl, "cURL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_curl");
@@ -66,7 +67,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ children, log = {}, on
       },
       {
         key: "copy_url",
-        label: <LocalWorkspaceTooltip featureName="Copy URL">Copy URL</LocalWorkspaceTooltip>,
+        label: "Copy URL",
         onClick: () => {
           copyToClipBoard(log.url, "URL copied to clipboard");
           trackTrafficTableDropdownClicked("copy_url");

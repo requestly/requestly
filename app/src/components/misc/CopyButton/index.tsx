@@ -1,16 +1,27 @@
+import React, { useState } from "react";
 import { CheckCircleFilled, CopyOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
-import { RQButton } from "lib/design-system-v2/components";
-import { useState } from "react";
+import { RQButton, RQButtonProps } from "lib/design-system-v2/components";
 import { copyToClipBoard } from "utils/Misc";
 
-const CopyButton = ({
+const CopyButton: React.FC<{
+  title?: string;
+  copyText: string;
+  disableTooltip?: boolean;
+  showIcon?: boolean;
+  type?: RQButtonProps["type"];
+  size?: RQButtonProps["size"];
+  disabled?: boolean;
+  trackCopiedEvent?: () => void;
+  tooltipText?: string;
+  icon?: React.ReactNode;
+}> = ({
   title = "",
   copyText,
   disableTooltip = false,
   showIcon = true,
-  type = "text",
-  size = "small",
+  type = "text" as RQButtonProps["type"],
+  size = "small" as RQButtonProps["size"],
   disabled = false,
   trackCopiedEvent = null,
   tooltipText = "Copy",
@@ -18,7 +29,7 @@ const CopyButton = ({
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
 
-  const handleCopyClick = async (e) => {
+  const handleCopyClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     const result = await copyToClipBoard(copyText);
     if (result.success) {
@@ -30,12 +41,12 @@ const CopyButton = ({
   return (
     <Tooltip
       title={copyClicked ? "Copied!" : tooltipText}
-      overlayStyle={{ display: disableTooltip && "none" }}
+      overlayStyle={{ display: disableTooltip ? "none" : undefined }}
       color="#000"
     >
       <RQButton
         type={type}
-        size={"small" | size}
+        size={size || "small"}
         icon={showIcon && (copyClicked ? <CheckCircleFilled style={{ color: "green" }} /> : icon ?? <CopyOutlined />)}
         onClick={handleCopyClick}
         disabled={disabled}

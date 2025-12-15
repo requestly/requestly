@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { Tabs, TabsProps, Typography } from "antd";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Tabs, TabsProps, Typography, Popover } from "antd";
 import { useTabServiceWithSelector } from "../store/tabServiceStore";
 import { TabItem } from "./TabItem";
 import { useMatchedTabSource } from "../hooks/useMatchedTabSource";
@@ -12,10 +12,13 @@ import { useSetUrl } from "../hooks/useSetUrl";
 import PATHS from "config/constants/sub/paths";
 import { useCloseActiveTabShortcut } from "hooks/useCloseActiveTabShortcut";
 import "./tabsContainer.scss";
+import { TabsMorePopover } from "./TabsMorePopover";
 
 export const TabsContainer: React.FC = () => {
   // Enable keyboard shortcuts for closing active tabs
   useCloseActiveTabShortcut();
+
+  const [isMorePopoverOpen, setIsMorePopoverOpen] = useState(false);
 
   const [
     activeTabId,
@@ -44,6 +47,40 @@ export const TabsContainer: React.FC = () => {
   ]);
 
   const { setUrl } = useSetUrl();
+
+  const onTabItemClick = useCallback(
+    (id: number) => {
+      setActiveTab(id);
+      setIsMorePopoverOpen(false);
+    },
+    [setActiveTab]
+  );
+
+  const operations = useMemo(
+    () => (
+      <Popover
+        trigger="click"
+        placement="topRight"
+        overlayClassName="tabs-operations-popover"
+        destroyTooltipOnHide
+        content={<TabsMorePopover onTabItemClick={onTabItemClick} />}
+        open={isMorePopoverOpen}
+        onOpenChange={setIsMorePopoverOpen}
+      >
+        <div className={`tabs-more-icon ${isMorePopoverOpen ? "tabs-more-icon-open" : ""}`}>
+          <IoIosArrowDown />
+        </div>
+      </Popover>
+    ),
+    [tabs, isMorePopoverOpen, onTabItemClick]
+  );
+
+  // Reset popover state when no tabs are present
+  useEffect(() => {
+    if (tabs.size === 0 && isMorePopoverOpen) {
+      setIsMorePopoverOpen(false);
+    }
+  }, [tabs.size, isMorePopoverOpen]);
 
   const hasUnsavedChanges = Array.from(tabs.values()).some(
     (tab) => tab.getState().unsaved || !tab.getState().canCloseTab()
@@ -178,11 +215,11 @@ export const TabsContainer: React.FC = () => {
     <div className="tabs-container">
       <Tabs
         type="editable-card"
+        tabBarExtraContent={operations}
         items={tabItems}
         activeKey={activeTabId?.toString()}
         className="tabs-content"
         popupClassName="tabs-content-more-dropdown"
-        moreIcon={<IoIosArrowDown />}
         size="small"
         onChange={(key) => {
           setActiveTab(parseInt(key));
