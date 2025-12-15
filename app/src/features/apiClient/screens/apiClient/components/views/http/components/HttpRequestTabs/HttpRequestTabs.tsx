@@ -1,9 +1,10 @@
 import { RequestContentType, RQAPI } from "features/apiClient/types";
 import { QueryParamsTable } from "../../../components/request/components/QueryParamsTable/QueryParamsTable";
 import RequestBody from "../../../components/request/RequestBody";
+import { captureException } from "@sentry/react";
 import { HeadersTable } from "../../../components/request/components/HeadersTable/HeadersTable";
 import AuthorizationView from "../../../components/request/components/AuthorizationView";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ApiClientRequestTabs } from "../../../components/request/components/ApiClientRequestTabs/ApiClientRequestTabs";
 import { sanitizeKeyValuePairs, supportsRequestBody } from "features/apiClient/screens/apiClient/utils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -49,6 +50,22 @@ const HttpRequestTabs: React.FC<Props> = ({
   scriptEditorVersion,
 }) => {
   const showCredentialsCheckbox = useFeatureValue("api-client-include-credentials", false);
+
+  const getContentTypeWithAlert = useCallback(
+    (contentType: RequestContentType | undefined): RequestContentType => {
+      if (contentType === undefined) {
+        captureException(new Error("Request contentType is undefined"), {
+          extra: {
+            requestId,
+            requestEntry,
+          },
+        });
+        return RequestContentType.RAW;
+      }
+      return contentType;
+    },
+    [requestEntry, requestId]
+  );
 
   const isRequestBodySupported = supportsRequestBody(requestEntry.request.method);
 
@@ -103,7 +120,7 @@ const HttpRequestTabs: React.FC<Props> = ({
             mode="multiple"
             recordId={requestId}
             bodyContainer={requestEntry.request.bodyContainer}
-            contentType={requestEntry.request.contentType}
+            contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
@@ -111,8 +128,8 @@ const HttpRequestTabs: React.FC<Props> = ({
           <RequestBody
             mode="single"
             recordId={requestId}
-            body={requestEntry.request.body}
-            contentType={requestEntry.request.contentType}
+            body={requestEntry.request.body ?? ""}
+            contentType={getContentTypeWithAlert(requestEntry.request.contentType)}
             setRequestEntry={setRequestEntry}
             setContentType={setContentType}
           />
@@ -182,6 +199,7 @@ const HttpRequestTabs: React.FC<Props> = ({
     setRequestEntry,
     focusPostResponseScriptEditor,
     scriptEditorVersion,
+    getContentTypeWithAlert,
   ]);
 
   return (

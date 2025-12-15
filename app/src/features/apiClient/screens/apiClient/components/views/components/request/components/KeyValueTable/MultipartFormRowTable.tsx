@@ -53,6 +53,11 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
   const [addFile, removeFile] = useApiClientFileStore((state) => [state.addFile, state.removeFile]);
   const form = useContext(EditableContext);
 
+  if (!form) {
+    Sentry.captureException(new Error("EditableCell rendered outside Multi-Part Form table context"));
+    return <td {...restProps}>{children}</td>;
+  }
+
   const save = async () => {
     try {
       const values = await form.validateFields();
@@ -61,6 +66,7 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
       Sentry.captureMessage("Error saving key-value pair", error);
     }
   };
+
   if (!editable) {
     return <td {...restProps}>{children}</td>;
   }
@@ -178,7 +184,9 @@ export const MultiEditableCell: React.FC<React.PropsWithChildren<EditableCellPro
             )}
 
             <Conditional
-              condition={INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && checkInvalidCharacter}
+              condition={
+                INVALID_KEY_CHARACTERS.test(record?.key) && dataIndex === "key" && Boolean(checkInvalidCharacter)
+              }
             >
               <div className="key-value-table-error-icon">
                 <InfoIcon
