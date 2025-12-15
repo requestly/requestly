@@ -4,8 +4,8 @@ import { RQAPI } from "features/apiClient/types";
 import { EntityId } from "../types";
 import { selectRecordById } from "./selectors";
 import { HttpRequestUpdater, GraphQLRequestUpdater } from "../updaters";
-import { useApiClientDispatch, useApiClientSelector } from "../hooks";
-import { ApiClientRootState } from "../hooks";
+import { useApiClientDispatch, useApiClientSelector } from "../hooks/base.hooks";
+import { ApiClientRootState } from "../hooks/types";
 
 const makeSelectRequestRecord = () =>
   createSelector([(state: ApiClientRootState, id: EntityId) => selectRecordById(state, id)], (record) => {
