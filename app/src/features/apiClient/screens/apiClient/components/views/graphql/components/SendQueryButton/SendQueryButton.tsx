@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useGraphQLRecordStore } from "features/apiClient/hooks/useGraphQLRecordStore";
 import { RQButton } from "lib/design-system-v2/components";
 import { KEYBOARD_SHORTCUTS } from "../../../../../../../../../constants/keyboardShortcuts";
-import { Dropdown, DropDownProps } from "antd";
+import { Dropdown, MenuProps } from "antd";
 import { MdOutlineKeyboardArrowDown } from "@react-icons/all-files/md/MdOutlineKeyboardArrowDown";
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 export const SendQueryButton: React.FC<Props> = ({ disabled, loading, onSendClick }) => {
   const [operationNames] = useGraphQLRecordStore((state) => [state.operationNames]);
 
-  const operationItems: DropDownProps["menu"]["items"] = useMemo(() => {
+  const operationItems: MenuProps["items"] = useMemo(() => {
     return operationNames.map((operationName) => ({
       key: operationName,
       label: operationName,
