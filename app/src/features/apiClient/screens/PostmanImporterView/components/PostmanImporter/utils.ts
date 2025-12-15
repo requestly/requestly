@@ -370,13 +370,12 @@ export const processPostmanCollectionData = (
         subCollection.collectionId = parentCollectionId;
         result.collections.push(subCollection);
 
-        //subCollection.id is necessary since it acts as a parentCollectionId for nested child collections
-        //should we throw any error if subCollection.id is not available or missing?
-        if (subCollection.id) {
-          const subItems = processItems(item.item, subCollection.id);
-          result.collections.push(...subItems.collections);
-          result.apis.push(...subItems.apis);
+        if (!subCollection.id) {
+          throw new Error(`Failed to generate collection ID for: ${item.name}`);
         }
+        const subItems = processItems(item.item, subCollection.id);
+        result.collections.push(...subItems.collections);
+        result.apis.push(...subItems.apis);
       } else if (item.request) {
         // This is an API endpoint
         const data = createApiRecord(item, parentCollectionId, apiClientRecordsRepository);
