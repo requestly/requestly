@@ -6,23 +6,25 @@ This repository contains most of the modules that make up Requestly.
 - Browser extension
 - Common code shared between this project and other projects like Desktop app and Web proxy.
 
-### Install
+## Following are the steps to set up the Mono Repo
+
+### Prerequisites
 
 Please make sure that Node version >= 18.18.0 is installed on your system.
 
-#### Windows Users
+### Install
 
-If you're using Windows and encounter issues while cloning this repository (due to long file paths), run this command first:
+First, navigate to the Requestly root repo:
 
 ```sh
-git config --system core.longpaths true
+cd requestly
 ```
 
-Then proceed with the installation:
+Then run:
 
 ```sh
 sh install.sh local
-```    
+```
 
 ### Build
 
@@ -30,13 +32,15 @@ sh install.sh local
 sh build.sh    
 ```
 
-### Test
+### Test [Optional Step]
 
-```sh 
+```sh
 sh test.sh
 ```
 
 ## Develop individual modules
+
+Please note: for the following modules setup, you must complete the above steps.
 
 ### UI application:
 
@@ -44,8 +48,4 @@ sh test.sh
 
 ### Browser extension:
 
-👉 Follow [README](./browser-extension/README.md).
-
-### Rule processor:
-
-👉 Follow [README](./common/rule-processor/README.md).
+👉 Follow [README](./browser-extension/mv3/README.md).
