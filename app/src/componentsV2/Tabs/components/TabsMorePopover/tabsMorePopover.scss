@@ -52,6 +52,12 @@
     border-radius: 4px;
     &:hover {
       background: var(--requestly-color-white-t-10);
+      .tab-ops-item-actions .tab-ops-item-close-button {
+        display: flex;
+      }
+      .tab-ops-item-actions .unsaved-changes-indicator {
+        display: none;
+      }
     }
 
     .tab-ops-item-container {
@@ -66,7 +72,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      width: 150px; /* or max-width: 100%; */
+      width: 200px;
       color: var(--requestly-color-text-default);
       font-family: var(--font-family-default);
       font-size: var(--font-size-sm, 12px);
@@ -75,17 +81,41 @@
       line-height: 18px;
     }
 
-    .tab-ops-item-close {
-      color: var(--requestly-color-text-subtle);
-      cursor: pointer;
-      opacity: 0.7;
-      width: 18px;
-      height: 18px;
-      padding: 2px;
-      border-radius: 4px;
-      &:hover {
-        color: var(--requestly-color-text-default);
-        background: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    .tab-ops-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .unsaved-changes-indicator {
+        flex-shrink: 0;
+        width: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &::after {
+          content: "";
+          display: block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background-color: var(--requestly-color-primary-soft);
+        }
+      }
+
+      .tab-ops-item-close-button {
+        color: var(--requestly-color-text-subtle);
+        cursor: pointer;
+        opacity: 0.7;
+        width: 18px;
+        height: 18px;
+        padding: 2px;
+        border-radius: 4px;
+        display: none;
+        &:hover {
+          color: var(--requestly-color-text-default);
+          background: var(--requestly-color-white-t-20);
+        }
       }
     }
   }
@@ -111,8 +141,82 @@
     max-width: 250px;
     word-wrap: break-word;
   }
+}
 
-  .ant-tooltip-arrow-content {
-    --antd-arrow-background-color: var(--requestly-color-black) !important;
+.opened-tabs-header {
+  display: flex;
+  padding-bottom: var(--requestly-space-2);
+  justify-content: space-between;
+  align-items: baseline;
+  align-self: stretch;
+
+  .close-all-tabs-button {
+    display: flex;
+    height: 24px;
+    padding: 0 var(--requestly-space-4);
+    justify-content: center;
+    align-items: center;
+    gap: var(--requestly-space-3);
+    border-radius: 4px;
+    background: var(--requestly-color-white-t-10);
+    text-align: center;
+    font-family: var(--font-family-default, Inter);
+    font-size: var(--requestly-font-size-xs);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 17px;
+
+    &:hover {
+      .close-all-tabs-icon {
+        color: var(--requestly-color-text-default) !important;
+      }
+
+      .close-all-tabs-text {
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .close-all-tabs-icon {
+      color: var(--requestly-color-text-subtle) !important;
+      &:hover {
+        color: var(--requestly-color-text-default) !important;
+      }
+    }
+
+    .close-all-tabs-text {
+      color: var(--requestly-color-text-subtle);
+      &:hover {
+        color: var(--requestly-color-text-default);
+      }
+    }
+  }
+
+  .header-left-section {
+    display: flex;
+    gap: 2px;
+    align-items: baseline;
+
+    .opened-tabs-title {
+      font-size: var(--requestly-font-size-sm);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      color: var(--requestly-color-text-subtle, #bbb);
+      font-family: var(--font-family-default, Inter);
+      font-size: var(--requestly-font-size-sm);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 18px;
+    }
+
+    .opened-tabs-count {
+      color: var(--requestly-color-text-subtle);
+      font-family: var(--requestly-font-family-default);
+      font-size: var(--requestly-font-size-sm);
+      font-style: normal;
+      font-weight: 400;
+      line-height: 18px;
+    }
   }
 }
