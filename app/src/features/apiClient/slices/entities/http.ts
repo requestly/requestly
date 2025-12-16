@@ -1,59 +1,73 @@
 import { KeyValuePair, RequestContentType, RequestMethod, RQAPI } from "features/apiClient/types";
-import { UpdateCommand } from "../types";
+import { InvalidEntityShape, UpdateCommand } from "../types";
 import { apiRecordsActions } from "../apiRecords/slice";
 import { selectRecordById } from "../apiRecords/selectors";
 import { ApiClientRootState } from "../hooks/types";
-import { RequestEntity } from "./request";
-import { EntityType, SerializedEntity } from "./types";
+import { ApiClientRecordEntity } from "./api-client-record-entity";
+import { ApiClientEntityType } from "./types";
 
-export class HttpRecordEntity extends RequestEntity<RQAPI.HttpApiRecord> {
-  readonly type = EntityType.HTTP_RECORD;
+export class HttpRecordEntity extends ApiClientRecordEntity<RQAPI.HttpApiRecord> {
 
-  protected dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
+  readonly type = ApiClientEntityType.HTTP_RECORD;
+
+  dispatchCommand(command: UpdateCommand<RQAPI.HttpApiRecord>): void {
     this.dispatch(apiRecordsActions.applyPatch({ id: this.meta.id, command }));
   }
 
-  getFromState(state: ApiClientRootState): RQAPI.HttpApiRecord | undefined {
+  getEntityFromState(state: ApiClientRootState): RQAPI.HttpApiRecord {
     const record = selectRecordById(state, this.meta.id);
-    if (record?.type !== RQAPI.RecordType.API) return undefined;
-    if (record.data?.type !== RQAPI.ApiEntryType.HTTP) return undefined;
+    if (record?.type !== RQAPI.RecordType.API) {
+      throw new InvalidEntityShape({
+        id: this.id,
+        expectedType: RQAPI.RecordType.API,
+        foundType: record?.type,
+      });
+    };
+    if (record.data?.type !== RQAPI.ApiEntryType.HTTP) {
+      throw new InvalidEntityShape({
+        id: this.id,
+        expectedType: RQAPI.ApiEntryType.HTTP,
+        foundType: record.data.type,
+      });
+
+    };
     return record as RQAPI.HttpApiRecord;
   }
 
-  private getRequest(state: ApiClientRootState): RQAPI.HttpRequest | undefined {
-    return this.getFromState(state)?.data?.request;
+  private getRequest(state: ApiClientRootState): RQAPI.HttpRequest {
+    return this.getEntityFromState(state).data.request;
   }
 
   getResponse(state: ApiClientRootState): RQAPI.HttpResponse | undefined {
-    return this.getFromState(state)?.data?.response;
+    return this.getEntityFromState(state).data.response;
   }
 
   getUrl(state: ApiClientRootState): string | undefined {
-    return this.getRequest(state)?.url;
+    return this.getRequest(state).url;
   }
 
   getMethod(state: ApiClientRootState): RequestMethod | undefined {
-    return this.getRequest(state)?.method;
+    return this.getRequest(state).method;
   }
 
   getHeaders(state: ApiClientRootState): KeyValuePair[] | undefined {
-    return this.getRequest(state)?.headers;
+    return this.getRequest(state).headers;
   }
 
   getQueryParams(state: ApiClientRootState): KeyValuePair[] | undefined {
-    return this.getRequest(state)?.queryParams;
+    return this.getRequest(state).queryParams;
   }
 
   getBody(state: ApiClientRootState): RQAPI.RequestBody | undefined {
-    return this.getRequest(state)?.body;
+    return this.getRequest(state).body;
   }
 
   getContentType(state: ApiClientRootState): RequestContentType | undefined {
-    return this.getRequest(state)?.contentType;
+    return this.getRequest(state).contentType;
   }
 
   getPathVariables(state: ApiClientRootState): RQAPI.PathVariable[] | undefined {
-    return this.getRequest(state)?.pathVariables;
+    return this.getRequest(state).pathVariables;
   }
 
   setUrl(url: string): void {
@@ -90,9 +104,5 @@ export class HttpRecordEntity extends RequestEntity<RQAPI.HttpApiRecord> {
 
   deleteBody(): void {
     this.DELETE({ data: { request: { body: null } } });
-  }
-
-  serialize(): SerializedEntity<EntityType.HTTP_RECORD> {
-    return { id: this.meta.id, type: this.type };
   }
 }

@@ -2,7 +2,11 @@
   "compilerOptions": {
     "outDir": "build",
     "target": "ESNext",
-    "lib": ["es2021", "dom", "dom.iterable"],
+    "lib": [
+      "es2021",
+      "dom",
+      "dom.iterable"
+    ],
     "module": "ESNext",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -26,7 +30,10 @@
       "chrome"
     ],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noFallThroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true
   },
   "exclude": [
     "node_modules",

@@ -1,34 +1,28 @@
-import { EntityType, EntityMeta, EntityDispatch, SerializedEntity } from "./types";
+import { ApiClientEntityType, EntityDispatch } from "./types";
 import { HttpRecordEntity } from "./http";
 import { GraphQLRecordEntity } from "./graphql";
+import { ApiClientEntityMeta } from "./base";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace EntityFactory {
-  export function from(
-    params: { id: string; type: EntityType.HTTP_RECORD },
-    dispatch: EntityDispatch
-  ): HttpRecordEntity;
-  export function from(
-    params: { id: string; type: EntityType.GRAPHQL_RECORD },
-    dispatch: EntityDispatch
-  ): GraphQLRecordEntity;
-  export function from(params: SerializedEntity, dispatch: EntityDispatch): HttpRecordEntity | GraphQLRecordEntity;
+  export type EntityTypeMap<T extends ApiClientEntityType> = T extends ApiClientEntityType.HTTP_RECORD ? HttpRecordEntity : GraphQLRecordEntity;
 
-  export function from(
-    params: { id: string; type: EntityType },
-    dispatch: EntityDispatch
-  ): HttpRecordEntity | GraphQLRecordEntity {
-    const meta: EntityMeta = { id: params.id };
 
-    switch (params.type) {
-      case EntityType.HTTP_RECORD:
-        return new HttpRecordEntity(dispatch, meta);
-      case EntityType.GRAPHQL_RECORD:
-        return new GraphQLRecordEntity(dispatch, meta);
-      default: {
-        const _exhaustive: never = params.type;
-        throw new Error(`Unknown entity type: ${_exhaustive}`);
+  export function from<T extends ApiClientEntityType>(
+    params: { id: string; type: T },
+    dispatch: EntityDispatch
+  ): EntityTypeMap<T> {
+    const meta: ApiClientEntityMeta = { id: params.id };
+
+    const entity = (() => {
+      switch (params.type) {
+        case ApiClientEntityType.HTTP_RECORD:
+          return new HttpRecordEntity(dispatch, meta);
+        case ApiClientEntityType.GRAPHQL_RECORD:
+          return new GraphQLRecordEntity(dispatch, meta);
       }
-    }
+    })() as EntityTypeMap<T>;
+
+    return entity;
   }
 }
