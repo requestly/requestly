@@ -36,7 +36,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
       {isTogglable && (
         <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
           {isChangeAble ? (
-            <Tooltip title={toolTipTitle}>
+            <Tooltip title={toolTipTitle} color="#000">
               {confirmation ? (
                 <Popconfirm {...confirmation}>
                   <Switch checked={isActive} onChange={onChange} {...props} />

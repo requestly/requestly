@@ -11,7 +11,7 @@ import { useNewApiClientContext } from "features/apiClient/hooks/useNewApiClient
 import { useApiClientRepository } from "features/apiClient/contexts/meta";
 
 export interface NewRecordNameInputProps {
-  recordToBeEdited?: RQAPI.ApiClientRecord;
+  recordToBeEdited: RQAPI.ApiClientRecord;
   recordType: RQAPI.RecordType;
   onSuccess: () => void;
   analyticEventSource: RQAPI.AnalyticsEventSource;
@@ -41,7 +41,7 @@ export const NewRecordNameInput: React.FC<NewRecordNameInputProps> = ({ recordTo
       return;
     }
 
-    const record: Partial<RQAPI.ApiClientRecord> = {
+    const record: RQAPI.ApiClientRecord = {
       ...recordToBeEdited,
       name: recordName,
     };

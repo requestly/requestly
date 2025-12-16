@@ -6,6 +6,7 @@ import InfoIcon from "components/misc/InfoIcon";
 import { Conditional } from "components/common/Conditional";
 import { INVALID_KEY_CHARACTERS } from "features/apiClient/constants";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
+import { captureException } from "@sentry/react";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -46,6 +47,11 @@ export const KeyValueTableEditableCell: React.FC<React.PropsWithChildren<Editabl
   ...restProps
 }) => {
   const form = useContext(EditableContext);
+
+  if (!form) {
+    captureException(new Error("EditableCell rendered outside Key-Value table context"));
+    return <td {...restProps}>{children}</td>;
+  }
 
   const save = async () => {
     try {

@@ -43,8 +43,10 @@ export const makeRequest = async (
 ): Promise<RQAPI.HttpResponse> => {
   return new Promise((resolve, reject) => {
     const abortListener = () => {
-      signal?.removeEventListener("abort", abortListener);
-      reject(createAbortError(signal));
+      if (signal) {
+        signal?.removeEventListener("abort", abortListener);
+        reject(createAbortError(signal));
+      }
     };
 
     if (signal) {
@@ -104,16 +106,18 @@ export const addUrlSchemeIfMissing = (url: string): string => {
 };
 
 export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry => {
+  const httpRequest = (request || {}) as RQAPI.HttpRequest;
+
   return {
     type: RQAPI.ApiEntryType.HTTP,
     request: {
-      url: DEMO_HTTP_API_URL,
-      method: RequestMethod.GET,
-      headers: [],
-      queryParams: [],
-      body: null,
-      contentType: RequestContentType.RAW,
-      ...(request || {}),
+      ...httpRequest,
+      url: httpRequest?.url || DEMO_HTTP_API_URL,
+      method: httpRequest?.method || RequestMethod.GET,
+      headers: httpRequest?.headers || [],
+      queryParams: httpRequest?.queryParams || [],
+      body: httpRequest?.body ?? "",
+      contentType: httpRequest?.contentType || RequestContentType.RAW,
     },
     response: null,
     scripts: {
@@ -125,15 +129,17 @@ export const getEmptyHttpEntry = (request?: RQAPI.Request): RQAPI.HttpApiEntry =
 };
 
 export const getEmptyGraphQLEntry = (request?: RQAPI.Request): RQAPI.GraphQLApiEntry => {
+  const graphqlRequest = (request || {}) as RQAPI.GraphQLRequest;
+
   return {
     type: RQAPI.ApiEntryType.GRAPHQL,
     request: {
-      url: "",
-      headers: [],
-      operation: "",
-      variables: "",
-      operationName: "",
-      ...(request || {}),
+      ...graphqlRequest,
+      url: graphqlRequest?.url || "",
+      headers: graphqlRequest?.headers || [],
+      operation: graphqlRequest?.operation || "",
+      variables: graphqlRequest?.variables || "",
+      operationName: graphqlRequest?.operationName || "",
     },
     response: null,
     scripts: {
@@ -192,7 +198,7 @@ export const sanitizeEntry = (entry: RQAPI.HttpApiEntry, removeInvalidPairs = tr
 
   if (entry.request.body != null) {
     if (!supportsRequestBody(entry.request.method)) {
-      sanitizedEntry.request.body = null;
+      delete sanitizedEntry.request.body;
     } else if (entry.request.contentType === RequestContentType.FORM) {
       sanitizedEntry.request.body = sanitizeKeyValuePairs(
         entry.request.body as RQAPI.RequestFormBody,
@@ -265,7 +271,7 @@ export const getContentTypeFromRequestHeaders = (headers: KeyValuePair[]) => {
   return contentType;
 };
 
-export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]): string => {
+export const getContentTypeFromResponseHeaders = (headers: KeyValuePair[]) => {
   return headers.find((header) => header.key.toLowerCase() === CONTENT_TYPE_HEADER.toLowerCase())?.value;
 };
 
@@ -406,6 +412,10 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
     }
   }
 
+  if (!contentType) {
+    contentType = RequestContentType.RAW; // Default fallback
+  }
+
   let body: RQAPI.RequestBody;
   switch (contentType) {
     case RequestContentType.JSON:
@@ -423,7 +433,7 @@ export const parseCurlRequest = (curl: string): RQAPI.Request => {
       }
 
       if (hasFiles) {
-        for (const [key, filePath] of Object.entries(requestJson.files)) {
+        for (const [key, filePath] of Object.entries(requestJson.files ?? {})) {
           multipartData.push({ key, value: `@${filePath}` });
         }
       }
@@ -473,7 +483,7 @@ const sortRecords = (records: RQAPI.ApiClientRecord[]) => {
 const sortNestedRecords = (records: RQAPI.ApiClientRecord[]) => {
   records.forEach((record) => {
     if (isApiCollection(record)) {
-      record.data.children = sortRecords(record.data.children);
+      record.data.children = sortRecords(record.data.children ?? []);
       sortNestedRecords(record.data.children);
     }
   });
@@ -497,9 +507,9 @@ export const convertFlatRecordsToNestedRecords = (records: RQAPI.ApiClientRecord
 
   recordsCopy.forEach((record) => {
     const recordState = recordsMap[record.id];
-    const parentNode = recordsMap[record.collectionId] as RQAPI.CollectionRecord;
+    const parentNode = recordsMap[record.collectionId as string] as RQAPI.CollectionRecord;
     if (parentNode) {
-      parentNode.data.children.push(recordState);
+      parentNode.data.children?.push(recordState);
     } else {
       updatedRecords.push({ ...recordState, collectionId: "" });
     }
@@ -522,7 +532,7 @@ export const createBlankApiRecord = (
   if (recordType === RQAPI.RecordType.API) {
     newRecord.name = "Untitled request";
     newRecord.type = RQAPI.RecordType.API;
-    newRecord.data = getEmptyApiEntry(entryType);
+    newRecord.data = getEmptyApiEntry(entryType ?? RQAPI.ApiEntryType.HTTP);
     newRecord.deleted = false;
     newRecord.collectionId = collectionId;
   }
@@ -603,7 +613,7 @@ export const filterRecordsBySearch = (
       if (!childrenMap.has(record.collectionId)) {
         childrenMap.set(record.collectionId, new Set());
       }
-      childrenMap.get(record.collectionId).add(record.id);
+      childrenMap.get(record.collectionId)?.add(record.id);
     }
   });
 
@@ -749,7 +759,7 @@ export const filterOutChildrenRecords = (
   recordsMap: Record<RQAPI.ApiClientRecord["id"], RQAPI.ApiClientRecord>
 ) =>
   [...selectedRecords]
-    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id)))
+    .filter((id) => !childParentMap.get(id) || !selectedRecords.has(childParentMap.get(id) ?? ""))
     .map((id) => recordsMap[id]);
 
 export const processRecordsForDuplication = (
@@ -763,7 +773,10 @@ export const processRecordsForDuplication = (
     const record = queue.shift()!;
 
     if (record.type === RQAPI.RecordType.COLLECTION) {
-      const newId = apiClientRecordsRepository.generateCollectionId(`(Copy) ${record.name}`, record.collectionId);
+      const newId = apiClientRecordsRepository.generateCollectionId(
+        `(Copy) ${record.name}`,
+        record.collectionId ?? undefined
+      );
 
       const collectionToDuplicate: RQAPI.CollectionRecord = Object.assign({}, record, {
         id: newId,
@@ -781,7 +794,7 @@ export const processRecordsForDuplication = (
       }
     } else {
       const requestToDuplicate: RQAPI.ApiClientRecord = Object.assign({}, record, {
-        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId),
+        id: apiClientRecordsRepository.generateApiRecordId(record.collectionId ?? undefined),
         name: `(Copy) ${record.name}`,
       });
 
@@ -794,9 +807,9 @@ export const processRecordsForDuplication = (
 
 export const resolveAuth = (
   auth: RQAPI.Auth,
-  childDetails: { id: string; parentId: string },
+  childDetails: { id: string; parentId: string | null },
   getParentChain: (id: string) => string[],
-  getData: (id: string) => RQAPI.ApiClientRecord
+  getData: (id: string | null) => RQAPI.ApiClientRecord | undefined
 ): RQAPI.Auth => {
   //create a record array
   const apiRecords: RQAPI.ApiClientRecord[] = [];
@@ -835,7 +848,7 @@ export const parseHttpRequestEntry = (
 
   const contentType = entry.request.contentType;
   if (contentType) {
-    result.content_type = parseContentType(entry.request.contentType);
+    result.content_type = parseContentType(contentType);
   }
   return result;
 };
@@ -883,11 +896,11 @@ export const isHTTPApiEntry = (entry: RQAPI.ApiEntry): entry is RQAPI.HttpApiEnt
 };
 
 export const isHttpResponse = (response: RQAPI.Response): response is RQAPI.HttpResponse => {
-  return "redirectUrl" in response;
+  return !!response && "redirectedUrl" in response;
 };
 
 export const isGraphQLResponse = (response: RQAPI.Response): response is RQAPI.GraphQLResponse => {
-  return "type" in response;
+  return !!response && "type" in response;
 };
 
 export const getFileExtension = (fileName: string) => {
