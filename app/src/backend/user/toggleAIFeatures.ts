@@ -25,7 +25,7 @@ export const toggleAIFeatures = async (
   }
 
   const data = snapshot.data();
-  const currentMetadata = (data?.metadata as Record<string, unknown>) || {};
+  const currentMetadata = data?.metadata || {};
 
   await updateDoc(docRef, {
     metadata: {
