@@ -39,7 +39,6 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       return data;
     } else {
       const emptyData = createEmptyPair();
-      emptyData.isEnabled = false;
       return [emptyData];
     }
   }, [data, createEmptyPair]);

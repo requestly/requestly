@@ -11,7 +11,7 @@ export type GraphQLRecordState = BaseApiEntryStoreState<RQAPI.GraphQLApiEntry> &
   hasIntrospectionFailed: boolean;
   setIsFetchingIntrospectionData: (isFetching: boolean) => void;
   setHasIntrospectionFailed: (hasFailed: boolean) => void;
-  setIntrospectionData: (data: IntrospectionData) => void;
+  setIntrospectionData: (data: IntrospectionData | null) => void;
   updateOperationNames: (newNames: string[]) => void;
 };
 
