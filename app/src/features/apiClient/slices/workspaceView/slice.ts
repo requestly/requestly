@@ -3,6 +3,7 @@ import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
 import { setupWorkspaceView, switchContext, workspaceViewManager } from "./thunks";
 import { RootState } from "store/types";
+import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 
 function updateWorkspaceStateById(state: WorkspaceViewState, id: string, workspaceStatus: WorkspaceState["status"]) {
   const existingEntity = state.selectedWorkspaces.entities[id];
@@ -151,4 +152,9 @@ export const workspaceViewSlice = createSlice({
 });
 
 export const workspaceViewActions = workspaceViewSlice.actions;
-export const workspaceViewReducer = workspaceViewSlice.reducer;
+
+export const workspaceViewReducerWithLocal = getReducerWithLocalStorageSync(
+  ReducerKeys.WORKSPACE_VIEW,
+  workspaceViewSlice.reducer,
+  ["viewMode", "selectedWorkspaces"]
+);
