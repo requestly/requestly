@@ -79,6 +79,10 @@ const AuthHandler: React.FC<{}> = () => {
         dispatch(globalActions.updateUsername({ username: userData.username }));
       }
 
+      if (userData?.metadata) {
+        dispatch(globalActions.updateUserMetadata(userData.metadata));
+      }
+
       dispatch(
         globalActions.updateUserInfo({
           loggedIn: true,

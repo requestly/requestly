@@ -54,6 +54,7 @@ interface EditorProps {
   mergeView?: {
     incomingValue: string;
     source: "ai" | "user";
+    onPartialMerge: (value: string) => void;
   };
 }
 const Editor: React.FC<EditorProps> = ({
@@ -175,6 +176,14 @@ const Editor: React.FC<EditorProps> = ({
       }
     }
   }, [showOptions?.enablePrettify, language, value, handleEditorSilentUpdate]);
+
+  const handleMergeChunk = useCallback(
+    (value: string) => {
+      mergeView?.onPartialMerge(value);
+      // TODO: add analytics for partial merge
+    },
+    [mergeView]
+  );
 
   useEffect(() => {
     if (!isEditorInitialized) return;
@@ -351,7 +360,15 @@ const Editor: React.FC<EditorProps> = ({
         }}
       >
         {toastContainer}
-        {mergeView ? <MergeViewEditor originalValue={value} newValue={mergeView.incomingValue} /> : editor}
+        {mergeView ? (
+          <MergeViewEditor
+            originalValue={value}
+            newValue={mergeView.incomingValue}
+            onMergeChunk={(value) => handleMergeChunk(value)}
+          />
+        ) : (
+          editor
+        )}
       </ResizableBox>
     </>
   );
