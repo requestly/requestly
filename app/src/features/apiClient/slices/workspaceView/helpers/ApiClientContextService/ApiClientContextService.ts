@@ -46,6 +46,7 @@ class ApiClientContextService {
     const { workspaceId, workspaceMeta, user } = params;
 
     if (workspaceMeta.type === WorkspaceType.LOCAL) {
+      // @ts-ignore
       return new ApiClientLocalRepository({ rootPath: workspaceMeta.rootPath });
     }
 
