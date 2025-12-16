@@ -61,7 +61,7 @@ export function getAllTestSummary(result: RunResultState["iterations"]) {
     successTestsCounts += success.length;
     failedTestsCounts += failed.length;
     skippedTestsCounts += skipped.length;
-    totalDuration += executionResult.runDuration;
+    totalDuration += executionResult.runDuration ?? 0;
 
     totalTests.set(iteration, [...(totalTests.get(iteration) ?? []), { requestExecutionResult: executionResult }]);
 
