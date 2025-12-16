@@ -13,12 +13,14 @@ import { reduxStore } from "store";
 import { forceRefreshRecords } from "features/apiClient/commands/records";
 import { forceRefreshEnvironments } from "features/apiClient/commands/environments";
 import { reloadFsManager } from "services/fsManagerServiceAdapter";
-import { multiWorkspaceViewActions } from "../../multiWorkspaceViewSlice";
+import { workspaceViewActions } from "../../slice";
 import {
   apiClientContextRegistry,
   ApiClientContextRegistry,
 } from "../ApiClientContextRegistry/ApiClientContextRegistry";
 import { Err, Ok, Result } from "utils/try";
+import { configureStore } from "@reduxjs/toolkit";
+import { apiRecordsSlice } from "features/apiClient/slices/apiRecords";
 
 export type UserDetails = { uid: string; loggedIn: true } | { loggedIn: false };
 
@@ -52,18 +54,13 @@ class ApiClientContextService {
   }
 
   private createStore(workspaceId: ApiClientFeatureContext["workspaceId"]): ApiClientFeatureContext["store"] {
-    // TODO: integration pending
-    // const store = configureStore({
-    //   reducer: {
-    //     recordsSlice: recordsSlice.reducer,
-    //     environmentSlice: environmentSlice.reducer,
-    //   },
-    // });
+    const store = configureStore({
+      reducer: {
+        [apiRecordsSlice.name]: apiRecordsSlice.reducer,
+      },
+    });
 
-    // return store;
-
-    // STUB
-    return {} as ApiClientFeatureContext["store"];
+    return store;
   }
 
   async createContext(workspace: Workspace, userDetails: UserDetails): Promise<Result<ApiClientFeatureContext>> {
@@ -82,9 +79,8 @@ class ApiClientContextService {
 
       const result = await this.extractSetupDataFromRepository(repo);
 
-      // TODO: at integration
-      // store.dispatch(recordsSlice.actions.setInitialData(result.apiClientRecords.records));
-      // store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
+      store.dispatch(apiRecordsSlice.actions.hydrate(result.apiClientRecords));
+      //   store.dispatch(environmentsSlice.actions.setInitialData(result.environments));
 
       const ctx: ApiClientFeatureContext = { workspaceId, store, repositories: repo };
       this.contextRegistry.addContext(ctx);
@@ -111,9 +107,9 @@ class ApiClientContextService {
       await Promise.all([forceRefreshRecords(context as any), forceRefreshEnvironments(context as any)]);
     } catch (e) {
       reduxStore.dispatch(
-        multiWorkspaceViewActions.setWorkspaceState({
+        workspaceViewActions.setWorkspaceStatus({
           id: workspaceId!,
-          workspaceState: {
+          status: {
             loading: false,
             state: {
               success: false,

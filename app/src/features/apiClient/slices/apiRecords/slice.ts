@@ -6,6 +6,7 @@ import { buildTreeIndices } from "../utils/treeUtils";
 import { objectToSetOperations, objectToDeletePaths } from "../utils/pathConverter";
 import { EntityId, TreeIndices, UpdateCommand } from "../types";
 import { ApiRecordsState } from "./types";
+import { API_CLIENT_RECORDS_SLICE_NAME } from "../common/constants";
 
 export const apiRecordsAdapter = createEntityAdapter<RQAPI.ApiClientRecord>({
   selectId: (record) => record.id,
@@ -31,7 +32,7 @@ function rebuildTreeIndices(state: ApiRecordsState): void {
 }
 
 export const apiRecordsSlice = createSlice({
-  name: "apiClient/records",
+  name: API_CLIENT_RECORDS_SLICE_NAME,
   initialState,
   reducers: {
     setAllRecords(state, action: PayloadAction<RQAPI.ApiClientRecord[]>) {
@@ -99,20 +100,14 @@ export const apiRecordsSlice = createSlice({
       state.tree = emptyTreeIndices;
     },
 
-    hydrateRecords(
+    hydrate(
       state,
       action: PayloadAction<{
-        success: boolean;
-        data: {
-          records: RQAPI.ApiClientRecord[];
-          erroredRecords: ErroredRecord[];
-        };
-        message?: string;
+        records: RQAPI.ApiClientRecord[];
+        erroredRecords: ErroredRecord[];
       }>
     ) {
-      if (!action.payload.success) return;
-
-      apiRecordsAdapter.setAll(state.records, action.payload.data.records);
+      apiRecordsAdapter.setAll(state.records, action.payload.records);
       rebuildTreeIndices(state);
     },
   },
