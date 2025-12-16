@@ -14,6 +14,7 @@ export interface WorkspaceState {
 }
 
 export interface WorkspaceViewState {
+  isSetupDone: boolean;
   viewMode: ApiClientViewMode;
   selectedWorkspaces: EntityState<WorkspaceState>;
 }

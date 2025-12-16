@@ -1,7 +1,7 @@
 import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ApiClientViewMode, WorkspaceState, WorkspaceViewState } from "./types";
 import { ReducerKeys } from "store/constants";
-import { switchContext, workspaceViewManager } from "./thunks";
+import { setupWorkspaces, switchContext, workspaceViewManager } from "./thunks";
 import { RootState } from "store/types";
 
 function updateWorkspaceStateById(state: WorkspaceViewState, id: string, workspaceStatus: WorkspaceState["status"]) {
@@ -40,6 +40,7 @@ export function getViewMode(state: RootState) {
 }
 
 const initialState: WorkspaceViewState = {
+  isSetupDone: false,
   viewMode: ApiClientViewMode.SINGLE,
   selectedWorkspaces: workspaceViewAdapter.getInitialState(),
 };
@@ -139,6 +140,12 @@ export const workspaceViewSlice = createSlice({
             },
           });
         });
+      })
+      .addCase(setupWorkspaces.pending, (state) => {
+        state.isSetupDone = false;
+      })
+      .addCase(setupWorkspaces.fulfilled, (state) => {
+        state.isSetupDone = true;
       });
   },
 });
