@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { EditorView, placeholder as cmPlaceHolder, keymap } from "@codemirror/view";
-import { EditorState, Prec } from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/commands";
 import { VariablePopover } from "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver";
 import "componentsV2/CodeEditor/components/EditorV2/components/VariablePopOver/variable-popover.scss";
@@ -23,8 +23,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   onBlur,
   variables,
 }) => {
-  const editorRef = useRef(null);
-  const editorViewRef = useRef(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   /*
   onKeyDown, onBlur and onChange is in the useEffect dependencies (implicitly through the editor setup),
   which causes the editor to be recreated when onKeyDown changes
@@ -34,6 +34,8 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
   const onBlurRef = useRef(onBlur);
   const onChangeRef = useRef(onChange);
   const previousDefaultValueRef = useRef(defaultValue);
+
+  const emptyVariables = useMemo(() => new Map(), []);
 
   useEffect(() => {
     onBlurRef.current = onBlur;
@@ -58,6 +60,7 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       });
     }
 
+    if (!editorRef.current) return;
     /*
     CodeMirror uses extensions to configure DOM interactions.
     Prec.highest ensures your keybinding takes priority.
@@ -94,11 +97,11 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
               setHoveredVariable,
               setPopupPosition,
             },
-            variables
+            variables || emptyVariables
           ),
           generateCompletionsForVariables(variables),
           cmPlaceHolder(placeholder ?? "Input here"),
-        ],
+        ].filter((ext): ext is NonNullable<typeof ext> => ext !== null),
       }),
     });
 
@@ -152,12 +155,12 @@ export const RQSingleLineEditor: React.FC<SingleLineEditorProps> = ({
       className={`${className ?? ""} editor-popup-container ant-input`}
       onMouseLeave={handleMouseLeave}
     >
-      <Conditional condition={hoveredVariable}>
+      <Conditional condition={!!hoveredVariable}>
         <VariablePopover
-          editorRef={editorRef}
-          hoveredVariable={hoveredVariable!}
+          editorRef={editorRef as React.RefObject<HTMLDivElement>}
+          hoveredVariable={hoveredVariable || ""}
           popupPosition={popupPosition}
-          variables={variables!}
+          variables={variables || emptyVariables}
           onClose={handleClosePopover}
           onPinChange={setIsPopoverPinned}
         />
