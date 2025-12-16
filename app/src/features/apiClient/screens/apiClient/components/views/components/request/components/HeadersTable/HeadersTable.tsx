@@ -18,16 +18,25 @@ function Data(props: {
 }) {
   const scopedVariables = useScopedVariables(props.recordId);
   const [showDescription, setShowDescription] = useState(false);
+
+  const tableConfigs = { checkInvalidCharacter: true };
+  const extraTableCols = {
+    description: {
+      visible: showDescription,
+      onToggle: (show: any) => {
+        setShowDescription(show);
+      },
+    },
+    dataType: { visible: true },
+  };
+
   return (
     <KeyValueTable
       data={props.headers}
       variables={scopedVariables}
       onChange={props.handleHeadersChange}
-      checkInvalidCharacter={true}
-      showDescription={showDescription}
-      onToggleDescription={(show) => {
-        setShowDescription(show);
-      }}
+      config={tableConfigs}
+      extraCols={extraTableCols}
     />
   );
 }

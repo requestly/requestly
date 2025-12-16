@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useEffect, useRef } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Form, Dropdown, Menu, MenuProps, FormInstance } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { KeyValuePair, ValueType } from "features/apiClient/types";
-import { getInferredType } from "features/apiClient/screens/apiClient/utils";
+import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
+import { capitalize } from "lodash";
 
-const ALL_VALUE_TYPES: ValueType[] = Object.values(ValueType);
+const ALL_VALUE_TYPES: KeyValueDataType[] = Object.values(KeyValueDataType);
 
 interface KeyValueTypeCellProps {
   record: KeyValuePair;
@@ -16,7 +16,7 @@ interface KeyValueTypeCellProps {
 const KeyValueTypeCell: React.FC<KeyValueTypeCellProps> = ({ record, dataIndex, form, onSave }) => {
   const handleMenuClick: MenuProps["onClick"] = useCallback(
     ({ key }) => {
-      const selectedValueType = key as ValueType;
+      const selectedValueType = key as KeyValueDataType;
       form.setFieldsValue({ [dataIndex]: selectedValueType });
       onSave();
     },
@@ -27,34 +27,20 @@ const KeyValueTypeCell: React.FC<KeyValueTypeCellProps> = ({ record, dataIndex, 
     () =>
       ALL_VALUE_TYPES.map((type) => ({
         key: type,
-        label: type,
+        label: capitalize(type),
         className: "key-value-type-dropdown-item",
       })),
     []
   );
 
   const menu = <Menu items={menuItems} onClick={handleMenuClick} />;
-
-  const displayType = useMemo(() => {
-    const explicitType = record?.[dataIndex] as ValueType | undefined;
-    return explicitType || getInferredType(record.value);
-  }, [record, dataIndex]);
-
-  const initializedRef = useRef<Set<number>>(new Set());
-  useEffect(() => {
-    const currentSavedType = record?.[dataIndex];
-    if (!currentSavedType && !initializedRef.current.has(record.id)) {
-      form.setFieldsValue({ [dataIndex]: displayType });
-      onSave();
-      initializedRef.current.add(record.id);
-    }
-  }, [record, dataIndex, displayType, form, onSave]);
+  const rawValue = record?.[dataIndex] ?? KeyValueDataType.STRING;
 
   return (
-    <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={displayType} validateTrigger={[]}>
+    <Form.Item style={{ margin: 0 }} name={dataIndex} initialValue={rawValue} validateTrigger={[]}>
       <Dropdown overlay={menu} trigger={["click"]} placement="bottomLeft">
         <div className="key-value-type-view">
-          <span className="key-value-type-text">{displayType}</span>
+          <span className="key-value-type-text">{capitalize(String(rawValue))}</span>
           <DownOutlined className="key-value-type-arrow" />
         </div>
       </Dropdown>
