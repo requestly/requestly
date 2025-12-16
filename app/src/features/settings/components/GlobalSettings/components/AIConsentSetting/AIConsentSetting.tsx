@@ -15,7 +15,7 @@ export const AIConsentSetting = () => {
 
   const [isAIConsentModalOpen, setIsAIConsentModalOpen] = useState(false);
 
-  const isAISupportedGlobally = useFeatureIsOn("global_ai_support");
+  const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
 
   const handleDisableAIFeatures = async () => {
     const result = await toggleAIFeatures(user.details?.profile?.uid, false);
@@ -29,7 +29,7 @@ export const AIConsentSetting = () => {
   return (
     <>
       <SettingsItem
-        disabled={!isAISupportedGlobally}
+        disabled={!isAIEnabledGlobally}
         title="AI features"
         caption={
           <>
@@ -46,7 +46,7 @@ export const AIConsentSetting = () => {
           } else handleDisableAIFeatures();
         }}
         toolTipTitle={
-          !isAISupportedGlobally ? (
+          !isAIEnabledGlobally ? (
             <>
               AI features are disabled for your organization, <a>Contact support</a>.
             </>

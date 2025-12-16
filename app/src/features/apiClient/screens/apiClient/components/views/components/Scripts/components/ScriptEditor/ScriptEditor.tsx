@@ -72,7 +72,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     : RQAPI.ScriptType.PRE_REQUEST;
 
   const isAITestsGenerationEnabled = useFeatureIsOn("ai_tests_generation");
-  const isAISupportedGlobally = useFeatureIsOn("global_ai_support");
+  const isAIEnabledGlobally = useFeatureIsOn("global_ai_support");
 
   const [scriptType, setScriptType] = useState<RQAPI.ScriptType>(activeScriptType);
   const [isLibraryPickerOpen, setIsLibraryPickerOpen] = useState(false);
@@ -238,7 +238,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
             <Tooltip
               showArrow={false}
               title={
-                !isAISupportedGlobally ? (
+                !isAIEnabledGlobally ? (
                   <>
                     AI features are disabled for your organization, <a>Contact support</a>.
                   </>
@@ -260,7 +260,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
                     isPopoverOpenRef.current = open;
                   }}
                   onGenerateClick={handleGenerateTests}
-                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAISupportedGlobally}
+                  disabled={scriptType !== RQAPI.ScriptType.POST_RESPONSE || !entry?.response || !isAIEnabledGlobally}
                   onCancelClick={stop}
                   negativeFeedback={negativeFeedback}
                   label={hasPostResponseScript ? "Update with AI" : "Generate tests"}
