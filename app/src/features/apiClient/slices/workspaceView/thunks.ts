@@ -144,6 +144,7 @@ export const switchContext = createAsyncThunk(
   }
 );
 
+// TODO: check how it behaves with redux hydration
 export const setupWorkspaceView = createAsyncThunk(
   `${SLICE_NAME}/setupWorkspaceView`,
   async (params: { userId?: string }, { dispatch, getState }) => {
