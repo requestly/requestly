@@ -215,7 +215,7 @@ export const PricingFeatures: PlanFeatures = {
         },
       ],
     },
-    api_client_professional: {
+    [PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL]: {
       planTitle: "Professional",
       heading: "For collaboration in teams",
       features: [
