@@ -30,14 +30,13 @@ export function FormBody(props: { recordId: string; setRequestEntry: RequestBody
     [setRequestEntry, setFormBody, requestBodyStateManager]
   );
 
+  const extraTableCols = {
+    description: {
+      visible: false,
+    },
+    dataType: { visible: false },
+  };
   return (
-    <KeyValueTable
-      data={formBody}
-      variables={scopedVariables}
-      onChange={handleFormChange}
-      showDescription={false}
-      showType={false}
-      showSettings={false}
-    />
+    <KeyValueTable data={formBody} variables={scopedVariables} onChange={handleFormChange} extraCols={extraTableCols} />
   );
 }

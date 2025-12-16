@@ -5,7 +5,7 @@ import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { RQButton } from "lib/design-system-v2/components";
 import { KeyValueTableEditableRow, KeyValueTableEditableCell } from "./KeyValueTableRow";
 import { KeyValueTableSettingsDropdown } from "./KeyValueTableSettingsDropdown";
-import { KeyValuePair, ValueType } from "features/apiClient/types";
+import { KeyValuePair, KeyValueDataType } from "features/apiClient/types";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import "./keyValueTable.scss";
 import { ScopedVariables } from "features/apiClient/helpers/variableResolver/variable-resolver";
@@ -19,23 +19,30 @@ interface KeyValueTableProps {
   data: KeyValuePair[];
   onChange: (updatedPairs: KeyValuePair[]) => void;
   variables: ScopedVariables;
-  checkInvalidCharacter?: boolean;
-  showDescription?: boolean;
-  showType?: boolean;
-  showSettings?: boolean;
-  onToggleDescription?: (show: boolean) => void;
+  extraCols?: {
+    description?: {
+      visible: boolean;
+      onToggle?: (show: boolean) => void;
+    };
+    dataType?: {
+      visible: boolean;
+    };
+  };
+  config?: {
+    checkInvalidCharacter?: boolean;
+    showSettings?: boolean;
+  };
 }
 
-export const KeyValueTable: React.FC<KeyValueTableProps> = ({
-  data,
-  variables,
-  onChange,
-  checkInvalidCharacter = false,
-  showDescription = true,
-  showType = true,
-  showSettings = true,
-  onToggleDescription = () => {},
-}) => {
+export const KeyValueTable: React.FC<KeyValueTableProps> = ({ data, variables, onChange, extraCols, config }) => {
+  const { checkInvalidCharacter = false } = config || {};
+
+  const descriptionConfig = {
+    visible: extraCols?.description?.visible ?? true,
+    onToggle: extraCols?.description?.onToggle ?? (() => {}),
+  };
+  const dataTypeConfig = extraCols?.dataType || { visible: true };
+
   const createEmptyPair = useCallback(
     () => ({
       id: Date.now(),
@@ -43,7 +50,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       value: "",
       isEnabled: true,
       description: "",
-      dataType: ValueType.STRING,
+      dataType: KeyValueDataType.STRING,
     }),
     []
   );
@@ -154,7 +161,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
           error: validateValue(record.value, record.dataType),
         }),
       },
-      showType && isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY)
+      dataTypeConfig.visible && isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY)
         ? {
             title: "Type",
             dataIndex: "dataType",
@@ -170,7 +177,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
             }),
           }
         : null,
-      showDescription && isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY)
+      descriptionConfig.visible && isFeatureCompatible(FEATURES.API_CLIENT_DESCRIPTION_COMPATIBILITY)
         ? {
             title: "Description",
             dataIndex: "description",
@@ -190,11 +197,11 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
         width: "50px",
         fixed: "right",
         title: () =>
-          showSettings &&
+          dataTypeConfig.visible &&
           isFeatureCompatible(FEATURES.API_CLIENT_TYPE_COMPATIBILITY) && (
             <KeyValueTableSettingsDropdown
-              showDescription={showDescription}
-              onToggleDescription={onToggleDescription}
+              showDescription={descriptionConfig.visible}
+              onToggleDescription={descriptionConfig.onToggle}
             />
           ),
         render: (_: any, record: KeyValuePair) => {
@@ -220,10 +227,9 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
     checkInvalidCharacter,
     data,
     handleDeletePair,
-    showDescription,
-    onToggleDescription,
-    showSettings,
-    showType,
+    descriptionConfig.visible,
+    descriptionConfig.onToggle,
+    dataTypeConfig.visible,
   ]);
 
   return (
@@ -231,7 +237,7 @@ export const KeyValueTable: React.FC<KeyValueTableProps> = ({
       id="api-key-value-table"
       className="api-key-value-table"
       bordered
-      showHeader={true}
+      showHeader={dataTypeConfig.visible}
       rowKey="id"
       columns={columns as ColumnTypes}
       data={memoizedData}

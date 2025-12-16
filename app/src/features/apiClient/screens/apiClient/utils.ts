@@ -7,7 +7,7 @@ import {
   RQAPI,
   RequestContentType,
   RequestMethod,
-  ValueType,
+  KeyValueDataType,
 } from "../../types";
 import { CONSTANTS } from "@requestly/requestly-core";
 import {
@@ -1121,38 +1121,50 @@ export const parseCollectionRunnerDataFile = async (filePath: string, maxlimit?:
   }
 };
 
-export function validateValue(value: string, type: ValueType | undefined): string | null {
+export function validateValue(value: string, type: KeyValueDataType | undefined): string | null {
   if (!value || value.includes("{{")) return null;
+
   switch (type) {
-    case ValueType.INTEGER:
-      return /^-?\d+$/.test(value) ? null : "Value must be an Integer";
-    case ValueType.FLOAT:
-      return /^-?\d+(\.\d+)?$/.test(value) ? null : "Value must be a Number";
-    case ValueType.BOOLEAN:
-      return ["true", "false"].includes(value.toLowerCase()) ? null : "Value must be 'True' or 'False'";
+    case KeyValueDataType.INTEGER: {
+      const num = Number(value);
+      const isValidInt = !Number.isNaN(num) && Number.isInteger(num);
+      return isValidInt ? null : "Value must be an Integer";
+    }
+
+    case KeyValueDataType.NUMBER: {
+      const num = Number(value);
+      return !Number.isNaN(num) ? null : "Value must be a Number";
+    }
+
+    case KeyValueDataType.BOOLEAN: {
+      const lower = value.toLowerCase();
+      return lower === "true" || lower === "false" ? null : "Value must be 'True' or 'False'";
+    }
+
     default:
       return null;
   }
 }
 
-export function getInferredType(value: any): ValueType {
+export function getInferredType(value: any): KeyValueDataType {
   if (value === null || value === undefined) {
-    return ValueType.STRING;
+    return KeyValueDataType.STRING;
   }
 
   const strValue = String(value).trim();
+  const lowerValue = strValue.toLowerCase();
 
-  if (/^(true|false)$/i.test(strValue)) {
-    return ValueType.BOOLEAN;
+  if (lowerValue === "true" || lowerValue === "false") {
+    return KeyValueDataType.BOOLEAN;
   }
 
-  if (/^-?\d+$/.test(strValue)) {
-    return ValueType.INTEGER;
+  const num = Number(strValue);
+  if (!Number.isNaN(num)) {
+    if (Number.isInteger(num) && !strValue.includes(".")) {
+      return KeyValueDataType.INTEGER;
+    }
+    return KeyValueDataType.NUMBER;
   }
 
-  if (/^-?\d+(\.\d+)?$/.test(strValue)) {
-    return ValueType.FLOAT;
-  }
-
-  return ValueType.STRING;
+  return KeyValueDataType.STRING;
 }
