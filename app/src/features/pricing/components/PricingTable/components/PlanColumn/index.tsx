@@ -12,15 +12,16 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { PlanQuantitySelector } from "../PlanQuantitySelector/PlanQuantitySelector";
 import { shouldShowNewCheckoutFlow } from "features/pricing/utils";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useIsBrowserStackIntegrationOn } from "hooks/useIsBrowserStackIntegrationOn";
+import { useDebounce } from "hooks/useDebounce";
 
 interface PlanColumnProps {
   planName: string;
   planDetails: any;
   planPrice: number;
   duration: string;
-  product?: string;
+  product: string;
   source: string;
   isOpenedFromModal: boolean;
 }
@@ -133,18 +134,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
   };
 
-  function debounce(func: Function, delay: number) {
-    let timer: NodeJS.Timeout;
-    return function debouncedFunction(...args: any[]) {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  }
-
   const sendNotification = useCallback(
-    debounce((value: number) => {
+    (value: number) => {
       if (user.loggedIn) {
         const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
         try {
@@ -155,9 +146,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           console.error(error);
         }
       }
-    }, 4000),
-    [planName, source, user.loggedIn]
+    },
+    [EVENTS.PRICING_QUANTITY_CHANGED, planName, source, user.loggedIn]
   );
+
+  const debouncedSendNotification = useDebounce(sendNotification, 4000);
 
   const handleQuantityChange = useCallback(
     (value: number, skipNotification: boolean = false) => {
@@ -179,10 +172,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         hasFiddledWithQuantity.current = true;
       }
       if (!skipNotification) {
-        sendNotification(value);
+        debouncedSendNotification(value);
       }
     },
-    [sendNotification, planName, source, user.loggedIn]
+    [debouncedSendNotification, planName, source, user.loggedIn]
   );
 
   const cardSubtitle = <>{planCardSubtitle ? <Typography.Text>{planCardSubtitle}</Typography.Text> : null}</>;
@@ -267,7 +260,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                   planName === PRICING.PLAN_NAMES.API_CLIENT_PROFESSIONAL)) && (
                 <PlanQuantitySelector
                   columnPlanName={planName}
-                  currentPlanName={user.details?.planDetails?.planName}
+                  currentPlanName={user.details?.planDetails?.planName ?? ""}
                   currentSeats={currentSeats}
                   isNewCheckoutFlowEnabled={isNewCheckoutFlowEnabled}
                   quantity={quantity}

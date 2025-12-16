@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from "react";
+import React, { RefObject } from "react";
 import { Row } from "antd";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
