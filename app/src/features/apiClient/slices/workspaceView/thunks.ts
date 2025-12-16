@@ -10,6 +10,7 @@ import { ReducerKeys } from "store/constants";
 import { reduxStore } from "store";
 import { Err, Ok, Result } from "utils/try";
 import { getSelectedWorkspaceCount, getViewMode, workspaceViewActions } from "./slice";
+import { dummyPersonalWorkspace } from "store/slices/workspaces/selectors";
 
 const SLICE_NAME = ReducerKeys.WORKSPACE_VIEW;
 
@@ -150,17 +151,16 @@ export const switchContext = createAsyncThunk(
   }
 );
 
-// TODO:
-// export const loadWorkspaces = createAsyncThunk<
-//   PromiseSettledResult<string | null>[],
-//   { userId?: string },
-//   { state: RootState }
-// >(`${SLICE_NAME}/loadWorkspaces`, async (payload, { dispatch, getState }) => {
-//   const { userId } = payload;
-// });
+export const setupWorkspaces = createAsyncThunk(
+  `${SLICE_NAME}/setupWorkspaces`,
+  async (params: { workspaces?: Workspace[]; userId?: string }, { dispatch, getState, signal }) => {
+    const { workspaces = [], userId } = params;
 
-// function WorkspaceProvider(props: { workspaceId: string; children: React.ReactNode }) {
-//   const context = createContext();
+    const viewMode = getViewMode(getState() as RootState);
+    if (viewMode === ApiClientViewMode.SINGLE) {
+      return dispatch(switchContext({ workspace: dummyPersonalWorkspace, userId })).unwrap();
+    }
 
-//   return <Provider>{props.children}</Provider>;
-// }
+    return dispatch(workspaceViewManager({ workspaces, userId, action: "add" })).unwrap();
+  }
+);
